@@ -54,12 +54,12 @@ export async function POST(request: Request) {
     const existingByEmail = new Map(
       existingContacts
         .filter((contact) => contact.email)
-        .map((contact) => [contact.email as string, contact.fullName]),
+        .map((contact) => [contact.email!, contact.fullName]),
     );
     const existingByPhone = new Map(
       existingContacts
         .filter((contact) => contact.phone)
-        .map((contact) => [contact.phone as string, contact.fullName]),
+        .map((contact) => [contact.phone!, contact.fullName]),
     );
 
     const duplicateWarnings = preview.contacts.flatMap((contact) => {
@@ -100,7 +100,7 @@ export async function POST(request: Request) {
         format: "CSV_GENERIC",
         status: "PENDING",
         sourceProfile: parsedBody.data.profile,
-        sourceFileName: parsedBody.data.sourceFileName?.trim() || "pasted-import.csv",
+        sourceFileName: parsedBody.data.sourceFileName?.trim() ?? "pasted-import.csv",
         sourceFileSizeBytes: parsedBody.data.sourceFileSizeBytes,
         rowCount: preview.totalRows,
         previewContactCount: preview.contacts.length,

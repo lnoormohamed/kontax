@@ -31,7 +31,7 @@ export async function POST(request: Request) {
     );
   }
 
-  const sourceFileName = parsedBody.data.sourceFileName?.trim() || "pasted-import.csv";
+  const sourceFileName = parsedBody.data.sourceFileName?.trim() ?? "pasted-import.csv";
   const existingJob = parsedBody.data.jobId
     ? await db.importJob.findFirst({
         where: {

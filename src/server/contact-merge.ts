@@ -220,10 +220,10 @@ const pickFieldValue = ({
   choice: MergeFieldChoice;
 }) => {
   if (choice === "secondary") {
-    return secondaryValue?.trim() || primaryValue?.trim() || null;
+    return secondaryValue?.trim() ?? primaryValue?.trim() ?? null;
   }
 
-  return primaryValue?.trim() || secondaryValue?.trim() || null;
+  return primaryValue?.trim() ?? secondaryValue?.trim() ?? null;
 };
 
 const getEdgeCaseWarnings = (left: MergeableContact, right: MergeableContact) => {
