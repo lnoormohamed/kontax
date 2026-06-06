@@ -22,7 +22,8 @@ export function ContactManager() {
     notes: "",
   });
 
-  const [list] = api.contact.list.useSuspenseQuery(
+  const { data: list = [], isLoading, isError } =
+    api.contact.list.useQuery(
     useMemo(() => ({ search: query.trim() || undefined }), [query]),
   );
   const utils = api.useUtils();
@@ -48,6 +49,12 @@ export function ContactManager() {
 
   return (
     <section className="grid gap-6">
+      {isError ? (
+        <p className="text-red-200">
+          Could not load contacts from the server. Please check your database
+          connection.
+        </p>
+      ) : null}
       <form
         className="grid gap-3 rounded-xl border border-white/20 bg-white/10 p-5"
         onSubmit={(event) => {
@@ -119,7 +126,11 @@ export function ContactManager() {
         />
 
         <ul className="grid gap-3">
-          {list.length === 0 ? (
+          {isLoading ? (
+            <li className="rounded-md border border-dashed border-white/30 p-4 text-white/80">
+              Loading contacts...
+            </li>
+          ) : list.length === 0 ? (
             <li className="rounded-md border border-dashed border-white/30 p-4 text-white/80">
               No contacts yet.
             </li>
