@@ -1,5 +1,5 @@
 {
-  "name": "Kontax",
+  "name": "kontax",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -21,25 +21,18 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
+    "@auth/prisma-adapter": "^2.7.2",
     "@prisma/client": "^6.6.0",
     "@t3-oss/env-nextjs": "^0.12.0",
-    "@tanstack/react-query": "^5.69.0",
-    "@trpc/client": "^11.0.0",
-    "@trpc/react-query": "^11.0.0",
-    "@trpc/server": "^11.0.0",
-    "bcryptjs": "^3.0.3",
     "next": "^15.2.3",
-    "next-auth": "^4.24.14",
+    "next-auth": "5.0.0-beta.25",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "server-only": "^0.0.1",
-    "superjson": "^2.2.1",
     "zod": "^3.24.2"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.1",
     "@tailwindcss/postcss": "^4.0.15",
-    "@types/bcryptjs": "^2.4.6",
     "@types/node": "^20.14.10",
     "@types/react": "^19.0.0",
     "@types/react-dom": "^19.0.0",

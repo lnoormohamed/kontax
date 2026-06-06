@@ -3,12 +3,9 @@ import "~/styles/globals.css";
 import { type Metadata } from "next";
 import { Geist } from "next/font/google";
 
-import { NextAuthSessionProvider } from "~/app/_components/session-provider";
-import { TRPCReactProvider } from "~/trpc/react";
-
 export const metadata: Metadata = {
   title: "Kontax",
-  description: "A contact app for hosting and saving your contacts.",
+  description: "Kontax is a consumer-friendly contact app built on the T3 stack.",
   icons: [{ rel: "icon", url: "/favicon.ico" }],
 };
 
@@ -22,11 +19,7 @@ export default function RootLayout({
 }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${geist.variable}`}>
-      <body>
-        <NextAuthSessionProvider>
-          <TRPCReactProvider>{children}</TRPCReactProvider>
-        </NextAuthSessionProvider>
-      </body>
+      <body>{children}</body>
     </html>
   );
 }
