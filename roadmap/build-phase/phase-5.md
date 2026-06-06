@@ -16,15 +16,15 @@ Prepare Kontax for reliable iPhone and Android contact sync via CardDAV by defin
 ## Phase Tracker
 | Ticket | Status | Priority | Depends On |
 | --- | --- | --- | --- |
-| P5-01 | In Progress | P0 | P1-02, P3-01 |
-| P5-02 | In Progress | P0 | P5-01 |
+| P5-01 | Done | P0 | P1-02, P3-01 |
+| P5-02 | Done | P0 | P5-01 |
 | P5-03 | Done | P1 | P5-01, P1-04 |
 | P5-04 | Done | P1 | P5-02, P4-05 |
 | P5-05 | Done | P2 | P5-02 |
 | P5-06 | Done | P2 | P5-03, P5-04 |
 
 ## P5-01 — Define sync data model for CardDAV readiness
-- Status: `In Progress`
+- Status: `Done`
 - Priority: `P0`
 - Dependencies: `P1-02`, `P3-01`
 - Implementation Notes:
@@ -36,6 +36,7 @@ Prepare Kontax for reliable iPhone and Android contact sync via CardDAV by defin
   - `SyncContactLink` preserves the mapping between canonical contacts and remote protocol records through `remoteHref`, `remoteUid`, `remoteETag`, tombstone timestamps, and per-link error fields.
   - `SyncAccount` stores account ownership, CardDAV endpoint metadata, remote collection versioning (`remoteCTag`), sync direction, status, cursor, and sync health timestamps without forcing credential storage details into this phase.
   - `SyncJob` now records queue/run outcomes, counts, cursors, and partial-failure state so later orchestration and support tooling can build on a stable history model.
+  - The sync center now exposes this model in-product through a dedicated `P5-01` data-model panel that explains `SyncAccount`, `SyncContactLink`, `SyncJob`, and local contact sync identity in the same place users manage sync accounts.
 - Acceptance Criteria:
   - Sync entities and relationships are documented.
   - Model supports future bidirectional sync without schema rework.
@@ -43,7 +44,7 @@ Prepare Kontax for reliable iPhone and Android contact sync via CardDAV by defin
   - CardDAV clients vary widely in field support and conflict behavior.
 
 ## P5-02 — Define sync scope and direction strategy
-- Status: `In Progress`
+- Status: `Done`
 - Priority: `P0`
 - Dependencies: `P5-01`
 - Implementation Notes:
@@ -55,6 +56,7 @@ Prepare Kontax for reliable iPhone and Android contact sync via CardDAV by defin
   - Local Kontax records remain the canonical product surface for merge, archive, billing, and audit workflows, but sync conflict handling should not silently overwrite remote changes. When both sides changed since the last successful sync cursor, the later sync phases should record a conflict and require deterministic resolution rather than pretending one side is always globally authoritative.
   - The practical v1 rollout strategy is: start with import-only bootstrap when connection quality or client behavior is uncertain, then enable two-way sync per account once account health and conflict behavior are understood well enough.
   - Filtered or tag-scoped sync is intentionally deferred. The first supported sync scope is the primary active address book for the signed-in consumer account, which keeps support expectations understandable before advanced selection rules exist.
+  - The sync center now states this scope directly in-product through a dedicated `P5-02` strategy panel plus form-level guidance on how sync direction and account coverage behave in the first shipping model.
 - Acceptance Criteria:
   - Sync direction and fallback strategy are explicit.
   - Product tradeoffs are documented, not implied.

@@ -156,6 +156,38 @@ const rolloutStages = [
   "Stage 3: broader beta only after conflict handling, credential rotation, and recovery tooling stay stable under load.",
 ] as const;
 
+const syncTopologyItems = [
+  {
+    title: "SyncAccount",
+    body:
+      "Owns the remote CardDAV connection, collection URLs, direction, lifecycle state, remote collection tag, cursors, and encrypted credential references.",
+  },
+  {
+    title: "SyncContactLink",
+    body:
+      "Maps a canonical Kontax contact to a remote CardDAV record using remote href, remote UID, ETag, tombstones, and per-link error state.",
+  },
+  {
+    title: "SyncJob",
+    body:
+      "Tracks queueing, retries, cursors, worker leases, result counts, and partial or failed execution so support can inspect real sync history.",
+  },
+  {
+    title: "Local contact identity",
+    body:
+      "Each contact keeps a stable sync UID plus sync version and tombstone timestamps so device-facing identity does not depend on ad hoc edits.",
+  },
+] as const;
+
+const syncScopeItems = [
+  "Roadmap target: two-way CardDAV sync.",
+  "Fallback path: import-only bootstrap for risky providers, weak client behavior, or recovery mode.",
+  "Initial scope: one Kontax sync account to one remote address book.",
+  "Default coverage: all active contacts in that account.",
+  "Archived contacts stay local-only in the first sync model.",
+  "Filtered or tag-scoped sync is intentionally deferred.",
+] as const;
+
 export default async function SyncPage({ searchParams }: SyncPageProps) {
   const session = await auth();
 
@@ -348,6 +380,48 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
           </div>
         ) : null}
 
+        <section className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+          <div className="rounded-[2rem] border border-white/10 bg-[#08101c]/88 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.35)]">
+            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P5-01 data model</p>
+            <h2 className="mt-3 text-2xl font-semibold text-white">
+              CardDAV-ready sync structure is now a first-class product surface
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm text-slate-400">
+              The schema foundation is already in place, and the sync center now makes the moving
+              pieces explicit so later execution logic does not have to invent its own model.
+            </p>
+            <div className="mt-5 grid gap-4 lg:grid-cols-2">
+              {syncTopologyItems.map((item) => (
+                <div
+                  className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4"
+                  key={item.title}
+                >
+                  <p className="text-sm font-semibold text-white">{item.title}</p>
+                  <p className="mt-2 text-sm text-slate-400">{item.body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.25)]">
+            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P5-02 scope and direction</p>
+            <h2 className="mt-3 text-2xl font-semibold text-white">
+              Two-way target, bootstrap fallback, and clear v1 boundaries
+            </h2>
+            <p className="mt-3 text-sm text-slate-400">
+              Sync is treated as a product decision, not just a transport toggle. The first-wave
+              scope stays intentionally narrow so support expectations remain understandable.
+            </p>
+            <div className="mt-5 rounded-[1.5rem] border border-white/10 bg-[#08101c] p-4 text-sm text-slate-300">
+              <div className="grid gap-2">
+                {syncScopeItems.map((item) => (
+                  <p key={item}>{item}</p>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
           <div className="rounded-[2rem] border border-white/10 bg-[#08101c]/88 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.35)]">
             <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P5-04 conflict policy</p>
@@ -513,6 +587,17 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                       </option>
                     </select>
                   </label>
+
+                  <div className="rounded-2xl border border-white/10 bg-[#08101c] p-4 text-sm text-slate-300">
+                    <p>
+                      Scope model: one sync account maps to one remote address book and covers all
+                      active Kontax contacts by default.
+                    </p>
+                    <p className="mt-1 text-slate-500">
+                      Two-way sync is the roadmap target. Import-only remains the safer fallback
+                      when provider behavior, client behavior, or recovery state calls for it.
+                    </p>
+                  </div>
 
                   <div className="rounded-2xl border border-white/10 bg-[#08101c] p-4 text-sm text-slate-300">
                     <p>
