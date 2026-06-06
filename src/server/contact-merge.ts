@@ -1,3 +1,4 @@
+import { Prisma } from "../../generated/prisma";
 import { db } from "~/server/db";
 
 type MergeCandidateContact = {
@@ -223,6 +224,10 @@ const parsePostalAddressArray = (value: unknown) =>
         return [{ label, formatted }];
       })
     : [];
+
+const toNullableJsonField = (
+  value: string[] | Array<{ label: string; formatted: string }> | null | undefined,
+) => (value == null ? Prisma.DbNull : value);
 
 const mergeUniqueStrings = (...groups: Array<Array<string | null | undefined>>) => {
   const seen = new Set<string>();
@@ -1097,7 +1102,19 @@ export const mergeContactsForUser = async ({
         id: primaryContact.id,
       },
       data: {
-        ...preview.mergedContact,
+        fullName: preview.mergedContact.fullName,
+        email: preview.mergedContact.email,
+        emailAddresses: toNullableJsonField(preview.mergedContact.emailAddresses),
+        phone: preview.mergedContact.phone,
+        phoneNumbers: toNullableJsonField(preview.mergedContact.phoneNumbers),
+        company: preview.mergedContact.company,
+        nickname: preview.mergedContact.nickname,
+        jobTitle: preview.mergedContact.jobTitle,
+        website: preview.mergedContact.website,
+        birthday: preview.mergedContact.birthday,
+        address: preview.mergedContact.address,
+        postalAddresses: toNullableJsonField(preview.mergedContact.postalAddresses),
+        notes: preview.mergedContact.notes,
         syncVersion: {
           increment: 1,
         },
@@ -1257,15 +1274,15 @@ export const undoMergedContactsForUser = async ({
         fullName: details.primaryBefore.fullName,
         nickname: details.primaryBefore.nickname,
         email: details.primaryBefore.email,
-        emailAddresses: details.primaryBefore.emailAddresses,
+        emailAddresses: toNullableJsonField(details.primaryBefore.emailAddresses),
         phone: details.primaryBefore.phone,
-        phoneNumbers: details.primaryBefore.phoneNumbers,
+        phoneNumbers: toNullableJsonField(details.primaryBefore.phoneNumbers),
         company: details.primaryBefore.company,
         jobTitle: details.primaryBefore.jobTitle,
         website: details.primaryBefore.website,
         birthday: details.primaryBefore.birthday,
         address: details.primaryBefore.address,
-        postalAddresses: details.primaryBefore.postalAddresses,
+        postalAddresses: toNullableJsonField(details.primaryBefore.postalAddresses),
         notes: details.primaryBefore.notes,
         archivedAt: details.primaryBefore.archivedAt
           ? new Date(details.primaryBefore.archivedAt)
@@ -1288,15 +1305,15 @@ export const undoMergedContactsForUser = async ({
         fullName: details.secondaryBefore.fullName,
         nickname: details.secondaryBefore.nickname,
         email: details.secondaryBefore.email,
-        emailAddresses: details.secondaryBefore.emailAddresses,
+        emailAddresses: toNullableJsonField(details.secondaryBefore.emailAddresses),
         phone: details.secondaryBefore.phone,
-        phoneNumbers: details.secondaryBefore.phoneNumbers,
+        phoneNumbers: toNullableJsonField(details.secondaryBefore.phoneNumbers),
         company: details.secondaryBefore.company,
         jobTitle: details.secondaryBefore.jobTitle,
         website: details.secondaryBefore.website,
         birthday: details.secondaryBefore.birthday,
         address: details.secondaryBefore.address,
-        postalAddresses: details.secondaryBefore.postalAddresses,
+        postalAddresses: toNullableJsonField(details.secondaryBefore.postalAddresses),
         notes: details.secondaryBefore.notes,
         archivedAt: details.secondaryBefore.archivedAt
           ? new Date(details.secondaryBefore.archivedAt)
