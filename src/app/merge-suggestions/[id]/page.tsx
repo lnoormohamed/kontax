@@ -117,6 +117,20 @@ export default async function MergeSuggestionReviewPage({
           </div>
 
           <aside className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
+            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P4-01 and P4-02</p>
+            <div className="mt-4 grid gap-3 text-sm text-slate-300">
+              <p>
+                Duplicate heuristics stay user-scoped and review-first. Exact email and phone
+                matches can score highly, but Kontax still leaves the final decision to you.
+              </p>
+              <p>
+                Suggestion lifecycle is now persistent: open, dismissed, merged, and stale states
+                remain traceable instead of being recreated as one-off scans.
+              </p>
+            </div>
+          </aside>
+
+          <aside className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
             <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Not a match?</p>
             <p className="mt-4 text-sm text-slate-300">
               Dismiss this suggestion to remove it from the open queue while preserving the review

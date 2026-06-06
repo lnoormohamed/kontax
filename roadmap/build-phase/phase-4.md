@@ -16,15 +16,15 @@ Make duplicate handling trustworthy by defining how Kontax finds likely duplicat
 ## Phase Tracker
 | Ticket | Status | Priority | Depends On |
 | --- | --- | --- | --- |
-| P4-01 | In Progress | P0 | P3-02, P3-05 |
-| P4-02 | In Progress | P0 | P4-01 |
-| P4-03 | In Progress | P1 | P4-02 |
-| P4-04 | In Progress | P1 | P4-03 |
-| P4-05 | In Progress | P1 | P4-03, P1-04 |
-| P4-06 | In Progress | P2 | P4-01, P4-04 |
+| P4-01 | Done | P0 | P3-02, P3-05 |
+| P4-02 | Done | P0 | P4-01 |
+| P4-03 | Done | P1 | P4-02 |
+| P4-04 | Done | P1 | P4-03 |
+| P4-05 | Done | P1 | P4-03, P1-04 |
+| P4-06 | Done | P2 | P4-01, P4-04 |
 
 ## P4-01 — Define duplicate detection heuristics
-- Status: `In Progress`
+- Status: `Done`
 - Priority: `P0`
 - Dependencies: `P3-02`, `P3-05`
 - Implementation Notes:
@@ -35,6 +35,7 @@ Make duplicate handling trustworthy by defining how Kontax finds likely duplicat
   - Exact email and exact phone are treated as hard-match signals and surfaced as high-confidence suggestions.
   - Same-name and same-company matches stay below hard-match level so household/shared-number false positives remain review-first.
   - Current implementation is intentionally contact-pair based and capped for dashboard display, which gives Phase 4 a concrete heuristic foundation before persisted suggestion lifecycles arrive in `P4-02`.
+  - The suggestion review surface now explains that these heuristics remain user-scoped and review-first, even when the signal is strong.
 - Acceptance Criteria:
   - Matching signals and confidence tiers are documented.
   - False-positive risk areas are explicitly called out.
@@ -43,7 +44,7 @@ Make duplicate handling trustworthy by defining how Kontax finds likely duplicat
   - Name-only similarity remains intentionally excluded for now to avoid noisy consumer suggestions.
 
 ## P4-02 — Define merge suggestion lifecycle
-- Status: `In Progress`
+- Status: `Done`
 - Priority: `P0`
 - Dependencies: `P4-01`
 - Implementation Notes:
@@ -53,6 +54,7 @@ Make duplicate handling trustworthy by defining how Kontax finds likely duplicat
   - `MergeDecision` records are now created for dismiss actions so review history starts existing before full merge execution is implemented.
   - The current generation entry point is a user-triggered duplicate refresh scan over active contacts; future phases can add automatic generation after import, contact edits, and background rescoring without changing the data model.
   - Dismissed suggestions stay dismissed across refreshes, while open suggestions that no longer match are marked stale.
+  - The suggestion review surface now calls out the persisted lifecycle and dismissal behavior in-product.
 - Acceptance Criteria:
   - Suggestion lifecycle is fully documented.
   - Decision history is preserved and auditable.
@@ -60,7 +62,7 @@ Make duplicate handling trustworthy by defining how Kontax finds likely duplicat
   - Background rescoring may be expensive if not constrained.
 
 ## P4-03 — Define suggested and manual merge flows
-- Status: `In Progress`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P4-02`
 - Implementation Notes:
@@ -71,6 +73,7 @@ Make duplicate handling trustworthy by defining how Kontax finds likely duplicat
   - Manual pairwise merge is now available through a dedicated page and contact-detail entry point so users can merge records that were not surfaced by heuristics.
   - The current merge preview is deterministic: the chosen primary contact keeps its non-empty canonical fields first, the secondary contact fills blanks, secondary records are archived after merge, and notes are combined when both sides have content.
   - Conflicting secondary email, phone, and company values are called out in preview notes so users understand what this pre-`P4-04` merge path does not preserve yet.
+  - The manual merge page now summarizes these flow rules directly in-product so trigger points and review expectations are visible before a merge starts.
 - Acceptance Criteria:
   - Suggested merge and manual merge flows are documented end-to-end.
   - Trigger points and user actions are clear.
@@ -79,7 +82,7 @@ Make duplicate handling trustworthy by defining how Kontax finds likely duplicat
   - This phase still uses record-level rather than per-field interactive choice, so lossy secondary identifiers remain a known limitation until `P4-04`.
 
 ## P4-04 — Define advanced merge preview and field precedence
-- Status: `In Progress`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P4-03`
 - Implementation Notes:
@@ -90,6 +93,7 @@ Make duplicate handling trustworthy by defining how Kontax finds likely duplicat
   - Current protected default rules are explicit in the UI: manual values outrank imported values when both sides conflict, otherwise the chosen primary record keeps precedence unless the user overrides a field.
   - Notes now support an explicit combine mode, while other canonical fields remain single-value selections in this phase.
   - Future synced-contact precedence is documented as a follow-on gap rather than being implied by the current import-vs-manual rule set.
+  - The merge preview component now reiterates these field precedence and protected-default rules in-product alongside the per-field choice UI.
 - Acceptance Criteria:
   - Field resolution rules are deterministic.
   - Advanced merge preview has clear requirements for engineering and design.
@@ -98,7 +102,7 @@ Make duplicate handling trustworthy by defining how Kontax finds likely duplicat
   - Multiple secondary identifiers are still not preserved structurally in the schema yet, so this phase remains intentionally conservative.
 
 ## P4-05 — Define audit, undo, and reversibility rules
-- Status: `In Progress`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P4-03`, `P1-04`
 - Implementation Notes:
@@ -109,6 +113,7 @@ Make duplicate handling trustworthy by defining how Kontax finds likely duplicat
   - The contact detail page now exposes an immediate undo path after merge so the current Phase 4 safety model is visible to the user instead of being hidden in backend state.
   - Undo currently restores the primary record to its pre-merge values, restores the archived secondary record, reopens the merge suggestion, and records a `REVERSED` decision event for audit history.
   - Reversibility is currently decision-scoped rather than time-limited, and it depends on the stored merge snapshot being present on the accepted merge decision.
+  - The merge preview now makes the audit and reversible-snapshot posture explicit before confirmation, not only after the merge has already happened.
 - Acceptance Criteria:
   - Merge audit expectations are explicit.
   - Undo or non-undo behavior is clearly defined, not implied.
@@ -117,7 +122,7 @@ Make duplicate handling trustworthy by defining how Kontax finds likely duplicat
   - A stricter undo window may still be needed before CardDAV sync work begins.
 
 ## P4-06 — Cover edge-case merge scenarios
-- Status: `In Progress`
+- Status: `Done`
 - Priority: `P2`
 - Dependencies: `P4-01`, `P4-04`
 - Implementation Notes:
@@ -126,6 +131,7 @@ Make duplicate handling trustworthy by defining how Kontax finds likely duplicat
   - Merge suggestions and merge previews now surface explicit review-first warnings for shared family emails, assistant or front-desk style shared phone numbers, same-number-different-company collisions, nickname or transliteration-style name mismatches, and sparse imported records.
   - Risky exact matches are now guarded by confidence downgrades in suggestion generation so the dashboard stops presenting those cases as high-confidence duplicates.
   - The current system remains intentionally user-confirmed only. Even strong matches stay in a review flow, and edge-case scenarios are called out before the merge is submitted.
+  - The manual merge page now summarizes these edge-case guardrails in-product so high-risk scenarios are visible before users start a merge review.
 - Acceptance Criteria:
   - Edge-case behaviors are listed with expected treatment.
   - High-risk scenarios are explicitly guarded.

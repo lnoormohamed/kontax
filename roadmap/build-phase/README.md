@@ -44,12 +44,12 @@ This roadmap is the implementation source of truth for phases 1-5. Each phase fi
 | P3-04 | 3 | Done | P1 | P3-02, P3-03 | Unassigned | Import/export job model and history metadata defined |
 | P3-05 | 3 | Done | P1 | P3-02 | Unassigned | Validation, duplicate blocking, and conflict rules defined |
 | P3-06 | 3 | Done | P2 | P3-02, P3-03 | Unassigned | UX preview, rollback, and history model specified |
-| P4-01 | 4 | In Progress | P0 | P3-02, P3-05 | Unassigned | Duplicate heuristics and confidence tiers defined |
-| P4-02 | 4 | In Progress | P0 | P4-01 | Unassigned | Merge suggestion lifecycle, statuses, and decisions set |
-| P4-03 | 4 | In Progress | P1 | P4-02 | Unassigned | Suggested review and manual pairwise merge flows specified |
-| P4-04 | 4 | In Progress | P1 | P4-03 | Unassigned | Advanced merge preview and field protection rules defined |
-| P4-05 | 4 | In Progress | P1 | P4-03, P1-04 | Unassigned | Merge audit, undo, and reversibility rules documented |
-| P4-06 | 4 | In Progress | P2 | P4-01, P4-04 | Unassigned | Edge-case merge scenarios and review-first guards covered |
+| P4-01 | 4 | Done | P0 | P3-02, P3-05 | Unassigned | Duplicate heuristics and confidence tiers defined |
+| P4-02 | 4 | Done | P0 | P4-01 | Unassigned | Merge suggestion lifecycle, statuses, and decisions set |
+| P4-03 | 4 | Done | P1 | P4-02 | Unassigned | Suggested review and manual pairwise merge flows specified |
+| P4-04 | 4 | Done | P1 | P4-03 | Unassigned | Advanced merge preview and field protection rules defined |
+| P4-05 | 4 | Done | P1 | P4-03, P1-04 | Unassigned | Merge audit, undo, and reversibility rules documented |
+| P4-06 | 4 | Done | P2 | P4-01, P4-04 | Unassigned | Edge-case merge scenarios and review-first guards covered |
 | P5-01 | 5 | Done | P0 | P1-02, P3-01 | Unassigned | CardDAV-ready sync account, link, and job model defined |
 | P5-02 | 5 | Done | P0 | P5-01 | Unassigned | Sync scope, two-way target, and bootstrap fallback strategy locked |
 | P5-03 | 5 | Done | P1 | P5-01, P1-04 | Unassigned | Sync credential protection, rotation metadata, and job orchestration documented |

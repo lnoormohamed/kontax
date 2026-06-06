@@ -41,6 +41,10 @@ export function MergePreviewForm({
           Manual values win over imported values when both sides conflict. Otherwise the primary
           contact keeps priority until you override a field below.
         </p>
+        <p className="mt-2 text-slate-400">
+          Ticket `P4-04`: field choices are explicit for full name, email, phone, company, and
+          notes. Ticket `P4-05`: the final merge stores a reversible snapshot for undo.
+        </p>
       </div>
 
       {preview.edgeCaseWarnings.length > 0 ? (
@@ -154,6 +158,15 @@ export function MergePreviewForm({
           </div>
           <p className="mt-3 text-slate-400">
             Your field choices above will be applied when you confirm the merge.
+          </p>
+        </div>
+
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
+          <p className="font-semibold text-white">Secondary identifier and audit posture</p>
+          <p className="mt-2">
+            Additional emails, phones, and addresses are kept conservative in this phase, while the
+            accepted merge stores before/after snapshots and your field choices for later undo or
+            investigation.
           </p>
         </div>
 

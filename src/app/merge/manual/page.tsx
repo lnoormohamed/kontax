@@ -131,6 +131,38 @@ export default async function ManualMergePage({ searchParams }: ManualMergePageP
           ) : null}
         </section>
 
+        <section className="grid gap-6 xl:grid-cols-2">
+          <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
+            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P4-03 flow rules</p>
+            <div className="mt-4 grid gap-3 text-sm text-slate-300">
+              <p>Manual merge is available even when no automatic suggestion was created.</p>
+              <p>
+                The preview stays deterministic: you choose the surviving record, then review
+                field-by-field choices before anything is archived.
+              </p>
+              <p>
+                Kontax keeps these merges user-confirmed only, even for strong matches, so review
+                remains the trust boundary.
+              </p>
+            </div>
+          </div>
+
+          <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
+            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P4-06 edge cases</p>
+            <div className="mt-4 grid gap-3 text-sm text-slate-300">
+              <p>Shared family emails and assistant or front-desk numbers should stay review-first.</p>
+              <p>
+                Sparse imported records, nickname/transliteration mismatches, and same-number but
+                different-company cases should be merged cautiously even when other signals look
+                strong.
+              </p>
+              <p>
+                High-risk shapes are intentionally not auto-merged in this phase.
+              </p>
+            </div>
+          </div>
+        </section>
+
         {validPair && keepLeftPreview && keepRightPreview ? (
           <section className="grid gap-6 lg:grid-cols-2">
             <MergePreviewForm
