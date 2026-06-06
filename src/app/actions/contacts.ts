@@ -104,6 +104,7 @@ export const updateContact = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const contactId = parseContactId(formData);
   const input = parseContactInput(formData);
+  const redirectTo = getRedirectTarget(formData);
 
   await db.contact.updateMany({
     where: {
@@ -114,6 +115,10 @@ export const updateContact = async (formData: FormData) => {
   });
 
   revalidateContactViews(contactId);
+
+  if (redirectTo) {
+    redirect(redirectTo);
+  }
 };
 
 export const archiveContact = async (formData: FormData) => {

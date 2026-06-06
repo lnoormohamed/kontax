@@ -14,6 +14,7 @@ type ContactDetailPageProps = {
   params: Promise<{
     id: string;
   }>;
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
 const formatTimestamp = (value: Date) =>
@@ -23,7 +24,7 @@ const formatTimestamp = (value: Date) =>
     year: "numeric",
   }).format(value);
 
-export default async function ContactDetailPage({ params }: ContactDetailPageProps) {
+export default async function ContactDetailPage({ params, searchParams }: ContactDetailPageProps) {
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -31,6 +32,10 @@ export default async function ContactDetailPage({ params }: ContactDetailPagePro
   }
 
   const { id } = await params;
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const savedParam = resolvedSearchParams?.saved;
+  const saveState = Array.isArray(savedParam) ? savedParam[0] : savedParam;
+  const wasSaved = saveState === "1";
   const contact = await db.contact.findFirst({
     where: {
       id,
@@ -89,6 +94,12 @@ export default async function ContactDetailPage({ params }: ContactDetailPagePro
           </div>
         </div>
 
+        {wasSaved ? (
+          <div className="rounded-[1.75rem] border border-emerald-300/25 bg-emerald-300/10 p-4 text-sm text-emerald-100 shadow-[0_20px_60px_rgba(16,185,129,0.12)]">
+            Contact changes saved successfully.
+          </div>
+        ) : null}
+
         <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
           <div className="rounded-[2rem] border border-white/10 bg-[#08101c]/88 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.35)]">
             <div className="space-y-2">
@@ -98,6 +109,7 @@ export default async function ContactDetailPage({ params }: ContactDetailPagePro
 
             <form action={updateContact} className="mt-6 grid gap-4 lg:grid-cols-2">
               <input name="contactId" type="hidden" value={contact.id} />
+              <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}?saved=1`} />
 
               <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
                 <span>Full name</span>
