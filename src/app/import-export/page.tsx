@@ -1,17 +1,26 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import { importContactsCsv } from "~/app/actions/import-export";
+import { ImportPreviewForm } from "~/app/_components/import-preview-form";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
 import { db } from "~/server/db";
 
-export default async function ImportExportPage() {
+type ImportExportPageProps = {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
+
+export default async function ImportExportPage({ searchParams }: ImportExportPageProps) {
   const session = await auth();
 
   if (!session?.user?.id) {
     redirect("/login");
   }
+
+  const resolvedSearchParams = searchParams ? await searchParams : undefined;
+  const importedParam = resolvedSearchParams?.imported;
+  const importedValue = Array.isArray(importedParam) ? importedParam[0] : importedParam;
+  const importCompleted = importedValue === "1";
 
   const [planSummary, importJobs, exportJobs] = await Promise.all([
     getUserPlanSummary(session.user.id),
@@ -58,44 +67,15 @@ export default async function ImportExportPage() {
           </div>
         </div>
 
+        {importCompleted ? (
+          <div className="rounded-[1.75rem] border border-emerald-300/25 bg-emerald-300/10 p-4 text-sm text-emerald-100 shadow-[0_20px_60px_rgba(16,185,129,0.12)]">
+            Import completed successfully.
+          </div>
+        ) : null}
+
         <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
           <div className="grid gap-6">
-            <div className="rounded-[2rem] border border-white/10 bg-[#08101c]/88 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.35)]">
-              <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Import CSV</p>
-              <h2 className="mt-3 text-2xl font-semibold text-white">Bring contacts into Kontax</h2>
-              <p className="mt-3 text-sm text-slate-400">
-                Supported now: generic CSV plus common name, email, phone, company, and notes headers.
-                Paste data or upload a CSV file. Rows without a usable name or identifier are skipped.
-              </p>
-
-              <form action={importContactsCsv} className="mt-6 grid gap-4">
-                <label className="grid gap-2 text-sm text-slate-200">
-                  <span>CSV file</span>
-                  <input
-                    accept=".csv,text/csv"
-                    className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white file:mr-4 file:rounded-full file:border-0 file:bg-cyan-300 file:px-4 file:py-2 file:font-semibold file:text-slate-950"
-                    name="csvFile"
-                    type="file"
-                  />
-                </label>
-
-                <label className="grid gap-2 text-sm text-slate-200">
-                  <span>Or paste CSV directly</span>
-                  <textarea
-                    className="min-h-56 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 font-mono text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
-                    name="csvText"
-                    placeholder={"Full Name,Email,Phone,Company,Notes\nAda Lovelace,ada@example.com,+44 20 7946 0958,Analytical Engines Ltd,First imported contact"}
-                  />
-                </label>
-
-                <button
-                  className="rounded-full bg-white px-5 py-3 font-semibold text-slate-950 transition hover:bg-cyan-100"
-                  type="submit"
-                >
-                  Import contacts
-                </button>
-              </form>
-            </div>
+            <ImportPreviewForm />
 
             <div className="rounded-[2rem] border border-white/10 bg-[#08101c]/88 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.35)]">
               <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Recent import jobs</p>

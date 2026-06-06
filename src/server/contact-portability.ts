@@ -6,24 +6,77 @@ export type PortableContactInput = {
   notes?: string | null;
 };
 
+export type CsvImportProfile = "GENERIC" | "GOOGLE" | "APPLE" | "OUTLOOK";
+
+export type ImportPreviewIssue = {
+  rowNumber: number;
+  severity: "error" | "warning";
+  message: string;
+};
+
+export type ImportPreviewContact = PortableContactInput & {
+  rowNumber: number;
+};
+
 type CsvParseResult = {
-  contacts: PortableContactInput[];
+  contacts: ImportPreviewContact[];
   totalRows: number;
   skippedCount: number;
-  errors: string[];
+  issues: ImportPreviewIssue[];
+  profile: CsvImportProfile;
 };
 
 const normalizeHeader = (value: string) => value.trim().toLowerCase();
 
-const HEADER_ALIASES = {
-  fullName: ["fullname", "full name", "name", "display name"],
-  firstName: ["first name", "firstname", "given name"],
-  lastName: ["last name", "lastname", "family name", "surname"],
-  email: ["email", "email address", "e-mail", "e-mail 1 - value"],
-  phone: ["phone", "mobile phone", "phone 1 - value", "primary phone"],
-  company: ["company", "organization", "organisation", "organization 1 - name"],
-  notes: ["notes", "memo", "description"],
-} as const;
+const HEADER_ALIASES: Record<
+  CsvImportProfile,
+  {
+    fullName: string[];
+    firstName: string[];
+    lastName: string[];
+    email: string[];
+    phone: string[];
+    company: string[];
+    notes: string[];
+  }
+> = {
+  GENERIC: {
+    fullName: ["fullname", "full name", "name", "display name"],
+    firstName: ["first name", "firstname", "given name"],
+    lastName: ["last name", "lastname", "family name", "surname"],
+    email: ["email", "email address", "e-mail", "e-mail 1 - value"],
+    phone: ["phone", "mobile phone", "phone 1 - value", "primary phone"],
+    company: ["company", "organization", "organisation", "organization 1 - name"],
+    notes: ["notes", "memo", "description"],
+  },
+  GOOGLE: {
+    fullName: ["name", "full name"],
+    firstName: ["given name", "first name"],
+    lastName: ["family name", "last name"],
+    email: ["e-mail 1 - value", "email", "email address"],
+    phone: ["phone 1 - value", "mobile phone", "phone"],
+    company: ["organization 1 - name", "company", "organization"],
+    notes: ["notes", "memo"],
+  },
+  APPLE: {
+    fullName: ["name", "full name"],
+    firstName: ["first name", "given name"],
+    lastName: ["last name", "family name"],
+    email: ["email", "email address"],
+    phone: ["phone", "mobile phone"],
+    company: ["company", "organization"],
+    notes: ["note", "notes"],
+  },
+  OUTLOOK: {
+    fullName: ["name", "full name"],
+    firstName: ["first name", "given name"],
+    lastName: ["last name", "surname", "family name"],
+    email: ["e-mail address", "email address", "email"],
+    phone: ["mobile phone", "business phone", "phone"],
+    company: ["company", "organization"],
+    notes: ["notes", "description"],
+  },
+};
 
 const splitCsvRows = (csvText: string) => {
   const rows: string[][] = [];
@@ -104,7 +157,21 @@ const escapeVCard = (value: string) =>
     .replace(/,/g, "\\,")
     .replace(/;/g, "\\;");
 
-export const parseCsvContacts = (csvText: string): CsvParseResult => {
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+const getAliasesForField = (
+  profile: CsvImportProfile,
+  field: keyof (typeof HEADER_ALIASES)["GENERIC"],
+) => {
+  const profileAliases = HEADER_ALIASES[profile][field];
+  const genericAliases = HEADER_ALIASES.GENERIC[field];
+  return [...new Set([...profileAliases, ...genericAliases])];
+};
+
+export const parseCsvContacts = (
+  csvText: string,
+  profile: CsvImportProfile = "GENERIC",
+): CsvParseResult => {
   const rows = splitCsvRows(csvText).filter((row) => row.some((field) => field.trim().length > 0));
 
   if (rows.length < 2) {
@@ -112,17 +179,19 @@ export const parseCsvContacts = (csvText: string): CsvParseResult => {
   }
 
   const headers = rows[0] ?? [];
-  const fullNameIndex = getIndex(headers, HEADER_ALIASES.fullName);
-  const firstNameIndex = getIndex(headers, HEADER_ALIASES.firstName);
-  const lastNameIndex = getIndex(headers, HEADER_ALIASES.lastName);
-  const emailIndex = getIndex(headers, HEADER_ALIASES.email);
-  const phoneIndex = getIndex(headers, HEADER_ALIASES.phone);
-  const companyIndex = getIndex(headers, HEADER_ALIASES.company);
-  const notesIndex = getIndex(headers, HEADER_ALIASES.notes);
+  const fullNameIndex = getIndex(headers, getAliasesForField(profile, "fullName"));
+  const firstNameIndex = getIndex(headers, getAliasesForField(profile, "firstName"));
+  const lastNameIndex = getIndex(headers, getAliasesForField(profile, "lastName"));
+  const emailIndex = getIndex(headers, getAliasesForField(profile, "email"));
+  const phoneIndex = getIndex(headers, getAliasesForField(profile, "phone"));
+  const companyIndex = getIndex(headers, getAliasesForField(profile, "company"));
+  const notesIndex = getIndex(headers, getAliasesForField(profile, "notes"));
 
-  const contacts: PortableContactInput[] = [];
-  const errors: string[] = [];
+  const contacts: ImportPreviewContact[] = [];
+  const issues: ImportPreviewIssue[] = [];
   let skippedCount = 0;
+  const seenEmails = new Map<string, number>();
+  const seenPhones = new Map<string, number>();
 
   rows.slice(1).forEach((row, index) => {
     const rowNumber = index + 2;
@@ -143,11 +212,52 @@ export const parseCsvContacts = (csvText: string): CsvParseResult => {
 
     if (!fullName) {
       skippedCount += 1;
-      errors.push(`Row ${rowNumber} skipped because it had no name or usable identifier.`);
+      issues.push({
+        rowNumber,
+        severity: "error",
+        message: "Skipped because the row had no name or usable identifier.",
+      });
       return;
     }
 
+    if (email && !emailPattern.test(email)) {
+      skippedCount += 1;
+      issues.push({
+        rowNumber,
+        severity: "error",
+        message: `Skipped because "${email}" is not a valid email address.`,
+      });
+      return;
+    }
+
+    if (email) {
+      const duplicateEmailRow = seenEmails.get(email);
+      if (duplicateEmailRow) {
+        issues.push({
+          rowNumber,
+          severity: "warning",
+          message: `Shares email ${email} with row ${duplicateEmailRow}.`,
+        });
+      } else {
+        seenEmails.set(email, rowNumber);
+      }
+    }
+
+    if (phone) {
+      const duplicatePhoneRow = seenPhones.get(phone);
+      if (duplicatePhoneRow) {
+        issues.push({
+          rowNumber,
+          severity: "warning",
+          message: `Shares phone ${phone} with row ${duplicatePhoneRow}.`,
+        });
+      } else {
+        seenPhones.set(phone, rowNumber);
+      }
+    }
+
     contacts.push({
+      rowNumber,
       fullName,
       email,
       phone,
@@ -160,7 +270,8 @@ export const parseCsvContacts = (csvText: string): CsvParseResult => {
     contacts,
     totalRows: rows.length - 1,
     skippedCount,
-    errors,
+    issues,
+    profile,
   };
 };
 

@@ -21,8 +21,8 @@ Make Kontax genuinely portable by supporting the most common contact formats, a 
 | P3-02 | In Progress | P0 | P3-01 |
 | P3-03 | In Progress | P0 | P3-01 |
 | P3-04 | In Progress | P1 | P3-02, P3-03 |
-| P3-05 | Not Started | P1 | P3-02 |
-| P3-06 | Not Started | P2 | P3-02, P3-03 |
+| P3-05 | In Progress | P1 | P3-02 |
+| P3-06 | In Progress | P2 | P3-02, P3-03 |
 
 ## P3-01 — Finalize supported contact formats
 - Status: `In Progress`
@@ -30,7 +30,8 @@ Make Kontax genuinely portable by supporting the most common contact formats, a 
 - Dependencies: `P1-02`
 - Implementation Notes:
   - First implementation slice now supports generic CSV import and export plus vCard 4.0 export.
-  - Google/Apple/Outlook-style header aliases have started through flexible CSV column matching for common fields.
+  - CSV profile selection is now explicit in the UI with `Generic`, `Google Contacts`, `Apple Contacts`, and `Outlook` parsing modes.
+  - Google/Apple/Outlook-style header aliases are applied server-side during preview and commit.
   - Next pass should expand the mapping table and explicitly document downgrade behavior across formats.
 - Acceptance Criteria:
   - A supported format list exists with field coverage expectations.
@@ -43,9 +44,9 @@ Make Kontax genuinely portable by supporting the most common contact formats, a 
 - Priority: `P0`
 - Dependencies: `P3-01`
 - Implementation Notes:
-  - First shipping flow supports CSV upload or pasted CSV text.
-  - The pipeline now performs parse, normalize, lightweight validate, import, and job recording.
-  - Next pass should add preview/confirm before commit and richer malformed-row review.
+  - The import flow now supports CSV upload or pasted CSV text plus a profile-aware preview step before commit.
+  - The pipeline now performs parse, normalize, lightweight validate, preview, confirm, import, and job recording.
+  - Next pass should add richer malformed-row review and future duplicate suggestions before commit.
 - Acceptance Criteria:
   - Import stages and transitions are documented.
   - Failure handling and partial-result rules are clear.
@@ -81,13 +82,13 @@ Make Kontax genuinely portable by supporting the most common contact formats, a 
   - File storage and retention policy needs alignment with Phase 2 operational cleanup.
 
 ## P3-05 — Define validation and conflict handling
-- Status: `Not Started`
+- Status: `In Progress`
 - Priority: `P1`
 - Dependencies: `P3-02`
 - Implementation Notes:
-  - Cover invalid encodings, malformed vCards, partial rows, missing required name/email fields, and unsupported custom attributes.
-  - Decide when the pipeline blocks, warns, or drops rows.
-  - Preserve row-level errors for user review.
+  - The preview step now surfaces row-level issues for missing identifiers, invalid emails, and duplicate phone/email values within the same import.
+  - Invalid rows are skipped before commit and warnings remain reviewable in the preview UI.
+  - Next pass should expand into malformed vCard handling, encoding issues, and unsupported custom attributes.
 - Acceptance Criteria:
   - Validation outcomes and user-visible error handling are documented.
   - Import behavior is deterministic and reviewable.
@@ -95,12 +96,12 @@ Make Kontax genuinely portable by supporting the most common contact formats, a 
   - Hard fail vs partial import policies must not surprise users.
 
 ## P3-06 — Define import/export UX preview and rollback model
-- Status: `Not Started`
+- Status: `In Progress`
 - Priority: `P2`
 - Dependencies: `P3-02`, `P3-03`
 - Implementation Notes:
-  - Design preview summaries, field mapping confirmation, duplicate warnings, and post-import rollback expectations.
-  - Clarify whether rollback is full-job only or row-level.
+  - The app now supports preview summaries, profile confirmation, row-level warnings, and explicit confirm-before-commit behavior.
+  - Rollback is still job-level rather than row-level and should be documented more explicitly in the next pass.
 - Acceptance Criteria:
   - UX expectations are documented well enough for design and implementation.
   - Rollback semantics align with audit and merge planning.
