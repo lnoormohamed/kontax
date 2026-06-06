@@ -1080,7 +1080,7 @@ export const buildMergedContactPreview = (
           secondaryContact: normalizedSecondary,
         }),
       }) ?? null,
-    isFavorite: Boolean(normalizedPrimary.isFavorite || normalizedSecondary.isFavorite),
+    isFavorite: [normalizedPrimary.isFavorite, normalizedSecondary.isFavorite].some(Boolean),
     labels: mergeUniqueStrings(normalizedPrimary.labels, normalizedSecondary.labels),
     significantDates: mergeDates(
       normalizedPrimary.significantDates,
