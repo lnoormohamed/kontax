@@ -1,5 +1,5 @@
 import { ContactManager } from "~/app/_components/contact-manager";
-import { TRPCReactProvider } from "~/trpc/react";
+import { AuthBar } from "~/app/_components/auth-bar";
 
 export const dynamic = "force-dynamic";
 
@@ -16,9 +16,8 @@ export default function Home() {
             Save, search, and manage the people you work with in one place.
           </p>
         </header>
-        <TRPCReactProvider>
-          <ContactManager />
-        </TRPCReactProvider>
+        <AuthBar />
+        <ContactManager />
       </div>
     </main>
   );

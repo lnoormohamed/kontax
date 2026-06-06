@@ -7,9 +7,13 @@
  * need to use are documented accordingly near the end.
  */
 import { initTRPC } from "@trpc/server";
+import { getToken } from "next-auth/jwt";
+import { TRPCError } from "@trpc/server";
+import { type NextRequest } from "next/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 
+import { env } from "~/env";
 import { db } from "~/server/db";
 
 /**
@@ -24,10 +28,12 @@ import { db } from "~/server/db";
  *
  * @see https://trpc.io/docs/server/context
  */
-export const createTRPCContext = async (opts: { headers: Headers }) => {
+export const createTRPCContext = async (opts: { req: NextRequest }) => {
+  const token = await getToken({ req: opts.req, secret: env.NEXTAUTH_SECRET });
+
   return {
     db,
-    ...opts,
+    userId: token?.userId ?? null,
   };
 };
 
@@ -96,6 +102,17 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
   return result;
 });
 
+const authMiddleware = t.middleware(async ({ ctx, next }) => {
+  if (!ctx.userId) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+      message: "Authentication required",
+    });
+  }
+
+  return next();
+});
+
 /**
  * Public (unauthenticated) procedure
  *
@@ -104,3 +121,10 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
  * are logged in.
  */
 export const publicProcedure = t.procedure.use(timingMiddleware);
+
+/**
+ * Authenticated procedure
+ *
+ * Use this for procedures that require an authenticated user.
+ */
+export const protectedProcedure = t.procedure.use(authMiddleware).use(timingMiddleware);

@@ -1,9 +1,9 @@
 import { z } from "zod";
 
-import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
+import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 
 export const contactRouter = createTRPCRouter({
-  list: publicProcedure
+  list: protectedProcedure
     .input(
       z
         .object({
@@ -45,7 +45,7 @@ export const contactRouter = createTRPCRouter({
       });
     }),
 
-  create: publicProcedure
+  create: protectedProcedure
     .input(
       z.object({
         fullName: z.string().trim().min(1, "Full name is required"),
@@ -67,7 +67,7 @@ export const contactRouter = createTRPCRouter({
       });
     }),
 
-  update: publicProcedure
+  update: protectedProcedure
     .input(
       z.object({
         id: z.number().int().positive(),
@@ -90,7 +90,7 @@ export const contactRouter = createTRPCRouter({
       });
     }),
 
-  delete: publicProcedure
+  delete: protectedProcedure
     .input(z.object({ id: z.number().int().positive() }))
     .mutation(async ({ ctx, input }) => {
       return ctx.db.contact.delete({
