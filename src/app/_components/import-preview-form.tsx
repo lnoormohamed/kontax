@@ -162,7 +162,7 @@ export function ImportPreviewForm() {
   };
 
   const selectedProfile =
-    PROFILE_OPTIONS.find((option) => option.value === profile) ?? PROFILE_OPTIONS[0];
+    PROFILE_OPTIONS.find((option) => option.value === profile) ?? PROFILE_OPTIONS[0]!;
   const warningCount =
     preview?.issues.filter((issue) => issue.severity === "warning").length ?? 0;
   const errorCount = preview?.issues.filter((issue) => issue.severity === "error").length ?? 0;
