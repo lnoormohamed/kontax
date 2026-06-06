@@ -1,9 +1,9 @@
 export type PortableContactInput = {
   fullName: string;
-  email?: string;
-  phone?: string;
-  company?: string;
-  notes?: string;
+  email?: string | null;
+  phone?: string | null;
+  company?: string | null;
+  notes?: string | null;
 };
 
 type CsvParseResult = {
