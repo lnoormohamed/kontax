@@ -1,5 +1,3 @@
-import Link from "next/link";
-
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,#1f6aa5_0%,#0f2a46_35%,#09111d_100%)] text-white">
@@ -14,28 +12,13 @@ export default function HomePage() {
             scaffolding without the extra complexity we were fighting before.
           </p>
         </div>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:max-w-3xl md:gap-6">
-          <Link
-            className="flex flex-col gap-4 rounded-2xl border border-white/15 bg-white/8 p-5 text-white transition hover:bg-white/14"
-            href="/api/auth/signin"
-          >
-            <h3 className="text-2xl font-bold">Open auth flow</h3>
-            <div className="text-base text-slate-200">
-              The starter auth route is live and ready for us to replace with the login experience
-              we actually want for Kontax.
-            </div>
-          </Link>
-          <Link
-            className="flex flex-col gap-4 rounded-2xl border border-white/15 bg-white/8 p-5 text-white transition hover:bg-white/14"
-            href="https://create.t3.gg/en/introduction"
-            target="_blank"
-          >
-            <h3 className="text-2xl font-bold">Read the T3 docs</h3>
-            <div className="text-base text-slate-200">
-              The scaffold is clean now, so the next job is shaping auth, contacts, and the
-              dashboard around the product we want.
-            </div>
-          </Link>
+        <div className="rounded-2xl border border-white/15 bg-white/8 p-6 md:max-w-3xl">
+          <h2 className="text-2xl font-bold">Next up</h2>
+          <p className="mt-3 text-base text-slate-200">
+            The starter is now focused on the clean app foundation only. Next we can build a real
+            Kontax login flow, user dashboard, and contact management without the default Discord
+            provider getting in the way.
+          </p>
         </div>
       </div>
     </main>
