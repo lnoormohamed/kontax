@@ -9,6 +9,7 @@ import {
   updateContact,
 } from "~/app/actions/contacts";
 import { auth } from "~/server/auth";
+import { parseContactPostalAddresses, parseContactStringArray } from "~/server/contact-portability";
 import { db } from "~/server/db";
 
 type ContactDetailPageProps = {
@@ -25,22 +26,8 @@ const formatTimestamp = (value: Date) =>
     year: "numeric",
   }).format(value);
 
-const getStringArray = (value: unknown) =>
-  Array.isArray(value)
-    ? value.filter((item): item is string => typeof item === "string" && item.trim().length > 0)
-    : [];
-
 const getFormattedAddressArray = (value: unknown) =>
-  Array.isArray(value)
-    ? value.flatMap((item) => {
-        if (typeof item !== "object" || item == null) {
-          return [];
-        }
-
-        const formatted = "formatted" in item ? item.formatted : undefined;
-        return typeof formatted === "string" && formatted.trim().length > 0 ? [formatted] : [];
-      })
-    : [];
+  parseContactPostalAddresses(value).map((item) => item.formatted);
 
 export default async function ContactDetailPage({ params, searchParams }: ContactDetailPageProps) {
   const session = await auth();
@@ -94,10 +81,10 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     notFound();
   }
 
-  const additionalEmails = getStringArray(contact.emailAddresses)
+  const additionalEmails = parseContactStringArray(contact.emailAddresses)
     .filter((item) => item !== contact.email)
     .join("\n");
-  const additionalPhones = getStringArray(contact.phoneNumbers)
+  const additionalPhones = parseContactStringArray(contact.phoneNumbers)
     .filter((item) => item !== contact.phone)
     .join("\n");
   const additionalAddresses = getFormattedAddressArray(contact.postalAddresses)

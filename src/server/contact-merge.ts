@@ -1,4 +1,8 @@
 import { Prisma } from "../../generated/prisma";
+import {
+  parseContactPostalAddresses,
+  parseContactStringArray,
+} from "~/server/contact-portability";
 import { db } from "~/server/db";
 
 type MergeCandidateContact = {
@@ -201,33 +205,9 @@ const combineNotes = (primaryNotes: string | null, secondaryNotes: string | null
   return `${trimmedPrimary}\n\n---\nMerged notes\n${trimmedSecondary}`;
 };
 
-const parseStringArray = (value: unknown) =>
-  Array.isArray(value)
-    ? value.filter((item): item is string => typeof item === "string" && item.trim().length > 0)
-    : [];
-
-const parsePostalAddressArray = (value: unknown) =>
-  Array.isArray(value)
-    ? value.flatMap((item) => {
-        if (typeof item !== "object" || item == null) {
-          return [];
-        }
-
-        const label = "label" in item && typeof item.label === "string" ? item.label : "other";
-        const formatted =
-          "formatted" in item && typeof item.formatted === "string" ? item.formatted : null;
-
-        if (!formatted || formatted.trim().length === 0) {
-          return [];
-        }
-
-        return [{ label, formatted }];
-      })
-    : [];
-
 const toNullableJsonField = (
   value: string[] | Array<{ label: string; formatted: string }> | null | undefined,
-) => (value == null ? Prisma.DbNull : value);
+) => value ?? Prisma.DbNull;
 
 const mergeUniqueStrings = (...groups: Array<Array<string | null | undefined>>) => {
   const seen = new Set<string>();
@@ -1161,15 +1141,15 @@ export const mergeContactsForUser = async ({
               fullName: primaryContact.fullName,
               nickname: primaryContact.nickname ?? null,
               email: primaryContact.email,
-              emailAddresses: parseStringArray(primaryContact.emailAddresses),
+              emailAddresses: parseContactStringArray(primaryContact.emailAddresses),
               phone: primaryContact.phone,
-              phoneNumbers: parseStringArray(primaryContact.phoneNumbers),
+              phoneNumbers: parseContactStringArray(primaryContact.phoneNumbers),
               company: primaryContact.company,
               jobTitle: primaryContact.jobTitle ?? null,
               website: primaryContact.website ?? null,
               birthday: primaryContact.birthday ?? null,
               address: primaryContact.address ?? null,
-              postalAddresses: parsePostalAddressArray(primaryContact.postalAddresses),
+              postalAddresses: parseContactPostalAddresses(primaryContact.postalAddresses),
               notes: primaryContact.notes,
               archivedAt: primaryContact.archivedAt?.toISOString() ?? null,
               syncTombstoneAt: primaryContact.syncTombstoneAt?.toISOString() ?? null,
@@ -1180,15 +1160,15 @@ export const mergeContactsForUser = async ({
               fullName: secondaryContact.fullName,
               nickname: secondaryContact.nickname ?? null,
               email: secondaryContact.email,
-              emailAddresses: parseStringArray(secondaryContact.emailAddresses),
+              emailAddresses: parseContactStringArray(secondaryContact.emailAddresses),
               phone: secondaryContact.phone,
-              phoneNumbers: parseStringArray(secondaryContact.phoneNumbers),
+              phoneNumbers: parseContactStringArray(secondaryContact.phoneNumbers),
               company: secondaryContact.company,
               jobTitle: secondaryContact.jobTitle ?? null,
               website: secondaryContact.website ?? null,
               birthday: secondaryContact.birthday ?? null,
               address: secondaryContact.address ?? null,
-              postalAddresses: parsePostalAddressArray(secondaryContact.postalAddresses),
+              postalAddresses: parseContactPostalAddresses(secondaryContact.postalAddresses),
               notes: secondaryContact.notes,
               archivedAt: secondaryContact.archivedAt?.toISOString() ?? null,
               syncTombstoneAt: secondaryContact.syncTombstoneAt?.toISOString() ?? null,

@@ -1,29 +1,10 @@
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import {
-  type ContactPostalAddressInput,
   contactsToCsv,
+  parseContactPostalAddresses,
+  parseContactStringArray,
 } from "~/server/contact-portability";
-
-const getStringArray = (value: unknown) =>
-  Array.isArray(value)
-    ? value.filter((item): item is string => typeof item === "string" && item.trim().length > 0)
-    : [];
-
-const getPostalAddresses = (value: unknown): ContactPostalAddressInput[] =>
-  Array.isArray(value)
-    ? value.flatMap((item) => {
-        if (typeof item !== "object" || item == null) {
-          return [];
-        }
-
-        const label = "label" in item && typeof item.label === "string" ? item.label : "other";
-        const formatted =
-          "formatted" in item && typeof item.formatted === "string" ? item.formatted : null;
-
-        return formatted && formatted.trim().length > 0 ? [{ label, formatted }] : [];
-      })
-    : [];
 
 export async function GET(request: Request) {
   const session = await auth();
@@ -90,9 +71,9 @@ export async function GET(request: Request) {
     const body = contactsToCsv(
       contacts.map((contact) => ({
         ...contact,
-        emailAddresses: getStringArray(contact.emailAddresses),
-        phoneNumbers: getStringArray(contact.phoneNumbers),
-        postalAddresses: getPostalAddresses(contact.postalAddresses),
+        emailAddresses: parseContactStringArray(contact.emailAddresses),
+        phoneNumbers: parseContactStringArray(contact.phoneNumbers),
+        postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
       })),
     );
 

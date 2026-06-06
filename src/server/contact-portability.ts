@@ -3,6 +3,30 @@ export type ContactPostalAddressInput = {
   formatted: string;
 };
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+export const parseContactStringArray = (value: unknown): string[] =>
+  Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string" && item.trim().length > 0)
+    : [];
+
+export const parseContactPostalAddresses = (value: unknown): ContactPostalAddressInput[] =>
+  Array.isArray(value)
+    ? value.flatMap((item) => {
+        if (!isRecord(item)) {
+          return [];
+        }
+
+        const rawLabel = item["label"];
+        const rawFormatted = item["formatted"];
+        const label = typeof rawLabel === "string" ? rawLabel : "other";
+        const formatted = typeof rawFormatted === "string" ? rawFormatted : null;
+
+        return formatted?.trim().length ? [{ label, formatted }] : [];
+      })
+    : [];
+
 export type PortableContactInput = {
   fullName: string;
   nickname?: string | null;
