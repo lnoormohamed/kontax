@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { z } from "zod";
 
 import { auth } from "~/server/auth";
+import { assertCanCreateContacts } from "~/server/billing";
 import { db } from "~/server/db";
 
 const contactSchema = z.object({
@@ -48,6 +49,7 @@ const getRedirectTarget = (formData: FormData) => {
 
 const revalidateContactViews = (contactId?: string) => {
   revalidatePath("/");
+  revalidatePath("/import-export");
 
   if (contactId) {
     revalidatePath(`/contacts/${contactId}`);
@@ -85,6 +87,8 @@ const parseContactId = (formData: FormData) => {
 export const createContact = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const input = parseContactInput(formData);
+
+  await assertCanCreateContacts(userId);
 
   await db.contact.create({
     data: {

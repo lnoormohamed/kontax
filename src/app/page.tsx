@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ContactDashboard } from "~/app/_components/contact-dashboard";
 import { signOut } from "~/server/auth";
 import { auth } from "~/server/auth";
+import { getUserPlanSummary } from "~/server/billing";
 import { db } from "~/server/db";
 
 type HomePageProps = {
@@ -87,9 +88,9 @@ const PublicLanding = () => (
         </div>
         <div className="rounded-[1.5rem] border border-white/10 bg-[#08101c] p-5">
           <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Next</p>
-          <p className="mt-3 text-3xl font-semibold text-white">Billing and sync foundation</p>
+          <p className="mt-3 text-3xl font-semibold text-white">Billing and portability</p>
           <p className="mt-2 text-sm text-slate-400">
-            The data model is now being shaped for entitlements, imports, merge logic, and CardDAV.
+            Plans, import jobs, and portable export formats are now part of the foundation.
           </p>
         </div>
       </section>
@@ -106,7 +107,7 @@ export default async function Home({ searchParams }: HomePageProps) {
 
   const query = await getQueryValue(searchParams);
   const searchConditions = getSearchConditions(query);
-  const [activeContacts, archivedContacts] = await Promise.all([
+  const [activeContacts, archivedContacts, planSummary] = await Promise.all([
     db.contact.findMany({
       where: {
         userId: session.user.id,
@@ -149,6 +150,7 @@ export default async function Home({ searchParams }: HomePageProps) {
         updatedAt: true,
       },
     }),
+    getUserPlanSummary(session.user.id),
   ]);
 
   const handleSignOut = async () => {
@@ -188,6 +190,15 @@ export default async function Home({ searchParams }: HomePageProps) {
       <ContactDashboard
         activeContacts={activeContacts}
         archivedContacts={archivedContacts}
+        planSummary={{
+          planLabel: planSummary.planLabel,
+          contactsUsed: planSummary.contactsUsed,
+          contactsRemaining: planSummary.contactsRemaining,
+          contactsLimit: planSummary.entitlements.contactsLimit,
+          importedThisMonth: planSummary.importedThisMonth,
+          monthlyImportLimit: planSummary.entitlements.monthlyImportLimit,
+          premiumExportEnabled: planSummary.entitlements.premiumExportEnabled,
+        }}
         query={query}
         userLabel={userLabel}
       />

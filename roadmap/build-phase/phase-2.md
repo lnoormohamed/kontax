@@ -17,10 +17,10 @@ Introduce subscription and entitlement planning early enough that Kontax can mon
 | Ticket | Status | Priority | Depends On |
 | --- | --- | --- | --- |
 | P2-01 | Done | P0 | P1-01 |
-| P2-02 | In Progress | P0 | P2-01 |
+| P2-02 | Done | P0 | P2-01 |
 | P2-03 | In Progress | P1 | P2-01 |
 | P2-04 | Not Started | P1 | P1-04, P2-01 |
-| P2-05 | Not Started | P1 | P2-02 |
+| P2-05 | In Progress | P1 | P2-02 |
 | P2-06 | Not Started | P2 | P2-05 |
 
 ## P2-01 — Define subscription customer and subscription records
@@ -38,13 +38,13 @@ Introduce subscription and entitlement planning early enough that Kontax can mon
   - Need to avoid prematurely modeling organization billing while still supporting future growth.
 
 ## P2-02 — Define plan tiers and entitlements
-- Status: `In Progress`
+- Status: `Done`
 - Priority: `P0`
 - Dependencies: `P2-01`
 - Implementation Notes:
-  - Prisma schema now includes `SubscriptionPlan` plus entitlement-oriented fields like `contactsLimit`, `monthlyImportLimit`, `syncAccountsLimit`, `advancedMergeEnabled`, `premiumExportEnabled`, and `cardDavSyncEnabled`.
-  - Next implementation pass should decide the exact product-level limits for free vs paid tiers and where enforcement will live in app logic.
-  - Include upgrade/downgrade behavior assumptions.
+  - Prisma schema includes `SubscriptionPlan` plus entitlement-oriented fields like `contactsLimit`, `monthlyImportLimit`, `syncAccountsLimit`, `advancedMergeEnabled`, `premiumExportEnabled`, and `cardDavSyncEnabled`.
+  - App logic now has a free-plan fallback plus plan-aware enforcement for contact creation, monthly imports, and premium export access.
+  - Upgrade and downgrade behavior still needs provider event wiring, but feature gating is no longer theoretical.
 - Acceptance Criteria:
   - Plan boundaries are documented and feature-relevant.
   - Entitlement checks can be implemented independently of billing UI.
@@ -79,13 +79,13 @@ Introduce subscription and entitlement planning early enough that Kontax can mon
   - Event volume and retention policy may matter later for support tooling.
 
 ## P2-05 — Define account lifecycle states and enforcement
-- Status: `Not Started`
+- Status: `In Progress`
 - Priority: `P1`
 - Dependencies: `P2-02`
 - Implementation Notes:
-  - Document `active`, `trialing`, `grace`, `canceled`, and `locked` behavior.
-  - Decide what features remain accessible in grace or canceled states, especially export rights and read-only access.
-  - Separate authentication from entitlement enforcement so access decisions remain predictable.
+  - `User.lifecycleState` exists and current enforcement blocks writes for locked accounts.
+  - Next pass should document and wire distinct behavior for `active`, `trialing`, `grace`, `canceled`, and `locked`, especially read-only/export rights after cancellation.
+  - Authentication and entitlements remain separate so future billing state changes do not break login assumptions.
 - Acceptance Criteria:
   - Lifecycle states and transitions are unambiguous.
   - Read/write/export behavior per state is documented.

@@ -13,11 +13,22 @@ type DashboardContact = {
   updatedAt: Date;
 };
 
+type PlanSummary = {
+  planLabel: string;
+  contactsUsed: number;
+  contactsRemaining: number;
+  contactsLimit: number;
+  importedThisMonth: number;
+  monthlyImportLimit: number;
+  premiumExportEnabled: boolean;
+};
+
 type ContactDashboardProps = {
   activeContacts: DashboardContact[];
   archivedContacts: DashboardContact[];
   query: string;
   userLabel: string;
+  planSummary: PlanSummary;
 };
 
 const formatTimestamp = (value: Date) =>
@@ -100,6 +111,7 @@ export function ContactDashboard({
   archivedContacts,
   query,
   userLabel,
+  planSummary,
 }: ContactDashboardProps) {
   const visibleCount = activeContacts.length + archivedContacts.length;
 
@@ -120,12 +132,20 @@ export function ContactDashboard({
 
           <div className="grid gap-3 rounded-[1.75rem] border border-white/10 bg-[#08101c] p-5 text-sm text-slate-300">
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Active contacts</p>
-              <p className="mt-2 text-3xl font-semibold text-white">{activeContacts.length}</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Plan</p>
+              <p className="mt-2 text-3xl font-semibold text-white">{planSummary.planLabel}</p>
             </div>
             <div>
-              <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Archived contacts</p>
-              <p className="mt-2 text-3xl font-semibold text-white">{archivedContacts.length}</p>
+              <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Contacts</p>
+              <p className="mt-2 text-sm text-white">
+                {planSummary.contactsUsed} / {planSummary.contactsLimit}
+              </p>
+            </div>
+            <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Imports this month</p>
+              <p className="mt-2 text-sm text-white">
+                {planSummary.importedThisMonth} / {planSummary.monthlyImportLimit}
+              </p>
             </div>
           </div>
         </section>
@@ -137,8 +157,8 @@ export function ContactDashboard({
                 <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">New contact</p>
                 <h2 className="text-2xl font-semibold text-white">Capture someone important</h2>
                 <p className="text-sm text-slate-400">
-                  Save the essentials now. The archive-safe lifecycle and billing-ready schema are
-                  now in place without forcing extra complexity into the first-use experience.
+                  Save the essentials now. Contact creation is now plan-aware so billing and product
+                  limits stay honest as we grow into premium features.
                 </p>
               </div>
 
@@ -203,12 +223,17 @@ export function ContactDashboard({
             </div>
 
             <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
-              <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Phase progress</p>
-              <ul className="mt-4 grid gap-3 text-sm text-slate-300">
-                <li>Phase 1 now covers reversible archive and a dedicated contact detail view.</li>
-                <li>Phase 2 billing entities are seeded in Prisma for entitlements and lifecycle work.</li>
-                <li>Next phases can add import, export, merge, and sync without ownership redesign.</li>
-              </ul>
+              <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Portability</p>
+              <p className="mt-4 text-sm text-slate-300">
+                CSV import plus CSV export are now part of the app, and vCard export is ready as a
+                premium path.
+              </p>
+              <Link
+                className="mt-5 inline-flex rounded-full border border-white/10 px-4 py-2 font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-100"
+                href="/import-export"
+              >
+                Open import / export center
+              </Link>
             </div>
           </aside>
 
@@ -222,7 +247,7 @@ export function ContactDashboard({
                 <p className="mt-2 text-sm text-slate-400">
                   {query
                     ? `${visibleCount} matching contacts across active and archived views.`
-                    : "Active contacts stay front and center while archived entries remain recoverable."}
+                    : `You have room for ${planSummary.contactsRemaining} more contacts on the ${planSummary.planLabel} plan.`}
                 </p>
               </div>
 

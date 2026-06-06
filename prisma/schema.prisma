@@ -41,6 +41,22 @@ enum SubscriptionInterval {
     YEARLY
 }
 
+enum ImportExportJobStatus {
+    PENDING
+    PROCESSING
+    COMPLETED
+    FAILED
+}
+
+enum ContactImportFormat {
+    CSV_GENERIC
+}
+
+enum ContactExportFormat {
+    CSV_GENERIC
+    VCARD_4
+}
+
 model User {
     id                   String                 @id @default(cuid())
     name                 String?
@@ -48,6 +64,8 @@ model User {
     password             String
     lifecycleState       AccountLifecycleState  @default(ACTIVE)
     contacts             Contact[]
+    importJobs           ImportJob[]
+    exportJobs           ExportJob[]
     subscriptionCustomer SubscriptionCustomer?
     subscriptions        Subscription[]
     createdAt            DateTime               @default(now())
@@ -117,4 +135,41 @@ model Subscription {
     @@unique([provider, providerSubscriptionId])
     @@index([userId, status])
     @@index([subscriptionCustomerId, status])
+}
+
+model ImportJob {
+    id             String                @id @default(cuid())
+    userId         String
+    format         ContactImportFormat
+    status         ImportExportJobStatus @default(PENDING)
+    sourceFileName String?
+    rowCount       Int                   @default(0)
+    importedCount  Int                   @default(0)
+    skippedCount   Int                   @default(0)
+    errorCount     Int                   @default(0)
+    errorSummary   String?
+    createdAt      DateTime              @default(now())
+    startedAt      DateTime              @default(now())
+    completedAt    DateTime?
+    updatedAt      DateTime              @updatedAt
+    user           User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId, status, createdAt])
+}
+
+model ExportJob {
+    id             String                @id @default(cuid())
+    userId         String
+    format         ContactExportFormat
+    status         ImportExportJobStatus @default(PENDING)
+    includeArchived Boolean              @default(false)
+    exportedCount  Int                   @default(0)
+    errorSummary   String?
+    createdAt      DateTime              @default(now())
+    startedAt      DateTime              @default(now())
+    completedAt    DateTime?
+    updatedAt      DateTime              @updatedAt
+    user           User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId, status, createdAt])
 }

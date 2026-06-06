@@ -17,21 +17,21 @@ Make Kontax genuinely portable by supporting the most common contact formats, a 
 ## Phase Tracker
 | Ticket | Status | Priority | Depends On |
 | --- | --- | --- | --- |
-| P3-01 | Not Started | P0 | P1-02 |
-| P3-02 | Not Started | P0 | P3-01 |
-| P3-03 | Not Started | P0 | P3-01 |
-| P3-04 | Not Started | P1 | P3-02, P3-03 |
+| P3-01 | In Progress | P0 | P1-02 |
+| P3-02 | In Progress | P0 | P3-01 |
+| P3-03 | In Progress | P0 | P3-01 |
+| P3-04 | In Progress | P1 | P3-02, P3-03 |
 | P3-05 | Not Started | P1 | P3-02 |
 | P3-06 | Not Started | P2 | P3-02, P3-03 |
 
 ## P3-01 — Finalize supported contact formats
-- Status: `Not Started`
+- Status: `In Progress`
 - Priority: `P0`
 - Dependencies: `P1-02`
 - Implementation Notes:
-  - Support `vCard 3.0`, `vCard 4.0`, generic CSV, and mapped CSV profiles for Google, Apple, and Outlook first.
-  - Decide which fields are first-wave canonical vs pass-through metadata.
-  - Define export downgrade behavior when a format cannot represent all contact data.
+  - First implementation slice now supports generic CSV import and export plus vCard 4.0 export.
+  - Google/Apple/Outlook-style header aliases have started through flexible CSV column matching for common fields.
+  - Next pass should expand the mapping table and explicitly document downgrade behavior across formats.
 - Acceptance Criteria:
   - A supported format list exists with field coverage expectations.
   - Canonical vs lossy format behavior is documented.
@@ -39,13 +39,13 @@ Make Kontax genuinely portable by supporting the most common contact formats, a 
   - CSV field naming is inconsistent across sources and needs explicit mapping tables.
 
 ## P3-02 — Design import pipeline
-- Status: `Not Started`
+- Status: `In Progress`
 - Priority: `P0`
 - Dependencies: `P3-01`
 - Implementation Notes:
-  - Specify stages: upload, file sniffing, parse, normalize, validate, preview, confirm, commit.
-  - Define how malformed rows, duplicate headers, and unsupported fields are surfaced.
-  - Include source attribution so imported contacts can power merge suggestions later.
+  - First shipping flow supports CSV upload or pasted CSV text.
+  - The pipeline now performs parse, normalize, lightweight validate, import, and job recording.
+  - Next pass should add preview/confirm before commit and richer malformed-row review.
 - Acceptance Criteria:
   - Import stages and transitions are documented.
   - Failure handling and partial-result rules are clear.
@@ -53,13 +53,13 @@ Make Kontax genuinely portable by supporting the most common contact formats, a 
   - Large imports may need async chunking or background processing sooner than expected.
 
 ## P3-03 — Design export pipeline
-- Status: `Not Started`
+- Status: `In Progress`
 - Priority: `P0`
 - Dependencies: `P3-01`
 - Implementation Notes:
-  - Support full export, filtered export, and format-specific mapping behavior.
-  - Decide whether exports include archived contacts by default and how deleted records are treated.
-  - Preserve stable contact IDs internally while keeping export payloads consumer-friendly.
+  - CSV export is open to all plans and vCard 4.0 export is plan-gated as a premium surface.
+  - Export jobs are recorded with counts and archived-scope metadata.
+  - Next pass should add filtered export controls and richer format-specific options.
 - Acceptance Criteria:
   - Export modes and field mapping rules are documented.
   - Export behavior after merges remains consistent with canonical records.
@@ -67,13 +67,13 @@ Make Kontax genuinely portable by supporting the most common contact formats, a 
   - Need clear expectations for what metadata is omitted from consumer exports.
 
 ## P3-04 — Define import and export job records
-- Status: `Not Started`
+- Status: `In Progress`
 - Priority: `P1`
 - Dependencies: `P3-02`, `P3-03`
 - Implementation Notes:
-  - Add `ImportJob` and `ExportJob` planning with format, file reference, counts, status, and errors.
-  - Include start/end timestamps, initiating user, and links to audit records.
-  - Plan for resumable or retryable jobs where feasible.
+  - Prisma schema now includes `ImportJob` and `ExportJob` with format, status, counts, and error summaries.
+  - The app records job history for recent imports and exports.
+  - Next pass should connect job records to file retention and future audit events.
 - Acceptance Criteria:
   - Job data model is explicit.
   - Operational status reporting is strong enough for both UI and support use.

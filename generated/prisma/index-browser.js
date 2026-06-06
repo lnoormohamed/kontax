@@ -181,6 +181,37 @@ exports.Prisma.SubscriptionScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ImportJobScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  format: 'format',
+  status: 'status',
+  sourceFileName: 'sourceFileName',
+  rowCount: 'rowCount',
+  importedCount: 'importedCount',
+  skippedCount: 'skippedCount',
+  errorCount: 'errorCount',
+  errorSummary: 'errorSummary',
+  createdAt: 'createdAt',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ExportJobScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  format: 'format',
+  status: 'status',
+  includeArchived: 'includeArchived',
+  exportedCount: 'exportedCount',
+  errorSummary: 'errorSummary',
+  createdAt: 'createdAt',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -228,11 +259,29 @@ exports.SubscriptionInterval = exports.$Enums.SubscriptionInterval = {
   YEARLY: 'YEARLY'
 };
 
+exports.ContactImportFormat = exports.$Enums.ContactImportFormat = {
+  CSV_GENERIC: 'CSV_GENERIC'
+};
+
+exports.ImportExportJobStatus = exports.$Enums.ImportExportJobStatus = {
+  PENDING: 'PENDING',
+  PROCESSING: 'PROCESSING',
+  COMPLETED: 'COMPLETED',
+  FAILED: 'FAILED'
+};
+
+exports.ContactExportFormat = exports.$Enums.ContactExportFormat = {
+  CSV_GENERIC: 'CSV_GENERIC',
+  VCARD_4: 'VCARD_4'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   Contact: 'Contact',
   SubscriptionCustomer: 'SubscriptionCustomer',
-  Subscription: 'Subscription'
+  Subscription: 'Subscription',
+  ImportJob: 'ImportJob',
+  ExportJob: 'ExportJob'
 };
 
 /**
