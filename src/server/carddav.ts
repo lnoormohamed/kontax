@@ -1,3 +1,6 @@
+import type { PortableContactInput } from "~/server/contact-portability";
+import { contactsToVCard } from "~/server/contact-portability";
+
 type CardDavCredentials = {
   username: string;
   password: string;
@@ -25,6 +28,44 @@ export type CardDavAddressBookEntry = {
   href: string;
   etag: string | null;
   uid: string;
+};
+
+export type CardDavContactCard = CardDavAddressBookEntry & {
+  fullName: string;
+  firstName: string | null;
+  middleName: string | null;
+  lastName: string | null;
+  namePrefix: string | null;
+  nameSuffix: string | null;
+  nickname: string | null;
+  emailAddresses: string[];
+  emailEntries: Array<{ label: string; value: string; isPrimary: boolean }>;
+  phoneNumbers: string[];
+  phoneEntries: Array<{ label: string; value: string; isPrimary: boolean }>;
+  company: string | null;
+  jobTitle: string | null;
+  website: string | null;
+  websiteEntries: Array<{ label: string; value: string; isPrimary: boolean }>;
+  birthday: string | null;
+  address: string | null;
+  postalAddresses: Array<{ label: string; formatted: string }>;
+  addressEntries: Array<{
+    label: string;
+    formatted: string;
+    isPrimary: boolean;
+    countryOrRegion?: string;
+    streetLine1?: string;
+    streetLine2?: string;
+    cityOrTown?: string;
+    postcode?: string;
+    poBox?: string;
+  }>;
+  notes: string | null;
+};
+
+export type CardDavPushResult = {
+  href: string;
+  etag: string | null;
 };
 
 export class CardDavPreflightError extends Error {
@@ -244,11 +285,227 @@ const getAddressBookCandidate = (xml: string, contextUrl: string) => {
 
 const unfoldVCard = (value: string) => value.replace(/\r?\n[ \t]/g, "");
 
+const unescapeVCardValue = (value: string) =>
+  value
+    .replaceAll("\\n", "\n")
+    .replaceAll("\\N", "\n")
+    .replaceAll("\\,", ",")
+    .replaceAll("\\;", ";")
+    .replaceAll("\\\\", "\\")
+    .trim();
+
+const parseVCardParams = (parts: string[]) =>
+  parts.reduce<Record<string, string[]>>((acc, rawPart) => {
+    const [rawKey, rawValue] = rawPart.split("=", 2);
+    const key = rawKey?.trim().toUpperCase();
+
+    if (!key) {
+      return acc;
+    }
+
+    const values =
+      rawValue
+        ?.split(",")
+        .map((value) => unescapeVCardValue(value))
+        .filter(Boolean) ?? [""];
+
+    acc[key] = values;
+    return acc;
+  }, {});
+
+const getPreferredLabel = (params: Record<string, string[]>, fallback: string) => {
+  const typeValues = params.TYPE ?? [];
+  const firstUsableType = typeValues.find((value) => value.toLowerCase() !== "pref");
+
+  return firstUsableType?.toLowerCase() ?? fallback;
+};
+
+const parseVCardLines = (value: string) =>
+  unfoldVCard(decodeXmlEntities(value))
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0 && !line.toUpperCase().startsWith("BEGIN:") && !line.toUpperCase().startsWith("END:"))
+    .map((line) => {
+      const separatorIndex = line.indexOf(":");
+      if (separatorIndex < 0) {
+        return null;
+      }
+
+      const left = line.slice(0, separatorIndex);
+      const rawValue = line.slice(separatorIndex + 1);
+      const [rawName, ...paramParts] = left.split(";");
+      const name = rawName.trim().toUpperCase();
+
+      return {
+        name,
+        params: parseVCardParams(paramParts),
+        value: unescapeVCardValue(rawValue),
+      };
+    })
+    .filter((line): line is { name: string; params: Record<string, string[]>; value: string } => line != null);
+
 const getVCardUid = (value: string) => {
   const unfolded = unfoldVCard(decodeXmlEntities(value));
   const match = /^UID(?:;[^:]*)?:(.+)$/im.exec(unfolded);
 
   return match?.[1]?.trim() ?? null;
+};
+
+const dedupeValues = (values: string[]) => {
+  const seen = new Set<string>();
+  const result: string[] = [];
+
+  for (const value of values) {
+    const trimmed = value.trim();
+    const key = trimmed.toLowerCase();
+
+    if (!trimmed || seen.has(key)) {
+      continue;
+    }
+
+    seen.add(key);
+    result.push(trimmed);
+  }
+
+  return result;
+};
+
+const buildStructuredValues = (
+  entries: Array<{ label: string; value: string }>,
+): Array<{ label: string; value: string; isPrimary: boolean }> =>
+  entries
+    .filter((entry) => entry.value.trim().length > 0)
+    .map((entry, index) => ({
+      label: entry.label,
+      value: entry.value.trim(),
+      isPrimary: index === 0,
+    }));
+
+const parseNameParts = (value: string) => {
+  const [lastName, firstName, middleName, namePrefix, nameSuffix] = value
+    .split(";")
+    .map((part) => unescapeVCardValue(part));
+
+  return {
+    firstName: firstName || null,
+    middleName: middleName || null,
+    lastName: lastName || null,
+    namePrefix: namePrefix || null,
+    nameSuffix: nameSuffix || null,
+  };
+};
+
+const parseAdrValue = (value: string, label: string) => {
+  const [poBox, , streetLine1, cityOrTown, region, postcode, countryOrRegion] = value
+    .split(";")
+    .map((part) => unescapeVCardValue(part));
+  const formatted = [streetLine1, cityOrTown, region, postcode, countryOrRegion]
+    .filter(Boolean)
+    .join(", ");
+
+  if (!formatted) {
+    return null;
+  }
+
+  return {
+    label,
+    formatted,
+    isPrimary: false,
+    countryOrRegion: countryOrRegion || region || undefined,
+    streetLine1: streetLine1 || undefined,
+    cityOrTown: cityOrTown || undefined,
+    postcode: postcode || undefined,
+    poBox: poBox || undefined,
+  };
+};
+
+const parseCardDavContactCard = (
+  entry: CardDavAddressBookEntry,
+  addressData: string,
+): CardDavContactCard => {
+  const lines = parseVCardLines(addressData);
+  const fnLine = lines.find((line) => line.name === "FN");
+  const nLine = lines.find((line) => line.name === "N");
+  const nicknameLine = lines.find((line) => line.name === "NICKNAME");
+  const orgLine = lines.find((line) => line.name === "ORG");
+  const titleLine = lines.find((line) => line.name === "TITLE");
+  const bdayLine = lines.find((line) => line.name === "BDAY");
+  const noteLines = lines.filter((line) => line.name === "NOTE");
+  const emailEntries = buildStructuredValues(
+    dedupeValues(
+      lines.filter((line) => line.name === "EMAIL").map((line) => line.value),
+    ).map((value) => {
+      const original = lines.find((line) => line.name === "EMAIL" && line.value === value);
+      return {
+        label: getPreferredLabel(original?.params ?? {}, "email"),
+        value,
+      };
+    }),
+  );
+  const phoneEntries = buildStructuredValues(
+    dedupeValues(
+      lines.filter((line) => line.name === "TEL").map((line) => line.value),
+    ).map((value) => {
+      const original = lines.find((line) => line.name === "TEL" && line.value === value);
+      return {
+        label: getPreferredLabel(original?.params ?? {}, "phone"),
+        value,
+      };
+    }),
+  );
+  const websiteEntries = buildStructuredValues(
+    dedupeValues(
+      lines.filter((line) => line.name === "URL").map((line) => line.value),
+    ).map((value) => {
+      const original = lines.find((line) => line.name === "URL" && line.value === value);
+      return {
+        label: getPreferredLabel(original?.params ?? {}, "website"),
+        value,
+      };
+    }),
+  );
+  const addressEntries = lines
+    .filter((line) => line.name === "ADR")
+    .map((line) => parseAdrValue(line.value, getPreferredLabel(line.params, "address")))
+    .filter((entry): entry is NonNullable<ReturnType<typeof parseAdrValue>> => entry != null)
+    .map((entry, index) => ({
+      ...entry,
+      isPrimary: index === 0,
+    }));
+  const postalAddresses = addressEntries.map((entry) => ({
+    label: entry.label,
+    formatted: entry.formatted,
+  }));
+  const nameParts = nLine ? parseNameParts(nLine.value) : null;
+
+  return {
+    ...entry,
+    fullName:
+      fnLine?.value ||
+      [nameParts?.namePrefix, nameParts?.firstName, nameParts?.middleName, nameParts?.lastName, nameParts?.nameSuffix]
+        .filter(Boolean)
+        .join(" ") ||
+      `Imported contact ${entry.uid}`,
+    firstName: nameParts?.firstName ?? null,
+    middleName: nameParts?.middleName ?? null,
+    lastName: nameParts?.lastName ?? null,
+    namePrefix: nameParts?.namePrefix ?? null,
+    nameSuffix: nameParts?.nameSuffix ?? null,
+    nickname: nicknameLine?.value ?? null,
+    emailAddresses: emailEntries.map((item) => item.value),
+    emailEntries,
+    phoneNumbers: phoneEntries.map((item) => item.value),
+    phoneEntries,
+    company: orgLine?.value.split(";")[0]?.trim() || null,
+    jobTitle: titleLine?.value ?? null,
+    website: websiteEntries[0]?.value ?? null,
+    websiteEntries,
+    birthday: bdayLine?.value ?? null,
+    address: addressEntries[0]?.formatted ?? null,
+    postalAddresses,
+    addressEntries,
+    notes: noteLines.map((line) => line.value).filter(Boolean).join("\n\n") || null,
+  };
 };
 
 export const fetchCardDavAddressBookIndex = async ({
@@ -284,6 +541,109 @@ export const fetchCardDavAddressBookIndex = async ({
       };
     })
     .filter((item): item is CardDavAddressBookEntry => item != null);
+};
+
+export const fetchCardDavAddressBookCards = async ({
+  addressBookUrl,
+  credentials,
+}: {
+  addressBookUrl: string;
+  credentials: CardDavCredentials;
+}): Promise<CardDavContactCard[]> => {
+  const normalizedAddressBookUrl = normalizeUrl(addressBookUrl);
+  const xml = await davRequest({
+    url: normalizedAddressBookUrl,
+    credentials,
+    method: "REPORT",
+    depth: 1,
+    body: ADDRESS_BOOK_INDEX_BODY,
+  });
+
+  return getResponseBlocks(xml)
+    .map((block) => {
+      const summary = summarizeResponse(block, normalizedAddressBookUrl);
+      const addressData = getTagContent(block, "address-data");
+      const uid = addressData ? getVCardUid(addressData) : null;
+
+      if (!summary.resolvedHref || !addressData || !uid) {
+        return null;
+      }
+
+      return parseCardDavContactCard(
+        {
+          href: summary.resolvedHref,
+          etag: getTagContent(block, "getetag"),
+          uid,
+        },
+        addressData,
+      );
+    })
+    .filter((item): item is CardDavContactCard => item != null);
+};
+
+const ensureTrailingSlash = (value: string) => (value.endsWith("/") ? value : `${value}/`);
+
+const buildCardDavContactBody = (contact: PortableContactInput, uid: string) =>
+  contactsToVCard([contact]).replace(/\r\nEND:VCARD$/, `\r\nUID:${uid}\r\nEND:VCARD`);
+
+export const pushCardDavContact = async ({
+  addressBookUrl,
+  credentials,
+  remoteUid,
+  contact,
+}: {
+  addressBookUrl: string;
+  credentials: CardDavCredentials;
+  remoteUid: string;
+  contact: PortableContactInput;
+}): Promise<CardDavPushResult> => {
+  const collectionUrl = ensureTrailingSlash(normalizeUrl(addressBookUrl));
+  const href = new URL(`${encodeURIComponent(remoteUid)}.vcf`, collectionUrl).toString();
+  const body = buildCardDavContactBody(contact, remoteUid);
+
+  let response: Response;
+
+  try {
+    response = await fetch(href, {
+      method: "PUT",
+      headers: {
+        Authorization: `Basic ${Buffer.from(
+          `${credentials.username}:${credentials.password}`,
+          "utf8",
+        ).toString("base64")}`,
+        "Content-Type": "text/vcard; charset=utf-8",
+        "User-Agent": USER_AGENT,
+      },
+      body,
+      cache: "no-store",
+    });
+  } catch (error) {
+    throw new CardDavPreflightError(
+      "CARDDAV_PUSH_NETWORK_ERROR",
+      error instanceof Error
+        ? `CardDAV push could not reach the remote server: ${error.message}`
+        : "CardDAV push could not reach the remote server.",
+    );
+  }
+
+  if (response.status === 401 || response.status === 403) {
+    throw new CardDavPreflightError(
+      "CARDDAV_PUSH_AUTH_FAILED",
+      "CardDAV push credentials were rejected by the remote address book.",
+    );
+  }
+
+  if (!response.ok) {
+    throw new CardDavPreflightError(
+      "CARDDAV_PUSH_HTTP_ERROR",
+      `CardDAV push failed with HTTP ${response.status}.`,
+    );
+  }
+
+  return {
+    href,
+    etag: response.headers.get("etag"),
+  };
 };
 
 export const discoverCardDavAccount = async ({

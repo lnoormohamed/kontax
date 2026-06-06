@@ -1014,8 +1014,8 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                         Lease {formatTimestamp(job.leaseExpiresAt)} · worker {job.workerId ?? "unassigned"}
                       </p>
                       <p className="mt-1 text-slate-500">
-                        Result counts C:{job.createdCount} U:{job.updatedCount} D:{job.deletedCount} S:
-                        {job.skippedCount}
+                        Result counts imported {job.createdCount} · matched {job.updatedCount} · exported{" "}
+                        {job.deletedCount} · skipped {job.skippedCount}
                       </p>
                       {job.errorSummary ? (
                         <p className="mt-2 text-sm text-amber-100">

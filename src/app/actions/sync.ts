@@ -9,8 +9,11 @@ import { assertCanCreateSyncAccount, assertCanUseCardDavSync } from "~/server/bi
 import {
   CardDavPreflightError,
   discoverCardDavAccount,
+  fetchCardDavAddressBookCards,
   fetchCardDavAddressBookIndex,
+  pushCardDavContact,
 } from "~/server/carddav";
+import { parseContactPostalAddresses, parseContactStringArray } from "~/server/contact-portability";
 import { db } from "~/server/db";
 import {
   decryptSyncCredentialPayload,
@@ -603,14 +606,20 @@ export const queueSyncJob = async (formData: FormData) => {
         password: decryptedCredentials.password,
       },
     });
+    const remoteCards = await fetchCardDavAddressBookCards({
+      addressBookUrl: account.addressBookUrl,
+      credentials: {
+        username: decryptedCredentials.username,
+        password: decryptedCredentials.password,
+      },
+    });
 
     const remoteUids = remoteEntries.map((entry) => entry.uid);
-    const matchingContacts =
+    const existingContacts =
       remoteUids.length > 0
         ? await db.contact.findMany({
             where: {
               userId,
-              archivedAt: null,
               syncUid: {
                 in: remoteUids,
               },
@@ -618,53 +627,200 @@ export const queueSyncJob = async (formData: FormData) => {
             select: {
               id: true,
               syncUid: true,
+              archivedAt: true,
             },
           })
         : [];
-    const contactByUid = new Map(matchingContacts.map((contact) => [contact.syncUid, contact]));
-    const matchedEntries = remoteEntries.filter((entry) => contactByUid.has(entry.uid));
-    const unmatchedEntries = remoteEntries.length - matchedEntries.length;
-
-    if (matchedEntries.length > 0) {
-      await db.$transaction(
-        matchedEntries.map((entry) => {
-          const contact = contactByUid.get(entry.uid)!;
-
-          return db.syncContactLink.upsert({
+    const exportCandidates =
+      account.syncDirection !== "IMPORT_ONLY"
+        ? await db.contact.findMany({
             where: {
-              syncAccountId_contactId: {
-                syncAccountId: account.id,
-                contactId: contact.id,
+              userId,
+              archivedAt: null,
+              syncTombstoneAt: null,
+              syncLinks: {
+                none: {
+                  syncAccountId: account.id,
+                },
               },
             },
-            create: {
+            select: {
+              id: true,
+              syncUid: true,
+              fullName: true,
+              nickname: true,
+              email: true,
+              emailAddresses: true,
+              phone: true,
+              phoneNumbers: true,
+              company: true,
+              jobTitle: true,
+              website: true,
+              birthday: true,
+              address: true,
+              postalAddresses: true,
+              notes: true,
+            },
+          })
+        : [];
+    const contactByUid = new Map(existingContacts.map((contact) => [contact.syncUid, contact]));
+    const remoteEntryByUid = new Map(remoteEntries.map((entry) => [entry.uid, entry]));
+    const matchedEntries = remoteEntries.filter((entry) => contactByUid.has(entry.uid));
+    const unmatchedCards =
+      account.syncDirection === "EXPORT_ONLY"
+        ? []
+        : remoteCards.filter((card) => !contactByUid.has(card.uid));
+    const pushedContacts =
+      exportCandidates.length > 0
+        ? await Promise.all(
+            exportCandidates.map(async (contact) => {
+              const remote = await pushCardDavContact({
+                addressBookUrl: account.addressBookUrl!,
+                credentials: {
+                  username: decryptedCredentials.username,
+                  password: decryptedCredentials.password,
+                },
+                remoteUid: contact.syncUid,
+                contact: {
+                  fullName: contact.fullName,
+                  nickname: contact.nickname,
+                  email: contact.email,
+                  emailAddresses: parseContactStringArray(contact.emailAddresses),
+                  phone: contact.phone,
+                  phoneNumbers: parseContactStringArray(contact.phoneNumbers),
+                  company: contact.company,
+                  jobTitle: contact.jobTitle,
+                  website: contact.website,
+                  birthday: contact.birthday,
+                  address: contact.address,
+                  postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
+                  notes: contact.notes,
+                },
+              });
+
+              return {
+                contactId: contact.id,
+                syncUid: contact.syncUid,
+                remoteHref: remote.href,
+                remoteETag: remote.etag,
+              };
+            }),
+          )
+        : [];
+
+    await db.$transaction(async (tx) => {
+      for (const entry of matchedEntries) {
+        const contact = contactByUid.get(entry.uid)!;
+
+        await tx.syncContactLink.upsert({
+          where: {
+            syncAccountId_contactId: {
               syncAccountId: account.id,
               contactId: contact.id,
-              remoteHref: entry.href,
-              remoteUid: entry.uid,
-              remoteETag: entry.etag,
-              lastSyncedAt: now,
             },
-            update: {
-              remoteHref: entry.href,
-              remoteUid: entry.uid,
-              remoteETag: entry.etag,
-              remoteDeletedAt: null,
-              tombstonedAt: null,
-              lastErrorCode: null,
-              lastErrorMessage: null,
-              lastSyncedAt: now,
-            },
-          });
-        }),
-      );
-    }
+          },
+          create: {
+            syncAccountId: account.id,
+            contactId: contact.id,
+            remoteHref: entry.href,
+            remoteUid: entry.uid,
+            remoteETag: entry.etag,
+            lastSyncedAt: now,
+          },
+          update: {
+            remoteHref: entry.href,
+            remoteUid: entry.uid,
+            remoteETag: entry.etag,
+            remoteDeletedAt: null,
+            tombstonedAt: null,
+            lastErrorCode: null,
+            lastErrorMessage: null,
+            lastSyncedAt: now,
+          },
+        });
+      }
 
-    await db.$transaction([
-      db.syncJob.create({
+      for (const card of unmatchedCards) {
+        const createdContact = await tx.contact.create({
+          data: {
+            userId,
+            syncUid: card.uid,
+            fullName: card.fullName,
+            firstName: card.firstName,
+            middleName: card.middleName,
+            lastName: card.lastName,
+            namePrefix: card.namePrefix,
+            nameSuffix: card.nameSuffix,
+            nickname: card.nickname,
+            email: card.emailAddresses[0] ?? null,
+            emailAddresses: card.emailAddresses.length > 0 ? card.emailAddresses : undefined,
+            emailEntries: card.emailEntries.length > 0 ? card.emailEntries : undefined,
+            phone: card.phoneNumbers[0] ?? null,
+            phoneNumbers: card.phoneNumbers.length > 0 ? card.phoneNumbers : undefined,
+            phoneEntries: card.phoneEntries.length > 0 ? card.phoneEntries : undefined,
+            company: card.company,
+            jobTitle: card.jobTitle,
+            website: card.website,
+            websiteEntries: card.websiteEntries.length > 0 ? card.websiteEntries : undefined,
+            birthday: card.birthday,
+            address: card.address,
+            postalAddresses:
+              card.postalAddresses.length > 0 ? card.postalAddresses : undefined,
+            addressEntries: card.addressEntries.length > 0 ? card.addressEntries : undefined,
+            notes: card.notes,
+          },
+          select: {
+            id: true,
+          },
+        });
+
+        const remoteEntry = remoteEntryByUid.get(card.uid);
+
+        await tx.syncContactLink.create({
+          data: {
+            syncAccountId: account.id,
+            contactId: createdContact.id,
+            remoteHref: remoteEntry?.href ?? card.href,
+            remoteUid: card.uid,
+            remoteETag: remoteEntry?.etag ?? card.etag,
+            lastSyncedAt: now,
+          },
+        });
+      }
+
+      for (const pushedContact of pushedContacts) {
+        await tx.syncContactLink.upsert({
+          where: {
+            syncAccountId_contactId: {
+              syncAccountId: account.id,
+              contactId: pushedContact.contactId,
+            },
+          },
+          create: {
+            syncAccountId: account.id,
+            contactId: pushedContact.contactId,
+            remoteHref: pushedContact.remoteHref,
+            remoteUid: pushedContact.syncUid,
+            remoteETag: pushedContact.remoteETag,
+            lastSyncedAt: now,
+          },
+          update: {
+            remoteHref: pushedContact.remoteHref,
+            remoteUid: pushedContact.syncUid,
+            remoteETag: pushedContact.remoteETag,
+            remoteDeletedAt: null,
+            tombstonedAt: null,
+            lastErrorCode: null,
+            lastErrorMessage: null,
+            lastSyncedAt: now,
+          },
+        });
+      }
+
+      await tx.syncJob.create({
         data: {
           syncAccountId: account.id,
-          status: unmatchedEntries > 0 ? "PARTIAL" : "SUCCEEDED",
+          status: "SUCCEEDED",
           trigger: "MANUAL",
           syncDirection: account.syncDirection,
           attemptCount: 1,
@@ -672,33 +828,33 @@ export const queueSyncJob = async (formData: FormData) => {
           nextRetryAt: now,
           startedAt: now,
           completedAt: new Date(),
+          createdCount: unmatchedCards.length,
           updatedCount: matchedEntries.length,
-          skippedCount: unmatchedEntries,
+          deletedCount: pushedContacts.length,
+          skippedCount: 0,
           cursorBefore: account.remoteAccountId ?? account.addressBookUrl,
           cursorAfter: String(remoteEntries.length),
           idempotencyKey: createIdempotencyKey([account.id, "manual", "index"]),
-          errorCode: unmatchedEntries > 0 ? "REMOTE_CONTACTS_UNMATCHED" : null,
           errorSummary:
-            unmatchedEntries > 0
-              ? `${matchedEntries.length} remote contacts linked and ${unmatchedEntries} remote contacts are still unmatched locally.`
+            unmatchedCards.length > 0 || pushedContacts.length > 0
+              ? `Imported ${unmatchedCards.length} remote contacts, refreshed ${matchedEntries.length} existing sync links, and exported ${pushedContacts.length} local contacts.`
               : `Indexed ${matchedEntries.length} remote contacts and refreshed local sync links.`,
         },
-      }),
-      db.syncAccount.update({
+      });
+
+      await tx.syncAccount.update({
         where: { id: account.id },
         data: {
           status: account.status === "PAUSED" ? "PAUSED" : "ACTIVE",
           lastSyncedAt: now,
           lastSucceededAt: now,
-          lastErrorAt: unmatchedEntries > 0 ? now : null,
-          lastErrorCode: unmatchedEntries > 0 ? "REMOTE_CONTACTS_UNMATCHED" : null,
-          lastErrorMessage:
-            unmatchedEntries > 0
-              ? `${unmatchedEntries} remote contacts do not map to a local sync UID yet.`
-              : null,
+          lastErrorAt: null,
+          lastErrorCode: null,
+          lastErrorMessage: null,
         },
-      }),
-    ]);
+      });
+
+    });
   } catch (error) {
     const errorCode =
       error instanceof CardDavPreflightError ? error.code : "CARDDAV_INDEX_FAILED";
