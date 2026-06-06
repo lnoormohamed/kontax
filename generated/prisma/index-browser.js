@@ -126,6 +126,7 @@ exports.Prisma.UserScalarFieldEnum = {
   name: 'name',
   email: 'email',
   password: 'password',
+  lifecycleState: 'lifecycleState',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -138,6 +139,44 @@ exports.Prisma.ContactScalarFieldEnum = {
   phone: 'phone',
   company: 'company',
   notes: 'notes',
+  archivedAt: 'archivedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SubscriptionCustomerScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  provider: 'provider',
+  providerCustomerId: 'providerCustomerId',
+  billingEmail: 'billingEmail',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SubscriptionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  subscriptionCustomerId: 'subscriptionCustomerId',
+  provider: 'provider',
+  providerSubscriptionId: 'providerSubscriptionId',
+  plan: 'plan',
+  status: 'status',
+  interval: 'interval',
+  contactsLimit: 'contactsLimit',
+  monthlyImportLimit: 'monthlyImportLimit',
+  syncAccountsLimit: 'syncAccountsLimit',
+  advancedMergeEnabled: 'advancedMergeEnabled',
+  premiumExportEnabled: 'premiumExportEnabled',
+  cardDavSyncEnabled: 'cardDavSyncEnabled',
+  startedAt: 'startedAt',
+  currentPeriodStart: 'currentPeriodStart',
+  currentPeriodEnd: 'currentPeriodEnd',
+  trialEndsAt: 'trialEndsAt',
+  graceEndsAt: 'graceEndsAt',
+  cancelAtPeriodEnd: 'cancelAtPeriodEnd',
+  canceledAt: 'canceledAt',
+  endedAt: 'endedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -156,11 +195,44 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+exports.AccountLifecycleState = exports.$Enums.AccountLifecycleState = {
+  ACTIVE: 'ACTIVE',
+  TRIALING: 'TRIALING',
+  GRACE: 'GRACE',
+  CANCELED: 'CANCELED',
+  LOCKED: 'LOCKED'
+};
 
+exports.BillingProvider = exports.$Enums.BillingProvider = {
+  STRIPE: 'STRIPE'
+};
+
+exports.SubscriptionPlan = exports.$Enums.SubscriptionPlan = {
+  FREE: 'FREE',
+  PLUS: 'PLUS',
+  PRO: 'PRO'
+};
+
+exports.SubscriptionStatus = exports.$Enums.SubscriptionStatus = {
+  INCOMPLETE: 'INCOMPLETE',
+  TRIALING: 'TRIALING',
+  ACTIVE: 'ACTIVE',
+  PAST_DUE: 'PAST_DUE',
+  CANCELED: 'CANCELED',
+  PAUSED: 'PAUSED',
+  EXPIRED: 'EXPIRED'
+};
+
+exports.SubscriptionInterval = exports.$Enums.SubscriptionInterval = {
+  MONTHLY: 'MONTHLY',
+  YEARLY: 'YEARLY'
+};
 
 exports.Prisma.ModelName = {
   User: 'User',
-  Contact: 'Contact'
+  Contact: 'Contact',
+  SubscriptionCustomer: 'SubscriptionCustomer',
+  Subscription: 'Subscription'
 };
 
 /**

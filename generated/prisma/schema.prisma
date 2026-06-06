@@ -8,27 +8,113 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum AccountLifecycleState {
+  ACTIVE
+  TRIALING
+  GRACE
+  CANCELED
+  LOCKED
+}
+
+enum BillingProvider {
+  STRIPE
+}
+
+enum SubscriptionPlan {
+  FREE
+  PLUS
+  PRO
+}
+
+enum SubscriptionStatus {
+  INCOMPLETE
+  TRIALING
+  ACTIVE
+  PAST_DUE
+  CANCELED
+  PAUSED
+  EXPIRED
+}
+
+enum SubscriptionInterval {
+  MONTHLY
+  YEARLY
+}
+
 model User {
-  id        String    @id @default(cuid())
-  name      String?
-  email     String    @unique
-  password  String
-  contacts  Contact[]
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
+  id                   String                @id @default(cuid())
+  name                 String?
+  email                String                @unique
+  password             String
+  lifecycleState       AccountLifecycleState @default(ACTIVE)
+  contacts             Contact[]
+  subscriptionCustomer SubscriptionCustomer?
+  subscriptions        Subscription[]
+  createdAt            DateTime              @default(now())
+  updatedAt            DateTime              @updatedAt
 }
 
 model Contact {
-  id        String   @id @default(cuid())
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  fullName  String
-  email     String?
-  phone     String?
-  company   String?
-  notes     String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id         String    @id @default(cuid())
+  userId     String
+  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  fullName   String
+  email      String?
+  phone      String?
+  company    String?
+  notes      String?
+  archivedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
 
-  @@index([userId, fullName])
+  @@index([userId, archivedAt, fullName])
+  @@index([userId, archivedAt, email])
+  @@index([userId, archivedAt, phone])
+}
+
+model SubscriptionCustomer {
+  id                 String          @id @default(cuid())
+  userId             String          @unique
+  provider           BillingProvider @default(STRIPE)
+  providerCustomerId String
+  billingEmail       String?
+  createdAt          DateTime        @default(now())
+  updatedAt          DateTime        @updatedAt
+  user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscriptions      Subscription[]
+
+  @@unique([provider, providerCustomerId])
+}
+
+model Subscription {
+  id                     String               @id @default(cuid())
+  userId                 String
+  subscriptionCustomerId String
+  provider               BillingProvider      @default(STRIPE)
+  providerSubscriptionId String
+  plan                   SubscriptionPlan     @default(FREE)
+  status                 SubscriptionStatus   @default(TRIALING)
+  interval               SubscriptionInterval @default(MONTHLY)
+  contactsLimit          Int?
+  monthlyImportLimit     Int?
+  syncAccountsLimit      Int?
+  advancedMergeEnabled   Boolean              @default(false)
+  premiumExportEnabled   Boolean              @default(false)
+  cardDavSyncEnabled     Boolean              @default(false)
+  startedAt              DateTime             @default(now())
+  currentPeriodStart     DateTime?
+  currentPeriodEnd       DateTime?
+  trialEndsAt            DateTime?
+  graceEndsAt            DateTime?
+  cancelAtPeriodEnd      Boolean              @default(false)
+  canceledAt             DateTime?
+  endedAt                DateTime?
+  createdAt              DateTime             @default(now())
+  updatedAt              DateTime             @updatedAt
+  user                   User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+  subscriptionCustomer   SubscriptionCustomer @relation(fields: [subscriptionCustomerId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerSubscriptionId])
+  @@index([userId, status])
+  @@index([subscriptionCustomerId, status])
 }

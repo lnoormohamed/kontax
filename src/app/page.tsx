@@ -1,92 +1,196 @@
 import Link from "next/link";
 
-import { auth, signOut } from "~/server/auth";
+import { ContactDashboard } from "~/app/_components/contact-dashboard";
+import { signOut } from "~/server/auth";
+import { auth } from "~/server/auth";
+import { db } from "~/server/db";
 
-export default async function HomePage() {
-  const session = await auth();
+type HomePageProps = {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+};
 
-  if (session?.user) {
-    return (
-      <main className="min-h-screen bg-[radial-gradient(circle_at_top,#1f6aa5_0%,#0f2a46_35%,#09111d_100%)] text-white">
-        <div className="mx-auto flex min-h-screen max-w-5xl flex-col justify-center gap-10 px-6 py-16">
-          <div className="space-y-4">
-            <p className="text-sm uppercase tracking-[0.35em] text-cyan-200">Kontax</p>
-            <h1 className="text-5xl font-extrabold tracking-tight sm:text-7xl">
-              Welcome back{session.user.name ? `, ${session.user.name}` : ""}.
-            </h1>
-            <p className="max-w-2xl text-lg text-slate-200">
-              You&apos;re signed in and ready for the next step. We can build the contact dashboard
-              on top of this authenticated foundation next.
-            </p>
-          </div>
-          <div className="grid gap-4 md:grid-cols-[1.3fr_0.7fr]">
-            <section className="rounded-3xl border border-white/15 bg-white/8 p-6">
-              <h2 className="text-2xl font-bold">Account</h2>
-              <p className="mt-3 text-base text-slate-200">
-                Signed in as <span className="font-semibold text-white">{session.user.email}</span>
-              </p>
-            </section>
-            <section className="rounded-3xl border border-white/15 bg-white/8 p-6">
-              <form
-                action={async () => {
-                  "use server";
-                  await signOut({ redirectTo: "/" });
-                }}
-              >
-                <button className="w-full rounded-full bg-white px-5 py-3 font-semibold text-slate-950 transition hover:bg-cyan-100">
-                  Sign out
-                </button>
-              </form>
-            </section>
-          </div>
+const getQueryValue = async (searchParams?: HomePageProps["searchParams"]) => {
+  const params = searchParams ? await searchParams : undefined;
+  const rawQuery = params?.q;
+  const query = Array.isArray(rawQuery) ? rawQuery[0] : rawQuery;
+
+  return query?.trim() ?? "";
+};
+
+const getSearchConditions = (query: string) =>
+  query
+    ? {
+        OR: [
+          {
+            fullName: {
+              contains: query,
+              mode: "insensitive" as const,
+            },
+          },
+          {
+            email: {
+              contains: query,
+              mode: "insensitive" as const,
+            },
+          },
+          {
+            phone: {
+              contains: query,
+              mode: "insensitive" as const,
+            },
+          },
+          {
+            company: {
+              contains: query,
+              mode: "insensitive" as const,
+            },
+          },
+        ],
+      }
+    : {};
+
+const PublicLanding = () => (
+  <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),_transparent_30%),linear-gradient(180deg,#020617_0%,#07111d_45%,#0f172a_100%)] text-white">
+    <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-center gap-12 px-6 py-12 lg:flex-row lg:items-center lg:justify-between lg:px-10">
+      <section className="max-w-2xl space-y-6">
+        <p className="text-sm uppercase tracking-[0.35em] text-cyan-200">Kontax</p>
+        <h1 className="text-5xl font-semibold tracking-tight text-white sm:text-6xl">
+          Your personal contact home, built to stay clean as life gets messier.
+        </h1>
+        <p className="max-w-xl text-base text-slate-300 sm:text-lg">
+          Save the people who matter, keep details current, and grow into imports, merge tools,
+          and sync without rebuilding your contact foundation later.
+        </p>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <Link
+            className="rounded-full bg-white px-6 py-3 text-center font-semibold text-slate-950 transition hover:bg-cyan-100"
+            href="/register"
+          >
+            Create account
+          </Link>
+          <Link
+            className="rounded-full border border-white/15 px-6 py-3 text-center font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-100"
+            href="/login"
+          >
+            Log in
+          </Link>
         </div>
-      </main>
-    );
-  }
+      </section>
 
-  return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,#1f6aa5_0%,#0f2a46_35%,#09111d_100%)] text-white">
-      <div className="mx-auto flex min-h-screen max-w-5xl flex-col justify-center gap-12 px-6 py-16">
-        <div className="max-w-3xl space-y-5">
-          <p className="text-sm uppercase tracking-[0.35em] text-cyan-200">Kontax</p>
-          <h1 className="text-5xl font-extrabold tracking-tight sm:text-7xl">
-            Your people, remembered beautifully.
-          </h1>
-          <p className="max-w-2xl text-lg text-slate-200">
-            Kontax is the place to keep the customers, partners, friends, and leads that matter to
-            you most. Sign in to start building your contact home.
+      <section className="grid max-w-xl gap-4 rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-[0_30px_120px_rgba(2,8,23,0.45)] backdrop-blur sm:grid-cols-2">
+        <div className="rounded-[1.5rem] border border-white/10 bg-[#08101c] p-5">
+          <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Today</p>
+          <p className="mt-3 text-3xl font-semibold text-white">Contact dashboard</p>
+          <p className="mt-2 text-sm text-slate-400">
+            Sign up, save people, archive safely, and manage details from one workspace.
           </p>
         </div>
-        <div className="grid grid-cols-1 gap-4 md:max-w-4xl md:grid-cols-[1.1fr_0.9fr]">
-          <section className="rounded-3xl border border-white/15 bg-white/8 p-6">
-            <h2 className="text-2xl font-bold">Get started</h2>
-            <p className="mt-3 text-base text-slate-200">
-              Create your account and start with a clean, secure login flow built for Kontax.
-            </p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Link
-                className="rounded-full bg-white px-5 py-3 font-semibold text-slate-950 transition hover:bg-cyan-100"
-                href="/login"
-              >
-                Log in
-              </Link>
-              <Link
-                className="rounded-full border border-white/30 px-5 py-3 font-semibold text-white transition hover:bg-white/10"
-                href="/register"
-              >
-                Create account
-              </Link>
-            </div>
-          </section>
-          <section className="rounded-3xl border border-white/15 bg-white/8 p-6">
-            <h2 className="text-2xl font-bold">What&apos;s next</h2>
-            <p className="mt-3 text-base text-slate-200">
-              Login is now the first-class path into the app. Next we can plug in contact creation,
-              search, and personal organization flows.
-            </p>
-          </section>
+        <div className="rounded-[1.5rem] border border-white/10 bg-[#08101c] p-5">
+          <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Next</p>
+          <p className="mt-3 text-3xl font-semibold text-white">Billing and sync foundation</p>
+          <p className="mt-2 text-sm text-slate-400">
+            The data model is now being shaped for entitlements, imports, merge logic, and CardDAV.
+          </p>
         </div>
-      </div>
-    </main>
+      </section>
+    </div>
+  </main>
+);
+
+export default async function Home({ searchParams }: HomePageProps) {
+  const session = await auth();
+
+  if (!session?.user?.id) {
+    return <PublicLanding />;
+  }
+
+  const query = await getQueryValue(searchParams);
+  const searchConditions = getSearchConditions(query);
+  const [activeContacts, archivedContacts] = await Promise.all([
+    db.contact.findMany({
+      where: {
+        userId: session.user.id,
+        archivedAt: null,
+        ...searchConditions,
+      },
+      orderBy: {
+        updatedAt: "desc",
+      },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        phone: true,
+        company: true,
+        notes: true,
+        archivedAt: true,
+        updatedAt: true,
+      },
+    }),
+    db.contact.findMany({
+      where: {
+        userId: session.user.id,
+        NOT: {
+          archivedAt: null,
+        },
+        ...searchConditions,
+      },
+      orderBy: {
+        archivedAt: "desc",
+      },
+      select: {
+        id: true,
+        fullName: true,
+        email: true,
+        phone: true,
+        company: true,
+        notes: true,
+        archivedAt: true,
+        updatedAt: true,
+      },
+    }),
+  ]);
+
+  const handleSignOut = async () => {
+    "use server";
+
+    await signOut({ redirectTo: "/login" });
+  };
+
+  const userLabel = session.user.name?.trim() || session.user.email?.split("@")[0] || "friend";
+
+  return (
+    <>
+      <header className="sticky top-0 z-20 border-b border-white/10 bg-[#020817]/80 backdrop-blur">
+        <div className="mx-auto flex w-full max-w-7xl items-center justify-between px-6 py-4 lg:px-10">
+          <div>
+            <p className="text-sm uppercase tracking-[0.35em] text-cyan-200">Kontax</p>
+            <p className="mt-1 text-sm text-slate-400">Personal contact workspace</p>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <div className="hidden text-right sm:block">
+              <p className="text-sm font-medium text-white">{session.user.email}</p>
+              <p className="text-xs text-slate-400">Signed in</p>
+            </div>
+            <form action={handleSignOut}>
+              <button
+                className="rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-100"
+                type="submit"
+              >
+                Sign out
+              </button>
+            </form>
+          </div>
+        </div>
+      </header>
+
+      <ContactDashboard
+        activeContacts={activeContacts}
+        archivedContacts={archivedContacts}
+        query={query}
+        userLabel={userLabel}
+      />
+    </>
   );
 }

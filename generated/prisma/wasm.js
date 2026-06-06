@@ -98,6 +98,7 @@ exports.Prisma.UserScalarFieldEnum = {
   name: 'name',
   email: 'email',
   password: 'password',
+  lifecycleState: 'lifecycleState',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -110,6 +111,44 @@ exports.Prisma.ContactScalarFieldEnum = {
   phone: 'phone',
   company: 'company',
   notes: 'notes',
+  archivedAt: 'archivedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SubscriptionCustomerScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  provider: 'provider',
+  providerCustomerId: 'providerCustomerId',
+  billingEmail: 'billingEmail',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SubscriptionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  subscriptionCustomerId: 'subscriptionCustomerId',
+  provider: 'provider',
+  providerSubscriptionId: 'providerSubscriptionId',
+  plan: 'plan',
+  status: 'status',
+  interval: 'interval',
+  contactsLimit: 'contactsLimit',
+  monthlyImportLimit: 'monthlyImportLimit',
+  syncAccountsLimit: 'syncAccountsLimit',
+  advancedMergeEnabled: 'advancedMergeEnabled',
+  premiumExportEnabled: 'premiumExportEnabled',
+  cardDavSyncEnabled: 'cardDavSyncEnabled',
+  startedAt: 'startedAt',
+  currentPeriodStart: 'currentPeriodStart',
+  currentPeriodEnd: 'currentPeriodEnd',
+  trialEndsAt: 'trialEndsAt',
+  graceEndsAt: 'graceEndsAt',
+  cancelAtPeriodEnd: 'cancelAtPeriodEnd',
+  canceledAt: 'canceledAt',
+  endedAt: 'endedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -128,11 +167,44 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
+exports.AccountLifecycleState = exports.$Enums.AccountLifecycleState = {
+  ACTIVE: 'ACTIVE',
+  TRIALING: 'TRIALING',
+  GRACE: 'GRACE',
+  CANCELED: 'CANCELED',
+  LOCKED: 'LOCKED'
+};
 
+exports.BillingProvider = exports.$Enums.BillingProvider = {
+  STRIPE: 'STRIPE'
+};
+
+exports.SubscriptionPlan = exports.$Enums.SubscriptionPlan = {
+  FREE: 'FREE',
+  PLUS: 'PLUS',
+  PRO: 'PRO'
+};
+
+exports.SubscriptionStatus = exports.$Enums.SubscriptionStatus = {
+  INCOMPLETE: 'INCOMPLETE',
+  TRIALING: 'TRIALING',
+  ACTIVE: 'ACTIVE',
+  PAST_DUE: 'PAST_DUE',
+  CANCELED: 'CANCELED',
+  PAUSED: 'PAUSED',
+  EXPIRED: 'EXPIRED'
+};
+
+exports.SubscriptionInterval = exports.$Enums.SubscriptionInterval = {
+  MONTHLY: 'MONTHLY',
+  YEARLY: 'YEARLY'
+};
 
 exports.Prisma.ModelName = {
   User: 'User',
-  Contact: 'Contact'
+  Contact: 'Contact',
+  SubscriptionCustomer: 'SubscriptionCustomer',
+  Subscription: 'Subscription'
 };
 /**
  * Create the Client
@@ -182,13 +254,13 @@ const config = {
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id        String    @id @default(cuid())\n  name      String?\n  email     String    @unique\n  password  String\n  contacts  Contact[]\n  createdAt DateTime  @default(now())\n  updatedAt DateTime  @updatedAt\n}\n\nmodel Contact {\n  id        String   @id @default(cuid())\n  userId    String\n  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)\n  fullName  String\n  email     String?\n  phone     String?\n  company   String?\n  notes     String?\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  @@index([userId, fullName])\n}\n",
-  "inlineSchemaHash": "f7c3de236653edf5f7bee17cb6724f62621491458dd940da302e0f7eeebbaf89",
+  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nenum AccountLifecycleState {\n  ACTIVE\n  TRIALING\n  GRACE\n  CANCELED\n  LOCKED\n}\n\nenum BillingProvider {\n  STRIPE\n}\n\nenum SubscriptionPlan {\n  FREE\n  PLUS\n  PRO\n}\n\nenum SubscriptionStatus {\n  INCOMPLETE\n  TRIALING\n  ACTIVE\n  PAST_DUE\n  CANCELED\n  PAUSED\n  EXPIRED\n}\n\nenum SubscriptionInterval {\n  MONTHLY\n  YEARLY\n}\n\nmodel User {\n  id                   String                @id @default(cuid())\n  name                 String?\n  email                String                @unique\n  password             String\n  lifecycleState       AccountLifecycleState @default(ACTIVE)\n  contacts             Contact[]\n  subscriptionCustomer SubscriptionCustomer?\n  subscriptions        Subscription[]\n  createdAt            DateTime              @default(now())\n  updatedAt            DateTime              @updatedAt\n}\n\nmodel Contact {\n  id         String    @id @default(cuid())\n  userId     String\n  user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)\n  fullName   String\n  email      String?\n  phone      String?\n  company    String?\n  notes      String?\n  archivedAt DateTime?\n  createdAt  DateTime  @default(now())\n  updatedAt  DateTime  @updatedAt\n\n  @@index([userId, archivedAt, fullName])\n  @@index([userId, archivedAt, email])\n  @@index([userId, archivedAt, phone])\n}\n\nmodel SubscriptionCustomer {\n  id                 String          @id @default(cuid())\n  userId             String          @unique\n  provider           BillingProvider @default(STRIPE)\n  providerCustomerId String\n  billingEmail       String?\n  createdAt          DateTime        @default(now())\n  updatedAt          DateTime        @updatedAt\n  user               User            @relation(fields: [userId], references: [id], onDelete: Cascade)\n  subscriptions      Subscription[]\n\n  @@unique([provider, providerCustomerId])\n}\n\nmodel Subscription {\n  id                     String               @id @default(cuid())\n  userId                 String\n  subscriptionCustomerId String\n  provider               BillingProvider      @default(STRIPE)\n  providerSubscriptionId String\n  plan                   SubscriptionPlan     @default(FREE)\n  status                 SubscriptionStatus   @default(TRIALING)\n  interval               SubscriptionInterval @default(MONTHLY)\n  contactsLimit          Int?\n  monthlyImportLimit     Int?\n  syncAccountsLimit      Int?\n  advancedMergeEnabled   Boolean              @default(false)\n  premiumExportEnabled   Boolean              @default(false)\n  cardDavSyncEnabled     Boolean              @default(false)\n  startedAt              DateTime             @default(now())\n  currentPeriodStart     DateTime?\n  currentPeriodEnd       DateTime?\n  trialEndsAt            DateTime?\n  graceEndsAt            DateTime?\n  cancelAtPeriodEnd      Boolean              @default(false)\n  canceledAt             DateTime?\n  endedAt                DateTime?\n  createdAt              DateTime             @default(now())\n  updatedAt              DateTime             @updatedAt\n  user                   User                 @relation(fields: [userId], references: [id], onDelete: Cascade)\n  subscriptionCustomer   SubscriptionCustomer @relation(fields: [subscriptionCustomerId], references: [id], onDelete: Cascade)\n\n  @@unique([provider, providerSubscriptionId])\n  @@index([userId, status])\n  @@index([subscriptionCustomerId, status])\n}\n",
+  "inlineSchemaHash": "e057f768e638f541585f522c0bbd4bd7291bf6300d8a6d080b63a240ad9886a9",
   "copyEngine": true
 }
 config.dirname = '/'
 
-config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"contacts\",\"kind\":\"object\",\"type\":\"Contact\",\"relationName\":\"ContactToUser\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Contact\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"ContactToUser\"},{\"name\":\"fullName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"phone\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"company\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"notes\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
+config.runtimeDataModel = JSON.parse("{\"models\":{\"User\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"name\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"password\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"lifecycleState\",\"kind\":\"enum\",\"type\":\"AccountLifecycleState\"},{\"name\":\"contacts\",\"kind\":\"object\",\"type\":\"Contact\",\"relationName\":\"ContactToUser\"},{\"name\":\"subscriptionCustomer\",\"kind\":\"object\",\"type\":\"SubscriptionCustomer\",\"relationName\":\"SubscriptionCustomerToUser\"},{\"name\":\"subscriptions\",\"kind\":\"object\",\"type\":\"Subscription\",\"relationName\":\"SubscriptionToUser\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"Contact\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"ContactToUser\"},{\"name\":\"fullName\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"email\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"phone\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"company\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"notes\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"archivedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"}],\"dbName\":null},\"SubscriptionCustomer\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"provider\",\"kind\":\"enum\",\"type\":\"BillingProvider\"},{\"name\":\"providerCustomerId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"billingEmail\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"SubscriptionCustomerToUser\"},{\"name\":\"subscriptions\",\"kind\":\"object\",\"type\":\"Subscription\",\"relationName\":\"SubscriptionToSubscriptionCustomer\"}],\"dbName\":null},\"Subscription\":{\"fields\":[{\"name\":\"id\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"userId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"subscriptionCustomerId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"provider\",\"kind\":\"enum\",\"type\":\"BillingProvider\"},{\"name\":\"providerSubscriptionId\",\"kind\":\"scalar\",\"type\":\"String\"},{\"name\":\"plan\",\"kind\":\"enum\",\"type\":\"SubscriptionPlan\"},{\"name\":\"status\",\"kind\":\"enum\",\"type\":\"SubscriptionStatus\"},{\"name\":\"interval\",\"kind\":\"enum\",\"type\":\"SubscriptionInterval\"},{\"name\":\"contactsLimit\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"monthlyImportLimit\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"syncAccountsLimit\",\"kind\":\"scalar\",\"type\":\"Int\"},{\"name\":\"advancedMergeEnabled\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"premiumExportEnabled\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"cardDavSyncEnabled\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"startedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"currentPeriodStart\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"currentPeriodEnd\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"trialEndsAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"graceEndsAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"cancelAtPeriodEnd\",\"kind\":\"scalar\",\"type\":\"Boolean\"},{\"name\":\"canceledAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"endedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"createdAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"updatedAt\",\"kind\":\"scalar\",\"type\":\"DateTime\"},{\"name\":\"user\",\"kind\":\"object\",\"type\":\"User\",\"relationName\":\"SubscriptionToUser\"},{\"name\":\"subscriptionCustomer\",\"kind\":\"object\",\"type\":\"SubscriptionCustomer\",\"relationName\":\"SubscriptionToSubscriptionCustomer\"}],\"dbName\":null}},\"enums\":{},\"types\":{}}")
 defineDmmfProperty(exports.Prisma, config.runtimeDataModel)
 config.engineWasm = {
   getRuntime: async () => require('./query_engine_bg.js'),
