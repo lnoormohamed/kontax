@@ -18,8 +18,8 @@ export const parseContactPostalAddresses = (value: unknown): ContactPostalAddres
           return [];
         }
 
-        const rawLabel = item["label"];
-        const rawFormatted = item["formatted"];
+        const rawLabel = item.label;
+        const rawFormatted = item.formatted;
         const label = typeof rawLabel === "string" ? rawLabel : "other";
         const formatted = typeof rawFormatted === "string" ? rawFormatted : null;
 
