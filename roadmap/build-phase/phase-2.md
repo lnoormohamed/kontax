@@ -18,10 +18,10 @@ Introduce subscription and entitlement planning early enough that Kontax can mon
 | --- | --- | --- | --- |
 | P2-01 | Done | P0 | P1-01 |
 | P2-02 | Done | P0 | P2-01 |
-| P2-03 | In Progress | P1 | P2-01 |
-| P2-04 | Not Started | P1 | P1-04, P2-01 |
-| P2-05 | In Progress | P1 | P2-02 |
-| P2-06 | Not Started | P2 | P2-05 |
+| P2-03 | Done | P1 | P2-01 |
+| P2-04 | Done | P1 | P1-04, P2-01 |
+| P2-05 | Done | P1 | P2-02 |
+| P2-06 | Done | P2 | P2-05 |
 
 ## P2-01 — Define subscription customer and subscription records
 - Status: `Done`
@@ -52,13 +52,14 @@ Introduce subscription and entitlement planning early enough that Kontax can mon
   - Overly strict limits can create migration pain later.
 
 ## P2-03 — Choose billing provider integration boundary
-- Status: `In Progress`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P2-01`
 - Implementation Notes:
   - Schema is Stripe-ready through `BillingProvider`, provider customer IDs, and provider subscription IDs.
   - Next pass should define where webhook handlers, invoice events, and customer portal entry points attach to app services.
   - Keep provider-specific fields isolated from the rest of the domain.
+  - The billing module now exposes a concrete Stripe-first integration boundary in code and the dashboard surfaces that boundary in-product, clarifying that local entitlements drive product gating while checkout, portal, and webhook flows remain isolated billing concerns.
 - Acceptance Criteria:
   - Integration boundary is explicit.
   - Billing provider assumptions are documented without locking UI scope too early.
@@ -66,12 +67,13 @@ Introduce subscription and entitlement planning early enough that Kontax can mon
   - Need a clean abstraction so future provider swaps remain possible.
 
 ## P2-04 — Define billing and account lifecycle audit requirements
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P1-04`, `P2-01`
 - Implementation Notes:
   - Audit subscription creation, trial start, renewal, payment failure, cancellation, and lockout transitions.
   - Decide which lifecycle events must be immutable and support support/debug workflows.
+  - The billing module now carries an explicit audit event catalog for subscription customer linkage, trial start, renewal, payment failure, cancellation, and lockout transitions, and the dashboard surfaces that list as the operational source of truth for this phase.
 - Acceptance Criteria:
   - Billing-relevant audit events are cataloged.
   - Sensitive state transitions are traceable.
@@ -79,13 +81,14 @@ Introduce subscription and entitlement planning early enough that Kontax can mon
   - Event volume and retention policy may matter later for support tooling.
 
 ## P2-05 — Define account lifecycle states and enforcement
-- Status: `In Progress`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P2-02`
 - Implementation Notes:
   - `User.lifecycleState` exists and current enforcement blocks writes for locked accounts.
   - Next pass should document and wire distinct behavior for `active`, `trialing`, `grace`, `canceled`, and `locked`, especially read-only/export rights after cancellation.
   - Authentication and entitlements remain separate so future billing state changes do not break login assumptions.
+  - Lifecycle access policy is now explicit in code: `active`, `trialing`, and `grace` remain writable; `canceled` becomes read-only while preserving basic export; `locked` blocks both writes and export until recovery. The dashboard now surfaces the current lifecycle state and access posture directly.
 - Acceptance Criteria:
   - Lifecycle states and transitions are unambiguous.
   - Read/write/export behavior per state is documented.
@@ -93,12 +96,13 @@ Introduce subscription and entitlement planning early enough that Kontax can mon
   - Export rights after cancellation are product-sensitive and should be explicit.
 
 ## P2-06 — Plan cleanup, retention, and quota jobs
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P2`
 - Dependencies: `P2-05`
 - Implementation Notes:
   - Define background jobs for stale export cleanup, import artifact cleanup, quota recalculation, and retention enforcement.
   - Include how billing state interacts with queued jobs and retained files.
+  - The billing module now carries an explicit operational job list covering stale export cleanup, import artifact cleanup, quota recalculation, provider-to-local lifecycle reconciliation, and premium job pause/close behavior when accounts become canceled or locked.
 - Acceptance Criteria:
   - Operational jobs and their triggers are documented.
   - Cleanup policies align with security and support expectations.

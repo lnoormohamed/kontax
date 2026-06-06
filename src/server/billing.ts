@@ -2,6 +2,8 @@ import { type SubscriptionPlan } from "../../generated/prisma";
 
 import { db } from "~/server/db";
 
+export type BillingLifecycleState = "ACTIVE" | "TRIALING" | "GRACE" | "CANCELED" | "LOCKED";
+
 type PlanEntitlements = {
   contactsLimit: number;
   monthlyImportLimit: number;
@@ -12,10 +14,92 @@ type PlanEntitlements = {
 };
 
 type BillingContext = {
-  lifecycleState: "ACTIVE" | "TRIALING" | "GRACE" | "CANCELED" | "LOCKED";
+  lifecycleState: BillingLifecycleState;
   plan: SubscriptionPlan;
   planLabel: string;
   entitlements: PlanEntitlements;
+};
+
+type LifecycleAccessPolicy = {
+  label: string;
+  description: string;
+  canWrite: boolean;
+  canUseBasicExport: boolean;
+  canAuthenticateExpected: boolean;
+};
+
+export const BILLING_PROVIDER_BOUNDARY = {
+  providerLabel: "Stripe-first integration boundary",
+  integrationShape: [
+    "Checkout, upgrades, and customer portal entry points should call a dedicated billing service boundary instead of mutating subscription rows directly from product UI.",
+    "Webhook handlers should be the only automated writers for provider customer IDs, provider subscription IDs, renewal timestamps, payment failure state, and cancellation transitions.",
+    "Feature gating inside the app should read local entitlement state from Kontax, not make live provider API calls during ordinary product actions.",
+  ],
+  providerScopedFields: [
+    "BillingProvider",
+    "providerCustomerId",
+    "providerSubscriptionId",
+    "provider price or product mapping",
+    "webhook event identifiers for idempotency",
+  ],
+} as const;
+
+export const BILLING_AUDIT_REQUIREMENTS = [
+  "subscription customer created or linked",
+  "trial started or extended",
+  "subscription renewed",
+  "payment failed and grace started",
+  "subscription canceled or cancellation reversed",
+  "account moved to locked or reactivated state",
+] as const;
+
+export const BILLING_OPERATIONAL_JOBS = [
+  "expire stale export artifacts on a shorter retention window than canonical contacts",
+  "clean import upload artifacts after preview or commit windows close",
+  "recalculate contact, import, and sync quota usage on a scheduled basis",
+  "reconcile provider lifecycle changes into local subscription and user lifecycle state",
+  "close or pause queued premium jobs when lifecycle state becomes canceled or locked",
+] as const;
+
+const LIFECYCLE_ACCESS_POLICIES: Record<BillingLifecycleState, LifecycleAccessPolicy> = {
+  ACTIVE: {
+    label: "Active",
+    description: "Full read/write access with normal entitlement checks.",
+    canWrite: true,
+    canUseBasicExport: true,
+    canAuthenticateExpected: true,
+  },
+  TRIALING: {
+    label: "Trialing",
+    description: "Full product access during the active trial window.",
+    canWrite: true,
+    canUseBasicExport: true,
+    canAuthenticateExpected: true,
+  },
+  GRACE: {
+    label: "Grace",
+    description:
+      "Writes continue during recovery from billing issues, but billing follow-up is expected before lockout.",
+    canWrite: true,
+    canUseBasicExport: true,
+    canAuthenticateExpected: true,
+  },
+  CANCELED: {
+    label: "Canceled",
+    description:
+      "Account becomes read-only, but owned contacts remain visible and basic export stays available for portability.",
+    canWrite: false,
+    canUseBasicExport: true,
+    canAuthenticateExpected: true,
+  },
+  LOCKED: {
+    label: "Locked",
+    description:
+      "Account is restricted until billing recovery or administrative intervention clears the lock.",
+    canWrite: false,
+    canUseBasicExport: false,
+    canAuthenticateExpected: false,
+  },
 };
 
 const PLAN_DEFAULTS: Record<SubscriptionPlan, PlanEntitlements> = {
@@ -50,6 +134,9 @@ const PLAN_LABELS: Record<SubscriptionPlan, string> = {
   PLUS: "Plus",
   PRO: "Pro",
 };
+
+export const getLifecycleAccessPolicy = (state: BillingLifecycleState) =>
+  LIFECYCLE_ACCESS_POLICIES[state];
 
 const getMonthStart = () => {
   const now = new Date();
@@ -107,8 +194,24 @@ export const getUserBillingContext = async (userId: string): Promise<BillingCont
 };
 
 const assertWritableAccount = (context: BillingContext) => {
-  if (context.lifecycleState === "LOCKED") {
+  const policy = getLifecycleAccessPolicy(context.lifecycleState);
+
+  if (!policy.canWrite) {
+    if (context.lifecycleState === "CANCELED") {
+      throw new Error(
+        "This account is canceled and currently read-only. Export your contacts or reactivate billing to resume changes.",
+      );
+    }
+
     throw new Error("This account is locked. Update billing before making changes.");
+  }
+};
+
+const assertExportableAccount = (context: BillingContext) => {
+  const policy = getLifecycleAccessPolicy(context.lifecycleState);
+
+  if (!policy.canUseBasicExport) {
+    throw new Error("This account is locked. Update billing before exporting contacts.");
   }
 };
 
@@ -134,6 +237,7 @@ export const getUserPlanSummary = async (userId: string) => {
 
   return {
     ...context,
+    lifecyclePolicy: getLifecycleAccessPolicy(context.lifecycleState),
     contactsUsed,
     contactsRemaining: Math.max(context.entitlements.contactsLimit - contactsUsed, 0),
     importedThisMonth: importedThisMonthAggregate._sum.importedCount ?? 0,
@@ -167,7 +271,7 @@ export const assertCanImportContacts = async (userId: string, incomingCount: num
 
 export const assertCanUsePremiumExport = async (userId: string) => {
   const summary = await getUserPlanSummary(userId);
-  assertWritableAccount(summary);
+  assertExportableAccount(summary);
 
   if (!summary.entitlements.premiumExportEnabled) {
     throw new Error("vCard export is available on Plus and Pro plans.");

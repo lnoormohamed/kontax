@@ -34,10 +34,10 @@ This roadmap is the implementation source of truth for phases 1-5. Each phase fi
 | P1-06 | 1 | Done | P1 | P1-02, P1-03 | Unassigned | Dashboard and CRUD milestone defined |
 | P2-01 | 2 | Done | P0 | P1-01 | Unassigned | Subscription customer model drafted |
 | P2-02 | 2 | Done | P0 | P2-01 | Unassigned | Plan and entitlement rules defined |
-| P2-03 | 2 | In Progress | P1 | P2-01 | Unassigned | Billing provider integration boundary chosen |
-| P2-04 | 2 | Not Started | P1 | P1-04, P2-01 | Unassigned | Billing lifecycle audit events defined |
-| P2-05 | 2 | In Progress | P1 | P2-02 | Unassigned | Account lifecycle states and enforcement documented |
-| P2-06 | 2 | Not Started | P2 | P2-05 | Unassigned | Retention, cleanup, and quota jobs planned |
+| P2-03 | 2 | Done | P1 | P2-01 | Unassigned | Billing provider integration boundary chosen |
+| P2-04 | 2 | Done | P1 | P1-04, P2-01 | Unassigned | Billing lifecycle audit events defined |
+| P2-05 | 2 | Done | P1 | P2-02 | Unassigned | Account lifecycle states and enforcement documented |
+| P2-06 | 2 | Done | P2 | P2-05 | Unassigned | Retention, cleanup, and quota jobs planned |
 | P3-01 | 3 | In Progress | P0 | P1-02 | Unassigned | Supported formats and multi-column field mapping finalized |
 | P3-02 | 3 | In Progress | P0 | P3-01 | Unassigned | Import pipeline and preview/commit stages documented |
 | P3-03 | 3 | Done | P0 | P3-01 | Unassigned | Export pipeline stages documented |

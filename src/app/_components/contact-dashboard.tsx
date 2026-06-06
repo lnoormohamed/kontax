@@ -3,6 +3,12 @@ import Link from "next/link";
 import { archiveContact, createContact, restoreContact } from "~/app/actions/contacts";
 import { MergeSuggestionDismissButton } from "~/app/_components/merge-suggestion-dismiss-button";
 import { MergeSuggestionRefreshButton } from "~/app/_components/merge-suggestion-refresh-button";
+import {
+  BILLING_AUDIT_REQUIREMENTS,
+  BILLING_OPERATIONAL_JOBS,
+  BILLING_PROVIDER_BOUNDARY,
+  type BillingLifecycleState,
+} from "~/server/billing";
 import type { PersistedMergeSuggestion } from "~/server/contact-merge";
 
 type DashboardContact = {
@@ -23,6 +29,11 @@ type DashboardContact = {
 
 type PlanSummary = {
   planLabel: string;
+  lifecycleState: BillingLifecycleState;
+  lifecycleLabel: string;
+  lifecycleDescription: string;
+  canWrite: boolean;
+  canUseBasicExport: boolean;
   contactsUsed: number;
   contactsRemaining: number;
   contactsLimit: number;
@@ -169,6 +180,10 @@ export function ContactDashboard({
               <p className="mt-2 text-3xl font-semibold text-white">{planSummary.planLabel}</p>
             </div>
             <div>
+              <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Lifecycle</p>
+              <p className="mt-2 text-sm text-white">{planSummary.lifecycleLabel}</p>
+            </div>
+            <div>
               <p className="text-xs uppercase tracking-[0.3em] text-slate-500">Contacts</p>
               <p className="mt-2 text-sm text-white">
                 {planSummary.contactsUsed} / {planSummary.contactsLimit}
@@ -179,6 +194,83 @@ export function ContactDashboard({
               <p className="mt-2 text-sm text-white">
                 {planSummary.importedThisMonth} / {planSummary.monthlyImportLimit}
               </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+          <div className="rounded-[2rem] border border-white/10 bg-[#08101c]/90 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.35)]">
+            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P2-03 billing boundary</p>
+            <h2 className="mt-3 text-2xl font-semibold text-white">
+              Stripe-ready boundary without leaking provider logic into core contacts
+            </h2>
+            <p className="mt-3 text-sm text-slate-400">
+              Billing is planned as a thin integration layer around local subscription state. That
+              keeps checkout, webhooks, and future portal work isolated from the canonical contact
+              model.
+            </p>
+            <div className="mt-5 rounded-[1.5rem] border border-white/10 bg-white/5 p-4">
+              <p className="text-sm font-semibold text-white">
+                {BILLING_PROVIDER_BOUNDARY.providerLabel}
+              </p>
+              <div className="mt-3 grid gap-2 text-sm text-slate-300">
+                {BILLING_PROVIDER_BOUNDARY.integrationShape.map((item) => (
+                  <p key={item}>{item}</p>
+                ))}
+              </div>
+              <div className="mt-4 grid gap-2 text-sm text-slate-400">
+                {BILLING_PROVIDER_BOUNDARY.providerScopedFields.map((item) => (
+                  <p key={item}>Provider-scoped field: {item}</p>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.25)]">
+            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P2-05 lifecycle policy</p>
+            <h2 className="mt-3 text-2xl font-semibold text-white">
+              Account access and portability stay explicit as plans evolve
+            </h2>
+            <p className="mt-3 text-sm text-slate-400">{planSummary.lifecycleDescription}</p>
+            <div className="mt-5 rounded-[1.5rem] border border-white/10 bg-[#08101c] p-4 text-sm text-slate-300">
+              <p>Current state: {planSummary.lifecycleLabel}</p>
+              <p className="mt-1">Writes allowed: {planSummary.canWrite ? "Yes" : "No"}</p>
+              <p className="mt-1">
+                Basic export preserved: {planSummary.canUseBasicExport ? "Yes" : "No"}
+              </p>
+              <p className="mt-1">
+                Lifecycle code: {planSummary.lifecycleState.toLowerCase()}
+              </p>
+            </div>
+          </div>
+        </section>
+
+        <section className="grid gap-6 xl:grid-cols-2">
+          <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.25)]">
+            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P2-04 audit requirements</p>
+            <h2 className="mt-3 text-2xl font-semibold text-white">
+              Billing and lifecycle transitions should be traceable
+            </h2>
+            <div className="mt-5 rounded-[1.5rem] border border-white/10 bg-[#08101c] p-4 text-sm text-slate-300">
+              <div className="grid gap-2">
+                {BILLING_AUDIT_REQUIREMENTS.map((item) => (
+                  <p key={item}>{item}</p>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.25)]">
+            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P2-06 operational jobs</p>
+            <h2 className="mt-3 text-2xl font-semibold text-white">
+              Retention, quota, and cleanup jobs are part of the billing contract
+            </h2>
+            <div className="mt-5 rounded-[1.5rem] border border-white/10 bg-[#08101c] p-4 text-sm text-slate-300">
+              <div className="grid gap-2">
+                {BILLING_OPERATIONAL_JOBS.map((item) => (
+                  <p key={item}>{item}</p>
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -199,6 +291,12 @@ export function ContactDashboard({
                   Save the essentials now. Contact creation is now plan-aware so billing and product
                   limits stay honest as we grow into premium features.
                 </p>
+                {!planSummary.canWrite ? (
+                  <p className="rounded-2xl border border-amber-300/20 bg-amber-300/10 p-3 text-sm text-amber-100">
+                    This account is currently read-only. Contact changes are blocked until billing
+                    access is restored.
+                  </p>
+                ) : null}
               </div>
 
               <form action={createContact} className="mt-6 grid gap-4 lg:grid-cols-2">
@@ -328,10 +426,11 @@ export function ContactDashboard({
                 </label>
 
                 <button
-                  className="mt-2 rounded-full bg-white px-5 py-3 font-semibold text-slate-950 transition hover:bg-cyan-100 lg:col-span-2"
+                  className="mt-2 rounded-full bg-white px-5 py-3 font-semibold text-slate-950 transition hover:bg-cyan-100 disabled:cursor-not-allowed disabled:opacity-50 lg:col-span-2"
+                  disabled={!planSummary.canWrite}
                   type="submit"
                 >
-                  Save contact
+                  {planSummary.canWrite ? "Save contact" : "Read-only account"}
                 </button>
               </form>
             </div>

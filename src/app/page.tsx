@@ -234,6 +234,11 @@ export default async function Home({ searchParams }: HomePageProps) {
         archivedContacts={archivedContacts}
         planSummary={{
           planLabel: planSummary.planLabel,
+          lifecycleState: planSummary.lifecycleState,
+          lifecycleLabel: planSummary.lifecyclePolicy.label,
+          lifecycleDescription: planSummary.lifecyclePolicy.description,
+          canWrite: planSummary.lifecyclePolicy.canWrite,
+          canUseBasicExport: planSummary.lifecyclePolicy.canUseBasicExport,
           contactsUsed: planSummary.contactsUsed,
           contactsRemaining: planSummary.contactsRemaining,
           contactsLimit: planSummary.entitlements.contactsLimit,
