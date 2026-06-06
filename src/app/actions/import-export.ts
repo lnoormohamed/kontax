@@ -78,8 +78,14 @@ export const importContactsCsv = async (formData: FormData) => {
         rowCount: parsed.totalRows,
         importedCount: created.count,
         skippedCount: parsed.skippedCount,
-        errorCount: parsed.errors.length,
-        errorSummary: parsed.errors.length > 0 ? parsed.errors.slice(0, 5).join(" | ") : null,
+        errorCount: parsed.issues.length,
+        errorSummary:
+          parsed.issues.length > 0
+            ? parsed.issues
+                .slice(0, 5)
+                .map((issue) => `Row ${issue.rowNumber}: ${issue.message}`)
+                .join(" | ")
+            : null,
         completedAt: new Date(),
       },
     });
