@@ -38,12 +38,12 @@ This roadmap is the implementation source of truth for phases 1-5. Each phase fi
 | P2-04 | 2 | Done | P1 | P1-04, P2-01 | Unassigned | Billing lifecycle audit events defined |
 | P2-05 | 2 | Done | P1 | P2-02 | Unassigned | Account lifecycle states and enforcement documented |
 | P2-06 | 2 | Done | P2 | P2-05 | Unassigned | Retention, cleanup, and quota jobs planned |
-| P3-01 | 3 | In Progress | P0 | P1-02 | Unassigned | Supported formats and multi-column field mapping finalized |
-| P3-02 | 3 | In Progress | P0 | P3-01 | Unassigned | Import pipeline and preview/commit stages documented |
+| P3-01 | 3 | Done | P0 | P1-02 | Unassigned | Supported formats and multi-column field mapping finalized |
+| P3-02 | 3 | Done | P0 | P3-01 | Unassigned | Import pipeline and preview/commit stages documented |
 | P3-03 | 3 | Done | P0 | P3-01 | Unassigned | Export pipeline stages documented |
-| P3-04 | 3 | In Progress | P1 | P3-02, P3-03 | Unassigned | Import/export job model and history metadata defined |
-| P3-05 | 3 | In Progress | P1 | P3-02 | Unassigned | Validation, duplicate blocking, and conflict rules defined |
-| P3-06 | 3 | In Progress | P2 | P3-02, P3-03 | Unassigned | UX preview, rollback, and history model specified |
+| P3-04 | 3 | Done | P1 | P3-02, P3-03 | Unassigned | Import/export job model and history metadata defined |
+| P3-05 | 3 | Done | P1 | P3-02 | Unassigned | Validation, duplicate blocking, and conflict rules defined |
+| P3-06 | 3 | Done | P2 | P3-02, P3-03 | Unassigned | UX preview, rollback, and history model specified |
 | P4-01 | 4 | In Progress | P0 | P3-02, P3-05 | Unassigned | Duplicate heuristics and confidence tiers defined |
 | P4-02 | 4 | In Progress | P0 | P4-01 | Unassigned | Merge suggestion lifecycle, statuses, and decisions set |
 | P4-03 | 4 | In Progress | P1 | P4-02 | Unassigned | Suggested review and manual pairwise merge flows specified |

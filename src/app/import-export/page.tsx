@@ -11,6 +11,85 @@ type ImportExportPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
+const formatTimestamp = (value: Date | null) =>
+  value
+    ? new Intl.DateTimeFormat("en-GB", {
+        day: "2-digit",
+        month: "short",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      }).format(value)
+    : "Not yet";
+
+const formatFileSize = (value: number | null) => {
+  if (!value || value <= 0) {
+    return "Unknown";
+  }
+
+  if (value < 1024) {
+    return `${value} B`;
+  }
+
+  if (value < 1024 * 1024) {
+    return `${(value / 1024).toFixed(1)} KB`;
+  }
+
+  return `${(value / (1024 * 1024)).toFixed(1)} MB`;
+};
+
+const supportedFormats = [
+  {
+    ticket: "P3-01",
+    title: "Generic CSV import and export",
+    body: "Best for hand-made spreadsheets or simple exports with recognizable headers.",
+  },
+  {
+    ticket: "P3-01",
+    title: "Google, Apple, and Outlook CSV profiles",
+    body: "Server-side header aliases map common multi-column exports into the canonical Kontax contact shape.",
+  },
+  {
+    ticket: "P3-01",
+    title: "vCard 4.0 export",
+    body: "Available as the premium portability path for Apple and wider address-book workflows.",
+  },
+  {
+    ticket: "P3-01",
+    title: "Intentional lossiness",
+    body: "Unsupported structured provider fields are currently collapsed or ignored, and vCard import remains deferred so format lossiness stays explicit.",
+  },
+] as const;
+
+const importPipelineStages = [
+  "Choose a CSV profile and provide a file or pasted CSV text.",
+  "Preview parse and normalization results before any contacts are created.",
+  "Review warnings, skipped rows, duplicate groups, and commit-blocking issues.",
+  "Confirm import only when the preview is acceptable.",
+  "Record the resulting import job with preview, commit, warning, and rollback metadata.",
+] as const;
+
+const validationRules = [
+  "Malformed CSV quoting fails fast instead of producing a confusing partial parse.",
+  "Rows with errors are skipped and remain visible in the preview.",
+  "High-confidence duplicate email and phone groups inside the same CSV block commit.",
+  "Warnings stay reviewable so ignored columns, sparse rows, and fallback names are visible before import.",
+] as const;
+
+const jobModelNotes = [
+  "Import jobs record profile, preview counts, warnings, file size, preview time, commit time, and rollback time.",
+  "Export jobs record format, filter query, include-archived scope, generated filename, and completion state.",
+  "Retention direction stays portability-aware: job history can remain longer than temporary import/export artifacts.",
+  "Future audit work should attach to these job records rather than replacing them.",
+] as const;
+
+const rollbackNotes = [
+  "Rollback is job-level, not row-level, so the first recovery model stays simple and auditable.",
+  "Completed imports can be reversed by archiving the contacts that specific job created.",
+  "Rollback metadata remains visible in import history so users know whether a bulk import was later reversed.",
+  "Per-row rollback is still intentionally deferred from v1.",
+] as const;
+
 export default async function ImportExportPage({ searchParams }: ImportExportPageProps) {
   const session = await auth();
 
@@ -53,8 +132,9 @@ export default async function ImportExportPage({ searchParams }: ImportExportPag
               Move contacts in and out without losing control.
             </h1>
             <p className="mt-3 max-w-2xl text-sm text-slate-300 sm:text-base">
-              This first Phase 3 slice supports generic CSV import, CSV export for everyone, and
-              premium vCard export for Apple and wider address-book portability.
+              Phase 3 now covers profile-aware CSV import, CSV export for everyone, premium vCard
+              export, explicit preview and rollback behavior, and stronger import/export job
+              history for support and recovery.
             </p>
           </div>
 
@@ -82,6 +162,69 @@ export default async function ImportExportPage({ searchParams }: ImportExportPag
           </div>
         ) : null}
 
+        <section className="grid gap-6 xl:grid-cols-[minmax(0,1.05fr)_minmax(0,0.95fr)]">
+          <div className="rounded-[2rem] border border-white/10 bg-[#08101c]/88 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.35)]">
+            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P3-01 supported formats</p>
+            <h2 className="mt-3 text-2xl font-semibold text-white">
+              Portability targets stay explicit, including where today’s model is lossy
+            </h2>
+            <div className="mt-5 grid gap-4 lg:grid-cols-2">
+              {supportedFormats.map((item) => (
+                <div
+                  className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4"
+                  key={item.title}
+                >
+                  <p className="text-sm font-semibold text-white">{item.title}</p>
+                  <p className="mt-2 text-sm text-slate-400">{item.body}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.25)]">
+            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P3-02 import pipeline</p>
+            <h2 className="mt-3 text-2xl font-semibold text-white">
+              Preview-first import remains the safety boundary
+            </h2>
+            <div className="mt-5 rounded-[1.5rem] border border-white/10 bg-[#08101c] p-4 text-sm text-slate-300">
+              <div className="grid gap-2">
+                {importPipelineStages.map((item) => (
+                  <p key={item}>{item}</p>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="grid gap-6 xl:grid-cols-3">
+          <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.25)]">
+            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P3-04 job records</p>
+            <div className="mt-4 grid gap-2 text-sm text-slate-300">
+              {jobModelNotes.map((item) => (
+                <p key={item}>{item}</p>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.25)]">
+            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P3-05 validation</p>
+            <div className="mt-4 grid gap-2 text-sm text-slate-300">
+              {validationRules.map((item) => (
+                <p key={item}>{item}</p>
+              ))}
+            </div>
+          </div>
+
+          <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.25)]">
+            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P3-06 rollback model</p>
+            <div className="mt-4 grid gap-2 text-sm text-slate-300">
+              {rollbackNotes.map((item) => (
+                <p key={item}>{item}</p>
+              ))}
+            </div>
+          </div>
+        </section>
+
         <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
           <div className="grid gap-6">
             <ImportPreviewForm />
@@ -105,14 +248,16 @@ export default async function ImportExportPage({ searchParams }: ImportExportPag
                         {job.previewContactCount} contacts · {job.warningCount} warnings
                       </p>
                       <p className="mt-1 text-slate-500">
-                        {job.previewedAt
-                          ? `Previewed ${job.previewedAt.toLocaleString()}`
-                          : "Preview pending"}
-                        {job.committedAt ? ` · committed ${job.committedAt.toLocaleString()}` : ""}
+                        Source size {formatFileSize(job.sourceFileSizeBytes)} · completed{" "}
+                        {formatTimestamp(job.completedAt)}
+                      </p>
+                      <p className="mt-1 text-slate-500">
+                        {job.previewedAt ? `Previewed ${formatTimestamp(job.previewedAt)}` : "Preview pending"}
+                        {job.committedAt ? ` · committed ${formatTimestamp(job.committedAt)}` : ""}
                       </p>
                       {job.rolledBackAt ? (
                         <p className="mt-1 text-amber-200">
-                          Rolled back {job.rolledBackCount} contacts on {job.rolledBackAt.toLocaleString()}
+                          Rolled back {job.rolledBackCount} contacts on {formatTimestamp(job.rolledBackAt)}
                         </p>
                       ) : null}
                       {job.errorSummary ? <p className="mt-2 text-amber-200">{job.errorSummary}</p> : null}
@@ -215,7 +360,13 @@ export default async function ImportExportPage({ searchParams }: ImportExportPag
                         {job.status} · exported {job.exportedCount} contacts
                       </p>
                       <p className="mt-1 text-slate-500">
+                        Format: {job.format} · archived scope {job.includeArchived ? "included" : "active only"}
+                      </p>
+                      <p className="mt-1 text-slate-500">
                         Filter: {job.filterQuery?.trim() ? job.filterQuery : "all contacts"}
+                      </p>
+                      <p className="mt-1 text-slate-500">
+                        Completed {formatTimestamp(job.completedAt)}
                       </p>
                       {job.errorSummary ? <p className="mt-2 text-amber-200">{job.errorSummary}</p> : null}
                     </div>
