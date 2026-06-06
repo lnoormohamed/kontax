@@ -1,9 +1,7 @@
 import { ContactManager } from "~/app/_components/contact-manager";
-import { api, HydrateClient } from "~/trpc/server";
+import { HydrateClient } from "~/trpc/server";
 
 export default async function Home() {
-  void api.contact.list.prefetch();
-
   return (
     <HydrateClient>
       <main className="min-h-screen bg-gradient-to-b from-[#042f66] to-[#0b1020] px-4 py-12 text-white">
