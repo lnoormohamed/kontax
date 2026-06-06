@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { ImportJobRollbackButton } from "~/app/_components/import-job-rollback-button";
 import { ImportPreviewForm } from "~/app/_components/import-preview-form";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
@@ -21,6 +22,9 @@ export default async function ImportExportPage({ searchParams }: ImportExportPag
   const importedParam = resolvedSearchParams?.imported;
   const importedValue = Array.isArray(importedParam) ? importedParam[0] : importedParam;
   const importCompleted = importedValue === "1";
+  const rolledBackParam = resolvedSearchParams?.rolledBack;
+  const rolledBackValue = Array.isArray(rolledBackParam) ? rolledBackParam[0] : rolledBackParam;
+  const rollbackCompleted = rolledBackValue === "1";
 
   const [planSummary, importJobs, exportJobs] = await Promise.all([
     getUserPlanSummary(session.user.id),
@@ -72,6 +76,11 @@ export default async function ImportExportPage({ searchParams }: ImportExportPag
             Import completed successfully.
           </div>
         ) : null}
+        {rollbackCompleted ? (
+          <div className="rounded-[1.75rem] border border-amber-300/25 bg-amber-300/10 p-4 text-sm text-amber-100 shadow-[0_20px_60px_rgba(251,191,36,0.12)]">
+            Import rollback completed. Imported contacts from that job were archived.
+          </div>
+        ) : null}
 
         <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
           <div className="grid gap-6">
@@ -91,7 +100,27 @@ export default async function ImportExportPage({ searchParams }: ImportExportPag
                       <p className="mt-1 text-slate-400">
                         {job.status} · imported {job.importedCount} of {job.rowCount} rows
                       </p>
+                      <p className="mt-1 text-slate-500">
+                        {(job.sourceProfile ?? "GENERIC").toLowerCase()} profile · previewed{" "}
+                        {job.previewContactCount} contacts · {job.warningCount} warnings
+                      </p>
+                      <p className="mt-1 text-slate-500">
+                        {job.previewedAt
+                          ? `Previewed ${job.previewedAt.toLocaleString()}`
+                          : "Preview pending"}
+                        {job.committedAt ? ` · committed ${job.committedAt.toLocaleString()}` : ""}
+                      </p>
+                      {job.rolledBackAt ? (
+                        <p className="mt-1 text-amber-200">
+                          Rolled back {job.rolledBackCount} contacts on {job.rolledBackAt.toLocaleString()}
+                        </p>
+                      ) : null}
                       {job.errorSummary ? <p className="mt-2 text-amber-200">{job.errorSummary}</p> : null}
+                      {job.status === "COMPLETED" &&
+                      job.importedCount > 0 &&
+                      job.rolledBackAt == null ? (
+                        <ImportJobRollbackButton jobId={job.id} />
+                      ) : null}
                     </div>
                   ))
                 )}
@@ -102,26 +131,71 @@ export default async function ImportExportPage({ searchParams }: ImportExportPag
           <aside className="grid gap-6 self-start">
             <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
               <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Export</p>
-              <div className="mt-4 grid gap-3">
-                <a
+              <p className="mt-4 text-sm text-slate-400">
+                Ticket `P3-03`: export all active contacts, include archived contacts in CSV, or
+                export a filtered subset by search term.
+              </p>
+              <p className="mt-2 text-sm text-slate-500">
+                Ticket `P3-06`: import history now keeps rollback context so users can safely
+                reverse a bulk import by archiving the contacts that job created.
+              </p>
+              <form
+                action="/api/exports/contacts/csv"
+                className="mt-4 grid gap-3 rounded-2xl border border-white/10 bg-white/5 p-4"
+                method="get"
+              >
+                <label className="grid gap-2 text-sm text-slate-200">
+                  <span>Filter contacts before export</span>
+                  <input
+                    className="rounded-full border border-white/10 bg-[#08101c] px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
+                    name="q"
+                    placeholder="Search by name, email, phone, or company"
+                    type="text"
+                  />
+                </label>
+                <label className="flex items-center gap-3 text-sm text-slate-300">
+                  <input
+                    className="h-4 w-4 rounded border-white/10 bg-[#08101c] text-cyan-300"
+                    name="includeArchived"
+                    type="checkbox"
+                    value="true"
+                  />
+                  <span>Include archived contacts in CSV export</span>
+                </label>
+                <button
                   className="rounded-full bg-cyan-300 px-4 py-3 text-center font-semibold text-slate-950 transition hover:bg-cyan-200"
-                  href="/api/exports/contacts/csv"
+                  type="submit"
                 >
                   Download CSV export
-                </a>
-                {planSummary.entitlements.premiumExportEnabled ? (
-                  <a
+                </button>
+              </form>
+              {planSummary.entitlements.premiumExportEnabled ? (
+                <form
+                  action="/api/exports/contacts/vcard"
+                  className="mt-4 grid gap-3 rounded-2xl border border-white/10 bg-white/5 p-4"
+                  method="get"
+                >
+                  <label className="grid gap-2 text-sm text-slate-200">
+                    <span>Filter vCard export</span>
+                    <input
+                      className="rounded-full border border-white/10 bg-[#08101c] px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
+                      name="q"
+                      placeholder="Search active contacts before exporting"
+                      type="text"
+                    />
+                  </label>
+                  <button
                     className="rounded-full border border-white/10 px-4 py-3 text-center font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-100"
-                    href="/api/exports/contacts/vcard"
+                    type="submit"
                   >
                     Download vCard export
-                  </a>
-                ) : (
-                  <div className="rounded-2xl border border-amber-300/20 bg-amber-300/10 p-4 text-sm text-amber-100">
-                    vCard export unlocks on Plus and Pro plans.
-                  </div>
-                )}
-              </div>
+                  </button>
+                </form>
+              ) : (
+                <div className="mt-4 rounded-2xl border border-amber-300/20 bg-amber-300/10 p-4 text-sm text-amber-100">
+                  vCard export unlocks on Plus and Pro plans.
+                </div>
+              )}
             </div>
 
             <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
@@ -134,9 +208,14 @@ export default async function ImportExportPage({ searchParams }: ImportExportPag
                 ) : (
                   exportJobs.map((job) => (
                     <div className="rounded-2xl border border-white/10 bg-white/5 p-4" key={job.id}>
-                      <p className="font-semibold text-white">{job.format}</p>
+                      <p className="font-semibold text-white">
+                        {job.resultFileName ?? job.format}
+                      </p>
                       <p className="mt-1 text-slate-400">
                         {job.status} · exported {job.exportedCount} contacts
+                      </p>
+                      <p className="mt-1 text-slate-500">
+                        Filter: {job.filterQuery?.trim() ? job.filterQuery : "all contacts"}
                       </p>
                       {job.errorSummary ? <p className="mt-2 text-amber-200">{job.errorSummary}</p> : null}
                     </div>

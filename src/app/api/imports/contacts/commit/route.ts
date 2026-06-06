@@ -9,6 +9,8 @@ const commitRequestSchema = z.object({
   csvText: z.string().min(1, "Paste CSV data or choose a CSV file."),
   profile: z.enum(["GENERIC", "GOOGLE", "APPLE", "OUTLOOK"]),
   sourceFileName: z.string().trim().optional(),
+  sourceFileSizeBytes: z.number().int().nonnegative().optional(),
+  jobId: z.string().trim().optional(),
 });
 
 export async function POST(request: Request) {
@@ -30,17 +32,48 @@ export async function POST(request: Request) {
   }
 
   const sourceFileName = parsedBody.data.sourceFileName?.trim() || "pasted-import.csv";
-  const job = await db.importJob.create({
-    data: {
-      userId,
-      format: "CSV_GENERIC",
-      status: "PROCESSING",
-      sourceFileName,
-    },
-  });
+  const existingJob = parsedBody.data.jobId
+    ? await db.importJob.findFirst({
+        where: {
+          id: parsedBody.data.jobId,
+          userId,
+        },
+      })
+    : null;
+
+  const job = existingJob
+    ? await db.importJob.update({
+        where: { id: existingJob.id },
+        data: {
+          status: "PROCESSING",
+          sourceProfile: parsedBody.data.profile,
+          sourceFileName,
+          sourceFileSizeBytes: parsedBody.data.sourceFileSizeBytes,
+          startedAt: new Date(),
+        },
+      })
+    : await db.importJob.create({
+        data: {
+          userId,
+          format: "CSV_GENERIC",
+          status: "PROCESSING",
+          sourceProfile: parsedBody.data.profile,
+          sourceFileName,
+          sourceFileSizeBytes: parsedBody.data.sourceFileSizeBytes,
+          startedAt: new Date(),
+        },
+      });
 
   try {
     const preview = parseCsvContacts(parsedBody.data.csvText, parsedBody.data.profile);
+    const warningCount = preview.issues.filter((issue) => issue.severity === "warning").length;
+    const errorCount = preview.issues.filter((issue) => issue.severity === "error").length;
+
+    if (!preview.canImport) {
+      throw new Error(
+        preview.blockingReasons[0] ?? "Import is blocked until duplicate conflicts are resolved.",
+      );
+    }
 
     if (preview.contacts.length === 0) {
       throw new Error("No importable contacts were found in that CSV file.");
@@ -51,6 +84,7 @@ export async function POST(request: Request) {
     const created = await db.contact.createMany({
       data: preview.contacts.map((contact) => ({
         userId,
+        importJobId: job.id,
         fullName: contact.fullName,
         email: contact.email,
         phone: contact.phone,
@@ -63,10 +97,15 @@ export async function POST(request: Request) {
       where: { id: job.id },
       data: {
         status: "COMPLETED",
+        sourceProfile: parsedBody.data.profile,
+        sourceFileName,
+        sourceFileSizeBytes: parsedBody.data.sourceFileSizeBytes,
         rowCount: preview.totalRows,
+        previewContactCount: preview.contacts.length,
         importedCount: created.count,
         skippedCount: preview.skippedCount,
-        errorCount: preview.issues.length,
+        errorCount,
+        warningCount,
         errorSummary:
           preview.issues.length > 0
             ? preview.issues
@@ -74,6 +113,8 @@ export async function POST(request: Request) {
                 .map((issue) => `Row ${issue.rowNumber}: ${issue.message}`)
                 .join(" | ")
             : null,
+        previewedAt: existingJob?.previewedAt ?? job.previewedAt ?? null,
+        committedAt: new Date(),
         completedAt: new Date(),
       },
     });
@@ -88,7 +129,11 @@ export async function POST(request: Request) {
       where: { id: job.id },
       data: {
         status: "FAILED",
+        sourceProfile: parsedBody.data.profile,
+        sourceFileName,
+        sourceFileSizeBytes: parsedBody.data.sourceFileSizeBytes,
         errorSummary: error instanceof Error ? error.message : "Import failed.",
+        committedAt: new Date(),
         completedAt: new Date(),
       },
     });

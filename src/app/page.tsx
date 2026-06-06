@@ -4,6 +4,7 @@ import { ContactDashboard } from "~/app/_components/contact-dashboard";
 import { signOut } from "~/server/auth";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
+import { getOpenMergeSuggestionsForUser } from "~/server/contact-merge";
 import { db } from "~/server/db";
 
 type HomePageProps = {
@@ -106,8 +107,14 @@ export default async function Home({ searchParams }: HomePageProps) {
   }
 
   const query = await getQueryValue(searchParams);
+  const params = searchParams ? await searchParams : undefined;
+  const mergeSuggestionsRefreshedParam = params?.mergeSuggestionsRefreshed;
+  const mergeSuggestionsRefreshedValue = Array.isArray(mergeSuggestionsRefreshedParam)
+    ? mergeSuggestionsRefreshedParam[0]
+    : mergeSuggestionsRefreshedParam;
+  const mergeSuggestionsRefreshed = mergeSuggestionsRefreshedValue === "1";
   const searchConditions = getSearchConditions(query);
-  const [activeContacts, archivedContacts, planSummary] = await Promise.all([
+  const [activeContacts, archivedContacts, mergeSuggestions, planSummary] = await Promise.all([
     db.contact.findMany({
       where: {
         userId: session.user.id,
@@ -150,6 +157,7 @@ export default async function Home({ searchParams }: HomePageProps) {
         updatedAt: true,
       },
     }),
+    getOpenMergeSuggestionsForUser(session.user.id),
     getUserPlanSummary(session.user.id),
   ]);
 
@@ -200,6 +208,8 @@ export default async function Home({ searchParams }: HomePageProps) {
           premiumExportEnabled: planSummary.entitlements.premiumExportEnabled,
         }}
         query={query}
+        mergeSuggestions={mergeSuggestions}
+        mergeSuggestionsRefreshed={mergeSuggestionsRefreshed}
         userLabel={userLabel}
       />
     </>

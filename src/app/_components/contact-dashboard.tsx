@@ -1,6 +1,9 @@
 import Link from "next/link";
 
 import { archiveContact, createContact, restoreContact } from "~/app/actions/contacts";
+import { MergeSuggestionDismissButton } from "~/app/_components/merge-suggestion-dismiss-button";
+import { MergeSuggestionRefreshButton } from "~/app/_components/merge-suggestion-refresh-button";
+import type { PersistedMergeSuggestion } from "~/server/contact-merge";
 
 type DashboardContact = {
   id: string;
@@ -29,6 +32,8 @@ type ContactDashboardProps = {
   query: string;
   userLabel: string;
   planSummary: PlanSummary;
+  mergeSuggestions: PersistedMergeSuggestion[];
+  mergeSuggestionsRefreshed: boolean;
 };
 
 const formatTimestamp = (value: Date) =>
@@ -112,6 +117,8 @@ export function ContactDashboard({
   query,
   userLabel,
   planSummary,
+  mergeSuggestions,
+  mergeSuggestionsRefreshed,
 }: ContactDashboardProps) {
   const visibleCount = activeContacts.length + archivedContacts.length;
 
@@ -149,6 +156,12 @@ export function ContactDashboard({
             </div>
           </div>
         </section>
+
+        {mergeSuggestionsRefreshed ? (
+          <div className="rounded-[1.75rem] border border-emerald-300/25 bg-emerald-300/10 p-4 text-sm text-emerald-100 shadow-[0_20px_60px_rgba(16,185,129,0.12)]">
+            Duplicate suggestions refreshed successfully.
+          </div>
+        ) : null}
 
         <section className="grid gap-6 lg:grid-cols-[360px_minmax(0,1fr)]">
           <aside className="grid gap-6 self-start">
@@ -233,6 +246,89 @@ export function ContactDashboard({
                 href="/import-export"
               >
                 Open import / export center
+              </Link>
+            </div>
+
+            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
+              <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Possible duplicates</p>
+              <p className="mt-4 text-sm text-slate-300">
+                Ticket `P4-02`: duplicate suggestions now have a tracked lifecycle with refresh,
+                open, dismissed, and stale states so later merge flows can build on saved review
+                items instead of one-off scans.
+              </p>
+              <MergeSuggestionRefreshButton />
+              {mergeSuggestions.length === 0 ? (
+                <div className="mt-4 rounded-2xl border border-dashed border-white/15 bg-[#08101c]/70 p-4 text-slate-400">
+                  No open duplicate suggestions are showing up right now.
+                </div>
+              ) : (
+                <div className="mt-4 grid gap-3">
+                  {mergeSuggestions.map((suggestion) => (
+                    <article
+                      className="rounded-2xl border border-white/10 bg-[#08101c]/70 p-4"
+                      key={`${suggestion.leftContact.id}-${suggestion.rightContact.id}`}
+                    >
+                      <div className="flex items-center justify-between gap-3">
+                        <p className="font-semibold text-white">
+                          {suggestion.leftContact.fullName} ↔ {suggestion.rightContact.fullName}
+                        </p>
+                        <span
+                          className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${
+                            suggestion.confidence === "high"
+                              ? "border border-rose-300/30 bg-rose-300/10 text-rose-100"
+                              : "border border-amber-300/30 bg-amber-300/10 text-amber-100"
+                          }`}
+                        >
+                          {suggestion.confidence}
+                        </span>
+                      </div>
+                      <p className="mt-2 text-xs uppercase tracking-[0.24em] text-slate-500">
+                        Score {suggestion.score} · {suggestion.hardMatch ? "hard match" : "review"} · scanned{" "}
+                        {formatTimestamp(suggestion.generatedAt)}
+                      </p>
+                      <div className="mt-3 grid gap-2 text-sm text-slate-300">
+                        {suggestion.reasons.map((reason) => (
+                          <p key={reason}>{reason}</p>
+                        ))}
+                      </div>
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        <Link
+                          className="rounded-full bg-cyan-300 px-3 py-2 text-xs font-semibold text-slate-950 transition hover:bg-cyan-200"
+                          href={`/merge-suggestions/${suggestion.id}`}
+                        >
+                          Review merge
+                        </Link>
+                        <Link
+                          className="rounded-full border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-100"
+                          href={`/contacts/${suggestion.leftContact.id}`}
+                        >
+                          Open first
+                        </Link>
+                        <Link
+                          className="rounded-full border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-100"
+                          href={`/contacts/${suggestion.rightContact.id}`}
+                        >
+                          Open second
+                        </Link>
+                        <MergeSuggestionDismissButton suggestionId={suggestion.id} />
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
+              <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Manual merge</p>
+              <p className="mt-4 text-sm text-slate-300">
+                Ticket `P4-03`: choose any two active contacts and review a deterministic merge
+                preview even when they were not surfaced as an automatic suggestion.
+              </p>
+              <Link
+                className="mt-5 inline-flex rounded-full border border-white/10 px-4 py-2 font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-100"
+                href="/merge/manual"
+              >
+                Open manual merge
               </Link>
             </div>
           </aside>

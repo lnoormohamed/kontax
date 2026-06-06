@@ -134,6 +134,11 @@ exports.Prisma.UserScalarFieldEnum = {
 exports.Prisma.ContactScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
+  importJobId: 'importJobId',
+  mergedIntoContactId: 'mergedIntoContactId',
+  syncUid: 'syncUid',
+  syncVersion: 'syncVersion',
+  syncTombstoneAt: 'syncTombstoneAt',
   fullName: 'fullName',
   email: 'email',
   phone: 'phone',
@@ -185,13 +190,21 @@ exports.Prisma.ImportJobScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   format: 'format',
+  sourceProfile: 'sourceProfile',
   status: 'status',
   sourceFileName: 'sourceFileName',
+  sourceFileSizeBytes: 'sourceFileSizeBytes',
   rowCount: 'rowCount',
+  previewContactCount: 'previewContactCount',
   importedCount: 'importedCount',
   skippedCount: 'skippedCount',
   errorCount: 'errorCount',
+  warningCount: 'warningCount',
+  rolledBackCount: 'rolledBackCount',
   errorSummary: 'errorSummary',
+  previewedAt: 'previewedAt',
+  committedAt: 'committedAt',
+  rolledBackAt: 'rolledBackAt',
   createdAt: 'createdAt',
   startedAt: 'startedAt',
   completedAt: 'completedAt',
@@ -204,6 +217,8 @@ exports.Prisma.ExportJobScalarFieldEnum = {
   format: 'format',
   status: 'status',
   includeArchived: 'includeArchived',
+  filterQuery: 'filterQuery',
+  resultFileName: 'resultFileName',
   exportedCount: 'exportedCount',
   errorSummary: 'errorSummary',
   createdAt: 'createdAt',
@@ -212,9 +227,141 @@ exports.Prisma.ExportJobScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.MergeSuggestionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  leftContactId: 'leftContactId',
+  rightContactId: 'rightContactId',
+  pairKey: 'pairKey',
+  status: 'status',
+  confidence: 'confidence',
+  score: 'score',
+  hardMatch: 'hardMatch',
+  signals: 'signals',
+  reasons: 'reasons',
+  source: 'source',
+  generatedAt: 'generatedAt',
+  reviewedAt: 'reviewedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.MergeDecisionScalarFieldEnum = {
+  id: 'id',
+  suggestionId: 'suggestionId',
+  userId: 'userId',
+  status: 'status',
+  source: 'source',
+  notes: 'notes',
+  details: 'details',
+  decidedAt: 'decidedAt',
+  reversedAt: 'reversedAt',
+  reversalSource: 'reversalSource',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SyncAccountScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  provider: 'provider',
+  status: 'status',
+  syncDirection: 'syncDirection',
+  label: 'label',
+  baseUrl: 'baseUrl',
+  principalUrl: 'principalUrl',
+  addressBookUrl: 'addressBookUrl',
+  remoteAccountId: 'remoteAccountId',
+  remoteCTag: 'remoteCTag',
+  credentialReference: 'credentialReference',
+  credentialVersion: 'credentialVersion',
+  credentialUpdatedAt: 'credentialUpdatedAt',
+  credentialRevokedAt: 'credentialRevokedAt',
+  encryptionKeyRef: 'encryptionKeyRef',
+  lastSyncCursor: 'lastSyncCursor',
+  lastSyncedAt: 'lastSyncedAt',
+  lastSucceededAt: 'lastSucceededAt',
+  lastErrorAt: 'lastErrorAt',
+  lastErrorCode: 'lastErrorCode',
+  lastErrorMessage: 'lastErrorMessage',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SyncContactLinkScalarFieldEnum = {
+  id: 'id',
+  syncAccountId: 'syncAccountId',
+  contactId: 'contactId',
+  remoteHref: 'remoteHref',
+  remoteUid: 'remoteUid',
+  remoteETag: 'remoteETag',
+  lastSyncedAt: 'lastSyncedAt',
+  tombstonedAt: 'tombstonedAt',
+  remoteDeletedAt: 'remoteDeletedAt',
+  lastErrorCode: 'lastErrorCode',
+  lastErrorMessage: 'lastErrorMessage',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SyncJobScalarFieldEnum = {
+  id: 'id',
+  syncAccountId: 'syncAccountId',
+  status: 'status',
+  trigger: 'trigger',
+  syncDirection: 'syncDirection',
+  attemptCount: 'attemptCount',
+  maxAttempts: 'maxAttempts',
+  nextRetryAt: 'nextRetryAt',
+  leaseExpiresAt: 'leaseExpiresAt',
+  workerId: 'workerId',
+  idempotencyKey: 'idempotencyKey',
+  cursorBefore: 'cursorBefore',
+  cursorAfter: 'cursorAfter',
+  createdCount: 'createdCount',
+  updatedCount: 'updatedCount',
+  deletedCount: 'deletedCount',
+  conflictCount: 'conflictCount',
+  skippedCount: 'skippedCount',
+  errorCode: 'errorCode',
+  errorSummary: 'errorSummary',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SyncConflictScalarFieldEnum = {
+  id: 'id',
+  syncAccountId: 'syncAccountId',
+  syncContactLinkId: 'syncContactLinkId',
+  contactId: 'contactId',
+  conflictType: 'conflictType',
+  status: 'status',
+  resolutionStrategy: 'resolutionStrategy',
+  localSyncVersion: 'localSyncVersion',
+  remoteETag: 'remoteETag',
+  localSnapshot: 'localSnapshot',
+  remoteSnapshot: 'remoteSnapshot',
+  resolutionNotes: 'resolutionNotes',
+  detectedAt: 'detectedAt',
+  resolvedAt: 'resolvedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.JsonNullValueInput = {
+  JsonNull: Prisma.JsonNull
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -225,6 +372,12 @@ exports.Prisma.QueryMode = {
 exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
+};
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
 };
 exports.AccountLifecycleState = exports.$Enums.AccountLifecycleState = {
   ACTIVE: 'ACTIVE',
@@ -263,6 +416,13 @@ exports.ContactImportFormat = exports.$Enums.ContactImportFormat = {
   CSV_GENERIC: 'CSV_GENERIC'
 };
 
+exports.ImportSourceProfile = exports.$Enums.ImportSourceProfile = {
+  GENERIC: 'GENERIC',
+  GOOGLE: 'GOOGLE',
+  APPLE: 'APPLE',
+  OUTLOOK: 'OUTLOOK'
+};
+
 exports.ImportExportJobStatus = exports.$Enums.ImportExportJobStatus = {
   PENDING: 'PENDING',
   PROCESSING: 'PROCESSING',
@@ -275,13 +435,91 @@ exports.ContactExportFormat = exports.$Enums.ContactExportFormat = {
   VCARD_4: 'VCARD_4'
 };
 
+exports.MergeSuggestionStatus = exports.$Enums.MergeSuggestionStatus = {
+  OPEN: 'OPEN',
+  DISMISSED: 'DISMISSED',
+  MERGED: 'MERGED',
+  STALE: 'STALE'
+};
+
+exports.MergeSuggestionConfidence = exports.$Enums.MergeSuggestionConfidence = {
+  HIGH: 'HIGH',
+  MEDIUM: 'MEDIUM',
+  LOW: 'LOW'
+};
+
+exports.MergeDecisionStatus = exports.$Enums.MergeDecisionStatus = {
+  ACCEPTED: 'ACCEPTED',
+  REJECTED: 'REJECTED',
+  REVERSED: 'REVERSED'
+};
+
+exports.SyncProvider = exports.$Enums.SyncProvider = {
+  CARDDAV: 'CARDDAV'
+};
+
+exports.SyncAccountStatus = exports.$Enums.SyncAccountStatus = {
+  ACTIVE: 'ACTIVE',
+  PAUSED: 'PAUSED',
+  NEEDS_REAUTH: 'NEEDS_REAUTH',
+  ERROR: 'ERROR'
+};
+
+exports.SyncDirection = exports.$Enums.SyncDirection = {
+  TWO_WAY: 'TWO_WAY',
+  IMPORT_ONLY: 'IMPORT_ONLY',
+  EXPORT_ONLY: 'EXPORT_ONLY'
+};
+
+exports.SyncJobStatus = exports.$Enums.SyncJobStatus = {
+  QUEUED: 'QUEUED',
+  RUNNING: 'RUNNING',
+  SUCCEEDED: 'SUCCEEDED',
+  PARTIAL: 'PARTIAL',
+  FAILED: 'FAILED'
+};
+
+exports.SyncJobTrigger = exports.$Enums.SyncJobTrigger = {
+  MANUAL: 'MANUAL',
+  SCHEDULED: 'SCHEDULED',
+  WEBHOOK: 'WEBHOOK',
+  RECOVERY: 'RECOVERY'
+};
+
+exports.SyncConflictType = exports.$Enums.SyncConflictType = {
+  LOCAL_REMOTE_MUTATION: 'LOCAL_REMOTE_MUTATION',
+  DELETE_CONFLICT: 'DELETE_CONFLICT',
+  MERGE_CONFLICT: 'MERGE_CONFLICT',
+  VERSION_MISMATCH: 'VERSION_MISMATCH'
+};
+
+exports.SyncConflictStatus = exports.$Enums.SyncConflictStatus = {
+  OPEN: 'OPEN',
+  RESOLVED: 'RESOLVED',
+  IGNORED: 'IGNORED'
+};
+
+exports.SyncResolutionStrategy = exports.$Enums.SyncResolutionStrategy = {
+  KEEP_LOCAL: 'KEEP_LOCAL',
+  KEEP_REMOTE: 'KEEP_REMOTE',
+  DUPLICATE_LOCAL: 'DUPLICATE_LOCAL',
+  ARCHIVE_LOCAL: 'ARCHIVE_LOCAL',
+  MANUAL_MERGE: 'MANUAL_MERGE'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   Contact: 'Contact',
   SubscriptionCustomer: 'SubscriptionCustomer',
   Subscription: 'Subscription',
   ImportJob: 'ImportJob',
-  ExportJob: 'ExportJob'
+  ExportJob: 'ExportJob',
+  MergeSuggestion: 'MergeSuggestion',
+  MergeDecision: 'MergeDecision',
+  SyncAccount: 'SyncAccount',
+  SyncContactLink: 'SyncContactLink',
+  SyncJob: 'SyncJob',
+  SyncConflict: 'SyncConflict'
 };
 
 /**

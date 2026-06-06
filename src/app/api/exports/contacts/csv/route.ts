@@ -12,6 +12,8 @@ export async function GET(request: Request) {
 
   const url = new URL(request.url);
   const includeArchived = url.searchParams.get("includeArchived") === "true";
+  const query = url.searchParams.get("q")?.trim() ?? "";
+  const resultFileName = `kontax-contacts-${new Date().toISOString().slice(0, 10)}.csv`;
 
   const job = await db.exportJob.create({
     data: {
@@ -19,6 +21,8 @@ export async function GET(request: Request) {
       format: "CSV_GENERIC",
       status: "PROCESSING",
       includeArchived,
+      filterQuery: query || null,
+      resultFileName,
     },
   });
 
@@ -27,6 +31,16 @@ export async function GET(request: Request) {
       where: {
         userId,
         ...(includeArchived ? {} : { archivedAt: null }),
+        ...(query
+          ? {
+              OR: [
+                { fullName: { contains: query, mode: "insensitive" } },
+                { email: { contains: query, mode: "insensitive" } },
+                { phone: { contains: query, mode: "insensitive" } },
+                { company: { contains: query, mode: "insensitive" } },
+              ],
+            }
+          : {}),
       },
       orderBy: { updatedAt: "desc" },
       select: {
@@ -45,6 +59,8 @@ export async function GET(request: Request) {
       data: {
         status: "COMPLETED",
         exportedCount: contacts.length,
+        filterQuery: query || null,
+        resultFileName,
         completedAt: new Date(),
       },
     });
@@ -53,7 +69,7 @@ export async function GET(request: Request) {
       status: 200,
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
-        "Content-Disposition": `attachment; filename="kontax-contacts-${new Date().toISOString().slice(0, 10)}.csv"`,
+        "Content-Disposition": `attachment; filename="${resultFileName}"`,
       },
     });
   } catch (error) {
@@ -61,6 +77,8 @@ export async function GET(request: Request) {
       where: { id: job.id },
       data: {
         status: "FAILED",
+        filterQuery: query || null,
+        resultFileName,
         errorSummary: error instanceof Error ? error.message : "CSV export failed.",
         completedAt: new Date(),
       },

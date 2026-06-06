@@ -18,12 +18,22 @@ export type ImportPreviewContact = PortableContactInput & {
   rowNumber: number;
 };
 
+export type ImportPreviewDuplicateGroup = {
+  kind: "email" | "phone" | "name-company";
+  value: string;
+  rowNumbers: number[];
+  confidence: "high" | "medium";
+};
+
 type CsvParseResult = {
   contacts: ImportPreviewContact[];
   totalRows: number;
   skippedCount: number;
   issues: ImportPreviewIssue[];
   profile: CsvImportProfile;
+  duplicateGroups: ImportPreviewDuplicateGroup[];
+  canImport: boolean;
+  blockingReasons: string[];
 };
 
 const normalizeHeader = (value: string) => value.trim().toLowerCase();
@@ -41,40 +51,175 @@ const HEADER_ALIASES: Record<
   }
 > = {
   GENERIC: {
-    fullName: ["fullname", "full name", "name", "display name"],
-    firstName: ["first name", "firstname", "given name"],
-    lastName: ["last name", "lastname", "family name", "surname"],
-    email: ["email", "email address", "e-mail", "e-mail 1 - value"],
-    phone: ["phone", "mobile phone", "phone 1 - value", "primary phone"],
-    company: ["company", "organization", "organisation", "organization 1 - name"],
-    notes: ["notes", "memo", "description"],
+    fullName: [
+      "fullname",
+      "full name",
+      "name",
+      "display name",
+      "file as",
+      "contact name",
+      "customer name",
+      "contact",
+    ],
+    firstName: [
+      "first name",
+      "firstname",
+      "given name",
+      "givenname",
+      "forename",
+      "first",
+    ],
+    lastName: [
+      "last name",
+      "lastname",
+      "family name",
+      "familyname",
+      "surname",
+      "last",
+      "second name",
+    ],
+    email: [
+      "email",
+      "email address",
+      "e-mail",
+      "e-mail address",
+      "e-mail 1 - value",
+      "e-mail 2 - value",
+      "e-mail 3 - value",
+      "e-mail 1 address",
+      "e-mail 2 address",
+      "e-mail 3 address",
+      "primary email",
+      "email 1 value",
+      "email 2 value",
+      "email 3 value",
+      "email 1",
+      "email 2",
+      "email 3",
+      "home email",
+      "work email",
+      "other email",
+    ],
+    phone: [
+      "phone",
+      "mobile phone",
+      "phone 1 - value",
+      "phone 2 - value",
+      "phone 3 - value",
+      "primary phone",
+      "phone 1 value",
+      "phone 2 value",
+      "phone 3 value",
+      "cell phone",
+      "telephone",
+      "mobile",
+      "home phone",
+      "business phone",
+      "work phone",
+      "other phone",
+      "main phone",
+      "company main phone",
+    ],
+    company: [
+      "company",
+      "company name",
+      "organization",
+      "organisation",
+      "organization 1 - name",
+      "business name",
+      "employer",
+      "business",
+    ],
+    notes: [
+      "notes",
+      "memo",
+      "description",
+      "comment",
+      "comments",
+      "note",
+      "personal notes",
+      "content",
+    ],
   },
   GOOGLE: {
-    fullName: ["name", "full name"],
-    firstName: ["given name", "first name"],
-    lastName: ["family name", "last name"],
-    email: ["e-mail 1 - value", "email", "email address"],
-    phone: ["phone 1 - value", "mobile phone", "phone"],
-    company: ["organization 1 - name", "company", "organization"],
-    notes: ["notes", "memo"],
+    fullName: ["name", "full name", "file as", "nickname"],
+    firstName: ["given name", "first name", "additional name", "name prefix", "givenname"],
+    lastName: ["family name", "last name", "name suffix", "familyname"],
+    email: [
+      "e-mail 1 - value",
+      "e-mail 2 - value",
+      "e-mail 3 - value",
+      "email",
+      "email address",
+      "e-mail address",
+    ],
+    phone: [
+      "phone 1 - value",
+      "phone 2 - value",
+      "phone 3 - value",
+      "mobile phone",
+      "phone",
+      "organization 1 - phone",
+    ],
+    company: [
+      "organization 1 - name",
+      "organization 2 - name",
+      "company",
+      "organization",
+      "organization 1 - title",
+    ],
+    notes: ["notes", "memo", "billing information", "directory server", "keywords"],
   },
   APPLE: {
-    fullName: ["name", "full name"],
-    firstName: ["first name", "given name"],
-    lastName: ["last name", "family name"],
-    email: ["email", "email address"],
-    phone: ["phone", "mobile phone"],
-    company: ["company", "organization"],
-    notes: ["note", "notes"],
+    fullName: ["name", "full name", "display name", "card", "nickname"],
+    firstName: ["first name", "given name", "first", "middle name"],
+    lastName: ["last name", "family name", "last", "maiden name"],
+    email: [
+      "email",
+      "email address",
+      "home email",
+      "work email",
+      "icloud email",
+      "other email",
+    ],
+    phone: [
+      "phone",
+      "mobile phone",
+      "iphone",
+      "main phone",
+      "home phone",
+      "work phone",
+      "other phone",
+    ],
+    company: ["company", "organization", "department", "job title", "organization name"],
+    notes: ["note", "notes", "related names", "label"],
   },
   OUTLOOK: {
-    fullName: ["name", "full name"],
-    firstName: ["first name", "given name"],
-    lastName: ["last name", "surname", "family name"],
-    email: ["e-mail address", "email address", "email"],
-    phone: ["mobile phone", "business phone", "phone"],
-    company: ["company", "organization"],
-    notes: ["notes", "description"],
+    fullName: ["name", "full name", "file as", "display name"],
+    firstName: ["first name", "given name", "forename", "middle name"],
+    lastName: ["last name", "surname", "family name", "last"],
+    email: [
+      "e-mail address",
+      "e-mail 2 address",
+      "e-mail 3 address",
+      "email address",
+      "email",
+      "e-mail",
+    ],
+    phone: [
+      "mobile phone",
+      "business phone",
+      "business phone 2",
+      "home phone",
+      "home phone 2",
+      "car phone",
+      "primary phone",
+      "phone",
+      "other phone",
+      "radio phone",
+    ],
+    company: ["company", "organization", "department", "office location", "profession"],
+    notes: ["notes", "description", "billing information", "location", "keywords"],
   },
 };
 
@@ -121,12 +266,18 @@ const splitCsvRows = (csvText: string) => {
     rows.push(currentRow);
   }
 
+  if (inQuotes) {
+    throw new Error("The CSV appears to contain an unmatched quote. Please fix the file and try again.");
+  }
+
   return rows;
 };
 
-const getIndex = (headers: string[], aliases: readonly string[]) => {
+const getIndexes = (headers: string[], aliases: readonly string[]) => {
   const aliasSet = new Set(aliases.map(normalizeHeader));
-  return headers.findIndex((header) => aliasSet.has(normalizeHeader(header)));
+  return headers.flatMap((header, index) =>
+    aliasSet.has(normalizeHeader(header)) ? [index] : [],
+  );
 };
 
 const getValue = (row: string[], index: number) => {
@@ -140,6 +291,17 @@ const getValue = (row: string[], index: number) => {
   }
 
   return value;
+};
+
+const getFirstValue = (row: string[], indexes: number[]) => {
+  for (const index of indexes) {
+    const value = getValue(row, index);
+    if (value != null) {
+      return value;
+    }
+  }
+
+  return undefined;
 };
 
 const escapeCsv = (value: string) => {
@@ -179,30 +341,85 @@ export const parseCsvContacts = (
   }
 
   const headers = rows[0] ?? [];
-  const fullNameIndex = getIndex(headers, getAliasesForField(profile, "fullName"));
-  const firstNameIndex = getIndex(headers, getAliasesForField(profile, "firstName"));
-  const lastNameIndex = getIndex(headers, getAliasesForField(profile, "lastName"));
-  const emailIndex = getIndex(headers, getAliasesForField(profile, "email"));
-  const phoneIndex = getIndex(headers, getAliasesForField(profile, "phone"));
-  const companyIndex = getIndex(headers, getAliasesForField(profile, "company"));
-  const notesIndex = getIndex(headers, getAliasesForField(profile, "notes"));
+  const normalizedHeaders = headers.map(normalizeHeader);
+  const duplicateHeaders = normalizedHeaders.filter(
+    (header, index) => header.length > 0 && normalizedHeaders.indexOf(header) !== index,
+  );
+  const blankHeaderCount = headers.filter((header) => header.trim() === "").length;
+  const fullNameIndexes = getIndexes(headers, getAliasesForField(profile, "fullName"));
+  const firstNameIndexes = getIndexes(headers, getAliasesForField(profile, "firstName"));
+  const lastNameIndexes = getIndexes(headers, getAliasesForField(profile, "lastName"));
+  const emailIndexes = getIndexes(headers, getAliasesForField(profile, "email"));
+  const phoneIndexes = getIndexes(headers, getAliasesForField(profile, "phone"));
+  const companyIndexes = getIndexes(headers, getAliasesForField(profile, "company"));
+  const notesIndexes = getIndexes(headers, getAliasesForField(profile, "notes"));
+  const recognizedFieldIndexes = [
+    ...fullNameIndexes,
+    ...firstNameIndexes,
+    ...lastNameIndexes,
+    ...emailIndexes,
+    ...phoneIndexes,
+    ...companyIndexes,
+    ...notesIndexes,
+  ];
+
+  if (recognizedFieldIndexes.length === 0) {
+    throw new Error(
+      `We could not recognize any supported columns for the ${profile.toLowerCase()} CSV profile.`,
+    );
+  }
 
   const contacts: ImportPreviewContact[] = [];
   const issues: ImportPreviewIssue[] = [];
   let skippedCount = 0;
-  const seenEmails = new Map<string, number>();
-  const seenPhones = new Map<string, number>();
+  const seenEmails = new Map<string, number[]>();
+  const seenPhones = new Map<string, number[]>();
+  const seenNameCompanyPairs = new Map<string, { label: string; rowNumbers: number[] }>();
+  const ignoredHeaders = headers.filter(
+    (_, index) => !recognizedFieldIndexes.includes(index),
+  );
+
+  if (duplicateHeaders.length > 0) {
+    issues.push({
+      rowNumber: 1,
+      severity: "warning",
+      message: `Duplicate headers detected: ${[...new Set(duplicateHeaders)].join(", ")}.`,
+    });
+  }
+
+  if (blankHeaderCount > 0) {
+    issues.push({
+      rowNumber: 1,
+      severity: "warning",
+      message: `${blankHeaderCount} blank column header${blankHeaderCount === 1 ? "" : "s"} detected. Those columns will be ignored.`,
+    });
+  }
+
+  if (ignoredHeaders.length > 0) {
+    issues.push({
+      rowNumber: 1,
+      severity: "warning",
+      message: `Ignoring unsupported columns: ${ignoredHeaders.slice(0, 6).join(", ")}${
+        ignoredHeaders.length > 6 ? ", ..." : ""
+      }.`,
+    });
+  }
 
   rows.slice(1).forEach((row, index) => {
     const rowNumber = index + 2;
-    const explicitFullName = getValue(row, fullNameIndex);
-    const firstName = getValue(row, firstNameIndex);
-    const lastName = getValue(row, lastNameIndex);
-    const email = getValue(row, emailIndex)?.toLowerCase();
-    const phone = getValue(row, phoneIndex);
-    const company = getValue(row, companyIndex);
-    const notes = getValue(row, notesIndex);
+    const expectedColumnCount = headers.length;
+    const actualColumnCount = row.length;
+    const explicitFullName = getFirstValue(row, fullNameIndexes);
+    const firstName = getFirstValue(row, firstNameIndexes);
+    const lastName = getFirstValue(row, lastNameIndexes);
+    const email = getFirstValue(row, emailIndexes)?.toLowerCase();
+    const phone = getFirstValue(row, phoneIndexes);
+    const company = getFirstValue(row, companyIndexes);
+    const notes = getFirstValue(row, notesIndexes);
     const fallbackName = [firstName, lastName].filter(Boolean).join(" ").trim();
+    const usedFallbackIdentifier =
+      explicitFullName == null &&
+      (fallbackName !== "" || email != null || phone != null || company != null);
     const fullName =
       explicitFullName ??
       (fallbackName === "" ? undefined : fallbackName) ??
@@ -220,6 +437,14 @@ export const parseCsvContacts = (
       return;
     }
 
+    if (actualColumnCount !== expectedColumnCount) {
+      issues.push({
+        rowNumber,
+        severity: "warning",
+        message: `Column count mismatch: expected ${expectedColumnCount}, received ${actualColumnCount}. Review this row carefully before importing.`,
+      });
+    }
+
     if (email && !emailPattern.test(email)) {
       skippedCount += 1;
       issues.push({
@@ -231,30 +456,69 @@ export const parseCsvContacts = (
     }
 
     if (email) {
-      const duplicateEmailRow = seenEmails.get(email);
-      if (duplicateEmailRow) {
+      const duplicateEmailRows = seenEmails.get(email) ?? [];
+      if (duplicateEmailRows.length > 0) {
         issues.push({
           rowNumber,
           severity: "warning",
-          message: `Shares email ${email} with row ${duplicateEmailRow}.`,
+          message: `Shares email ${email} with row ${duplicateEmailRows[0]}.`,
         });
-      } else {
-        seenEmails.set(email, rowNumber);
       }
+      seenEmails.set(email, [...duplicateEmailRows, rowNumber]);
     }
 
     if (phone) {
-      const duplicatePhoneRow = seenPhones.get(phone);
-      if (duplicatePhoneRow) {
+      const duplicatePhoneRows = seenPhones.get(phone) ?? [];
+      if (duplicatePhoneRows.length > 0) {
         issues.push({
           rowNumber,
           severity: "warning",
-          message: `Shares phone ${phone} with row ${duplicatePhoneRow}.`,
+          message: `Shares phone ${phone} with row ${duplicatePhoneRows[0]}.`,
         });
-      } else {
-        seenPhones.set(phone, rowNumber);
       }
+      seenPhones.set(phone, [...duplicatePhoneRows, rowNumber]);
     }
+
+    if (usedFallbackIdentifier) {
+      issues.push({
+        rowNumber,
+        severity: "warning",
+        message:
+          "No explicit full name value was present, so Kontax will import this row using a fallback identifier.",
+      });
+    }
+
+    if (email == null && phone == null) {
+      issues.push({
+        rowNumber,
+        severity: "warning",
+        message:
+          "This row has no email or phone number, so future duplicate detection and sync matching may be weaker.",
+      });
+    }
+
+    if (notes != null && notes.length > 500) {
+      issues.push({
+        rowNumber,
+        severity: "warning",
+        message:
+          "Notes are unusually long for this contact and may need a quick review before import.",
+      });
+    }
+
+    const nameCompanyKey = `${fullName.toLowerCase()}::${company?.toLowerCase() ?? ""}`;
+    const duplicateNameCompanyGroup = seenNameCompanyPairs.get(nameCompanyKey);
+    if (duplicateNameCompanyGroup) {
+      issues.push({
+        rowNumber,
+        severity: "warning",
+        message: `Shares the same name/company shape as row ${duplicateNameCompanyGroup.rowNumbers[0]}.`,
+      });
+    }
+    seenNameCompanyPairs.set(nameCompanyKey, {
+      label: duplicateNameCompanyGroup?.label ?? (company ? `${fullName} · ${company}` : fullName),
+      rowNumbers: [...(duplicateNameCompanyGroup?.rowNumbers ?? []), rowNumber],
+    });
 
     contacts.push({
       rowNumber,
@@ -266,12 +530,57 @@ export const parseCsvContacts = (
     });
   });
 
+  const duplicateGroups: ImportPreviewDuplicateGroup[] = [
+    ...[...seenEmails.entries()]
+      .filter(([, rowNumbers]) => rowNumbers.length > 1)
+      .map(([value, rowNumbers]) => ({
+        kind: "email" as const,
+        value,
+        rowNumbers,
+        confidence: "high" as const,
+      })),
+    ...[...seenPhones.entries()]
+      .filter(([, rowNumbers]) => rowNumbers.length > 1)
+      .map(([value, rowNumbers]) => ({
+        kind: "phone" as const,
+        value,
+        rowNumbers,
+        confidence: "high" as const,
+      })),
+    ...[...seenNameCompanyPairs.values()]
+      .filter((group) => group.rowNumbers.length > 1)
+      .map((group) => ({
+        kind: "name-company" as const,
+        value: group.label,
+        rowNumbers: group.rowNumbers,
+        confidence: "medium" as const,
+      })),
+  ];
+
+  const blockingReasons: string[] = [];
+
+  if (contacts.length === 0) {
+    blockingReasons.push("No importable contacts remain after validation.");
+  }
+
+  const blockingDuplicateGroups = duplicateGroups.filter((group) => group.confidence === "high");
+  if (blockingDuplicateGroups.length > 0) {
+    blockingReasons.push(
+      `Resolve ${blockingDuplicateGroups.length} high-confidence duplicate group${
+        blockingDuplicateGroups.length === 1 ? "" : "s"
+      } before importing. Kontax blocks duplicate email and phone rows from the same CSV.`,
+    );
+  }
+
   return {
     contacts,
     totalRows: rows.length - 1,
     skippedCount,
     issues,
     profile,
+    duplicateGroups,
+    canImport: blockingReasons.length === 0,
+    blockingReasons,
   };
 };
 

@@ -19,12 +19,23 @@ type PreviewContact = {
   notes?: string | null;
 };
 
+type PreviewDuplicateGroup = {
+  kind: "email" | "phone" | "name-company";
+  value: string;
+  rowNumbers: number[];
+  confidence: "high" | "medium";
+};
+
 type PreviewResponse = {
+  jobId: string;
   contacts: PreviewContact[];
   totalRows: number;
   skippedCount: number;
   issues: PreviewIssue[];
   profile: ImportProfile;
+  duplicateGroups: PreviewDuplicateGroup[];
+  canImport: boolean;
+  blockingReasons: string[];
 };
 
 const PROFILE_OPTIONS: Array<{
@@ -58,6 +69,7 @@ export function ImportPreviewForm() {
   const [profile, setProfile] = useState<ImportProfile>("GENERIC");
   const [csvText, setCsvText] = useState("");
   const [sourceFileName, setSourceFileName] = useState("pasted-import.csv");
+  const [sourceFileSizeBytes, setSourceFileSizeBytes] = useState<number | undefined>(undefined);
   const [preview, setPreview] = useState<PreviewResponse | null>(null);
   const [error, setError] = useState("");
   const [isPreviewing, setIsPreviewing] = useState(false);
@@ -71,6 +83,7 @@ export function ImportPreviewForm() {
     }
 
     setSourceFileName(file.name);
+    setSourceFileSizeBytes(file.size);
     setCsvText(await file.text());
     setPreview(null);
     setError("");
@@ -94,6 +107,8 @@ export function ImportPreviewForm() {
       body: JSON.stringify({
         csvText,
         profile,
+        sourceFileName,
+        sourceFileSizeBytes,
       }),
     });
 
@@ -130,6 +145,8 @@ export function ImportPreviewForm() {
         csvText,
         profile,
         sourceFileName,
+        sourceFileSizeBytes,
+        jobId: preview.jobId,
       }),
     });
 
@@ -149,6 +166,8 @@ export function ImportPreviewForm() {
   const warningCount =
     preview?.issues.filter((issue) => issue.severity === "warning").length ?? 0;
   const errorCount = preview?.issues.filter((issue) => issue.severity === "error").length ?? 0;
+  const blockingDuplicateCount =
+    preview?.duplicateGroups.filter((group) => group.confidence === "high").length ?? 0;
 
   return (
     <div className="grid gap-6">
@@ -158,6 +177,10 @@ export function ImportPreviewForm() {
         <p className="mt-3 text-sm text-slate-400">
           Ticket `P3-02` and `P3-06`: sniff the CSV profile, review the parsed contacts, then
           confirm the import only when the preview looks right.
+        </p>
+        <p className="mt-2 text-sm text-slate-500">
+          Ticket `P3-05`: warnings flag ignored columns, duplicate headers, fallback names, sparse
+          rows, inconsistent column counts, and likely duplicates before anything is committed.
         </p>
 
         <div className="mt-6 grid gap-4">
@@ -202,6 +225,7 @@ export function ImportPreviewForm() {
               onChange={(event) => {
                 setCsvText(event.target.value);
                 setSourceFileName("pasted-import.csv");
+                setSourceFileSizeBytes(undefined);
                 setPreview(null);
                 setError("");
               }}
@@ -231,7 +255,7 @@ export function ImportPreviewForm() {
             {preview ? (
               <button
                 className="rounded-full bg-cyan-300 px-5 py-3 font-semibold text-slate-950 transition hover:bg-cyan-200 disabled:cursor-not-allowed disabled:opacity-70"
-                disabled={isImporting || preview.contacts.length === 0}
+                disabled={isImporting || preview.contacts.length === 0 || !preview.canImport}
                 onClick={handleImport}
                 type="button"
               >
@@ -268,6 +292,21 @@ export function ImportPreviewForm() {
               Ticket `P3-05`: row-level issues are surfaced before commit so the import stays
               deterministic and reviewable.
             </p>
+            <p className="mt-2 text-sm text-slate-500">
+              Rows with errors are skipped. Rows with warnings can still be imported, but
+              duplicate email and phone groups inside the same CSV now block commit until you fix
+              them.
+            </p>
+            {!preview.canImport ? (
+              <div className="mt-4 rounded-2xl border border-rose-300/20 bg-rose-300/10 p-4 text-sm text-rose-100">
+                <p className="font-semibold">Import blocked</p>
+                <ul className="mt-2 grid gap-2">
+                  {preview.blockingReasons.map((reason) => (
+                    <li key={reason}>{reason}</li>
+                  ))}
+                </ul>
+              </div>
+            ) : null}
             {errorCount > 0 || warningCount > 0 ? (
               <div className="mt-4 grid gap-3">
                 {preview.issues.map((issue) => (
@@ -283,6 +322,35 @@ export function ImportPreviewForm() {
                       Row {issue.rowNumber} {issue.severity === "error" ? "error" : "warning"}
                     </p>
                     <p className="mt-1">{issue.message}</p>
+                  </div>
+                ))}
+              </div>
+            ) : null}
+            {preview.duplicateGroups.length > 0 ? (
+              <div className="mt-4 grid gap-3">
+                <p className="text-sm font-semibold text-white">
+                  Duplicate group summary
+                  {blockingDuplicateCount > 0 ? ` · ${blockingDuplicateCount} blocking` : ""}
+                </p>
+                {preview.duplicateGroups.map((group) => (
+                  <div
+                    className={`rounded-2xl border p-4 text-sm ${
+                      group.confidence === "high"
+                        ? "border-rose-300/20 bg-rose-300/10 text-rose-100"
+                        : "border-amber-300/20 bg-amber-300/10 text-amber-100"
+                    }`}
+                    key={`${group.kind}-${group.value}-${group.rowNumbers.join("-")}`}
+                  >
+                    <p className="font-semibold">
+                      {group.kind === "name-company"
+                        ? "Possible duplicate name/company cluster"
+                        : `Duplicate ${group.kind} cluster`}
+                    </p>
+                    <p className="mt-1 break-all">{group.value}</p>
+                    <p className="mt-1">
+                      Rows: {group.rowNumbers.join(", ")} ·{" "}
+                      {group.confidence === "high" ? "commit blocking" : "review recommended"}
+                    </p>
                   </div>
                 ))}
               </div>

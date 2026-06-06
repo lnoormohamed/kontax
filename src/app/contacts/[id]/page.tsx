@@ -3,6 +3,7 @@ import { notFound, redirect } from "next/navigation";
 
 import {
   archiveContact,
+  undoMergeContacts,
   permanentlyDeleteContact,
   restoreContact,
   updateContact,
@@ -36,6 +37,16 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
   const savedParam = resolvedSearchParams?.saved;
   const saveState = Array.isArray(savedParam) ? savedParam[0] : savedParam;
   const wasSaved = saveState === "1";
+  const mergedParam = resolvedSearchParams?.merged;
+  const mergedState = Array.isArray(mergedParam) ? mergedParam[0] : mergedParam;
+  const wasMerged = mergedState === "1";
+  const mergeUndoneParam = resolvedSearchParams?.mergeUndone;
+  const mergeUndoneState = Array.isArray(mergeUndoneParam)
+    ? mergeUndoneParam[0]
+    : mergeUndoneParam;
+  const wasMergeUndone = mergeUndoneState === "1";
+  const decisionParam = resolvedSearchParams?.decisionId;
+  const decisionId = Array.isArray(decisionParam) ? decisionParam[0] : decisionParam;
   const contact = await db.contact.findFirst({
     where: {
       id,
@@ -97,6 +108,18 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
         {wasSaved ? (
           <div className="rounded-[1.75rem] border border-emerald-300/25 bg-emerald-300/10 p-4 text-sm text-emerald-100 shadow-[0_20px_60px_rgba(16,185,129,0.12)]">
             Contact changes saved successfully.
+          </div>
+        ) : null}
+        {wasMerged ? (
+          <div className="rounded-[1.75rem] border border-cyan-300/25 bg-cyan-300/10 p-4 text-sm text-cyan-100 shadow-[0_20px_60px_rgba(34,211,238,0.12)]">
+            Merge completed successfully. You can undo this merge from the merge audit card below
+            while we are still in the Phase 4 reversible merge model.
+          </div>
+        ) : null}
+        {wasMergeUndone ? (
+          <div className="rounded-[1.75rem] border border-amber-300/25 bg-amber-300/10 p-4 text-sm text-amber-100 shadow-[0_20px_60px_rgba(251,191,36,0.12)]">
+            Merge undo completed. The archived secondary contact has been restored and the primary
+            contact has been rolled back to its pre-merge state.
           </div>
         ) : null}
 
@@ -202,8 +225,36 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 <p className="text-sm text-slate-400">
                   Archive is reversible and keeps the record available for later restore.
                 </p>
+                {!contact.archivedAt ? (
+                  <Link
+                    className="inline-flex rounded-full border border-white/10 px-4 py-3 text-center text-sm font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-100"
+                    href={`/merge/manual?left=${contact.id}`}
+                  >
+                    Start manual merge
+                  </Link>
+                ) : null}
               </div>
             </div>
+
+            {decisionId ? (
+              <div className="rounded-[2rem] border border-cyan-300/20 bg-cyan-300/5 p-6 text-sm text-slate-300">
+                <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Merge audit</p>
+                <p className="mt-4 text-sm text-slate-300">
+                  Ticket `P4-05`: this merge stored a reversible snapshot so you can roll back the
+                  primary record and restore the archived secondary record if needed.
+                </p>
+                <form action={undoMergeContacts} className="mt-4">
+                  <input name="decisionId" type="hidden" value={decisionId} />
+                  <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}`} />
+                  <button
+                    className="w-full rounded-full border border-cyan-300/30 px-4 py-3 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200 hover:text-white"
+                    type="submit"
+                  >
+                    Undo last merge
+                  </button>
+                </form>
+              </div>
+            ) : null}
 
             <div className="rounded-[2rem] border border-rose-300/20 bg-rose-300/5 p-6 text-sm text-slate-300">
               <p className="text-sm uppercase tracking-[0.3em] text-rose-200">Danger zone</p>

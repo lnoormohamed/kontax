@@ -32,30 +32,30 @@ This roadmap is the implementation source of truth for phases 1-5. Each phase fi
 | P1-04 | 1 | Done | P0 | P1-03 | Unassigned | Encryption baseline and audit requirements captured |
 | P1-05 | 1 | Done | P1 | P1-01 | Unassigned | Consumer v1 scope and boundaries locked |
 | P1-06 | 1 | Done | P1 | P1-02, P1-03 | Unassigned | Dashboard and CRUD milestone defined |
-| P2-01 | 2 | Not Started | P0 | P1-01 | Unassigned | Subscription customer model drafted |
-| P2-02 | 2 | Not Started | P0 | P2-01 | Unassigned | Plan and entitlement rules defined |
-| P2-03 | 2 | Not Started | P1 | P2-01 | Unassigned | Billing provider integration boundary chosen |
+| P2-01 | 2 | Done | P0 | P1-01 | Unassigned | Subscription customer model drafted |
+| P2-02 | 2 | Done | P0 | P2-01 | Unassigned | Plan and entitlement rules defined |
+| P2-03 | 2 | In Progress | P1 | P2-01 | Unassigned | Billing provider integration boundary chosen |
 | P2-04 | 2 | Not Started | P1 | P1-04, P2-01 | Unassigned | Billing lifecycle audit events defined |
-| P2-05 | 2 | Not Started | P1 | P2-02 | Unassigned | Account lifecycle states and enforcement documented |
+| P2-05 | 2 | In Progress | P1 | P2-02 | Unassigned | Account lifecycle states and enforcement documented |
 | P2-06 | 2 | Not Started | P2 | P2-05 | Unassigned | Retention, cleanup, and quota jobs planned |
-| P3-01 | 3 | Not Started | P0 | P1-02 | Unassigned | Supported import/export formats finalized |
-| P3-02 | 3 | Not Started | P0 | P3-01 | Unassigned | Import pipeline stages documented |
-| P3-03 | 3 | Not Started | P0 | P3-01 | Unassigned | Export pipeline stages documented |
-| P3-04 | 3 | Not Started | P1 | P3-02, P3-03 | Unassigned | Import/export job model defined |
-| P3-05 | 3 | Not Started | P1 | P3-02 | Unassigned | Validation and conflict handling rules defined |
-| P3-06 | 3 | Not Started | P2 | P3-02, P3-03 | Unassigned | UX preview and rollback model specified |
-| P4-01 | 4 | Not Started | P0 | P3-02, P3-05 | Unassigned | Duplicate heuristics defined |
-| P4-02 | 4 | Not Started | P0 | P4-01 | Unassigned | Merge suggestion lifecycle and confidence rules set |
-| P4-03 | 4 | Not Started | P1 | P4-02 | Unassigned | Suggested and manual merge flows specified |
-| P4-04 | 4 | Not Started | P1 | P4-03 | Unassigned | Advanced merge preview and field protection rules defined |
-| P4-05 | 4 | Not Started | P1 | P4-03, P1-04 | Unassigned | Merge audit, undo, and reversibility rules documented |
-| P4-06 | 4 | Not Started | P2 | P4-01, P4-04 | Unassigned | Edge-case merge scenarios covered |
-| P5-01 | 5 | Not Started | P0 | P1-02, P3-01 | Unassigned | CardDAV-ready sync data model defined |
-| P5-02 | 5 | Not Started | P0 | P5-01 | Unassigned | Sync scope and direction strategy locked |
-| P5-03 | 5 | Not Started | P1 | P5-01, P1-04 | Unassigned | Sync credential protection and job model documented |
-| P5-04 | 5 | Not Started | P1 | P5-02, P4-05 | Unassigned | Conflict, tombstone, and versioning rules defined |
-| P5-05 | 5 | Not Started | P2 | P5-02 | Unassigned | iPhone and Android compatibility notes captured |
-| P5-06 | 5 | Not Started | P2 | P5-03, P5-04 | Unassigned | Beta rollout and support plan documented |
+| P3-01 | 3 | In Progress | P0 | P1-02 | Unassigned | Supported formats and multi-column field mapping finalized |
+| P3-02 | 3 | In Progress | P0 | P3-01 | Unassigned | Import pipeline and preview/commit stages documented |
+| P3-03 | 3 | Done | P0 | P3-01 | Unassigned | Export pipeline stages documented |
+| P3-04 | 3 | In Progress | P1 | P3-02, P3-03 | Unassigned | Import/export job model and history metadata defined |
+| P3-05 | 3 | In Progress | P1 | P3-02 | Unassigned | Validation, duplicate blocking, and conflict rules defined |
+| P3-06 | 3 | In Progress | P2 | P3-02, P3-03 | Unassigned | UX preview, rollback, and history model specified |
+| P4-01 | 4 | In Progress | P0 | P3-02, P3-05 | Unassigned | Duplicate heuristics and confidence tiers defined |
+| P4-02 | 4 | In Progress | P0 | P4-01 | Unassigned | Merge suggestion lifecycle, statuses, and decisions set |
+| P4-03 | 4 | In Progress | P1 | P4-02 | Unassigned | Suggested review and manual pairwise merge flows specified |
+| P4-04 | 4 | In Progress | P1 | P4-03 | Unassigned | Advanced merge preview and field protection rules defined |
+| P4-05 | 4 | In Progress | P1 | P4-03, P1-04 | Unassigned | Merge audit, undo, and reversibility rules documented |
+| P4-06 | 4 | In Progress | P2 | P4-01, P4-04 | Unassigned | Edge-case merge scenarios and review-first guards covered |
+| P5-01 | 5 | In Progress | P0 | P1-02, P3-01 | Unassigned | CardDAV-ready sync account, link, and job model defined |
+| P5-02 | 5 | In Progress | P0 | P5-01 | Unassigned | Sync scope, two-way target, and bootstrap fallback strategy locked |
+| P5-03 | 5 | In Progress | P1 | P5-01, P1-04 | Unassigned | Sync credential protection, rotation metadata, and job orchestration documented |
+| P5-04 | 5 | In Progress | P1 | P5-02, P4-05 | Unassigned | Conflict model, tombstones, merge lineage, and versioning rules defined |
+| P5-05 | 5 | In Progress | P2 | P5-02 | Unassigned | iPhone and Android compatibility assumptions and limitations captured |
+| P5-06 | 5 | In Progress | P2 | P5-03, P5-04 | Unassigned | Beta rollout, support tooling, and recovery plan documented |
 
 ## Dependency Map
 - Phase 1 defines the contact model, security baseline, and consumer scope.

@@ -57,6 +57,85 @@ enum ContactExportFormat {
     VCARD_4
 }
 
+enum ImportSourceProfile {
+    GENERIC
+    GOOGLE
+    APPLE
+    OUTLOOK
+}
+
+enum MergeSuggestionStatus {
+    OPEN
+    DISMISSED
+    MERGED
+    STALE
+}
+
+enum MergeSuggestionConfidence {
+    HIGH
+    MEDIUM
+    LOW
+}
+
+enum MergeDecisionStatus {
+    ACCEPTED
+    REJECTED
+    REVERSED
+}
+
+enum SyncProvider {
+    CARDDAV
+}
+
+enum SyncDirection {
+    TWO_WAY
+    IMPORT_ONLY
+    EXPORT_ONLY
+}
+
+enum SyncAccountStatus {
+    ACTIVE
+    PAUSED
+    NEEDS_REAUTH
+    ERROR
+}
+
+enum SyncJobTrigger {
+    MANUAL
+    SCHEDULED
+    WEBHOOK
+    RECOVERY
+}
+
+enum SyncJobStatus {
+    QUEUED
+    RUNNING
+    SUCCEEDED
+    PARTIAL
+    FAILED
+}
+
+enum SyncConflictType {
+    LOCAL_REMOTE_MUTATION
+    DELETE_CONFLICT
+    MERGE_CONFLICT
+    VERSION_MISMATCH
+}
+
+enum SyncConflictStatus {
+    OPEN
+    RESOLVED
+    IGNORED
+}
+
+enum SyncResolutionStrategy {
+    KEEP_LOCAL
+    KEEP_REMOTE
+    DUPLICATE_LOCAL
+    ARCHIVE_LOCAL
+    MANUAL_MERGE
+}
+
 model User {
     id                   String                 @id @default(cuid())
     name                 String?
@@ -66,6 +145,9 @@ model User {
     contacts             Contact[]
     importJobs           ImportJob[]
     exportJobs           ExportJob[]
+    mergeSuggestions     MergeSuggestion[]
+    mergeDecisions       MergeDecision[]
+    syncAccounts         SyncAccount[]
     subscriptionCustomer SubscriptionCustomer?
     subscriptions        Subscription[]
     createdAt            DateTime               @default(now())
@@ -73,21 +155,36 @@ model User {
 }
 
 model Contact {
-    id         String    @id @default(cuid())
-    userId     String
-    user       User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-    fullName   String
-    email      String?
-    phone      String?
-    company    String?
-    notes      String?
-    archivedAt DateTime?
-    createdAt  DateTime  @default(now())
-    updatedAt  DateTime  @updatedAt
+    id          String    @id @default(cuid())
+    userId      String
+    user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    importJobId String?
+    importJob   ImportJob? @relation(fields: [importJobId], references: [id], onDelete: SetNull)
+    leftMergeSuggestions  MergeSuggestion[] @relation("MergeSuggestionLeftContact")
+    rightMergeSuggestions MergeSuggestion[] @relation("MergeSuggestionRightContact")
+    syncLinks   SyncContactLink[]
+    syncConflicts SyncConflict[]
+    mergedIntoContactId String?
+    mergedIntoContact Contact? @relation("ContactMergeLineage", fields: [mergedIntoContactId], references: [id], onDelete: SetNull)
+    mergedChildren Contact[] @relation("ContactMergeLineage")
+    syncUid     String    @unique @default(cuid())
+    syncVersion Int       @default(1)
+    syncTombstoneAt DateTime?
+    fullName    String
+    email       String?
+    phone       String?
+    company     String?
+    notes       String?
+    archivedAt  DateTime?
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
 
     @@index([userId, archivedAt, fullName])
     @@index([userId, archivedAt, email])
     @@index([userId, archivedAt, phone])
+    @@index([userId, importJobId])
+    @@index([userId, syncUid])
+    @@index([userId, mergedIntoContactId])
 }
 
 model SubscriptionCustomer {
@@ -138,38 +235,212 @@ model Subscription {
 }
 
 model ImportJob {
-    id             String                @id @default(cuid())
-    userId         String
-    format         ContactImportFormat
-    status         ImportExportJobStatus @default(PENDING)
-    sourceFileName String?
-    rowCount       Int                   @default(0)
-    importedCount  Int                   @default(0)
-    skippedCount   Int                   @default(0)
-    errorCount     Int                   @default(0)
-    errorSummary   String?
-    createdAt      DateTime              @default(now())
-    startedAt      DateTime              @default(now())
-    completedAt    DateTime?
-    updatedAt      DateTime              @updatedAt
-    user           User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+    id                  String                @id @default(cuid())
+    userId              String
+    format              ContactImportFormat
+    sourceProfile       ImportSourceProfile?
+    status              ImportExportJobStatus @default(PENDING)
+    sourceFileName      String?
+    sourceFileSizeBytes Int?
+    rowCount            Int                   @default(0)
+    previewContactCount Int                   @default(0)
+    importedCount       Int                   @default(0)
+    skippedCount        Int                   @default(0)
+    errorCount          Int                   @default(0)
+    warningCount        Int                   @default(0)
+    rolledBackCount     Int                   @default(0)
+    errorSummary        String?
+    previewedAt         DateTime?
+    committedAt         DateTime?
+    rolledBackAt        DateTime?
+    createdAt           DateTime              @default(now())
+    startedAt           DateTime              @default(now())
+    completedAt         DateTime?
+    updatedAt           DateTime              @updatedAt
+    user                User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+    contacts            Contact[]
 
     @@index([userId, status, createdAt])
 }
 
 model ExportJob {
-    id             String                @id @default(cuid())
-    userId         String
-    format         ContactExportFormat
-    status         ImportExportJobStatus @default(PENDING)
-    includeArchived Boolean              @default(false)
-    exportedCount  Int                   @default(0)
-    errorSummary   String?
-    createdAt      DateTime              @default(now())
-    startedAt      DateTime              @default(now())
-    completedAt    DateTime?
-    updatedAt      DateTime              @updatedAt
-    user           User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
+    id              String                @id @default(cuid())
+    userId          String
+    format          ContactExportFormat
+    status          ImportExportJobStatus @default(PENDING)
+    includeArchived Boolean               @default(false)
+    filterQuery     String?
+    resultFileName  String?
+    exportedCount   Int                   @default(0)
+    errorSummary    String?
+    createdAt       DateTime              @default(now())
+    startedAt       DateTime              @default(now())
+    completedAt     DateTime?
+    updatedAt       DateTime              @updatedAt
+    user            User                  @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@index([userId, status, createdAt])
+}
+
+model MergeSuggestion {
+    id             String                    @id @default(cuid())
+    userId         String
+    leftContactId  String
+    rightContactId String
+    pairKey        String
+    status         MergeSuggestionStatus     @default(OPEN)
+    confidence     MergeSuggestionConfidence
+    score          Int
+    hardMatch      Boolean                   @default(false)
+    signals        Json
+    reasons        Json
+    source         String
+    generatedAt    DateTime                  @default(now())
+    reviewedAt     DateTime?
+    createdAt      DateTime                  @default(now())
+    updatedAt      DateTime                  @updatedAt
+    user           User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    leftContact    Contact                   @relation("MergeSuggestionLeftContact", fields: [leftContactId], references: [id], onDelete: Cascade)
+    rightContact   Contact                   @relation("MergeSuggestionRightContact", fields: [rightContactId], references: [id], onDelete: Cascade)
+    decisions      MergeDecision[]
+
+    @@unique([userId, pairKey])
+    @@index([userId, status, updatedAt])
+}
+
+model MergeDecision {
+    id                String              @id @default(cuid())
+    suggestionId      String
+    userId            String
+    status            MergeDecisionStatus
+    source            String
+    notes             String?
+    details           Json?
+    decidedAt         DateTime            @default(now())
+    reversedAt        DateTime?
+    reversalSource    String?
+    createdAt         DateTime            @default(now())
+    updatedAt         DateTime            @updatedAt
+    suggestion        MergeSuggestion     @relation(fields: [suggestionId], references: [id], onDelete: Cascade)
+    user              User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId, status, decidedAt])
+    @@index([suggestionId, decidedAt])
+}
+
+model SyncAccount {
+    id                  String            @id @default(cuid())
+    userId              String
+    provider            SyncProvider      @default(CARDDAV)
+    status              SyncAccountStatus @default(PAUSED)
+    syncDirection       SyncDirection     @default(TWO_WAY)
+    label               String
+    baseUrl             String
+    principalUrl        String?
+    addressBookUrl      String?
+    remoteAccountId     String?
+    remoteCTag          String?
+    credentialReference String?
+    credentialVersion   Int               @default(1)
+    credentialUpdatedAt DateTime?
+    credentialRevokedAt DateTime?
+    encryptionKeyRef    String?
+    lastSyncCursor      String?
+    lastSyncedAt        DateTime?
+    lastSucceededAt     DateTime?
+    lastErrorAt         DateTime?
+    lastErrorCode       String?
+    lastErrorMessage    String?
+    createdAt           DateTime          @default(now())
+    updatedAt           DateTime          @updatedAt
+    user                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+    syncLinks           SyncContactLink[]
+    syncJobs            SyncJob[]
+    syncConflicts       SyncConflict[]
+
+    @@index([userId, status, updatedAt])
+    @@unique([userId, baseUrl, label])
+}
+
+model SyncContactLink {
+    id             String      @id @default(cuid())
+    syncAccountId  String
+    contactId      String
+    remoteHref     String?
+    remoteUid      String?
+    remoteETag     String?
+    lastSyncedAt   DateTime?
+    tombstonedAt   DateTime?
+    remoteDeletedAt DateTime?
+    lastErrorCode  String?
+    lastErrorMessage String?
+    createdAt      DateTime    @default(now())
+    updatedAt      DateTime    @updatedAt
+    syncAccount    SyncAccount @relation(fields: [syncAccountId], references: [id], onDelete: Cascade)
+    contact        Contact     @relation(fields: [contactId], references: [id], onDelete: Cascade)
+    syncConflicts  SyncConflict[]
+
+    @@unique([syncAccountId, contactId])
+    @@unique([syncAccountId, remoteHref])
+    @@unique([syncAccountId, remoteUid])
+    @@index([contactId, updatedAt])
+    @@index([syncAccountId, tombstonedAt])
+}
+
+model SyncJob {
+    id                 String         @id @default(cuid())
+    syncAccountId      String
+    status             SyncJobStatus  @default(QUEUED)
+    trigger            SyncJobTrigger @default(MANUAL)
+    syncDirection      SyncDirection
+    attemptCount       Int            @default(0)
+    maxAttempts        Int            @default(5)
+    nextRetryAt        DateTime?
+    leaseExpiresAt     DateTime?
+    workerId           String?
+    idempotencyKey     String?
+    cursorBefore       String?
+    cursorAfter        String?
+    createdCount       Int            @default(0)
+    updatedCount       Int            @default(0)
+    deletedCount       Int            @default(0)
+    conflictCount      Int            @default(0)
+    skippedCount       Int            @default(0)
+    errorCode          String?
+    errorSummary       String?
+    startedAt          DateTime?
+    completedAt        DateTime?
+    createdAt          DateTime       @default(now())
+    updatedAt          DateTime       @updatedAt
+    syncAccount        SyncAccount    @relation(fields: [syncAccountId], references: [id], onDelete: Cascade)
+
+    @@index([syncAccountId, status, createdAt])
+    @@index([status, nextRetryAt])
+    @@unique([syncAccountId, idempotencyKey])
+}
+
+model SyncConflict {
+    id                 String                 @id @default(cuid())
+    syncAccountId      String
+    syncContactLinkId  String?
+    contactId          String?
+    conflictType       SyncConflictType
+    status             SyncConflictStatus     @default(OPEN)
+    resolutionStrategy SyncResolutionStrategy?
+    localSyncVersion   Int?
+    remoteETag         String?
+    localSnapshot      Json?
+    remoteSnapshot     Json?
+    resolutionNotes    String?
+    detectedAt         DateTime               @default(now())
+    resolvedAt         DateTime?
+    createdAt          DateTime               @default(now())
+    updatedAt          DateTime               @updatedAt
+    syncAccount        SyncAccount            @relation(fields: [syncAccountId], references: [id], onDelete: Cascade)
+    syncContactLink    SyncContactLink?       @relation(fields: [syncContactLinkId], references: [id], onDelete: SetNull)
+    contact            Contact?               @relation(fields: [contactId], references: [id], onDelete: SetNull)
+
+    @@index([syncAccountId, status, detectedAt])
+    @@index([contactId, status])
+    @@index([syncContactLinkId, status])
 }

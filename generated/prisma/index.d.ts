@@ -43,6 +43,36 @@ export type ImportJob = $Result.DefaultSelection<Prisma.$ImportJobPayload>
  * 
  */
 export type ExportJob = $Result.DefaultSelection<Prisma.$ExportJobPayload>
+/**
+ * Model MergeSuggestion
+ * 
+ */
+export type MergeSuggestion = $Result.DefaultSelection<Prisma.$MergeSuggestionPayload>
+/**
+ * Model MergeDecision
+ * 
+ */
+export type MergeDecision = $Result.DefaultSelection<Prisma.$MergeDecisionPayload>
+/**
+ * Model SyncAccount
+ * 
+ */
+export type SyncAccount = $Result.DefaultSelection<Prisma.$SyncAccountPayload>
+/**
+ * Model SyncContactLink
+ * 
+ */
+export type SyncContactLink = $Result.DefaultSelection<Prisma.$SyncContactLinkPayload>
+/**
+ * Model SyncJob
+ * 
+ */
+export type SyncJob = $Result.DefaultSelection<Prisma.$SyncJobPayload>
+/**
+ * Model SyncConflict
+ * 
+ */
+export type SyncConflict = $Result.DefaultSelection<Prisma.$SyncConflictPayload>
 
 /**
  * Enums
@@ -120,6 +150,121 @@ export const ContactExportFormat: {
 
 export type ContactExportFormat = (typeof ContactExportFormat)[keyof typeof ContactExportFormat]
 
+
+export const ImportSourceProfile: {
+  GENERIC: 'GENERIC',
+  GOOGLE: 'GOOGLE',
+  APPLE: 'APPLE',
+  OUTLOOK: 'OUTLOOK'
+};
+
+export type ImportSourceProfile = (typeof ImportSourceProfile)[keyof typeof ImportSourceProfile]
+
+
+export const MergeSuggestionStatus: {
+  OPEN: 'OPEN',
+  DISMISSED: 'DISMISSED',
+  MERGED: 'MERGED',
+  STALE: 'STALE'
+};
+
+export type MergeSuggestionStatus = (typeof MergeSuggestionStatus)[keyof typeof MergeSuggestionStatus]
+
+
+export const MergeSuggestionConfidence: {
+  HIGH: 'HIGH',
+  MEDIUM: 'MEDIUM',
+  LOW: 'LOW'
+};
+
+export type MergeSuggestionConfidence = (typeof MergeSuggestionConfidence)[keyof typeof MergeSuggestionConfidence]
+
+
+export const MergeDecisionStatus: {
+  ACCEPTED: 'ACCEPTED',
+  REJECTED: 'REJECTED',
+  REVERSED: 'REVERSED'
+};
+
+export type MergeDecisionStatus = (typeof MergeDecisionStatus)[keyof typeof MergeDecisionStatus]
+
+
+export const SyncProvider: {
+  CARDDAV: 'CARDDAV'
+};
+
+export type SyncProvider = (typeof SyncProvider)[keyof typeof SyncProvider]
+
+
+export const SyncDirection: {
+  TWO_WAY: 'TWO_WAY',
+  IMPORT_ONLY: 'IMPORT_ONLY',
+  EXPORT_ONLY: 'EXPORT_ONLY'
+};
+
+export type SyncDirection = (typeof SyncDirection)[keyof typeof SyncDirection]
+
+
+export const SyncAccountStatus: {
+  ACTIVE: 'ACTIVE',
+  PAUSED: 'PAUSED',
+  NEEDS_REAUTH: 'NEEDS_REAUTH',
+  ERROR: 'ERROR'
+};
+
+export type SyncAccountStatus = (typeof SyncAccountStatus)[keyof typeof SyncAccountStatus]
+
+
+export const SyncJobTrigger: {
+  MANUAL: 'MANUAL',
+  SCHEDULED: 'SCHEDULED',
+  WEBHOOK: 'WEBHOOK',
+  RECOVERY: 'RECOVERY'
+};
+
+export type SyncJobTrigger = (typeof SyncJobTrigger)[keyof typeof SyncJobTrigger]
+
+
+export const SyncJobStatus: {
+  QUEUED: 'QUEUED',
+  RUNNING: 'RUNNING',
+  SUCCEEDED: 'SUCCEEDED',
+  PARTIAL: 'PARTIAL',
+  FAILED: 'FAILED'
+};
+
+export type SyncJobStatus = (typeof SyncJobStatus)[keyof typeof SyncJobStatus]
+
+
+export const SyncConflictType: {
+  LOCAL_REMOTE_MUTATION: 'LOCAL_REMOTE_MUTATION',
+  DELETE_CONFLICT: 'DELETE_CONFLICT',
+  MERGE_CONFLICT: 'MERGE_CONFLICT',
+  VERSION_MISMATCH: 'VERSION_MISMATCH'
+};
+
+export type SyncConflictType = (typeof SyncConflictType)[keyof typeof SyncConflictType]
+
+
+export const SyncConflictStatus: {
+  OPEN: 'OPEN',
+  RESOLVED: 'RESOLVED',
+  IGNORED: 'IGNORED'
+};
+
+export type SyncConflictStatus = (typeof SyncConflictStatus)[keyof typeof SyncConflictStatus]
+
+
+export const SyncResolutionStrategy: {
+  KEEP_LOCAL: 'KEEP_LOCAL',
+  KEEP_REMOTE: 'KEEP_REMOTE',
+  DUPLICATE_LOCAL: 'DUPLICATE_LOCAL',
+  ARCHIVE_LOCAL: 'ARCHIVE_LOCAL',
+  MANUAL_MERGE: 'MANUAL_MERGE'
+};
+
+export type SyncResolutionStrategy = (typeof SyncResolutionStrategy)[keyof typeof SyncResolutionStrategy]
+
 }
 
 export type AccountLifecycleState = $Enums.AccountLifecycleState
@@ -153,6 +298,54 @@ export const ContactImportFormat: typeof $Enums.ContactImportFormat
 export type ContactExportFormat = $Enums.ContactExportFormat
 
 export const ContactExportFormat: typeof $Enums.ContactExportFormat
+
+export type ImportSourceProfile = $Enums.ImportSourceProfile
+
+export const ImportSourceProfile: typeof $Enums.ImportSourceProfile
+
+export type MergeSuggestionStatus = $Enums.MergeSuggestionStatus
+
+export const MergeSuggestionStatus: typeof $Enums.MergeSuggestionStatus
+
+export type MergeSuggestionConfidence = $Enums.MergeSuggestionConfidence
+
+export const MergeSuggestionConfidence: typeof $Enums.MergeSuggestionConfidence
+
+export type MergeDecisionStatus = $Enums.MergeDecisionStatus
+
+export const MergeDecisionStatus: typeof $Enums.MergeDecisionStatus
+
+export type SyncProvider = $Enums.SyncProvider
+
+export const SyncProvider: typeof $Enums.SyncProvider
+
+export type SyncDirection = $Enums.SyncDirection
+
+export const SyncDirection: typeof $Enums.SyncDirection
+
+export type SyncAccountStatus = $Enums.SyncAccountStatus
+
+export const SyncAccountStatus: typeof $Enums.SyncAccountStatus
+
+export type SyncJobTrigger = $Enums.SyncJobTrigger
+
+export const SyncJobTrigger: typeof $Enums.SyncJobTrigger
+
+export type SyncJobStatus = $Enums.SyncJobStatus
+
+export const SyncJobStatus: typeof $Enums.SyncJobStatus
+
+export type SyncConflictType = $Enums.SyncConflictType
+
+export const SyncConflictType: typeof $Enums.SyncConflictType
+
+export type SyncConflictStatus = $Enums.SyncConflictStatus
+
+export const SyncConflictStatus: typeof $Enums.SyncConflictStatus
+
+export type SyncResolutionStrategy = $Enums.SyncResolutionStrategy
+
+export const SyncResolutionStrategy: typeof $Enums.SyncResolutionStrategy
 
 /**
  * ##  Prisma Client ʲˢ
@@ -331,6 +524,66 @@ export class PrismaClient<
     * ```
     */
   get exportJob(): Prisma.ExportJobDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.mergeSuggestion`: Exposes CRUD operations for the **MergeSuggestion** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MergeSuggestions
+    * const mergeSuggestions = await prisma.mergeSuggestion.findMany()
+    * ```
+    */
+  get mergeSuggestion(): Prisma.MergeSuggestionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.mergeDecision`: Exposes CRUD operations for the **MergeDecision** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MergeDecisions
+    * const mergeDecisions = await prisma.mergeDecision.findMany()
+    * ```
+    */
+  get mergeDecision(): Prisma.MergeDecisionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.syncAccount`: Exposes CRUD operations for the **SyncAccount** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SyncAccounts
+    * const syncAccounts = await prisma.syncAccount.findMany()
+    * ```
+    */
+  get syncAccount(): Prisma.SyncAccountDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.syncContactLink`: Exposes CRUD operations for the **SyncContactLink** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SyncContactLinks
+    * const syncContactLinks = await prisma.syncContactLink.findMany()
+    * ```
+    */
+  get syncContactLink(): Prisma.SyncContactLinkDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.syncJob`: Exposes CRUD operations for the **SyncJob** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SyncJobs
+    * const syncJobs = await prisma.syncJob.findMany()
+    * ```
+    */
+  get syncJob(): Prisma.SyncJobDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.syncConflict`: Exposes CRUD operations for the **SyncConflict** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SyncConflicts
+    * const syncConflicts = await prisma.syncConflict.findMany()
+    * ```
+    */
+  get syncConflict(): Prisma.SyncConflictDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -777,7 +1030,13 @@ export namespace Prisma {
     SubscriptionCustomer: 'SubscriptionCustomer',
     Subscription: 'Subscription',
     ImportJob: 'ImportJob',
-    ExportJob: 'ExportJob'
+    ExportJob: 'ExportJob',
+    MergeSuggestion: 'MergeSuggestion',
+    MergeDecision: 'MergeDecision',
+    SyncAccount: 'SyncAccount',
+    SyncContactLink: 'SyncContactLink',
+    SyncJob: 'SyncJob',
+    SyncConflict: 'SyncConflict'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -796,7 +1055,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob"
+      modelProps: "user" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncContactLink" | "syncJob" | "syncConflict"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1244,6 +1503,450 @@ export namespace Prisma {
           }
         }
       }
+      MergeSuggestion: {
+        payload: Prisma.$MergeSuggestionPayload<ExtArgs>
+        fields: Prisma.MergeSuggestionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MergeSuggestionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeSuggestionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MergeSuggestionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeSuggestionPayload>
+          }
+          findFirst: {
+            args: Prisma.MergeSuggestionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeSuggestionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MergeSuggestionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeSuggestionPayload>
+          }
+          findMany: {
+            args: Prisma.MergeSuggestionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeSuggestionPayload>[]
+          }
+          create: {
+            args: Prisma.MergeSuggestionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeSuggestionPayload>
+          }
+          createMany: {
+            args: Prisma.MergeSuggestionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.MergeSuggestionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeSuggestionPayload>[]
+          }
+          delete: {
+            args: Prisma.MergeSuggestionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeSuggestionPayload>
+          }
+          update: {
+            args: Prisma.MergeSuggestionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeSuggestionPayload>
+          }
+          deleteMany: {
+            args: Prisma.MergeSuggestionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MergeSuggestionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.MergeSuggestionUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeSuggestionPayload>[]
+          }
+          upsert: {
+            args: Prisma.MergeSuggestionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeSuggestionPayload>
+          }
+          aggregate: {
+            args: Prisma.MergeSuggestionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMergeSuggestion>
+          }
+          groupBy: {
+            args: Prisma.MergeSuggestionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MergeSuggestionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MergeSuggestionCountArgs<ExtArgs>
+            result: $Utils.Optional<MergeSuggestionCountAggregateOutputType> | number
+          }
+        }
+      }
+      MergeDecision: {
+        payload: Prisma.$MergeDecisionPayload<ExtArgs>
+        fields: Prisma.MergeDecisionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MergeDecisionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeDecisionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MergeDecisionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeDecisionPayload>
+          }
+          findFirst: {
+            args: Prisma.MergeDecisionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeDecisionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MergeDecisionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeDecisionPayload>
+          }
+          findMany: {
+            args: Prisma.MergeDecisionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeDecisionPayload>[]
+          }
+          create: {
+            args: Prisma.MergeDecisionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeDecisionPayload>
+          }
+          createMany: {
+            args: Prisma.MergeDecisionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.MergeDecisionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeDecisionPayload>[]
+          }
+          delete: {
+            args: Prisma.MergeDecisionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeDecisionPayload>
+          }
+          update: {
+            args: Prisma.MergeDecisionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeDecisionPayload>
+          }
+          deleteMany: {
+            args: Prisma.MergeDecisionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MergeDecisionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.MergeDecisionUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeDecisionPayload>[]
+          }
+          upsert: {
+            args: Prisma.MergeDecisionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeDecisionPayload>
+          }
+          aggregate: {
+            args: Prisma.MergeDecisionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMergeDecision>
+          }
+          groupBy: {
+            args: Prisma.MergeDecisionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MergeDecisionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MergeDecisionCountArgs<ExtArgs>
+            result: $Utils.Optional<MergeDecisionCountAggregateOutputType> | number
+          }
+        }
+      }
+      SyncAccount: {
+        payload: Prisma.$SyncAccountPayload<ExtArgs>
+        fields: Prisma.SyncAccountFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SyncAccountFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncAccountPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SyncAccountFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncAccountPayload>
+          }
+          findFirst: {
+            args: Prisma.SyncAccountFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncAccountPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SyncAccountFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncAccountPayload>
+          }
+          findMany: {
+            args: Prisma.SyncAccountFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncAccountPayload>[]
+          }
+          create: {
+            args: Prisma.SyncAccountCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncAccountPayload>
+          }
+          createMany: {
+            args: Prisma.SyncAccountCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SyncAccountCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncAccountPayload>[]
+          }
+          delete: {
+            args: Prisma.SyncAccountDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncAccountPayload>
+          }
+          update: {
+            args: Prisma.SyncAccountUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncAccountPayload>
+          }
+          deleteMany: {
+            args: Prisma.SyncAccountDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SyncAccountUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SyncAccountUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncAccountPayload>[]
+          }
+          upsert: {
+            args: Prisma.SyncAccountUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncAccountPayload>
+          }
+          aggregate: {
+            args: Prisma.SyncAccountAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSyncAccount>
+          }
+          groupBy: {
+            args: Prisma.SyncAccountGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SyncAccountGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SyncAccountCountArgs<ExtArgs>
+            result: $Utils.Optional<SyncAccountCountAggregateOutputType> | number
+          }
+        }
+      }
+      SyncContactLink: {
+        payload: Prisma.$SyncContactLinkPayload<ExtArgs>
+        fields: Prisma.SyncContactLinkFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SyncContactLinkFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncContactLinkPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SyncContactLinkFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncContactLinkPayload>
+          }
+          findFirst: {
+            args: Prisma.SyncContactLinkFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncContactLinkPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SyncContactLinkFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncContactLinkPayload>
+          }
+          findMany: {
+            args: Prisma.SyncContactLinkFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncContactLinkPayload>[]
+          }
+          create: {
+            args: Prisma.SyncContactLinkCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncContactLinkPayload>
+          }
+          createMany: {
+            args: Prisma.SyncContactLinkCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SyncContactLinkCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncContactLinkPayload>[]
+          }
+          delete: {
+            args: Prisma.SyncContactLinkDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncContactLinkPayload>
+          }
+          update: {
+            args: Prisma.SyncContactLinkUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncContactLinkPayload>
+          }
+          deleteMany: {
+            args: Prisma.SyncContactLinkDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SyncContactLinkUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SyncContactLinkUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncContactLinkPayload>[]
+          }
+          upsert: {
+            args: Prisma.SyncContactLinkUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncContactLinkPayload>
+          }
+          aggregate: {
+            args: Prisma.SyncContactLinkAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSyncContactLink>
+          }
+          groupBy: {
+            args: Prisma.SyncContactLinkGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SyncContactLinkGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SyncContactLinkCountArgs<ExtArgs>
+            result: $Utils.Optional<SyncContactLinkCountAggregateOutputType> | number
+          }
+        }
+      }
+      SyncJob: {
+        payload: Prisma.$SyncJobPayload<ExtArgs>
+        fields: Prisma.SyncJobFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SyncJobFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncJobPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SyncJobFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncJobPayload>
+          }
+          findFirst: {
+            args: Prisma.SyncJobFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncJobPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SyncJobFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncJobPayload>
+          }
+          findMany: {
+            args: Prisma.SyncJobFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncJobPayload>[]
+          }
+          create: {
+            args: Prisma.SyncJobCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncJobPayload>
+          }
+          createMany: {
+            args: Prisma.SyncJobCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SyncJobCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncJobPayload>[]
+          }
+          delete: {
+            args: Prisma.SyncJobDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncJobPayload>
+          }
+          update: {
+            args: Prisma.SyncJobUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncJobPayload>
+          }
+          deleteMany: {
+            args: Prisma.SyncJobDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SyncJobUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SyncJobUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncJobPayload>[]
+          }
+          upsert: {
+            args: Prisma.SyncJobUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncJobPayload>
+          }
+          aggregate: {
+            args: Prisma.SyncJobAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSyncJob>
+          }
+          groupBy: {
+            args: Prisma.SyncJobGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SyncJobGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SyncJobCountArgs<ExtArgs>
+            result: $Utils.Optional<SyncJobCountAggregateOutputType> | number
+          }
+        }
+      }
+      SyncConflict: {
+        payload: Prisma.$SyncConflictPayload<ExtArgs>
+        fields: Prisma.SyncConflictFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SyncConflictFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncConflictPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SyncConflictFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncConflictPayload>
+          }
+          findFirst: {
+            args: Prisma.SyncConflictFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncConflictPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SyncConflictFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncConflictPayload>
+          }
+          findMany: {
+            args: Prisma.SyncConflictFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncConflictPayload>[]
+          }
+          create: {
+            args: Prisma.SyncConflictCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncConflictPayload>
+          }
+          createMany: {
+            args: Prisma.SyncConflictCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SyncConflictCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncConflictPayload>[]
+          }
+          delete: {
+            args: Prisma.SyncConflictDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncConflictPayload>
+          }
+          update: {
+            args: Prisma.SyncConflictUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncConflictPayload>
+          }
+          deleteMany: {
+            args: Prisma.SyncConflictDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SyncConflictUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SyncConflictUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncConflictPayload>[]
+          }
+          upsert: {
+            args: Prisma.SyncConflictUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncConflictPayload>
+          }
+          aggregate: {
+            args: Prisma.SyncConflictAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSyncConflict>
+          }
+          groupBy: {
+            args: Prisma.SyncConflictGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SyncConflictGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SyncConflictCountArgs<ExtArgs>
+            result: $Utils.Optional<SyncConflictCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1346,6 +2049,12 @@ export namespace Prisma {
     subscription?: SubscriptionOmit
     importJob?: ImportJobOmit
     exportJob?: ExportJobOmit
+    mergeSuggestion?: MergeSuggestionOmit
+    mergeDecision?: MergeDecisionOmit
+    syncAccount?: SyncAccountOmit
+    syncContactLink?: SyncContactLinkOmit
+    syncJob?: SyncJobOmit
+    syncConflict?: SyncConflictOmit
   }
 
   /* Types for Logging */
@@ -1429,6 +2138,9 @@ export namespace Prisma {
     contacts: number
     importJobs: number
     exportJobs: number
+    mergeSuggestions: number
+    mergeDecisions: number
+    syncAccounts: number
     subscriptions: number
   }
 
@@ -1436,6 +2148,9 @@ export namespace Prisma {
     contacts?: boolean | UserCountOutputTypeCountContactsArgs
     importJobs?: boolean | UserCountOutputTypeCountImportJobsArgs
     exportJobs?: boolean | UserCountOutputTypeCountExportJobsArgs
+    mergeSuggestions?: boolean | UserCountOutputTypeCountMergeSuggestionsArgs
+    mergeDecisions?: boolean | UserCountOutputTypeCountMergeDecisionsArgs
+    syncAccounts?: boolean | UserCountOutputTypeCountSyncAccountsArgs
     subscriptions?: boolean | UserCountOutputTypeCountSubscriptionsArgs
   }
 
@@ -1474,8 +2189,96 @@ export namespace Prisma {
   /**
    * UserCountOutputType without action
    */
+  export type UserCountOutputTypeCountMergeSuggestionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MergeSuggestionWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountMergeDecisionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MergeDecisionWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountSyncAccountsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SyncAccountWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
   export type UserCountOutputTypeCountSubscriptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: SubscriptionWhereInput
+  }
+
+
+  /**
+   * Count Type ContactCountOutputType
+   */
+
+  export type ContactCountOutputType = {
+    leftMergeSuggestions: number
+    rightMergeSuggestions: number
+    syncLinks: number
+    syncConflicts: number
+    mergedChildren: number
+  }
+
+  export type ContactCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    leftMergeSuggestions?: boolean | ContactCountOutputTypeCountLeftMergeSuggestionsArgs
+    rightMergeSuggestions?: boolean | ContactCountOutputTypeCountRightMergeSuggestionsArgs
+    syncLinks?: boolean | ContactCountOutputTypeCountSyncLinksArgs
+    syncConflicts?: boolean | ContactCountOutputTypeCountSyncConflictsArgs
+    mergedChildren?: boolean | ContactCountOutputTypeCountMergedChildrenArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * ContactCountOutputType without action
+   */
+  export type ContactCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactCountOutputType
+     */
+    select?: ContactCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * ContactCountOutputType without action
+   */
+  export type ContactCountOutputTypeCountLeftMergeSuggestionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MergeSuggestionWhereInput
+  }
+
+  /**
+   * ContactCountOutputType without action
+   */
+  export type ContactCountOutputTypeCountRightMergeSuggestionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MergeSuggestionWhereInput
+  }
+
+  /**
+   * ContactCountOutputType without action
+   */
+  export type ContactCountOutputTypeCountSyncLinksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SyncContactLinkWhereInput
+  }
+
+  /**
+   * ContactCountOutputType without action
+   */
+  export type ContactCountOutputTypeCountSyncConflictsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SyncConflictWhereInput
+  }
+
+  /**
+   * ContactCountOutputType without action
+   */
+  export type ContactCountOutputTypeCountMergedChildrenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ContactWhereInput
   }
 
 
@@ -1507,6 +2310,148 @@ export namespace Prisma {
    */
   export type SubscriptionCustomerCountOutputTypeCountSubscriptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: SubscriptionWhereInput
+  }
+
+
+  /**
+   * Count Type ImportJobCountOutputType
+   */
+
+  export type ImportJobCountOutputType = {
+    contacts: number
+  }
+
+  export type ImportJobCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    contacts?: boolean | ImportJobCountOutputTypeCountContactsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * ImportJobCountOutputType without action
+   */
+  export type ImportJobCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportJobCountOutputType
+     */
+    select?: ImportJobCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * ImportJobCountOutputType without action
+   */
+  export type ImportJobCountOutputTypeCountContactsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ContactWhereInput
+  }
+
+
+  /**
+   * Count Type MergeSuggestionCountOutputType
+   */
+
+  export type MergeSuggestionCountOutputType = {
+    decisions: number
+  }
+
+  export type MergeSuggestionCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    decisions?: boolean | MergeSuggestionCountOutputTypeCountDecisionsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * MergeSuggestionCountOutputType without action
+   */
+  export type MergeSuggestionCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeSuggestionCountOutputType
+     */
+    select?: MergeSuggestionCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * MergeSuggestionCountOutputType without action
+   */
+  export type MergeSuggestionCountOutputTypeCountDecisionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MergeDecisionWhereInput
+  }
+
+
+  /**
+   * Count Type SyncAccountCountOutputType
+   */
+
+  export type SyncAccountCountOutputType = {
+    syncLinks: number
+    syncJobs: number
+    syncConflicts: number
+  }
+
+  export type SyncAccountCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    syncLinks?: boolean | SyncAccountCountOutputTypeCountSyncLinksArgs
+    syncJobs?: boolean | SyncAccountCountOutputTypeCountSyncJobsArgs
+    syncConflicts?: boolean | SyncAccountCountOutputTypeCountSyncConflictsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * SyncAccountCountOutputType without action
+   */
+  export type SyncAccountCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccountCountOutputType
+     */
+    select?: SyncAccountCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * SyncAccountCountOutputType without action
+   */
+  export type SyncAccountCountOutputTypeCountSyncLinksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SyncContactLinkWhereInput
+  }
+
+  /**
+   * SyncAccountCountOutputType without action
+   */
+  export type SyncAccountCountOutputTypeCountSyncJobsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SyncJobWhereInput
+  }
+
+  /**
+   * SyncAccountCountOutputType without action
+   */
+  export type SyncAccountCountOutputTypeCountSyncConflictsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SyncConflictWhereInput
+  }
+
+
+  /**
+   * Count Type SyncContactLinkCountOutputType
+   */
+
+  export type SyncContactLinkCountOutputType = {
+    syncConflicts: number
+  }
+
+  export type SyncContactLinkCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    syncConflicts?: boolean | SyncContactLinkCountOutputTypeCountSyncConflictsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * SyncContactLinkCountOutputType without action
+   */
+  export type SyncContactLinkCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncContactLinkCountOutputType
+     */
+    select?: SyncContactLinkCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * SyncContactLinkCountOutputType without action
+   */
+  export type SyncContactLinkCountOutputTypeCountSyncConflictsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SyncConflictWhereInput
   }
 
 
@@ -1697,6 +2642,9 @@ export namespace Prisma {
     contacts?: boolean | User$contactsArgs<ExtArgs>
     importJobs?: boolean | User$importJobsArgs<ExtArgs>
     exportJobs?: boolean | User$exportJobsArgs<ExtArgs>
+    mergeSuggestions?: boolean | User$mergeSuggestionsArgs<ExtArgs>
+    mergeDecisions?: boolean | User$mergeDecisionsArgs<ExtArgs>
+    syncAccounts?: boolean | User$syncAccountsArgs<ExtArgs>
     subscriptionCustomer?: boolean | User$subscriptionCustomerArgs<ExtArgs>
     subscriptions?: boolean | User$subscriptionsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -1737,6 +2685,9 @@ export namespace Prisma {
     contacts?: boolean | User$contactsArgs<ExtArgs>
     importJobs?: boolean | User$importJobsArgs<ExtArgs>
     exportJobs?: boolean | User$exportJobsArgs<ExtArgs>
+    mergeSuggestions?: boolean | User$mergeSuggestionsArgs<ExtArgs>
+    mergeDecisions?: boolean | User$mergeDecisionsArgs<ExtArgs>
+    syncAccounts?: boolean | User$syncAccountsArgs<ExtArgs>
     subscriptionCustomer?: boolean | User$subscriptionCustomerArgs<ExtArgs>
     subscriptions?: boolean | User$subscriptionsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -1750,6 +2701,9 @@ export namespace Prisma {
       contacts: Prisma.$ContactPayload<ExtArgs>[]
       importJobs: Prisma.$ImportJobPayload<ExtArgs>[]
       exportJobs: Prisma.$ExportJobPayload<ExtArgs>[]
+      mergeSuggestions: Prisma.$MergeSuggestionPayload<ExtArgs>[]
+      mergeDecisions: Prisma.$MergeDecisionPayload<ExtArgs>[]
+      syncAccounts: Prisma.$SyncAccountPayload<ExtArgs>[]
       subscriptionCustomer: Prisma.$SubscriptionCustomerPayload<ExtArgs> | null
       subscriptions: Prisma.$SubscriptionPayload<ExtArgs>[]
     }
@@ -2158,6 +3112,9 @@ export namespace Prisma {
     contacts<T extends User$contactsArgs<ExtArgs> = {}>(args?: Subset<T, User$contactsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     importJobs<T extends User$importJobsArgs<ExtArgs> = {}>(args?: Subset<T, User$importJobsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ImportJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     exportJobs<T extends User$exportJobsArgs<ExtArgs> = {}>(args?: Subset<T, User$exportJobsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExportJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    mergeSuggestions<T extends User$mergeSuggestionsArgs<ExtArgs> = {}>(args?: Subset<T, User$mergeSuggestionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeSuggestionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    mergeDecisions<T extends User$mergeDecisionsArgs<ExtArgs> = {}>(args?: Subset<T, User$mergeDecisionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeDecisionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    syncAccounts<T extends User$syncAccountsArgs<ExtArgs> = {}>(args?: Subset<T, User$syncAccountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     subscriptionCustomer<T extends User$subscriptionCustomerArgs<ExtArgs> = {}>(args?: Subset<T, User$subscriptionCustomerArgs<ExtArgs>>): Prisma__SubscriptionCustomerClient<$Result.GetResult<Prisma.$SubscriptionCustomerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     subscriptions<T extends User$subscriptionsArgs<ExtArgs> = {}>(args?: Subset<T, User$subscriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -2656,6 +3613,78 @@ export namespace Prisma {
   }
 
   /**
+   * User.mergeSuggestions
+   */
+  export type User$mergeSuggestionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeSuggestion
+     */
+    select?: MergeSuggestionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeSuggestion
+     */
+    omit?: MergeSuggestionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeSuggestionInclude<ExtArgs> | null
+    where?: MergeSuggestionWhereInput
+    orderBy?: MergeSuggestionOrderByWithRelationInput | MergeSuggestionOrderByWithRelationInput[]
+    cursor?: MergeSuggestionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MergeSuggestionScalarFieldEnum | MergeSuggestionScalarFieldEnum[]
+  }
+
+  /**
+   * User.mergeDecisions
+   */
+  export type User$mergeDecisionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDecision
+     */
+    select?: MergeDecisionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDecision
+     */
+    omit?: MergeDecisionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDecisionInclude<ExtArgs> | null
+    where?: MergeDecisionWhereInput
+    orderBy?: MergeDecisionOrderByWithRelationInput | MergeDecisionOrderByWithRelationInput[]
+    cursor?: MergeDecisionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MergeDecisionScalarFieldEnum | MergeDecisionScalarFieldEnum[]
+  }
+
+  /**
+   * User.syncAccounts
+   */
+  export type User$syncAccountsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccount
+     */
+    select?: SyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccount
+     */
+    omit?: SyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountInclude<ExtArgs> | null
+    where?: SyncAccountWhereInput
+    orderBy?: SyncAccountOrderByWithRelationInput | SyncAccountOrderByWithRelationInput[]
+    cursor?: SyncAccountWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SyncAccountScalarFieldEnum | SyncAccountScalarFieldEnum[]
+  }
+
+  /**
    * User.subscriptionCustomer
    */
   export type User$subscriptionCustomerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2723,13 +3752,28 @@ export namespace Prisma {
 
   export type AggregateContact = {
     _count: ContactCountAggregateOutputType | null
+    _avg: ContactAvgAggregateOutputType | null
+    _sum: ContactSumAggregateOutputType | null
     _min: ContactMinAggregateOutputType | null
     _max: ContactMaxAggregateOutputType | null
+  }
+
+  export type ContactAvgAggregateOutputType = {
+    syncVersion: number | null
+  }
+
+  export type ContactSumAggregateOutputType = {
+    syncVersion: number | null
   }
 
   export type ContactMinAggregateOutputType = {
     id: string | null
     userId: string | null
+    importJobId: string | null
+    mergedIntoContactId: string | null
+    syncUid: string | null
+    syncVersion: number | null
+    syncTombstoneAt: Date | null
     fullName: string | null
     email: string | null
     phone: string | null
@@ -2743,6 +3787,11 @@ export namespace Prisma {
   export type ContactMaxAggregateOutputType = {
     id: string | null
     userId: string | null
+    importJobId: string | null
+    mergedIntoContactId: string | null
+    syncUid: string | null
+    syncVersion: number | null
+    syncTombstoneAt: Date | null
     fullName: string | null
     email: string | null
     phone: string | null
@@ -2756,6 +3805,11 @@ export namespace Prisma {
   export type ContactCountAggregateOutputType = {
     id: number
     userId: number
+    importJobId: number
+    mergedIntoContactId: number
+    syncUid: number
+    syncVersion: number
+    syncTombstoneAt: number
     fullName: number
     email: number
     phone: number
@@ -2768,9 +3822,22 @@ export namespace Prisma {
   }
 
 
+  export type ContactAvgAggregateInputType = {
+    syncVersion?: true
+  }
+
+  export type ContactSumAggregateInputType = {
+    syncVersion?: true
+  }
+
   export type ContactMinAggregateInputType = {
     id?: true
     userId?: true
+    importJobId?: true
+    mergedIntoContactId?: true
+    syncUid?: true
+    syncVersion?: true
+    syncTombstoneAt?: true
     fullName?: true
     email?: true
     phone?: true
@@ -2784,6 +3851,11 @@ export namespace Prisma {
   export type ContactMaxAggregateInputType = {
     id?: true
     userId?: true
+    importJobId?: true
+    mergedIntoContactId?: true
+    syncUid?: true
+    syncVersion?: true
+    syncTombstoneAt?: true
     fullName?: true
     email?: true
     phone?: true
@@ -2797,6 +3869,11 @@ export namespace Prisma {
   export type ContactCountAggregateInputType = {
     id?: true
     userId?: true
+    importJobId?: true
+    mergedIntoContactId?: true
+    syncUid?: true
+    syncVersion?: true
+    syncTombstoneAt?: true
     fullName?: true
     email?: true
     phone?: true
@@ -2846,6 +3923,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: ContactAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ContactSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: ContactMinAggregateInputType
@@ -2876,6 +3965,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: ContactCountAggregateInputType | true
+    _avg?: ContactAvgAggregateInputType
+    _sum?: ContactSumAggregateInputType
     _min?: ContactMinAggregateInputType
     _max?: ContactMaxAggregateInputType
   }
@@ -2883,6 +3974,11 @@ export namespace Prisma {
   export type ContactGroupByOutputType = {
     id: string
     userId: string
+    importJobId: string | null
+    mergedIntoContactId: string | null
+    syncUid: string
+    syncVersion: number
+    syncTombstoneAt: Date | null
     fullName: string
     email: string | null
     phone: string | null
@@ -2892,6 +3988,8 @@ export namespace Prisma {
     createdAt: Date
     updatedAt: Date
     _count: ContactCountAggregateOutputType | null
+    _avg: ContactAvgAggregateOutputType | null
+    _sum: ContactSumAggregateOutputType | null
     _min: ContactMinAggregateOutputType | null
     _max: ContactMaxAggregateOutputType | null
   }
@@ -2913,6 +4011,11 @@ export namespace Prisma {
   export type ContactSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
+    importJobId?: boolean
+    mergedIntoContactId?: boolean
+    syncUid?: boolean
+    syncVersion?: boolean
+    syncTombstoneAt?: boolean
     fullName?: boolean
     email?: boolean
     phone?: boolean
@@ -2922,11 +4025,24 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+    importJob?: boolean | Contact$importJobArgs<ExtArgs>
+    leftMergeSuggestions?: boolean | Contact$leftMergeSuggestionsArgs<ExtArgs>
+    rightMergeSuggestions?: boolean | Contact$rightMergeSuggestionsArgs<ExtArgs>
+    syncLinks?: boolean | Contact$syncLinksArgs<ExtArgs>
+    syncConflicts?: boolean | Contact$syncConflictsArgs<ExtArgs>
+    mergedIntoContact?: boolean | Contact$mergedIntoContactArgs<ExtArgs>
+    mergedChildren?: boolean | Contact$mergedChildrenArgs<ExtArgs>
+    _count?: boolean | ContactCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["contact"]>
 
   export type ContactSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
+    importJobId?: boolean
+    mergedIntoContactId?: boolean
+    syncUid?: boolean
+    syncVersion?: boolean
+    syncTombstoneAt?: boolean
     fullName?: boolean
     email?: boolean
     phone?: boolean
@@ -2936,11 +4052,18 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+    importJob?: boolean | Contact$importJobArgs<ExtArgs>
+    mergedIntoContact?: boolean | Contact$mergedIntoContactArgs<ExtArgs>
   }, ExtArgs["result"]["contact"]>
 
   export type ContactSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
+    importJobId?: boolean
+    mergedIntoContactId?: boolean
+    syncUid?: boolean
+    syncVersion?: boolean
+    syncTombstoneAt?: boolean
     fullName?: boolean
     email?: boolean
     phone?: boolean
@@ -2950,11 +4073,18 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+    importJob?: boolean | Contact$importJobArgs<ExtArgs>
+    mergedIntoContact?: boolean | Contact$mergedIntoContactArgs<ExtArgs>
   }, ExtArgs["result"]["contact"]>
 
   export type ContactSelectScalar = {
     id?: boolean
     userId?: boolean
+    importJobId?: boolean
+    mergedIntoContactId?: boolean
+    syncUid?: boolean
+    syncVersion?: boolean
+    syncTombstoneAt?: boolean
     fullName?: boolean
     email?: boolean
     phone?: boolean
@@ -2965,25 +4095,49 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ContactOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "fullName" | "email" | "phone" | "company" | "notes" | "archivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["contact"]>
+  export type ContactOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "importJobId" | "mergedIntoContactId" | "syncUid" | "syncVersion" | "syncTombstoneAt" | "fullName" | "email" | "phone" | "company" | "notes" | "archivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["contact"]>
   export type ContactInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+    importJob?: boolean | Contact$importJobArgs<ExtArgs>
+    leftMergeSuggestions?: boolean | Contact$leftMergeSuggestionsArgs<ExtArgs>
+    rightMergeSuggestions?: boolean | Contact$rightMergeSuggestionsArgs<ExtArgs>
+    syncLinks?: boolean | Contact$syncLinksArgs<ExtArgs>
+    syncConflicts?: boolean | Contact$syncConflictsArgs<ExtArgs>
+    mergedIntoContact?: boolean | Contact$mergedIntoContactArgs<ExtArgs>
+    mergedChildren?: boolean | Contact$mergedChildrenArgs<ExtArgs>
+    _count?: boolean | ContactCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ContactIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+    importJob?: boolean | Contact$importJobArgs<ExtArgs>
+    mergedIntoContact?: boolean | Contact$mergedIntoContactArgs<ExtArgs>
   }
   export type ContactIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+    importJob?: boolean | Contact$importJobArgs<ExtArgs>
+    mergedIntoContact?: boolean | Contact$mergedIntoContactArgs<ExtArgs>
   }
 
   export type $ContactPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Contact"
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
+      importJob: Prisma.$ImportJobPayload<ExtArgs> | null
+      leftMergeSuggestions: Prisma.$MergeSuggestionPayload<ExtArgs>[]
+      rightMergeSuggestions: Prisma.$MergeSuggestionPayload<ExtArgs>[]
+      syncLinks: Prisma.$SyncContactLinkPayload<ExtArgs>[]
+      syncConflicts: Prisma.$SyncConflictPayload<ExtArgs>[]
+      mergedIntoContact: Prisma.$ContactPayload<ExtArgs> | null
+      mergedChildren: Prisma.$ContactPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       userId: string
+      importJobId: string | null
+      mergedIntoContactId: string | null
+      syncUid: string
+      syncVersion: number
+      syncTombstoneAt: Date | null
       fullName: string
       email: string | null
       phone: string | null
@@ -3387,6 +4541,13 @@ export namespace Prisma {
   export interface Prisma__ContactClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    importJob<T extends Contact$importJobArgs<ExtArgs> = {}>(args?: Subset<T, Contact$importJobArgs<ExtArgs>>): Prisma__ImportJobClient<$Result.GetResult<Prisma.$ImportJobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    leftMergeSuggestions<T extends Contact$leftMergeSuggestionsArgs<ExtArgs> = {}>(args?: Subset<T, Contact$leftMergeSuggestionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeSuggestionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    rightMergeSuggestions<T extends Contact$rightMergeSuggestionsArgs<ExtArgs> = {}>(args?: Subset<T, Contact$rightMergeSuggestionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeSuggestionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    syncLinks<T extends Contact$syncLinksArgs<ExtArgs> = {}>(args?: Subset<T, Contact$syncLinksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncContactLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    syncConflicts<T extends Contact$syncConflictsArgs<ExtArgs> = {}>(args?: Subset<T, Contact$syncConflictsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncConflictPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    mergedIntoContact<T extends Contact$mergedIntoContactArgs<ExtArgs> = {}>(args?: Subset<T, Contact$mergedIntoContactArgs<ExtArgs>>): Prisma__ContactClient<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    mergedChildren<T extends Contact$mergedChildrenArgs<ExtArgs> = {}>(args?: Subset<T, Contact$mergedChildrenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3418,6 +4579,11 @@ export namespace Prisma {
   interface ContactFieldRefs {
     readonly id: FieldRef<"Contact", 'String'>
     readonly userId: FieldRef<"Contact", 'String'>
+    readonly importJobId: FieldRef<"Contact", 'String'>
+    readonly mergedIntoContactId: FieldRef<"Contact", 'String'>
+    readonly syncUid: FieldRef<"Contact", 'String'>
+    readonly syncVersion: FieldRef<"Contact", 'Int'>
+    readonly syncTombstoneAt: FieldRef<"Contact", 'DateTime'>
     readonly fullName: FieldRef<"Contact", 'String'>
     readonly email: FieldRef<"Contact", 'String'>
     readonly phone: FieldRef<"Contact", 'String'>
@@ -3819,6 +4985,164 @@ export namespace Prisma {
      * Limit how many Contacts to delete.
      */
     limit?: number
+  }
+
+  /**
+   * Contact.importJob
+   */
+  export type Contact$importJobArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportJob
+     */
+    select?: ImportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportJob
+     */
+    omit?: ImportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportJobInclude<ExtArgs> | null
+    where?: ImportJobWhereInput
+  }
+
+  /**
+   * Contact.leftMergeSuggestions
+   */
+  export type Contact$leftMergeSuggestionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeSuggestion
+     */
+    select?: MergeSuggestionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeSuggestion
+     */
+    omit?: MergeSuggestionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeSuggestionInclude<ExtArgs> | null
+    where?: MergeSuggestionWhereInput
+    orderBy?: MergeSuggestionOrderByWithRelationInput | MergeSuggestionOrderByWithRelationInput[]
+    cursor?: MergeSuggestionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MergeSuggestionScalarFieldEnum | MergeSuggestionScalarFieldEnum[]
+  }
+
+  /**
+   * Contact.rightMergeSuggestions
+   */
+  export type Contact$rightMergeSuggestionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeSuggestion
+     */
+    select?: MergeSuggestionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeSuggestion
+     */
+    omit?: MergeSuggestionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeSuggestionInclude<ExtArgs> | null
+    where?: MergeSuggestionWhereInput
+    orderBy?: MergeSuggestionOrderByWithRelationInput | MergeSuggestionOrderByWithRelationInput[]
+    cursor?: MergeSuggestionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MergeSuggestionScalarFieldEnum | MergeSuggestionScalarFieldEnum[]
+  }
+
+  /**
+   * Contact.syncLinks
+   */
+  export type Contact$syncLinksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncContactLink
+     */
+    select?: SyncContactLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncContactLink
+     */
+    omit?: SyncContactLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncContactLinkInclude<ExtArgs> | null
+    where?: SyncContactLinkWhereInput
+    orderBy?: SyncContactLinkOrderByWithRelationInput | SyncContactLinkOrderByWithRelationInput[]
+    cursor?: SyncContactLinkWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SyncContactLinkScalarFieldEnum | SyncContactLinkScalarFieldEnum[]
+  }
+
+  /**
+   * Contact.syncConflicts
+   */
+  export type Contact$syncConflictsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncConflict
+     */
+    select?: SyncConflictSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncConflict
+     */
+    omit?: SyncConflictOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncConflictInclude<ExtArgs> | null
+    where?: SyncConflictWhereInput
+    orderBy?: SyncConflictOrderByWithRelationInput | SyncConflictOrderByWithRelationInput[]
+    cursor?: SyncConflictWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SyncConflictScalarFieldEnum | SyncConflictScalarFieldEnum[]
+  }
+
+  /**
+   * Contact.mergedIntoContact
+   */
+  export type Contact$mergedIntoContactArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Contact
+     */
+    select?: ContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Contact
+     */
+    omit?: ContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactInclude<ExtArgs> | null
+    where?: ContactWhereInput
+  }
+
+  /**
+   * Contact.mergedChildren
+   */
+  export type Contact$mergedChildrenArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Contact
+     */
+    select?: ContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Contact
+     */
+    omit?: ContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactInclude<ExtArgs> | null
+    where?: ContactWhereInput
+    orderBy?: ContactOrderByWithRelationInput | ContactOrderByWithRelationInput[]
+    cursor?: ContactWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ContactScalarFieldEnum | ContactScalarFieldEnum[]
   }
 
   /**
@@ -6322,30 +7646,46 @@ export namespace Prisma {
   }
 
   export type ImportJobAvgAggregateOutputType = {
+    sourceFileSizeBytes: number | null
     rowCount: number | null
+    previewContactCount: number | null
     importedCount: number | null
     skippedCount: number | null
     errorCount: number | null
+    warningCount: number | null
+    rolledBackCount: number | null
   }
 
   export type ImportJobSumAggregateOutputType = {
+    sourceFileSizeBytes: number | null
     rowCount: number | null
+    previewContactCount: number | null
     importedCount: number | null
     skippedCount: number | null
     errorCount: number | null
+    warningCount: number | null
+    rolledBackCount: number | null
   }
 
   export type ImportJobMinAggregateOutputType = {
     id: string | null
     userId: string | null
     format: $Enums.ContactImportFormat | null
+    sourceProfile: $Enums.ImportSourceProfile | null
     status: $Enums.ImportExportJobStatus | null
     sourceFileName: string | null
+    sourceFileSizeBytes: number | null
     rowCount: number | null
+    previewContactCount: number | null
     importedCount: number | null
     skippedCount: number | null
     errorCount: number | null
+    warningCount: number | null
+    rolledBackCount: number | null
     errorSummary: string | null
+    previewedAt: Date | null
+    committedAt: Date | null
+    rolledBackAt: Date | null
     createdAt: Date | null
     startedAt: Date | null
     completedAt: Date | null
@@ -6356,13 +7696,21 @@ export namespace Prisma {
     id: string | null
     userId: string | null
     format: $Enums.ContactImportFormat | null
+    sourceProfile: $Enums.ImportSourceProfile | null
     status: $Enums.ImportExportJobStatus | null
     sourceFileName: string | null
+    sourceFileSizeBytes: number | null
     rowCount: number | null
+    previewContactCount: number | null
     importedCount: number | null
     skippedCount: number | null
     errorCount: number | null
+    warningCount: number | null
+    rolledBackCount: number | null
     errorSummary: string | null
+    previewedAt: Date | null
+    committedAt: Date | null
+    rolledBackAt: Date | null
     createdAt: Date | null
     startedAt: Date | null
     completedAt: Date | null
@@ -6373,13 +7721,21 @@ export namespace Prisma {
     id: number
     userId: number
     format: number
+    sourceProfile: number
     status: number
     sourceFileName: number
+    sourceFileSizeBytes: number
     rowCount: number
+    previewContactCount: number
     importedCount: number
     skippedCount: number
     errorCount: number
+    warningCount: number
+    rolledBackCount: number
     errorSummary: number
+    previewedAt: number
+    committedAt: number
+    rolledBackAt: number
     createdAt: number
     startedAt: number
     completedAt: number
@@ -6389,30 +7745,46 @@ export namespace Prisma {
 
 
   export type ImportJobAvgAggregateInputType = {
+    sourceFileSizeBytes?: true
     rowCount?: true
+    previewContactCount?: true
     importedCount?: true
     skippedCount?: true
     errorCount?: true
+    warningCount?: true
+    rolledBackCount?: true
   }
 
   export type ImportJobSumAggregateInputType = {
+    sourceFileSizeBytes?: true
     rowCount?: true
+    previewContactCount?: true
     importedCount?: true
     skippedCount?: true
     errorCount?: true
+    warningCount?: true
+    rolledBackCount?: true
   }
 
   export type ImportJobMinAggregateInputType = {
     id?: true
     userId?: true
     format?: true
+    sourceProfile?: true
     status?: true
     sourceFileName?: true
+    sourceFileSizeBytes?: true
     rowCount?: true
+    previewContactCount?: true
     importedCount?: true
     skippedCount?: true
     errorCount?: true
+    warningCount?: true
+    rolledBackCount?: true
     errorSummary?: true
+    previewedAt?: true
+    committedAt?: true
+    rolledBackAt?: true
     createdAt?: true
     startedAt?: true
     completedAt?: true
@@ -6423,13 +7795,21 @@ export namespace Prisma {
     id?: true
     userId?: true
     format?: true
+    sourceProfile?: true
     status?: true
     sourceFileName?: true
+    sourceFileSizeBytes?: true
     rowCount?: true
+    previewContactCount?: true
     importedCount?: true
     skippedCount?: true
     errorCount?: true
+    warningCount?: true
+    rolledBackCount?: true
     errorSummary?: true
+    previewedAt?: true
+    committedAt?: true
+    rolledBackAt?: true
     createdAt?: true
     startedAt?: true
     completedAt?: true
@@ -6440,13 +7820,21 @@ export namespace Prisma {
     id?: true
     userId?: true
     format?: true
+    sourceProfile?: true
     status?: true
     sourceFileName?: true
+    sourceFileSizeBytes?: true
     rowCount?: true
+    previewContactCount?: true
     importedCount?: true
     skippedCount?: true
     errorCount?: true
+    warningCount?: true
+    rolledBackCount?: true
     errorSummary?: true
+    previewedAt?: true
+    committedAt?: true
+    rolledBackAt?: true
     createdAt?: true
     startedAt?: true
     completedAt?: true
@@ -6544,13 +7932,21 @@ export namespace Prisma {
     id: string
     userId: string
     format: $Enums.ContactImportFormat
+    sourceProfile: $Enums.ImportSourceProfile | null
     status: $Enums.ImportExportJobStatus
     sourceFileName: string | null
+    sourceFileSizeBytes: number | null
     rowCount: number
+    previewContactCount: number
     importedCount: number
     skippedCount: number
     errorCount: number
+    warningCount: number
+    rolledBackCount: number
     errorSummary: string | null
+    previewedAt: Date | null
+    committedAt: Date | null
+    rolledBackAt: Date | null
     createdAt: Date
     startedAt: Date
     completedAt: Date | null
@@ -6580,31 +7976,49 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     format?: boolean
+    sourceProfile?: boolean
     status?: boolean
     sourceFileName?: boolean
+    sourceFileSizeBytes?: boolean
     rowCount?: boolean
+    previewContactCount?: boolean
     importedCount?: boolean
     skippedCount?: boolean
     errorCount?: boolean
+    warningCount?: boolean
+    rolledBackCount?: boolean
     errorSummary?: boolean
+    previewedAt?: boolean
+    committedAt?: boolean
+    rolledBackAt?: boolean
     createdAt?: boolean
     startedAt?: boolean
     completedAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+    contacts?: boolean | ImportJob$contactsArgs<ExtArgs>
+    _count?: boolean | ImportJobCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["importJob"]>
 
   export type ImportJobSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
     format?: boolean
+    sourceProfile?: boolean
     status?: boolean
     sourceFileName?: boolean
+    sourceFileSizeBytes?: boolean
     rowCount?: boolean
+    previewContactCount?: boolean
     importedCount?: boolean
     skippedCount?: boolean
     errorCount?: boolean
+    warningCount?: boolean
+    rolledBackCount?: boolean
     errorSummary?: boolean
+    previewedAt?: boolean
+    committedAt?: boolean
+    rolledBackAt?: boolean
     createdAt?: boolean
     startedAt?: boolean
     completedAt?: boolean
@@ -6616,13 +8030,21 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     format?: boolean
+    sourceProfile?: boolean
     status?: boolean
     sourceFileName?: boolean
+    sourceFileSizeBytes?: boolean
     rowCount?: boolean
+    previewContactCount?: boolean
     importedCount?: boolean
     skippedCount?: boolean
     errorCount?: boolean
+    warningCount?: boolean
+    rolledBackCount?: boolean
     errorSummary?: boolean
+    previewedAt?: boolean
+    committedAt?: boolean
+    rolledBackAt?: boolean
     createdAt?: boolean
     startedAt?: boolean
     completedAt?: boolean
@@ -6634,22 +8056,32 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     format?: boolean
+    sourceProfile?: boolean
     status?: boolean
     sourceFileName?: boolean
+    sourceFileSizeBytes?: boolean
     rowCount?: boolean
+    previewContactCount?: boolean
     importedCount?: boolean
     skippedCount?: boolean
     errorCount?: boolean
+    warningCount?: boolean
+    rolledBackCount?: boolean
     errorSummary?: boolean
+    previewedAt?: boolean
+    committedAt?: boolean
+    rolledBackAt?: boolean
     createdAt?: boolean
     startedAt?: boolean
     completedAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ImportJobOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "format" | "status" | "sourceFileName" | "rowCount" | "importedCount" | "skippedCount" | "errorCount" | "errorSummary" | "createdAt" | "startedAt" | "completedAt" | "updatedAt", ExtArgs["result"]["importJob"]>
+  export type ImportJobOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "format" | "sourceProfile" | "status" | "sourceFileName" | "sourceFileSizeBytes" | "rowCount" | "previewContactCount" | "importedCount" | "skippedCount" | "errorCount" | "warningCount" | "rolledBackCount" | "errorSummary" | "previewedAt" | "committedAt" | "rolledBackAt" | "createdAt" | "startedAt" | "completedAt" | "updatedAt", ExtArgs["result"]["importJob"]>
   export type ImportJobInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+    contacts?: boolean | ImportJob$contactsArgs<ExtArgs>
+    _count?: boolean | ImportJobCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ImportJobIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -6662,18 +8094,27 @@ export namespace Prisma {
     name: "ImportJob"
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
+      contacts: Prisma.$ContactPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       userId: string
       format: $Enums.ContactImportFormat
+      sourceProfile: $Enums.ImportSourceProfile | null
       status: $Enums.ImportExportJobStatus
       sourceFileName: string | null
+      sourceFileSizeBytes: number | null
       rowCount: number
+      previewContactCount: number
       importedCount: number
       skippedCount: number
       errorCount: number
+      warningCount: number
+      rolledBackCount: number
       errorSummary: string | null
+      previewedAt: Date | null
+      committedAt: Date | null
+      rolledBackAt: Date | null
       createdAt: Date
       startedAt: Date
       completedAt: Date | null
@@ -7073,6 +8514,7 @@ export namespace Prisma {
   export interface Prisma__ImportJobClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    contacts<T extends ImportJob$contactsArgs<ExtArgs> = {}>(args?: Subset<T, ImportJob$contactsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7105,13 +8547,21 @@ export namespace Prisma {
     readonly id: FieldRef<"ImportJob", 'String'>
     readonly userId: FieldRef<"ImportJob", 'String'>
     readonly format: FieldRef<"ImportJob", 'ContactImportFormat'>
+    readonly sourceProfile: FieldRef<"ImportJob", 'ImportSourceProfile'>
     readonly status: FieldRef<"ImportJob", 'ImportExportJobStatus'>
     readonly sourceFileName: FieldRef<"ImportJob", 'String'>
+    readonly sourceFileSizeBytes: FieldRef<"ImportJob", 'Int'>
     readonly rowCount: FieldRef<"ImportJob", 'Int'>
+    readonly previewContactCount: FieldRef<"ImportJob", 'Int'>
     readonly importedCount: FieldRef<"ImportJob", 'Int'>
     readonly skippedCount: FieldRef<"ImportJob", 'Int'>
     readonly errorCount: FieldRef<"ImportJob", 'Int'>
+    readonly warningCount: FieldRef<"ImportJob", 'Int'>
+    readonly rolledBackCount: FieldRef<"ImportJob", 'Int'>
     readonly errorSummary: FieldRef<"ImportJob", 'String'>
+    readonly previewedAt: FieldRef<"ImportJob", 'DateTime'>
+    readonly committedAt: FieldRef<"ImportJob", 'DateTime'>
+    readonly rolledBackAt: FieldRef<"ImportJob", 'DateTime'>
     readonly createdAt: FieldRef<"ImportJob", 'DateTime'>
     readonly startedAt: FieldRef<"ImportJob", 'DateTime'>
     readonly completedAt: FieldRef<"ImportJob", 'DateTime'>
@@ -7512,6 +8962,30 @@ export namespace Prisma {
   }
 
   /**
+   * ImportJob.contacts
+   */
+  export type ImportJob$contactsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Contact
+     */
+    select?: ContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Contact
+     */
+    omit?: ContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactInclude<ExtArgs> | null
+    where?: ContactWhereInput
+    orderBy?: ContactOrderByWithRelationInput | ContactOrderByWithRelationInput[]
+    cursor?: ContactWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ContactScalarFieldEnum | ContactScalarFieldEnum[]
+  }
+
+  /**
    * ImportJob without action
    */
   export type ImportJobDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7556,6 +9030,8 @@ export namespace Prisma {
     format: $Enums.ContactExportFormat | null
     status: $Enums.ImportExportJobStatus | null
     includeArchived: boolean | null
+    filterQuery: string | null
+    resultFileName: string | null
     exportedCount: number | null
     errorSummary: string | null
     createdAt: Date | null
@@ -7570,6 +9046,8 @@ export namespace Prisma {
     format: $Enums.ContactExportFormat | null
     status: $Enums.ImportExportJobStatus | null
     includeArchived: boolean | null
+    filterQuery: string | null
+    resultFileName: string | null
     exportedCount: number | null
     errorSummary: string | null
     createdAt: Date | null
@@ -7584,6 +9062,8 @@ export namespace Prisma {
     format: number
     status: number
     includeArchived: number
+    filterQuery: number
+    resultFileName: number
     exportedCount: number
     errorSummary: number
     createdAt: number
@@ -7608,6 +9088,8 @@ export namespace Prisma {
     format?: true
     status?: true
     includeArchived?: true
+    filterQuery?: true
+    resultFileName?: true
     exportedCount?: true
     errorSummary?: true
     createdAt?: true
@@ -7622,6 +9104,8 @@ export namespace Prisma {
     format?: true
     status?: true
     includeArchived?: true
+    filterQuery?: true
+    resultFileName?: true
     exportedCount?: true
     errorSummary?: true
     createdAt?: true
@@ -7636,6 +9120,8 @@ export namespace Prisma {
     format?: true
     status?: true
     includeArchived?: true
+    filterQuery?: true
+    resultFileName?: true
     exportedCount?: true
     errorSummary?: true
     createdAt?: true
@@ -7737,6 +9223,8 @@ export namespace Prisma {
     format: $Enums.ContactExportFormat
     status: $Enums.ImportExportJobStatus
     includeArchived: boolean
+    filterQuery: string | null
+    resultFileName: string | null
     exportedCount: number
     errorSummary: string | null
     createdAt: Date
@@ -7770,6 +9258,8 @@ export namespace Prisma {
     format?: boolean
     status?: boolean
     includeArchived?: boolean
+    filterQuery?: boolean
+    resultFileName?: boolean
     exportedCount?: boolean
     errorSummary?: boolean
     createdAt?: boolean
@@ -7785,6 +9275,8 @@ export namespace Prisma {
     format?: boolean
     status?: boolean
     includeArchived?: boolean
+    filterQuery?: boolean
+    resultFileName?: boolean
     exportedCount?: boolean
     errorSummary?: boolean
     createdAt?: boolean
@@ -7800,6 +9292,8 @@ export namespace Prisma {
     format?: boolean
     status?: boolean
     includeArchived?: boolean
+    filterQuery?: boolean
+    resultFileName?: boolean
     exportedCount?: boolean
     errorSummary?: boolean
     createdAt?: boolean
@@ -7815,6 +9309,8 @@ export namespace Prisma {
     format?: boolean
     status?: boolean
     includeArchived?: boolean
+    filterQuery?: boolean
+    resultFileName?: boolean
     exportedCount?: boolean
     errorSummary?: boolean
     createdAt?: boolean
@@ -7823,7 +9319,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ExportJobOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "format" | "status" | "includeArchived" | "exportedCount" | "errorSummary" | "createdAt" | "startedAt" | "completedAt" | "updatedAt", ExtArgs["result"]["exportJob"]>
+  export type ExportJobOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "format" | "status" | "includeArchived" | "filterQuery" | "resultFileName" | "exportedCount" | "errorSummary" | "createdAt" | "startedAt" | "completedAt" | "updatedAt", ExtArgs["result"]["exportJob"]>
   export type ExportJobInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -7845,6 +9341,8 @@ export namespace Prisma {
       format: $Enums.ContactExportFormat
       status: $Enums.ImportExportJobStatus
       includeArchived: boolean
+      filterQuery: string | null
+      resultFileName: string | null
       exportedCount: number
       errorSummary: string | null
       createdAt: Date
@@ -8280,6 +9778,8 @@ export namespace Prisma {
     readonly format: FieldRef<"ExportJob", 'ContactExportFormat'>
     readonly status: FieldRef<"ExportJob", 'ImportExportJobStatus'>
     readonly includeArchived: FieldRef<"ExportJob", 'Boolean'>
+    readonly filterQuery: FieldRef<"ExportJob", 'String'>
+    readonly resultFileName: FieldRef<"ExportJob", 'String'>
     readonly exportedCount: FieldRef<"ExportJob", 'Int'>
     readonly errorSummary: FieldRef<"ExportJob", 'String'>
     readonly createdAt: FieldRef<"ExportJob", 'DateTime'>
@@ -8701,6 +10201,7701 @@ export namespace Prisma {
 
 
   /**
+   * Model MergeSuggestion
+   */
+
+  export type AggregateMergeSuggestion = {
+    _count: MergeSuggestionCountAggregateOutputType | null
+    _avg: MergeSuggestionAvgAggregateOutputType | null
+    _sum: MergeSuggestionSumAggregateOutputType | null
+    _min: MergeSuggestionMinAggregateOutputType | null
+    _max: MergeSuggestionMaxAggregateOutputType | null
+  }
+
+  export type MergeSuggestionAvgAggregateOutputType = {
+    score: number | null
+  }
+
+  export type MergeSuggestionSumAggregateOutputType = {
+    score: number | null
+  }
+
+  export type MergeSuggestionMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    leftContactId: string | null
+    rightContactId: string | null
+    pairKey: string | null
+    status: $Enums.MergeSuggestionStatus | null
+    confidence: $Enums.MergeSuggestionConfidence | null
+    score: number | null
+    hardMatch: boolean | null
+    source: string | null
+    generatedAt: Date | null
+    reviewedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MergeSuggestionMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    leftContactId: string | null
+    rightContactId: string | null
+    pairKey: string | null
+    status: $Enums.MergeSuggestionStatus | null
+    confidence: $Enums.MergeSuggestionConfidence | null
+    score: number | null
+    hardMatch: boolean | null
+    source: string | null
+    generatedAt: Date | null
+    reviewedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MergeSuggestionCountAggregateOutputType = {
+    id: number
+    userId: number
+    leftContactId: number
+    rightContactId: number
+    pairKey: number
+    status: number
+    confidence: number
+    score: number
+    hardMatch: number
+    signals: number
+    reasons: number
+    source: number
+    generatedAt: number
+    reviewedAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type MergeSuggestionAvgAggregateInputType = {
+    score?: true
+  }
+
+  export type MergeSuggestionSumAggregateInputType = {
+    score?: true
+  }
+
+  export type MergeSuggestionMinAggregateInputType = {
+    id?: true
+    userId?: true
+    leftContactId?: true
+    rightContactId?: true
+    pairKey?: true
+    status?: true
+    confidence?: true
+    score?: true
+    hardMatch?: true
+    source?: true
+    generatedAt?: true
+    reviewedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MergeSuggestionMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    leftContactId?: true
+    rightContactId?: true
+    pairKey?: true
+    status?: true
+    confidence?: true
+    score?: true
+    hardMatch?: true
+    source?: true
+    generatedAt?: true
+    reviewedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MergeSuggestionCountAggregateInputType = {
+    id?: true
+    userId?: true
+    leftContactId?: true
+    rightContactId?: true
+    pairKey?: true
+    status?: true
+    confidence?: true
+    score?: true
+    hardMatch?: true
+    signals?: true
+    reasons?: true
+    source?: true
+    generatedAt?: true
+    reviewedAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type MergeSuggestionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MergeSuggestion to aggregate.
+     */
+    where?: MergeSuggestionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MergeSuggestions to fetch.
+     */
+    orderBy?: MergeSuggestionOrderByWithRelationInput | MergeSuggestionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MergeSuggestionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MergeSuggestions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MergeSuggestions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MergeSuggestions
+    **/
+    _count?: true | MergeSuggestionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: MergeSuggestionAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: MergeSuggestionSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MergeSuggestionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MergeSuggestionMaxAggregateInputType
+  }
+
+  export type GetMergeSuggestionAggregateType<T extends MergeSuggestionAggregateArgs> = {
+        [P in keyof T & keyof AggregateMergeSuggestion]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMergeSuggestion[P]>
+      : GetScalarType<T[P], AggregateMergeSuggestion[P]>
+  }
+
+
+
+
+  export type MergeSuggestionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MergeSuggestionWhereInput
+    orderBy?: MergeSuggestionOrderByWithAggregationInput | MergeSuggestionOrderByWithAggregationInput[]
+    by: MergeSuggestionScalarFieldEnum[] | MergeSuggestionScalarFieldEnum
+    having?: MergeSuggestionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MergeSuggestionCountAggregateInputType | true
+    _avg?: MergeSuggestionAvgAggregateInputType
+    _sum?: MergeSuggestionSumAggregateInputType
+    _min?: MergeSuggestionMinAggregateInputType
+    _max?: MergeSuggestionMaxAggregateInputType
+  }
+
+  export type MergeSuggestionGroupByOutputType = {
+    id: string
+    userId: string
+    leftContactId: string
+    rightContactId: string
+    pairKey: string
+    status: $Enums.MergeSuggestionStatus
+    confidence: $Enums.MergeSuggestionConfidence
+    score: number
+    hardMatch: boolean
+    signals: JsonValue
+    reasons: JsonValue
+    source: string
+    generatedAt: Date
+    reviewedAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: MergeSuggestionCountAggregateOutputType | null
+    _avg: MergeSuggestionAvgAggregateOutputType | null
+    _sum: MergeSuggestionSumAggregateOutputType | null
+    _min: MergeSuggestionMinAggregateOutputType | null
+    _max: MergeSuggestionMaxAggregateOutputType | null
+  }
+
+  type GetMergeSuggestionGroupByPayload<T extends MergeSuggestionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MergeSuggestionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MergeSuggestionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MergeSuggestionGroupByOutputType[P]>
+            : GetScalarType<T[P], MergeSuggestionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MergeSuggestionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    leftContactId?: boolean
+    rightContactId?: boolean
+    pairKey?: boolean
+    status?: boolean
+    confidence?: boolean
+    score?: boolean
+    hardMatch?: boolean
+    signals?: boolean
+    reasons?: boolean
+    source?: boolean
+    generatedAt?: boolean
+    reviewedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    leftContact?: boolean | ContactDefaultArgs<ExtArgs>
+    rightContact?: boolean | ContactDefaultArgs<ExtArgs>
+    decisions?: boolean | MergeSuggestion$decisionsArgs<ExtArgs>
+    _count?: boolean | MergeSuggestionCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["mergeSuggestion"]>
+
+  export type MergeSuggestionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    leftContactId?: boolean
+    rightContactId?: boolean
+    pairKey?: boolean
+    status?: boolean
+    confidence?: boolean
+    score?: boolean
+    hardMatch?: boolean
+    signals?: boolean
+    reasons?: boolean
+    source?: boolean
+    generatedAt?: boolean
+    reviewedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    leftContact?: boolean | ContactDefaultArgs<ExtArgs>
+    rightContact?: boolean | ContactDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["mergeSuggestion"]>
+
+  export type MergeSuggestionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    leftContactId?: boolean
+    rightContactId?: boolean
+    pairKey?: boolean
+    status?: boolean
+    confidence?: boolean
+    score?: boolean
+    hardMatch?: boolean
+    signals?: boolean
+    reasons?: boolean
+    source?: boolean
+    generatedAt?: boolean
+    reviewedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    leftContact?: boolean | ContactDefaultArgs<ExtArgs>
+    rightContact?: boolean | ContactDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["mergeSuggestion"]>
+
+  export type MergeSuggestionSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    leftContactId?: boolean
+    rightContactId?: boolean
+    pairKey?: boolean
+    status?: boolean
+    confidence?: boolean
+    score?: boolean
+    hardMatch?: boolean
+    signals?: boolean
+    reasons?: boolean
+    source?: boolean
+    generatedAt?: boolean
+    reviewedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type MergeSuggestionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "leftContactId" | "rightContactId" | "pairKey" | "status" | "confidence" | "score" | "hardMatch" | "signals" | "reasons" | "source" | "generatedAt" | "reviewedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["mergeSuggestion"]>
+  export type MergeSuggestionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    leftContact?: boolean | ContactDefaultArgs<ExtArgs>
+    rightContact?: boolean | ContactDefaultArgs<ExtArgs>
+    decisions?: boolean | MergeSuggestion$decisionsArgs<ExtArgs>
+    _count?: boolean | MergeSuggestionCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type MergeSuggestionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    leftContact?: boolean | ContactDefaultArgs<ExtArgs>
+    rightContact?: boolean | ContactDefaultArgs<ExtArgs>
+  }
+  export type MergeSuggestionIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    leftContact?: boolean | ContactDefaultArgs<ExtArgs>
+    rightContact?: boolean | ContactDefaultArgs<ExtArgs>
+  }
+
+  export type $MergeSuggestionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MergeSuggestion"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+      leftContact: Prisma.$ContactPayload<ExtArgs>
+      rightContact: Prisma.$ContactPayload<ExtArgs>
+      decisions: Prisma.$MergeDecisionPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      leftContactId: string
+      rightContactId: string
+      pairKey: string
+      status: $Enums.MergeSuggestionStatus
+      confidence: $Enums.MergeSuggestionConfidence
+      score: number
+      hardMatch: boolean
+      signals: Prisma.JsonValue
+      reasons: Prisma.JsonValue
+      source: string
+      generatedAt: Date
+      reviewedAt: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["mergeSuggestion"]>
+    composites: {}
+  }
+
+  type MergeSuggestionGetPayload<S extends boolean | null | undefined | MergeSuggestionDefaultArgs> = $Result.GetResult<Prisma.$MergeSuggestionPayload, S>
+
+  type MergeSuggestionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MergeSuggestionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MergeSuggestionCountAggregateInputType | true
+    }
+
+  export interface MergeSuggestionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MergeSuggestion'], meta: { name: 'MergeSuggestion' } }
+    /**
+     * Find zero or one MergeSuggestion that matches the filter.
+     * @param {MergeSuggestionFindUniqueArgs} args - Arguments to find a MergeSuggestion
+     * @example
+     * // Get one MergeSuggestion
+     * const mergeSuggestion = await prisma.mergeSuggestion.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MergeSuggestionFindUniqueArgs>(args: SelectSubset<T, MergeSuggestionFindUniqueArgs<ExtArgs>>): Prisma__MergeSuggestionClient<$Result.GetResult<Prisma.$MergeSuggestionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one MergeSuggestion that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MergeSuggestionFindUniqueOrThrowArgs} args - Arguments to find a MergeSuggestion
+     * @example
+     * // Get one MergeSuggestion
+     * const mergeSuggestion = await prisma.mergeSuggestion.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MergeSuggestionFindUniqueOrThrowArgs>(args: SelectSubset<T, MergeSuggestionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MergeSuggestionClient<$Result.GetResult<Prisma.$MergeSuggestionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MergeSuggestion that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergeSuggestionFindFirstArgs} args - Arguments to find a MergeSuggestion
+     * @example
+     * // Get one MergeSuggestion
+     * const mergeSuggestion = await prisma.mergeSuggestion.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MergeSuggestionFindFirstArgs>(args?: SelectSubset<T, MergeSuggestionFindFirstArgs<ExtArgs>>): Prisma__MergeSuggestionClient<$Result.GetResult<Prisma.$MergeSuggestionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MergeSuggestion that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergeSuggestionFindFirstOrThrowArgs} args - Arguments to find a MergeSuggestion
+     * @example
+     * // Get one MergeSuggestion
+     * const mergeSuggestion = await prisma.mergeSuggestion.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MergeSuggestionFindFirstOrThrowArgs>(args?: SelectSubset<T, MergeSuggestionFindFirstOrThrowArgs<ExtArgs>>): Prisma__MergeSuggestionClient<$Result.GetResult<Prisma.$MergeSuggestionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MergeSuggestions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergeSuggestionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MergeSuggestions
+     * const mergeSuggestions = await prisma.mergeSuggestion.findMany()
+     * 
+     * // Get first 10 MergeSuggestions
+     * const mergeSuggestions = await prisma.mergeSuggestion.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const mergeSuggestionWithIdOnly = await prisma.mergeSuggestion.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MergeSuggestionFindManyArgs>(args?: SelectSubset<T, MergeSuggestionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeSuggestionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a MergeSuggestion.
+     * @param {MergeSuggestionCreateArgs} args - Arguments to create a MergeSuggestion.
+     * @example
+     * // Create one MergeSuggestion
+     * const MergeSuggestion = await prisma.mergeSuggestion.create({
+     *   data: {
+     *     // ... data to create a MergeSuggestion
+     *   }
+     * })
+     * 
+     */
+    create<T extends MergeSuggestionCreateArgs>(args: SelectSubset<T, MergeSuggestionCreateArgs<ExtArgs>>): Prisma__MergeSuggestionClient<$Result.GetResult<Prisma.$MergeSuggestionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many MergeSuggestions.
+     * @param {MergeSuggestionCreateManyArgs} args - Arguments to create many MergeSuggestions.
+     * @example
+     * // Create many MergeSuggestions
+     * const mergeSuggestion = await prisma.mergeSuggestion.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MergeSuggestionCreateManyArgs>(args?: SelectSubset<T, MergeSuggestionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many MergeSuggestions and returns the data saved in the database.
+     * @param {MergeSuggestionCreateManyAndReturnArgs} args - Arguments to create many MergeSuggestions.
+     * @example
+     * // Create many MergeSuggestions
+     * const mergeSuggestion = await prisma.mergeSuggestion.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many MergeSuggestions and only return the `id`
+     * const mergeSuggestionWithIdOnly = await prisma.mergeSuggestion.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends MergeSuggestionCreateManyAndReturnArgs>(args?: SelectSubset<T, MergeSuggestionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeSuggestionPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a MergeSuggestion.
+     * @param {MergeSuggestionDeleteArgs} args - Arguments to delete one MergeSuggestion.
+     * @example
+     * // Delete one MergeSuggestion
+     * const MergeSuggestion = await prisma.mergeSuggestion.delete({
+     *   where: {
+     *     // ... filter to delete one MergeSuggestion
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MergeSuggestionDeleteArgs>(args: SelectSubset<T, MergeSuggestionDeleteArgs<ExtArgs>>): Prisma__MergeSuggestionClient<$Result.GetResult<Prisma.$MergeSuggestionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one MergeSuggestion.
+     * @param {MergeSuggestionUpdateArgs} args - Arguments to update one MergeSuggestion.
+     * @example
+     * // Update one MergeSuggestion
+     * const mergeSuggestion = await prisma.mergeSuggestion.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MergeSuggestionUpdateArgs>(args: SelectSubset<T, MergeSuggestionUpdateArgs<ExtArgs>>): Prisma__MergeSuggestionClient<$Result.GetResult<Prisma.$MergeSuggestionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more MergeSuggestions.
+     * @param {MergeSuggestionDeleteManyArgs} args - Arguments to filter MergeSuggestions to delete.
+     * @example
+     * // Delete a few MergeSuggestions
+     * const { count } = await prisma.mergeSuggestion.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MergeSuggestionDeleteManyArgs>(args?: SelectSubset<T, MergeSuggestionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MergeSuggestions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergeSuggestionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MergeSuggestions
+     * const mergeSuggestion = await prisma.mergeSuggestion.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MergeSuggestionUpdateManyArgs>(args: SelectSubset<T, MergeSuggestionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MergeSuggestions and returns the data updated in the database.
+     * @param {MergeSuggestionUpdateManyAndReturnArgs} args - Arguments to update many MergeSuggestions.
+     * @example
+     * // Update many MergeSuggestions
+     * const mergeSuggestion = await prisma.mergeSuggestion.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more MergeSuggestions and only return the `id`
+     * const mergeSuggestionWithIdOnly = await prisma.mergeSuggestion.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends MergeSuggestionUpdateManyAndReturnArgs>(args: SelectSubset<T, MergeSuggestionUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeSuggestionPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one MergeSuggestion.
+     * @param {MergeSuggestionUpsertArgs} args - Arguments to update or create a MergeSuggestion.
+     * @example
+     * // Update or create a MergeSuggestion
+     * const mergeSuggestion = await prisma.mergeSuggestion.upsert({
+     *   create: {
+     *     // ... data to create a MergeSuggestion
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MergeSuggestion we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MergeSuggestionUpsertArgs>(args: SelectSubset<T, MergeSuggestionUpsertArgs<ExtArgs>>): Prisma__MergeSuggestionClient<$Result.GetResult<Prisma.$MergeSuggestionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of MergeSuggestions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergeSuggestionCountArgs} args - Arguments to filter MergeSuggestions to count.
+     * @example
+     * // Count the number of MergeSuggestions
+     * const count = await prisma.mergeSuggestion.count({
+     *   where: {
+     *     // ... the filter for the MergeSuggestions we want to count
+     *   }
+     * })
+    **/
+    count<T extends MergeSuggestionCountArgs>(
+      args?: Subset<T, MergeSuggestionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MergeSuggestionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MergeSuggestion.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergeSuggestionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MergeSuggestionAggregateArgs>(args: Subset<T, MergeSuggestionAggregateArgs>): Prisma.PrismaPromise<GetMergeSuggestionAggregateType<T>>
+
+    /**
+     * Group by MergeSuggestion.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergeSuggestionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MergeSuggestionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MergeSuggestionGroupByArgs['orderBy'] }
+        : { orderBy?: MergeSuggestionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MergeSuggestionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMergeSuggestionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MergeSuggestion model
+   */
+  readonly fields: MergeSuggestionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MergeSuggestion.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MergeSuggestionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    leftContact<T extends ContactDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ContactDefaultArgs<ExtArgs>>): Prisma__ContactClient<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    rightContact<T extends ContactDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ContactDefaultArgs<ExtArgs>>): Prisma__ContactClient<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    decisions<T extends MergeSuggestion$decisionsArgs<ExtArgs> = {}>(args?: Subset<T, MergeSuggestion$decisionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeDecisionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MergeSuggestion model
+   */
+  interface MergeSuggestionFieldRefs {
+    readonly id: FieldRef<"MergeSuggestion", 'String'>
+    readonly userId: FieldRef<"MergeSuggestion", 'String'>
+    readonly leftContactId: FieldRef<"MergeSuggestion", 'String'>
+    readonly rightContactId: FieldRef<"MergeSuggestion", 'String'>
+    readonly pairKey: FieldRef<"MergeSuggestion", 'String'>
+    readonly status: FieldRef<"MergeSuggestion", 'MergeSuggestionStatus'>
+    readonly confidence: FieldRef<"MergeSuggestion", 'MergeSuggestionConfidence'>
+    readonly score: FieldRef<"MergeSuggestion", 'Int'>
+    readonly hardMatch: FieldRef<"MergeSuggestion", 'Boolean'>
+    readonly signals: FieldRef<"MergeSuggestion", 'Json'>
+    readonly reasons: FieldRef<"MergeSuggestion", 'Json'>
+    readonly source: FieldRef<"MergeSuggestion", 'String'>
+    readonly generatedAt: FieldRef<"MergeSuggestion", 'DateTime'>
+    readonly reviewedAt: FieldRef<"MergeSuggestion", 'DateTime'>
+    readonly createdAt: FieldRef<"MergeSuggestion", 'DateTime'>
+    readonly updatedAt: FieldRef<"MergeSuggestion", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MergeSuggestion findUnique
+   */
+  export type MergeSuggestionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeSuggestion
+     */
+    select?: MergeSuggestionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeSuggestion
+     */
+    omit?: MergeSuggestionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeSuggestionInclude<ExtArgs> | null
+    /**
+     * Filter, which MergeSuggestion to fetch.
+     */
+    where: MergeSuggestionWhereUniqueInput
+  }
+
+  /**
+   * MergeSuggestion findUniqueOrThrow
+   */
+  export type MergeSuggestionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeSuggestion
+     */
+    select?: MergeSuggestionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeSuggestion
+     */
+    omit?: MergeSuggestionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeSuggestionInclude<ExtArgs> | null
+    /**
+     * Filter, which MergeSuggestion to fetch.
+     */
+    where: MergeSuggestionWhereUniqueInput
+  }
+
+  /**
+   * MergeSuggestion findFirst
+   */
+  export type MergeSuggestionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeSuggestion
+     */
+    select?: MergeSuggestionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeSuggestion
+     */
+    omit?: MergeSuggestionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeSuggestionInclude<ExtArgs> | null
+    /**
+     * Filter, which MergeSuggestion to fetch.
+     */
+    where?: MergeSuggestionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MergeSuggestions to fetch.
+     */
+    orderBy?: MergeSuggestionOrderByWithRelationInput | MergeSuggestionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MergeSuggestions.
+     */
+    cursor?: MergeSuggestionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MergeSuggestions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MergeSuggestions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MergeSuggestions.
+     */
+    distinct?: MergeSuggestionScalarFieldEnum | MergeSuggestionScalarFieldEnum[]
+  }
+
+  /**
+   * MergeSuggestion findFirstOrThrow
+   */
+  export type MergeSuggestionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeSuggestion
+     */
+    select?: MergeSuggestionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeSuggestion
+     */
+    omit?: MergeSuggestionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeSuggestionInclude<ExtArgs> | null
+    /**
+     * Filter, which MergeSuggestion to fetch.
+     */
+    where?: MergeSuggestionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MergeSuggestions to fetch.
+     */
+    orderBy?: MergeSuggestionOrderByWithRelationInput | MergeSuggestionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MergeSuggestions.
+     */
+    cursor?: MergeSuggestionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MergeSuggestions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MergeSuggestions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MergeSuggestions.
+     */
+    distinct?: MergeSuggestionScalarFieldEnum | MergeSuggestionScalarFieldEnum[]
+  }
+
+  /**
+   * MergeSuggestion findMany
+   */
+  export type MergeSuggestionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeSuggestion
+     */
+    select?: MergeSuggestionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeSuggestion
+     */
+    omit?: MergeSuggestionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeSuggestionInclude<ExtArgs> | null
+    /**
+     * Filter, which MergeSuggestions to fetch.
+     */
+    where?: MergeSuggestionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MergeSuggestions to fetch.
+     */
+    orderBy?: MergeSuggestionOrderByWithRelationInput | MergeSuggestionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MergeSuggestions.
+     */
+    cursor?: MergeSuggestionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MergeSuggestions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MergeSuggestions.
+     */
+    skip?: number
+    distinct?: MergeSuggestionScalarFieldEnum | MergeSuggestionScalarFieldEnum[]
+  }
+
+  /**
+   * MergeSuggestion create
+   */
+  export type MergeSuggestionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeSuggestion
+     */
+    select?: MergeSuggestionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeSuggestion
+     */
+    omit?: MergeSuggestionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeSuggestionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a MergeSuggestion.
+     */
+    data: XOR<MergeSuggestionCreateInput, MergeSuggestionUncheckedCreateInput>
+  }
+
+  /**
+   * MergeSuggestion createMany
+   */
+  export type MergeSuggestionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MergeSuggestions.
+     */
+    data: MergeSuggestionCreateManyInput | MergeSuggestionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MergeSuggestion createManyAndReturn
+   */
+  export type MergeSuggestionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeSuggestion
+     */
+    select?: MergeSuggestionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeSuggestion
+     */
+    omit?: MergeSuggestionOmit<ExtArgs> | null
+    /**
+     * The data used to create many MergeSuggestions.
+     */
+    data: MergeSuggestionCreateManyInput | MergeSuggestionCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeSuggestionIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MergeSuggestion update
+   */
+  export type MergeSuggestionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeSuggestion
+     */
+    select?: MergeSuggestionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeSuggestion
+     */
+    omit?: MergeSuggestionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeSuggestionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a MergeSuggestion.
+     */
+    data: XOR<MergeSuggestionUpdateInput, MergeSuggestionUncheckedUpdateInput>
+    /**
+     * Choose, which MergeSuggestion to update.
+     */
+    where: MergeSuggestionWhereUniqueInput
+  }
+
+  /**
+   * MergeSuggestion updateMany
+   */
+  export type MergeSuggestionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MergeSuggestions.
+     */
+    data: XOR<MergeSuggestionUpdateManyMutationInput, MergeSuggestionUncheckedUpdateManyInput>
+    /**
+     * Filter which MergeSuggestions to update
+     */
+    where?: MergeSuggestionWhereInput
+    /**
+     * Limit how many MergeSuggestions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MergeSuggestion updateManyAndReturn
+   */
+  export type MergeSuggestionUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeSuggestion
+     */
+    select?: MergeSuggestionSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeSuggestion
+     */
+    omit?: MergeSuggestionOmit<ExtArgs> | null
+    /**
+     * The data used to update MergeSuggestions.
+     */
+    data: XOR<MergeSuggestionUpdateManyMutationInput, MergeSuggestionUncheckedUpdateManyInput>
+    /**
+     * Filter which MergeSuggestions to update
+     */
+    where?: MergeSuggestionWhereInput
+    /**
+     * Limit how many MergeSuggestions to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeSuggestionIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MergeSuggestion upsert
+   */
+  export type MergeSuggestionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeSuggestion
+     */
+    select?: MergeSuggestionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeSuggestion
+     */
+    omit?: MergeSuggestionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeSuggestionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the MergeSuggestion to update in case it exists.
+     */
+    where: MergeSuggestionWhereUniqueInput
+    /**
+     * In case the MergeSuggestion found by the `where` argument doesn't exist, create a new MergeSuggestion with this data.
+     */
+    create: XOR<MergeSuggestionCreateInput, MergeSuggestionUncheckedCreateInput>
+    /**
+     * In case the MergeSuggestion was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MergeSuggestionUpdateInput, MergeSuggestionUncheckedUpdateInput>
+  }
+
+  /**
+   * MergeSuggestion delete
+   */
+  export type MergeSuggestionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeSuggestion
+     */
+    select?: MergeSuggestionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeSuggestion
+     */
+    omit?: MergeSuggestionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeSuggestionInclude<ExtArgs> | null
+    /**
+     * Filter which MergeSuggestion to delete.
+     */
+    where: MergeSuggestionWhereUniqueInput
+  }
+
+  /**
+   * MergeSuggestion deleteMany
+   */
+  export type MergeSuggestionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MergeSuggestions to delete
+     */
+    where?: MergeSuggestionWhereInput
+    /**
+     * Limit how many MergeSuggestions to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * MergeSuggestion.decisions
+   */
+  export type MergeSuggestion$decisionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDecision
+     */
+    select?: MergeDecisionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDecision
+     */
+    omit?: MergeDecisionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDecisionInclude<ExtArgs> | null
+    where?: MergeDecisionWhereInput
+    orderBy?: MergeDecisionOrderByWithRelationInput | MergeDecisionOrderByWithRelationInput[]
+    cursor?: MergeDecisionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MergeDecisionScalarFieldEnum | MergeDecisionScalarFieldEnum[]
+  }
+
+  /**
+   * MergeSuggestion without action
+   */
+  export type MergeSuggestionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeSuggestion
+     */
+    select?: MergeSuggestionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeSuggestion
+     */
+    omit?: MergeSuggestionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeSuggestionInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model MergeDecision
+   */
+
+  export type AggregateMergeDecision = {
+    _count: MergeDecisionCountAggregateOutputType | null
+    _min: MergeDecisionMinAggregateOutputType | null
+    _max: MergeDecisionMaxAggregateOutputType | null
+  }
+
+  export type MergeDecisionMinAggregateOutputType = {
+    id: string | null
+    suggestionId: string | null
+    userId: string | null
+    status: $Enums.MergeDecisionStatus | null
+    source: string | null
+    notes: string | null
+    decidedAt: Date | null
+    reversedAt: Date | null
+    reversalSource: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MergeDecisionMaxAggregateOutputType = {
+    id: string | null
+    suggestionId: string | null
+    userId: string | null
+    status: $Enums.MergeDecisionStatus | null
+    source: string | null
+    notes: string | null
+    decidedAt: Date | null
+    reversedAt: Date | null
+    reversalSource: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type MergeDecisionCountAggregateOutputType = {
+    id: number
+    suggestionId: number
+    userId: number
+    status: number
+    source: number
+    notes: number
+    details: number
+    decidedAt: number
+    reversedAt: number
+    reversalSource: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type MergeDecisionMinAggregateInputType = {
+    id?: true
+    suggestionId?: true
+    userId?: true
+    status?: true
+    source?: true
+    notes?: true
+    decidedAt?: true
+    reversedAt?: true
+    reversalSource?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MergeDecisionMaxAggregateInputType = {
+    id?: true
+    suggestionId?: true
+    userId?: true
+    status?: true
+    source?: true
+    notes?: true
+    decidedAt?: true
+    reversedAt?: true
+    reversalSource?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type MergeDecisionCountAggregateInputType = {
+    id?: true
+    suggestionId?: true
+    userId?: true
+    status?: true
+    source?: true
+    notes?: true
+    details?: true
+    decidedAt?: true
+    reversedAt?: true
+    reversalSource?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type MergeDecisionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MergeDecision to aggregate.
+     */
+    where?: MergeDecisionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MergeDecisions to fetch.
+     */
+    orderBy?: MergeDecisionOrderByWithRelationInput | MergeDecisionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MergeDecisionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MergeDecisions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MergeDecisions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MergeDecisions
+    **/
+    _count?: true | MergeDecisionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MergeDecisionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MergeDecisionMaxAggregateInputType
+  }
+
+  export type GetMergeDecisionAggregateType<T extends MergeDecisionAggregateArgs> = {
+        [P in keyof T & keyof AggregateMergeDecision]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMergeDecision[P]>
+      : GetScalarType<T[P], AggregateMergeDecision[P]>
+  }
+
+
+
+
+  export type MergeDecisionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MergeDecisionWhereInput
+    orderBy?: MergeDecisionOrderByWithAggregationInput | MergeDecisionOrderByWithAggregationInput[]
+    by: MergeDecisionScalarFieldEnum[] | MergeDecisionScalarFieldEnum
+    having?: MergeDecisionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MergeDecisionCountAggregateInputType | true
+    _min?: MergeDecisionMinAggregateInputType
+    _max?: MergeDecisionMaxAggregateInputType
+  }
+
+  export type MergeDecisionGroupByOutputType = {
+    id: string
+    suggestionId: string
+    userId: string
+    status: $Enums.MergeDecisionStatus
+    source: string
+    notes: string | null
+    details: JsonValue | null
+    decidedAt: Date
+    reversedAt: Date | null
+    reversalSource: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: MergeDecisionCountAggregateOutputType | null
+    _min: MergeDecisionMinAggregateOutputType | null
+    _max: MergeDecisionMaxAggregateOutputType | null
+  }
+
+  type GetMergeDecisionGroupByPayload<T extends MergeDecisionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MergeDecisionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MergeDecisionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MergeDecisionGroupByOutputType[P]>
+            : GetScalarType<T[P], MergeDecisionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MergeDecisionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    suggestionId?: boolean
+    userId?: boolean
+    status?: boolean
+    source?: boolean
+    notes?: boolean
+    details?: boolean
+    decidedAt?: boolean
+    reversedAt?: boolean
+    reversalSource?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    suggestion?: boolean | MergeSuggestionDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["mergeDecision"]>
+
+  export type MergeDecisionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    suggestionId?: boolean
+    userId?: boolean
+    status?: boolean
+    source?: boolean
+    notes?: boolean
+    details?: boolean
+    decidedAt?: boolean
+    reversedAt?: boolean
+    reversalSource?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    suggestion?: boolean | MergeSuggestionDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["mergeDecision"]>
+
+  export type MergeDecisionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    suggestionId?: boolean
+    userId?: boolean
+    status?: boolean
+    source?: boolean
+    notes?: boolean
+    details?: boolean
+    decidedAt?: boolean
+    reversedAt?: boolean
+    reversalSource?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    suggestion?: boolean | MergeSuggestionDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["mergeDecision"]>
+
+  export type MergeDecisionSelectScalar = {
+    id?: boolean
+    suggestionId?: boolean
+    userId?: boolean
+    status?: boolean
+    source?: boolean
+    notes?: boolean
+    details?: boolean
+    decidedAt?: boolean
+    reversedAt?: boolean
+    reversalSource?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type MergeDecisionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "suggestionId" | "userId" | "status" | "source" | "notes" | "details" | "decidedAt" | "reversedAt" | "reversalSource" | "createdAt" | "updatedAt", ExtArgs["result"]["mergeDecision"]>
+  export type MergeDecisionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    suggestion?: boolean | MergeSuggestionDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type MergeDecisionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    suggestion?: boolean | MergeSuggestionDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type MergeDecisionIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    suggestion?: boolean | MergeSuggestionDefaultArgs<ExtArgs>
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $MergeDecisionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MergeDecision"
+    objects: {
+      suggestion: Prisma.$MergeSuggestionPayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      suggestionId: string
+      userId: string
+      status: $Enums.MergeDecisionStatus
+      source: string
+      notes: string | null
+      details: Prisma.JsonValue | null
+      decidedAt: Date
+      reversedAt: Date | null
+      reversalSource: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["mergeDecision"]>
+    composites: {}
+  }
+
+  type MergeDecisionGetPayload<S extends boolean | null | undefined | MergeDecisionDefaultArgs> = $Result.GetResult<Prisma.$MergeDecisionPayload, S>
+
+  type MergeDecisionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MergeDecisionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MergeDecisionCountAggregateInputType | true
+    }
+
+  export interface MergeDecisionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MergeDecision'], meta: { name: 'MergeDecision' } }
+    /**
+     * Find zero or one MergeDecision that matches the filter.
+     * @param {MergeDecisionFindUniqueArgs} args - Arguments to find a MergeDecision
+     * @example
+     * // Get one MergeDecision
+     * const mergeDecision = await prisma.mergeDecision.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MergeDecisionFindUniqueArgs>(args: SelectSubset<T, MergeDecisionFindUniqueArgs<ExtArgs>>): Prisma__MergeDecisionClient<$Result.GetResult<Prisma.$MergeDecisionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one MergeDecision that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MergeDecisionFindUniqueOrThrowArgs} args - Arguments to find a MergeDecision
+     * @example
+     * // Get one MergeDecision
+     * const mergeDecision = await prisma.mergeDecision.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MergeDecisionFindUniqueOrThrowArgs>(args: SelectSubset<T, MergeDecisionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MergeDecisionClient<$Result.GetResult<Prisma.$MergeDecisionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MergeDecision that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergeDecisionFindFirstArgs} args - Arguments to find a MergeDecision
+     * @example
+     * // Get one MergeDecision
+     * const mergeDecision = await prisma.mergeDecision.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MergeDecisionFindFirstArgs>(args?: SelectSubset<T, MergeDecisionFindFirstArgs<ExtArgs>>): Prisma__MergeDecisionClient<$Result.GetResult<Prisma.$MergeDecisionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MergeDecision that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergeDecisionFindFirstOrThrowArgs} args - Arguments to find a MergeDecision
+     * @example
+     * // Get one MergeDecision
+     * const mergeDecision = await prisma.mergeDecision.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MergeDecisionFindFirstOrThrowArgs>(args?: SelectSubset<T, MergeDecisionFindFirstOrThrowArgs<ExtArgs>>): Prisma__MergeDecisionClient<$Result.GetResult<Prisma.$MergeDecisionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MergeDecisions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergeDecisionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MergeDecisions
+     * const mergeDecisions = await prisma.mergeDecision.findMany()
+     * 
+     * // Get first 10 MergeDecisions
+     * const mergeDecisions = await prisma.mergeDecision.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const mergeDecisionWithIdOnly = await prisma.mergeDecision.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MergeDecisionFindManyArgs>(args?: SelectSubset<T, MergeDecisionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeDecisionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a MergeDecision.
+     * @param {MergeDecisionCreateArgs} args - Arguments to create a MergeDecision.
+     * @example
+     * // Create one MergeDecision
+     * const MergeDecision = await prisma.mergeDecision.create({
+     *   data: {
+     *     // ... data to create a MergeDecision
+     *   }
+     * })
+     * 
+     */
+    create<T extends MergeDecisionCreateArgs>(args: SelectSubset<T, MergeDecisionCreateArgs<ExtArgs>>): Prisma__MergeDecisionClient<$Result.GetResult<Prisma.$MergeDecisionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many MergeDecisions.
+     * @param {MergeDecisionCreateManyArgs} args - Arguments to create many MergeDecisions.
+     * @example
+     * // Create many MergeDecisions
+     * const mergeDecision = await prisma.mergeDecision.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MergeDecisionCreateManyArgs>(args?: SelectSubset<T, MergeDecisionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many MergeDecisions and returns the data saved in the database.
+     * @param {MergeDecisionCreateManyAndReturnArgs} args - Arguments to create many MergeDecisions.
+     * @example
+     * // Create many MergeDecisions
+     * const mergeDecision = await prisma.mergeDecision.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many MergeDecisions and only return the `id`
+     * const mergeDecisionWithIdOnly = await prisma.mergeDecision.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends MergeDecisionCreateManyAndReturnArgs>(args?: SelectSubset<T, MergeDecisionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeDecisionPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a MergeDecision.
+     * @param {MergeDecisionDeleteArgs} args - Arguments to delete one MergeDecision.
+     * @example
+     * // Delete one MergeDecision
+     * const MergeDecision = await prisma.mergeDecision.delete({
+     *   where: {
+     *     // ... filter to delete one MergeDecision
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MergeDecisionDeleteArgs>(args: SelectSubset<T, MergeDecisionDeleteArgs<ExtArgs>>): Prisma__MergeDecisionClient<$Result.GetResult<Prisma.$MergeDecisionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one MergeDecision.
+     * @param {MergeDecisionUpdateArgs} args - Arguments to update one MergeDecision.
+     * @example
+     * // Update one MergeDecision
+     * const mergeDecision = await prisma.mergeDecision.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MergeDecisionUpdateArgs>(args: SelectSubset<T, MergeDecisionUpdateArgs<ExtArgs>>): Prisma__MergeDecisionClient<$Result.GetResult<Prisma.$MergeDecisionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more MergeDecisions.
+     * @param {MergeDecisionDeleteManyArgs} args - Arguments to filter MergeDecisions to delete.
+     * @example
+     * // Delete a few MergeDecisions
+     * const { count } = await prisma.mergeDecision.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MergeDecisionDeleteManyArgs>(args?: SelectSubset<T, MergeDecisionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MergeDecisions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergeDecisionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MergeDecisions
+     * const mergeDecision = await prisma.mergeDecision.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MergeDecisionUpdateManyArgs>(args: SelectSubset<T, MergeDecisionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MergeDecisions and returns the data updated in the database.
+     * @param {MergeDecisionUpdateManyAndReturnArgs} args - Arguments to update many MergeDecisions.
+     * @example
+     * // Update many MergeDecisions
+     * const mergeDecision = await prisma.mergeDecision.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more MergeDecisions and only return the `id`
+     * const mergeDecisionWithIdOnly = await prisma.mergeDecision.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends MergeDecisionUpdateManyAndReturnArgs>(args: SelectSubset<T, MergeDecisionUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeDecisionPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one MergeDecision.
+     * @param {MergeDecisionUpsertArgs} args - Arguments to update or create a MergeDecision.
+     * @example
+     * // Update or create a MergeDecision
+     * const mergeDecision = await prisma.mergeDecision.upsert({
+     *   create: {
+     *     // ... data to create a MergeDecision
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MergeDecision we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MergeDecisionUpsertArgs>(args: SelectSubset<T, MergeDecisionUpsertArgs<ExtArgs>>): Prisma__MergeDecisionClient<$Result.GetResult<Prisma.$MergeDecisionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of MergeDecisions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergeDecisionCountArgs} args - Arguments to filter MergeDecisions to count.
+     * @example
+     * // Count the number of MergeDecisions
+     * const count = await prisma.mergeDecision.count({
+     *   where: {
+     *     // ... the filter for the MergeDecisions we want to count
+     *   }
+     * })
+    **/
+    count<T extends MergeDecisionCountArgs>(
+      args?: Subset<T, MergeDecisionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MergeDecisionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MergeDecision.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergeDecisionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MergeDecisionAggregateArgs>(args: Subset<T, MergeDecisionAggregateArgs>): Prisma.PrismaPromise<GetMergeDecisionAggregateType<T>>
+
+    /**
+     * Group by MergeDecision.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergeDecisionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MergeDecisionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MergeDecisionGroupByArgs['orderBy'] }
+        : { orderBy?: MergeDecisionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MergeDecisionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMergeDecisionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MergeDecision model
+   */
+  readonly fields: MergeDecisionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MergeDecision.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MergeDecisionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    suggestion<T extends MergeSuggestionDefaultArgs<ExtArgs> = {}>(args?: Subset<T, MergeSuggestionDefaultArgs<ExtArgs>>): Prisma__MergeSuggestionClient<$Result.GetResult<Prisma.$MergeSuggestionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MergeDecision model
+   */
+  interface MergeDecisionFieldRefs {
+    readonly id: FieldRef<"MergeDecision", 'String'>
+    readonly suggestionId: FieldRef<"MergeDecision", 'String'>
+    readonly userId: FieldRef<"MergeDecision", 'String'>
+    readonly status: FieldRef<"MergeDecision", 'MergeDecisionStatus'>
+    readonly source: FieldRef<"MergeDecision", 'String'>
+    readonly notes: FieldRef<"MergeDecision", 'String'>
+    readonly details: FieldRef<"MergeDecision", 'Json'>
+    readonly decidedAt: FieldRef<"MergeDecision", 'DateTime'>
+    readonly reversedAt: FieldRef<"MergeDecision", 'DateTime'>
+    readonly reversalSource: FieldRef<"MergeDecision", 'String'>
+    readonly createdAt: FieldRef<"MergeDecision", 'DateTime'>
+    readonly updatedAt: FieldRef<"MergeDecision", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MergeDecision findUnique
+   */
+  export type MergeDecisionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDecision
+     */
+    select?: MergeDecisionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDecision
+     */
+    omit?: MergeDecisionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDecisionInclude<ExtArgs> | null
+    /**
+     * Filter, which MergeDecision to fetch.
+     */
+    where: MergeDecisionWhereUniqueInput
+  }
+
+  /**
+   * MergeDecision findUniqueOrThrow
+   */
+  export type MergeDecisionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDecision
+     */
+    select?: MergeDecisionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDecision
+     */
+    omit?: MergeDecisionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDecisionInclude<ExtArgs> | null
+    /**
+     * Filter, which MergeDecision to fetch.
+     */
+    where: MergeDecisionWhereUniqueInput
+  }
+
+  /**
+   * MergeDecision findFirst
+   */
+  export type MergeDecisionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDecision
+     */
+    select?: MergeDecisionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDecision
+     */
+    omit?: MergeDecisionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDecisionInclude<ExtArgs> | null
+    /**
+     * Filter, which MergeDecision to fetch.
+     */
+    where?: MergeDecisionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MergeDecisions to fetch.
+     */
+    orderBy?: MergeDecisionOrderByWithRelationInput | MergeDecisionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MergeDecisions.
+     */
+    cursor?: MergeDecisionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MergeDecisions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MergeDecisions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MergeDecisions.
+     */
+    distinct?: MergeDecisionScalarFieldEnum | MergeDecisionScalarFieldEnum[]
+  }
+
+  /**
+   * MergeDecision findFirstOrThrow
+   */
+  export type MergeDecisionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDecision
+     */
+    select?: MergeDecisionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDecision
+     */
+    omit?: MergeDecisionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDecisionInclude<ExtArgs> | null
+    /**
+     * Filter, which MergeDecision to fetch.
+     */
+    where?: MergeDecisionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MergeDecisions to fetch.
+     */
+    orderBy?: MergeDecisionOrderByWithRelationInput | MergeDecisionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MergeDecisions.
+     */
+    cursor?: MergeDecisionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MergeDecisions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MergeDecisions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MergeDecisions.
+     */
+    distinct?: MergeDecisionScalarFieldEnum | MergeDecisionScalarFieldEnum[]
+  }
+
+  /**
+   * MergeDecision findMany
+   */
+  export type MergeDecisionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDecision
+     */
+    select?: MergeDecisionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDecision
+     */
+    omit?: MergeDecisionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDecisionInclude<ExtArgs> | null
+    /**
+     * Filter, which MergeDecisions to fetch.
+     */
+    where?: MergeDecisionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MergeDecisions to fetch.
+     */
+    orderBy?: MergeDecisionOrderByWithRelationInput | MergeDecisionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MergeDecisions.
+     */
+    cursor?: MergeDecisionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MergeDecisions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MergeDecisions.
+     */
+    skip?: number
+    distinct?: MergeDecisionScalarFieldEnum | MergeDecisionScalarFieldEnum[]
+  }
+
+  /**
+   * MergeDecision create
+   */
+  export type MergeDecisionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDecision
+     */
+    select?: MergeDecisionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDecision
+     */
+    omit?: MergeDecisionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDecisionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a MergeDecision.
+     */
+    data: XOR<MergeDecisionCreateInput, MergeDecisionUncheckedCreateInput>
+  }
+
+  /**
+   * MergeDecision createMany
+   */
+  export type MergeDecisionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MergeDecisions.
+     */
+    data: MergeDecisionCreateManyInput | MergeDecisionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MergeDecision createManyAndReturn
+   */
+  export type MergeDecisionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDecision
+     */
+    select?: MergeDecisionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDecision
+     */
+    omit?: MergeDecisionOmit<ExtArgs> | null
+    /**
+     * The data used to create many MergeDecisions.
+     */
+    data: MergeDecisionCreateManyInput | MergeDecisionCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDecisionIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MergeDecision update
+   */
+  export type MergeDecisionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDecision
+     */
+    select?: MergeDecisionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDecision
+     */
+    omit?: MergeDecisionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDecisionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a MergeDecision.
+     */
+    data: XOR<MergeDecisionUpdateInput, MergeDecisionUncheckedUpdateInput>
+    /**
+     * Choose, which MergeDecision to update.
+     */
+    where: MergeDecisionWhereUniqueInput
+  }
+
+  /**
+   * MergeDecision updateMany
+   */
+  export type MergeDecisionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MergeDecisions.
+     */
+    data: XOR<MergeDecisionUpdateManyMutationInput, MergeDecisionUncheckedUpdateManyInput>
+    /**
+     * Filter which MergeDecisions to update
+     */
+    where?: MergeDecisionWhereInput
+    /**
+     * Limit how many MergeDecisions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MergeDecision updateManyAndReturn
+   */
+  export type MergeDecisionUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDecision
+     */
+    select?: MergeDecisionSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDecision
+     */
+    omit?: MergeDecisionOmit<ExtArgs> | null
+    /**
+     * The data used to update MergeDecisions.
+     */
+    data: XOR<MergeDecisionUpdateManyMutationInput, MergeDecisionUncheckedUpdateManyInput>
+    /**
+     * Filter which MergeDecisions to update
+     */
+    where?: MergeDecisionWhereInput
+    /**
+     * Limit how many MergeDecisions to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDecisionIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MergeDecision upsert
+   */
+  export type MergeDecisionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDecision
+     */
+    select?: MergeDecisionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDecision
+     */
+    omit?: MergeDecisionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDecisionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the MergeDecision to update in case it exists.
+     */
+    where: MergeDecisionWhereUniqueInput
+    /**
+     * In case the MergeDecision found by the `where` argument doesn't exist, create a new MergeDecision with this data.
+     */
+    create: XOR<MergeDecisionCreateInput, MergeDecisionUncheckedCreateInput>
+    /**
+     * In case the MergeDecision was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MergeDecisionUpdateInput, MergeDecisionUncheckedUpdateInput>
+  }
+
+  /**
+   * MergeDecision delete
+   */
+  export type MergeDecisionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDecision
+     */
+    select?: MergeDecisionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDecision
+     */
+    omit?: MergeDecisionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDecisionInclude<ExtArgs> | null
+    /**
+     * Filter which MergeDecision to delete.
+     */
+    where: MergeDecisionWhereUniqueInput
+  }
+
+  /**
+   * MergeDecision deleteMany
+   */
+  export type MergeDecisionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MergeDecisions to delete
+     */
+    where?: MergeDecisionWhereInput
+    /**
+     * Limit how many MergeDecisions to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * MergeDecision without action
+   */
+  export type MergeDecisionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDecision
+     */
+    select?: MergeDecisionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDecision
+     */
+    omit?: MergeDecisionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDecisionInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SyncAccount
+   */
+
+  export type AggregateSyncAccount = {
+    _count: SyncAccountCountAggregateOutputType | null
+    _avg: SyncAccountAvgAggregateOutputType | null
+    _sum: SyncAccountSumAggregateOutputType | null
+    _min: SyncAccountMinAggregateOutputType | null
+    _max: SyncAccountMaxAggregateOutputType | null
+  }
+
+  export type SyncAccountAvgAggregateOutputType = {
+    credentialVersion: number | null
+  }
+
+  export type SyncAccountSumAggregateOutputType = {
+    credentialVersion: number | null
+  }
+
+  export type SyncAccountMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    provider: $Enums.SyncProvider | null
+    status: $Enums.SyncAccountStatus | null
+    syncDirection: $Enums.SyncDirection | null
+    label: string | null
+    baseUrl: string | null
+    principalUrl: string | null
+    addressBookUrl: string | null
+    remoteAccountId: string | null
+    remoteCTag: string | null
+    credentialReference: string | null
+    credentialVersion: number | null
+    credentialUpdatedAt: Date | null
+    credentialRevokedAt: Date | null
+    encryptionKeyRef: string | null
+    lastSyncCursor: string | null
+    lastSyncedAt: Date | null
+    lastSucceededAt: Date | null
+    lastErrorAt: Date | null
+    lastErrorCode: string | null
+    lastErrorMessage: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SyncAccountMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    provider: $Enums.SyncProvider | null
+    status: $Enums.SyncAccountStatus | null
+    syncDirection: $Enums.SyncDirection | null
+    label: string | null
+    baseUrl: string | null
+    principalUrl: string | null
+    addressBookUrl: string | null
+    remoteAccountId: string | null
+    remoteCTag: string | null
+    credentialReference: string | null
+    credentialVersion: number | null
+    credentialUpdatedAt: Date | null
+    credentialRevokedAt: Date | null
+    encryptionKeyRef: string | null
+    lastSyncCursor: string | null
+    lastSyncedAt: Date | null
+    lastSucceededAt: Date | null
+    lastErrorAt: Date | null
+    lastErrorCode: string | null
+    lastErrorMessage: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SyncAccountCountAggregateOutputType = {
+    id: number
+    userId: number
+    provider: number
+    status: number
+    syncDirection: number
+    label: number
+    baseUrl: number
+    principalUrl: number
+    addressBookUrl: number
+    remoteAccountId: number
+    remoteCTag: number
+    credentialReference: number
+    credentialVersion: number
+    credentialUpdatedAt: number
+    credentialRevokedAt: number
+    encryptionKeyRef: number
+    lastSyncCursor: number
+    lastSyncedAt: number
+    lastSucceededAt: number
+    lastErrorAt: number
+    lastErrorCode: number
+    lastErrorMessage: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SyncAccountAvgAggregateInputType = {
+    credentialVersion?: true
+  }
+
+  export type SyncAccountSumAggregateInputType = {
+    credentialVersion?: true
+  }
+
+  export type SyncAccountMinAggregateInputType = {
+    id?: true
+    userId?: true
+    provider?: true
+    status?: true
+    syncDirection?: true
+    label?: true
+    baseUrl?: true
+    principalUrl?: true
+    addressBookUrl?: true
+    remoteAccountId?: true
+    remoteCTag?: true
+    credentialReference?: true
+    credentialVersion?: true
+    credentialUpdatedAt?: true
+    credentialRevokedAt?: true
+    encryptionKeyRef?: true
+    lastSyncCursor?: true
+    lastSyncedAt?: true
+    lastSucceededAt?: true
+    lastErrorAt?: true
+    lastErrorCode?: true
+    lastErrorMessage?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SyncAccountMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    provider?: true
+    status?: true
+    syncDirection?: true
+    label?: true
+    baseUrl?: true
+    principalUrl?: true
+    addressBookUrl?: true
+    remoteAccountId?: true
+    remoteCTag?: true
+    credentialReference?: true
+    credentialVersion?: true
+    credentialUpdatedAt?: true
+    credentialRevokedAt?: true
+    encryptionKeyRef?: true
+    lastSyncCursor?: true
+    lastSyncedAt?: true
+    lastSucceededAt?: true
+    lastErrorAt?: true
+    lastErrorCode?: true
+    lastErrorMessage?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SyncAccountCountAggregateInputType = {
+    id?: true
+    userId?: true
+    provider?: true
+    status?: true
+    syncDirection?: true
+    label?: true
+    baseUrl?: true
+    principalUrl?: true
+    addressBookUrl?: true
+    remoteAccountId?: true
+    remoteCTag?: true
+    credentialReference?: true
+    credentialVersion?: true
+    credentialUpdatedAt?: true
+    credentialRevokedAt?: true
+    encryptionKeyRef?: true
+    lastSyncCursor?: true
+    lastSyncedAt?: true
+    lastSucceededAt?: true
+    lastErrorAt?: true
+    lastErrorCode?: true
+    lastErrorMessage?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SyncAccountAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SyncAccount to aggregate.
+     */
+    where?: SyncAccountWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SyncAccounts to fetch.
+     */
+    orderBy?: SyncAccountOrderByWithRelationInput | SyncAccountOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SyncAccountWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SyncAccounts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SyncAccounts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SyncAccounts
+    **/
+    _count?: true | SyncAccountCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SyncAccountAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SyncAccountSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SyncAccountMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SyncAccountMaxAggregateInputType
+  }
+
+  export type GetSyncAccountAggregateType<T extends SyncAccountAggregateArgs> = {
+        [P in keyof T & keyof AggregateSyncAccount]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSyncAccount[P]>
+      : GetScalarType<T[P], AggregateSyncAccount[P]>
+  }
+
+
+
+
+  export type SyncAccountGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SyncAccountWhereInput
+    orderBy?: SyncAccountOrderByWithAggregationInput | SyncAccountOrderByWithAggregationInput[]
+    by: SyncAccountScalarFieldEnum[] | SyncAccountScalarFieldEnum
+    having?: SyncAccountScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SyncAccountCountAggregateInputType | true
+    _avg?: SyncAccountAvgAggregateInputType
+    _sum?: SyncAccountSumAggregateInputType
+    _min?: SyncAccountMinAggregateInputType
+    _max?: SyncAccountMaxAggregateInputType
+  }
+
+  export type SyncAccountGroupByOutputType = {
+    id: string
+    userId: string
+    provider: $Enums.SyncProvider
+    status: $Enums.SyncAccountStatus
+    syncDirection: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl: string | null
+    addressBookUrl: string | null
+    remoteAccountId: string | null
+    remoteCTag: string | null
+    credentialReference: string | null
+    credentialVersion: number
+    credentialUpdatedAt: Date | null
+    credentialRevokedAt: Date | null
+    encryptionKeyRef: string | null
+    lastSyncCursor: string | null
+    lastSyncedAt: Date | null
+    lastSucceededAt: Date | null
+    lastErrorAt: Date | null
+    lastErrorCode: string | null
+    lastErrorMessage: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: SyncAccountCountAggregateOutputType | null
+    _avg: SyncAccountAvgAggregateOutputType | null
+    _sum: SyncAccountSumAggregateOutputType | null
+    _min: SyncAccountMinAggregateOutputType | null
+    _max: SyncAccountMaxAggregateOutputType | null
+  }
+
+  type GetSyncAccountGroupByPayload<T extends SyncAccountGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SyncAccountGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SyncAccountGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SyncAccountGroupByOutputType[P]>
+            : GetScalarType<T[P], SyncAccountGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SyncAccountSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    provider?: boolean
+    status?: boolean
+    syncDirection?: boolean
+    label?: boolean
+    baseUrl?: boolean
+    principalUrl?: boolean
+    addressBookUrl?: boolean
+    remoteAccountId?: boolean
+    remoteCTag?: boolean
+    credentialReference?: boolean
+    credentialVersion?: boolean
+    credentialUpdatedAt?: boolean
+    credentialRevokedAt?: boolean
+    encryptionKeyRef?: boolean
+    lastSyncCursor?: boolean
+    lastSyncedAt?: boolean
+    lastSucceededAt?: boolean
+    lastErrorAt?: boolean
+    lastErrorCode?: boolean
+    lastErrorMessage?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    syncLinks?: boolean | SyncAccount$syncLinksArgs<ExtArgs>
+    syncJobs?: boolean | SyncAccount$syncJobsArgs<ExtArgs>
+    syncConflicts?: boolean | SyncAccount$syncConflictsArgs<ExtArgs>
+    _count?: boolean | SyncAccountCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["syncAccount"]>
+
+  export type SyncAccountSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    provider?: boolean
+    status?: boolean
+    syncDirection?: boolean
+    label?: boolean
+    baseUrl?: boolean
+    principalUrl?: boolean
+    addressBookUrl?: boolean
+    remoteAccountId?: boolean
+    remoteCTag?: boolean
+    credentialReference?: boolean
+    credentialVersion?: boolean
+    credentialUpdatedAt?: boolean
+    credentialRevokedAt?: boolean
+    encryptionKeyRef?: boolean
+    lastSyncCursor?: boolean
+    lastSyncedAt?: boolean
+    lastSucceededAt?: boolean
+    lastErrorAt?: boolean
+    lastErrorCode?: boolean
+    lastErrorMessage?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["syncAccount"]>
+
+  export type SyncAccountSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    provider?: boolean
+    status?: boolean
+    syncDirection?: boolean
+    label?: boolean
+    baseUrl?: boolean
+    principalUrl?: boolean
+    addressBookUrl?: boolean
+    remoteAccountId?: boolean
+    remoteCTag?: boolean
+    credentialReference?: boolean
+    credentialVersion?: boolean
+    credentialUpdatedAt?: boolean
+    credentialRevokedAt?: boolean
+    encryptionKeyRef?: boolean
+    lastSyncCursor?: boolean
+    lastSyncedAt?: boolean
+    lastSucceededAt?: boolean
+    lastErrorAt?: boolean
+    lastErrorCode?: boolean
+    lastErrorMessage?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["syncAccount"]>
+
+  export type SyncAccountSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    provider?: boolean
+    status?: boolean
+    syncDirection?: boolean
+    label?: boolean
+    baseUrl?: boolean
+    principalUrl?: boolean
+    addressBookUrl?: boolean
+    remoteAccountId?: boolean
+    remoteCTag?: boolean
+    credentialReference?: boolean
+    credentialVersion?: boolean
+    credentialUpdatedAt?: boolean
+    credentialRevokedAt?: boolean
+    encryptionKeyRef?: boolean
+    lastSyncCursor?: boolean
+    lastSyncedAt?: boolean
+    lastSucceededAt?: boolean
+    lastErrorAt?: boolean
+    lastErrorCode?: boolean
+    lastErrorMessage?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type SyncAccountOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "provider" | "status" | "syncDirection" | "label" | "baseUrl" | "principalUrl" | "addressBookUrl" | "remoteAccountId" | "remoteCTag" | "credentialReference" | "credentialVersion" | "credentialUpdatedAt" | "credentialRevokedAt" | "encryptionKeyRef" | "lastSyncCursor" | "lastSyncedAt" | "lastSucceededAt" | "lastErrorAt" | "lastErrorCode" | "lastErrorMessage" | "createdAt" | "updatedAt", ExtArgs["result"]["syncAccount"]>
+  export type SyncAccountInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    syncLinks?: boolean | SyncAccount$syncLinksArgs<ExtArgs>
+    syncJobs?: boolean | SyncAccount$syncJobsArgs<ExtArgs>
+    syncConflicts?: boolean | SyncAccount$syncConflictsArgs<ExtArgs>
+    _count?: boolean | SyncAccountCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type SyncAccountIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SyncAccountIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $SyncAccountPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SyncAccount"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+      syncLinks: Prisma.$SyncContactLinkPayload<ExtArgs>[]
+      syncJobs: Prisma.$SyncJobPayload<ExtArgs>[]
+      syncConflicts: Prisma.$SyncConflictPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      provider: $Enums.SyncProvider
+      status: $Enums.SyncAccountStatus
+      syncDirection: $Enums.SyncDirection
+      label: string
+      baseUrl: string
+      principalUrl: string | null
+      addressBookUrl: string | null
+      remoteAccountId: string | null
+      remoteCTag: string | null
+      credentialReference: string | null
+      credentialVersion: number
+      credentialUpdatedAt: Date | null
+      credentialRevokedAt: Date | null
+      encryptionKeyRef: string | null
+      lastSyncCursor: string | null
+      lastSyncedAt: Date | null
+      lastSucceededAt: Date | null
+      lastErrorAt: Date | null
+      lastErrorCode: string | null
+      lastErrorMessage: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["syncAccount"]>
+    composites: {}
+  }
+
+  type SyncAccountGetPayload<S extends boolean | null | undefined | SyncAccountDefaultArgs> = $Result.GetResult<Prisma.$SyncAccountPayload, S>
+
+  type SyncAccountCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SyncAccountFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SyncAccountCountAggregateInputType | true
+    }
+
+  export interface SyncAccountDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SyncAccount'], meta: { name: 'SyncAccount' } }
+    /**
+     * Find zero or one SyncAccount that matches the filter.
+     * @param {SyncAccountFindUniqueArgs} args - Arguments to find a SyncAccount
+     * @example
+     * // Get one SyncAccount
+     * const syncAccount = await prisma.syncAccount.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SyncAccountFindUniqueArgs>(args: SelectSubset<T, SyncAccountFindUniqueArgs<ExtArgs>>): Prisma__SyncAccountClient<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SyncAccount that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SyncAccountFindUniqueOrThrowArgs} args - Arguments to find a SyncAccount
+     * @example
+     * // Get one SyncAccount
+     * const syncAccount = await prisma.syncAccount.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SyncAccountFindUniqueOrThrowArgs>(args: SelectSubset<T, SyncAccountFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SyncAccountClient<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SyncAccount that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncAccountFindFirstArgs} args - Arguments to find a SyncAccount
+     * @example
+     * // Get one SyncAccount
+     * const syncAccount = await prisma.syncAccount.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SyncAccountFindFirstArgs>(args?: SelectSubset<T, SyncAccountFindFirstArgs<ExtArgs>>): Prisma__SyncAccountClient<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SyncAccount that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncAccountFindFirstOrThrowArgs} args - Arguments to find a SyncAccount
+     * @example
+     * // Get one SyncAccount
+     * const syncAccount = await prisma.syncAccount.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SyncAccountFindFirstOrThrowArgs>(args?: SelectSubset<T, SyncAccountFindFirstOrThrowArgs<ExtArgs>>): Prisma__SyncAccountClient<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SyncAccounts that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncAccountFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SyncAccounts
+     * const syncAccounts = await prisma.syncAccount.findMany()
+     * 
+     * // Get first 10 SyncAccounts
+     * const syncAccounts = await prisma.syncAccount.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const syncAccountWithIdOnly = await prisma.syncAccount.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SyncAccountFindManyArgs>(args?: SelectSubset<T, SyncAccountFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SyncAccount.
+     * @param {SyncAccountCreateArgs} args - Arguments to create a SyncAccount.
+     * @example
+     * // Create one SyncAccount
+     * const SyncAccount = await prisma.syncAccount.create({
+     *   data: {
+     *     // ... data to create a SyncAccount
+     *   }
+     * })
+     * 
+     */
+    create<T extends SyncAccountCreateArgs>(args: SelectSubset<T, SyncAccountCreateArgs<ExtArgs>>): Prisma__SyncAccountClient<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SyncAccounts.
+     * @param {SyncAccountCreateManyArgs} args - Arguments to create many SyncAccounts.
+     * @example
+     * // Create many SyncAccounts
+     * const syncAccount = await prisma.syncAccount.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SyncAccountCreateManyArgs>(args?: SelectSubset<T, SyncAccountCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SyncAccounts and returns the data saved in the database.
+     * @param {SyncAccountCreateManyAndReturnArgs} args - Arguments to create many SyncAccounts.
+     * @example
+     * // Create many SyncAccounts
+     * const syncAccount = await prisma.syncAccount.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SyncAccounts and only return the `id`
+     * const syncAccountWithIdOnly = await prisma.syncAccount.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SyncAccountCreateManyAndReturnArgs>(args?: SelectSubset<T, SyncAccountCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SyncAccount.
+     * @param {SyncAccountDeleteArgs} args - Arguments to delete one SyncAccount.
+     * @example
+     * // Delete one SyncAccount
+     * const SyncAccount = await prisma.syncAccount.delete({
+     *   where: {
+     *     // ... filter to delete one SyncAccount
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SyncAccountDeleteArgs>(args: SelectSubset<T, SyncAccountDeleteArgs<ExtArgs>>): Prisma__SyncAccountClient<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SyncAccount.
+     * @param {SyncAccountUpdateArgs} args - Arguments to update one SyncAccount.
+     * @example
+     * // Update one SyncAccount
+     * const syncAccount = await prisma.syncAccount.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SyncAccountUpdateArgs>(args: SelectSubset<T, SyncAccountUpdateArgs<ExtArgs>>): Prisma__SyncAccountClient<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SyncAccounts.
+     * @param {SyncAccountDeleteManyArgs} args - Arguments to filter SyncAccounts to delete.
+     * @example
+     * // Delete a few SyncAccounts
+     * const { count } = await prisma.syncAccount.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SyncAccountDeleteManyArgs>(args?: SelectSubset<T, SyncAccountDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SyncAccounts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncAccountUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SyncAccounts
+     * const syncAccount = await prisma.syncAccount.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SyncAccountUpdateManyArgs>(args: SelectSubset<T, SyncAccountUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SyncAccounts and returns the data updated in the database.
+     * @param {SyncAccountUpdateManyAndReturnArgs} args - Arguments to update many SyncAccounts.
+     * @example
+     * // Update many SyncAccounts
+     * const syncAccount = await prisma.syncAccount.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SyncAccounts and only return the `id`
+     * const syncAccountWithIdOnly = await prisma.syncAccount.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SyncAccountUpdateManyAndReturnArgs>(args: SelectSubset<T, SyncAccountUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SyncAccount.
+     * @param {SyncAccountUpsertArgs} args - Arguments to update or create a SyncAccount.
+     * @example
+     * // Update or create a SyncAccount
+     * const syncAccount = await prisma.syncAccount.upsert({
+     *   create: {
+     *     // ... data to create a SyncAccount
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SyncAccount we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SyncAccountUpsertArgs>(args: SelectSubset<T, SyncAccountUpsertArgs<ExtArgs>>): Prisma__SyncAccountClient<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SyncAccounts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncAccountCountArgs} args - Arguments to filter SyncAccounts to count.
+     * @example
+     * // Count the number of SyncAccounts
+     * const count = await prisma.syncAccount.count({
+     *   where: {
+     *     // ... the filter for the SyncAccounts we want to count
+     *   }
+     * })
+    **/
+    count<T extends SyncAccountCountArgs>(
+      args?: Subset<T, SyncAccountCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SyncAccountCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SyncAccount.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncAccountAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SyncAccountAggregateArgs>(args: Subset<T, SyncAccountAggregateArgs>): Prisma.PrismaPromise<GetSyncAccountAggregateType<T>>
+
+    /**
+     * Group by SyncAccount.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncAccountGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SyncAccountGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SyncAccountGroupByArgs['orderBy'] }
+        : { orderBy?: SyncAccountGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SyncAccountGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSyncAccountGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SyncAccount model
+   */
+  readonly fields: SyncAccountFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SyncAccount.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SyncAccountClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    syncLinks<T extends SyncAccount$syncLinksArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccount$syncLinksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncContactLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    syncJobs<T extends SyncAccount$syncJobsArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccount$syncJobsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    syncConflicts<T extends SyncAccount$syncConflictsArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccount$syncConflictsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncConflictPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SyncAccount model
+   */
+  interface SyncAccountFieldRefs {
+    readonly id: FieldRef<"SyncAccount", 'String'>
+    readonly userId: FieldRef<"SyncAccount", 'String'>
+    readonly provider: FieldRef<"SyncAccount", 'SyncProvider'>
+    readonly status: FieldRef<"SyncAccount", 'SyncAccountStatus'>
+    readonly syncDirection: FieldRef<"SyncAccount", 'SyncDirection'>
+    readonly label: FieldRef<"SyncAccount", 'String'>
+    readonly baseUrl: FieldRef<"SyncAccount", 'String'>
+    readonly principalUrl: FieldRef<"SyncAccount", 'String'>
+    readonly addressBookUrl: FieldRef<"SyncAccount", 'String'>
+    readonly remoteAccountId: FieldRef<"SyncAccount", 'String'>
+    readonly remoteCTag: FieldRef<"SyncAccount", 'String'>
+    readonly credentialReference: FieldRef<"SyncAccount", 'String'>
+    readonly credentialVersion: FieldRef<"SyncAccount", 'Int'>
+    readonly credentialUpdatedAt: FieldRef<"SyncAccount", 'DateTime'>
+    readonly credentialRevokedAt: FieldRef<"SyncAccount", 'DateTime'>
+    readonly encryptionKeyRef: FieldRef<"SyncAccount", 'String'>
+    readonly lastSyncCursor: FieldRef<"SyncAccount", 'String'>
+    readonly lastSyncedAt: FieldRef<"SyncAccount", 'DateTime'>
+    readonly lastSucceededAt: FieldRef<"SyncAccount", 'DateTime'>
+    readonly lastErrorAt: FieldRef<"SyncAccount", 'DateTime'>
+    readonly lastErrorCode: FieldRef<"SyncAccount", 'String'>
+    readonly lastErrorMessage: FieldRef<"SyncAccount", 'String'>
+    readonly createdAt: FieldRef<"SyncAccount", 'DateTime'>
+    readonly updatedAt: FieldRef<"SyncAccount", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SyncAccount findUnique
+   */
+  export type SyncAccountFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccount
+     */
+    select?: SyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccount
+     */
+    omit?: SyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountInclude<ExtArgs> | null
+    /**
+     * Filter, which SyncAccount to fetch.
+     */
+    where: SyncAccountWhereUniqueInput
+  }
+
+  /**
+   * SyncAccount findUniqueOrThrow
+   */
+  export type SyncAccountFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccount
+     */
+    select?: SyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccount
+     */
+    omit?: SyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountInclude<ExtArgs> | null
+    /**
+     * Filter, which SyncAccount to fetch.
+     */
+    where: SyncAccountWhereUniqueInput
+  }
+
+  /**
+   * SyncAccount findFirst
+   */
+  export type SyncAccountFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccount
+     */
+    select?: SyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccount
+     */
+    omit?: SyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountInclude<ExtArgs> | null
+    /**
+     * Filter, which SyncAccount to fetch.
+     */
+    where?: SyncAccountWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SyncAccounts to fetch.
+     */
+    orderBy?: SyncAccountOrderByWithRelationInput | SyncAccountOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SyncAccounts.
+     */
+    cursor?: SyncAccountWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SyncAccounts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SyncAccounts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SyncAccounts.
+     */
+    distinct?: SyncAccountScalarFieldEnum | SyncAccountScalarFieldEnum[]
+  }
+
+  /**
+   * SyncAccount findFirstOrThrow
+   */
+  export type SyncAccountFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccount
+     */
+    select?: SyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccount
+     */
+    omit?: SyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountInclude<ExtArgs> | null
+    /**
+     * Filter, which SyncAccount to fetch.
+     */
+    where?: SyncAccountWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SyncAccounts to fetch.
+     */
+    orderBy?: SyncAccountOrderByWithRelationInput | SyncAccountOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SyncAccounts.
+     */
+    cursor?: SyncAccountWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SyncAccounts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SyncAccounts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SyncAccounts.
+     */
+    distinct?: SyncAccountScalarFieldEnum | SyncAccountScalarFieldEnum[]
+  }
+
+  /**
+   * SyncAccount findMany
+   */
+  export type SyncAccountFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccount
+     */
+    select?: SyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccount
+     */
+    omit?: SyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountInclude<ExtArgs> | null
+    /**
+     * Filter, which SyncAccounts to fetch.
+     */
+    where?: SyncAccountWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SyncAccounts to fetch.
+     */
+    orderBy?: SyncAccountOrderByWithRelationInput | SyncAccountOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SyncAccounts.
+     */
+    cursor?: SyncAccountWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SyncAccounts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SyncAccounts.
+     */
+    skip?: number
+    distinct?: SyncAccountScalarFieldEnum | SyncAccountScalarFieldEnum[]
+  }
+
+  /**
+   * SyncAccount create
+   */
+  export type SyncAccountCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccount
+     */
+    select?: SyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccount
+     */
+    omit?: SyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SyncAccount.
+     */
+    data: XOR<SyncAccountCreateInput, SyncAccountUncheckedCreateInput>
+  }
+
+  /**
+   * SyncAccount createMany
+   */
+  export type SyncAccountCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SyncAccounts.
+     */
+    data: SyncAccountCreateManyInput | SyncAccountCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SyncAccount createManyAndReturn
+   */
+  export type SyncAccountCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccount
+     */
+    select?: SyncAccountSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccount
+     */
+    omit?: SyncAccountOmit<ExtArgs> | null
+    /**
+     * The data used to create many SyncAccounts.
+     */
+    data: SyncAccountCreateManyInput | SyncAccountCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SyncAccount update
+   */
+  export type SyncAccountUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccount
+     */
+    select?: SyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccount
+     */
+    omit?: SyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SyncAccount.
+     */
+    data: XOR<SyncAccountUpdateInput, SyncAccountUncheckedUpdateInput>
+    /**
+     * Choose, which SyncAccount to update.
+     */
+    where: SyncAccountWhereUniqueInput
+  }
+
+  /**
+   * SyncAccount updateMany
+   */
+  export type SyncAccountUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SyncAccounts.
+     */
+    data: XOR<SyncAccountUpdateManyMutationInput, SyncAccountUncheckedUpdateManyInput>
+    /**
+     * Filter which SyncAccounts to update
+     */
+    where?: SyncAccountWhereInput
+    /**
+     * Limit how many SyncAccounts to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SyncAccount updateManyAndReturn
+   */
+  export type SyncAccountUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccount
+     */
+    select?: SyncAccountSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccount
+     */
+    omit?: SyncAccountOmit<ExtArgs> | null
+    /**
+     * The data used to update SyncAccounts.
+     */
+    data: XOR<SyncAccountUpdateManyMutationInput, SyncAccountUncheckedUpdateManyInput>
+    /**
+     * Filter which SyncAccounts to update
+     */
+    where?: SyncAccountWhereInput
+    /**
+     * Limit how many SyncAccounts to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SyncAccount upsert
+   */
+  export type SyncAccountUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccount
+     */
+    select?: SyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccount
+     */
+    omit?: SyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SyncAccount to update in case it exists.
+     */
+    where: SyncAccountWhereUniqueInput
+    /**
+     * In case the SyncAccount found by the `where` argument doesn't exist, create a new SyncAccount with this data.
+     */
+    create: XOR<SyncAccountCreateInput, SyncAccountUncheckedCreateInput>
+    /**
+     * In case the SyncAccount was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SyncAccountUpdateInput, SyncAccountUncheckedUpdateInput>
+  }
+
+  /**
+   * SyncAccount delete
+   */
+  export type SyncAccountDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccount
+     */
+    select?: SyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccount
+     */
+    omit?: SyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountInclude<ExtArgs> | null
+    /**
+     * Filter which SyncAccount to delete.
+     */
+    where: SyncAccountWhereUniqueInput
+  }
+
+  /**
+   * SyncAccount deleteMany
+   */
+  export type SyncAccountDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SyncAccounts to delete
+     */
+    where?: SyncAccountWhereInput
+    /**
+     * Limit how many SyncAccounts to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SyncAccount.syncLinks
+   */
+  export type SyncAccount$syncLinksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncContactLink
+     */
+    select?: SyncContactLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncContactLink
+     */
+    omit?: SyncContactLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncContactLinkInclude<ExtArgs> | null
+    where?: SyncContactLinkWhereInput
+    orderBy?: SyncContactLinkOrderByWithRelationInput | SyncContactLinkOrderByWithRelationInput[]
+    cursor?: SyncContactLinkWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SyncContactLinkScalarFieldEnum | SyncContactLinkScalarFieldEnum[]
+  }
+
+  /**
+   * SyncAccount.syncJobs
+   */
+  export type SyncAccount$syncJobsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncJob
+     */
+    select?: SyncJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncJob
+     */
+    omit?: SyncJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncJobInclude<ExtArgs> | null
+    where?: SyncJobWhereInput
+    orderBy?: SyncJobOrderByWithRelationInput | SyncJobOrderByWithRelationInput[]
+    cursor?: SyncJobWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SyncJobScalarFieldEnum | SyncJobScalarFieldEnum[]
+  }
+
+  /**
+   * SyncAccount.syncConflicts
+   */
+  export type SyncAccount$syncConflictsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncConflict
+     */
+    select?: SyncConflictSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncConflict
+     */
+    omit?: SyncConflictOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncConflictInclude<ExtArgs> | null
+    where?: SyncConflictWhereInput
+    orderBy?: SyncConflictOrderByWithRelationInput | SyncConflictOrderByWithRelationInput[]
+    cursor?: SyncConflictWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SyncConflictScalarFieldEnum | SyncConflictScalarFieldEnum[]
+  }
+
+  /**
+   * SyncAccount without action
+   */
+  export type SyncAccountDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccount
+     */
+    select?: SyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccount
+     */
+    omit?: SyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SyncContactLink
+   */
+
+  export type AggregateSyncContactLink = {
+    _count: SyncContactLinkCountAggregateOutputType | null
+    _min: SyncContactLinkMinAggregateOutputType | null
+    _max: SyncContactLinkMaxAggregateOutputType | null
+  }
+
+  export type SyncContactLinkMinAggregateOutputType = {
+    id: string | null
+    syncAccountId: string | null
+    contactId: string | null
+    remoteHref: string | null
+    remoteUid: string | null
+    remoteETag: string | null
+    lastSyncedAt: Date | null
+    tombstonedAt: Date | null
+    remoteDeletedAt: Date | null
+    lastErrorCode: string | null
+    lastErrorMessage: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SyncContactLinkMaxAggregateOutputType = {
+    id: string | null
+    syncAccountId: string | null
+    contactId: string | null
+    remoteHref: string | null
+    remoteUid: string | null
+    remoteETag: string | null
+    lastSyncedAt: Date | null
+    tombstonedAt: Date | null
+    remoteDeletedAt: Date | null
+    lastErrorCode: string | null
+    lastErrorMessage: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SyncContactLinkCountAggregateOutputType = {
+    id: number
+    syncAccountId: number
+    contactId: number
+    remoteHref: number
+    remoteUid: number
+    remoteETag: number
+    lastSyncedAt: number
+    tombstonedAt: number
+    remoteDeletedAt: number
+    lastErrorCode: number
+    lastErrorMessage: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SyncContactLinkMinAggregateInputType = {
+    id?: true
+    syncAccountId?: true
+    contactId?: true
+    remoteHref?: true
+    remoteUid?: true
+    remoteETag?: true
+    lastSyncedAt?: true
+    tombstonedAt?: true
+    remoteDeletedAt?: true
+    lastErrorCode?: true
+    lastErrorMessage?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SyncContactLinkMaxAggregateInputType = {
+    id?: true
+    syncAccountId?: true
+    contactId?: true
+    remoteHref?: true
+    remoteUid?: true
+    remoteETag?: true
+    lastSyncedAt?: true
+    tombstonedAt?: true
+    remoteDeletedAt?: true
+    lastErrorCode?: true
+    lastErrorMessage?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SyncContactLinkCountAggregateInputType = {
+    id?: true
+    syncAccountId?: true
+    contactId?: true
+    remoteHref?: true
+    remoteUid?: true
+    remoteETag?: true
+    lastSyncedAt?: true
+    tombstonedAt?: true
+    remoteDeletedAt?: true
+    lastErrorCode?: true
+    lastErrorMessage?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SyncContactLinkAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SyncContactLink to aggregate.
+     */
+    where?: SyncContactLinkWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SyncContactLinks to fetch.
+     */
+    orderBy?: SyncContactLinkOrderByWithRelationInput | SyncContactLinkOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SyncContactLinkWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SyncContactLinks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SyncContactLinks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SyncContactLinks
+    **/
+    _count?: true | SyncContactLinkCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SyncContactLinkMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SyncContactLinkMaxAggregateInputType
+  }
+
+  export type GetSyncContactLinkAggregateType<T extends SyncContactLinkAggregateArgs> = {
+        [P in keyof T & keyof AggregateSyncContactLink]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSyncContactLink[P]>
+      : GetScalarType<T[P], AggregateSyncContactLink[P]>
+  }
+
+
+
+
+  export type SyncContactLinkGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SyncContactLinkWhereInput
+    orderBy?: SyncContactLinkOrderByWithAggregationInput | SyncContactLinkOrderByWithAggregationInput[]
+    by: SyncContactLinkScalarFieldEnum[] | SyncContactLinkScalarFieldEnum
+    having?: SyncContactLinkScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SyncContactLinkCountAggregateInputType | true
+    _min?: SyncContactLinkMinAggregateInputType
+    _max?: SyncContactLinkMaxAggregateInputType
+  }
+
+  export type SyncContactLinkGroupByOutputType = {
+    id: string
+    syncAccountId: string
+    contactId: string
+    remoteHref: string | null
+    remoteUid: string | null
+    remoteETag: string | null
+    lastSyncedAt: Date | null
+    tombstonedAt: Date | null
+    remoteDeletedAt: Date | null
+    lastErrorCode: string | null
+    lastErrorMessage: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: SyncContactLinkCountAggregateOutputType | null
+    _min: SyncContactLinkMinAggregateOutputType | null
+    _max: SyncContactLinkMaxAggregateOutputType | null
+  }
+
+  type GetSyncContactLinkGroupByPayload<T extends SyncContactLinkGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SyncContactLinkGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SyncContactLinkGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SyncContactLinkGroupByOutputType[P]>
+            : GetScalarType<T[P], SyncContactLinkGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SyncContactLinkSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    syncAccountId?: boolean
+    contactId?: boolean
+    remoteHref?: boolean
+    remoteUid?: boolean
+    remoteETag?: boolean
+    lastSyncedAt?: boolean
+    tombstonedAt?: boolean
+    remoteDeletedAt?: boolean
+    lastErrorCode?: boolean
+    lastErrorMessage?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+    syncConflicts?: boolean | SyncContactLink$syncConflictsArgs<ExtArgs>
+    _count?: boolean | SyncContactLinkCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["syncContactLink"]>
+
+  export type SyncContactLinkSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    syncAccountId?: boolean
+    contactId?: boolean
+    remoteHref?: boolean
+    remoteUid?: boolean
+    remoteETag?: boolean
+    lastSyncedAt?: boolean
+    tombstonedAt?: boolean
+    remoteDeletedAt?: boolean
+    lastErrorCode?: boolean
+    lastErrorMessage?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["syncContactLink"]>
+
+  export type SyncContactLinkSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    syncAccountId?: boolean
+    contactId?: boolean
+    remoteHref?: boolean
+    remoteUid?: boolean
+    remoteETag?: boolean
+    lastSyncedAt?: boolean
+    tombstonedAt?: boolean
+    remoteDeletedAt?: boolean
+    lastErrorCode?: boolean
+    lastErrorMessage?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["syncContactLink"]>
+
+  export type SyncContactLinkSelectScalar = {
+    id?: boolean
+    syncAccountId?: boolean
+    contactId?: boolean
+    remoteHref?: boolean
+    remoteUid?: boolean
+    remoteETag?: boolean
+    lastSyncedAt?: boolean
+    tombstonedAt?: boolean
+    remoteDeletedAt?: boolean
+    lastErrorCode?: boolean
+    lastErrorMessage?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type SyncContactLinkOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "syncAccountId" | "contactId" | "remoteHref" | "remoteUid" | "remoteETag" | "lastSyncedAt" | "tombstonedAt" | "remoteDeletedAt" | "lastErrorCode" | "lastErrorMessage" | "createdAt" | "updatedAt", ExtArgs["result"]["syncContactLink"]>
+  export type SyncContactLinkInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+    syncConflicts?: boolean | SyncContactLink$syncConflictsArgs<ExtArgs>
+    _count?: boolean | SyncContactLinkCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type SyncContactLinkIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+  }
+  export type SyncContactLinkIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+  }
+
+  export type $SyncContactLinkPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SyncContactLink"
+    objects: {
+      syncAccount: Prisma.$SyncAccountPayload<ExtArgs>
+      contact: Prisma.$ContactPayload<ExtArgs>
+      syncConflicts: Prisma.$SyncConflictPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      syncAccountId: string
+      contactId: string
+      remoteHref: string | null
+      remoteUid: string | null
+      remoteETag: string | null
+      lastSyncedAt: Date | null
+      tombstonedAt: Date | null
+      remoteDeletedAt: Date | null
+      lastErrorCode: string | null
+      lastErrorMessage: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["syncContactLink"]>
+    composites: {}
+  }
+
+  type SyncContactLinkGetPayload<S extends boolean | null | undefined | SyncContactLinkDefaultArgs> = $Result.GetResult<Prisma.$SyncContactLinkPayload, S>
+
+  type SyncContactLinkCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SyncContactLinkFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SyncContactLinkCountAggregateInputType | true
+    }
+
+  export interface SyncContactLinkDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SyncContactLink'], meta: { name: 'SyncContactLink' } }
+    /**
+     * Find zero or one SyncContactLink that matches the filter.
+     * @param {SyncContactLinkFindUniqueArgs} args - Arguments to find a SyncContactLink
+     * @example
+     * // Get one SyncContactLink
+     * const syncContactLink = await prisma.syncContactLink.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SyncContactLinkFindUniqueArgs>(args: SelectSubset<T, SyncContactLinkFindUniqueArgs<ExtArgs>>): Prisma__SyncContactLinkClient<$Result.GetResult<Prisma.$SyncContactLinkPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SyncContactLink that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SyncContactLinkFindUniqueOrThrowArgs} args - Arguments to find a SyncContactLink
+     * @example
+     * // Get one SyncContactLink
+     * const syncContactLink = await prisma.syncContactLink.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SyncContactLinkFindUniqueOrThrowArgs>(args: SelectSubset<T, SyncContactLinkFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SyncContactLinkClient<$Result.GetResult<Prisma.$SyncContactLinkPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SyncContactLink that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncContactLinkFindFirstArgs} args - Arguments to find a SyncContactLink
+     * @example
+     * // Get one SyncContactLink
+     * const syncContactLink = await prisma.syncContactLink.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SyncContactLinkFindFirstArgs>(args?: SelectSubset<T, SyncContactLinkFindFirstArgs<ExtArgs>>): Prisma__SyncContactLinkClient<$Result.GetResult<Prisma.$SyncContactLinkPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SyncContactLink that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncContactLinkFindFirstOrThrowArgs} args - Arguments to find a SyncContactLink
+     * @example
+     * // Get one SyncContactLink
+     * const syncContactLink = await prisma.syncContactLink.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SyncContactLinkFindFirstOrThrowArgs>(args?: SelectSubset<T, SyncContactLinkFindFirstOrThrowArgs<ExtArgs>>): Prisma__SyncContactLinkClient<$Result.GetResult<Prisma.$SyncContactLinkPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SyncContactLinks that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncContactLinkFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SyncContactLinks
+     * const syncContactLinks = await prisma.syncContactLink.findMany()
+     * 
+     * // Get first 10 SyncContactLinks
+     * const syncContactLinks = await prisma.syncContactLink.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const syncContactLinkWithIdOnly = await prisma.syncContactLink.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SyncContactLinkFindManyArgs>(args?: SelectSubset<T, SyncContactLinkFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncContactLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SyncContactLink.
+     * @param {SyncContactLinkCreateArgs} args - Arguments to create a SyncContactLink.
+     * @example
+     * // Create one SyncContactLink
+     * const SyncContactLink = await prisma.syncContactLink.create({
+     *   data: {
+     *     // ... data to create a SyncContactLink
+     *   }
+     * })
+     * 
+     */
+    create<T extends SyncContactLinkCreateArgs>(args: SelectSubset<T, SyncContactLinkCreateArgs<ExtArgs>>): Prisma__SyncContactLinkClient<$Result.GetResult<Prisma.$SyncContactLinkPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SyncContactLinks.
+     * @param {SyncContactLinkCreateManyArgs} args - Arguments to create many SyncContactLinks.
+     * @example
+     * // Create many SyncContactLinks
+     * const syncContactLink = await prisma.syncContactLink.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SyncContactLinkCreateManyArgs>(args?: SelectSubset<T, SyncContactLinkCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SyncContactLinks and returns the data saved in the database.
+     * @param {SyncContactLinkCreateManyAndReturnArgs} args - Arguments to create many SyncContactLinks.
+     * @example
+     * // Create many SyncContactLinks
+     * const syncContactLink = await prisma.syncContactLink.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SyncContactLinks and only return the `id`
+     * const syncContactLinkWithIdOnly = await prisma.syncContactLink.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SyncContactLinkCreateManyAndReturnArgs>(args?: SelectSubset<T, SyncContactLinkCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncContactLinkPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SyncContactLink.
+     * @param {SyncContactLinkDeleteArgs} args - Arguments to delete one SyncContactLink.
+     * @example
+     * // Delete one SyncContactLink
+     * const SyncContactLink = await prisma.syncContactLink.delete({
+     *   where: {
+     *     // ... filter to delete one SyncContactLink
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SyncContactLinkDeleteArgs>(args: SelectSubset<T, SyncContactLinkDeleteArgs<ExtArgs>>): Prisma__SyncContactLinkClient<$Result.GetResult<Prisma.$SyncContactLinkPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SyncContactLink.
+     * @param {SyncContactLinkUpdateArgs} args - Arguments to update one SyncContactLink.
+     * @example
+     * // Update one SyncContactLink
+     * const syncContactLink = await prisma.syncContactLink.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SyncContactLinkUpdateArgs>(args: SelectSubset<T, SyncContactLinkUpdateArgs<ExtArgs>>): Prisma__SyncContactLinkClient<$Result.GetResult<Prisma.$SyncContactLinkPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SyncContactLinks.
+     * @param {SyncContactLinkDeleteManyArgs} args - Arguments to filter SyncContactLinks to delete.
+     * @example
+     * // Delete a few SyncContactLinks
+     * const { count } = await prisma.syncContactLink.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SyncContactLinkDeleteManyArgs>(args?: SelectSubset<T, SyncContactLinkDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SyncContactLinks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncContactLinkUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SyncContactLinks
+     * const syncContactLink = await prisma.syncContactLink.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SyncContactLinkUpdateManyArgs>(args: SelectSubset<T, SyncContactLinkUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SyncContactLinks and returns the data updated in the database.
+     * @param {SyncContactLinkUpdateManyAndReturnArgs} args - Arguments to update many SyncContactLinks.
+     * @example
+     * // Update many SyncContactLinks
+     * const syncContactLink = await prisma.syncContactLink.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SyncContactLinks and only return the `id`
+     * const syncContactLinkWithIdOnly = await prisma.syncContactLink.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SyncContactLinkUpdateManyAndReturnArgs>(args: SelectSubset<T, SyncContactLinkUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncContactLinkPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SyncContactLink.
+     * @param {SyncContactLinkUpsertArgs} args - Arguments to update or create a SyncContactLink.
+     * @example
+     * // Update or create a SyncContactLink
+     * const syncContactLink = await prisma.syncContactLink.upsert({
+     *   create: {
+     *     // ... data to create a SyncContactLink
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SyncContactLink we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SyncContactLinkUpsertArgs>(args: SelectSubset<T, SyncContactLinkUpsertArgs<ExtArgs>>): Prisma__SyncContactLinkClient<$Result.GetResult<Prisma.$SyncContactLinkPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SyncContactLinks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncContactLinkCountArgs} args - Arguments to filter SyncContactLinks to count.
+     * @example
+     * // Count the number of SyncContactLinks
+     * const count = await prisma.syncContactLink.count({
+     *   where: {
+     *     // ... the filter for the SyncContactLinks we want to count
+     *   }
+     * })
+    **/
+    count<T extends SyncContactLinkCountArgs>(
+      args?: Subset<T, SyncContactLinkCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SyncContactLinkCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SyncContactLink.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncContactLinkAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SyncContactLinkAggregateArgs>(args: Subset<T, SyncContactLinkAggregateArgs>): Prisma.PrismaPromise<GetSyncContactLinkAggregateType<T>>
+
+    /**
+     * Group by SyncContactLink.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncContactLinkGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SyncContactLinkGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SyncContactLinkGroupByArgs['orderBy'] }
+        : { orderBy?: SyncContactLinkGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SyncContactLinkGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSyncContactLinkGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SyncContactLink model
+   */
+  readonly fields: SyncContactLinkFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SyncContactLink.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SyncContactLinkClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    syncAccount<T extends SyncAccountDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccountDefaultArgs<ExtArgs>>): Prisma__SyncAccountClient<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    contact<T extends ContactDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ContactDefaultArgs<ExtArgs>>): Prisma__ContactClient<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    syncConflicts<T extends SyncContactLink$syncConflictsArgs<ExtArgs> = {}>(args?: Subset<T, SyncContactLink$syncConflictsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncConflictPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SyncContactLink model
+   */
+  interface SyncContactLinkFieldRefs {
+    readonly id: FieldRef<"SyncContactLink", 'String'>
+    readonly syncAccountId: FieldRef<"SyncContactLink", 'String'>
+    readonly contactId: FieldRef<"SyncContactLink", 'String'>
+    readonly remoteHref: FieldRef<"SyncContactLink", 'String'>
+    readonly remoteUid: FieldRef<"SyncContactLink", 'String'>
+    readonly remoteETag: FieldRef<"SyncContactLink", 'String'>
+    readonly lastSyncedAt: FieldRef<"SyncContactLink", 'DateTime'>
+    readonly tombstonedAt: FieldRef<"SyncContactLink", 'DateTime'>
+    readonly remoteDeletedAt: FieldRef<"SyncContactLink", 'DateTime'>
+    readonly lastErrorCode: FieldRef<"SyncContactLink", 'String'>
+    readonly lastErrorMessage: FieldRef<"SyncContactLink", 'String'>
+    readonly createdAt: FieldRef<"SyncContactLink", 'DateTime'>
+    readonly updatedAt: FieldRef<"SyncContactLink", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SyncContactLink findUnique
+   */
+  export type SyncContactLinkFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncContactLink
+     */
+    select?: SyncContactLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncContactLink
+     */
+    omit?: SyncContactLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncContactLinkInclude<ExtArgs> | null
+    /**
+     * Filter, which SyncContactLink to fetch.
+     */
+    where: SyncContactLinkWhereUniqueInput
+  }
+
+  /**
+   * SyncContactLink findUniqueOrThrow
+   */
+  export type SyncContactLinkFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncContactLink
+     */
+    select?: SyncContactLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncContactLink
+     */
+    omit?: SyncContactLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncContactLinkInclude<ExtArgs> | null
+    /**
+     * Filter, which SyncContactLink to fetch.
+     */
+    where: SyncContactLinkWhereUniqueInput
+  }
+
+  /**
+   * SyncContactLink findFirst
+   */
+  export type SyncContactLinkFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncContactLink
+     */
+    select?: SyncContactLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncContactLink
+     */
+    omit?: SyncContactLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncContactLinkInclude<ExtArgs> | null
+    /**
+     * Filter, which SyncContactLink to fetch.
+     */
+    where?: SyncContactLinkWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SyncContactLinks to fetch.
+     */
+    orderBy?: SyncContactLinkOrderByWithRelationInput | SyncContactLinkOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SyncContactLinks.
+     */
+    cursor?: SyncContactLinkWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SyncContactLinks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SyncContactLinks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SyncContactLinks.
+     */
+    distinct?: SyncContactLinkScalarFieldEnum | SyncContactLinkScalarFieldEnum[]
+  }
+
+  /**
+   * SyncContactLink findFirstOrThrow
+   */
+  export type SyncContactLinkFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncContactLink
+     */
+    select?: SyncContactLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncContactLink
+     */
+    omit?: SyncContactLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncContactLinkInclude<ExtArgs> | null
+    /**
+     * Filter, which SyncContactLink to fetch.
+     */
+    where?: SyncContactLinkWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SyncContactLinks to fetch.
+     */
+    orderBy?: SyncContactLinkOrderByWithRelationInput | SyncContactLinkOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SyncContactLinks.
+     */
+    cursor?: SyncContactLinkWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SyncContactLinks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SyncContactLinks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SyncContactLinks.
+     */
+    distinct?: SyncContactLinkScalarFieldEnum | SyncContactLinkScalarFieldEnum[]
+  }
+
+  /**
+   * SyncContactLink findMany
+   */
+  export type SyncContactLinkFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncContactLink
+     */
+    select?: SyncContactLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncContactLink
+     */
+    omit?: SyncContactLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncContactLinkInclude<ExtArgs> | null
+    /**
+     * Filter, which SyncContactLinks to fetch.
+     */
+    where?: SyncContactLinkWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SyncContactLinks to fetch.
+     */
+    orderBy?: SyncContactLinkOrderByWithRelationInput | SyncContactLinkOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SyncContactLinks.
+     */
+    cursor?: SyncContactLinkWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SyncContactLinks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SyncContactLinks.
+     */
+    skip?: number
+    distinct?: SyncContactLinkScalarFieldEnum | SyncContactLinkScalarFieldEnum[]
+  }
+
+  /**
+   * SyncContactLink create
+   */
+  export type SyncContactLinkCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncContactLink
+     */
+    select?: SyncContactLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncContactLink
+     */
+    omit?: SyncContactLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncContactLinkInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SyncContactLink.
+     */
+    data: XOR<SyncContactLinkCreateInput, SyncContactLinkUncheckedCreateInput>
+  }
+
+  /**
+   * SyncContactLink createMany
+   */
+  export type SyncContactLinkCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SyncContactLinks.
+     */
+    data: SyncContactLinkCreateManyInput | SyncContactLinkCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SyncContactLink createManyAndReturn
+   */
+  export type SyncContactLinkCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncContactLink
+     */
+    select?: SyncContactLinkSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncContactLink
+     */
+    omit?: SyncContactLinkOmit<ExtArgs> | null
+    /**
+     * The data used to create many SyncContactLinks.
+     */
+    data: SyncContactLinkCreateManyInput | SyncContactLinkCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncContactLinkIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SyncContactLink update
+   */
+  export type SyncContactLinkUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncContactLink
+     */
+    select?: SyncContactLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncContactLink
+     */
+    omit?: SyncContactLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncContactLinkInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SyncContactLink.
+     */
+    data: XOR<SyncContactLinkUpdateInput, SyncContactLinkUncheckedUpdateInput>
+    /**
+     * Choose, which SyncContactLink to update.
+     */
+    where: SyncContactLinkWhereUniqueInput
+  }
+
+  /**
+   * SyncContactLink updateMany
+   */
+  export type SyncContactLinkUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SyncContactLinks.
+     */
+    data: XOR<SyncContactLinkUpdateManyMutationInput, SyncContactLinkUncheckedUpdateManyInput>
+    /**
+     * Filter which SyncContactLinks to update
+     */
+    where?: SyncContactLinkWhereInput
+    /**
+     * Limit how many SyncContactLinks to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SyncContactLink updateManyAndReturn
+   */
+  export type SyncContactLinkUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncContactLink
+     */
+    select?: SyncContactLinkSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncContactLink
+     */
+    omit?: SyncContactLinkOmit<ExtArgs> | null
+    /**
+     * The data used to update SyncContactLinks.
+     */
+    data: XOR<SyncContactLinkUpdateManyMutationInput, SyncContactLinkUncheckedUpdateManyInput>
+    /**
+     * Filter which SyncContactLinks to update
+     */
+    where?: SyncContactLinkWhereInput
+    /**
+     * Limit how many SyncContactLinks to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncContactLinkIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SyncContactLink upsert
+   */
+  export type SyncContactLinkUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncContactLink
+     */
+    select?: SyncContactLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncContactLink
+     */
+    omit?: SyncContactLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncContactLinkInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SyncContactLink to update in case it exists.
+     */
+    where: SyncContactLinkWhereUniqueInput
+    /**
+     * In case the SyncContactLink found by the `where` argument doesn't exist, create a new SyncContactLink with this data.
+     */
+    create: XOR<SyncContactLinkCreateInput, SyncContactLinkUncheckedCreateInput>
+    /**
+     * In case the SyncContactLink was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SyncContactLinkUpdateInput, SyncContactLinkUncheckedUpdateInput>
+  }
+
+  /**
+   * SyncContactLink delete
+   */
+  export type SyncContactLinkDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncContactLink
+     */
+    select?: SyncContactLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncContactLink
+     */
+    omit?: SyncContactLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncContactLinkInclude<ExtArgs> | null
+    /**
+     * Filter which SyncContactLink to delete.
+     */
+    where: SyncContactLinkWhereUniqueInput
+  }
+
+  /**
+   * SyncContactLink deleteMany
+   */
+  export type SyncContactLinkDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SyncContactLinks to delete
+     */
+    where?: SyncContactLinkWhereInput
+    /**
+     * Limit how many SyncContactLinks to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SyncContactLink.syncConflicts
+   */
+  export type SyncContactLink$syncConflictsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncConflict
+     */
+    select?: SyncConflictSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncConflict
+     */
+    omit?: SyncConflictOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncConflictInclude<ExtArgs> | null
+    where?: SyncConflictWhereInput
+    orderBy?: SyncConflictOrderByWithRelationInput | SyncConflictOrderByWithRelationInput[]
+    cursor?: SyncConflictWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SyncConflictScalarFieldEnum | SyncConflictScalarFieldEnum[]
+  }
+
+  /**
+   * SyncContactLink without action
+   */
+  export type SyncContactLinkDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncContactLink
+     */
+    select?: SyncContactLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncContactLink
+     */
+    omit?: SyncContactLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncContactLinkInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SyncJob
+   */
+
+  export type AggregateSyncJob = {
+    _count: SyncJobCountAggregateOutputType | null
+    _avg: SyncJobAvgAggregateOutputType | null
+    _sum: SyncJobSumAggregateOutputType | null
+    _min: SyncJobMinAggregateOutputType | null
+    _max: SyncJobMaxAggregateOutputType | null
+  }
+
+  export type SyncJobAvgAggregateOutputType = {
+    attemptCount: number | null
+    maxAttempts: number | null
+    createdCount: number | null
+    updatedCount: number | null
+    deletedCount: number | null
+    conflictCount: number | null
+    skippedCount: number | null
+  }
+
+  export type SyncJobSumAggregateOutputType = {
+    attemptCount: number | null
+    maxAttempts: number | null
+    createdCount: number | null
+    updatedCount: number | null
+    deletedCount: number | null
+    conflictCount: number | null
+    skippedCount: number | null
+  }
+
+  export type SyncJobMinAggregateOutputType = {
+    id: string | null
+    syncAccountId: string | null
+    status: $Enums.SyncJobStatus | null
+    trigger: $Enums.SyncJobTrigger | null
+    syncDirection: $Enums.SyncDirection | null
+    attemptCount: number | null
+    maxAttempts: number | null
+    nextRetryAt: Date | null
+    leaseExpiresAt: Date | null
+    workerId: string | null
+    idempotencyKey: string | null
+    cursorBefore: string | null
+    cursorAfter: string | null
+    createdCount: number | null
+    updatedCount: number | null
+    deletedCount: number | null
+    conflictCount: number | null
+    skippedCount: number | null
+    errorCode: string | null
+    errorSummary: string | null
+    startedAt: Date | null
+    completedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SyncJobMaxAggregateOutputType = {
+    id: string | null
+    syncAccountId: string | null
+    status: $Enums.SyncJobStatus | null
+    trigger: $Enums.SyncJobTrigger | null
+    syncDirection: $Enums.SyncDirection | null
+    attemptCount: number | null
+    maxAttempts: number | null
+    nextRetryAt: Date | null
+    leaseExpiresAt: Date | null
+    workerId: string | null
+    idempotencyKey: string | null
+    cursorBefore: string | null
+    cursorAfter: string | null
+    createdCount: number | null
+    updatedCount: number | null
+    deletedCount: number | null
+    conflictCount: number | null
+    skippedCount: number | null
+    errorCode: string | null
+    errorSummary: string | null
+    startedAt: Date | null
+    completedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SyncJobCountAggregateOutputType = {
+    id: number
+    syncAccountId: number
+    status: number
+    trigger: number
+    syncDirection: number
+    attemptCount: number
+    maxAttempts: number
+    nextRetryAt: number
+    leaseExpiresAt: number
+    workerId: number
+    idempotencyKey: number
+    cursorBefore: number
+    cursorAfter: number
+    createdCount: number
+    updatedCount: number
+    deletedCount: number
+    conflictCount: number
+    skippedCount: number
+    errorCode: number
+    errorSummary: number
+    startedAt: number
+    completedAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SyncJobAvgAggregateInputType = {
+    attemptCount?: true
+    maxAttempts?: true
+    createdCount?: true
+    updatedCount?: true
+    deletedCount?: true
+    conflictCount?: true
+    skippedCount?: true
+  }
+
+  export type SyncJobSumAggregateInputType = {
+    attemptCount?: true
+    maxAttempts?: true
+    createdCount?: true
+    updatedCount?: true
+    deletedCount?: true
+    conflictCount?: true
+    skippedCount?: true
+  }
+
+  export type SyncJobMinAggregateInputType = {
+    id?: true
+    syncAccountId?: true
+    status?: true
+    trigger?: true
+    syncDirection?: true
+    attemptCount?: true
+    maxAttempts?: true
+    nextRetryAt?: true
+    leaseExpiresAt?: true
+    workerId?: true
+    idempotencyKey?: true
+    cursorBefore?: true
+    cursorAfter?: true
+    createdCount?: true
+    updatedCount?: true
+    deletedCount?: true
+    conflictCount?: true
+    skippedCount?: true
+    errorCode?: true
+    errorSummary?: true
+    startedAt?: true
+    completedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SyncJobMaxAggregateInputType = {
+    id?: true
+    syncAccountId?: true
+    status?: true
+    trigger?: true
+    syncDirection?: true
+    attemptCount?: true
+    maxAttempts?: true
+    nextRetryAt?: true
+    leaseExpiresAt?: true
+    workerId?: true
+    idempotencyKey?: true
+    cursorBefore?: true
+    cursorAfter?: true
+    createdCount?: true
+    updatedCount?: true
+    deletedCount?: true
+    conflictCount?: true
+    skippedCount?: true
+    errorCode?: true
+    errorSummary?: true
+    startedAt?: true
+    completedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SyncJobCountAggregateInputType = {
+    id?: true
+    syncAccountId?: true
+    status?: true
+    trigger?: true
+    syncDirection?: true
+    attemptCount?: true
+    maxAttempts?: true
+    nextRetryAt?: true
+    leaseExpiresAt?: true
+    workerId?: true
+    idempotencyKey?: true
+    cursorBefore?: true
+    cursorAfter?: true
+    createdCount?: true
+    updatedCount?: true
+    deletedCount?: true
+    conflictCount?: true
+    skippedCount?: true
+    errorCode?: true
+    errorSummary?: true
+    startedAt?: true
+    completedAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SyncJobAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SyncJob to aggregate.
+     */
+    where?: SyncJobWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SyncJobs to fetch.
+     */
+    orderBy?: SyncJobOrderByWithRelationInput | SyncJobOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SyncJobWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SyncJobs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SyncJobs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SyncJobs
+    **/
+    _count?: true | SyncJobCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SyncJobAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SyncJobSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SyncJobMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SyncJobMaxAggregateInputType
+  }
+
+  export type GetSyncJobAggregateType<T extends SyncJobAggregateArgs> = {
+        [P in keyof T & keyof AggregateSyncJob]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSyncJob[P]>
+      : GetScalarType<T[P], AggregateSyncJob[P]>
+  }
+
+
+
+
+  export type SyncJobGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SyncJobWhereInput
+    orderBy?: SyncJobOrderByWithAggregationInput | SyncJobOrderByWithAggregationInput[]
+    by: SyncJobScalarFieldEnum[] | SyncJobScalarFieldEnum
+    having?: SyncJobScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SyncJobCountAggregateInputType | true
+    _avg?: SyncJobAvgAggregateInputType
+    _sum?: SyncJobSumAggregateInputType
+    _min?: SyncJobMinAggregateInputType
+    _max?: SyncJobMaxAggregateInputType
+  }
+
+  export type SyncJobGroupByOutputType = {
+    id: string
+    syncAccountId: string
+    status: $Enums.SyncJobStatus
+    trigger: $Enums.SyncJobTrigger
+    syncDirection: $Enums.SyncDirection
+    attemptCount: number
+    maxAttempts: number
+    nextRetryAt: Date | null
+    leaseExpiresAt: Date | null
+    workerId: string | null
+    idempotencyKey: string | null
+    cursorBefore: string | null
+    cursorAfter: string | null
+    createdCount: number
+    updatedCount: number
+    deletedCount: number
+    conflictCount: number
+    skippedCount: number
+    errorCode: string | null
+    errorSummary: string | null
+    startedAt: Date | null
+    completedAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: SyncJobCountAggregateOutputType | null
+    _avg: SyncJobAvgAggregateOutputType | null
+    _sum: SyncJobSumAggregateOutputType | null
+    _min: SyncJobMinAggregateOutputType | null
+    _max: SyncJobMaxAggregateOutputType | null
+  }
+
+  type GetSyncJobGroupByPayload<T extends SyncJobGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SyncJobGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SyncJobGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SyncJobGroupByOutputType[P]>
+            : GetScalarType<T[P], SyncJobGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SyncJobSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    syncAccountId?: boolean
+    status?: boolean
+    trigger?: boolean
+    syncDirection?: boolean
+    attemptCount?: boolean
+    maxAttempts?: boolean
+    nextRetryAt?: boolean
+    leaseExpiresAt?: boolean
+    workerId?: boolean
+    idempotencyKey?: boolean
+    cursorBefore?: boolean
+    cursorAfter?: boolean
+    createdCount?: boolean
+    updatedCount?: boolean
+    deletedCount?: boolean
+    conflictCount?: boolean
+    skippedCount?: boolean
+    errorCode?: boolean
+    errorSummary?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["syncJob"]>
+
+  export type SyncJobSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    syncAccountId?: boolean
+    status?: boolean
+    trigger?: boolean
+    syncDirection?: boolean
+    attemptCount?: boolean
+    maxAttempts?: boolean
+    nextRetryAt?: boolean
+    leaseExpiresAt?: boolean
+    workerId?: boolean
+    idempotencyKey?: boolean
+    cursorBefore?: boolean
+    cursorAfter?: boolean
+    createdCount?: boolean
+    updatedCount?: boolean
+    deletedCount?: boolean
+    conflictCount?: boolean
+    skippedCount?: boolean
+    errorCode?: boolean
+    errorSummary?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["syncJob"]>
+
+  export type SyncJobSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    syncAccountId?: boolean
+    status?: boolean
+    trigger?: boolean
+    syncDirection?: boolean
+    attemptCount?: boolean
+    maxAttempts?: boolean
+    nextRetryAt?: boolean
+    leaseExpiresAt?: boolean
+    workerId?: boolean
+    idempotencyKey?: boolean
+    cursorBefore?: boolean
+    cursorAfter?: boolean
+    createdCount?: boolean
+    updatedCount?: boolean
+    deletedCount?: boolean
+    conflictCount?: boolean
+    skippedCount?: boolean
+    errorCode?: boolean
+    errorSummary?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["syncJob"]>
+
+  export type SyncJobSelectScalar = {
+    id?: boolean
+    syncAccountId?: boolean
+    status?: boolean
+    trigger?: boolean
+    syncDirection?: boolean
+    attemptCount?: boolean
+    maxAttempts?: boolean
+    nextRetryAt?: boolean
+    leaseExpiresAt?: boolean
+    workerId?: boolean
+    idempotencyKey?: boolean
+    cursorBefore?: boolean
+    cursorAfter?: boolean
+    createdCount?: boolean
+    updatedCount?: boolean
+    deletedCount?: boolean
+    conflictCount?: boolean
+    skippedCount?: boolean
+    errorCode?: boolean
+    errorSummary?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type SyncJobOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "syncAccountId" | "status" | "trigger" | "syncDirection" | "attemptCount" | "maxAttempts" | "nextRetryAt" | "leaseExpiresAt" | "workerId" | "idempotencyKey" | "cursorBefore" | "cursorAfter" | "createdCount" | "updatedCount" | "deletedCount" | "conflictCount" | "skippedCount" | "errorCode" | "errorSummary" | "startedAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["syncJob"]>
+  export type SyncJobInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+  }
+  export type SyncJobIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+  }
+  export type SyncJobIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+  }
+
+  export type $SyncJobPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SyncJob"
+    objects: {
+      syncAccount: Prisma.$SyncAccountPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      syncAccountId: string
+      status: $Enums.SyncJobStatus
+      trigger: $Enums.SyncJobTrigger
+      syncDirection: $Enums.SyncDirection
+      attemptCount: number
+      maxAttempts: number
+      nextRetryAt: Date | null
+      leaseExpiresAt: Date | null
+      workerId: string | null
+      idempotencyKey: string | null
+      cursorBefore: string | null
+      cursorAfter: string | null
+      createdCount: number
+      updatedCount: number
+      deletedCount: number
+      conflictCount: number
+      skippedCount: number
+      errorCode: string | null
+      errorSummary: string | null
+      startedAt: Date | null
+      completedAt: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["syncJob"]>
+    composites: {}
+  }
+
+  type SyncJobGetPayload<S extends boolean | null | undefined | SyncJobDefaultArgs> = $Result.GetResult<Prisma.$SyncJobPayload, S>
+
+  type SyncJobCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SyncJobFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SyncJobCountAggregateInputType | true
+    }
+
+  export interface SyncJobDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SyncJob'], meta: { name: 'SyncJob' } }
+    /**
+     * Find zero or one SyncJob that matches the filter.
+     * @param {SyncJobFindUniqueArgs} args - Arguments to find a SyncJob
+     * @example
+     * // Get one SyncJob
+     * const syncJob = await prisma.syncJob.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SyncJobFindUniqueArgs>(args: SelectSubset<T, SyncJobFindUniqueArgs<ExtArgs>>): Prisma__SyncJobClient<$Result.GetResult<Prisma.$SyncJobPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SyncJob that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SyncJobFindUniqueOrThrowArgs} args - Arguments to find a SyncJob
+     * @example
+     * // Get one SyncJob
+     * const syncJob = await prisma.syncJob.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SyncJobFindUniqueOrThrowArgs>(args: SelectSubset<T, SyncJobFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SyncJobClient<$Result.GetResult<Prisma.$SyncJobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SyncJob that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncJobFindFirstArgs} args - Arguments to find a SyncJob
+     * @example
+     * // Get one SyncJob
+     * const syncJob = await prisma.syncJob.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SyncJobFindFirstArgs>(args?: SelectSubset<T, SyncJobFindFirstArgs<ExtArgs>>): Prisma__SyncJobClient<$Result.GetResult<Prisma.$SyncJobPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SyncJob that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncJobFindFirstOrThrowArgs} args - Arguments to find a SyncJob
+     * @example
+     * // Get one SyncJob
+     * const syncJob = await prisma.syncJob.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SyncJobFindFirstOrThrowArgs>(args?: SelectSubset<T, SyncJobFindFirstOrThrowArgs<ExtArgs>>): Prisma__SyncJobClient<$Result.GetResult<Prisma.$SyncJobPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SyncJobs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncJobFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SyncJobs
+     * const syncJobs = await prisma.syncJob.findMany()
+     * 
+     * // Get first 10 SyncJobs
+     * const syncJobs = await prisma.syncJob.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const syncJobWithIdOnly = await prisma.syncJob.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SyncJobFindManyArgs>(args?: SelectSubset<T, SyncJobFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SyncJob.
+     * @param {SyncJobCreateArgs} args - Arguments to create a SyncJob.
+     * @example
+     * // Create one SyncJob
+     * const SyncJob = await prisma.syncJob.create({
+     *   data: {
+     *     // ... data to create a SyncJob
+     *   }
+     * })
+     * 
+     */
+    create<T extends SyncJobCreateArgs>(args: SelectSubset<T, SyncJobCreateArgs<ExtArgs>>): Prisma__SyncJobClient<$Result.GetResult<Prisma.$SyncJobPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SyncJobs.
+     * @param {SyncJobCreateManyArgs} args - Arguments to create many SyncJobs.
+     * @example
+     * // Create many SyncJobs
+     * const syncJob = await prisma.syncJob.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SyncJobCreateManyArgs>(args?: SelectSubset<T, SyncJobCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SyncJobs and returns the data saved in the database.
+     * @param {SyncJobCreateManyAndReturnArgs} args - Arguments to create many SyncJobs.
+     * @example
+     * // Create many SyncJobs
+     * const syncJob = await prisma.syncJob.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SyncJobs and only return the `id`
+     * const syncJobWithIdOnly = await prisma.syncJob.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SyncJobCreateManyAndReturnArgs>(args?: SelectSubset<T, SyncJobCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncJobPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SyncJob.
+     * @param {SyncJobDeleteArgs} args - Arguments to delete one SyncJob.
+     * @example
+     * // Delete one SyncJob
+     * const SyncJob = await prisma.syncJob.delete({
+     *   where: {
+     *     // ... filter to delete one SyncJob
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SyncJobDeleteArgs>(args: SelectSubset<T, SyncJobDeleteArgs<ExtArgs>>): Prisma__SyncJobClient<$Result.GetResult<Prisma.$SyncJobPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SyncJob.
+     * @param {SyncJobUpdateArgs} args - Arguments to update one SyncJob.
+     * @example
+     * // Update one SyncJob
+     * const syncJob = await prisma.syncJob.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SyncJobUpdateArgs>(args: SelectSubset<T, SyncJobUpdateArgs<ExtArgs>>): Prisma__SyncJobClient<$Result.GetResult<Prisma.$SyncJobPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SyncJobs.
+     * @param {SyncJobDeleteManyArgs} args - Arguments to filter SyncJobs to delete.
+     * @example
+     * // Delete a few SyncJobs
+     * const { count } = await prisma.syncJob.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SyncJobDeleteManyArgs>(args?: SelectSubset<T, SyncJobDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SyncJobs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncJobUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SyncJobs
+     * const syncJob = await prisma.syncJob.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SyncJobUpdateManyArgs>(args: SelectSubset<T, SyncJobUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SyncJobs and returns the data updated in the database.
+     * @param {SyncJobUpdateManyAndReturnArgs} args - Arguments to update many SyncJobs.
+     * @example
+     * // Update many SyncJobs
+     * const syncJob = await prisma.syncJob.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SyncJobs and only return the `id`
+     * const syncJobWithIdOnly = await prisma.syncJob.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SyncJobUpdateManyAndReturnArgs>(args: SelectSubset<T, SyncJobUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncJobPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SyncJob.
+     * @param {SyncJobUpsertArgs} args - Arguments to update or create a SyncJob.
+     * @example
+     * // Update or create a SyncJob
+     * const syncJob = await prisma.syncJob.upsert({
+     *   create: {
+     *     // ... data to create a SyncJob
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SyncJob we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SyncJobUpsertArgs>(args: SelectSubset<T, SyncJobUpsertArgs<ExtArgs>>): Prisma__SyncJobClient<$Result.GetResult<Prisma.$SyncJobPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SyncJobs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncJobCountArgs} args - Arguments to filter SyncJobs to count.
+     * @example
+     * // Count the number of SyncJobs
+     * const count = await prisma.syncJob.count({
+     *   where: {
+     *     // ... the filter for the SyncJobs we want to count
+     *   }
+     * })
+    **/
+    count<T extends SyncJobCountArgs>(
+      args?: Subset<T, SyncJobCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SyncJobCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SyncJob.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncJobAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SyncJobAggregateArgs>(args: Subset<T, SyncJobAggregateArgs>): Prisma.PrismaPromise<GetSyncJobAggregateType<T>>
+
+    /**
+     * Group by SyncJob.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncJobGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SyncJobGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SyncJobGroupByArgs['orderBy'] }
+        : { orderBy?: SyncJobGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SyncJobGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSyncJobGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SyncJob model
+   */
+  readonly fields: SyncJobFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SyncJob.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SyncJobClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    syncAccount<T extends SyncAccountDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccountDefaultArgs<ExtArgs>>): Prisma__SyncAccountClient<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SyncJob model
+   */
+  interface SyncJobFieldRefs {
+    readonly id: FieldRef<"SyncJob", 'String'>
+    readonly syncAccountId: FieldRef<"SyncJob", 'String'>
+    readonly status: FieldRef<"SyncJob", 'SyncJobStatus'>
+    readonly trigger: FieldRef<"SyncJob", 'SyncJobTrigger'>
+    readonly syncDirection: FieldRef<"SyncJob", 'SyncDirection'>
+    readonly attemptCount: FieldRef<"SyncJob", 'Int'>
+    readonly maxAttempts: FieldRef<"SyncJob", 'Int'>
+    readonly nextRetryAt: FieldRef<"SyncJob", 'DateTime'>
+    readonly leaseExpiresAt: FieldRef<"SyncJob", 'DateTime'>
+    readonly workerId: FieldRef<"SyncJob", 'String'>
+    readonly idempotencyKey: FieldRef<"SyncJob", 'String'>
+    readonly cursorBefore: FieldRef<"SyncJob", 'String'>
+    readonly cursorAfter: FieldRef<"SyncJob", 'String'>
+    readonly createdCount: FieldRef<"SyncJob", 'Int'>
+    readonly updatedCount: FieldRef<"SyncJob", 'Int'>
+    readonly deletedCount: FieldRef<"SyncJob", 'Int'>
+    readonly conflictCount: FieldRef<"SyncJob", 'Int'>
+    readonly skippedCount: FieldRef<"SyncJob", 'Int'>
+    readonly errorCode: FieldRef<"SyncJob", 'String'>
+    readonly errorSummary: FieldRef<"SyncJob", 'String'>
+    readonly startedAt: FieldRef<"SyncJob", 'DateTime'>
+    readonly completedAt: FieldRef<"SyncJob", 'DateTime'>
+    readonly createdAt: FieldRef<"SyncJob", 'DateTime'>
+    readonly updatedAt: FieldRef<"SyncJob", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SyncJob findUnique
+   */
+  export type SyncJobFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncJob
+     */
+    select?: SyncJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncJob
+     */
+    omit?: SyncJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncJobInclude<ExtArgs> | null
+    /**
+     * Filter, which SyncJob to fetch.
+     */
+    where: SyncJobWhereUniqueInput
+  }
+
+  /**
+   * SyncJob findUniqueOrThrow
+   */
+  export type SyncJobFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncJob
+     */
+    select?: SyncJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncJob
+     */
+    omit?: SyncJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncJobInclude<ExtArgs> | null
+    /**
+     * Filter, which SyncJob to fetch.
+     */
+    where: SyncJobWhereUniqueInput
+  }
+
+  /**
+   * SyncJob findFirst
+   */
+  export type SyncJobFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncJob
+     */
+    select?: SyncJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncJob
+     */
+    omit?: SyncJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncJobInclude<ExtArgs> | null
+    /**
+     * Filter, which SyncJob to fetch.
+     */
+    where?: SyncJobWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SyncJobs to fetch.
+     */
+    orderBy?: SyncJobOrderByWithRelationInput | SyncJobOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SyncJobs.
+     */
+    cursor?: SyncJobWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SyncJobs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SyncJobs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SyncJobs.
+     */
+    distinct?: SyncJobScalarFieldEnum | SyncJobScalarFieldEnum[]
+  }
+
+  /**
+   * SyncJob findFirstOrThrow
+   */
+  export type SyncJobFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncJob
+     */
+    select?: SyncJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncJob
+     */
+    omit?: SyncJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncJobInclude<ExtArgs> | null
+    /**
+     * Filter, which SyncJob to fetch.
+     */
+    where?: SyncJobWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SyncJobs to fetch.
+     */
+    orderBy?: SyncJobOrderByWithRelationInput | SyncJobOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SyncJobs.
+     */
+    cursor?: SyncJobWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SyncJobs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SyncJobs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SyncJobs.
+     */
+    distinct?: SyncJobScalarFieldEnum | SyncJobScalarFieldEnum[]
+  }
+
+  /**
+   * SyncJob findMany
+   */
+  export type SyncJobFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncJob
+     */
+    select?: SyncJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncJob
+     */
+    omit?: SyncJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncJobInclude<ExtArgs> | null
+    /**
+     * Filter, which SyncJobs to fetch.
+     */
+    where?: SyncJobWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SyncJobs to fetch.
+     */
+    orderBy?: SyncJobOrderByWithRelationInput | SyncJobOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SyncJobs.
+     */
+    cursor?: SyncJobWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SyncJobs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SyncJobs.
+     */
+    skip?: number
+    distinct?: SyncJobScalarFieldEnum | SyncJobScalarFieldEnum[]
+  }
+
+  /**
+   * SyncJob create
+   */
+  export type SyncJobCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncJob
+     */
+    select?: SyncJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncJob
+     */
+    omit?: SyncJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncJobInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SyncJob.
+     */
+    data: XOR<SyncJobCreateInput, SyncJobUncheckedCreateInput>
+  }
+
+  /**
+   * SyncJob createMany
+   */
+  export type SyncJobCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SyncJobs.
+     */
+    data: SyncJobCreateManyInput | SyncJobCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SyncJob createManyAndReturn
+   */
+  export type SyncJobCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncJob
+     */
+    select?: SyncJobSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncJob
+     */
+    omit?: SyncJobOmit<ExtArgs> | null
+    /**
+     * The data used to create many SyncJobs.
+     */
+    data: SyncJobCreateManyInput | SyncJobCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncJobIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SyncJob update
+   */
+  export type SyncJobUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncJob
+     */
+    select?: SyncJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncJob
+     */
+    omit?: SyncJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncJobInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SyncJob.
+     */
+    data: XOR<SyncJobUpdateInput, SyncJobUncheckedUpdateInput>
+    /**
+     * Choose, which SyncJob to update.
+     */
+    where: SyncJobWhereUniqueInput
+  }
+
+  /**
+   * SyncJob updateMany
+   */
+  export type SyncJobUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SyncJobs.
+     */
+    data: XOR<SyncJobUpdateManyMutationInput, SyncJobUncheckedUpdateManyInput>
+    /**
+     * Filter which SyncJobs to update
+     */
+    where?: SyncJobWhereInput
+    /**
+     * Limit how many SyncJobs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SyncJob updateManyAndReturn
+   */
+  export type SyncJobUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncJob
+     */
+    select?: SyncJobSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncJob
+     */
+    omit?: SyncJobOmit<ExtArgs> | null
+    /**
+     * The data used to update SyncJobs.
+     */
+    data: XOR<SyncJobUpdateManyMutationInput, SyncJobUncheckedUpdateManyInput>
+    /**
+     * Filter which SyncJobs to update
+     */
+    where?: SyncJobWhereInput
+    /**
+     * Limit how many SyncJobs to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncJobIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SyncJob upsert
+   */
+  export type SyncJobUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncJob
+     */
+    select?: SyncJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncJob
+     */
+    omit?: SyncJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncJobInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SyncJob to update in case it exists.
+     */
+    where: SyncJobWhereUniqueInput
+    /**
+     * In case the SyncJob found by the `where` argument doesn't exist, create a new SyncJob with this data.
+     */
+    create: XOR<SyncJobCreateInput, SyncJobUncheckedCreateInput>
+    /**
+     * In case the SyncJob was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SyncJobUpdateInput, SyncJobUncheckedUpdateInput>
+  }
+
+  /**
+   * SyncJob delete
+   */
+  export type SyncJobDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncJob
+     */
+    select?: SyncJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncJob
+     */
+    omit?: SyncJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncJobInclude<ExtArgs> | null
+    /**
+     * Filter which SyncJob to delete.
+     */
+    where: SyncJobWhereUniqueInput
+  }
+
+  /**
+   * SyncJob deleteMany
+   */
+  export type SyncJobDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SyncJobs to delete
+     */
+    where?: SyncJobWhereInput
+    /**
+     * Limit how many SyncJobs to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SyncJob without action
+   */
+  export type SyncJobDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncJob
+     */
+    select?: SyncJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncJob
+     */
+    omit?: SyncJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncJobInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SyncConflict
+   */
+
+  export type AggregateSyncConflict = {
+    _count: SyncConflictCountAggregateOutputType | null
+    _avg: SyncConflictAvgAggregateOutputType | null
+    _sum: SyncConflictSumAggregateOutputType | null
+    _min: SyncConflictMinAggregateOutputType | null
+    _max: SyncConflictMaxAggregateOutputType | null
+  }
+
+  export type SyncConflictAvgAggregateOutputType = {
+    localSyncVersion: number | null
+  }
+
+  export type SyncConflictSumAggregateOutputType = {
+    localSyncVersion: number | null
+  }
+
+  export type SyncConflictMinAggregateOutputType = {
+    id: string | null
+    syncAccountId: string | null
+    syncContactLinkId: string | null
+    contactId: string | null
+    conflictType: $Enums.SyncConflictType | null
+    status: $Enums.SyncConflictStatus | null
+    resolutionStrategy: $Enums.SyncResolutionStrategy | null
+    localSyncVersion: number | null
+    remoteETag: string | null
+    resolutionNotes: string | null
+    detectedAt: Date | null
+    resolvedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SyncConflictMaxAggregateOutputType = {
+    id: string | null
+    syncAccountId: string | null
+    syncContactLinkId: string | null
+    contactId: string | null
+    conflictType: $Enums.SyncConflictType | null
+    status: $Enums.SyncConflictStatus | null
+    resolutionStrategy: $Enums.SyncResolutionStrategy | null
+    localSyncVersion: number | null
+    remoteETag: string | null
+    resolutionNotes: string | null
+    detectedAt: Date | null
+    resolvedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SyncConflictCountAggregateOutputType = {
+    id: number
+    syncAccountId: number
+    syncContactLinkId: number
+    contactId: number
+    conflictType: number
+    status: number
+    resolutionStrategy: number
+    localSyncVersion: number
+    remoteETag: number
+    localSnapshot: number
+    remoteSnapshot: number
+    resolutionNotes: number
+    detectedAt: number
+    resolvedAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SyncConflictAvgAggregateInputType = {
+    localSyncVersion?: true
+  }
+
+  export type SyncConflictSumAggregateInputType = {
+    localSyncVersion?: true
+  }
+
+  export type SyncConflictMinAggregateInputType = {
+    id?: true
+    syncAccountId?: true
+    syncContactLinkId?: true
+    contactId?: true
+    conflictType?: true
+    status?: true
+    resolutionStrategy?: true
+    localSyncVersion?: true
+    remoteETag?: true
+    resolutionNotes?: true
+    detectedAt?: true
+    resolvedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SyncConflictMaxAggregateInputType = {
+    id?: true
+    syncAccountId?: true
+    syncContactLinkId?: true
+    contactId?: true
+    conflictType?: true
+    status?: true
+    resolutionStrategy?: true
+    localSyncVersion?: true
+    remoteETag?: true
+    resolutionNotes?: true
+    detectedAt?: true
+    resolvedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SyncConflictCountAggregateInputType = {
+    id?: true
+    syncAccountId?: true
+    syncContactLinkId?: true
+    contactId?: true
+    conflictType?: true
+    status?: true
+    resolutionStrategy?: true
+    localSyncVersion?: true
+    remoteETag?: true
+    localSnapshot?: true
+    remoteSnapshot?: true
+    resolutionNotes?: true
+    detectedAt?: true
+    resolvedAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SyncConflictAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SyncConflict to aggregate.
+     */
+    where?: SyncConflictWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SyncConflicts to fetch.
+     */
+    orderBy?: SyncConflictOrderByWithRelationInput | SyncConflictOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SyncConflictWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SyncConflicts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SyncConflicts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SyncConflicts
+    **/
+    _count?: true | SyncConflictCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SyncConflictAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SyncConflictSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SyncConflictMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SyncConflictMaxAggregateInputType
+  }
+
+  export type GetSyncConflictAggregateType<T extends SyncConflictAggregateArgs> = {
+        [P in keyof T & keyof AggregateSyncConflict]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSyncConflict[P]>
+      : GetScalarType<T[P], AggregateSyncConflict[P]>
+  }
+
+
+
+
+  export type SyncConflictGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SyncConflictWhereInput
+    orderBy?: SyncConflictOrderByWithAggregationInput | SyncConflictOrderByWithAggregationInput[]
+    by: SyncConflictScalarFieldEnum[] | SyncConflictScalarFieldEnum
+    having?: SyncConflictScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SyncConflictCountAggregateInputType | true
+    _avg?: SyncConflictAvgAggregateInputType
+    _sum?: SyncConflictSumAggregateInputType
+    _min?: SyncConflictMinAggregateInputType
+    _max?: SyncConflictMaxAggregateInputType
+  }
+
+  export type SyncConflictGroupByOutputType = {
+    id: string
+    syncAccountId: string
+    syncContactLinkId: string | null
+    contactId: string | null
+    conflictType: $Enums.SyncConflictType
+    status: $Enums.SyncConflictStatus
+    resolutionStrategy: $Enums.SyncResolutionStrategy | null
+    localSyncVersion: number | null
+    remoteETag: string | null
+    localSnapshot: JsonValue | null
+    remoteSnapshot: JsonValue | null
+    resolutionNotes: string | null
+    detectedAt: Date
+    resolvedAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: SyncConflictCountAggregateOutputType | null
+    _avg: SyncConflictAvgAggregateOutputType | null
+    _sum: SyncConflictSumAggregateOutputType | null
+    _min: SyncConflictMinAggregateOutputType | null
+    _max: SyncConflictMaxAggregateOutputType | null
+  }
+
+  type GetSyncConflictGroupByPayload<T extends SyncConflictGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SyncConflictGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SyncConflictGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SyncConflictGroupByOutputType[P]>
+            : GetScalarType<T[P], SyncConflictGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SyncConflictSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    syncAccountId?: boolean
+    syncContactLinkId?: boolean
+    contactId?: boolean
+    conflictType?: boolean
+    status?: boolean
+    resolutionStrategy?: boolean
+    localSyncVersion?: boolean
+    remoteETag?: boolean
+    localSnapshot?: boolean
+    remoteSnapshot?: boolean
+    resolutionNotes?: boolean
+    detectedAt?: boolean
+    resolvedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    syncContactLink?: boolean | SyncConflict$syncContactLinkArgs<ExtArgs>
+    contact?: boolean | SyncConflict$contactArgs<ExtArgs>
+  }, ExtArgs["result"]["syncConflict"]>
+
+  export type SyncConflictSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    syncAccountId?: boolean
+    syncContactLinkId?: boolean
+    contactId?: boolean
+    conflictType?: boolean
+    status?: boolean
+    resolutionStrategy?: boolean
+    localSyncVersion?: boolean
+    remoteETag?: boolean
+    localSnapshot?: boolean
+    remoteSnapshot?: boolean
+    resolutionNotes?: boolean
+    detectedAt?: boolean
+    resolvedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    syncContactLink?: boolean | SyncConflict$syncContactLinkArgs<ExtArgs>
+    contact?: boolean | SyncConflict$contactArgs<ExtArgs>
+  }, ExtArgs["result"]["syncConflict"]>
+
+  export type SyncConflictSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    syncAccountId?: boolean
+    syncContactLinkId?: boolean
+    contactId?: boolean
+    conflictType?: boolean
+    status?: boolean
+    resolutionStrategy?: boolean
+    localSyncVersion?: boolean
+    remoteETag?: boolean
+    localSnapshot?: boolean
+    remoteSnapshot?: boolean
+    resolutionNotes?: boolean
+    detectedAt?: boolean
+    resolvedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    syncContactLink?: boolean | SyncConflict$syncContactLinkArgs<ExtArgs>
+    contact?: boolean | SyncConflict$contactArgs<ExtArgs>
+  }, ExtArgs["result"]["syncConflict"]>
+
+  export type SyncConflictSelectScalar = {
+    id?: boolean
+    syncAccountId?: boolean
+    syncContactLinkId?: boolean
+    contactId?: boolean
+    conflictType?: boolean
+    status?: boolean
+    resolutionStrategy?: boolean
+    localSyncVersion?: boolean
+    remoteETag?: boolean
+    localSnapshot?: boolean
+    remoteSnapshot?: boolean
+    resolutionNotes?: boolean
+    detectedAt?: boolean
+    resolvedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type SyncConflictOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "syncAccountId" | "syncContactLinkId" | "contactId" | "conflictType" | "status" | "resolutionStrategy" | "localSyncVersion" | "remoteETag" | "localSnapshot" | "remoteSnapshot" | "resolutionNotes" | "detectedAt" | "resolvedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["syncConflict"]>
+  export type SyncConflictInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    syncContactLink?: boolean | SyncConflict$syncContactLinkArgs<ExtArgs>
+    contact?: boolean | SyncConflict$contactArgs<ExtArgs>
+  }
+  export type SyncConflictIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    syncContactLink?: boolean | SyncConflict$syncContactLinkArgs<ExtArgs>
+    contact?: boolean | SyncConflict$contactArgs<ExtArgs>
+  }
+  export type SyncConflictIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    syncContactLink?: boolean | SyncConflict$syncContactLinkArgs<ExtArgs>
+    contact?: boolean | SyncConflict$contactArgs<ExtArgs>
+  }
+
+  export type $SyncConflictPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SyncConflict"
+    objects: {
+      syncAccount: Prisma.$SyncAccountPayload<ExtArgs>
+      syncContactLink: Prisma.$SyncContactLinkPayload<ExtArgs> | null
+      contact: Prisma.$ContactPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      syncAccountId: string
+      syncContactLinkId: string | null
+      contactId: string | null
+      conflictType: $Enums.SyncConflictType
+      status: $Enums.SyncConflictStatus
+      resolutionStrategy: $Enums.SyncResolutionStrategy | null
+      localSyncVersion: number | null
+      remoteETag: string | null
+      localSnapshot: Prisma.JsonValue | null
+      remoteSnapshot: Prisma.JsonValue | null
+      resolutionNotes: string | null
+      detectedAt: Date
+      resolvedAt: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["syncConflict"]>
+    composites: {}
+  }
+
+  type SyncConflictGetPayload<S extends boolean | null | undefined | SyncConflictDefaultArgs> = $Result.GetResult<Prisma.$SyncConflictPayload, S>
+
+  type SyncConflictCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SyncConflictFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SyncConflictCountAggregateInputType | true
+    }
+
+  export interface SyncConflictDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SyncConflict'], meta: { name: 'SyncConflict' } }
+    /**
+     * Find zero or one SyncConflict that matches the filter.
+     * @param {SyncConflictFindUniqueArgs} args - Arguments to find a SyncConflict
+     * @example
+     * // Get one SyncConflict
+     * const syncConflict = await prisma.syncConflict.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SyncConflictFindUniqueArgs>(args: SelectSubset<T, SyncConflictFindUniqueArgs<ExtArgs>>): Prisma__SyncConflictClient<$Result.GetResult<Prisma.$SyncConflictPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SyncConflict that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SyncConflictFindUniqueOrThrowArgs} args - Arguments to find a SyncConflict
+     * @example
+     * // Get one SyncConflict
+     * const syncConflict = await prisma.syncConflict.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SyncConflictFindUniqueOrThrowArgs>(args: SelectSubset<T, SyncConflictFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SyncConflictClient<$Result.GetResult<Prisma.$SyncConflictPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SyncConflict that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncConflictFindFirstArgs} args - Arguments to find a SyncConflict
+     * @example
+     * // Get one SyncConflict
+     * const syncConflict = await prisma.syncConflict.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SyncConflictFindFirstArgs>(args?: SelectSubset<T, SyncConflictFindFirstArgs<ExtArgs>>): Prisma__SyncConflictClient<$Result.GetResult<Prisma.$SyncConflictPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SyncConflict that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncConflictFindFirstOrThrowArgs} args - Arguments to find a SyncConflict
+     * @example
+     * // Get one SyncConflict
+     * const syncConflict = await prisma.syncConflict.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SyncConflictFindFirstOrThrowArgs>(args?: SelectSubset<T, SyncConflictFindFirstOrThrowArgs<ExtArgs>>): Prisma__SyncConflictClient<$Result.GetResult<Prisma.$SyncConflictPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SyncConflicts that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncConflictFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SyncConflicts
+     * const syncConflicts = await prisma.syncConflict.findMany()
+     * 
+     * // Get first 10 SyncConflicts
+     * const syncConflicts = await prisma.syncConflict.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const syncConflictWithIdOnly = await prisma.syncConflict.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SyncConflictFindManyArgs>(args?: SelectSubset<T, SyncConflictFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncConflictPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SyncConflict.
+     * @param {SyncConflictCreateArgs} args - Arguments to create a SyncConflict.
+     * @example
+     * // Create one SyncConflict
+     * const SyncConflict = await prisma.syncConflict.create({
+     *   data: {
+     *     // ... data to create a SyncConflict
+     *   }
+     * })
+     * 
+     */
+    create<T extends SyncConflictCreateArgs>(args: SelectSubset<T, SyncConflictCreateArgs<ExtArgs>>): Prisma__SyncConflictClient<$Result.GetResult<Prisma.$SyncConflictPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SyncConflicts.
+     * @param {SyncConflictCreateManyArgs} args - Arguments to create many SyncConflicts.
+     * @example
+     * // Create many SyncConflicts
+     * const syncConflict = await prisma.syncConflict.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SyncConflictCreateManyArgs>(args?: SelectSubset<T, SyncConflictCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SyncConflicts and returns the data saved in the database.
+     * @param {SyncConflictCreateManyAndReturnArgs} args - Arguments to create many SyncConflicts.
+     * @example
+     * // Create many SyncConflicts
+     * const syncConflict = await prisma.syncConflict.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SyncConflicts and only return the `id`
+     * const syncConflictWithIdOnly = await prisma.syncConflict.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SyncConflictCreateManyAndReturnArgs>(args?: SelectSubset<T, SyncConflictCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncConflictPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SyncConflict.
+     * @param {SyncConflictDeleteArgs} args - Arguments to delete one SyncConflict.
+     * @example
+     * // Delete one SyncConflict
+     * const SyncConflict = await prisma.syncConflict.delete({
+     *   where: {
+     *     // ... filter to delete one SyncConflict
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SyncConflictDeleteArgs>(args: SelectSubset<T, SyncConflictDeleteArgs<ExtArgs>>): Prisma__SyncConflictClient<$Result.GetResult<Prisma.$SyncConflictPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SyncConflict.
+     * @param {SyncConflictUpdateArgs} args - Arguments to update one SyncConflict.
+     * @example
+     * // Update one SyncConflict
+     * const syncConflict = await prisma.syncConflict.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SyncConflictUpdateArgs>(args: SelectSubset<T, SyncConflictUpdateArgs<ExtArgs>>): Prisma__SyncConflictClient<$Result.GetResult<Prisma.$SyncConflictPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SyncConflicts.
+     * @param {SyncConflictDeleteManyArgs} args - Arguments to filter SyncConflicts to delete.
+     * @example
+     * // Delete a few SyncConflicts
+     * const { count } = await prisma.syncConflict.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SyncConflictDeleteManyArgs>(args?: SelectSubset<T, SyncConflictDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SyncConflicts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncConflictUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SyncConflicts
+     * const syncConflict = await prisma.syncConflict.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SyncConflictUpdateManyArgs>(args: SelectSubset<T, SyncConflictUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SyncConflicts and returns the data updated in the database.
+     * @param {SyncConflictUpdateManyAndReturnArgs} args - Arguments to update many SyncConflicts.
+     * @example
+     * // Update many SyncConflicts
+     * const syncConflict = await prisma.syncConflict.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SyncConflicts and only return the `id`
+     * const syncConflictWithIdOnly = await prisma.syncConflict.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SyncConflictUpdateManyAndReturnArgs>(args: SelectSubset<T, SyncConflictUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncConflictPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SyncConflict.
+     * @param {SyncConflictUpsertArgs} args - Arguments to update or create a SyncConflict.
+     * @example
+     * // Update or create a SyncConflict
+     * const syncConflict = await prisma.syncConflict.upsert({
+     *   create: {
+     *     // ... data to create a SyncConflict
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SyncConflict we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SyncConflictUpsertArgs>(args: SelectSubset<T, SyncConflictUpsertArgs<ExtArgs>>): Prisma__SyncConflictClient<$Result.GetResult<Prisma.$SyncConflictPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SyncConflicts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncConflictCountArgs} args - Arguments to filter SyncConflicts to count.
+     * @example
+     * // Count the number of SyncConflicts
+     * const count = await prisma.syncConflict.count({
+     *   where: {
+     *     // ... the filter for the SyncConflicts we want to count
+     *   }
+     * })
+    **/
+    count<T extends SyncConflictCountArgs>(
+      args?: Subset<T, SyncConflictCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SyncConflictCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SyncConflict.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncConflictAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SyncConflictAggregateArgs>(args: Subset<T, SyncConflictAggregateArgs>): Prisma.PrismaPromise<GetSyncConflictAggregateType<T>>
+
+    /**
+     * Group by SyncConflict.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncConflictGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SyncConflictGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SyncConflictGroupByArgs['orderBy'] }
+        : { orderBy?: SyncConflictGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SyncConflictGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSyncConflictGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SyncConflict model
+   */
+  readonly fields: SyncConflictFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SyncConflict.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SyncConflictClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    syncAccount<T extends SyncAccountDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccountDefaultArgs<ExtArgs>>): Prisma__SyncAccountClient<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    syncContactLink<T extends SyncConflict$syncContactLinkArgs<ExtArgs> = {}>(args?: Subset<T, SyncConflict$syncContactLinkArgs<ExtArgs>>): Prisma__SyncContactLinkClient<$Result.GetResult<Prisma.$SyncContactLinkPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    contact<T extends SyncConflict$contactArgs<ExtArgs> = {}>(args?: Subset<T, SyncConflict$contactArgs<ExtArgs>>): Prisma__ContactClient<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SyncConflict model
+   */
+  interface SyncConflictFieldRefs {
+    readonly id: FieldRef<"SyncConflict", 'String'>
+    readonly syncAccountId: FieldRef<"SyncConflict", 'String'>
+    readonly syncContactLinkId: FieldRef<"SyncConflict", 'String'>
+    readonly contactId: FieldRef<"SyncConflict", 'String'>
+    readonly conflictType: FieldRef<"SyncConflict", 'SyncConflictType'>
+    readonly status: FieldRef<"SyncConflict", 'SyncConflictStatus'>
+    readonly resolutionStrategy: FieldRef<"SyncConflict", 'SyncResolutionStrategy'>
+    readonly localSyncVersion: FieldRef<"SyncConflict", 'Int'>
+    readonly remoteETag: FieldRef<"SyncConflict", 'String'>
+    readonly localSnapshot: FieldRef<"SyncConflict", 'Json'>
+    readonly remoteSnapshot: FieldRef<"SyncConflict", 'Json'>
+    readonly resolutionNotes: FieldRef<"SyncConflict", 'String'>
+    readonly detectedAt: FieldRef<"SyncConflict", 'DateTime'>
+    readonly resolvedAt: FieldRef<"SyncConflict", 'DateTime'>
+    readonly createdAt: FieldRef<"SyncConflict", 'DateTime'>
+    readonly updatedAt: FieldRef<"SyncConflict", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SyncConflict findUnique
+   */
+  export type SyncConflictFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncConflict
+     */
+    select?: SyncConflictSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncConflict
+     */
+    omit?: SyncConflictOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncConflictInclude<ExtArgs> | null
+    /**
+     * Filter, which SyncConflict to fetch.
+     */
+    where: SyncConflictWhereUniqueInput
+  }
+
+  /**
+   * SyncConflict findUniqueOrThrow
+   */
+  export type SyncConflictFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncConflict
+     */
+    select?: SyncConflictSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncConflict
+     */
+    omit?: SyncConflictOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncConflictInclude<ExtArgs> | null
+    /**
+     * Filter, which SyncConflict to fetch.
+     */
+    where: SyncConflictWhereUniqueInput
+  }
+
+  /**
+   * SyncConflict findFirst
+   */
+  export type SyncConflictFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncConflict
+     */
+    select?: SyncConflictSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncConflict
+     */
+    omit?: SyncConflictOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncConflictInclude<ExtArgs> | null
+    /**
+     * Filter, which SyncConflict to fetch.
+     */
+    where?: SyncConflictWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SyncConflicts to fetch.
+     */
+    orderBy?: SyncConflictOrderByWithRelationInput | SyncConflictOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SyncConflicts.
+     */
+    cursor?: SyncConflictWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SyncConflicts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SyncConflicts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SyncConflicts.
+     */
+    distinct?: SyncConflictScalarFieldEnum | SyncConflictScalarFieldEnum[]
+  }
+
+  /**
+   * SyncConflict findFirstOrThrow
+   */
+  export type SyncConflictFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncConflict
+     */
+    select?: SyncConflictSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncConflict
+     */
+    omit?: SyncConflictOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncConflictInclude<ExtArgs> | null
+    /**
+     * Filter, which SyncConflict to fetch.
+     */
+    where?: SyncConflictWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SyncConflicts to fetch.
+     */
+    orderBy?: SyncConflictOrderByWithRelationInput | SyncConflictOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SyncConflicts.
+     */
+    cursor?: SyncConflictWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SyncConflicts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SyncConflicts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SyncConflicts.
+     */
+    distinct?: SyncConflictScalarFieldEnum | SyncConflictScalarFieldEnum[]
+  }
+
+  /**
+   * SyncConflict findMany
+   */
+  export type SyncConflictFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncConflict
+     */
+    select?: SyncConflictSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncConflict
+     */
+    omit?: SyncConflictOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncConflictInclude<ExtArgs> | null
+    /**
+     * Filter, which SyncConflicts to fetch.
+     */
+    where?: SyncConflictWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SyncConflicts to fetch.
+     */
+    orderBy?: SyncConflictOrderByWithRelationInput | SyncConflictOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SyncConflicts.
+     */
+    cursor?: SyncConflictWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SyncConflicts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SyncConflicts.
+     */
+    skip?: number
+    distinct?: SyncConflictScalarFieldEnum | SyncConflictScalarFieldEnum[]
+  }
+
+  /**
+   * SyncConflict create
+   */
+  export type SyncConflictCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncConflict
+     */
+    select?: SyncConflictSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncConflict
+     */
+    omit?: SyncConflictOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncConflictInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SyncConflict.
+     */
+    data: XOR<SyncConflictCreateInput, SyncConflictUncheckedCreateInput>
+  }
+
+  /**
+   * SyncConflict createMany
+   */
+  export type SyncConflictCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SyncConflicts.
+     */
+    data: SyncConflictCreateManyInput | SyncConflictCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SyncConflict createManyAndReturn
+   */
+  export type SyncConflictCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncConflict
+     */
+    select?: SyncConflictSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncConflict
+     */
+    omit?: SyncConflictOmit<ExtArgs> | null
+    /**
+     * The data used to create many SyncConflicts.
+     */
+    data: SyncConflictCreateManyInput | SyncConflictCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncConflictIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SyncConflict update
+   */
+  export type SyncConflictUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncConflict
+     */
+    select?: SyncConflictSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncConflict
+     */
+    omit?: SyncConflictOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncConflictInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SyncConflict.
+     */
+    data: XOR<SyncConflictUpdateInput, SyncConflictUncheckedUpdateInput>
+    /**
+     * Choose, which SyncConflict to update.
+     */
+    where: SyncConflictWhereUniqueInput
+  }
+
+  /**
+   * SyncConflict updateMany
+   */
+  export type SyncConflictUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SyncConflicts.
+     */
+    data: XOR<SyncConflictUpdateManyMutationInput, SyncConflictUncheckedUpdateManyInput>
+    /**
+     * Filter which SyncConflicts to update
+     */
+    where?: SyncConflictWhereInput
+    /**
+     * Limit how many SyncConflicts to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SyncConflict updateManyAndReturn
+   */
+  export type SyncConflictUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncConflict
+     */
+    select?: SyncConflictSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncConflict
+     */
+    omit?: SyncConflictOmit<ExtArgs> | null
+    /**
+     * The data used to update SyncConflicts.
+     */
+    data: XOR<SyncConflictUpdateManyMutationInput, SyncConflictUncheckedUpdateManyInput>
+    /**
+     * Filter which SyncConflicts to update
+     */
+    where?: SyncConflictWhereInput
+    /**
+     * Limit how many SyncConflicts to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncConflictIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SyncConflict upsert
+   */
+  export type SyncConflictUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncConflict
+     */
+    select?: SyncConflictSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncConflict
+     */
+    omit?: SyncConflictOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncConflictInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SyncConflict to update in case it exists.
+     */
+    where: SyncConflictWhereUniqueInput
+    /**
+     * In case the SyncConflict found by the `where` argument doesn't exist, create a new SyncConflict with this data.
+     */
+    create: XOR<SyncConflictCreateInput, SyncConflictUncheckedCreateInput>
+    /**
+     * In case the SyncConflict was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SyncConflictUpdateInput, SyncConflictUncheckedUpdateInput>
+  }
+
+  /**
+   * SyncConflict delete
+   */
+  export type SyncConflictDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncConflict
+     */
+    select?: SyncConflictSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncConflict
+     */
+    omit?: SyncConflictOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncConflictInclude<ExtArgs> | null
+    /**
+     * Filter which SyncConflict to delete.
+     */
+    where: SyncConflictWhereUniqueInput
+  }
+
+  /**
+   * SyncConflict deleteMany
+   */
+  export type SyncConflictDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SyncConflicts to delete
+     */
+    where?: SyncConflictWhereInput
+    /**
+     * Limit how many SyncConflicts to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SyncConflict.syncContactLink
+   */
+  export type SyncConflict$syncContactLinkArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncContactLink
+     */
+    select?: SyncContactLinkSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncContactLink
+     */
+    omit?: SyncContactLinkOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncContactLinkInclude<ExtArgs> | null
+    where?: SyncContactLinkWhereInput
+  }
+
+  /**
+   * SyncConflict.contact
+   */
+  export type SyncConflict$contactArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Contact
+     */
+    select?: ContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Contact
+     */
+    omit?: ContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactInclude<ExtArgs> | null
+    where?: ContactWhereInput
+  }
+
+  /**
+   * SyncConflict without action
+   */
+  export type SyncConflictDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncConflict
+     */
+    select?: SyncConflictSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncConflict
+     */
+    omit?: SyncConflictOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncConflictInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -8730,6 +17925,11 @@ export namespace Prisma {
   export const ContactScalarFieldEnum: {
     id: 'id',
     userId: 'userId',
+    importJobId: 'importJobId',
+    mergedIntoContactId: 'mergedIntoContactId',
+    syncUid: 'syncUid',
+    syncVersion: 'syncVersion',
+    syncTombstoneAt: 'syncTombstoneAt',
     fullName: 'fullName',
     email: 'email',
     phone: 'phone',
@@ -8790,13 +17990,21 @@ export namespace Prisma {
     id: 'id',
     userId: 'userId',
     format: 'format',
+    sourceProfile: 'sourceProfile',
     status: 'status',
     sourceFileName: 'sourceFileName',
+    sourceFileSizeBytes: 'sourceFileSizeBytes',
     rowCount: 'rowCount',
+    previewContactCount: 'previewContactCount',
     importedCount: 'importedCount',
     skippedCount: 'skippedCount',
     errorCount: 'errorCount',
+    warningCount: 'warningCount',
+    rolledBackCount: 'rolledBackCount',
     errorSummary: 'errorSummary',
+    previewedAt: 'previewedAt',
+    committedAt: 'committedAt',
+    rolledBackAt: 'rolledBackAt',
     createdAt: 'createdAt',
     startedAt: 'startedAt',
     completedAt: 'completedAt',
@@ -8812,6 +18020,8 @@ export namespace Prisma {
     format: 'format',
     status: 'status',
     includeArchived: 'includeArchived',
+    filterQuery: 'filterQuery',
+    resultFileName: 'resultFileName',
     exportedCount: 'exportedCount',
     errorSummary: 'errorSummary',
     createdAt: 'createdAt',
@@ -8823,12 +18033,168 @@ export namespace Prisma {
   export type ExportJobScalarFieldEnum = (typeof ExportJobScalarFieldEnum)[keyof typeof ExportJobScalarFieldEnum]
 
 
+  export const MergeSuggestionScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    leftContactId: 'leftContactId',
+    rightContactId: 'rightContactId',
+    pairKey: 'pairKey',
+    status: 'status',
+    confidence: 'confidence',
+    score: 'score',
+    hardMatch: 'hardMatch',
+    signals: 'signals',
+    reasons: 'reasons',
+    source: 'source',
+    generatedAt: 'generatedAt',
+    reviewedAt: 'reviewedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type MergeSuggestionScalarFieldEnum = (typeof MergeSuggestionScalarFieldEnum)[keyof typeof MergeSuggestionScalarFieldEnum]
+
+
+  export const MergeDecisionScalarFieldEnum: {
+    id: 'id',
+    suggestionId: 'suggestionId',
+    userId: 'userId',
+    status: 'status',
+    source: 'source',
+    notes: 'notes',
+    details: 'details',
+    decidedAt: 'decidedAt',
+    reversedAt: 'reversedAt',
+    reversalSource: 'reversalSource',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type MergeDecisionScalarFieldEnum = (typeof MergeDecisionScalarFieldEnum)[keyof typeof MergeDecisionScalarFieldEnum]
+
+
+  export const SyncAccountScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    provider: 'provider',
+    status: 'status',
+    syncDirection: 'syncDirection',
+    label: 'label',
+    baseUrl: 'baseUrl',
+    principalUrl: 'principalUrl',
+    addressBookUrl: 'addressBookUrl',
+    remoteAccountId: 'remoteAccountId',
+    remoteCTag: 'remoteCTag',
+    credentialReference: 'credentialReference',
+    credentialVersion: 'credentialVersion',
+    credentialUpdatedAt: 'credentialUpdatedAt',
+    credentialRevokedAt: 'credentialRevokedAt',
+    encryptionKeyRef: 'encryptionKeyRef',
+    lastSyncCursor: 'lastSyncCursor',
+    lastSyncedAt: 'lastSyncedAt',
+    lastSucceededAt: 'lastSucceededAt',
+    lastErrorAt: 'lastErrorAt',
+    lastErrorCode: 'lastErrorCode',
+    lastErrorMessage: 'lastErrorMessage',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SyncAccountScalarFieldEnum = (typeof SyncAccountScalarFieldEnum)[keyof typeof SyncAccountScalarFieldEnum]
+
+
+  export const SyncContactLinkScalarFieldEnum: {
+    id: 'id',
+    syncAccountId: 'syncAccountId',
+    contactId: 'contactId',
+    remoteHref: 'remoteHref',
+    remoteUid: 'remoteUid',
+    remoteETag: 'remoteETag',
+    lastSyncedAt: 'lastSyncedAt',
+    tombstonedAt: 'tombstonedAt',
+    remoteDeletedAt: 'remoteDeletedAt',
+    lastErrorCode: 'lastErrorCode',
+    lastErrorMessage: 'lastErrorMessage',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SyncContactLinkScalarFieldEnum = (typeof SyncContactLinkScalarFieldEnum)[keyof typeof SyncContactLinkScalarFieldEnum]
+
+
+  export const SyncJobScalarFieldEnum: {
+    id: 'id',
+    syncAccountId: 'syncAccountId',
+    status: 'status',
+    trigger: 'trigger',
+    syncDirection: 'syncDirection',
+    attemptCount: 'attemptCount',
+    maxAttempts: 'maxAttempts',
+    nextRetryAt: 'nextRetryAt',
+    leaseExpiresAt: 'leaseExpiresAt',
+    workerId: 'workerId',
+    idempotencyKey: 'idempotencyKey',
+    cursorBefore: 'cursorBefore',
+    cursorAfter: 'cursorAfter',
+    createdCount: 'createdCount',
+    updatedCount: 'updatedCount',
+    deletedCount: 'deletedCount',
+    conflictCount: 'conflictCount',
+    skippedCount: 'skippedCount',
+    errorCode: 'errorCode',
+    errorSummary: 'errorSummary',
+    startedAt: 'startedAt',
+    completedAt: 'completedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SyncJobScalarFieldEnum = (typeof SyncJobScalarFieldEnum)[keyof typeof SyncJobScalarFieldEnum]
+
+
+  export const SyncConflictScalarFieldEnum: {
+    id: 'id',
+    syncAccountId: 'syncAccountId',
+    syncContactLinkId: 'syncContactLinkId',
+    contactId: 'contactId',
+    conflictType: 'conflictType',
+    status: 'status',
+    resolutionStrategy: 'resolutionStrategy',
+    localSyncVersion: 'localSyncVersion',
+    remoteETag: 'remoteETag',
+    localSnapshot: 'localSnapshot',
+    remoteSnapshot: 'remoteSnapshot',
+    resolutionNotes: 'resolutionNotes',
+    detectedAt: 'detectedAt',
+    resolvedAt: 'resolvedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SyncConflictScalarFieldEnum = (typeof SyncConflictScalarFieldEnum)[keyof typeof SyncConflictScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
   };
 
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+  export const JsonNullValueInput: {
+    JsonNull: typeof JsonNull
+  };
+
+  export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
+
+
+  export const NullableJsonNullValueInput: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull
+  };
+
+  export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
   export const QueryMode: {
@@ -8845,6 +18211,15 @@ export namespace Prisma {
   };
 
   export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+  export const JsonNullValueFilter: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull,
+    AnyNull: typeof AnyNull
+  };
+
+  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
   /**
@@ -8891,6 +18266,20 @@ export namespace Prisma {
    * Reference to a field of type 'DateTime[]'
    */
   export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int'
+   */
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int[]'
+   */
+  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
 
 
@@ -8951,20 +18340,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Int'
-   */
-  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-  /**
-   * Reference to a field of type 'Int[]'
-   */
-  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
-    
-
-
-  /**
    * Reference to a field of type 'Boolean'
    */
   export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
@@ -8982,6 +18357,20 @@ export namespace Prisma {
    * Reference to a field of type 'ContactImportFormat[]'
    */
   export type ListEnumContactImportFormatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ContactImportFormat[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'ImportSourceProfile'
+   */
+  export type EnumImportSourceProfileFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ImportSourceProfile'>
+    
+
+
+  /**
+   * Reference to a field of type 'ImportSourceProfile[]'
+   */
+  export type ListEnumImportSourceProfileFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ImportSourceProfile[]'>
     
 
 
@@ -9010,6 +18399,174 @@ export namespace Prisma {
    * Reference to a field of type 'ContactExportFormat[]'
    */
   export type ListEnumContactExportFormatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ContactExportFormat[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'MergeSuggestionStatus'
+   */
+  export type EnumMergeSuggestionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MergeSuggestionStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'MergeSuggestionStatus[]'
+   */
+  export type ListEnumMergeSuggestionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MergeSuggestionStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'MergeSuggestionConfidence'
+   */
+  export type EnumMergeSuggestionConfidenceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MergeSuggestionConfidence'>
+    
+
+
+  /**
+   * Reference to a field of type 'MergeSuggestionConfidence[]'
+   */
+  export type ListEnumMergeSuggestionConfidenceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MergeSuggestionConfidence[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+  /**
+   * Reference to a field of type 'MergeDecisionStatus'
+   */
+  export type EnumMergeDecisionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MergeDecisionStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'MergeDecisionStatus[]'
+   */
+  export type ListEnumMergeDecisionStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MergeDecisionStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'SyncProvider'
+   */
+  export type EnumSyncProviderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SyncProvider'>
+    
+
+
+  /**
+   * Reference to a field of type 'SyncProvider[]'
+   */
+  export type ListEnumSyncProviderFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SyncProvider[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'SyncAccountStatus'
+   */
+  export type EnumSyncAccountStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SyncAccountStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'SyncAccountStatus[]'
+   */
+  export type ListEnumSyncAccountStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SyncAccountStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'SyncDirection'
+   */
+  export type EnumSyncDirectionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SyncDirection'>
+    
+
+
+  /**
+   * Reference to a field of type 'SyncDirection[]'
+   */
+  export type ListEnumSyncDirectionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SyncDirection[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'SyncJobStatus'
+   */
+  export type EnumSyncJobStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SyncJobStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'SyncJobStatus[]'
+   */
+  export type ListEnumSyncJobStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SyncJobStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'SyncJobTrigger'
+   */
+  export type EnumSyncJobTriggerFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SyncJobTrigger'>
+    
+
+
+  /**
+   * Reference to a field of type 'SyncJobTrigger[]'
+   */
+  export type ListEnumSyncJobTriggerFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SyncJobTrigger[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'SyncConflictType'
+   */
+  export type EnumSyncConflictTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SyncConflictType'>
+    
+
+
+  /**
+   * Reference to a field of type 'SyncConflictType[]'
+   */
+  export type ListEnumSyncConflictTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SyncConflictType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'SyncConflictStatus'
+   */
+  export type EnumSyncConflictStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SyncConflictStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'SyncConflictStatus[]'
+   */
+  export type ListEnumSyncConflictStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SyncConflictStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'SyncResolutionStrategy'
+   */
+  export type EnumSyncResolutionStrategyFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SyncResolutionStrategy'>
+    
+
+
+  /**
+   * Reference to a field of type 'SyncResolutionStrategy[]'
+   */
+  export type ListEnumSyncResolutionStrategyFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SyncResolutionStrategy[]'>
     
 
 
@@ -9044,6 +18601,9 @@ export namespace Prisma {
     contacts?: ContactListRelationFilter
     importJobs?: ImportJobListRelationFilter
     exportJobs?: ExportJobListRelationFilter
+    mergeSuggestions?: MergeSuggestionListRelationFilter
+    mergeDecisions?: MergeDecisionListRelationFilter
+    syncAccounts?: SyncAccountListRelationFilter
     subscriptionCustomer?: XOR<SubscriptionCustomerNullableScalarRelationFilter, SubscriptionCustomerWhereInput> | null
     subscriptions?: SubscriptionListRelationFilter
   }
@@ -9059,6 +18619,9 @@ export namespace Prisma {
     contacts?: ContactOrderByRelationAggregateInput
     importJobs?: ImportJobOrderByRelationAggregateInput
     exportJobs?: ExportJobOrderByRelationAggregateInput
+    mergeSuggestions?: MergeSuggestionOrderByRelationAggregateInput
+    mergeDecisions?: MergeDecisionOrderByRelationAggregateInput
+    syncAccounts?: SyncAccountOrderByRelationAggregateInput
     subscriptionCustomer?: SubscriptionCustomerOrderByWithRelationInput
     subscriptions?: SubscriptionOrderByRelationAggregateInput
   }
@@ -9077,6 +18640,9 @@ export namespace Prisma {
     contacts?: ContactListRelationFilter
     importJobs?: ImportJobListRelationFilter
     exportJobs?: ExportJobListRelationFilter
+    mergeSuggestions?: MergeSuggestionListRelationFilter
+    mergeDecisions?: MergeDecisionListRelationFilter
+    syncAccounts?: SyncAccountListRelationFilter
     subscriptionCustomer?: XOR<SubscriptionCustomerNullableScalarRelationFilter, SubscriptionCustomerWhereInput> | null
     subscriptions?: SubscriptionListRelationFilter
   }, "id" | "email">
@@ -9113,6 +18679,11 @@ export namespace Prisma {
     NOT?: ContactWhereInput | ContactWhereInput[]
     id?: StringFilter<"Contact"> | string
     userId?: StringFilter<"Contact"> | string
+    importJobId?: StringNullableFilter<"Contact"> | string | null
+    mergedIntoContactId?: StringNullableFilter<"Contact"> | string | null
+    syncUid?: StringFilter<"Contact"> | string
+    syncVersion?: IntFilter<"Contact"> | number
+    syncTombstoneAt?: DateTimeNullableFilter<"Contact"> | Date | string | null
     fullName?: StringFilter<"Contact"> | string
     email?: StringNullableFilter<"Contact"> | string | null
     phone?: StringNullableFilter<"Contact"> | string | null
@@ -9122,11 +18693,23 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Contact"> | Date | string
     updatedAt?: DateTimeFilter<"Contact"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    importJob?: XOR<ImportJobNullableScalarRelationFilter, ImportJobWhereInput> | null
+    leftMergeSuggestions?: MergeSuggestionListRelationFilter
+    rightMergeSuggestions?: MergeSuggestionListRelationFilter
+    syncLinks?: SyncContactLinkListRelationFilter
+    syncConflicts?: SyncConflictListRelationFilter
+    mergedIntoContact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
+    mergedChildren?: ContactListRelationFilter
   }
 
   export type ContactOrderByWithRelationInput = {
     id?: SortOrder
     userId?: SortOrder
+    importJobId?: SortOrderInput | SortOrder
+    mergedIntoContactId?: SortOrderInput | SortOrder
+    syncUid?: SortOrder
+    syncVersion?: SortOrder
+    syncTombstoneAt?: SortOrderInput | SortOrder
     fullName?: SortOrder
     email?: SortOrderInput | SortOrder
     phone?: SortOrderInput | SortOrder
@@ -9136,14 +18719,26 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
+    importJob?: ImportJobOrderByWithRelationInput
+    leftMergeSuggestions?: MergeSuggestionOrderByRelationAggregateInput
+    rightMergeSuggestions?: MergeSuggestionOrderByRelationAggregateInput
+    syncLinks?: SyncContactLinkOrderByRelationAggregateInput
+    syncConflicts?: SyncConflictOrderByRelationAggregateInput
+    mergedIntoContact?: ContactOrderByWithRelationInput
+    mergedChildren?: ContactOrderByRelationAggregateInput
   }
 
   export type ContactWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    syncUid?: string
     AND?: ContactWhereInput | ContactWhereInput[]
     OR?: ContactWhereInput[]
     NOT?: ContactWhereInput | ContactWhereInput[]
     userId?: StringFilter<"Contact"> | string
+    importJobId?: StringNullableFilter<"Contact"> | string | null
+    mergedIntoContactId?: StringNullableFilter<"Contact"> | string | null
+    syncVersion?: IntFilter<"Contact"> | number
+    syncTombstoneAt?: DateTimeNullableFilter<"Contact"> | Date | string | null
     fullName?: StringFilter<"Contact"> | string
     email?: StringNullableFilter<"Contact"> | string | null
     phone?: StringNullableFilter<"Contact"> | string | null
@@ -9153,11 +18748,23 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Contact"> | Date | string
     updatedAt?: DateTimeFilter<"Contact"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
-  }, "id">
+    importJob?: XOR<ImportJobNullableScalarRelationFilter, ImportJobWhereInput> | null
+    leftMergeSuggestions?: MergeSuggestionListRelationFilter
+    rightMergeSuggestions?: MergeSuggestionListRelationFilter
+    syncLinks?: SyncContactLinkListRelationFilter
+    syncConflicts?: SyncConflictListRelationFilter
+    mergedIntoContact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
+    mergedChildren?: ContactListRelationFilter
+  }, "id" | "syncUid">
 
   export type ContactOrderByWithAggregationInput = {
     id?: SortOrder
     userId?: SortOrder
+    importJobId?: SortOrderInput | SortOrder
+    mergedIntoContactId?: SortOrderInput | SortOrder
+    syncUid?: SortOrder
+    syncVersion?: SortOrder
+    syncTombstoneAt?: SortOrderInput | SortOrder
     fullName?: SortOrder
     email?: SortOrderInput | SortOrder
     phone?: SortOrderInput | SortOrder
@@ -9167,8 +18774,10 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ContactCountOrderByAggregateInput
+    _avg?: ContactAvgOrderByAggregateInput
     _max?: ContactMaxOrderByAggregateInput
     _min?: ContactMinOrderByAggregateInput
+    _sum?: ContactSumOrderByAggregateInput
   }
 
   export type ContactScalarWhereWithAggregatesInput = {
@@ -9177,6 +18786,11 @@ export namespace Prisma {
     NOT?: ContactScalarWhereWithAggregatesInput | ContactScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Contact"> | string
     userId?: StringWithAggregatesFilter<"Contact"> | string
+    importJobId?: StringNullableWithAggregatesFilter<"Contact"> | string | null
+    mergedIntoContactId?: StringNullableWithAggregatesFilter<"Contact"> | string | null
+    syncUid?: StringWithAggregatesFilter<"Contact"> | string
+    syncVersion?: IntWithAggregatesFilter<"Contact"> | number
+    syncTombstoneAt?: DateTimeNullableWithAggregatesFilter<"Contact"> | Date | string | null
     fullName?: StringWithAggregatesFilter<"Contact"> | string
     email?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     phone?: StringNullableWithAggregatesFilter<"Contact"> | string | null
@@ -9419,36 +19033,54 @@ export namespace Prisma {
     id?: StringFilter<"ImportJob"> | string
     userId?: StringFilter<"ImportJob"> | string
     format?: EnumContactImportFormatFilter<"ImportJob"> | $Enums.ContactImportFormat
+    sourceProfile?: EnumImportSourceProfileNullableFilter<"ImportJob"> | $Enums.ImportSourceProfile | null
     status?: EnumImportExportJobStatusFilter<"ImportJob"> | $Enums.ImportExportJobStatus
     sourceFileName?: StringNullableFilter<"ImportJob"> | string | null
+    sourceFileSizeBytes?: IntNullableFilter<"ImportJob"> | number | null
     rowCount?: IntFilter<"ImportJob"> | number
+    previewContactCount?: IntFilter<"ImportJob"> | number
     importedCount?: IntFilter<"ImportJob"> | number
     skippedCount?: IntFilter<"ImportJob"> | number
     errorCount?: IntFilter<"ImportJob"> | number
+    warningCount?: IntFilter<"ImportJob"> | number
+    rolledBackCount?: IntFilter<"ImportJob"> | number
     errorSummary?: StringNullableFilter<"ImportJob"> | string | null
+    previewedAt?: DateTimeNullableFilter<"ImportJob"> | Date | string | null
+    committedAt?: DateTimeNullableFilter<"ImportJob"> | Date | string | null
+    rolledBackAt?: DateTimeNullableFilter<"ImportJob"> | Date | string | null
     createdAt?: DateTimeFilter<"ImportJob"> | Date | string
     startedAt?: DateTimeFilter<"ImportJob"> | Date | string
     completedAt?: DateTimeNullableFilter<"ImportJob"> | Date | string | null
     updatedAt?: DateTimeFilter<"ImportJob"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    contacts?: ContactListRelationFilter
   }
 
   export type ImportJobOrderByWithRelationInput = {
     id?: SortOrder
     userId?: SortOrder
     format?: SortOrder
+    sourceProfile?: SortOrderInput | SortOrder
     status?: SortOrder
     sourceFileName?: SortOrderInput | SortOrder
+    sourceFileSizeBytes?: SortOrderInput | SortOrder
     rowCount?: SortOrder
+    previewContactCount?: SortOrder
     importedCount?: SortOrder
     skippedCount?: SortOrder
     errorCount?: SortOrder
+    warningCount?: SortOrder
+    rolledBackCount?: SortOrder
     errorSummary?: SortOrderInput | SortOrder
+    previewedAt?: SortOrderInput | SortOrder
+    committedAt?: SortOrderInput | SortOrder
+    rolledBackAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     startedAt?: SortOrder
     completedAt?: SortOrderInput | SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
+    contacts?: ContactOrderByRelationAggregateInput
   }
 
   export type ImportJobWhereUniqueInput = Prisma.AtLeast<{
@@ -9458,31 +19090,48 @@ export namespace Prisma {
     NOT?: ImportJobWhereInput | ImportJobWhereInput[]
     userId?: StringFilter<"ImportJob"> | string
     format?: EnumContactImportFormatFilter<"ImportJob"> | $Enums.ContactImportFormat
+    sourceProfile?: EnumImportSourceProfileNullableFilter<"ImportJob"> | $Enums.ImportSourceProfile | null
     status?: EnumImportExportJobStatusFilter<"ImportJob"> | $Enums.ImportExportJobStatus
     sourceFileName?: StringNullableFilter<"ImportJob"> | string | null
+    sourceFileSizeBytes?: IntNullableFilter<"ImportJob"> | number | null
     rowCount?: IntFilter<"ImportJob"> | number
+    previewContactCount?: IntFilter<"ImportJob"> | number
     importedCount?: IntFilter<"ImportJob"> | number
     skippedCount?: IntFilter<"ImportJob"> | number
     errorCount?: IntFilter<"ImportJob"> | number
+    warningCount?: IntFilter<"ImportJob"> | number
+    rolledBackCount?: IntFilter<"ImportJob"> | number
     errorSummary?: StringNullableFilter<"ImportJob"> | string | null
+    previewedAt?: DateTimeNullableFilter<"ImportJob"> | Date | string | null
+    committedAt?: DateTimeNullableFilter<"ImportJob"> | Date | string | null
+    rolledBackAt?: DateTimeNullableFilter<"ImportJob"> | Date | string | null
     createdAt?: DateTimeFilter<"ImportJob"> | Date | string
     startedAt?: DateTimeFilter<"ImportJob"> | Date | string
     completedAt?: DateTimeNullableFilter<"ImportJob"> | Date | string | null
     updatedAt?: DateTimeFilter<"ImportJob"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    contacts?: ContactListRelationFilter
   }, "id">
 
   export type ImportJobOrderByWithAggregationInput = {
     id?: SortOrder
     userId?: SortOrder
     format?: SortOrder
+    sourceProfile?: SortOrderInput | SortOrder
     status?: SortOrder
     sourceFileName?: SortOrderInput | SortOrder
+    sourceFileSizeBytes?: SortOrderInput | SortOrder
     rowCount?: SortOrder
+    previewContactCount?: SortOrder
     importedCount?: SortOrder
     skippedCount?: SortOrder
     errorCount?: SortOrder
+    warningCount?: SortOrder
+    rolledBackCount?: SortOrder
     errorSummary?: SortOrderInput | SortOrder
+    previewedAt?: SortOrderInput | SortOrder
+    committedAt?: SortOrderInput | SortOrder
+    rolledBackAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     startedAt?: SortOrder
     completedAt?: SortOrderInput | SortOrder
@@ -9501,13 +19150,21 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"ImportJob"> | string
     userId?: StringWithAggregatesFilter<"ImportJob"> | string
     format?: EnumContactImportFormatWithAggregatesFilter<"ImportJob"> | $Enums.ContactImportFormat
+    sourceProfile?: EnumImportSourceProfileNullableWithAggregatesFilter<"ImportJob"> | $Enums.ImportSourceProfile | null
     status?: EnumImportExportJobStatusWithAggregatesFilter<"ImportJob"> | $Enums.ImportExportJobStatus
     sourceFileName?: StringNullableWithAggregatesFilter<"ImportJob"> | string | null
+    sourceFileSizeBytes?: IntNullableWithAggregatesFilter<"ImportJob"> | number | null
     rowCount?: IntWithAggregatesFilter<"ImportJob"> | number
+    previewContactCount?: IntWithAggregatesFilter<"ImportJob"> | number
     importedCount?: IntWithAggregatesFilter<"ImportJob"> | number
     skippedCount?: IntWithAggregatesFilter<"ImportJob"> | number
     errorCount?: IntWithAggregatesFilter<"ImportJob"> | number
+    warningCount?: IntWithAggregatesFilter<"ImportJob"> | number
+    rolledBackCount?: IntWithAggregatesFilter<"ImportJob"> | number
     errorSummary?: StringNullableWithAggregatesFilter<"ImportJob"> | string | null
+    previewedAt?: DateTimeNullableWithAggregatesFilter<"ImportJob"> | Date | string | null
+    committedAt?: DateTimeNullableWithAggregatesFilter<"ImportJob"> | Date | string | null
+    rolledBackAt?: DateTimeNullableWithAggregatesFilter<"ImportJob"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"ImportJob"> | Date | string
     startedAt?: DateTimeWithAggregatesFilter<"ImportJob"> | Date | string
     completedAt?: DateTimeNullableWithAggregatesFilter<"ImportJob"> | Date | string | null
@@ -9523,6 +19180,8 @@ export namespace Prisma {
     format?: EnumContactExportFormatFilter<"ExportJob"> | $Enums.ContactExportFormat
     status?: EnumImportExportJobStatusFilter<"ExportJob"> | $Enums.ImportExportJobStatus
     includeArchived?: BoolFilter<"ExportJob"> | boolean
+    filterQuery?: StringNullableFilter<"ExportJob"> | string | null
+    resultFileName?: StringNullableFilter<"ExportJob"> | string | null
     exportedCount?: IntFilter<"ExportJob"> | number
     errorSummary?: StringNullableFilter<"ExportJob"> | string | null
     createdAt?: DateTimeFilter<"ExportJob"> | Date | string
@@ -9538,6 +19197,8 @@ export namespace Prisma {
     format?: SortOrder
     status?: SortOrder
     includeArchived?: SortOrder
+    filterQuery?: SortOrderInput | SortOrder
+    resultFileName?: SortOrderInput | SortOrder
     exportedCount?: SortOrder
     errorSummary?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -9556,6 +19217,8 @@ export namespace Prisma {
     format?: EnumContactExportFormatFilter<"ExportJob"> | $Enums.ContactExportFormat
     status?: EnumImportExportJobStatusFilter<"ExportJob"> | $Enums.ImportExportJobStatus
     includeArchived?: BoolFilter<"ExportJob"> | boolean
+    filterQuery?: StringNullableFilter<"ExportJob"> | string | null
+    resultFileName?: StringNullableFilter<"ExportJob"> | string | null
     exportedCount?: IntFilter<"ExportJob"> | number
     errorSummary?: StringNullableFilter<"ExportJob"> | string | null
     createdAt?: DateTimeFilter<"ExportJob"> | Date | string
@@ -9571,6 +19234,8 @@ export namespace Prisma {
     format?: SortOrder
     status?: SortOrder
     includeArchived?: SortOrder
+    filterQuery?: SortOrderInput | SortOrder
+    resultFileName?: SortOrderInput | SortOrder
     exportedCount?: SortOrder
     errorSummary?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -9593,12 +19258,766 @@ export namespace Prisma {
     format?: EnumContactExportFormatWithAggregatesFilter<"ExportJob"> | $Enums.ContactExportFormat
     status?: EnumImportExportJobStatusWithAggregatesFilter<"ExportJob"> | $Enums.ImportExportJobStatus
     includeArchived?: BoolWithAggregatesFilter<"ExportJob"> | boolean
+    filterQuery?: StringNullableWithAggregatesFilter<"ExportJob"> | string | null
+    resultFileName?: StringNullableWithAggregatesFilter<"ExportJob"> | string | null
     exportedCount?: IntWithAggregatesFilter<"ExportJob"> | number
     errorSummary?: StringNullableWithAggregatesFilter<"ExportJob"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"ExportJob"> | Date | string
     startedAt?: DateTimeWithAggregatesFilter<"ExportJob"> | Date | string
     completedAt?: DateTimeNullableWithAggregatesFilter<"ExportJob"> | Date | string | null
     updatedAt?: DateTimeWithAggregatesFilter<"ExportJob"> | Date | string
+  }
+
+  export type MergeSuggestionWhereInput = {
+    AND?: MergeSuggestionWhereInput | MergeSuggestionWhereInput[]
+    OR?: MergeSuggestionWhereInput[]
+    NOT?: MergeSuggestionWhereInput | MergeSuggestionWhereInput[]
+    id?: StringFilter<"MergeSuggestion"> | string
+    userId?: StringFilter<"MergeSuggestion"> | string
+    leftContactId?: StringFilter<"MergeSuggestion"> | string
+    rightContactId?: StringFilter<"MergeSuggestion"> | string
+    pairKey?: StringFilter<"MergeSuggestion"> | string
+    status?: EnumMergeSuggestionStatusFilter<"MergeSuggestion"> | $Enums.MergeSuggestionStatus
+    confidence?: EnumMergeSuggestionConfidenceFilter<"MergeSuggestion"> | $Enums.MergeSuggestionConfidence
+    score?: IntFilter<"MergeSuggestion"> | number
+    hardMatch?: BoolFilter<"MergeSuggestion"> | boolean
+    signals?: JsonFilter<"MergeSuggestion">
+    reasons?: JsonFilter<"MergeSuggestion">
+    source?: StringFilter<"MergeSuggestion"> | string
+    generatedAt?: DateTimeFilter<"MergeSuggestion"> | Date | string
+    reviewedAt?: DateTimeNullableFilter<"MergeSuggestion"> | Date | string | null
+    createdAt?: DateTimeFilter<"MergeSuggestion"> | Date | string
+    updatedAt?: DateTimeFilter<"MergeSuggestion"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    leftContact?: XOR<ContactScalarRelationFilter, ContactWhereInput>
+    rightContact?: XOR<ContactScalarRelationFilter, ContactWhereInput>
+    decisions?: MergeDecisionListRelationFilter
+  }
+
+  export type MergeSuggestionOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    leftContactId?: SortOrder
+    rightContactId?: SortOrder
+    pairKey?: SortOrder
+    status?: SortOrder
+    confidence?: SortOrder
+    score?: SortOrder
+    hardMatch?: SortOrder
+    signals?: SortOrder
+    reasons?: SortOrder
+    source?: SortOrder
+    generatedAt?: SortOrder
+    reviewedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+    leftContact?: ContactOrderByWithRelationInput
+    rightContact?: ContactOrderByWithRelationInput
+    decisions?: MergeDecisionOrderByRelationAggregateInput
+  }
+
+  export type MergeSuggestionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId_pairKey?: MergeSuggestionUserIdPairKeyCompoundUniqueInput
+    AND?: MergeSuggestionWhereInput | MergeSuggestionWhereInput[]
+    OR?: MergeSuggestionWhereInput[]
+    NOT?: MergeSuggestionWhereInput | MergeSuggestionWhereInput[]
+    userId?: StringFilter<"MergeSuggestion"> | string
+    leftContactId?: StringFilter<"MergeSuggestion"> | string
+    rightContactId?: StringFilter<"MergeSuggestion"> | string
+    pairKey?: StringFilter<"MergeSuggestion"> | string
+    status?: EnumMergeSuggestionStatusFilter<"MergeSuggestion"> | $Enums.MergeSuggestionStatus
+    confidence?: EnumMergeSuggestionConfidenceFilter<"MergeSuggestion"> | $Enums.MergeSuggestionConfidence
+    score?: IntFilter<"MergeSuggestion"> | number
+    hardMatch?: BoolFilter<"MergeSuggestion"> | boolean
+    signals?: JsonFilter<"MergeSuggestion">
+    reasons?: JsonFilter<"MergeSuggestion">
+    source?: StringFilter<"MergeSuggestion"> | string
+    generatedAt?: DateTimeFilter<"MergeSuggestion"> | Date | string
+    reviewedAt?: DateTimeNullableFilter<"MergeSuggestion"> | Date | string | null
+    createdAt?: DateTimeFilter<"MergeSuggestion"> | Date | string
+    updatedAt?: DateTimeFilter<"MergeSuggestion"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    leftContact?: XOR<ContactScalarRelationFilter, ContactWhereInput>
+    rightContact?: XOR<ContactScalarRelationFilter, ContactWhereInput>
+    decisions?: MergeDecisionListRelationFilter
+  }, "id" | "userId_pairKey">
+
+  export type MergeSuggestionOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    leftContactId?: SortOrder
+    rightContactId?: SortOrder
+    pairKey?: SortOrder
+    status?: SortOrder
+    confidence?: SortOrder
+    score?: SortOrder
+    hardMatch?: SortOrder
+    signals?: SortOrder
+    reasons?: SortOrder
+    source?: SortOrder
+    generatedAt?: SortOrder
+    reviewedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: MergeSuggestionCountOrderByAggregateInput
+    _avg?: MergeSuggestionAvgOrderByAggregateInput
+    _max?: MergeSuggestionMaxOrderByAggregateInput
+    _min?: MergeSuggestionMinOrderByAggregateInput
+    _sum?: MergeSuggestionSumOrderByAggregateInput
+  }
+
+  export type MergeSuggestionScalarWhereWithAggregatesInput = {
+    AND?: MergeSuggestionScalarWhereWithAggregatesInput | MergeSuggestionScalarWhereWithAggregatesInput[]
+    OR?: MergeSuggestionScalarWhereWithAggregatesInput[]
+    NOT?: MergeSuggestionScalarWhereWithAggregatesInput | MergeSuggestionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"MergeSuggestion"> | string
+    userId?: StringWithAggregatesFilter<"MergeSuggestion"> | string
+    leftContactId?: StringWithAggregatesFilter<"MergeSuggestion"> | string
+    rightContactId?: StringWithAggregatesFilter<"MergeSuggestion"> | string
+    pairKey?: StringWithAggregatesFilter<"MergeSuggestion"> | string
+    status?: EnumMergeSuggestionStatusWithAggregatesFilter<"MergeSuggestion"> | $Enums.MergeSuggestionStatus
+    confidence?: EnumMergeSuggestionConfidenceWithAggregatesFilter<"MergeSuggestion"> | $Enums.MergeSuggestionConfidence
+    score?: IntWithAggregatesFilter<"MergeSuggestion"> | number
+    hardMatch?: BoolWithAggregatesFilter<"MergeSuggestion"> | boolean
+    signals?: JsonWithAggregatesFilter<"MergeSuggestion">
+    reasons?: JsonWithAggregatesFilter<"MergeSuggestion">
+    source?: StringWithAggregatesFilter<"MergeSuggestion"> | string
+    generatedAt?: DateTimeWithAggregatesFilter<"MergeSuggestion"> | Date | string
+    reviewedAt?: DateTimeNullableWithAggregatesFilter<"MergeSuggestion"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"MergeSuggestion"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"MergeSuggestion"> | Date | string
+  }
+
+  export type MergeDecisionWhereInput = {
+    AND?: MergeDecisionWhereInput | MergeDecisionWhereInput[]
+    OR?: MergeDecisionWhereInput[]
+    NOT?: MergeDecisionWhereInput | MergeDecisionWhereInput[]
+    id?: StringFilter<"MergeDecision"> | string
+    suggestionId?: StringFilter<"MergeDecision"> | string
+    userId?: StringFilter<"MergeDecision"> | string
+    status?: EnumMergeDecisionStatusFilter<"MergeDecision"> | $Enums.MergeDecisionStatus
+    source?: StringFilter<"MergeDecision"> | string
+    notes?: StringNullableFilter<"MergeDecision"> | string | null
+    details?: JsonNullableFilter<"MergeDecision">
+    decidedAt?: DateTimeFilter<"MergeDecision"> | Date | string
+    reversedAt?: DateTimeNullableFilter<"MergeDecision"> | Date | string | null
+    reversalSource?: StringNullableFilter<"MergeDecision"> | string | null
+    createdAt?: DateTimeFilter<"MergeDecision"> | Date | string
+    updatedAt?: DateTimeFilter<"MergeDecision"> | Date | string
+    suggestion?: XOR<MergeSuggestionScalarRelationFilter, MergeSuggestionWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type MergeDecisionOrderByWithRelationInput = {
+    id?: SortOrder
+    suggestionId?: SortOrder
+    userId?: SortOrder
+    status?: SortOrder
+    source?: SortOrder
+    notes?: SortOrderInput | SortOrder
+    details?: SortOrderInput | SortOrder
+    decidedAt?: SortOrder
+    reversedAt?: SortOrderInput | SortOrder
+    reversalSource?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    suggestion?: MergeSuggestionOrderByWithRelationInput
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type MergeDecisionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: MergeDecisionWhereInput | MergeDecisionWhereInput[]
+    OR?: MergeDecisionWhereInput[]
+    NOT?: MergeDecisionWhereInput | MergeDecisionWhereInput[]
+    suggestionId?: StringFilter<"MergeDecision"> | string
+    userId?: StringFilter<"MergeDecision"> | string
+    status?: EnumMergeDecisionStatusFilter<"MergeDecision"> | $Enums.MergeDecisionStatus
+    source?: StringFilter<"MergeDecision"> | string
+    notes?: StringNullableFilter<"MergeDecision"> | string | null
+    details?: JsonNullableFilter<"MergeDecision">
+    decidedAt?: DateTimeFilter<"MergeDecision"> | Date | string
+    reversedAt?: DateTimeNullableFilter<"MergeDecision"> | Date | string | null
+    reversalSource?: StringNullableFilter<"MergeDecision"> | string | null
+    createdAt?: DateTimeFilter<"MergeDecision"> | Date | string
+    updatedAt?: DateTimeFilter<"MergeDecision"> | Date | string
+    suggestion?: XOR<MergeSuggestionScalarRelationFilter, MergeSuggestionWhereInput>
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type MergeDecisionOrderByWithAggregationInput = {
+    id?: SortOrder
+    suggestionId?: SortOrder
+    userId?: SortOrder
+    status?: SortOrder
+    source?: SortOrder
+    notes?: SortOrderInput | SortOrder
+    details?: SortOrderInput | SortOrder
+    decidedAt?: SortOrder
+    reversedAt?: SortOrderInput | SortOrder
+    reversalSource?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: MergeDecisionCountOrderByAggregateInput
+    _max?: MergeDecisionMaxOrderByAggregateInput
+    _min?: MergeDecisionMinOrderByAggregateInput
+  }
+
+  export type MergeDecisionScalarWhereWithAggregatesInput = {
+    AND?: MergeDecisionScalarWhereWithAggregatesInput | MergeDecisionScalarWhereWithAggregatesInput[]
+    OR?: MergeDecisionScalarWhereWithAggregatesInput[]
+    NOT?: MergeDecisionScalarWhereWithAggregatesInput | MergeDecisionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"MergeDecision"> | string
+    suggestionId?: StringWithAggregatesFilter<"MergeDecision"> | string
+    userId?: StringWithAggregatesFilter<"MergeDecision"> | string
+    status?: EnumMergeDecisionStatusWithAggregatesFilter<"MergeDecision"> | $Enums.MergeDecisionStatus
+    source?: StringWithAggregatesFilter<"MergeDecision"> | string
+    notes?: StringNullableWithAggregatesFilter<"MergeDecision"> | string | null
+    details?: JsonNullableWithAggregatesFilter<"MergeDecision">
+    decidedAt?: DateTimeWithAggregatesFilter<"MergeDecision"> | Date | string
+    reversedAt?: DateTimeNullableWithAggregatesFilter<"MergeDecision"> | Date | string | null
+    reversalSource?: StringNullableWithAggregatesFilter<"MergeDecision"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"MergeDecision"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"MergeDecision"> | Date | string
+  }
+
+  export type SyncAccountWhereInput = {
+    AND?: SyncAccountWhereInput | SyncAccountWhereInput[]
+    OR?: SyncAccountWhereInput[]
+    NOT?: SyncAccountWhereInput | SyncAccountWhereInput[]
+    id?: StringFilter<"SyncAccount"> | string
+    userId?: StringFilter<"SyncAccount"> | string
+    provider?: EnumSyncProviderFilter<"SyncAccount"> | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFilter<"SyncAccount"> | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFilter<"SyncAccount"> | $Enums.SyncDirection
+    label?: StringFilter<"SyncAccount"> | string
+    baseUrl?: StringFilter<"SyncAccount"> | string
+    principalUrl?: StringNullableFilter<"SyncAccount"> | string | null
+    addressBookUrl?: StringNullableFilter<"SyncAccount"> | string | null
+    remoteAccountId?: StringNullableFilter<"SyncAccount"> | string | null
+    remoteCTag?: StringNullableFilter<"SyncAccount"> | string | null
+    credentialReference?: StringNullableFilter<"SyncAccount"> | string | null
+    credentialVersion?: IntFilter<"SyncAccount"> | number
+    credentialUpdatedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    credentialRevokedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    encryptionKeyRef?: StringNullableFilter<"SyncAccount"> | string | null
+    lastSyncCursor?: StringNullableFilter<"SyncAccount"> | string | null
+    lastSyncedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    lastSucceededAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    lastErrorAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    lastErrorCode?: StringNullableFilter<"SyncAccount"> | string | null
+    lastErrorMessage?: StringNullableFilter<"SyncAccount"> | string | null
+    createdAt?: DateTimeFilter<"SyncAccount"> | Date | string
+    updatedAt?: DateTimeFilter<"SyncAccount"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    syncLinks?: SyncContactLinkListRelationFilter
+    syncJobs?: SyncJobListRelationFilter
+    syncConflicts?: SyncConflictListRelationFilter
+  }
+
+  export type SyncAccountOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    provider?: SortOrder
+    status?: SortOrder
+    syncDirection?: SortOrder
+    label?: SortOrder
+    baseUrl?: SortOrder
+    principalUrl?: SortOrderInput | SortOrder
+    addressBookUrl?: SortOrderInput | SortOrder
+    remoteAccountId?: SortOrderInput | SortOrder
+    remoteCTag?: SortOrderInput | SortOrder
+    credentialReference?: SortOrderInput | SortOrder
+    credentialVersion?: SortOrder
+    credentialUpdatedAt?: SortOrderInput | SortOrder
+    credentialRevokedAt?: SortOrderInput | SortOrder
+    encryptionKeyRef?: SortOrderInput | SortOrder
+    lastSyncCursor?: SortOrderInput | SortOrder
+    lastSyncedAt?: SortOrderInput | SortOrder
+    lastSucceededAt?: SortOrderInput | SortOrder
+    lastErrorAt?: SortOrderInput | SortOrder
+    lastErrorCode?: SortOrderInput | SortOrder
+    lastErrorMessage?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+    syncLinks?: SyncContactLinkOrderByRelationAggregateInput
+    syncJobs?: SyncJobOrderByRelationAggregateInput
+    syncConflicts?: SyncConflictOrderByRelationAggregateInput
+  }
+
+  export type SyncAccountWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId_baseUrl_label?: SyncAccountUserIdBaseUrlLabelCompoundUniqueInput
+    AND?: SyncAccountWhereInput | SyncAccountWhereInput[]
+    OR?: SyncAccountWhereInput[]
+    NOT?: SyncAccountWhereInput | SyncAccountWhereInput[]
+    userId?: StringFilter<"SyncAccount"> | string
+    provider?: EnumSyncProviderFilter<"SyncAccount"> | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFilter<"SyncAccount"> | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFilter<"SyncAccount"> | $Enums.SyncDirection
+    label?: StringFilter<"SyncAccount"> | string
+    baseUrl?: StringFilter<"SyncAccount"> | string
+    principalUrl?: StringNullableFilter<"SyncAccount"> | string | null
+    addressBookUrl?: StringNullableFilter<"SyncAccount"> | string | null
+    remoteAccountId?: StringNullableFilter<"SyncAccount"> | string | null
+    remoteCTag?: StringNullableFilter<"SyncAccount"> | string | null
+    credentialReference?: StringNullableFilter<"SyncAccount"> | string | null
+    credentialVersion?: IntFilter<"SyncAccount"> | number
+    credentialUpdatedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    credentialRevokedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    encryptionKeyRef?: StringNullableFilter<"SyncAccount"> | string | null
+    lastSyncCursor?: StringNullableFilter<"SyncAccount"> | string | null
+    lastSyncedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    lastSucceededAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    lastErrorAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    lastErrorCode?: StringNullableFilter<"SyncAccount"> | string | null
+    lastErrorMessage?: StringNullableFilter<"SyncAccount"> | string | null
+    createdAt?: DateTimeFilter<"SyncAccount"> | Date | string
+    updatedAt?: DateTimeFilter<"SyncAccount"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    syncLinks?: SyncContactLinkListRelationFilter
+    syncJobs?: SyncJobListRelationFilter
+    syncConflicts?: SyncConflictListRelationFilter
+  }, "id" | "userId_baseUrl_label">
+
+  export type SyncAccountOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    provider?: SortOrder
+    status?: SortOrder
+    syncDirection?: SortOrder
+    label?: SortOrder
+    baseUrl?: SortOrder
+    principalUrl?: SortOrderInput | SortOrder
+    addressBookUrl?: SortOrderInput | SortOrder
+    remoteAccountId?: SortOrderInput | SortOrder
+    remoteCTag?: SortOrderInput | SortOrder
+    credentialReference?: SortOrderInput | SortOrder
+    credentialVersion?: SortOrder
+    credentialUpdatedAt?: SortOrderInput | SortOrder
+    credentialRevokedAt?: SortOrderInput | SortOrder
+    encryptionKeyRef?: SortOrderInput | SortOrder
+    lastSyncCursor?: SortOrderInput | SortOrder
+    lastSyncedAt?: SortOrderInput | SortOrder
+    lastSucceededAt?: SortOrderInput | SortOrder
+    lastErrorAt?: SortOrderInput | SortOrder
+    lastErrorCode?: SortOrderInput | SortOrder
+    lastErrorMessage?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: SyncAccountCountOrderByAggregateInput
+    _avg?: SyncAccountAvgOrderByAggregateInput
+    _max?: SyncAccountMaxOrderByAggregateInput
+    _min?: SyncAccountMinOrderByAggregateInput
+    _sum?: SyncAccountSumOrderByAggregateInput
+  }
+
+  export type SyncAccountScalarWhereWithAggregatesInput = {
+    AND?: SyncAccountScalarWhereWithAggregatesInput | SyncAccountScalarWhereWithAggregatesInput[]
+    OR?: SyncAccountScalarWhereWithAggregatesInput[]
+    NOT?: SyncAccountScalarWhereWithAggregatesInput | SyncAccountScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SyncAccount"> | string
+    userId?: StringWithAggregatesFilter<"SyncAccount"> | string
+    provider?: EnumSyncProviderWithAggregatesFilter<"SyncAccount"> | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusWithAggregatesFilter<"SyncAccount"> | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionWithAggregatesFilter<"SyncAccount"> | $Enums.SyncDirection
+    label?: StringWithAggregatesFilter<"SyncAccount"> | string
+    baseUrl?: StringWithAggregatesFilter<"SyncAccount"> | string
+    principalUrl?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
+    addressBookUrl?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
+    remoteAccountId?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
+    remoteCTag?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
+    credentialReference?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
+    credentialVersion?: IntWithAggregatesFilter<"SyncAccount"> | number
+    credentialUpdatedAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
+    credentialRevokedAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
+    encryptionKeyRef?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
+    lastSyncCursor?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
+    lastSyncedAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
+    lastSucceededAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
+    lastErrorAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
+    lastErrorCode?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
+    lastErrorMessage?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"SyncAccount"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"SyncAccount"> | Date | string
+  }
+
+  export type SyncContactLinkWhereInput = {
+    AND?: SyncContactLinkWhereInput | SyncContactLinkWhereInput[]
+    OR?: SyncContactLinkWhereInput[]
+    NOT?: SyncContactLinkWhereInput | SyncContactLinkWhereInput[]
+    id?: StringFilter<"SyncContactLink"> | string
+    syncAccountId?: StringFilter<"SyncContactLink"> | string
+    contactId?: StringFilter<"SyncContactLink"> | string
+    remoteHref?: StringNullableFilter<"SyncContactLink"> | string | null
+    remoteUid?: StringNullableFilter<"SyncContactLink"> | string | null
+    remoteETag?: StringNullableFilter<"SyncContactLink"> | string | null
+    lastSyncedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
+    tombstonedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
+    remoteDeletedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
+    lastErrorCode?: StringNullableFilter<"SyncContactLink"> | string | null
+    lastErrorMessage?: StringNullableFilter<"SyncContactLink"> | string | null
+    createdAt?: DateTimeFilter<"SyncContactLink"> | Date | string
+    updatedAt?: DateTimeFilter<"SyncContactLink"> | Date | string
+    syncAccount?: XOR<SyncAccountScalarRelationFilter, SyncAccountWhereInput>
+    contact?: XOR<ContactScalarRelationFilter, ContactWhereInput>
+    syncConflicts?: SyncConflictListRelationFilter
+  }
+
+  export type SyncContactLinkOrderByWithRelationInput = {
+    id?: SortOrder
+    syncAccountId?: SortOrder
+    contactId?: SortOrder
+    remoteHref?: SortOrderInput | SortOrder
+    remoteUid?: SortOrderInput | SortOrder
+    remoteETag?: SortOrderInput | SortOrder
+    lastSyncedAt?: SortOrderInput | SortOrder
+    tombstonedAt?: SortOrderInput | SortOrder
+    remoteDeletedAt?: SortOrderInput | SortOrder
+    lastErrorCode?: SortOrderInput | SortOrder
+    lastErrorMessage?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    syncAccount?: SyncAccountOrderByWithRelationInput
+    contact?: ContactOrderByWithRelationInput
+    syncConflicts?: SyncConflictOrderByRelationAggregateInput
+  }
+
+  export type SyncContactLinkWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    syncAccountId_contactId?: SyncContactLinkSyncAccountIdContactIdCompoundUniqueInput
+    syncAccountId_remoteHref?: SyncContactLinkSyncAccountIdRemoteHrefCompoundUniqueInput
+    syncAccountId_remoteUid?: SyncContactLinkSyncAccountIdRemoteUidCompoundUniqueInput
+    AND?: SyncContactLinkWhereInput | SyncContactLinkWhereInput[]
+    OR?: SyncContactLinkWhereInput[]
+    NOT?: SyncContactLinkWhereInput | SyncContactLinkWhereInput[]
+    syncAccountId?: StringFilter<"SyncContactLink"> | string
+    contactId?: StringFilter<"SyncContactLink"> | string
+    remoteHref?: StringNullableFilter<"SyncContactLink"> | string | null
+    remoteUid?: StringNullableFilter<"SyncContactLink"> | string | null
+    remoteETag?: StringNullableFilter<"SyncContactLink"> | string | null
+    lastSyncedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
+    tombstonedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
+    remoteDeletedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
+    lastErrorCode?: StringNullableFilter<"SyncContactLink"> | string | null
+    lastErrorMessage?: StringNullableFilter<"SyncContactLink"> | string | null
+    createdAt?: DateTimeFilter<"SyncContactLink"> | Date | string
+    updatedAt?: DateTimeFilter<"SyncContactLink"> | Date | string
+    syncAccount?: XOR<SyncAccountScalarRelationFilter, SyncAccountWhereInput>
+    contact?: XOR<ContactScalarRelationFilter, ContactWhereInput>
+    syncConflicts?: SyncConflictListRelationFilter
+  }, "id" | "syncAccountId_contactId" | "syncAccountId_remoteHref" | "syncAccountId_remoteUid">
+
+  export type SyncContactLinkOrderByWithAggregationInput = {
+    id?: SortOrder
+    syncAccountId?: SortOrder
+    contactId?: SortOrder
+    remoteHref?: SortOrderInput | SortOrder
+    remoteUid?: SortOrderInput | SortOrder
+    remoteETag?: SortOrderInput | SortOrder
+    lastSyncedAt?: SortOrderInput | SortOrder
+    tombstonedAt?: SortOrderInput | SortOrder
+    remoteDeletedAt?: SortOrderInput | SortOrder
+    lastErrorCode?: SortOrderInput | SortOrder
+    lastErrorMessage?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: SyncContactLinkCountOrderByAggregateInput
+    _max?: SyncContactLinkMaxOrderByAggregateInput
+    _min?: SyncContactLinkMinOrderByAggregateInput
+  }
+
+  export type SyncContactLinkScalarWhereWithAggregatesInput = {
+    AND?: SyncContactLinkScalarWhereWithAggregatesInput | SyncContactLinkScalarWhereWithAggregatesInput[]
+    OR?: SyncContactLinkScalarWhereWithAggregatesInput[]
+    NOT?: SyncContactLinkScalarWhereWithAggregatesInput | SyncContactLinkScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SyncContactLink"> | string
+    syncAccountId?: StringWithAggregatesFilter<"SyncContactLink"> | string
+    contactId?: StringWithAggregatesFilter<"SyncContactLink"> | string
+    remoteHref?: StringNullableWithAggregatesFilter<"SyncContactLink"> | string | null
+    remoteUid?: StringNullableWithAggregatesFilter<"SyncContactLink"> | string | null
+    remoteETag?: StringNullableWithAggregatesFilter<"SyncContactLink"> | string | null
+    lastSyncedAt?: DateTimeNullableWithAggregatesFilter<"SyncContactLink"> | Date | string | null
+    tombstonedAt?: DateTimeNullableWithAggregatesFilter<"SyncContactLink"> | Date | string | null
+    remoteDeletedAt?: DateTimeNullableWithAggregatesFilter<"SyncContactLink"> | Date | string | null
+    lastErrorCode?: StringNullableWithAggregatesFilter<"SyncContactLink"> | string | null
+    lastErrorMessage?: StringNullableWithAggregatesFilter<"SyncContactLink"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"SyncContactLink"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"SyncContactLink"> | Date | string
+  }
+
+  export type SyncJobWhereInput = {
+    AND?: SyncJobWhereInput | SyncJobWhereInput[]
+    OR?: SyncJobWhereInput[]
+    NOT?: SyncJobWhereInput | SyncJobWhereInput[]
+    id?: StringFilter<"SyncJob"> | string
+    syncAccountId?: StringFilter<"SyncJob"> | string
+    status?: EnumSyncJobStatusFilter<"SyncJob"> | $Enums.SyncJobStatus
+    trigger?: EnumSyncJobTriggerFilter<"SyncJob"> | $Enums.SyncJobTrigger
+    syncDirection?: EnumSyncDirectionFilter<"SyncJob"> | $Enums.SyncDirection
+    attemptCount?: IntFilter<"SyncJob"> | number
+    maxAttempts?: IntFilter<"SyncJob"> | number
+    nextRetryAt?: DateTimeNullableFilter<"SyncJob"> | Date | string | null
+    leaseExpiresAt?: DateTimeNullableFilter<"SyncJob"> | Date | string | null
+    workerId?: StringNullableFilter<"SyncJob"> | string | null
+    idempotencyKey?: StringNullableFilter<"SyncJob"> | string | null
+    cursorBefore?: StringNullableFilter<"SyncJob"> | string | null
+    cursorAfter?: StringNullableFilter<"SyncJob"> | string | null
+    createdCount?: IntFilter<"SyncJob"> | number
+    updatedCount?: IntFilter<"SyncJob"> | number
+    deletedCount?: IntFilter<"SyncJob"> | number
+    conflictCount?: IntFilter<"SyncJob"> | number
+    skippedCount?: IntFilter<"SyncJob"> | number
+    errorCode?: StringNullableFilter<"SyncJob"> | string | null
+    errorSummary?: StringNullableFilter<"SyncJob"> | string | null
+    startedAt?: DateTimeNullableFilter<"SyncJob"> | Date | string | null
+    completedAt?: DateTimeNullableFilter<"SyncJob"> | Date | string | null
+    createdAt?: DateTimeFilter<"SyncJob"> | Date | string
+    updatedAt?: DateTimeFilter<"SyncJob"> | Date | string
+    syncAccount?: XOR<SyncAccountScalarRelationFilter, SyncAccountWhereInput>
+  }
+
+  export type SyncJobOrderByWithRelationInput = {
+    id?: SortOrder
+    syncAccountId?: SortOrder
+    status?: SortOrder
+    trigger?: SortOrder
+    syncDirection?: SortOrder
+    attemptCount?: SortOrder
+    maxAttempts?: SortOrder
+    nextRetryAt?: SortOrderInput | SortOrder
+    leaseExpiresAt?: SortOrderInput | SortOrder
+    workerId?: SortOrderInput | SortOrder
+    idempotencyKey?: SortOrderInput | SortOrder
+    cursorBefore?: SortOrderInput | SortOrder
+    cursorAfter?: SortOrderInput | SortOrder
+    createdCount?: SortOrder
+    updatedCount?: SortOrder
+    deletedCount?: SortOrder
+    conflictCount?: SortOrder
+    skippedCount?: SortOrder
+    errorCode?: SortOrderInput | SortOrder
+    errorSummary?: SortOrderInput | SortOrder
+    startedAt?: SortOrderInput | SortOrder
+    completedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    syncAccount?: SyncAccountOrderByWithRelationInput
+  }
+
+  export type SyncJobWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    syncAccountId_idempotencyKey?: SyncJobSyncAccountIdIdempotencyKeyCompoundUniqueInput
+    AND?: SyncJobWhereInput | SyncJobWhereInput[]
+    OR?: SyncJobWhereInput[]
+    NOT?: SyncJobWhereInput | SyncJobWhereInput[]
+    syncAccountId?: StringFilter<"SyncJob"> | string
+    status?: EnumSyncJobStatusFilter<"SyncJob"> | $Enums.SyncJobStatus
+    trigger?: EnumSyncJobTriggerFilter<"SyncJob"> | $Enums.SyncJobTrigger
+    syncDirection?: EnumSyncDirectionFilter<"SyncJob"> | $Enums.SyncDirection
+    attemptCount?: IntFilter<"SyncJob"> | number
+    maxAttempts?: IntFilter<"SyncJob"> | number
+    nextRetryAt?: DateTimeNullableFilter<"SyncJob"> | Date | string | null
+    leaseExpiresAt?: DateTimeNullableFilter<"SyncJob"> | Date | string | null
+    workerId?: StringNullableFilter<"SyncJob"> | string | null
+    idempotencyKey?: StringNullableFilter<"SyncJob"> | string | null
+    cursorBefore?: StringNullableFilter<"SyncJob"> | string | null
+    cursorAfter?: StringNullableFilter<"SyncJob"> | string | null
+    createdCount?: IntFilter<"SyncJob"> | number
+    updatedCount?: IntFilter<"SyncJob"> | number
+    deletedCount?: IntFilter<"SyncJob"> | number
+    conflictCount?: IntFilter<"SyncJob"> | number
+    skippedCount?: IntFilter<"SyncJob"> | number
+    errorCode?: StringNullableFilter<"SyncJob"> | string | null
+    errorSummary?: StringNullableFilter<"SyncJob"> | string | null
+    startedAt?: DateTimeNullableFilter<"SyncJob"> | Date | string | null
+    completedAt?: DateTimeNullableFilter<"SyncJob"> | Date | string | null
+    createdAt?: DateTimeFilter<"SyncJob"> | Date | string
+    updatedAt?: DateTimeFilter<"SyncJob"> | Date | string
+    syncAccount?: XOR<SyncAccountScalarRelationFilter, SyncAccountWhereInput>
+  }, "id" | "syncAccountId_idempotencyKey">
+
+  export type SyncJobOrderByWithAggregationInput = {
+    id?: SortOrder
+    syncAccountId?: SortOrder
+    status?: SortOrder
+    trigger?: SortOrder
+    syncDirection?: SortOrder
+    attemptCount?: SortOrder
+    maxAttempts?: SortOrder
+    nextRetryAt?: SortOrderInput | SortOrder
+    leaseExpiresAt?: SortOrderInput | SortOrder
+    workerId?: SortOrderInput | SortOrder
+    idempotencyKey?: SortOrderInput | SortOrder
+    cursorBefore?: SortOrderInput | SortOrder
+    cursorAfter?: SortOrderInput | SortOrder
+    createdCount?: SortOrder
+    updatedCount?: SortOrder
+    deletedCount?: SortOrder
+    conflictCount?: SortOrder
+    skippedCount?: SortOrder
+    errorCode?: SortOrderInput | SortOrder
+    errorSummary?: SortOrderInput | SortOrder
+    startedAt?: SortOrderInput | SortOrder
+    completedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: SyncJobCountOrderByAggregateInput
+    _avg?: SyncJobAvgOrderByAggregateInput
+    _max?: SyncJobMaxOrderByAggregateInput
+    _min?: SyncJobMinOrderByAggregateInput
+    _sum?: SyncJobSumOrderByAggregateInput
+  }
+
+  export type SyncJobScalarWhereWithAggregatesInput = {
+    AND?: SyncJobScalarWhereWithAggregatesInput | SyncJobScalarWhereWithAggregatesInput[]
+    OR?: SyncJobScalarWhereWithAggregatesInput[]
+    NOT?: SyncJobScalarWhereWithAggregatesInput | SyncJobScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SyncJob"> | string
+    syncAccountId?: StringWithAggregatesFilter<"SyncJob"> | string
+    status?: EnumSyncJobStatusWithAggregatesFilter<"SyncJob"> | $Enums.SyncJobStatus
+    trigger?: EnumSyncJobTriggerWithAggregatesFilter<"SyncJob"> | $Enums.SyncJobTrigger
+    syncDirection?: EnumSyncDirectionWithAggregatesFilter<"SyncJob"> | $Enums.SyncDirection
+    attemptCount?: IntWithAggregatesFilter<"SyncJob"> | number
+    maxAttempts?: IntWithAggregatesFilter<"SyncJob"> | number
+    nextRetryAt?: DateTimeNullableWithAggregatesFilter<"SyncJob"> | Date | string | null
+    leaseExpiresAt?: DateTimeNullableWithAggregatesFilter<"SyncJob"> | Date | string | null
+    workerId?: StringNullableWithAggregatesFilter<"SyncJob"> | string | null
+    idempotencyKey?: StringNullableWithAggregatesFilter<"SyncJob"> | string | null
+    cursorBefore?: StringNullableWithAggregatesFilter<"SyncJob"> | string | null
+    cursorAfter?: StringNullableWithAggregatesFilter<"SyncJob"> | string | null
+    createdCount?: IntWithAggregatesFilter<"SyncJob"> | number
+    updatedCount?: IntWithAggregatesFilter<"SyncJob"> | number
+    deletedCount?: IntWithAggregatesFilter<"SyncJob"> | number
+    conflictCount?: IntWithAggregatesFilter<"SyncJob"> | number
+    skippedCount?: IntWithAggregatesFilter<"SyncJob"> | number
+    errorCode?: StringNullableWithAggregatesFilter<"SyncJob"> | string | null
+    errorSummary?: StringNullableWithAggregatesFilter<"SyncJob"> | string | null
+    startedAt?: DateTimeNullableWithAggregatesFilter<"SyncJob"> | Date | string | null
+    completedAt?: DateTimeNullableWithAggregatesFilter<"SyncJob"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"SyncJob"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"SyncJob"> | Date | string
+  }
+
+  export type SyncConflictWhereInput = {
+    AND?: SyncConflictWhereInput | SyncConflictWhereInput[]
+    OR?: SyncConflictWhereInput[]
+    NOT?: SyncConflictWhereInput | SyncConflictWhereInput[]
+    id?: StringFilter<"SyncConflict"> | string
+    syncAccountId?: StringFilter<"SyncConflict"> | string
+    syncContactLinkId?: StringNullableFilter<"SyncConflict"> | string | null
+    contactId?: StringNullableFilter<"SyncConflict"> | string | null
+    conflictType?: EnumSyncConflictTypeFilter<"SyncConflict"> | $Enums.SyncConflictType
+    status?: EnumSyncConflictStatusFilter<"SyncConflict"> | $Enums.SyncConflictStatus
+    resolutionStrategy?: EnumSyncResolutionStrategyNullableFilter<"SyncConflict"> | $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: IntNullableFilter<"SyncConflict"> | number | null
+    remoteETag?: StringNullableFilter<"SyncConflict"> | string | null
+    localSnapshot?: JsonNullableFilter<"SyncConflict">
+    remoteSnapshot?: JsonNullableFilter<"SyncConflict">
+    resolutionNotes?: StringNullableFilter<"SyncConflict"> | string | null
+    detectedAt?: DateTimeFilter<"SyncConflict"> | Date | string
+    resolvedAt?: DateTimeNullableFilter<"SyncConflict"> | Date | string | null
+    createdAt?: DateTimeFilter<"SyncConflict"> | Date | string
+    updatedAt?: DateTimeFilter<"SyncConflict"> | Date | string
+    syncAccount?: XOR<SyncAccountScalarRelationFilter, SyncAccountWhereInput>
+    syncContactLink?: XOR<SyncContactLinkNullableScalarRelationFilter, SyncContactLinkWhereInput> | null
+    contact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
+  }
+
+  export type SyncConflictOrderByWithRelationInput = {
+    id?: SortOrder
+    syncAccountId?: SortOrder
+    syncContactLinkId?: SortOrderInput | SortOrder
+    contactId?: SortOrderInput | SortOrder
+    conflictType?: SortOrder
+    status?: SortOrder
+    resolutionStrategy?: SortOrderInput | SortOrder
+    localSyncVersion?: SortOrderInput | SortOrder
+    remoteETag?: SortOrderInput | SortOrder
+    localSnapshot?: SortOrderInput | SortOrder
+    remoteSnapshot?: SortOrderInput | SortOrder
+    resolutionNotes?: SortOrderInput | SortOrder
+    detectedAt?: SortOrder
+    resolvedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    syncAccount?: SyncAccountOrderByWithRelationInput
+    syncContactLink?: SyncContactLinkOrderByWithRelationInput
+    contact?: ContactOrderByWithRelationInput
+  }
+
+  export type SyncConflictWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: SyncConflictWhereInput | SyncConflictWhereInput[]
+    OR?: SyncConflictWhereInput[]
+    NOT?: SyncConflictWhereInput | SyncConflictWhereInput[]
+    syncAccountId?: StringFilter<"SyncConflict"> | string
+    syncContactLinkId?: StringNullableFilter<"SyncConflict"> | string | null
+    contactId?: StringNullableFilter<"SyncConflict"> | string | null
+    conflictType?: EnumSyncConflictTypeFilter<"SyncConflict"> | $Enums.SyncConflictType
+    status?: EnumSyncConflictStatusFilter<"SyncConflict"> | $Enums.SyncConflictStatus
+    resolutionStrategy?: EnumSyncResolutionStrategyNullableFilter<"SyncConflict"> | $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: IntNullableFilter<"SyncConflict"> | number | null
+    remoteETag?: StringNullableFilter<"SyncConflict"> | string | null
+    localSnapshot?: JsonNullableFilter<"SyncConflict">
+    remoteSnapshot?: JsonNullableFilter<"SyncConflict">
+    resolutionNotes?: StringNullableFilter<"SyncConflict"> | string | null
+    detectedAt?: DateTimeFilter<"SyncConflict"> | Date | string
+    resolvedAt?: DateTimeNullableFilter<"SyncConflict"> | Date | string | null
+    createdAt?: DateTimeFilter<"SyncConflict"> | Date | string
+    updatedAt?: DateTimeFilter<"SyncConflict"> | Date | string
+    syncAccount?: XOR<SyncAccountScalarRelationFilter, SyncAccountWhereInput>
+    syncContactLink?: XOR<SyncContactLinkNullableScalarRelationFilter, SyncContactLinkWhereInput> | null
+    contact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
+  }, "id">
+
+  export type SyncConflictOrderByWithAggregationInput = {
+    id?: SortOrder
+    syncAccountId?: SortOrder
+    syncContactLinkId?: SortOrderInput | SortOrder
+    contactId?: SortOrderInput | SortOrder
+    conflictType?: SortOrder
+    status?: SortOrder
+    resolutionStrategy?: SortOrderInput | SortOrder
+    localSyncVersion?: SortOrderInput | SortOrder
+    remoteETag?: SortOrderInput | SortOrder
+    localSnapshot?: SortOrderInput | SortOrder
+    remoteSnapshot?: SortOrderInput | SortOrder
+    resolutionNotes?: SortOrderInput | SortOrder
+    detectedAt?: SortOrder
+    resolvedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: SyncConflictCountOrderByAggregateInput
+    _avg?: SyncConflictAvgOrderByAggregateInput
+    _max?: SyncConflictMaxOrderByAggregateInput
+    _min?: SyncConflictMinOrderByAggregateInput
+    _sum?: SyncConflictSumOrderByAggregateInput
+  }
+
+  export type SyncConflictScalarWhereWithAggregatesInput = {
+    AND?: SyncConflictScalarWhereWithAggregatesInput | SyncConflictScalarWhereWithAggregatesInput[]
+    OR?: SyncConflictScalarWhereWithAggregatesInput[]
+    NOT?: SyncConflictScalarWhereWithAggregatesInput | SyncConflictScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SyncConflict"> | string
+    syncAccountId?: StringWithAggregatesFilter<"SyncConflict"> | string
+    syncContactLinkId?: StringNullableWithAggregatesFilter<"SyncConflict"> | string | null
+    contactId?: StringNullableWithAggregatesFilter<"SyncConflict"> | string | null
+    conflictType?: EnumSyncConflictTypeWithAggregatesFilter<"SyncConflict"> | $Enums.SyncConflictType
+    status?: EnumSyncConflictStatusWithAggregatesFilter<"SyncConflict"> | $Enums.SyncConflictStatus
+    resolutionStrategy?: EnumSyncResolutionStrategyNullableWithAggregatesFilter<"SyncConflict"> | $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: IntNullableWithAggregatesFilter<"SyncConflict"> | number | null
+    remoteETag?: StringNullableWithAggregatesFilter<"SyncConflict"> | string | null
+    localSnapshot?: JsonNullableWithAggregatesFilter<"SyncConflict">
+    remoteSnapshot?: JsonNullableWithAggregatesFilter<"SyncConflict">
+    resolutionNotes?: StringNullableWithAggregatesFilter<"SyncConflict"> | string | null
+    detectedAt?: DateTimeWithAggregatesFilter<"SyncConflict"> | Date | string
+    resolvedAt?: DateTimeNullableWithAggregatesFilter<"SyncConflict"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"SyncConflict"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"SyncConflict"> | Date | string
   }
 
   export type UserCreateInput = {
@@ -9612,6 +20031,9 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
   }
@@ -9627,6 +20049,9 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
   }
@@ -9642,6 +20067,9 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
   }
@@ -9657,6 +20085,9 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
   }
@@ -9693,6 +20124,9 @@ export namespace Prisma {
 
   export type ContactCreateInput = {
     id?: string
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
     fullName: string
     email?: string | null
     phone?: string | null
@@ -9702,11 +20136,23 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutContactsInput
+    importJob?: ImportJobCreateNestedOneWithoutContactsInput
+    leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
+    mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
 
   export type ContactUncheckedCreateInput = {
     id?: string
     userId: string
+    importJobId?: string | null
+    mergedIntoContactId?: string | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
     fullName: string
     email?: string | null
     phone?: string | null
@@ -9715,10 +20161,18 @@ export namespace Prisma {
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
   export type ContactUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -9728,11 +20182,23 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutContactsNestedInput
+    importJob?: ImportJobUpdateOneWithoutContactsNestedInput
+    leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
+    mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
 
   export type ContactUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -9741,11 +20207,21 @@ export namespace Prisma {
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
   export type ContactCreateManyInput = {
     id?: string
     userId: string
+    importJobId?: string | null
+    mergedIntoContactId?: string | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
     fullName: string
     email?: string | null
     phone?: string | null
@@ -9758,6 +20234,9 @@ export namespace Prisma {
 
   export type ContactUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -9771,6 +20250,11 @@ export namespace Prisma {
   export type ContactUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -10044,82 +20528,126 @@ export namespace Prisma {
   export type ImportJobCreateInput = {
     id?: string
     format: $Enums.ContactImportFormat
+    sourceProfile?: $Enums.ImportSourceProfile | null
     status?: $Enums.ImportExportJobStatus
     sourceFileName?: string | null
+    sourceFileSizeBytes?: number | null
     rowCount?: number
+    previewContactCount?: number
     importedCount?: number
     skippedCount?: number
     errorCount?: number
+    warningCount?: number
+    rolledBackCount?: number
     errorSummary?: string | null
+    previewedAt?: Date | string | null
+    committedAt?: Date | string | null
+    rolledBackAt?: Date | string | null
     createdAt?: Date | string
     startedAt?: Date | string
     completedAt?: Date | string | null
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutImportJobsInput
+    contacts?: ContactCreateNestedManyWithoutImportJobInput
   }
 
   export type ImportJobUncheckedCreateInput = {
     id?: string
     userId: string
     format: $Enums.ContactImportFormat
+    sourceProfile?: $Enums.ImportSourceProfile | null
     status?: $Enums.ImportExportJobStatus
     sourceFileName?: string | null
+    sourceFileSizeBytes?: number | null
     rowCount?: number
+    previewContactCount?: number
     importedCount?: number
     skippedCount?: number
     errorCount?: number
+    warningCount?: number
+    rolledBackCount?: number
     errorSummary?: string | null
+    previewedAt?: Date | string | null
+    committedAt?: Date | string | null
+    rolledBackAt?: Date | string | null
     createdAt?: Date | string
     startedAt?: Date | string
     completedAt?: Date | string | null
     updatedAt?: Date | string
+    contacts?: ContactUncheckedCreateNestedManyWithoutImportJobInput
   }
 
   export type ImportJobUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     format?: EnumContactImportFormatFieldUpdateOperationsInput | $Enums.ContactImportFormat
+    sourceProfile?: NullableEnumImportSourceProfileFieldUpdateOperationsInput | $Enums.ImportSourceProfile | null
     status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
     sourceFileName?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
     rowCount?: IntFieldUpdateOperationsInput | number
+    previewContactCount?: IntFieldUpdateOperationsInput | number
     importedCount?: IntFieldUpdateOperationsInput | number
     skippedCount?: IntFieldUpdateOperationsInput | number
     errorCount?: IntFieldUpdateOperationsInput | number
+    warningCount?: IntFieldUpdateOperationsInput | number
+    rolledBackCount?: IntFieldUpdateOperationsInput | number
     errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    previewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    committedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rolledBackAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutImportJobsNestedInput
+    contacts?: ContactUpdateManyWithoutImportJobNestedInput
   }
 
   export type ImportJobUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     format?: EnumContactImportFormatFieldUpdateOperationsInput | $Enums.ContactImportFormat
+    sourceProfile?: NullableEnumImportSourceProfileFieldUpdateOperationsInput | $Enums.ImportSourceProfile | null
     status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
     sourceFileName?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
     rowCount?: IntFieldUpdateOperationsInput | number
+    previewContactCount?: IntFieldUpdateOperationsInput | number
     importedCount?: IntFieldUpdateOperationsInput | number
     skippedCount?: IntFieldUpdateOperationsInput | number
     errorCount?: IntFieldUpdateOperationsInput | number
+    warningCount?: IntFieldUpdateOperationsInput | number
+    rolledBackCount?: IntFieldUpdateOperationsInput | number
     errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    previewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    committedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rolledBackAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: ContactUncheckedUpdateManyWithoutImportJobNestedInput
   }
 
   export type ImportJobCreateManyInput = {
     id?: string
     userId: string
     format: $Enums.ContactImportFormat
+    sourceProfile?: $Enums.ImportSourceProfile | null
     status?: $Enums.ImportExportJobStatus
     sourceFileName?: string | null
+    sourceFileSizeBytes?: number | null
     rowCount?: number
+    previewContactCount?: number
     importedCount?: number
     skippedCount?: number
     errorCount?: number
+    warningCount?: number
+    rolledBackCount?: number
     errorSummary?: string | null
+    previewedAt?: Date | string | null
+    committedAt?: Date | string | null
+    rolledBackAt?: Date | string | null
     createdAt?: Date | string
     startedAt?: Date | string
     completedAt?: Date | string | null
@@ -10129,13 +20657,21 @@ export namespace Prisma {
   export type ImportJobUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     format?: EnumContactImportFormatFieldUpdateOperationsInput | $Enums.ContactImportFormat
+    sourceProfile?: NullableEnumImportSourceProfileFieldUpdateOperationsInput | $Enums.ImportSourceProfile | null
     status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
     sourceFileName?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
     rowCount?: IntFieldUpdateOperationsInput | number
+    previewContactCount?: IntFieldUpdateOperationsInput | number
     importedCount?: IntFieldUpdateOperationsInput | number
     skippedCount?: IntFieldUpdateOperationsInput | number
     errorCount?: IntFieldUpdateOperationsInput | number
+    warningCount?: IntFieldUpdateOperationsInput | number
+    rolledBackCount?: IntFieldUpdateOperationsInput | number
     errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    previewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    committedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rolledBackAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -10146,13 +20682,21 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     format?: EnumContactImportFormatFieldUpdateOperationsInput | $Enums.ContactImportFormat
+    sourceProfile?: NullableEnumImportSourceProfileFieldUpdateOperationsInput | $Enums.ImportSourceProfile | null
     status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
     sourceFileName?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
     rowCount?: IntFieldUpdateOperationsInput | number
+    previewContactCount?: IntFieldUpdateOperationsInput | number
     importedCount?: IntFieldUpdateOperationsInput | number
     skippedCount?: IntFieldUpdateOperationsInput | number
     errorCount?: IntFieldUpdateOperationsInput | number
+    warningCount?: IntFieldUpdateOperationsInput | number
+    rolledBackCount?: IntFieldUpdateOperationsInput | number
     errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    previewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    committedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rolledBackAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -10164,6 +20708,8 @@ export namespace Prisma {
     format: $Enums.ContactExportFormat
     status?: $Enums.ImportExportJobStatus
     includeArchived?: boolean
+    filterQuery?: string | null
+    resultFileName?: string | null
     exportedCount?: number
     errorSummary?: string | null
     createdAt?: Date | string
@@ -10179,6 +20725,8 @@ export namespace Prisma {
     format: $Enums.ContactExportFormat
     status?: $Enums.ImportExportJobStatus
     includeArchived?: boolean
+    filterQuery?: string | null
+    resultFileName?: string | null
     exportedCount?: number
     errorSummary?: string | null
     createdAt?: Date | string
@@ -10192,6 +20740,8 @@ export namespace Prisma {
     format?: EnumContactExportFormatFieldUpdateOperationsInput | $Enums.ContactExportFormat
     status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
     includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    filterQuery?: NullableStringFieldUpdateOperationsInput | string | null
+    resultFileName?: NullableStringFieldUpdateOperationsInput | string | null
     exportedCount?: IntFieldUpdateOperationsInput | number
     errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10207,6 +20757,8 @@ export namespace Prisma {
     format?: EnumContactExportFormatFieldUpdateOperationsInput | $Enums.ContactExportFormat
     status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
     includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    filterQuery?: NullableStringFieldUpdateOperationsInput | string | null
+    resultFileName?: NullableStringFieldUpdateOperationsInput | string | null
     exportedCount?: IntFieldUpdateOperationsInput | number
     errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10221,6 +20773,8 @@ export namespace Prisma {
     format: $Enums.ContactExportFormat
     status?: $Enums.ImportExportJobStatus
     includeArchived?: boolean
+    filterQuery?: string | null
+    resultFileName?: string | null
     exportedCount?: number
     errorSummary?: string | null
     createdAt?: Date | string
@@ -10234,6 +20788,8 @@ export namespace Prisma {
     format?: EnumContactExportFormatFieldUpdateOperationsInput | $Enums.ContactExportFormat
     status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
     includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    filterQuery?: NullableStringFieldUpdateOperationsInput | string | null
+    resultFileName?: NullableStringFieldUpdateOperationsInput | string | null
     exportedCount?: IntFieldUpdateOperationsInput | number
     errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -10248,11 +20804,882 @@ export namespace Prisma {
     format?: EnumContactExportFormatFieldUpdateOperationsInput | $Enums.ContactExportFormat
     status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
     includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    filterQuery?: NullableStringFieldUpdateOperationsInput | string | null
+    resultFileName?: NullableStringFieldUpdateOperationsInput | string | null
     exportedCount?: IntFieldUpdateOperationsInput | number
     errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergeSuggestionCreateInput = {
+    id?: string
+    pairKey: string
+    status?: $Enums.MergeSuggestionStatus
+    confidence: $Enums.MergeSuggestionConfidence
+    score: number
+    hardMatch?: boolean
+    signals: JsonNullValueInput | InputJsonValue
+    reasons: JsonNullValueInput | InputJsonValue
+    source: string
+    generatedAt?: Date | string
+    reviewedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutMergeSuggestionsInput
+    leftContact: ContactCreateNestedOneWithoutLeftMergeSuggestionsInput
+    rightContact: ContactCreateNestedOneWithoutRightMergeSuggestionsInput
+    decisions?: MergeDecisionCreateNestedManyWithoutSuggestionInput
+  }
+
+  export type MergeSuggestionUncheckedCreateInput = {
+    id?: string
+    userId: string
+    leftContactId: string
+    rightContactId: string
+    pairKey: string
+    status?: $Enums.MergeSuggestionStatus
+    confidence: $Enums.MergeSuggestionConfidence
+    score: number
+    hardMatch?: boolean
+    signals: JsonNullValueInput | InputJsonValue
+    reasons: JsonNullValueInput | InputJsonValue
+    source: string
+    generatedAt?: Date | string
+    reviewedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    decisions?: MergeDecisionUncheckedCreateNestedManyWithoutSuggestionInput
+  }
+
+  export type MergeSuggestionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    pairKey?: StringFieldUpdateOperationsInput | string
+    status?: EnumMergeSuggestionStatusFieldUpdateOperationsInput | $Enums.MergeSuggestionStatus
+    confidence?: EnumMergeSuggestionConfidenceFieldUpdateOperationsInput | $Enums.MergeSuggestionConfidence
+    score?: IntFieldUpdateOperationsInput | number
+    hardMatch?: BoolFieldUpdateOperationsInput | boolean
+    signals?: JsonNullValueInput | InputJsonValue
+    reasons?: JsonNullValueInput | InputJsonValue
+    source?: StringFieldUpdateOperationsInput | string
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutMergeSuggestionsNestedInput
+    leftContact?: ContactUpdateOneRequiredWithoutLeftMergeSuggestionsNestedInput
+    rightContact?: ContactUpdateOneRequiredWithoutRightMergeSuggestionsNestedInput
+    decisions?: MergeDecisionUpdateManyWithoutSuggestionNestedInput
+  }
+
+  export type MergeSuggestionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    leftContactId?: StringFieldUpdateOperationsInput | string
+    rightContactId?: StringFieldUpdateOperationsInput | string
+    pairKey?: StringFieldUpdateOperationsInput | string
+    status?: EnumMergeSuggestionStatusFieldUpdateOperationsInput | $Enums.MergeSuggestionStatus
+    confidence?: EnumMergeSuggestionConfidenceFieldUpdateOperationsInput | $Enums.MergeSuggestionConfidence
+    score?: IntFieldUpdateOperationsInput | number
+    hardMatch?: BoolFieldUpdateOperationsInput | boolean
+    signals?: JsonNullValueInput | InputJsonValue
+    reasons?: JsonNullValueInput | InputJsonValue
+    source?: StringFieldUpdateOperationsInput | string
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    decisions?: MergeDecisionUncheckedUpdateManyWithoutSuggestionNestedInput
+  }
+
+  export type MergeSuggestionCreateManyInput = {
+    id?: string
+    userId: string
+    leftContactId: string
+    rightContactId: string
+    pairKey: string
+    status?: $Enums.MergeSuggestionStatus
+    confidence: $Enums.MergeSuggestionConfidence
+    score: number
+    hardMatch?: boolean
+    signals: JsonNullValueInput | InputJsonValue
+    reasons: JsonNullValueInput | InputJsonValue
+    source: string
+    generatedAt?: Date | string
+    reviewedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MergeSuggestionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    pairKey?: StringFieldUpdateOperationsInput | string
+    status?: EnumMergeSuggestionStatusFieldUpdateOperationsInput | $Enums.MergeSuggestionStatus
+    confidence?: EnumMergeSuggestionConfidenceFieldUpdateOperationsInput | $Enums.MergeSuggestionConfidence
+    score?: IntFieldUpdateOperationsInput | number
+    hardMatch?: BoolFieldUpdateOperationsInput | boolean
+    signals?: JsonNullValueInput | InputJsonValue
+    reasons?: JsonNullValueInput | InputJsonValue
+    source?: StringFieldUpdateOperationsInput | string
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergeSuggestionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    leftContactId?: StringFieldUpdateOperationsInput | string
+    rightContactId?: StringFieldUpdateOperationsInput | string
+    pairKey?: StringFieldUpdateOperationsInput | string
+    status?: EnumMergeSuggestionStatusFieldUpdateOperationsInput | $Enums.MergeSuggestionStatus
+    confidence?: EnumMergeSuggestionConfidenceFieldUpdateOperationsInput | $Enums.MergeSuggestionConfidence
+    score?: IntFieldUpdateOperationsInput | number
+    hardMatch?: BoolFieldUpdateOperationsInput | boolean
+    signals?: JsonNullValueInput | InputJsonValue
+    reasons?: JsonNullValueInput | InputJsonValue
+    source?: StringFieldUpdateOperationsInput | string
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergeDecisionCreateInput = {
+    id?: string
+    status: $Enums.MergeDecisionStatus
+    source: string
+    notes?: string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    decidedAt?: Date | string
+    reversedAt?: Date | string | null
+    reversalSource?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    suggestion: MergeSuggestionCreateNestedOneWithoutDecisionsInput
+    user: UserCreateNestedOneWithoutMergeDecisionsInput
+  }
+
+  export type MergeDecisionUncheckedCreateInput = {
+    id?: string
+    suggestionId: string
+    userId: string
+    status: $Enums.MergeDecisionStatus
+    source: string
+    notes?: string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    decidedAt?: Date | string
+    reversedAt?: Date | string | null
+    reversalSource?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MergeDecisionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumMergeDecisionStatusFieldUpdateOperationsInput | $Enums.MergeDecisionStatus
+    source?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    decidedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reversalSource?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    suggestion?: MergeSuggestionUpdateOneRequiredWithoutDecisionsNestedInput
+    user?: UserUpdateOneRequiredWithoutMergeDecisionsNestedInput
+  }
+
+  export type MergeDecisionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    suggestionId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    status?: EnumMergeDecisionStatusFieldUpdateOperationsInput | $Enums.MergeDecisionStatus
+    source?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    decidedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reversalSource?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergeDecisionCreateManyInput = {
+    id?: string
+    suggestionId: string
+    userId: string
+    status: $Enums.MergeDecisionStatus
+    source: string
+    notes?: string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    decidedAt?: Date | string
+    reversedAt?: Date | string | null
+    reversalSource?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MergeDecisionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumMergeDecisionStatusFieldUpdateOperationsInput | $Enums.MergeDecisionStatus
+    source?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    decidedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reversalSource?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergeDecisionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    suggestionId?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    status?: EnumMergeDecisionStatusFieldUpdateOperationsInput | $Enums.MergeDecisionStatus
+    source?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    decidedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reversalSource?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncAccountCreateInput = {
+    id?: string
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutSyncAccountsInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
+    syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
+  }
+
+  export type SyncAccountUncheckedCreateInput = {
+    id?: string
+    userId: string
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
+    syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
+  }
+
+  export type SyncAccountUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
+    syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
+  }
+
+  export type SyncAccountUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
+    syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
+  }
+
+  export type SyncAccountCreateManyInput = {
+    id?: string
+    userId: string
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SyncAccountUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncAccountUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncContactLinkCreateInput = {
+    id?: string
+    remoteHref?: string | null
+    remoteUid?: string | null
+    remoteETag?: string | null
+    lastSyncedAt?: Date | string | null
+    tombstonedAt?: Date | string | null
+    remoteDeletedAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    syncAccount: SyncAccountCreateNestedOneWithoutSyncLinksInput
+    contact: ContactCreateNestedOneWithoutSyncLinksInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutSyncContactLinkInput
+  }
+
+  export type SyncContactLinkUncheckedCreateInput = {
+    id?: string
+    syncAccountId: string
+    contactId: string
+    remoteHref?: string | null
+    remoteUid?: string | null
+    remoteETag?: string | null
+    lastSyncedAt?: Date | string | null
+    tombstonedAt?: Date | string | null
+    remoteDeletedAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncContactLinkInput
+  }
+
+  export type SyncContactLinkUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    remoteHref?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteUid?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncAccount?: SyncAccountUpdateOneRequiredWithoutSyncLinksNestedInput
+    contact?: ContactUpdateOneRequiredWithoutSyncLinksNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutSyncContactLinkNestedInput
+  }
+
+  export type SyncContactLinkUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: StringFieldUpdateOperationsInput | string
+    contactId?: StringFieldUpdateOperationsInput | string
+    remoteHref?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteUid?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncContactLinkNestedInput
+  }
+
+  export type SyncContactLinkCreateManyInput = {
+    id?: string
+    syncAccountId: string
+    contactId: string
+    remoteHref?: string | null
+    remoteUid?: string | null
+    remoteETag?: string | null
+    lastSyncedAt?: Date | string | null
+    tombstonedAt?: Date | string | null
+    remoteDeletedAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SyncContactLinkUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    remoteHref?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteUid?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncContactLinkUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: StringFieldUpdateOperationsInput | string
+    contactId?: StringFieldUpdateOperationsInput | string
+    remoteHref?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteUid?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncJobCreateInput = {
+    id?: string
+    status?: $Enums.SyncJobStatus
+    trigger?: $Enums.SyncJobTrigger
+    syncDirection: $Enums.SyncDirection
+    attemptCount?: number
+    maxAttempts?: number
+    nextRetryAt?: Date | string | null
+    leaseExpiresAt?: Date | string | null
+    workerId?: string | null
+    idempotencyKey?: string | null
+    cursorBefore?: string | null
+    cursorAfter?: string | null
+    createdCount?: number
+    updatedCount?: number
+    deletedCount?: number
+    conflictCount?: number
+    skippedCount?: number
+    errorCode?: string | null
+    errorSummary?: string | null
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    syncAccount: SyncAccountCreateNestedOneWithoutSyncJobsInput
+  }
+
+  export type SyncJobUncheckedCreateInput = {
+    id?: string
+    syncAccountId: string
+    status?: $Enums.SyncJobStatus
+    trigger?: $Enums.SyncJobTrigger
+    syncDirection: $Enums.SyncDirection
+    attemptCount?: number
+    maxAttempts?: number
+    nextRetryAt?: Date | string | null
+    leaseExpiresAt?: Date | string | null
+    workerId?: string | null
+    idempotencyKey?: string | null
+    cursorBefore?: string | null
+    cursorAfter?: string | null
+    createdCount?: number
+    updatedCount?: number
+    deletedCount?: number
+    conflictCount?: number
+    skippedCount?: number
+    errorCode?: string | null
+    errorSummary?: string | null
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SyncJobUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumSyncJobStatusFieldUpdateOperationsInput | $Enums.SyncJobStatus
+    trigger?: EnumSyncJobTriggerFieldUpdateOperationsInput | $Enums.SyncJobTrigger
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    attemptCount?: IntFieldUpdateOperationsInput | number
+    maxAttempts?: IntFieldUpdateOperationsInput | number
+    nextRetryAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    leaseExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    workerId?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    cursorBefore?: NullableStringFieldUpdateOperationsInput | string | null
+    cursorAfter?: NullableStringFieldUpdateOperationsInput | string | null
+    createdCount?: IntFieldUpdateOperationsInput | number
+    updatedCount?: IntFieldUpdateOperationsInput | number
+    deletedCount?: IntFieldUpdateOperationsInput | number
+    conflictCount?: IntFieldUpdateOperationsInput | number
+    skippedCount?: IntFieldUpdateOperationsInput | number
+    errorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncAccount?: SyncAccountUpdateOneRequiredWithoutSyncJobsNestedInput
+  }
+
+  export type SyncJobUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: StringFieldUpdateOperationsInput | string
+    status?: EnumSyncJobStatusFieldUpdateOperationsInput | $Enums.SyncJobStatus
+    trigger?: EnumSyncJobTriggerFieldUpdateOperationsInput | $Enums.SyncJobTrigger
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    attemptCount?: IntFieldUpdateOperationsInput | number
+    maxAttempts?: IntFieldUpdateOperationsInput | number
+    nextRetryAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    leaseExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    workerId?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    cursorBefore?: NullableStringFieldUpdateOperationsInput | string | null
+    cursorAfter?: NullableStringFieldUpdateOperationsInput | string | null
+    createdCount?: IntFieldUpdateOperationsInput | number
+    updatedCount?: IntFieldUpdateOperationsInput | number
+    deletedCount?: IntFieldUpdateOperationsInput | number
+    conflictCount?: IntFieldUpdateOperationsInput | number
+    skippedCount?: IntFieldUpdateOperationsInput | number
+    errorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncJobCreateManyInput = {
+    id?: string
+    syncAccountId: string
+    status?: $Enums.SyncJobStatus
+    trigger?: $Enums.SyncJobTrigger
+    syncDirection: $Enums.SyncDirection
+    attemptCount?: number
+    maxAttempts?: number
+    nextRetryAt?: Date | string | null
+    leaseExpiresAt?: Date | string | null
+    workerId?: string | null
+    idempotencyKey?: string | null
+    cursorBefore?: string | null
+    cursorAfter?: string | null
+    createdCount?: number
+    updatedCount?: number
+    deletedCount?: number
+    conflictCount?: number
+    skippedCount?: number
+    errorCode?: string | null
+    errorSummary?: string | null
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SyncJobUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumSyncJobStatusFieldUpdateOperationsInput | $Enums.SyncJobStatus
+    trigger?: EnumSyncJobTriggerFieldUpdateOperationsInput | $Enums.SyncJobTrigger
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    attemptCount?: IntFieldUpdateOperationsInput | number
+    maxAttempts?: IntFieldUpdateOperationsInput | number
+    nextRetryAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    leaseExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    workerId?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    cursorBefore?: NullableStringFieldUpdateOperationsInput | string | null
+    cursorAfter?: NullableStringFieldUpdateOperationsInput | string | null
+    createdCount?: IntFieldUpdateOperationsInput | number
+    updatedCount?: IntFieldUpdateOperationsInput | number
+    deletedCount?: IntFieldUpdateOperationsInput | number
+    conflictCount?: IntFieldUpdateOperationsInput | number
+    skippedCount?: IntFieldUpdateOperationsInput | number
+    errorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncJobUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: StringFieldUpdateOperationsInput | string
+    status?: EnumSyncJobStatusFieldUpdateOperationsInput | $Enums.SyncJobStatus
+    trigger?: EnumSyncJobTriggerFieldUpdateOperationsInput | $Enums.SyncJobTrigger
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    attemptCount?: IntFieldUpdateOperationsInput | number
+    maxAttempts?: IntFieldUpdateOperationsInput | number
+    nextRetryAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    leaseExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    workerId?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    cursorBefore?: NullableStringFieldUpdateOperationsInput | string | null
+    cursorAfter?: NullableStringFieldUpdateOperationsInput | string | null
+    createdCount?: IntFieldUpdateOperationsInput | number
+    updatedCount?: IntFieldUpdateOperationsInput | number
+    deletedCount?: IntFieldUpdateOperationsInput | number
+    conflictCount?: IntFieldUpdateOperationsInput | number
+    skippedCount?: IntFieldUpdateOperationsInput | number
+    errorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncConflictCreateInput = {
+    id?: string
+    conflictType: $Enums.SyncConflictType
+    status?: $Enums.SyncConflictStatus
+    resolutionStrategy?: $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: number | null
+    remoteETag?: string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: string | null
+    detectedAt?: Date | string
+    resolvedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    syncAccount: SyncAccountCreateNestedOneWithoutSyncConflictsInput
+    syncContactLink?: SyncContactLinkCreateNestedOneWithoutSyncConflictsInput
+    contact?: ContactCreateNestedOneWithoutSyncConflictsInput
+  }
+
+  export type SyncConflictUncheckedCreateInput = {
+    id?: string
+    syncAccountId: string
+    syncContactLinkId?: string | null
+    contactId?: string | null
+    conflictType: $Enums.SyncConflictType
+    status?: $Enums.SyncConflictStatus
+    resolutionStrategy?: $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: number | null
+    remoteETag?: string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: string | null
+    detectedAt?: Date | string
+    resolvedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SyncConflictUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
+    resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncAccount?: SyncAccountUpdateOneRequiredWithoutSyncConflictsNestedInput
+    syncContactLink?: SyncContactLinkUpdateOneWithoutSyncConflictsNestedInput
+    contact?: ContactUpdateOneWithoutSyncConflictsNestedInput
+  }
+
+  export type SyncConflictUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: StringFieldUpdateOperationsInput | string
+    syncContactLinkId?: NullableStringFieldUpdateOperationsInput | string | null
+    contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
+    resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncConflictCreateManyInput = {
+    id?: string
+    syncAccountId: string
+    syncContactLinkId?: string | null
+    contactId?: string | null
+    conflictType: $Enums.SyncConflictType
+    status?: $Enums.SyncConflictStatus
+    resolutionStrategy?: $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: number | null
+    remoteETag?: string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: string | null
+    detectedAt?: Date | string
+    resolvedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SyncConflictUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
+    resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncConflictUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: StringFieldUpdateOperationsInput | string
+    syncContactLinkId?: NullableStringFieldUpdateOperationsInput | string | null
+    contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
+    resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -10322,6 +21749,24 @@ export namespace Prisma {
     none?: ExportJobWhereInput
   }
 
+  export type MergeSuggestionListRelationFilter = {
+    every?: MergeSuggestionWhereInput
+    some?: MergeSuggestionWhereInput
+    none?: MergeSuggestionWhereInput
+  }
+
+  export type MergeDecisionListRelationFilter = {
+    every?: MergeDecisionWhereInput
+    some?: MergeDecisionWhereInput
+    none?: MergeDecisionWhereInput
+  }
+
+  export type SyncAccountListRelationFilter = {
+    every?: SyncAccountWhereInput
+    some?: SyncAccountWhereInput
+    none?: SyncAccountWhereInput
+  }
+
   export type SubscriptionCustomerNullableScalarRelationFilter = {
     is?: SubscriptionCustomerWhereInput | null
     isNot?: SubscriptionCustomerWhereInput | null
@@ -10347,6 +21792,18 @@ export namespace Prisma {
   }
 
   export type ExportJobOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type MergeSuggestionOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type MergeDecisionOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SyncAccountOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -10444,6 +21901,17 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
   export type DateTimeNullableFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
@@ -10460,9 +21928,44 @@ export namespace Prisma {
     isNot?: UserWhereInput
   }
 
+  export type ImportJobNullableScalarRelationFilter = {
+    is?: ImportJobWhereInput | null
+    isNot?: ImportJobWhereInput | null
+  }
+
+  export type SyncContactLinkListRelationFilter = {
+    every?: SyncContactLinkWhereInput
+    some?: SyncContactLinkWhereInput
+    none?: SyncContactLinkWhereInput
+  }
+
+  export type SyncConflictListRelationFilter = {
+    every?: SyncConflictWhereInput
+    some?: SyncConflictWhereInput
+    none?: SyncConflictWhereInput
+  }
+
+  export type ContactNullableScalarRelationFilter = {
+    is?: ContactWhereInput | null
+    isNot?: ContactWhereInput | null
+  }
+
+  export type SyncContactLinkOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SyncConflictOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type ContactCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    importJobId?: SortOrder
+    mergedIntoContactId?: SortOrder
+    syncUid?: SortOrder
+    syncVersion?: SortOrder
+    syncTombstoneAt?: SortOrder
     fullName?: SortOrder
     email?: SortOrder
     phone?: SortOrder
@@ -10473,9 +21976,18 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
+  export type ContactAvgOrderByAggregateInput = {
+    syncVersion?: SortOrder
+  }
+
   export type ContactMaxOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    importJobId?: SortOrder
+    mergedIntoContactId?: SortOrder
+    syncUid?: SortOrder
+    syncVersion?: SortOrder
+    syncTombstoneAt?: SortOrder
     fullName?: SortOrder
     email?: SortOrder
     phone?: SortOrder
@@ -10489,6 +22001,11 @@ export namespace Prisma {
   export type ContactMinOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    importJobId?: SortOrder
+    mergedIntoContactId?: SortOrder
+    syncUid?: SortOrder
+    syncVersion?: SortOrder
+    syncTombstoneAt?: SortOrder
     fullName?: SortOrder
     email?: SortOrder
     phone?: SortOrder
@@ -10497,6 +22014,26 @@ export namespace Prisma {
     archivedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type ContactSumOrderByAggregateInput = {
+    syncVersion?: SortOrder
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
@@ -10766,6 +22303,13 @@ export namespace Prisma {
     not?: NestedEnumContactImportFormatFilter<$PrismaModel> | $Enums.ContactImportFormat
   }
 
+  export type EnumImportSourceProfileNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.ImportSourceProfile | EnumImportSourceProfileFieldRefInput<$PrismaModel> | null
+    in?: $Enums.ImportSourceProfile[] | ListEnumImportSourceProfileFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.ImportSourceProfile[] | ListEnumImportSourceProfileFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumImportSourceProfileNullableFilter<$PrismaModel> | $Enums.ImportSourceProfile | null
+  }
+
   export type EnumImportExportJobStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.ImportExportJobStatus | EnumImportExportJobStatusFieldRefInput<$PrismaModel>
     in?: $Enums.ImportExportJobStatus[] | ListEnumImportExportJobStatusFieldRefInput<$PrismaModel>
@@ -10773,28 +22317,25 @@ export namespace Prisma {
     not?: NestedEnumImportExportJobStatusFilter<$PrismaModel> | $Enums.ImportExportJobStatus
   }
 
-  export type IntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
-  }
-
   export type ImportJobCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
     format?: SortOrder
+    sourceProfile?: SortOrder
     status?: SortOrder
     sourceFileName?: SortOrder
+    sourceFileSizeBytes?: SortOrder
     rowCount?: SortOrder
+    previewContactCount?: SortOrder
     importedCount?: SortOrder
     skippedCount?: SortOrder
     errorCount?: SortOrder
+    warningCount?: SortOrder
+    rolledBackCount?: SortOrder
     errorSummary?: SortOrder
+    previewedAt?: SortOrder
+    committedAt?: SortOrder
+    rolledBackAt?: SortOrder
     createdAt?: SortOrder
     startedAt?: SortOrder
     completedAt?: SortOrder
@@ -10802,23 +22343,35 @@ export namespace Prisma {
   }
 
   export type ImportJobAvgOrderByAggregateInput = {
+    sourceFileSizeBytes?: SortOrder
     rowCount?: SortOrder
+    previewContactCount?: SortOrder
     importedCount?: SortOrder
     skippedCount?: SortOrder
     errorCount?: SortOrder
+    warningCount?: SortOrder
+    rolledBackCount?: SortOrder
   }
 
   export type ImportJobMaxOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
     format?: SortOrder
+    sourceProfile?: SortOrder
     status?: SortOrder
     sourceFileName?: SortOrder
+    sourceFileSizeBytes?: SortOrder
     rowCount?: SortOrder
+    previewContactCount?: SortOrder
     importedCount?: SortOrder
     skippedCount?: SortOrder
     errorCount?: SortOrder
+    warningCount?: SortOrder
+    rolledBackCount?: SortOrder
     errorSummary?: SortOrder
+    previewedAt?: SortOrder
+    committedAt?: SortOrder
+    rolledBackAt?: SortOrder
     createdAt?: SortOrder
     startedAt?: SortOrder
     completedAt?: SortOrder
@@ -10829,13 +22382,21 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     format?: SortOrder
+    sourceProfile?: SortOrder
     status?: SortOrder
     sourceFileName?: SortOrder
+    sourceFileSizeBytes?: SortOrder
     rowCount?: SortOrder
+    previewContactCount?: SortOrder
     importedCount?: SortOrder
     skippedCount?: SortOrder
     errorCount?: SortOrder
+    warningCount?: SortOrder
+    rolledBackCount?: SortOrder
     errorSummary?: SortOrder
+    previewedAt?: SortOrder
+    committedAt?: SortOrder
+    rolledBackAt?: SortOrder
     createdAt?: SortOrder
     startedAt?: SortOrder
     completedAt?: SortOrder
@@ -10843,10 +22404,14 @@ export namespace Prisma {
   }
 
   export type ImportJobSumOrderByAggregateInput = {
+    sourceFileSizeBytes?: SortOrder
     rowCount?: SortOrder
+    previewContactCount?: SortOrder
     importedCount?: SortOrder
     skippedCount?: SortOrder
     errorCount?: SortOrder
+    warningCount?: SortOrder
+    rolledBackCount?: SortOrder
   }
 
   export type EnumContactImportFormatWithAggregatesFilter<$PrismaModel = never> = {
@@ -10859,6 +22424,16 @@ export namespace Prisma {
     _max?: NestedEnumContactImportFormatFilter<$PrismaModel>
   }
 
+  export type EnumImportSourceProfileNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ImportSourceProfile | EnumImportSourceProfileFieldRefInput<$PrismaModel> | null
+    in?: $Enums.ImportSourceProfile[] | ListEnumImportSourceProfileFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.ImportSourceProfile[] | ListEnumImportSourceProfileFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumImportSourceProfileNullableWithAggregatesFilter<$PrismaModel> | $Enums.ImportSourceProfile | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumImportSourceProfileNullableFilter<$PrismaModel>
+    _max?: NestedEnumImportSourceProfileNullableFilter<$PrismaModel>
+  }
+
   export type EnumImportExportJobStatusWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.ImportExportJobStatus | EnumImportExportJobStatusFieldRefInput<$PrismaModel>
     in?: $Enums.ImportExportJobStatus[] | ListEnumImportExportJobStatusFieldRefInput<$PrismaModel>
@@ -10867,22 +22442,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumImportExportJobStatusFilter<$PrismaModel>
     _max?: NestedEnumImportExportJobStatusFilter<$PrismaModel>
-  }
-
-  export type IntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type EnumContactExportFormatFilter<$PrismaModel = never> = {
@@ -10898,6 +22457,8 @@ export namespace Prisma {
     format?: SortOrder
     status?: SortOrder
     includeArchived?: SortOrder
+    filterQuery?: SortOrder
+    resultFileName?: SortOrder
     exportedCount?: SortOrder
     errorSummary?: SortOrder
     createdAt?: SortOrder
@@ -10916,6 +22477,8 @@ export namespace Prisma {
     format?: SortOrder
     status?: SortOrder
     includeArchived?: SortOrder
+    filterQuery?: SortOrder
+    resultFileName?: SortOrder
     exportedCount?: SortOrder
     errorSummary?: SortOrder
     createdAt?: SortOrder
@@ -10930,6 +22493,8 @@ export namespace Prisma {
     format?: SortOrder
     status?: SortOrder
     includeArchived?: SortOrder
+    filterQuery?: SortOrder
+    resultFileName?: SortOrder
     exportedCount?: SortOrder
     errorSummary?: SortOrder
     createdAt?: SortOrder
@@ -10952,6 +22517,755 @@ export namespace Prisma {
     _max?: NestedEnumContactExportFormatFilter<$PrismaModel>
   }
 
+  export type EnumMergeSuggestionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.MergeSuggestionStatus | EnumMergeSuggestionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.MergeSuggestionStatus[] | ListEnumMergeSuggestionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MergeSuggestionStatus[] | ListEnumMergeSuggestionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumMergeSuggestionStatusFilter<$PrismaModel> | $Enums.MergeSuggestionStatus
+  }
+
+  export type EnumMergeSuggestionConfidenceFilter<$PrismaModel = never> = {
+    equals?: $Enums.MergeSuggestionConfidence | EnumMergeSuggestionConfidenceFieldRefInput<$PrismaModel>
+    in?: $Enums.MergeSuggestionConfidence[] | ListEnumMergeSuggestionConfidenceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MergeSuggestionConfidence[] | ListEnumMergeSuggestionConfidenceFieldRefInput<$PrismaModel>
+    not?: NestedEnumMergeSuggestionConfidenceFilter<$PrismaModel> | $Enums.MergeSuggestionConfidence
+  }
+  export type JsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type ContactScalarRelationFilter = {
+    is?: ContactWhereInput
+    isNot?: ContactWhereInput
+  }
+
+  export type MergeSuggestionUserIdPairKeyCompoundUniqueInput = {
+    userId: string
+    pairKey: string
+  }
+
+  export type MergeSuggestionCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    leftContactId?: SortOrder
+    rightContactId?: SortOrder
+    pairKey?: SortOrder
+    status?: SortOrder
+    confidence?: SortOrder
+    score?: SortOrder
+    hardMatch?: SortOrder
+    signals?: SortOrder
+    reasons?: SortOrder
+    source?: SortOrder
+    generatedAt?: SortOrder
+    reviewedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MergeSuggestionAvgOrderByAggregateInput = {
+    score?: SortOrder
+  }
+
+  export type MergeSuggestionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    leftContactId?: SortOrder
+    rightContactId?: SortOrder
+    pairKey?: SortOrder
+    status?: SortOrder
+    confidence?: SortOrder
+    score?: SortOrder
+    hardMatch?: SortOrder
+    source?: SortOrder
+    generatedAt?: SortOrder
+    reviewedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MergeSuggestionMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    leftContactId?: SortOrder
+    rightContactId?: SortOrder
+    pairKey?: SortOrder
+    status?: SortOrder
+    confidence?: SortOrder
+    score?: SortOrder
+    hardMatch?: SortOrder
+    source?: SortOrder
+    generatedAt?: SortOrder
+    reviewedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MergeSuggestionSumOrderByAggregateInput = {
+    score?: SortOrder
+  }
+
+  export type EnumMergeSuggestionStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.MergeSuggestionStatus | EnumMergeSuggestionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.MergeSuggestionStatus[] | ListEnumMergeSuggestionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MergeSuggestionStatus[] | ListEnumMergeSuggestionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumMergeSuggestionStatusWithAggregatesFilter<$PrismaModel> | $Enums.MergeSuggestionStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMergeSuggestionStatusFilter<$PrismaModel>
+    _max?: NestedEnumMergeSuggestionStatusFilter<$PrismaModel>
+  }
+
+  export type EnumMergeSuggestionConfidenceWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.MergeSuggestionConfidence | EnumMergeSuggestionConfidenceFieldRefInput<$PrismaModel>
+    in?: $Enums.MergeSuggestionConfidence[] | ListEnumMergeSuggestionConfidenceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MergeSuggestionConfidence[] | ListEnumMergeSuggestionConfidenceFieldRefInput<$PrismaModel>
+    not?: NestedEnumMergeSuggestionConfidenceWithAggregatesFilter<$PrismaModel> | $Enums.MergeSuggestionConfidence
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMergeSuggestionConfidenceFilter<$PrismaModel>
+    _max?: NestedEnumMergeSuggestionConfidenceFilter<$PrismaModel>
+  }
+  export type JsonWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedJsonFilter<$PrismaModel>
+    _max?: NestedJsonFilter<$PrismaModel>
+  }
+
+  export type EnumMergeDecisionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.MergeDecisionStatus | EnumMergeDecisionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.MergeDecisionStatus[] | ListEnumMergeDecisionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MergeDecisionStatus[] | ListEnumMergeDecisionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumMergeDecisionStatusFilter<$PrismaModel> | $Enums.MergeDecisionStatus
+  }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type MergeSuggestionScalarRelationFilter = {
+    is?: MergeSuggestionWhereInput
+    isNot?: MergeSuggestionWhereInput
+  }
+
+  export type MergeDecisionCountOrderByAggregateInput = {
+    id?: SortOrder
+    suggestionId?: SortOrder
+    userId?: SortOrder
+    status?: SortOrder
+    source?: SortOrder
+    notes?: SortOrder
+    details?: SortOrder
+    decidedAt?: SortOrder
+    reversedAt?: SortOrder
+    reversalSource?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MergeDecisionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    suggestionId?: SortOrder
+    userId?: SortOrder
+    status?: SortOrder
+    source?: SortOrder
+    notes?: SortOrder
+    decidedAt?: SortOrder
+    reversedAt?: SortOrder
+    reversalSource?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type MergeDecisionMinOrderByAggregateInput = {
+    id?: SortOrder
+    suggestionId?: SortOrder
+    userId?: SortOrder
+    status?: SortOrder
+    source?: SortOrder
+    notes?: SortOrder
+    decidedAt?: SortOrder
+    reversedAt?: SortOrder
+    reversalSource?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumMergeDecisionStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.MergeDecisionStatus | EnumMergeDecisionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.MergeDecisionStatus[] | ListEnumMergeDecisionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MergeDecisionStatus[] | ListEnumMergeDecisionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumMergeDecisionStatusWithAggregatesFilter<$PrismaModel> | $Enums.MergeDecisionStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMergeDecisionStatusFilter<$PrismaModel>
+    _max?: NestedEnumMergeDecisionStatusFilter<$PrismaModel>
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+
+  export type EnumSyncProviderFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncProvider | EnumSyncProviderFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncProvider[] | ListEnumSyncProviderFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncProvider[] | ListEnumSyncProviderFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncProviderFilter<$PrismaModel> | $Enums.SyncProvider
+  }
+
+  export type EnumSyncAccountStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncAccountStatus | EnumSyncAccountStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncAccountStatus[] | ListEnumSyncAccountStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncAccountStatus[] | ListEnumSyncAccountStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncAccountStatusFilter<$PrismaModel> | $Enums.SyncAccountStatus
+  }
+
+  export type EnumSyncDirectionFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncDirection | EnumSyncDirectionFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncDirection[] | ListEnumSyncDirectionFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncDirection[] | ListEnumSyncDirectionFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncDirectionFilter<$PrismaModel> | $Enums.SyncDirection
+  }
+
+  export type SyncJobListRelationFilter = {
+    every?: SyncJobWhereInput
+    some?: SyncJobWhereInput
+    none?: SyncJobWhereInput
+  }
+
+  export type SyncJobOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SyncAccountUserIdBaseUrlLabelCompoundUniqueInput = {
+    userId: string
+    baseUrl: string
+    label: string
+  }
+
+  export type SyncAccountCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    provider?: SortOrder
+    status?: SortOrder
+    syncDirection?: SortOrder
+    label?: SortOrder
+    baseUrl?: SortOrder
+    principalUrl?: SortOrder
+    addressBookUrl?: SortOrder
+    remoteAccountId?: SortOrder
+    remoteCTag?: SortOrder
+    credentialReference?: SortOrder
+    credentialVersion?: SortOrder
+    credentialUpdatedAt?: SortOrder
+    credentialRevokedAt?: SortOrder
+    encryptionKeyRef?: SortOrder
+    lastSyncCursor?: SortOrder
+    lastSyncedAt?: SortOrder
+    lastSucceededAt?: SortOrder
+    lastErrorAt?: SortOrder
+    lastErrorCode?: SortOrder
+    lastErrorMessage?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SyncAccountAvgOrderByAggregateInput = {
+    credentialVersion?: SortOrder
+  }
+
+  export type SyncAccountMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    provider?: SortOrder
+    status?: SortOrder
+    syncDirection?: SortOrder
+    label?: SortOrder
+    baseUrl?: SortOrder
+    principalUrl?: SortOrder
+    addressBookUrl?: SortOrder
+    remoteAccountId?: SortOrder
+    remoteCTag?: SortOrder
+    credentialReference?: SortOrder
+    credentialVersion?: SortOrder
+    credentialUpdatedAt?: SortOrder
+    credentialRevokedAt?: SortOrder
+    encryptionKeyRef?: SortOrder
+    lastSyncCursor?: SortOrder
+    lastSyncedAt?: SortOrder
+    lastSucceededAt?: SortOrder
+    lastErrorAt?: SortOrder
+    lastErrorCode?: SortOrder
+    lastErrorMessage?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SyncAccountMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    provider?: SortOrder
+    status?: SortOrder
+    syncDirection?: SortOrder
+    label?: SortOrder
+    baseUrl?: SortOrder
+    principalUrl?: SortOrder
+    addressBookUrl?: SortOrder
+    remoteAccountId?: SortOrder
+    remoteCTag?: SortOrder
+    credentialReference?: SortOrder
+    credentialVersion?: SortOrder
+    credentialUpdatedAt?: SortOrder
+    credentialRevokedAt?: SortOrder
+    encryptionKeyRef?: SortOrder
+    lastSyncCursor?: SortOrder
+    lastSyncedAt?: SortOrder
+    lastSucceededAt?: SortOrder
+    lastErrorAt?: SortOrder
+    lastErrorCode?: SortOrder
+    lastErrorMessage?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SyncAccountSumOrderByAggregateInput = {
+    credentialVersion?: SortOrder
+  }
+
+  export type EnumSyncProviderWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncProvider | EnumSyncProviderFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncProvider[] | ListEnumSyncProviderFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncProvider[] | ListEnumSyncProviderFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncProviderWithAggregatesFilter<$PrismaModel> | $Enums.SyncProvider
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSyncProviderFilter<$PrismaModel>
+    _max?: NestedEnumSyncProviderFilter<$PrismaModel>
+  }
+
+  export type EnumSyncAccountStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncAccountStatus | EnumSyncAccountStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncAccountStatus[] | ListEnumSyncAccountStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncAccountStatus[] | ListEnumSyncAccountStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncAccountStatusWithAggregatesFilter<$PrismaModel> | $Enums.SyncAccountStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSyncAccountStatusFilter<$PrismaModel>
+    _max?: NestedEnumSyncAccountStatusFilter<$PrismaModel>
+  }
+
+  export type EnumSyncDirectionWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncDirection | EnumSyncDirectionFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncDirection[] | ListEnumSyncDirectionFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncDirection[] | ListEnumSyncDirectionFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncDirectionWithAggregatesFilter<$PrismaModel> | $Enums.SyncDirection
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSyncDirectionFilter<$PrismaModel>
+    _max?: NestedEnumSyncDirectionFilter<$PrismaModel>
+  }
+
+  export type SyncAccountScalarRelationFilter = {
+    is?: SyncAccountWhereInput
+    isNot?: SyncAccountWhereInput
+  }
+
+  export type SyncContactLinkSyncAccountIdContactIdCompoundUniqueInput = {
+    syncAccountId: string
+    contactId: string
+  }
+
+  export type SyncContactLinkSyncAccountIdRemoteHrefCompoundUniqueInput = {
+    syncAccountId: string
+    remoteHref: string
+  }
+
+  export type SyncContactLinkSyncAccountIdRemoteUidCompoundUniqueInput = {
+    syncAccountId: string
+    remoteUid: string
+  }
+
+  export type SyncContactLinkCountOrderByAggregateInput = {
+    id?: SortOrder
+    syncAccountId?: SortOrder
+    contactId?: SortOrder
+    remoteHref?: SortOrder
+    remoteUid?: SortOrder
+    remoteETag?: SortOrder
+    lastSyncedAt?: SortOrder
+    tombstonedAt?: SortOrder
+    remoteDeletedAt?: SortOrder
+    lastErrorCode?: SortOrder
+    lastErrorMessage?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SyncContactLinkMaxOrderByAggregateInput = {
+    id?: SortOrder
+    syncAccountId?: SortOrder
+    contactId?: SortOrder
+    remoteHref?: SortOrder
+    remoteUid?: SortOrder
+    remoteETag?: SortOrder
+    lastSyncedAt?: SortOrder
+    tombstonedAt?: SortOrder
+    remoteDeletedAt?: SortOrder
+    lastErrorCode?: SortOrder
+    lastErrorMessage?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SyncContactLinkMinOrderByAggregateInput = {
+    id?: SortOrder
+    syncAccountId?: SortOrder
+    contactId?: SortOrder
+    remoteHref?: SortOrder
+    remoteUid?: SortOrder
+    remoteETag?: SortOrder
+    lastSyncedAt?: SortOrder
+    tombstonedAt?: SortOrder
+    remoteDeletedAt?: SortOrder
+    lastErrorCode?: SortOrder
+    lastErrorMessage?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumSyncJobStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncJobStatus | EnumSyncJobStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncJobStatus[] | ListEnumSyncJobStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncJobStatus[] | ListEnumSyncJobStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncJobStatusFilter<$PrismaModel> | $Enums.SyncJobStatus
+  }
+
+  export type EnumSyncJobTriggerFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncJobTrigger | EnumSyncJobTriggerFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncJobTrigger[] | ListEnumSyncJobTriggerFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncJobTrigger[] | ListEnumSyncJobTriggerFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncJobTriggerFilter<$PrismaModel> | $Enums.SyncJobTrigger
+  }
+
+  export type SyncJobSyncAccountIdIdempotencyKeyCompoundUniqueInput = {
+    syncAccountId: string
+    idempotencyKey: string
+  }
+
+  export type SyncJobCountOrderByAggregateInput = {
+    id?: SortOrder
+    syncAccountId?: SortOrder
+    status?: SortOrder
+    trigger?: SortOrder
+    syncDirection?: SortOrder
+    attemptCount?: SortOrder
+    maxAttempts?: SortOrder
+    nextRetryAt?: SortOrder
+    leaseExpiresAt?: SortOrder
+    workerId?: SortOrder
+    idempotencyKey?: SortOrder
+    cursorBefore?: SortOrder
+    cursorAfter?: SortOrder
+    createdCount?: SortOrder
+    updatedCount?: SortOrder
+    deletedCount?: SortOrder
+    conflictCount?: SortOrder
+    skippedCount?: SortOrder
+    errorCode?: SortOrder
+    errorSummary?: SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SyncJobAvgOrderByAggregateInput = {
+    attemptCount?: SortOrder
+    maxAttempts?: SortOrder
+    createdCount?: SortOrder
+    updatedCount?: SortOrder
+    deletedCount?: SortOrder
+    conflictCount?: SortOrder
+    skippedCount?: SortOrder
+  }
+
+  export type SyncJobMaxOrderByAggregateInput = {
+    id?: SortOrder
+    syncAccountId?: SortOrder
+    status?: SortOrder
+    trigger?: SortOrder
+    syncDirection?: SortOrder
+    attemptCount?: SortOrder
+    maxAttempts?: SortOrder
+    nextRetryAt?: SortOrder
+    leaseExpiresAt?: SortOrder
+    workerId?: SortOrder
+    idempotencyKey?: SortOrder
+    cursorBefore?: SortOrder
+    cursorAfter?: SortOrder
+    createdCount?: SortOrder
+    updatedCount?: SortOrder
+    deletedCount?: SortOrder
+    conflictCount?: SortOrder
+    skippedCount?: SortOrder
+    errorCode?: SortOrder
+    errorSummary?: SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SyncJobMinOrderByAggregateInput = {
+    id?: SortOrder
+    syncAccountId?: SortOrder
+    status?: SortOrder
+    trigger?: SortOrder
+    syncDirection?: SortOrder
+    attemptCount?: SortOrder
+    maxAttempts?: SortOrder
+    nextRetryAt?: SortOrder
+    leaseExpiresAt?: SortOrder
+    workerId?: SortOrder
+    idempotencyKey?: SortOrder
+    cursorBefore?: SortOrder
+    cursorAfter?: SortOrder
+    createdCount?: SortOrder
+    updatedCount?: SortOrder
+    deletedCount?: SortOrder
+    conflictCount?: SortOrder
+    skippedCount?: SortOrder
+    errorCode?: SortOrder
+    errorSummary?: SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SyncJobSumOrderByAggregateInput = {
+    attemptCount?: SortOrder
+    maxAttempts?: SortOrder
+    createdCount?: SortOrder
+    updatedCount?: SortOrder
+    deletedCount?: SortOrder
+    conflictCount?: SortOrder
+    skippedCount?: SortOrder
+  }
+
+  export type EnumSyncJobStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncJobStatus | EnumSyncJobStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncJobStatus[] | ListEnumSyncJobStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncJobStatus[] | ListEnumSyncJobStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncJobStatusWithAggregatesFilter<$PrismaModel> | $Enums.SyncJobStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSyncJobStatusFilter<$PrismaModel>
+    _max?: NestedEnumSyncJobStatusFilter<$PrismaModel>
+  }
+
+  export type EnumSyncJobTriggerWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncJobTrigger | EnumSyncJobTriggerFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncJobTrigger[] | ListEnumSyncJobTriggerFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncJobTrigger[] | ListEnumSyncJobTriggerFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncJobTriggerWithAggregatesFilter<$PrismaModel> | $Enums.SyncJobTrigger
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSyncJobTriggerFilter<$PrismaModel>
+    _max?: NestedEnumSyncJobTriggerFilter<$PrismaModel>
+  }
+
+  export type EnumSyncConflictTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncConflictType | EnumSyncConflictTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncConflictType[] | ListEnumSyncConflictTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncConflictType[] | ListEnumSyncConflictTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncConflictTypeFilter<$PrismaModel> | $Enums.SyncConflictType
+  }
+
+  export type EnumSyncConflictStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncConflictStatus | EnumSyncConflictStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncConflictStatus[] | ListEnumSyncConflictStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncConflictStatus[] | ListEnumSyncConflictStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncConflictStatusFilter<$PrismaModel> | $Enums.SyncConflictStatus
+  }
+
+  export type EnumSyncResolutionStrategyNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncResolutionStrategy | EnumSyncResolutionStrategyFieldRefInput<$PrismaModel> | null
+    in?: $Enums.SyncResolutionStrategy[] | ListEnumSyncResolutionStrategyFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.SyncResolutionStrategy[] | ListEnumSyncResolutionStrategyFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumSyncResolutionStrategyNullableFilter<$PrismaModel> | $Enums.SyncResolutionStrategy | null
+  }
+
+  export type SyncContactLinkNullableScalarRelationFilter = {
+    is?: SyncContactLinkWhereInput | null
+    isNot?: SyncContactLinkWhereInput | null
+  }
+
+  export type SyncConflictCountOrderByAggregateInput = {
+    id?: SortOrder
+    syncAccountId?: SortOrder
+    syncContactLinkId?: SortOrder
+    contactId?: SortOrder
+    conflictType?: SortOrder
+    status?: SortOrder
+    resolutionStrategy?: SortOrder
+    localSyncVersion?: SortOrder
+    remoteETag?: SortOrder
+    localSnapshot?: SortOrder
+    remoteSnapshot?: SortOrder
+    resolutionNotes?: SortOrder
+    detectedAt?: SortOrder
+    resolvedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SyncConflictAvgOrderByAggregateInput = {
+    localSyncVersion?: SortOrder
+  }
+
+  export type SyncConflictMaxOrderByAggregateInput = {
+    id?: SortOrder
+    syncAccountId?: SortOrder
+    syncContactLinkId?: SortOrder
+    contactId?: SortOrder
+    conflictType?: SortOrder
+    status?: SortOrder
+    resolutionStrategy?: SortOrder
+    localSyncVersion?: SortOrder
+    remoteETag?: SortOrder
+    resolutionNotes?: SortOrder
+    detectedAt?: SortOrder
+    resolvedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SyncConflictMinOrderByAggregateInput = {
+    id?: SortOrder
+    syncAccountId?: SortOrder
+    syncContactLinkId?: SortOrder
+    contactId?: SortOrder
+    conflictType?: SortOrder
+    status?: SortOrder
+    resolutionStrategy?: SortOrder
+    localSyncVersion?: SortOrder
+    remoteETag?: SortOrder
+    resolutionNotes?: SortOrder
+    detectedAt?: SortOrder
+    resolvedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SyncConflictSumOrderByAggregateInput = {
+    localSyncVersion?: SortOrder
+  }
+
+  export type EnumSyncConflictTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncConflictType | EnumSyncConflictTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncConflictType[] | ListEnumSyncConflictTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncConflictType[] | ListEnumSyncConflictTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncConflictTypeWithAggregatesFilter<$PrismaModel> | $Enums.SyncConflictType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSyncConflictTypeFilter<$PrismaModel>
+    _max?: NestedEnumSyncConflictTypeFilter<$PrismaModel>
+  }
+
+  export type EnumSyncConflictStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncConflictStatus | EnumSyncConflictStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncConflictStatus[] | ListEnumSyncConflictStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncConflictStatus[] | ListEnumSyncConflictStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncConflictStatusWithAggregatesFilter<$PrismaModel> | $Enums.SyncConflictStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSyncConflictStatusFilter<$PrismaModel>
+    _max?: NestedEnumSyncConflictStatusFilter<$PrismaModel>
+  }
+
+  export type EnumSyncResolutionStrategyNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncResolutionStrategy | EnumSyncResolutionStrategyFieldRefInput<$PrismaModel> | null
+    in?: $Enums.SyncResolutionStrategy[] | ListEnumSyncResolutionStrategyFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.SyncResolutionStrategy[] | ListEnumSyncResolutionStrategyFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumSyncResolutionStrategyNullableWithAggregatesFilter<$PrismaModel> | $Enums.SyncResolutionStrategy | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumSyncResolutionStrategyNullableFilter<$PrismaModel>
+    _max?: NestedEnumSyncResolutionStrategyNullableFilter<$PrismaModel>
+  }
+
   export type ContactCreateNestedManyWithoutUserInput = {
     create?: XOR<ContactCreateWithoutUserInput, ContactUncheckedCreateWithoutUserInput> | ContactCreateWithoutUserInput[] | ContactUncheckedCreateWithoutUserInput[]
     connectOrCreate?: ContactCreateOrConnectWithoutUserInput | ContactCreateOrConnectWithoutUserInput[]
@@ -10971,6 +23285,27 @@ export namespace Prisma {
     connectOrCreate?: ExportJobCreateOrConnectWithoutUserInput | ExportJobCreateOrConnectWithoutUserInput[]
     createMany?: ExportJobCreateManyUserInputEnvelope
     connect?: ExportJobWhereUniqueInput | ExportJobWhereUniqueInput[]
+  }
+
+  export type MergeSuggestionCreateNestedManyWithoutUserInput = {
+    create?: XOR<MergeSuggestionCreateWithoutUserInput, MergeSuggestionUncheckedCreateWithoutUserInput> | MergeSuggestionCreateWithoutUserInput[] | MergeSuggestionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: MergeSuggestionCreateOrConnectWithoutUserInput | MergeSuggestionCreateOrConnectWithoutUserInput[]
+    createMany?: MergeSuggestionCreateManyUserInputEnvelope
+    connect?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+  }
+
+  export type MergeDecisionCreateNestedManyWithoutUserInput = {
+    create?: XOR<MergeDecisionCreateWithoutUserInput, MergeDecisionUncheckedCreateWithoutUserInput> | MergeDecisionCreateWithoutUserInput[] | MergeDecisionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: MergeDecisionCreateOrConnectWithoutUserInput | MergeDecisionCreateOrConnectWithoutUserInput[]
+    createMany?: MergeDecisionCreateManyUserInputEnvelope
+    connect?: MergeDecisionWhereUniqueInput | MergeDecisionWhereUniqueInput[]
+  }
+
+  export type SyncAccountCreateNestedManyWithoutUserInput = {
+    create?: XOR<SyncAccountCreateWithoutUserInput, SyncAccountUncheckedCreateWithoutUserInput> | SyncAccountCreateWithoutUserInput[] | SyncAccountUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutUserInput | SyncAccountCreateOrConnectWithoutUserInput[]
+    createMany?: SyncAccountCreateManyUserInputEnvelope
+    connect?: SyncAccountWhereUniqueInput | SyncAccountWhereUniqueInput[]
   }
 
   export type SubscriptionCustomerCreateNestedOneWithoutUserInput = {
@@ -11005,6 +23340,27 @@ export namespace Prisma {
     connectOrCreate?: ExportJobCreateOrConnectWithoutUserInput | ExportJobCreateOrConnectWithoutUserInput[]
     createMany?: ExportJobCreateManyUserInputEnvelope
     connect?: ExportJobWhereUniqueInput | ExportJobWhereUniqueInput[]
+  }
+
+  export type MergeSuggestionUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<MergeSuggestionCreateWithoutUserInput, MergeSuggestionUncheckedCreateWithoutUserInput> | MergeSuggestionCreateWithoutUserInput[] | MergeSuggestionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: MergeSuggestionCreateOrConnectWithoutUserInput | MergeSuggestionCreateOrConnectWithoutUserInput[]
+    createMany?: MergeSuggestionCreateManyUserInputEnvelope
+    connect?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+  }
+
+  export type MergeDecisionUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<MergeDecisionCreateWithoutUserInput, MergeDecisionUncheckedCreateWithoutUserInput> | MergeDecisionCreateWithoutUserInput[] | MergeDecisionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: MergeDecisionCreateOrConnectWithoutUserInput | MergeDecisionCreateOrConnectWithoutUserInput[]
+    createMany?: MergeDecisionCreateManyUserInputEnvelope
+    connect?: MergeDecisionWhereUniqueInput | MergeDecisionWhereUniqueInput[]
+  }
+
+  export type SyncAccountUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<SyncAccountCreateWithoutUserInput, SyncAccountUncheckedCreateWithoutUserInput> | SyncAccountCreateWithoutUserInput[] | SyncAccountUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutUserInput | SyncAccountCreateOrConnectWithoutUserInput[]
+    createMany?: SyncAccountCreateManyUserInputEnvelope
+    connect?: SyncAccountWhereUniqueInput | SyncAccountWhereUniqueInput[]
   }
 
   export type SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput = {
@@ -11078,6 +23434,48 @@ export namespace Prisma {
     deleteMany?: ExportJobScalarWhereInput | ExportJobScalarWhereInput[]
   }
 
+  export type MergeSuggestionUpdateManyWithoutUserNestedInput = {
+    create?: XOR<MergeSuggestionCreateWithoutUserInput, MergeSuggestionUncheckedCreateWithoutUserInput> | MergeSuggestionCreateWithoutUserInput[] | MergeSuggestionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: MergeSuggestionCreateOrConnectWithoutUserInput | MergeSuggestionCreateOrConnectWithoutUserInput[]
+    upsert?: MergeSuggestionUpsertWithWhereUniqueWithoutUserInput | MergeSuggestionUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: MergeSuggestionCreateManyUserInputEnvelope
+    set?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+    disconnect?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+    delete?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+    connect?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+    update?: MergeSuggestionUpdateWithWhereUniqueWithoutUserInput | MergeSuggestionUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: MergeSuggestionUpdateManyWithWhereWithoutUserInput | MergeSuggestionUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: MergeSuggestionScalarWhereInput | MergeSuggestionScalarWhereInput[]
+  }
+
+  export type MergeDecisionUpdateManyWithoutUserNestedInput = {
+    create?: XOR<MergeDecisionCreateWithoutUserInput, MergeDecisionUncheckedCreateWithoutUserInput> | MergeDecisionCreateWithoutUserInput[] | MergeDecisionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: MergeDecisionCreateOrConnectWithoutUserInput | MergeDecisionCreateOrConnectWithoutUserInput[]
+    upsert?: MergeDecisionUpsertWithWhereUniqueWithoutUserInput | MergeDecisionUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: MergeDecisionCreateManyUserInputEnvelope
+    set?: MergeDecisionWhereUniqueInput | MergeDecisionWhereUniqueInput[]
+    disconnect?: MergeDecisionWhereUniqueInput | MergeDecisionWhereUniqueInput[]
+    delete?: MergeDecisionWhereUniqueInput | MergeDecisionWhereUniqueInput[]
+    connect?: MergeDecisionWhereUniqueInput | MergeDecisionWhereUniqueInput[]
+    update?: MergeDecisionUpdateWithWhereUniqueWithoutUserInput | MergeDecisionUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: MergeDecisionUpdateManyWithWhereWithoutUserInput | MergeDecisionUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: MergeDecisionScalarWhereInput | MergeDecisionScalarWhereInput[]
+  }
+
+  export type SyncAccountUpdateManyWithoutUserNestedInput = {
+    create?: XOR<SyncAccountCreateWithoutUserInput, SyncAccountUncheckedCreateWithoutUserInput> | SyncAccountCreateWithoutUserInput[] | SyncAccountUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutUserInput | SyncAccountCreateOrConnectWithoutUserInput[]
+    upsert?: SyncAccountUpsertWithWhereUniqueWithoutUserInput | SyncAccountUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: SyncAccountCreateManyUserInputEnvelope
+    set?: SyncAccountWhereUniqueInput | SyncAccountWhereUniqueInput[]
+    disconnect?: SyncAccountWhereUniqueInput | SyncAccountWhereUniqueInput[]
+    delete?: SyncAccountWhereUniqueInput | SyncAccountWhereUniqueInput[]
+    connect?: SyncAccountWhereUniqueInput | SyncAccountWhereUniqueInput[]
+    update?: SyncAccountUpdateWithWhereUniqueWithoutUserInput | SyncAccountUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: SyncAccountUpdateManyWithWhereWithoutUserInput | SyncAccountUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: SyncAccountScalarWhereInput | SyncAccountScalarWhereInput[]
+  }
+
   export type SubscriptionCustomerUpdateOneWithoutUserNestedInput = {
     create?: XOR<SubscriptionCustomerCreateWithoutUserInput, SubscriptionCustomerUncheckedCreateWithoutUserInput>
     connectOrCreate?: SubscriptionCustomerCreateOrConnectWithoutUserInput
@@ -11144,6 +23542,48 @@ export namespace Prisma {
     deleteMany?: ExportJobScalarWhereInput | ExportJobScalarWhereInput[]
   }
 
+  export type MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<MergeSuggestionCreateWithoutUserInput, MergeSuggestionUncheckedCreateWithoutUserInput> | MergeSuggestionCreateWithoutUserInput[] | MergeSuggestionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: MergeSuggestionCreateOrConnectWithoutUserInput | MergeSuggestionCreateOrConnectWithoutUserInput[]
+    upsert?: MergeSuggestionUpsertWithWhereUniqueWithoutUserInput | MergeSuggestionUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: MergeSuggestionCreateManyUserInputEnvelope
+    set?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+    disconnect?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+    delete?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+    connect?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+    update?: MergeSuggestionUpdateWithWhereUniqueWithoutUserInput | MergeSuggestionUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: MergeSuggestionUpdateManyWithWhereWithoutUserInput | MergeSuggestionUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: MergeSuggestionScalarWhereInput | MergeSuggestionScalarWhereInput[]
+  }
+
+  export type MergeDecisionUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<MergeDecisionCreateWithoutUserInput, MergeDecisionUncheckedCreateWithoutUserInput> | MergeDecisionCreateWithoutUserInput[] | MergeDecisionUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: MergeDecisionCreateOrConnectWithoutUserInput | MergeDecisionCreateOrConnectWithoutUserInput[]
+    upsert?: MergeDecisionUpsertWithWhereUniqueWithoutUserInput | MergeDecisionUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: MergeDecisionCreateManyUserInputEnvelope
+    set?: MergeDecisionWhereUniqueInput | MergeDecisionWhereUniqueInput[]
+    disconnect?: MergeDecisionWhereUniqueInput | MergeDecisionWhereUniqueInput[]
+    delete?: MergeDecisionWhereUniqueInput | MergeDecisionWhereUniqueInput[]
+    connect?: MergeDecisionWhereUniqueInput | MergeDecisionWhereUniqueInput[]
+    update?: MergeDecisionUpdateWithWhereUniqueWithoutUserInput | MergeDecisionUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: MergeDecisionUpdateManyWithWhereWithoutUserInput | MergeDecisionUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: MergeDecisionScalarWhereInput | MergeDecisionScalarWhereInput[]
+  }
+
+  export type SyncAccountUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<SyncAccountCreateWithoutUserInput, SyncAccountUncheckedCreateWithoutUserInput> | SyncAccountCreateWithoutUserInput[] | SyncAccountUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutUserInput | SyncAccountCreateOrConnectWithoutUserInput[]
+    upsert?: SyncAccountUpsertWithWhereUniqueWithoutUserInput | SyncAccountUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: SyncAccountCreateManyUserInputEnvelope
+    set?: SyncAccountWhereUniqueInput | SyncAccountWhereUniqueInput[]
+    disconnect?: SyncAccountWhereUniqueInput | SyncAccountWhereUniqueInput[]
+    delete?: SyncAccountWhereUniqueInput | SyncAccountWhereUniqueInput[]
+    connect?: SyncAccountWhereUniqueInput | SyncAccountWhereUniqueInput[]
+    update?: SyncAccountUpdateWithWhereUniqueWithoutUserInput | SyncAccountUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: SyncAccountUpdateManyWithWhereWithoutUserInput | SyncAccountUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: SyncAccountScalarWhereInput | SyncAccountScalarWhereInput[]
+  }
+
   export type SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput = {
     create?: XOR<SubscriptionCustomerCreateWithoutUserInput, SubscriptionCustomerUncheckedCreateWithoutUserInput>
     connectOrCreate?: SubscriptionCustomerCreateOrConnectWithoutUserInput
@@ -11174,6 +23614,96 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type ImportJobCreateNestedOneWithoutContactsInput = {
+    create?: XOR<ImportJobCreateWithoutContactsInput, ImportJobUncheckedCreateWithoutContactsInput>
+    connectOrCreate?: ImportJobCreateOrConnectWithoutContactsInput
+    connect?: ImportJobWhereUniqueInput
+  }
+
+  export type MergeSuggestionCreateNestedManyWithoutLeftContactInput = {
+    create?: XOR<MergeSuggestionCreateWithoutLeftContactInput, MergeSuggestionUncheckedCreateWithoutLeftContactInput> | MergeSuggestionCreateWithoutLeftContactInput[] | MergeSuggestionUncheckedCreateWithoutLeftContactInput[]
+    connectOrCreate?: MergeSuggestionCreateOrConnectWithoutLeftContactInput | MergeSuggestionCreateOrConnectWithoutLeftContactInput[]
+    createMany?: MergeSuggestionCreateManyLeftContactInputEnvelope
+    connect?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+  }
+
+  export type MergeSuggestionCreateNestedManyWithoutRightContactInput = {
+    create?: XOR<MergeSuggestionCreateWithoutRightContactInput, MergeSuggestionUncheckedCreateWithoutRightContactInput> | MergeSuggestionCreateWithoutRightContactInput[] | MergeSuggestionUncheckedCreateWithoutRightContactInput[]
+    connectOrCreate?: MergeSuggestionCreateOrConnectWithoutRightContactInput | MergeSuggestionCreateOrConnectWithoutRightContactInput[]
+    createMany?: MergeSuggestionCreateManyRightContactInputEnvelope
+    connect?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+  }
+
+  export type SyncContactLinkCreateNestedManyWithoutContactInput = {
+    create?: XOR<SyncContactLinkCreateWithoutContactInput, SyncContactLinkUncheckedCreateWithoutContactInput> | SyncContactLinkCreateWithoutContactInput[] | SyncContactLinkUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: SyncContactLinkCreateOrConnectWithoutContactInput | SyncContactLinkCreateOrConnectWithoutContactInput[]
+    createMany?: SyncContactLinkCreateManyContactInputEnvelope
+    connect?: SyncContactLinkWhereUniqueInput | SyncContactLinkWhereUniqueInput[]
+  }
+
+  export type SyncConflictCreateNestedManyWithoutContactInput = {
+    create?: XOR<SyncConflictCreateWithoutContactInput, SyncConflictUncheckedCreateWithoutContactInput> | SyncConflictCreateWithoutContactInput[] | SyncConflictUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: SyncConflictCreateOrConnectWithoutContactInput | SyncConflictCreateOrConnectWithoutContactInput[]
+    createMany?: SyncConflictCreateManyContactInputEnvelope
+    connect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+  }
+
+  export type ContactCreateNestedOneWithoutMergedChildrenInput = {
+    create?: XOR<ContactCreateWithoutMergedChildrenInput, ContactUncheckedCreateWithoutMergedChildrenInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutMergedChildrenInput
+    connect?: ContactWhereUniqueInput
+  }
+
+  export type ContactCreateNestedManyWithoutMergedIntoContactInput = {
+    create?: XOR<ContactCreateWithoutMergedIntoContactInput, ContactUncheckedCreateWithoutMergedIntoContactInput> | ContactCreateWithoutMergedIntoContactInput[] | ContactUncheckedCreateWithoutMergedIntoContactInput[]
+    connectOrCreate?: ContactCreateOrConnectWithoutMergedIntoContactInput | ContactCreateOrConnectWithoutMergedIntoContactInput[]
+    createMany?: ContactCreateManyMergedIntoContactInputEnvelope
+    connect?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+  }
+
+  export type MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput = {
+    create?: XOR<MergeSuggestionCreateWithoutLeftContactInput, MergeSuggestionUncheckedCreateWithoutLeftContactInput> | MergeSuggestionCreateWithoutLeftContactInput[] | MergeSuggestionUncheckedCreateWithoutLeftContactInput[]
+    connectOrCreate?: MergeSuggestionCreateOrConnectWithoutLeftContactInput | MergeSuggestionCreateOrConnectWithoutLeftContactInput[]
+    createMany?: MergeSuggestionCreateManyLeftContactInputEnvelope
+    connect?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+  }
+
+  export type MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput = {
+    create?: XOR<MergeSuggestionCreateWithoutRightContactInput, MergeSuggestionUncheckedCreateWithoutRightContactInput> | MergeSuggestionCreateWithoutRightContactInput[] | MergeSuggestionUncheckedCreateWithoutRightContactInput[]
+    connectOrCreate?: MergeSuggestionCreateOrConnectWithoutRightContactInput | MergeSuggestionCreateOrConnectWithoutRightContactInput[]
+    createMany?: MergeSuggestionCreateManyRightContactInputEnvelope
+    connect?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+  }
+
+  export type SyncContactLinkUncheckedCreateNestedManyWithoutContactInput = {
+    create?: XOR<SyncContactLinkCreateWithoutContactInput, SyncContactLinkUncheckedCreateWithoutContactInput> | SyncContactLinkCreateWithoutContactInput[] | SyncContactLinkUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: SyncContactLinkCreateOrConnectWithoutContactInput | SyncContactLinkCreateOrConnectWithoutContactInput[]
+    createMany?: SyncContactLinkCreateManyContactInputEnvelope
+    connect?: SyncContactLinkWhereUniqueInput | SyncContactLinkWhereUniqueInput[]
+  }
+
+  export type SyncConflictUncheckedCreateNestedManyWithoutContactInput = {
+    create?: XOR<SyncConflictCreateWithoutContactInput, SyncConflictUncheckedCreateWithoutContactInput> | SyncConflictCreateWithoutContactInput[] | SyncConflictUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: SyncConflictCreateOrConnectWithoutContactInput | SyncConflictCreateOrConnectWithoutContactInput[]
+    createMany?: SyncConflictCreateManyContactInputEnvelope
+    connect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+  }
+
+  export type ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput = {
+    create?: XOR<ContactCreateWithoutMergedIntoContactInput, ContactUncheckedCreateWithoutMergedIntoContactInput> | ContactCreateWithoutMergedIntoContactInput[] | ContactUncheckedCreateWithoutMergedIntoContactInput[]
+    connectOrCreate?: ContactCreateOrConnectWithoutMergedIntoContactInput | ContactCreateOrConnectWithoutMergedIntoContactInput[]
+    createMany?: ContactCreateManyMergedIntoContactInputEnvelope
+    connect?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
   export type NullableDateTimeFieldUpdateOperationsInput = {
     set?: Date | string | null
   }
@@ -11184,6 +23714,166 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutContactsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutContactsInput, UserUpdateWithoutContactsInput>, UserUncheckedUpdateWithoutContactsInput>
+  }
+
+  export type ImportJobUpdateOneWithoutContactsNestedInput = {
+    create?: XOR<ImportJobCreateWithoutContactsInput, ImportJobUncheckedCreateWithoutContactsInput>
+    connectOrCreate?: ImportJobCreateOrConnectWithoutContactsInput
+    upsert?: ImportJobUpsertWithoutContactsInput
+    disconnect?: ImportJobWhereInput | boolean
+    delete?: ImportJobWhereInput | boolean
+    connect?: ImportJobWhereUniqueInput
+    update?: XOR<XOR<ImportJobUpdateToOneWithWhereWithoutContactsInput, ImportJobUpdateWithoutContactsInput>, ImportJobUncheckedUpdateWithoutContactsInput>
+  }
+
+  export type MergeSuggestionUpdateManyWithoutLeftContactNestedInput = {
+    create?: XOR<MergeSuggestionCreateWithoutLeftContactInput, MergeSuggestionUncheckedCreateWithoutLeftContactInput> | MergeSuggestionCreateWithoutLeftContactInput[] | MergeSuggestionUncheckedCreateWithoutLeftContactInput[]
+    connectOrCreate?: MergeSuggestionCreateOrConnectWithoutLeftContactInput | MergeSuggestionCreateOrConnectWithoutLeftContactInput[]
+    upsert?: MergeSuggestionUpsertWithWhereUniqueWithoutLeftContactInput | MergeSuggestionUpsertWithWhereUniqueWithoutLeftContactInput[]
+    createMany?: MergeSuggestionCreateManyLeftContactInputEnvelope
+    set?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+    disconnect?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+    delete?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+    connect?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+    update?: MergeSuggestionUpdateWithWhereUniqueWithoutLeftContactInput | MergeSuggestionUpdateWithWhereUniqueWithoutLeftContactInput[]
+    updateMany?: MergeSuggestionUpdateManyWithWhereWithoutLeftContactInput | MergeSuggestionUpdateManyWithWhereWithoutLeftContactInput[]
+    deleteMany?: MergeSuggestionScalarWhereInput | MergeSuggestionScalarWhereInput[]
+  }
+
+  export type MergeSuggestionUpdateManyWithoutRightContactNestedInput = {
+    create?: XOR<MergeSuggestionCreateWithoutRightContactInput, MergeSuggestionUncheckedCreateWithoutRightContactInput> | MergeSuggestionCreateWithoutRightContactInput[] | MergeSuggestionUncheckedCreateWithoutRightContactInput[]
+    connectOrCreate?: MergeSuggestionCreateOrConnectWithoutRightContactInput | MergeSuggestionCreateOrConnectWithoutRightContactInput[]
+    upsert?: MergeSuggestionUpsertWithWhereUniqueWithoutRightContactInput | MergeSuggestionUpsertWithWhereUniqueWithoutRightContactInput[]
+    createMany?: MergeSuggestionCreateManyRightContactInputEnvelope
+    set?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+    disconnect?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+    delete?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+    connect?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+    update?: MergeSuggestionUpdateWithWhereUniqueWithoutRightContactInput | MergeSuggestionUpdateWithWhereUniqueWithoutRightContactInput[]
+    updateMany?: MergeSuggestionUpdateManyWithWhereWithoutRightContactInput | MergeSuggestionUpdateManyWithWhereWithoutRightContactInput[]
+    deleteMany?: MergeSuggestionScalarWhereInput | MergeSuggestionScalarWhereInput[]
+  }
+
+  export type SyncContactLinkUpdateManyWithoutContactNestedInput = {
+    create?: XOR<SyncContactLinkCreateWithoutContactInput, SyncContactLinkUncheckedCreateWithoutContactInput> | SyncContactLinkCreateWithoutContactInput[] | SyncContactLinkUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: SyncContactLinkCreateOrConnectWithoutContactInput | SyncContactLinkCreateOrConnectWithoutContactInput[]
+    upsert?: SyncContactLinkUpsertWithWhereUniqueWithoutContactInput | SyncContactLinkUpsertWithWhereUniqueWithoutContactInput[]
+    createMany?: SyncContactLinkCreateManyContactInputEnvelope
+    set?: SyncContactLinkWhereUniqueInput | SyncContactLinkWhereUniqueInput[]
+    disconnect?: SyncContactLinkWhereUniqueInput | SyncContactLinkWhereUniqueInput[]
+    delete?: SyncContactLinkWhereUniqueInput | SyncContactLinkWhereUniqueInput[]
+    connect?: SyncContactLinkWhereUniqueInput | SyncContactLinkWhereUniqueInput[]
+    update?: SyncContactLinkUpdateWithWhereUniqueWithoutContactInput | SyncContactLinkUpdateWithWhereUniqueWithoutContactInput[]
+    updateMany?: SyncContactLinkUpdateManyWithWhereWithoutContactInput | SyncContactLinkUpdateManyWithWhereWithoutContactInput[]
+    deleteMany?: SyncContactLinkScalarWhereInput | SyncContactLinkScalarWhereInput[]
+  }
+
+  export type SyncConflictUpdateManyWithoutContactNestedInput = {
+    create?: XOR<SyncConflictCreateWithoutContactInput, SyncConflictUncheckedCreateWithoutContactInput> | SyncConflictCreateWithoutContactInput[] | SyncConflictUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: SyncConflictCreateOrConnectWithoutContactInput | SyncConflictCreateOrConnectWithoutContactInput[]
+    upsert?: SyncConflictUpsertWithWhereUniqueWithoutContactInput | SyncConflictUpsertWithWhereUniqueWithoutContactInput[]
+    createMany?: SyncConflictCreateManyContactInputEnvelope
+    set?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    disconnect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    delete?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    connect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    update?: SyncConflictUpdateWithWhereUniqueWithoutContactInput | SyncConflictUpdateWithWhereUniqueWithoutContactInput[]
+    updateMany?: SyncConflictUpdateManyWithWhereWithoutContactInput | SyncConflictUpdateManyWithWhereWithoutContactInput[]
+    deleteMany?: SyncConflictScalarWhereInput | SyncConflictScalarWhereInput[]
+  }
+
+  export type ContactUpdateOneWithoutMergedChildrenNestedInput = {
+    create?: XOR<ContactCreateWithoutMergedChildrenInput, ContactUncheckedCreateWithoutMergedChildrenInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutMergedChildrenInput
+    upsert?: ContactUpsertWithoutMergedChildrenInput
+    disconnect?: ContactWhereInput | boolean
+    delete?: ContactWhereInput | boolean
+    connect?: ContactWhereUniqueInput
+    update?: XOR<XOR<ContactUpdateToOneWithWhereWithoutMergedChildrenInput, ContactUpdateWithoutMergedChildrenInput>, ContactUncheckedUpdateWithoutMergedChildrenInput>
+  }
+
+  export type ContactUpdateManyWithoutMergedIntoContactNestedInput = {
+    create?: XOR<ContactCreateWithoutMergedIntoContactInput, ContactUncheckedCreateWithoutMergedIntoContactInput> | ContactCreateWithoutMergedIntoContactInput[] | ContactUncheckedCreateWithoutMergedIntoContactInput[]
+    connectOrCreate?: ContactCreateOrConnectWithoutMergedIntoContactInput | ContactCreateOrConnectWithoutMergedIntoContactInput[]
+    upsert?: ContactUpsertWithWhereUniqueWithoutMergedIntoContactInput | ContactUpsertWithWhereUniqueWithoutMergedIntoContactInput[]
+    createMany?: ContactCreateManyMergedIntoContactInputEnvelope
+    set?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+    disconnect?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+    delete?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+    connect?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+    update?: ContactUpdateWithWhereUniqueWithoutMergedIntoContactInput | ContactUpdateWithWhereUniqueWithoutMergedIntoContactInput[]
+    updateMany?: ContactUpdateManyWithWhereWithoutMergedIntoContactInput | ContactUpdateManyWithWhereWithoutMergedIntoContactInput[]
+    deleteMany?: ContactScalarWhereInput | ContactScalarWhereInput[]
+  }
+
+  export type MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput = {
+    create?: XOR<MergeSuggestionCreateWithoutLeftContactInput, MergeSuggestionUncheckedCreateWithoutLeftContactInput> | MergeSuggestionCreateWithoutLeftContactInput[] | MergeSuggestionUncheckedCreateWithoutLeftContactInput[]
+    connectOrCreate?: MergeSuggestionCreateOrConnectWithoutLeftContactInput | MergeSuggestionCreateOrConnectWithoutLeftContactInput[]
+    upsert?: MergeSuggestionUpsertWithWhereUniqueWithoutLeftContactInput | MergeSuggestionUpsertWithWhereUniqueWithoutLeftContactInput[]
+    createMany?: MergeSuggestionCreateManyLeftContactInputEnvelope
+    set?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+    disconnect?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+    delete?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+    connect?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+    update?: MergeSuggestionUpdateWithWhereUniqueWithoutLeftContactInput | MergeSuggestionUpdateWithWhereUniqueWithoutLeftContactInput[]
+    updateMany?: MergeSuggestionUpdateManyWithWhereWithoutLeftContactInput | MergeSuggestionUpdateManyWithWhereWithoutLeftContactInput[]
+    deleteMany?: MergeSuggestionScalarWhereInput | MergeSuggestionScalarWhereInput[]
+  }
+
+  export type MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput = {
+    create?: XOR<MergeSuggestionCreateWithoutRightContactInput, MergeSuggestionUncheckedCreateWithoutRightContactInput> | MergeSuggestionCreateWithoutRightContactInput[] | MergeSuggestionUncheckedCreateWithoutRightContactInput[]
+    connectOrCreate?: MergeSuggestionCreateOrConnectWithoutRightContactInput | MergeSuggestionCreateOrConnectWithoutRightContactInput[]
+    upsert?: MergeSuggestionUpsertWithWhereUniqueWithoutRightContactInput | MergeSuggestionUpsertWithWhereUniqueWithoutRightContactInput[]
+    createMany?: MergeSuggestionCreateManyRightContactInputEnvelope
+    set?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+    disconnect?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+    delete?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+    connect?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+    update?: MergeSuggestionUpdateWithWhereUniqueWithoutRightContactInput | MergeSuggestionUpdateWithWhereUniqueWithoutRightContactInput[]
+    updateMany?: MergeSuggestionUpdateManyWithWhereWithoutRightContactInput | MergeSuggestionUpdateManyWithWhereWithoutRightContactInput[]
+    deleteMany?: MergeSuggestionScalarWhereInput | MergeSuggestionScalarWhereInput[]
+  }
+
+  export type SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput = {
+    create?: XOR<SyncContactLinkCreateWithoutContactInput, SyncContactLinkUncheckedCreateWithoutContactInput> | SyncContactLinkCreateWithoutContactInput[] | SyncContactLinkUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: SyncContactLinkCreateOrConnectWithoutContactInput | SyncContactLinkCreateOrConnectWithoutContactInput[]
+    upsert?: SyncContactLinkUpsertWithWhereUniqueWithoutContactInput | SyncContactLinkUpsertWithWhereUniqueWithoutContactInput[]
+    createMany?: SyncContactLinkCreateManyContactInputEnvelope
+    set?: SyncContactLinkWhereUniqueInput | SyncContactLinkWhereUniqueInput[]
+    disconnect?: SyncContactLinkWhereUniqueInput | SyncContactLinkWhereUniqueInput[]
+    delete?: SyncContactLinkWhereUniqueInput | SyncContactLinkWhereUniqueInput[]
+    connect?: SyncContactLinkWhereUniqueInput | SyncContactLinkWhereUniqueInput[]
+    update?: SyncContactLinkUpdateWithWhereUniqueWithoutContactInput | SyncContactLinkUpdateWithWhereUniqueWithoutContactInput[]
+    updateMany?: SyncContactLinkUpdateManyWithWhereWithoutContactInput | SyncContactLinkUpdateManyWithWhereWithoutContactInput[]
+    deleteMany?: SyncContactLinkScalarWhereInput | SyncContactLinkScalarWhereInput[]
+  }
+
+  export type SyncConflictUncheckedUpdateManyWithoutContactNestedInput = {
+    create?: XOR<SyncConflictCreateWithoutContactInput, SyncConflictUncheckedCreateWithoutContactInput> | SyncConflictCreateWithoutContactInput[] | SyncConflictUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: SyncConflictCreateOrConnectWithoutContactInput | SyncConflictCreateOrConnectWithoutContactInput[]
+    upsert?: SyncConflictUpsertWithWhereUniqueWithoutContactInput | SyncConflictUpsertWithWhereUniqueWithoutContactInput[]
+    createMany?: SyncConflictCreateManyContactInputEnvelope
+    set?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    disconnect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    delete?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    connect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    update?: SyncConflictUpdateWithWhereUniqueWithoutContactInput | SyncConflictUpdateWithWhereUniqueWithoutContactInput[]
+    updateMany?: SyncConflictUpdateManyWithWhereWithoutContactInput | SyncConflictUpdateManyWithWhereWithoutContactInput[]
+    deleteMany?: SyncConflictScalarWhereInput | SyncConflictScalarWhereInput[]
+  }
+
+  export type ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput = {
+    create?: XOR<ContactCreateWithoutMergedIntoContactInput, ContactUncheckedCreateWithoutMergedIntoContactInput> | ContactCreateWithoutMergedIntoContactInput[] | ContactUncheckedCreateWithoutMergedIntoContactInput[]
+    connectOrCreate?: ContactCreateOrConnectWithoutMergedIntoContactInput | ContactCreateOrConnectWithoutMergedIntoContactInput[]
+    upsert?: ContactUpsertWithWhereUniqueWithoutMergedIntoContactInput | ContactUpsertWithWhereUniqueWithoutMergedIntoContactInput[]
+    createMany?: ContactCreateManyMergedIntoContactInputEnvelope
+    set?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+    disconnect?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+    delete?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+    connect?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+    update?: ContactUpdateWithWhereUniqueWithoutMergedIntoContactInput | ContactUpdateWithWhereUniqueWithoutMergedIntoContactInput[]
+    updateMany?: ContactUpdateManyWithWhereWithoutMergedIntoContactInput | ContactUpdateManyWithWhereWithoutMergedIntoContactInput[]
+    deleteMany?: ContactScalarWhereInput | ContactScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutSubscriptionCustomerInput = {
@@ -11304,20 +23994,30 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type ContactCreateNestedManyWithoutImportJobInput = {
+    create?: XOR<ContactCreateWithoutImportJobInput, ContactUncheckedCreateWithoutImportJobInput> | ContactCreateWithoutImportJobInput[] | ContactUncheckedCreateWithoutImportJobInput[]
+    connectOrCreate?: ContactCreateOrConnectWithoutImportJobInput | ContactCreateOrConnectWithoutImportJobInput[]
+    createMany?: ContactCreateManyImportJobInputEnvelope
+    connect?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+  }
+
+  export type ContactUncheckedCreateNestedManyWithoutImportJobInput = {
+    create?: XOR<ContactCreateWithoutImportJobInput, ContactUncheckedCreateWithoutImportJobInput> | ContactCreateWithoutImportJobInput[] | ContactUncheckedCreateWithoutImportJobInput[]
+    connectOrCreate?: ContactCreateOrConnectWithoutImportJobInput | ContactCreateOrConnectWithoutImportJobInput[]
+    createMany?: ContactCreateManyImportJobInputEnvelope
+    connect?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+  }
+
   export type EnumContactImportFormatFieldUpdateOperationsInput = {
     set?: $Enums.ContactImportFormat
   }
 
-  export type EnumImportExportJobStatusFieldUpdateOperationsInput = {
-    set?: $Enums.ImportExportJobStatus
+  export type NullableEnumImportSourceProfileFieldUpdateOperationsInput = {
+    set?: $Enums.ImportSourceProfile | null
   }
 
-  export type IntFieldUpdateOperationsInput = {
-    set?: number
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
+  export type EnumImportExportJobStatusFieldUpdateOperationsInput = {
+    set?: $Enums.ImportExportJobStatus
   }
 
   export type UserUpdateOneRequiredWithoutImportJobsNestedInput = {
@@ -11326,6 +24026,34 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutImportJobsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutImportJobsInput, UserUpdateWithoutImportJobsInput>, UserUncheckedUpdateWithoutImportJobsInput>
+  }
+
+  export type ContactUpdateManyWithoutImportJobNestedInput = {
+    create?: XOR<ContactCreateWithoutImportJobInput, ContactUncheckedCreateWithoutImportJobInput> | ContactCreateWithoutImportJobInput[] | ContactUncheckedCreateWithoutImportJobInput[]
+    connectOrCreate?: ContactCreateOrConnectWithoutImportJobInput | ContactCreateOrConnectWithoutImportJobInput[]
+    upsert?: ContactUpsertWithWhereUniqueWithoutImportJobInput | ContactUpsertWithWhereUniqueWithoutImportJobInput[]
+    createMany?: ContactCreateManyImportJobInputEnvelope
+    set?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+    disconnect?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+    delete?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+    connect?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+    update?: ContactUpdateWithWhereUniqueWithoutImportJobInput | ContactUpdateWithWhereUniqueWithoutImportJobInput[]
+    updateMany?: ContactUpdateManyWithWhereWithoutImportJobInput | ContactUpdateManyWithWhereWithoutImportJobInput[]
+    deleteMany?: ContactScalarWhereInput | ContactScalarWhereInput[]
+  }
+
+  export type ContactUncheckedUpdateManyWithoutImportJobNestedInput = {
+    create?: XOR<ContactCreateWithoutImportJobInput, ContactUncheckedCreateWithoutImportJobInput> | ContactCreateWithoutImportJobInput[] | ContactUncheckedCreateWithoutImportJobInput[]
+    connectOrCreate?: ContactCreateOrConnectWithoutImportJobInput | ContactCreateOrConnectWithoutImportJobInput[]
+    upsert?: ContactUpsertWithWhereUniqueWithoutImportJobInput | ContactUpsertWithWhereUniqueWithoutImportJobInput[]
+    createMany?: ContactCreateManyImportJobInputEnvelope
+    set?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+    disconnect?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+    delete?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+    connect?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+    update?: ContactUpdateWithWhereUniqueWithoutImportJobInput | ContactUpdateWithWhereUniqueWithoutImportJobInput[]
+    updateMany?: ContactUpdateManyWithWhereWithoutImportJobInput | ContactUpdateManyWithWhereWithoutImportJobInput[]
+    deleteMany?: ContactScalarWhereInput | ContactScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutExportJobsInput = {
@@ -11344,6 +24072,432 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutExportJobsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutExportJobsInput, UserUpdateWithoutExportJobsInput>, UserUncheckedUpdateWithoutExportJobsInput>
+  }
+
+  export type UserCreateNestedOneWithoutMergeSuggestionsInput = {
+    create?: XOR<UserCreateWithoutMergeSuggestionsInput, UserUncheckedCreateWithoutMergeSuggestionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutMergeSuggestionsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type ContactCreateNestedOneWithoutLeftMergeSuggestionsInput = {
+    create?: XOR<ContactCreateWithoutLeftMergeSuggestionsInput, ContactUncheckedCreateWithoutLeftMergeSuggestionsInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutLeftMergeSuggestionsInput
+    connect?: ContactWhereUniqueInput
+  }
+
+  export type ContactCreateNestedOneWithoutRightMergeSuggestionsInput = {
+    create?: XOR<ContactCreateWithoutRightMergeSuggestionsInput, ContactUncheckedCreateWithoutRightMergeSuggestionsInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutRightMergeSuggestionsInput
+    connect?: ContactWhereUniqueInput
+  }
+
+  export type MergeDecisionCreateNestedManyWithoutSuggestionInput = {
+    create?: XOR<MergeDecisionCreateWithoutSuggestionInput, MergeDecisionUncheckedCreateWithoutSuggestionInput> | MergeDecisionCreateWithoutSuggestionInput[] | MergeDecisionUncheckedCreateWithoutSuggestionInput[]
+    connectOrCreate?: MergeDecisionCreateOrConnectWithoutSuggestionInput | MergeDecisionCreateOrConnectWithoutSuggestionInput[]
+    createMany?: MergeDecisionCreateManySuggestionInputEnvelope
+    connect?: MergeDecisionWhereUniqueInput | MergeDecisionWhereUniqueInput[]
+  }
+
+  export type MergeDecisionUncheckedCreateNestedManyWithoutSuggestionInput = {
+    create?: XOR<MergeDecisionCreateWithoutSuggestionInput, MergeDecisionUncheckedCreateWithoutSuggestionInput> | MergeDecisionCreateWithoutSuggestionInput[] | MergeDecisionUncheckedCreateWithoutSuggestionInput[]
+    connectOrCreate?: MergeDecisionCreateOrConnectWithoutSuggestionInput | MergeDecisionCreateOrConnectWithoutSuggestionInput[]
+    createMany?: MergeDecisionCreateManySuggestionInputEnvelope
+    connect?: MergeDecisionWhereUniqueInput | MergeDecisionWhereUniqueInput[]
+  }
+
+  export type EnumMergeSuggestionStatusFieldUpdateOperationsInput = {
+    set?: $Enums.MergeSuggestionStatus
+  }
+
+  export type EnumMergeSuggestionConfidenceFieldUpdateOperationsInput = {
+    set?: $Enums.MergeSuggestionConfidence
+  }
+
+  export type UserUpdateOneRequiredWithoutMergeSuggestionsNestedInput = {
+    create?: XOR<UserCreateWithoutMergeSuggestionsInput, UserUncheckedCreateWithoutMergeSuggestionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutMergeSuggestionsInput
+    upsert?: UserUpsertWithoutMergeSuggestionsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutMergeSuggestionsInput, UserUpdateWithoutMergeSuggestionsInput>, UserUncheckedUpdateWithoutMergeSuggestionsInput>
+  }
+
+  export type ContactUpdateOneRequiredWithoutLeftMergeSuggestionsNestedInput = {
+    create?: XOR<ContactCreateWithoutLeftMergeSuggestionsInput, ContactUncheckedCreateWithoutLeftMergeSuggestionsInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutLeftMergeSuggestionsInput
+    upsert?: ContactUpsertWithoutLeftMergeSuggestionsInput
+    connect?: ContactWhereUniqueInput
+    update?: XOR<XOR<ContactUpdateToOneWithWhereWithoutLeftMergeSuggestionsInput, ContactUpdateWithoutLeftMergeSuggestionsInput>, ContactUncheckedUpdateWithoutLeftMergeSuggestionsInput>
+  }
+
+  export type ContactUpdateOneRequiredWithoutRightMergeSuggestionsNestedInput = {
+    create?: XOR<ContactCreateWithoutRightMergeSuggestionsInput, ContactUncheckedCreateWithoutRightMergeSuggestionsInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutRightMergeSuggestionsInput
+    upsert?: ContactUpsertWithoutRightMergeSuggestionsInput
+    connect?: ContactWhereUniqueInput
+    update?: XOR<XOR<ContactUpdateToOneWithWhereWithoutRightMergeSuggestionsInput, ContactUpdateWithoutRightMergeSuggestionsInput>, ContactUncheckedUpdateWithoutRightMergeSuggestionsInput>
+  }
+
+  export type MergeDecisionUpdateManyWithoutSuggestionNestedInput = {
+    create?: XOR<MergeDecisionCreateWithoutSuggestionInput, MergeDecisionUncheckedCreateWithoutSuggestionInput> | MergeDecisionCreateWithoutSuggestionInput[] | MergeDecisionUncheckedCreateWithoutSuggestionInput[]
+    connectOrCreate?: MergeDecisionCreateOrConnectWithoutSuggestionInput | MergeDecisionCreateOrConnectWithoutSuggestionInput[]
+    upsert?: MergeDecisionUpsertWithWhereUniqueWithoutSuggestionInput | MergeDecisionUpsertWithWhereUniqueWithoutSuggestionInput[]
+    createMany?: MergeDecisionCreateManySuggestionInputEnvelope
+    set?: MergeDecisionWhereUniqueInput | MergeDecisionWhereUniqueInput[]
+    disconnect?: MergeDecisionWhereUniqueInput | MergeDecisionWhereUniqueInput[]
+    delete?: MergeDecisionWhereUniqueInput | MergeDecisionWhereUniqueInput[]
+    connect?: MergeDecisionWhereUniqueInput | MergeDecisionWhereUniqueInput[]
+    update?: MergeDecisionUpdateWithWhereUniqueWithoutSuggestionInput | MergeDecisionUpdateWithWhereUniqueWithoutSuggestionInput[]
+    updateMany?: MergeDecisionUpdateManyWithWhereWithoutSuggestionInput | MergeDecisionUpdateManyWithWhereWithoutSuggestionInput[]
+    deleteMany?: MergeDecisionScalarWhereInput | MergeDecisionScalarWhereInput[]
+  }
+
+  export type MergeDecisionUncheckedUpdateManyWithoutSuggestionNestedInput = {
+    create?: XOR<MergeDecisionCreateWithoutSuggestionInput, MergeDecisionUncheckedCreateWithoutSuggestionInput> | MergeDecisionCreateWithoutSuggestionInput[] | MergeDecisionUncheckedCreateWithoutSuggestionInput[]
+    connectOrCreate?: MergeDecisionCreateOrConnectWithoutSuggestionInput | MergeDecisionCreateOrConnectWithoutSuggestionInput[]
+    upsert?: MergeDecisionUpsertWithWhereUniqueWithoutSuggestionInput | MergeDecisionUpsertWithWhereUniqueWithoutSuggestionInput[]
+    createMany?: MergeDecisionCreateManySuggestionInputEnvelope
+    set?: MergeDecisionWhereUniqueInput | MergeDecisionWhereUniqueInput[]
+    disconnect?: MergeDecisionWhereUniqueInput | MergeDecisionWhereUniqueInput[]
+    delete?: MergeDecisionWhereUniqueInput | MergeDecisionWhereUniqueInput[]
+    connect?: MergeDecisionWhereUniqueInput | MergeDecisionWhereUniqueInput[]
+    update?: MergeDecisionUpdateWithWhereUniqueWithoutSuggestionInput | MergeDecisionUpdateWithWhereUniqueWithoutSuggestionInput[]
+    updateMany?: MergeDecisionUpdateManyWithWhereWithoutSuggestionInput | MergeDecisionUpdateManyWithWhereWithoutSuggestionInput[]
+    deleteMany?: MergeDecisionScalarWhereInput | MergeDecisionScalarWhereInput[]
+  }
+
+  export type MergeSuggestionCreateNestedOneWithoutDecisionsInput = {
+    create?: XOR<MergeSuggestionCreateWithoutDecisionsInput, MergeSuggestionUncheckedCreateWithoutDecisionsInput>
+    connectOrCreate?: MergeSuggestionCreateOrConnectWithoutDecisionsInput
+    connect?: MergeSuggestionWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutMergeDecisionsInput = {
+    create?: XOR<UserCreateWithoutMergeDecisionsInput, UserUncheckedCreateWithoutMergeDecisionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutMergeDecisionsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type EnumMergeDecisionStatusFieldUpdateOperationsInput = {
+    set?: $Enums.MergeDecisionStatus
+  }
+
+  export type MergeSuggestionUpdateOneRequiredWithoutDecisionsNestedInput = {
+    create?: XOR<MergeSuggestionCreateWithoutDecisionsInput, MergeSuggestionUncheckedCreateWithoutDecisionsInput>
+    connectOrCreate?: MergeSuggestionCreateOrConnectWithoutDecisionsInput
+    upsert?: MergeSuggestionUpsertWithoutDecisionsInput
+    connect?: MergeSuggestionWhereUniqueInput
+    update?: XOR<XOR<MergeSuggestionUpdateToOneWithWhereWithoutDecisionsInput, MergeSuggestionUpdateWithoutDecisionsInput>, MergeSuggestionUncheckedUpdateWithoutDecisionsInput>
+  }
+
+  export type UserUpdateOneRequiredWithoutMergeDecisionsNestedInput = {
+    create?: XOR<UserCreateWithoutMergeDecisionsInput, UserUncheckedCreateWithoutMergeDecisionsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutMergeDecisionsInput
+    upsert?: UserUpsertWithoutMergeDecisionsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutMergeDecisionsInput, UserUpdateWithoutMergeDecisionsInput>, UserUncheckedUpdateWithoutMergeDecisionsInput>
+  }
+
+  export type UserCreateNestedOneWithoutSyncAccountsInput = {
+    create?: XOR<UserCreateWithoutSyncAccountsInput, UserUncheckedCreateWithoutSyncAccountsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSyncAccountsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type SyncContactLinkCreateNestedManyWithoutSyncAccountInput = {
+    create?: XOR<SyncContactLinkCreateWithoutSyncAccountInput, SyncContactLinkUncheckedCreateWithoutSyncAccountInput> | SyncContactLinkCreateWithoutSyncAccountInput[] | SyncContactLinkUncheckedCreateWithoutSyncAccountInput[]
+    connectOrCreate?: SyncContactLinkCreateOrConnectWithoutSyncAccountInput | SyncContactLinkCreateOrConnectWithoutSyncAccountInput[]
+    createMany?: SyncContactLinkCreateManySyncAccountInputEnvelope
+    connect?: SyncContactLinkWhereUniqueInput | SyncContactLinkWhereUniqueInput[]
+  }
+
+  export type SyncJobCreateNestedManyWithoutSyncAccountInput = {
+    create?: XOR<SyncJobCreateWithoutSyncAccountInput, SyncJobUncheckedCreateWithoutSyncAccountInput> | SyncJobCreateWithoutSyncAccountInput[] | SyncJobUncheckedCreateWithoutSyncAccountInput[]
+    connectOrCreate?: SyncJobCreateOrConnectWithoutSyncAccountInput | SyncJobCreateOrConnectWithoutSyncAccountInput[]
+    createMany?: SyncJobCreateManySyncAccountInputEnvelope
+    connect?: SyncJobWhereUniqueInput | SyncJobWhereUniqueInput[]
+  }
+
+  export type SyncConflictCreateNestedManyWithoutSyncAccountInput = {
+    create?: XOR<SyncConflictCreateWithoutSyncAccountInput, SyncConflictUncheckedCreateWithoutSyncAccountInput> | SyncConflictCreateWithoutSyncAccountInput[] | SyncConflictUncheckedCreateWithoutSyncAccountInput[]
+    connectOrCreate?: SyncConflictCreateOrConnectWithoutSyncAccountInput | SyncConflictCreateOrConnectWithoutSyncAccountInput[]
+    createMany?: SyncConflictCreateManySyncAccountInputEnvelope
+    connect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+  }
+
+  export type SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput = {
+    create?: XOR<SyncContactLinkCreateWithoutSyncAccountInput, SyncContactLinkUncheckedCreateWithoutSyncAccountInput> | SyncContactLinkCreateWithoutSyncAccountInput[] | SyncContactLinkUncheckedCreateWithoutSyncAccountInput[]
+    connectOrCreate?: SyncContactLinkCreateOrConnectWithoutSyncAccountInput | SyncContactLinkCreateOrConnectWithoutSyncAccountInput[]
+    createMany?: SyncContactLinkCreateManySyncAccountInputEnvelope
+    connect?: SyncContactLinkWhereUniqueInput | SyncContactLinkWhereUniqueInput[]
+  }
+
+  export type SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput = {
+    create?: XOR<SyncJobCreateWithoutSyncAccountInput, SyncJobUncheckedCreateWithoutSyncAccountInput> | SyncJobCreateWithoutSyncAccountInput[] | SyncJobUncheckedCreateWithoutSyncAccountInput[]
+    connectOrCreate?: SyncJobCreateOrConnectWithoutSyncAccountInput | SyncJobCreateOrConnectWithoutSyncAccountInput[]
+    createMany?: SyncJobCreateManySyncAccountInputEnvelope
+    connect?: SyncJobWhereUniqueInput | SyncJobWhereUniqueInput[]
+  }
+
+  export type SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput = {
+    create?: XOR<SyncConflictCreateWithoutSyncAccountInput, SyncConflictUncheckedCreateWithoutSyncAccountInput> | SyncConflictCreateWithoutSyncAccountInput[] | SyncConflictUncheckedCreateWithoutSyncAccountInput[]
+    connectOrCreate?: SyncConflictCreateOrConnectWithoutSyncAccountInput | SyncConflictCreateOrConnectWithoutSyncAccountInput[]
+    createMany?: SyncConflictCreateManySyncAccountInputEnvelope
+    connect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+  }
+
+  export type EnumSyncProviderFieldUpdateOperationsInput = {
+    set?: $Enums.SyncProvider
+  }
+
+  export type EnumSyncAccountStatusFieldUpdateOperationsInput = {
+    set?: $Enums.SyncAccountStatus
+  }
+
+  export type EnumSyncDirectionFieldUpdateOperationsInput = {
+    set?: $Enums.SyncDirection
+  }
+
+  export type UserUpdateOneRequiredWithoutSyncAccountsNestedInput = {
+    create?: XOR<UserCreateWithoutSyncAccountsInput, UserUncheckedCreateWithoutSyncAccountsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSyncAccountsInput
+    upsert?: UserUpsertWithoutSyncAccountsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSyncAccountsInput, UserUpdateWithoutSyncAccountsInput>, UserUncheckedUpdateWithoutSyncAccountsInput>
+  }
+
+  export type SyncContactLinkUpdateManyWithoutSyncAccountNestedInput = {
+    create?: XOR<SyncContactLinkCreateWithoutSyncAccountInput, SyncContactLinkUncheckedCreateWithoutSyncAccountInput> | SyncContactLinkCreateWithoutSyncAccountInput[] | SyncContactLinkUncheckedCreateWithoutSyncAccountInput[]
+    connectOrCreate?: SyncContactLinkCreateOrConnectWithoutSyncAccountInput | SyncContactLinkCreateOrConnectWithoutSyncAccountInput[]
+    upsert?: SyncContactLinkUpsertWithWhereUniqueWithoutSyncAccountInput | SyncContactLinkUpsertWithWhereUniqueWithoutSyncAccountInput[]
+    createMany?: SyncContactLinkCreateManySyncAccountInputEnvelope
+    set?: SyncContactLinkWhereUniqueInput | SyncContactLinkWhereUniqueInput[]
+    disconnect?: SyncContactLinkWhereUniqueInput | SyncContactLinkWhereUniqueInput[]
+    delete?: SyncContactLinkWhereUniqueInput | SyncContactLinkWhereUniqueInput[]
+    connect?: SyncContactLinkWhereUniqueInput | SyncContactLinkWhereUniqueInput[]
+    update?: SyncContactLinkUpdateWithWhereUniqueWithoutSyncAccountInput | SyncContactLinkUpdateWithWhereUniqueWithoutSyncAccountInput[]
+    updateMany?: SyncContactLinkUpdateManyWithWhereWithoutSyncAccountInput | SyncContactLinkUpdateManyWithWhereWithoutSyncAccountInput[]
+    deleteMany?: SyncContactLinkScalarWhereInput | SyncContactLinkScalarWhereInput[]
+  }
+
+  export type SyncJobUpdateManyWithoutSyncAccountNestedInput = {
+    create?: XOR<SyncJobCreateWithoutSyncAccountInput, SyncJobUncheckedCreateWithoutSyncAccountInput> | SyncJobCreateWithoutSyncAccountInput[] | SyncJobUncheckedCreateWithoutSyncAccountInput[]
+    connectOrCreate?: SyncJobCreateOrConnectWithoutSyncAccountInput | SyncJobCreateOrConnectWithoutSyncAccountInput[]
+    upsert?: SyncJobUpsertWithWhereUniqueWithoutSyncAccountInput | SyncJobUpsertWithWhereUniqueWithoutSyncAccountInput[]
+    createMany?: SyncJobCreateManySyncAccountInputEnvelope
+    set?: SyncJobWhereUniqueInput | SyncJobWhereUniqueInput[]
+    disconnect?: SyncJobWhereUniqueInput | SyncJobWhereUniqueInput[]
+    delete?: SyncJobWhereUniqueInput | SyncJobWhereUniqueInput[]
+    connect?: SyncJobWhereUniqueInput | SyncJobWhereUniqueInput[]
+    update?: SyncJobUpdateWithWhereUniqueWithoutSyncAccountInput | SyncJobUpdateWithWhereUniqueWithoutSyncAccountInput[]
+    updateMany?: SyncJobUpdateManyWithWhereWithoutSyncAccountInput | SyncJobUpdateManyWithWhereWithoutSyncAccountInput[]
+    deleteMany?: SyncJobScalarWhereInput | SyncJobScalarWhereInput[]
+  }
+
+  export type SyncConflictUpdateManyWithoutSyncAccountNestedInput = {
+    create?: XOR<SyncConflictCreateWithoutSyncAccountInput, SyncConflictUncheckedCreateWithoutSyncAccountInput> | SyncConflictCreateWithoutSyncAccountInput[] | SyncConflictUncheckedCreateWithoutSyncAccountInput[]
+    connectOrCreate?: SyncConflictCreateOrConnectWithoutSyncAccountInput | SyncConflictCreateOrConnectWithoutSyncAccountInput[]
+    upsert?: SyncConflictUpsertWithWhereUniqueWithoutSyncAccountInput | SyncConflictUpsertWithWhereUniqueWithoutSyncAccountInput[]
+    createMany?: SyncConflictCreateManySyncAccountInputEnvelope
+    set?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    disconnect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    delete?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    connect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    update?: SyncConflictUpdateWithWhereUniqueWithoutSyncAccountInput | SyncConflictUpdateWithWhereUniqueWithoutSyncAccountInput[]
+    updateMany?: SyncConflictUpdateManyWithWhereWithoutSyncAccountInput | SyncConflictUpdateManyWithWhereWithoutSyncAccountInput[]
+    deleteMany?: SyncConflictScalarWhereInput | SyncConflictScalarWhereInput[]
+  }
+
+  export type SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput = {
+    create?: XOR<SyncContactLinkCreateWithoutSyncAccountInput, SyncContactLinkUncheckedCreateWithoutSyncAccountInput> | SyncContactLinkCreateWithoutSyncAccountInput[] | SyncContactLinkUncheckedCreateWithoutSyncAccountInput[]
+    connectOrCreate?: SyncContactLinkCreateOrConnectWithoutSyncAccountInput | SyncContactLinkCreateOrConnectWithoutSyncAccountInput[]
+    upsert?: SyncContactLinkUpsertWithWhereUniqueWithoutSyncAccountInput | SyncContactLinkUpsertWithWhereUniqueWithoutSyncAccountInput[]
+    createMany?: SyncContactLinkCreateManySyncAccountInputEnvelope
+    set?: SyncContactLinkWhereUniqueInput | SyncContactLinkWhereUniqueInput[]
+    disconnect?: SyncContactLinkWhereUniqueInput | SyncContactLinkWhereUniqueInput[]
+    delete?: SyncContactLinkWhereUniqueInput | SyncContactLinkWhereUniqueInput[]
+    connect?: SyncContactLinkWhereUniqueInput | SyncContactLinkWhereUniqueInput[]
+    update?: SyncContactLinkUpdateWithWhereUniqueWithoutSyncAccountInput | SyncContactLinkUpdateWithWhereUniqueWithoutSyncAccountInput[]
+    updateMany?: SyncContactLinkUpdateManyWithWhereWithoutSyncAccountInput | SyncContactLinkUpdateManyWithWhereWithoutSyncAccountInput[]
+    deleteMany?: SyncContactLinkScalarWhereInput | SyncContactLinkScalarWhereInput[]
+  }
+
+  export type SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput = {
+    create?: XOR<SyncJobCreateWithoutSyncAccountInput, SyncJobUncheckedCreateWithoutSyncAccountInput> | SyncJobCreateWithoutSyncAccountInput[] | SyncJobUncheckedCreateWithoutSyncAccountInput[]
+    connectOrCreate?: SyncJobCreateOrConnectWithoutSyncAccountInput | SyncJobCreateOrConnectWithoutSyncAccountInput[]
+    upsert?: SyncJobUpsertWithWhereUniqueWithoutSyncAccountInput | SyncJobUpsertWithWhereUniqueWithoutSyncAccountInput[]
+    createMany?: SyncJobCreateManySyncAccountInputEnvelope
+    set?: SyncJobWhereUniqueInput | SyncJobWhereUniqueInput[]
+    disconnect?: SyncJobWhereUniqueInput | SyncJobWhereUniqueInput[]
+    delete?: SyncJobWhereUniqueInput | SyncJobWhereUniqueInput[]
+    connect?: SyncJobWhereUniqueInput | SyncJobWhereUniqueInput[]
+    update?: SyncJobUpdateWithWhereUniqueWithoutSyncAccountInput | SyncJobUpdateWithWhereUniqueWithoutSyncAccountInput[]
+    updateMany?: SyncJobUpdateManyWithWhereWithoutSyncAccountInput | SyncJobUpdateManyWithWhereWithoutSyncAccountInput[]
+    deleteMany?: SyncJobScalarWhereInput | SyncJobScalarWhereInput[]
+  }
+
+  export type SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput = {
+    create?: XOR<SyncConflictCreateWithoutSyncAccountInput, SyncConflictUncheckedCreateWithoutSyncAccountInput> | SyncConflictCreateWithoutSyncAccountInput[] | SyncConflictUncheckedCreateWithoutSyncAccountInput[]
+    connectOrCreate?: SyncConflictCreateOrConnectWithoutSyncAccountInput | SyncConflictCreateOrConnectWithoutSyncAccountInput[]
+    upsert?: SyncConflictUpsertWithWhereUniqueWithoutSyncAccountInput | SyncConflictUpsertWithWhereUniqueWithoutSyncAccountInput[]
+    createMany?: SyncConflictCreateManySyncAccountInputEnvelope
+    set?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    disconnect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    delete?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    connect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    update?: SyncConflictUpdateWithWhereUniqueWithoutSyncAccountInput | SyncConflictUpdateWithWhereUniqueWithoutSyncAccountInput[]
+    updateMany?: SyncConflictUpdateManyWithWhereWithoutSyncAccountInput | SyncConflictUpdateManyWithWhereWithoutSyncAccountInput[]
+    deleteMany?: SyncConflictScalarWhereInput | SyncConflictScalarWhereInput[]
+  }
+
+  export type SyncAccountCreateNestedOneWithoutSyncLinksInput = {
+    create?: XOR<SyncAccountCreateWithoutSyncLinksInput, SyncAccountUncheckedCreateWithoutSyncLinksInput>
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutSyncLinksInput
+    connect?: SyncAccountWhereUniqueInput
+  }
+
+  export type ContactCreateNestedOneWithoutSyncLinksInput = {
+    create?: XOR<ContactCreateWithoutSyncLinksInput, ContactUncheckedCreateWithoutSyncLinksInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutSyncLinksInput
+    connect?: ContactWhereUniqueInput
+  }
+
+  export type SyncConflictCreateNestedManyWithoutSyncContactLinkInput = {
+    create?: XOR<SyncConflictCreateWithoutSyncContactLinkInput, SyncConflictUncheckedCreateWithoutSyncContactLinkInput> | SyncConflictCreateWithoutSyncContactLinkInput[] | SyncConflictUncheckedCreateWithoutSyncContactLinkInput[]
+    connectOrCreate?: SyncConflictCreateOrConnectWithoutSyncContactLinkInput | SyncConflictCreateOrConnectWithoutSyncContactLinkInput[]
+    createMany?: SyncConflictCreateManySyncContactLinkInputEnvelope
+    connect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+  }
+
+  export type SyncConflictUncheckedCreateNestedManyWithoutSyncContactLinkInput = {
+    create?: XOR<SyncConflictCreateWithoutSyncContactLinkInput, SyncConflictUncheckedCreateWithoutSyncContactLinkInput> | SyncConflictCreateWithoutSyncContactLinkInput[] | SyncConflictUncheckedCreateWithoutSyncContactLinkInput[]
+    connectOrCreate?: SyncConflictCreateOrConnectWithoutSyncContactLinkInput | SyncConflictCreateOrConnectWithoutSyncContactLinkInput[]
+    createMany?: SyncConflictCreateManySyncContactLinkInputEnvelope
+    connect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+  }
+
+  export type SyncAccountUpdateOneRequiredWithoutSyncLinksNestedInput = {
+    create?: XOR<SyncAccountCreateWithoutSyncLinksInput, SyncAccountUncheckedCreateWithoutSyncLinksInput>
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutSyncLinksInput
+    upsert?: SyncAccountUpsertWithoutSyncLinksInput
+    connect?: SyncAccountWhereUniqueInput
+    update?: XOR<XOR<SyncAccountUpdateToOneWithWhereWithoutSyncLinksInput, SyncAccountUpdateWithoutSyncLinksInput>, SyncAccountUncheckedUpdateWithoutSyncLinksInput>
+  }
+
+  export type ContactUpdateOneRequiredWithoutSyncLinksNestedInput = {
+    create?: XOR<ContactCreateWithoutSyncLinksInput, ContactUncheckedCreateWithoutSyncLinksInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutSyncLinksInput
+    upsert?: ContactUpsertWithoutSyncLinksInput
+    connect?: ContactWhereUniqueInput
+    update?: XOR<XOR<ContactUpdateToOneWithWhereWithoutSyncLinksInput, ContactUpdateWithoutSyncLinksInput>, ContactUncheckedUpdateWithoutSyncLinksInput>
+  }
+
+  export type SyncConflictUpdateManyWithoutSyncContactLinkNestedInput = {
+    create?: XOR<SyncConflictCreateWithoutSyncContactLinkInput, SyncConflictUncheckedCreateWithoutSyncContactLinkInput> | SyncConflictCreateWithoutSyncContactLinkInput[] | SyncConflictUncheckedCreateWithoutSyncContactLinkInput[]
+    connectOrCreate?: SyncConflictCreateOrConnectWithoutSyncContactLinkInput | SyncConflictCreateOrConnectWithoutSyncContactLinkInput[]
+    upsert?: SyncConflictUpsertWithWhereUniqueWithoutSyncContactLinkInput | SyncConflictUpsertWithWhereUniqueWithoutSyncContactLinkInput[]
+    createMany?: SyncConflictCreateManySyncContactLinkInputEnvelope
+    set?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    disconnect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    delete?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    connect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    update?: SyncConflictUpdateWithWhereUniqueWithoutSyncContactLinkInput | SyncConflictUpdateWithWhereUniqueWithoutSyncContactLinkInput[]
+    updateMany?: SyncConflictUpdateManyWithWhereWithoutSyncContactLinkInput | SyncConflictUpdateManyWithWhereWithoutSyncContactLinkInput[]
+    deleteMany?: SyncConflictScalarWhereInput | SyncConflictScalarWhereInput[]
+  }
+
+  export type SyncConflictUncheckedUpdateManyWithoutSyncContactLinkNestedInput = {
+    create?: XOR<SyncConflictCreateWithoutSyncContactLinkInput, SyncConflictUncheckedCreateWithoutSyncContactLinkInput> | SyncConflictCreateWithoutSyncContactLinkInput[] | SyncConflictUncheckedCreateWithoutSyncContactLinkInput[]
+    connectOrCreate?: SyncConflictCreateOrConnectWithoutSyncContactLinkInput | SyncConflictCreateOrConnectWithoutSyncContactLinkInput[]
+    upsert?: SyncConflictUpsertWithWhereUniqueWithoutSyncContactLinkInput | SyncConflictUpsertWithWhereUniqueWithoutSyncContactLinkInput[]
+    createMany?: SyncConflictCreateManySyncContactLinkInputEnvelope
+    set?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    disconnect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    delete?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    connect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    update?: SyncConflictUpdateWithWhereUniqueWithoutSyncContactLinkInput | SyncConflictUpdateWithWhereUniqueWithoutSyncContactLinkInput[]
+    updateMany?: SyncConflictUpdateManyWithWhereWithoutSyncContactLinkInput | SyncConflictUpdateManyWithWhereWithoutSyncContactLinkInput[]
+    deleteMany?: SyncConflictScalarWhereInput | SyncConflictScalarWhereInput[]
+  }
+
+  export type SyncAccountCreateNestedOneWithoutSyncJobsInput = {
+    create?: XOR<SyncAccountCreateWithoutSyncJobsInput, SyncAccountUncheckedCreateWithoutSyncJobsInput>
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutSyncJobsInput
+    connect?: SyncAccountWhereUniqueInput
+  }
+
+  export type EnumSyncJobStatusFieldUpdateOperationsInput = {
+    set?: $Enums.SyncJobStatus
+  }
+
+  export type EnumSyncJobTriggerFieldUpdateOperationsInput = {
+    set?: $Enums.SyncJobTrigger
+  }
+
+  export type SyncAccountUpdateOneRequiredWithoutSyncJobsNestedInput = {
+    create?: XOR<SyncAccountCreateWithoutSyncJobsInput, SyncAccountUncheckedCreateWithoutSyncJobsInput>
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutSyncJobsInput
+    upsert?: SyncAccountUpsertWithoutSyncJobsInput
+    connect?: SyncAccountWhereUniqueInput
+    update?: XOR<XOR<SyncAccountUpdateToOneWithWhereWithoutSyncJobsInput, SyncAccountUpdateWithoutSyncJobsInput>, SyncAccountUncheckedUpdateWithoutSyncJobsInput>
+  }
+
+  export type SyncAccountCreateNestedOneWithoutSyncConflictsInput = {
+    create?: XOR<SyncAccountCreateWithoutSyncConflictsInput, SyncAccountUncheckedCreateWithoutSyncConflictsInput>
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutSyncConflictsInput
+    connect?: SyncAccountWhereUniqueInput
+  }
+
+  export type SyncContactLinkCreateNestedOneWithoutSyncConflictsInput = {
+    create?: XOR<SyncContactLinkCreateWithoutSyncConflictsInput, SyncContactLinkUncheckedCreateWithoutSyncConflictsInput>
+    connectOrCreate?: SyncContactLinkCreateOrConnectWithoutSyncConflictsInput
+    connect?: SyncContactLinkWhereUniqueInput
+  }
+
+  export type ContactCreateNestedOneWithoutSyncConflictsInput = {
+    create?: XOR<ContactCreateWithoutSyncConflictsInput, ContactUncheckedCreateWithoutSyncConflictsInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutSyncConflictsInput
+    connect?: ContactWhereUniqueInput
+  }
+
+  export type EnumSyncConflictTypeFieldUpdateOperationsInput = {
+    set?: $Enums.SyncConflictType
+  }
+
+  export type EnumSyncConflictStatusFieldUpdateOperationsInput = {
+    set?: $Enums.SyncConflictStatus
+  }
+
+  export type NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput = {
+    set?: $Enums.SyncResolutionStrategy | null
+  }
+
+  export type SyncAccountUpdateOneRequiredWithoutSyncConflictsNestedInput = {
+    create?: XOR<SyncAccountCreateWithoutSyncConflictsInput, SyncAccountUncheckedCreateWithoutSyncConflictsInput>
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutSyncConflictsInput
+    upsert?: SyncAccountUpsertWithoutSyncConflictsInput
+    connect?: SyncAccountWhereUniqueInput
+    update?: XOR<XOR<SyncAccountUpdateToOneWithWhereWithoutSyncConflictsInput, SyncAccountUpdateWithoutSyncConflictsInput>, SyncAccountUncheckedUpdateWithoutSyncConflictsInput>
+  }
+
+  export type SyncContactLinkUpdateOneWithoutSyncConflictsNestedInput = {
+    create?: XOR<SyncContactLinkCreateWithoutSyncConflictsInput, SyncContactLinkUncheckedCreateWithoutSyncConflictsInput>
+    connectOrCreate?: SyncContactLinkCreateOrConnectWithoutSyncConflictsInput
+    upsert?: SyncContactLinkUpsertWithoutSyncConflictsInput
+    disconnect?: SyncContactLinkWhereInput | boolean
+    delete?: SyncContactLinkWhereInput | boolean
+    connect?: SyncContactLinkWhereUniqueInput
+    update?: XOR<XOR<SyncContactLinkUpdateToOneWithWhereWithoutSyncConflictsInput, SyncContactLinkUpdateWithoutSyncConflictsInput>, SyncContactLinkUncheckedUpdateWithoutSyncConflictsInput>
+  }
+
+  export type ContactUpdateOneWithoutSyncConflictsNestedInput = {
+    create?: XOR<ContactCreateWithoutSyncConflictsInput, ContactUncheckedCreateWithoutSyncConflictsInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutSyncConflictsInput
+    upsert?: ContactUpsertWithoutSyncConflictsInput
+    disconnect?: ContactWhereInput | boolean
+    delete?: ContactWhereInput | boolean
+    connect?: ContactWhereUniqueInput
+    update?: XOR<XOR<ContactUpdateToOneWithWhereWithoutSyncConflictsInput, ContactUpdateWithoutSyncConflictsInput>, ContactUncheckedUpdateWithoutSyncConflictsInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -11483,6 +24637,33 @@ export namespace Prisma {
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
+  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type NestedFloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
   export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
@@ -11612,6 +24793,13 @@ export namespace Prisma {
     not?: NestedEnumContactImportFormatFilter<$PrismaModel> | $Enums.ContactImportFormat
   }
 
+  export type NestedEnumImportSourceProfileNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.ImportSourceProfile | EnumImportSourceProfileFieldRefInput<$PrismaModel> | null
+    in?: $Enums.ImportSourceProfile[] | ListEnumImportSourceProfileFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.ImportSourceProfile[] | ListEnumImportSourceProfileFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumImportSourceProfileNullableFilter<$PrismaModel> | $Enums.ImportSourceProfile | null
+  }
+
   export type NestedEnumImportExportJobStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.ImportExportJobStatus | EnumImportExportJobStatusFieldRefInput<$PrismaModel>
     in?: $Enums.ImportExportJobStatus[] | ListEnumImportExportJobStatusFieldRefInput<$PrismaModel>
@@ -11629,6 +24817,16 @@ export namespace Prisma {
     _max?: NestedEnumContactImportFormatFilter<$PrismaModel>
   }
 
+  export type NestedEnumImportSourceProfileNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ImportSourceProfile | EnumImportSourceProfileFieldRefInput<$PrismaModel> | null
+    in?: $Enums.ImportSourceProfile[] | ListEnumImportSourceProfileFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.ImportSourceProfile[] | ListEnumImportSourceProfileFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumImportSourceProfileNullableWithAggregatesFilter<$PrismaModel> | $Enums.ImportSourceProfile | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumImportSourceProfileNullableFilter<$PrismaModel>
+    _max?: NestedEnumImportSourceProfileNullableFilter<$PrismaModel>
+  }
+
   export type NestedEnumImportExportJobStatusWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.ImportExportJobStatus | EnumImportExportJobStatusFieldRefInput<$PrismaModel>
     in?: $Enums.ImportExportJobStatus[] | ListEnumImportExportJobStatusFieldRefInput<$PrismaModel>
@@ -11637,33 +24835,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumImportExportJobStatusFilter<$PrismaModel>
     _max?: NestedEnumImportExportJobStatusFilter<$PrismaModel>
-  }
-
-  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
-    _count?: NestedIntFilter<$PrismaModel>
-    _avg?: NestedFloatFilter<$PrismaModel>
-    _sum?: NestedIntFilter<$PrismaModel>
-    _min?: NestedIntFilter<$PrismaModel>
-    _max?: NestedIntFilter<$PrismaModel>
-  }
-
-  export type NestedFloatFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel>
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatFilter<$PrismaModel> | number
   }
 
   export type NestedEnumContactExportFormatFilter<$PrismaModel = never> = {
@@ -11683,8 +24854,244 @@ export namespace Prisma {
     _max?: NestedEnumContactExportFormatFilter<$PrismaModel>
   }
 
+  export type NestedEnumMergeSuggestionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.MergeSuggestionStatus | EnumMergeSuggestionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.MergeSuggestionStatus[] | ListEnumMergeSuggestionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MergeSuggestionStatus[] | ListEnumMergeSuggestionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumMergeSuggestionStatusFilter<$PrismaModel> | $Enums.MergeSuggestionStatus
+  }
+
+  export type NestedEnumMergeSuggestionConfidenceFilter<$PrismaModel = never> = {
+    equals?: $Enums.MergeSuggestionConfidence | EnumMergeSuggestionConfidenceFieldRefInput<$PrismaModel>
+    in?: $Enums.MergeSuggestionConfidence[] | ListEnumMergeSuggestionConfidenceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MergeSuggestionConfidence[] | ListEnumMergeSuggestionConfidenceFieldRefInput<$PrismaModel>
+    not?: NestedEnumMergeSuggestionConfidenceFilter<$PrismaModel> | $Enums.MergeSuggestionConfidence
+  }
+
+  export type NestedEnumMergeSuggestionStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.MergeSuggestionStatus | EnumMergeSuggestionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.MergeSuggestionStatus[] | ListEnumMergeSuggestionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MergeSuggestionStatus[] | ListEnumMergeSuggestionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumMergeSuggestionStatusWithAggregatesFilter<$PrismaModel> | $Enums.MergeSuggestionStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMergeSuggestionStatusFilter<$PrismaModel>
+    _max?: NestedEnumMergeSuggestionStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumMergeSuggestionConfidenceWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.MergeSuggestionConfidence | EnumMergeSuggestionConfidenceFieldRefInput<$PrismaModel>
+    in?: $Enums.MergeSuggestionConfidence[] | ListEnumMergeSuggestionConfidenceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MergeSuggestionConfidence[] | ListEnumMergeSuggestionConfidenceFieldRefInput<$PrismaModel>
+    not?: NestedEnumMergeSuggestionConfidenceWithAggregatesFilter<$PrismaModel> | $Enums.MergeSuggestionConfidence
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMergeSuggestionConfidenceFilter<$PrismaModel>
+    _max?: NestedEnumMergeSuggestionConfidenceFilter<$PrismaModel>
+  }
+  export type NestedJsonFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type NestedEnumMergeDecisionStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.MergeDecisionStatus | EnumMergeDecisionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.MergeDecisionStatus[] | ListEnumMergeDecisionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MergeDecisionStatus[] | ListEnumMergeDecisionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumMergeDecisionStatusFilter<$PrismaModel> | $Enums.MergeDecisionStatus
+  }
+
+  export type NestedEnumMergeDecisionStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.MergeDecisionStatus | EnumMergeDecisionStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.MergeDecisionStatus[] | ListEnumMergeDecisionStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.MergeDecisionStatus[] | ListEnumMergeDecisionStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumMergeDecisionStatusWithAggregatesFilter<$PrismaModel> | $Enums.MergeDecisionStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumMergeDecisionStatusFilter<$PrismaModel>
+    _max?: NestedEnumMergeDecisionStatusFilter<$PrismaModel>
+  }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type NestedEnumSyncProviderFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncProvider | EnumSyncProviderFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncProvider[] | ListEnumSyncProviderFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncProvider[] | ListEnumSyncProviderFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncProviderFilter<$PrismaModel> | $Enums.SyncProvider
+  }
+
+  export type NestedEnumSyncAccountStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncAccountStatus | EnumSyncAccountStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncAccountStatus[] | ListEnumSyncAccountStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncAccountStatus[] | ListEnumSyncAccountStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncAccountStatusFilter<$PrismaModel> | $Enums.SyncAccountStatus
+  }
+
+  export type NestedEnumSyncDirectionFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncDirection | EnumSyncDirectionFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncDirection[] | ListEnumSyncDirectionFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncDirection[] | ListEnumSyncDirectionFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncDirectionFilter<$PrismaModel> | $Enums.SyncDirection
+  }
+
+  export type NestedEnumSyncProviderWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncProvider | EnumSyncProviderFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncProvider[] | ListEnumSyncProviderFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncProvider[] | ListEnumSyncProviderFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncProviderWithAggregatesFilter<$PrismaModel> | $Enums.SyncProvider
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSyncProviderFilter<$PrismaModel>
+    _max?: NestedEnumSyncProviderFilter<$PrismaModel>
+  }
+
+  export type NestedEnumSyncAccountStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncAccountStatus | EnumSyncAccountStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncAccountStatus[] | ListEnumSyncAccountStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncAccountStatus[] | ListEnumSyncAccountStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncAccountStatusWithAggregatesFilter<$PrismaModel> | $Enums.SyncAccountStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSyncAccountStatusFilter<$PrismaModel>
+    _max?: NestedEnumSyncAccountStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumSyncDirectionWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncDirection | EnumSyncDirectionFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncDirection[] | ListEnumSyncDirectionFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncDirection[] | ListEnumSyncDirectionFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncDirectionWithAggregatesFilter<$PrismaModel> | $Enums.SyncDirection
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSyncDirectionFilter<$PrismaModel>
+    _max?: NestedEnumSyncDirectionFilter<$PrismaModel>
+  }
+
+  export type NestedEnumSyncJobStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncJobStatus | EnumSyncJobStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncJobStatus[] | ListEnumSyncJobStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncJobStatus[] | ListEnumSyncJobStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncJobStatusFilter<$PrismaModel> | $Enums.SyncJobStatus
+  }
+
+  export type NestedEnumSyncJobTriggerFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncJobTrigger | EnumSyncJobTriggerFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncJobTrigger[] | ListEnumSyncJobTriggerFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncJobTrigger[] | ListEnumSyncJobTriggerFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncJobTriggerFilter<$PrismaModel> | $Enums.SyncJobTrigger
+  }
+
+  export type NestedEnumSyncJobStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncJobStatus | EnumSyncJobStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncJobStatus[] | ListEnumSyncJobStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncJobStatus[] | ListEnumSyncJobStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncJobStatusWithAggregatesFilter<$PrismaModel> | $Enums.SyncJobStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSyncJobStatusFilter<$PrismaModel>
+    _max?: NestedEnumSyncJobStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumSyncJobTriggerWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncJobTrigger | EnumSyncJobTriggerFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncJobTrigger[] | ListEnumSyncJobTriggerFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncJobTrigger[] | ListEnumSyncJobTriggerFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncJobTriggerWithAggregatesFilter<$PrismaModel> | $Enums.SyncJobTrigger
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSyncJobTriggerFilter<$PrismaModel>
+    _max?: NestedEnumSyncJobTriggerFilter<$PrismaModel>
+  }
+
+  export type NestedEnumSyncConflictTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncConflictType | EnumSyncConflictTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncConflictType[] | ListEnumSyncConflictTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncConflictType[] | ListEnumSyncConflictTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncConflictTypeFilter<$PrismaModel> | $Enums.SyncConflictType
+  }
+
+  export type NestedEnumSyncConflictStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncConflictStatus | EnumSyncConflictStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncConflictStatus[] | ListEnumSyncConflictStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncConflictStatus[] | ListEnumSyncConflictStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncConflictStatusFilter<$PrismaModel> | $Enums.SyncConflictStatus
+  }
+
+  export type NestedEnumSyncResolutionStrategyNullableFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncResolutionStrategy | EnumSyncResolutionStrategyFieldRefInput<$PrismaModel> | null
+    in?: $Enums.SyncResolutionStrategy[] | ListEnumSyncResolutionStrategyFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.SyncResolutionStrategy[] | ListEnumSyncResolutionStrategyFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumSyncResolutionStrategyNullableFilter<$PrismaModel> | $Enums.SyncResolutionStrategy | null
+  }
+
+  export type NestedEnumSyncConflictTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncConflictType | EnumSyncConflictTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncConflictType[] | ListEnumSyncConflictTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncConflictType[] | ListEnumSyncConflictTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncConflictTypeWithAggregatesFilter<$PrismaModel> | $Enums.SyncConflictType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSyncConflictTypeFilter<$PrismaModel>
+    _max?: NestedEnumSyncConflictTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumSyncConflictStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncConflictStatus | EnumSyncConflictStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncConflictStatus[] | ListEnumSyncConflictStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncConflictStatus[] | ListEnumSyncConflictStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncConflictStatusWithAggregatesFilter<$PrismaModel> | $Enums.SyncConflictStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSyncConflictStatusFilter<$PrismaModel>
+    _max?: NestedEnumSyncConflictStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumSyncResolutionStrategyNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncResolutionStrategy | EnumSyncResolutionStrategyFieldRefInput<$PrismaModel> | null
+    in?: $Enums.SyncResolutionStrategy[] | ListEnumSyncResolutionStrategyFieldRefInput<$PrismaModel> | null
+    notIn?: $Enums.SyncResolutionStrategy[] | ListEnumSyncResolutionStrategyFieldRefInput<$PrismaModel> | null
+    not?: NestedEnumSyncResolutionStrategyNullableWithAggregatesFilter<$PrismaModel> | $Enums.SyncResolutionStrategy | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedEnumSyncResolutionStrategyNullableFilter<$PrismaModel>
+    _max?: NestedEnumSyncResolutionStrategyNullableFilter<$PrismaModel>
+  }
+
   export type ContactCreateWithoutUserInput = {
     id?: string
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
     fullName: string
     email?: string | null
     phone?: string | null
@@ -11693,10 +25100,22 @@ export namespace Prisma {
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    importJob?: ImportJobCreateNestedOneWithoutContactsInput
+    leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
+    mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
 
   export type ContactUncheckedCreateWithoutUserInput = {
     id?: string
+    importJobId?: string | null
+    mergedIntoContactId?: string | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
     fullName: string
     email?: string | null
     phone?: string | null
@@ -11705,6 +25124,11 @@ export namespace Prisma {
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
   export type ContactCreateOrConnectWithoutUserInput = {
@@ -11720,33 +25144,51 @@ export namespace Prisma {
   export type ImportJobCreateWithoutUserInput = {
     id?: string
     format: $Enums.ContactImportFormat
+    sourceProfile?: $Enums.ImportSourceProfile | null
     status?: $Enums.ImportExportJobStatus
     sourceFileName?: string | null
+    sourceFileSizeBytes?: number | null
     rowCount?: number
+    previewContactCount?: number
     importedCount?: number
     skippedCount?: number
     errorCount?: number
+    warningCount?: number
+    rolledBackCount?: number
     errorSummary?: string | null
+    previewedAt?: Date | string | null
+    committedAt?: Date | string | null
+    rolledBackAt?: Date | string | null
     createdAt?: Date | string
     startedAt?: Date | string
     completedAt?: Date | string | null
     updatedAt?: Date | string
+    contacts?: ContactCreateNestedManyWithoutImportJobInput
   }
 
   export type ImportJobUncheckedCreateWithoutUserInput = {
     id?: string
     format: $Enums.ContactImportFormat
+    sourceProfile?: $Enums.ImportSourceProfile | null
     status?: $Enums.ImportExportJobStatus
     sourceFileName?: string | null
+    sourceFileSizeBytes?: number | null
     rowCount?: number
+    previewContactCount?: number
     importedCount?: number
     skippedCount?: number
     errorCount?: number
+    warningCount?: number
+    rolledBackCount?: number
     errorSummary?: string | null
+    previewedAt?: Date | string | null
+    committedAt?: Date | string | null
+    rolledBackAt?: Date | string | null
     createdAt?: Date | string
     startedAt?: Date | string
     completedAt?: Date | string | null
     updatedAt?: Date | string
+    contacts?: ContactUncheckedCreateNestedManyWithoutImportJobInput
   }
 
   export type ImportJobCreateOrConnectWithoutUserInput = {
@@ -11764,6 +25206,8 @@ export namespace Prisma {
     format: $Enums.ContactExportFormat
     status?: $Enums.ImportExportJobStatus
     includeArchived?: boolean
+    filterQuery?: string | null
+    resultFileName?: string | null
     exportedCount?: number
     errorSummary?: string | null
     createdAt?: Date | string
@@ -11777,6 +25221,8 @@ export namespace Prisma {
     format: $Enums.ContactExportFormat
     status?: $Enums.ImportExportJobStatus
     includeArchived?: boolean
+    filterQuery?: string | null
+    resultFileName?: string | null
     exportedCount?: number
     errorSummary?: string | null
     createdAt?: Date | string
@@ -11792,6 +25238,160 @@ export namespace Prisma {
 
   export type ExportJobCreateManyUserInputEnvelope = {
     data: ExportJobCreateManyUserInput | ExportJobCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type MergeSuggestionCreateWithoutUserInput = {
+    id?: string
+    pairKey: string
+    status?: $Enums.MergeSuggestionStatus
+    confidence: $Enums.MergeSuggestionConfidence
+    score: number
+    hardMatch?: boolean
+    signals: JsonNullValueInput | InputJsonValue
+    reasons: JsonNullValueInput | InputJsonValue
+    source: string
+    generatedAt?: Date | string
+    reviewedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    leftContact: ContactCreateNestedOneWithoutLeftMergeSuggestionsInput
+    rightContact: ContactCreateNestedOneWithoutRightMergeSuggestionsInput
+    decisions?: MergeDecisionCreateNestedManyWithoutSuggestionInput
+  }
+
+  export type MergeSuggestionUncheckedCreateWithoutUserInput = {
+    id?: string
+    leftContactId: string
+    rightContactId: string
+    pairKey: string
+    status?: $Enums.MergeSuggestionStatus
+    confidence: $Enums.MergeSuggestionConfidence
+    score: number
+    hardMatch?: boolean
+    signals: JsonNullValueInput | InputJsonValue
+    reasons: JsonNullValueInput | InputJsonValue
+    source: string
+    generatedAt?: Date | string
+    reviewedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    decisions?: MergeDecisionUncheckedCreateNestedManyWithoutSuggestionInput
+  }
+
+  export type MergeSuggestionCreateOrConnectWithoutUserInput = {
+    where: MergeSuggestionWhereUniqueInput
+    create: XOR<MergeSuggestionCreateWithoutUserInput, MergeSuggestionUncheckedCreateWithoutUserInput>
+  }
+
+  export type MergeSuggestionCreateManyUserInputEnvelope = {
+    data: MergeSuggestionCreateManyUserInput | MergeSuggestionCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type MergeDecisionCreateWithoutUserInput = {
+    id?: string
+    status: $Enums.MergeDecisionStatus
+    source: string
+    notes?: string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    decidedAt?: Date | string
+    reversedAt?: Date | string | null
+    reversalSource?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    suggestion: MergeSuggestionCreateNestedOneWithoutDecisionsInput
+  }
+
+  export type MergeDecisionUncheckedCreateWithoutUserInput = {
+    id?: string
+    suggestionId: string
+    status: $Enums.MergeDecisionStatus
+    source: string
+    notes?: string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    decidedAt?: Date | string
+    reversedAt?: Date | string | null
+    reversalSource?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MergeDecisionCreateOrConnectWithoutUserInput = {
+    where: MergeDecisionWhereUniqueInput
+    create: XOR<MergeDecisionCreateWithoutUserInput, MergeDecisionUncheckedCreateWithoutUserInput>
+  }
+
+  export type MergeDecisionCreateManyUserInputEnvelope = {
+    data: MergeDecisionCreateManyUserInput | MergeDecisionCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SyncAccountCreateWithoutUserInput = {
+    id?: string
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
+    syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
+  }
+
+  export type SyncAccountUncheckedCreateWithoutUserInput = {
+    id?: string
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
+    syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
+  }
+
+  export type SyncAccountCreateOrConnectWithoutUserInput = {
+    where: SyncAccountWhereUniqueInput
+    create: XOR<SyncAccountCreateWithoutUserInput, SyncAccountUncheckedCreateWithoutUserInput>
+  }
+
+  export type SyncAccountCreateManyUserInputEnvelope = {
+    data: SyncAccountCreateManyUserInput | SyncAccountCreateManyUserInput[]
     skipDuplicates?: boolean
   }
 
@@ -11904,6 +25504,11 @@ export namespace Prisma {
     NOT?: ContactScalarWhereInput | ContactScalarWhereInput[]
     id?: StringFilter<"Contact"> | string
     userId?: StringFilter<"Contact"> | string
+    importJobId?: StringNullableFilter<"Contact"> | string | null
+    mergedIntoContactId?: StringNullableFilter<"Contact"> | string | null
+    syncUid?: StringFilter<"Contact"> | string
+    syncVersion?: IntFilter<"Contact"> | number
+    syncTombstoneAt?: DateTimeNullableFilter<"Contact"> | Date | string | null
     fullName?: StringFilter<"Contact"> | string
     email?: StringNullableFilter<"Contact"> | string | null
     phone?: StringNullableFilter<"Contact"> | string | null
@@ -11937,13 +25542,21 @@ export namespace Prisma {
     id?: StringFilter<"ImportJob"> | string
     userId?: StringFilter<"ImportJob"> | string
     format?: EnumContactImportFormatFilter<"ImportJob"> | $Enums.ContactImportFormat
+    sourceProfile?: EnumImportSourceProfileNullableFilter<"ImportJob"> | $Enums.ImportSourceProfile | null
     status?: EnumImportExportJobStatusFilter<"ImportJob"> | $Enums.ImportExportJobStatus
     sourceFileName?: StringNullableFilter<"ImportJob"> | string | null
+    sourceFileSizeBytes?: IntNullableFilter<"ImportJob"> | number | null
     rowCount?: IntFilter<"ImportJob"> | number
+    previewContactCount?: IntFilter<"ImportJob"> | number
     importedCount?: IntFilter<"ImportJob"> | number
     skippedCount?: IntFilter<"ImportJob"> | number
     errorCount?: IntFilter<"ImportJob"> | number
+    warningCount?: IntFilter<"ImportJob"> | number
+    rolledBackCount?: IntFilter<"ImportJob"> | number
     errorSummary?: StringNullableFilter<"ImportJob"> | string | null
+    previewedAt?: DateTimeNullableFilter<"ImportJob"> | Date | string | null
+    committedAt?: DateTimeNullableFilter<"ImportJob"> | Date | string | null
+    rolledBackAt?: DateTimeNullableFilter<"ImportJob"> | Date | string | null
     createdAt?: DateTimeFilter<"ImportJob"> | Date | string
     startedAt?: DateTimeFilter<"ImportJob"> | Date | string
     completedAt?: DateTimeNullableFilter<"ImportJob"> | Date | string | null
@@ -11975,12 +25588,132 @@ export namespace Prisma {
     format?: EnumContactExportFormatFilter<"ExportJob"> | $Enums.ContactExportFormat
     status?: EnumImportExportJobStatusFilter<"ExportJob"> | $Enums.ImportExportJobStatus
     includeArchived?: BoolFilter<"ExportJob"> | boolean
+    filterQuery?: StringNullableFilter<"ExportJob"> | string | null
+    resultFileName?: StringNullableFilter<"ExportJob"> | string | null
     exportedCount?: IntFilter<"ExportJob"> | number
     errorSummary?: StringNullableFilter<"ExportJob"> | string | null
     createdAt?: DateTimeFilter<"ExportJob"> | Date | string
     startedAt?: DateTimeFilter<"ExportJob"> | Date | string
     completedAt?: DateTimeNullableFilter<"ExportJob"> | Date | string | null
     updatedAt?: DateTimeFilter<"ExportJob"> | Date | string
+  }
+
+  export type MergeSuggestionUpsertWithWhereUniqueWithoutUserInput = {
+    where: MergeSuggestionWhereUniqueInput
+    update: XOR<MergeSuggestionUpdateWithoutUserInput, MergeSuggestionUncheckedUpdateWithoutUserInput>
+    create: XOR<MergeSuggestionCreateWithoutUserInput, MergeSuggestionUncheckedCreateWithoutUserInput>
+  }
+
+  export type MergeSuggestionUpdateWithWhereUniqueWithoutUserInput = {
+    where: MergeSuggestionWhereUniqueInput
+    data: XOR<MergeSuggestionUpdateWithoutUserInput, MergeSuggestionUncheckedUpdateWithoutUserInput>
+  }
+
+  export type MergeSuggestionUpdateManyWithWhereWithoutUserInput = {
+    where: MergeSuggestionScalarWhereInput
+    data: XOR<MergeSuggestionUpdateManyMutationInput, MergeSuggestionUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type MergeSuggestionScalarWhereInput = {
+    AND?: MergeSuggestionScalarWhereInput | MergeSuggestionScalarWhereInput[]
+    OR?: MergeSuggestionScalarWhereInput[]
+    NOT?: MergeSuggestionScalarWhereInput | MergeSuggestionScalarWhereInput[]
+    id?: StringFilter<"MergeSuggestion"> | string
+    userId?: StringFilter<"MergeSuggestion"> | string
+    leftContactId?: StringFilter<"MergeSuggestion"> | string
+    rightContactId?: StringFilter<"MergeSuggestion"> | string
+    pairKey?: StringFilter<"MergeSuggestion"> | string
+    status?: EnumMergeSuggestionStatusFilter<"MergeSuggestion"> | $Enums.MergeSuggestionStatus
+    confidence?: EnumMergeSuggestionConfidenceFilter<"MergeSuggestion"> | $Enums.MergeSuggestionConfidence
+    score?: IntFilter<"MergeSuggestion"> | number
+    hardMatch?: BoolFilter<"MergeSuggestion"> | boolean
+    signals?: JsonFilter<"MergeSuggestion">
+    reasons?: JsonFilter<"MergeSuggestion">
+    source?: StringFilter<"MergeSuggestion"> | string
+    generatedAt?: DateTimeFilter<"MergeSuggestion"> | Date | string
+    reviewedAt?: DateTimeNullableFilter<"MergeSuggestion"> | Date | string | null
+    createdAt?: DateTimeFilter<"MergeSuggestion"> | Date | string
+    updatedAt?: DateTimeFilter<"MergeSuggestion"> | Date | string
+  }
+
+  export type MergeDecisionUpsertWithWhereUniqueWithoutUserInput = {
+    where: MergeDecisionWhereUniqueInput
+    update: XOR<MergeDecisionUpdateWithoutUserInput, MergeDecisionUncheckedUpdateWithoutUserInput>
+    create: XOR<MergeDecisionCreateWithoutUserInput, MergeDecisionUncheckedCreateWithoutUserInput>
+  }
+
+  export type MergeDecisionUpdateWithWhereUniqueWithoutUserInput = {
+    where: MergeDecisionWhereUniqueInput
+    data: XOR<MergeDecisionUpdateWithoutUserInput, MergeDecisionUncheckedUpdateWithoutUserInput>
+  }
+
+  export type MergeDecisionUpdateManyWithWhereWithoutUserInput = {
+    where: MergeDecisionScalarWhereInput
+    data: XOR<MergeDecisionUpdateManyMutationInput, MergeDecisionUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type MergeDecisionScalarWhereInput = {
+    AND?: MergeDecisionScalarWhereInput | MergeDecisionScalarWhereInput[]
+    OR?: MergeDecisionScalarWhereInput[]
+    NOT?: MergeDecisionScalarWhereInput | MergeDecisionScalarWhereInput[]
+    id?: StringFilter<"MergeDecision"> | string
+    suggestionId?: StringFilter<"MergeDecision"> | string
+    userId?: StringFilter<"MergeDecision"> | string
+    status?: EnumMergeDecisionStatusFilter<"MergeDecision"> | $Enums.MergeDecisionStatus
+    source?: StringFilter<"MergeDecision"> | string
+    notes?: StringNullableFilter<"MergeDecision"> | string | null
+    details?: JsonNullableFilter<"MergeDecision">
+    decidedAt?: DateTimeFilter<"MergeDecision"> | Date | string
+    reversedAt?: DateTimeNullableFilter<"MergeDecision"> | Date | string | null
+    reversalSource?: StringNullableFilter<"MergeDecision"> | string | null
+    createdAt?: DateTimeFilter<"MergeDecision"> | Date | string
+    updatedAt?: DateTimeFilter<"MergeDecision"> | Date | string
+  }
+
+  export type SyncAccountUpsertWithWhereUniqueWithoutUserInput = {
+    where: SyncAccountWhereUniqueInput
+    update: XOR<SyncAccountUpdateWithoutUserInput, SyncAccountUncheckedUpdateWithoutUserInput>
+    create: XOR<SyncAccountCreateWithoutUserInput, SyncAccountUncheckedCreateWithoutUserInput>
+  }
+
+  export type SyncAccountUpdateWithWhereUniqueWithoutUserInput = {
+    where: SyncAccountWhereUniqueInput
+    data: XOR<SyncAccountUpdateWithoutUserInput, SyncAccountUncheckedUpdateWithoutUserInput>
+  }
+
+  export type SyncAccountUpdateManyWithWhereWithoutUserInput = {
+    where: SyncAccountScalarWhereInput
+    data: XOR<SyncAccountUpdateManyMutationInput, SyncAccountUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type SyncAccountScalarWhereInput = {
+    AND?: SyncAccountScalarWhereInput | SyncAccountScalarWhereInput[]
+    OR?: SyncAccountScalarWhereInput[]
+    NOT?: SyncAccountScalarWhereInput | SyncAccountScalarWhereInput[]
+    id?: StringFilter<"SyncAccount"> | string
+    userId?: StringFilter<"SyncAccount"> | string
+    provider?: EnumSyncProviderFilter<"SyncAccount"> | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFilter<"SyncAccount"> | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFilter<"SyncAccount"> | $Enums.SyncDirection
+    label?: StringFilter<"SyncAccount"> | string
+    baseUrl?: StringFilter<"SyncAccount"> | string
+    principalUrl?: StringNullableFilter<"SyncAccount"> | string | null
+    addressBookUrl?: StringNullableFilter<"SyncAccount"> | string | null
+    remoteAccountId?: StringNullableFilter<"SyncAccount"> | string | null
+    remoteCTag?: StringNullableFilter<"SyncAccount"> | string | null
+    credentialReference?: StringNullableFilter<"SyncAccount"> | string | null
+    credentialVersion?: IntFilter<"SyncAccount"> | number
+    credentialUpdatedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    credentialRevokedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    encryptionKeyRef?: StringNullableFilter<"SyncAccount"> | string | null
+    lastSyncCursor?: StringNullableFilter<"SyncAccount"> | string | null
+    lastSyncedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    lastSucceededAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    lastErrorAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    lastErrorCode?: StringNullableFilter<"SyncAccount"> | string | null
+    lastErrorMessage?: StringNullableFilter<"SyncAccount"> | string | null
+    createdAt?: DateTimeFilter<"SyncAccount"> | Date | string
+    updatedAt?: DateTimeFilter<"SyncAccount"> | Date | string
   }
 
   export type SubscriptionCustomerUpsertWithoutUserInput = {
@@ -12070,6 +25803,9 @@ export namespace Prisma {
     updatedAt?: Date | string
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
   }
@@ -12084,6 +25820,9 @@ export namespace Prisma {
     updatedAt?: Date | string
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
   }
@@ -12091,6 +25830,348 @@ export namespace Prisma {
   export type UserCreateOrConnectWithoutContactsInput = {
     where: UserWhereUniqueInput
     create: XOR<UserCreateWithoutContactsInput, UserUncheckedCreateWithoutContactsInput>
+  }
+
+  export type ImportJobCreateWithoutContactsInput = {
+    id?: string
+    format: $Enums.ContactImportFormat
+    sourceProfile?: $Enums.ImportSourceProfile | null
+    status?: $Enums.ImportExportJobStatus
+    sourceFileName?: string | null
+    sourceFileSizeBytes?: number | null
+    rowCount?: number
+    previewContactCount?: number
+    importedCount?: number
+    skippedCount?: number
+    errorCount?: number
+    warningCount?: number
+    rolledBackCount?: number
+    errorSummary?: string | null
+    previewedAt?: Date | string | null
+    committedAt?: Date | string | null
+    rolledBackAt?: Date | string | null
+    createdAt?: Date | string
+    startedAt?: Date | string
+    completedAt?: Date | string | null
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutImportJobsInput
+  }
+
+  export type ImportJobUncheckedCreateWithoutContactsInput = {
+    id?: string
+    userId: string
+    format: $Enums.ContactImportFormat
+    sourceProfile?: $Enums.ImportSourceProfile | null
+    status?: $Enums.ImportExportJobStatus
+    sourceFileName?: string | null
+    sourceFileSizeBytes?: number | null
+    rowCount?: number
+    previewContactCount?: number
+    importedCount?: number
+    skippedCount?: number
+    errorCount?: number
+    warningCount?: number
+    rolledBackCount?: number
+    errorSummary?: string | null
+    previewedAt?: Date | string | null
+    committedAt?: Date | string | null
+    rolledBackAt?: Date | string | null
+    createdAt?: Date | string
+    startedAt?: Date | string
+    completedAt?: Date | string | null
+    updatedAt?: Date | string
+  }
+
+  export type ImportJobCreateOrConnectWithoutContactsInput = {
+    where: ImportJobWhereUniqueInput
+    create: XOR<ImportJobCreateWithoutContactsInput, ImportJobUncheckedCreateWithoutContactsInput>
+  }
+
+  export type MergeSuggestionCreateWithoutLeftContactInput = {
+    id?: string
+    pairKey: string
+    status?: $Enums.MergeSuggestionStatus
+    confidence: $Enums.MergeSuggestionConfidence
+    score: number
+    hardMatch?: boolean
+    signals: JsonNullValueInput | InputJsonValue
+    reasons: JsonNullValueInput | InputJsonValue
+    source: string
+    generatedAt?: Date | string
+    reviewedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutMergeSuggestionsInput
+    rightContact: ContactCreateNestedOneWithoutRightMergeSuggestionsInput
+    decisions?: MergeDecisionCreateNestedManyWithoutSuggestionInput
+  }
+
+  export type MergeSuggestionUncheckedCreateWithoutLeftContactInput = {
+    id?: string
+    userId: string
+    rightContactId: string
+    pairKey: string
+    status?: $Enums.MergeSuggestionStatus
+    confidence: $Enums.MergeSuggestionConfidence
+    score: number
+    hardMatch?: boolean
+    signals: JsonNullValueInput | InputJsonValue
+    reasons: JsonNullValueInput | InputJsonValue
+    source: string
+    generatedAt?: Date | string
+    reviewedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    decisions?: MergeDecisionUncheckedCreateNestedManyWithoutSuggestionInput
+  }
+
+  export type MergeSuggestionCreateOrConnectWithoutLeftContactInput = {
+    where: MergeSuggestionWhereUniqueInput
+    create: XOR<MergeSuggestionCreateWithoutLeftContactInput, MergeSuggestionUncheckedCreateWithoutLeftContactInput>
+  }
+
+  export type MergeSuggestionCreateManyLeftContactInputEnvelope = {
+    data: MergeSuggestionCreateManyLeftContactInput | MergeSuggestionCreateManyLeftContactInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type MergeSuggestionCreateWithoutRightContactInput = {
+    id?: string
+    pairKey: string
+    status?: $Enums.MergeSuggestionStatus
+    confidence: $Enums.MergeSuggestionConfidence
+    score: number
+    hardMatch?: boolean
+    signals: JsonNullValueInput | InputJsonValue
+    reasons: JsonNullValueInput | InputJsonValue
+    source: string
+    generatedAt?: Date | string
+    reviewedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutMergeSuggestionsInput
+    leftContact: ContactCreateNestedOneWithoutLeftMergeSuggestionsInput
+    decisions?: MergeDecisionCreateNestedManyWithoutSuggestionInput
+  }
+
+  export type MergeSuggestionUncheckedCreateWithoutRightContactInput = {
+    id?: string
+    userId: string
+    leftContactId: string
+    pairKey: string
+    status?: $Enums.MergeSuggestionStatus
+    confidence: $Enums.MergeSuggestionConfidence
+    score: number
+    hardMatch?: boolean
+    signals: JsonNullValueInput | InputJsonValue
+    reasons: JsonNullValueInput | InputJsonValue
+    source: string
+    generatedAt?: Date | string
+    reviewedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    decisions?: MergeDecisionUncheckedCreateNestedManyWithoutSuggestionInput
+  }
+
+  export type MergeSuggestionCreateOrConnectWithoutRightContactInput = {
+    where: MergeSuggestionWhereUniqueInput
+    create: XOR<MergeSuggestionCreateWithoutRightContactInput, MergeSuggestionUncheckedCreateWithoutRightContactInput>
+  }
+
+  export type MergeSuggestionCreateManyRightContactInputEnvelope = {
+    data: MergeSuggestionCreateManyRightContactInput | MergeSuggestionCreateManyRightContactInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SyncContactLinkCreateWithoutContactInput = {
+    id?: string
+    remoteHref?: string | null
+    remoteUid?: string | null
+    remoteETag?: string | null
+    lastSyncedAt?: Date | string | null
+    tombstonedAt?: Date | string | null
+    remoteDeletedAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    syncAccount: SyncAccountCreateNestedOneWithoutSyncLinksInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutSyncContactLinkInput
+  }
+
+  export type SyncContactLinkUncheckedCreateWithoutContactInput = {
+    id?: string
+    syncAccountId: string
+    remoteHref?: string | null
+    remoteUid?: string | null
+    remoteETag?: string | null
+    lastSyncedAt?: Date | string | null
+    tombstonedAt?: Date | string | null
+    remoteDeletedAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncContactLinkInput
+  }
+
+  export type SyncContactLinkCreateOrConnectWithoutContactInput = {
+    where: SyncContactLinkWhereUniqueInput
+    create: XOR<SyncContactLinkCreateWithoutContactInput, SyncContactLinkUncheckedCreateWithoutContactInput>
+  }
+
+  export type SyncContactLinkCreateManyContactInputEnvelope = {
+    data: SyncContactLinkCreateManyContactInput | SyncContactLinkCreateManyContactInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SyncConflictCreateWithoutContactInput = {
+    id?: string
+    conflictType: $Enums.SyncConflictType
+    status?: $Enums.SyncConflictStatus
+    resolutionStrategy?: $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: number | null
+    remoteETag?: string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: string | null
+    detectedAt?: Date | string
+    resolvedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    syncAccount: SyncAccountCreateNestedOneWithoutSyncConflictsInput
+    syncContactLink?: SyncContactLinkCreateNestedOneWithoutSyncConflictsInput
+  }
+
+  export type SyncConflictUncheckedCreateWithoutContactInput = {
+    id?: string
+    syncAccountId: string
+    syncContactLinkId?: string | null
+    conflictType: $Enums.SyncConflictType
+    status?: $Enums.SyncConflictStatus
+    resolutionStrategy?: $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: number | null
+    remoteETag?: string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: string | null
+    detectedAt?: Date | string
+    resolvedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SyncConflictCreateOrConnectWithoutContactInput = {
+    where: SyncConflictWhereUniqueInput
+    create: XOR<SyncConflictCreateWithoutContactInput, SyncConflictUncheckedCreateWithoutContactInput>
+  }
+
+  export type SyncConflictCreateManyContactInputEnvelope = {
+    data: SyncConflictCreateManyContactInput | SyncConflictCreateManyContactInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ContactCreateWithoutMergedChildrenInput = {
+    id?: string
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    notes?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutContactsInput
+    importJob?: ImportJobCreateNestedOneWithoutContactsInput
+    leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
+  }
+
+  export type ContactUncheckedCreateWithoutMergedChildrenInput = {
+    id?: string
+    userId: string
+    importJobId?: string | null
+    mergedIntoContactId?: string | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    notes?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+  }
+
+  export type ContactCreateOrConnectWithoutMergedChildrenInput = {
+    where: ContactWhereUniqueInput
+    create: XOR<ContactCreateWithoutMergedChildrenInput, ContactUncheckedCreateWithoutMergedChildrenInput>
+  }
+
+  export type ContactCreateWithoutMergedIntoContactInput = {
+    id?: string
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    notes?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutContactsInput
+    importJob?: ImportJobCreateNestedOneWithoutContactsInput
+    leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactUncheckedCreateWithoutMergedIntoContactInput = {
+    id?: string
+    userId: string
+    importJobId?: string | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    notes?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactCreateOrConnectWithoutMergedIntoContactInput = {
+    where: ContactWhereUniqueInput
+    create: XOR<ContactCreateWithoutMergedIntoContactInput, ContactUncheckedCreateWithoutMergedIntoContactInput>
+  }
+
+  export type ContactCreateManyMergedIntoContactInputEnvelope = {
+    data: ContactCreateManyMergedIntoContactInput | ContactCreateManyMergedIntoContactInput[]
+    skipDuplicates?: boolean
   }
 
   export type UserUpsertWithoutContactsInput = {
@@ -12114,6 +26195,9 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
   }
@@ -12128,8 +26212,248 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type ImportJobUpsertWithoutContactsInput = {
+    update: XOR<ImportJobUpdateWithoutContactsInput, ImportJobUncheckedUpdateWithoutContactsInput>
+    create: XOR<ImportJobCreateWithoutContactsInput, ImportJobUncheckedCreateWithoutContactsInput>
+    where?: ImportJobWhereInput
+  }
+
+  export type ImportJobUpdateToOneWithWhereWithoutContactsInput = {
+    where?: ImportJobWhereInput
+    data: XOR<ImportJobUpdateWithoutContactsInput, ImportJobUncheckedUpdateWithoutContactsInput>
+  }
+
+  export type ImportJobUpdateWithoutContactsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    format?: EnumContactImportFormatFieldUpdateOperationsInput | $Enums.ContactImportFormat
+    sourceProfile?: NullableEnumImportSourceProfileFieldUpdateOperationsInput | $Enums.ImportSourceProfile | null
+    status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
+    sourceFileName?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
+    rowCount?: IntFieldUpdateOperationsInput | number
+    previewContactCount?: IntFieldUpdateOperationsInput | number
+    importedCount?: IntFieldUpdateOperationsInput | number
+    skippedCount?: IntFieldUpdateOperationsInput | number
+    errorCount?: IntFieldUpdateOperationsInput | number
+    warningCount?: IntFieldUpdateOperationsInput | number
+    rolledBackCount?: IntFieldUpdateOperationsInput | number
+    errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    previewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    committedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rolledBackAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutImportJobsNestedInput
+  }
+
+  export type ImportJobUncheckedUpdateWithoutContactsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    format?: EnumContactImportFormatFieldUpdateOperationsInput | $Enums.ContactImportFormat
+    sourceProfile?: NullableEnumImportSourceProfileFieldUpdateOperationsInput | $Enums.ImportSourceProfile | null
+    status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
+    sourceFileName?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
+    rowCount?: IntFieldUpdateOperationsInput | number
+    previewContactCount?: IntFieldUpdateOperationsInput | number
+    importedCount?: IntFieldUpdateOperationsInput | number
+    skippedCount?: IntFieldUpdateOperationsInput | number
+    errorCount?: IntFieldUpdateOperationsInput | number
+    warningCount?: IntFieldUpdateOperationsInput | number
+    rolledBackCount?: IntFieldUpdateOperationsInput | number
+    errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    previewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    committedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rolledBackAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergeSuggestionUpsertWithWhereUniqueWithoutLeftContactInput = {
+    where: MergeSuggestionWhereUniqueInput
+    update: XOR<MergeSuggestionUpdateWithoutLeftContactInput, MergeSuggestionUncheckedUpdateWithoutLeftContactInput>
+    create: XOR<MergeSuggestionCreateWithoutLeftContactInput, MergeSuggestionUncheckedCreateWithoutLeftContactInput>
+  }
+
+  export type MergeSuggestionUpdateWithWhereUniqueWithoutLeftContactInput = {
+    where: MergeSuggestionWhereUniqueInput
+    data: XOR<MergeSuggestionUpdateWithoutLeftContactInput, MergeSuggestionUncheckedUpdateWithoutLeftContactInput>
+  }
+
+  export type MergeSuggestionUpdateManyWithWhereWithoutLeftContactInput = {
+    where: MergeSuggestionScalarWhereInput
+    data: XOR<MergeSuggestionUpdateManyMutationInput, MergeSuggestionUncheckedUpdateManyWithoutLeftContactInput>
+  }
+
+  export type MergeSuggestionUpsertWithWhereUniqueWithoutRightContactInput = {
+    where: MergeSuggestionWhereUniqueInput
+    update: XOR<MergeSuggestionUpdateWithoutRightContactInput, MergeSuggestionUncheckedUpdateWithoutRightContactInput>
+    create: XOR<MergeSuggestionCreateWithoutRightContactInput, MergeSuggestionUncheckedCreateWithoutRightContactInput>
+  }
+
+  export type MergeSuggestionUpdateWithWhereUniqueWithoutRightContactInput = {
+    where: MergeSuggestionWhereUniqueInput
+    data: XOR<MergeSuggestionUpdateWithoutRightContactInput, MergeSuggestionUncheckedUpdateWithoutRightContactInput>
+  }
+
+  export type MergeSuggestionUpdateManyWithWhereWithoutRightContactInput = {
+    where: MergeSuggestionScalarWhereInput
+    data: XOR<MergeSuggestionUpdateManyMutationInput, MergeSuggestionUncheckedUpdateManyWithoutRightContactInput>
+  }
+
+  export type SyncContactLinkUpsertWithWhereUniqueWithoutContactInput = {
+    where: SyncContactLinkWhereUniqueInput
+    update: XOR<SyncContactLinkUpdateWithoutContactInput, SyncContactLinkUncheckedUpdateWithoutContactInput>
+    create: XOR<SyncContactLinkCreateWithoutContactInput, SyncContactLinkUncheckedCreateWithoutContactInput>
+  }
+
+  export type SyncContactLinkUpdateWithWhereUniqueWithoutContactInput = {
+    where: SyncContactLinkWhereUniqueInput
+    data: XOR<SyncContactLinkUpdateWithoutContactInput, SyncContactLinkUncheckedUpdateWithoutContactInput>
+  }
+
+  export type SyncContactLinkUpdateManyWithWhereWithoutContactInput = {
+    where: SyncContactLinkScalarWhereInput
+    data: XOR<SyncContactLinkUpdateManyMutationInput, SyncContactLinkUncheckedUpdateManyWithoutContactInput>
+  }
+
+  export type SyncContactLinkScalarWhereInput = {
+    AND?: SyncContactLinkScalarWhereInput | SyncContactLinkScalarWhereInput[]
+    OR?: SyncContactLinkScalarWhereInput[]
+    NOT?: SyncContactLinkScalarWhereInput | SyncContactLinkScalarWhereInput[]
+    id?: StringFilter<"SyncContactLink"> | string
+    syncAccountId?: StringFilter<"SyncContactLink"> | string
+    contactId?: StringFilter<"SyncContactLink"> | string
+    remoteHref?: StringNullableFilter<"SyncContactLink"> | string | null
+    remoteUid?: StringNullableFilter<"SyncContactLink"> | string | null
+    remoteETag?: StringNullableFilter<"SyncContactLink"> | string | null
+    lastSyncedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
+    tombstonedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
+    remoteDeletedAt?: DateTimeNullableFilter<"SyncContactLink"> | Date | string | null
+    lastErrorCode?: StringNullableFilter<"SyncContactLink"> | string | null
+    lastErrorMessage?: StringNullableFilter<"SyncContactLink"> | string | null
+    createdAt?: DateTimeFilter<"SyncContactLink"> | Date | string
+    updatedAt?: DateTimeFilter<"SyncContactLink"> | Date | string
+  }
+
+  export type SyncConflictUpsertWithWhereUniqueWithoutContactInput = {
+    where: SyncConflictWhereUniqueInput
+    update: XOR<SyncConflictUpdateWithoutContactInput, SyncConflictUncheckedUpdateWithoutContactInput>
+    create: XOR<SyncConflictCreateWithoutContactInput, SyncConflictUncheckedCreateWithoutContactInput>
+  }
+
+  export type SyncConflictUpdateWithWhereUniqueWithoutContactInput = {
+    where: SyncConflictWhereUniqueInput
+    data: XOR<SyncConflictUpdateWithoutContactInput, SyncConflictUncheckedUpdateWithoutContactInput>
+  }
+
+  export type SyncConflictUpdateManyWithWhereWithoutContactInput = {
+    where: SyncConflictScalarWhereInput
+    data: XOR<SyncConflictUpdateManyMutationInput, SyncConflictUncheckedUpdateManyWithoutContactInput>
+  }
+
+  export type SyncConflictScalarWhereInput = {
+    AND?: SyncConflictScalarWhereInput | SyncConflictScalarWhereInput[]
+    OR?: SyncConflictScalarWhereInput[]
+    NOT?: SyncConflictScalarWhereInput | SyncConflictScalarWhereInput[]
+    id?: StringFilter<"SyncConflict"> | string
+    syncAccountId?: StringFilter<"SyncConflict"> | string
+    syncContactLinkId?: StringNullableFilter<"SyncConflict"> | string | null
+    contactId?: StringNullableFilter<"SyncConflict"> | string | null
+    conflictType?: EnumSyncConflictTypeFilter<"SyncConflict"> | $Enums.SyncConflictType
+    status?: EnumSyncConflictStatusFilter<"SyncConflict"> | $Enums.SyncConflictStatus
+    resolutionStrategy?: EnumSyncResolutionStrategyNullableFilter<"SyncConflict"> | $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: IntNullableFilter<"SyncConflict"> | number | null
+    remoteETag?: StringNullableFilter<"SyncConflict"> | string | null
+    localSnapshot?: JsonNullableFilter<"SyncConflict">
+    remoteSnapshot?: JsonNullableFilter<"SyncConflict">
+    resolutionNotes?: StringNullableFilter<"SyncConflict"> | string | null
+    detectedAt?: DateTimeFilter<"SyncConflict"> | Date | string
+    resolvedAt?: DateTimeNullableFilter<"SyncConflict"> | Date | string | null
+    createdAt?: DateTimeFilter<"SyncConflict"> | Date | string
+    updatedAt?: DateTimeFilter<"SyncConflict"> | Date | string
+  }
+
+  export type ContactUpsertWithoutMergedChildrenInput = {
+    update: XOR<ContactUpdateWithoutMergedChildrenInput, ContactUncheckedUpdateWithoutMergedChildrenInput>
+    create: XOR<ContactCreateWithoutMergedChildrenInput, ContactUncheckedCreateWithoutMergedChildrenInput>
+    where?: ContactWhereInput
+  }
+
+  export type ContactUpdateToOneWithWhereWithoutMergedChildrenInput = {
+    where?: ContactWhereInput
+    data: XOR<ContactUpdateWithoutMergedChildrenInput, ContactUncheckedUpdateWithoutMergedChildrenInput>
+  }
+
+  export type ContactUpdateWithoutMergedChildrenInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutContactsNestedInput
+    importJob?: ImportJobUpdateOneWithoutContactsNestedInput
+    leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
+  }
+
+  export type ContactUncheckedUpdateWithoutMergedChildrenInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+  }
+
+  export type ContactUpsertWithWhereUniqueWithoutMergedIntoContactInput = {
+    where: ContactWhereUniqueInput
+    update: XOR<ContactUpdateWithoutMergedIntoContactInput, ContactUncheckedUpdateWithoutMergedIntoContactInput>
+    create: XOR<ContactCreateWithoutMergedIntoContactInput, ContactUncheckedCreateWithoutMergedIntoContactInput>
+  }
+
+  export type ContactUpdateWithWhereUniqueWithoutMergedIntoContactInput = {
+    where: ContactWhereUniqueInput
+    data: XOR<ContactUpdateWithoutMergedIntoContactInput, ContactUncheckedUpdateWithoutMergedIntoContactInput>
+  }
+
+  export type ContactUpdateManyWithWhereWithoutMergedIntoContactInput = {
+    where: ContactScalarWhereInput
+    data: XOR<ContactUpdateManyMutationInput, ContactUncheckedUpdateManyWithoutMergedIntoContactInput>
   }
 
   export type UserCreateWithoutSubscriptionCustomerInput = {
@@ -12143,6 +26467,9 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
   }
 
@@ -12157,6 +26484,9 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -12249,6 +26579,9 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
   }
 
@@ -12263,6 +26596,9 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -12293,6 +26629,9 @@ export namespace Prisma {
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
   }
 
@@ -12307,6 +26646,9 @@ export namespace Prisma {
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
   }
 
@@ -12362,6 +26704,9 @@ export namespace Prisma {
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
   }
 
@@ -12376,6 +26721,9 @@ export namespace Prisma {
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
   }
 
@@ -12420,6 +26768,9 @@ export namespace Prisma {
     updatedAt?: Date | string
     contacts?: ContactCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
   }
@@ -12434,6 +26785,9 @@ export namespace Prisma {
     updatedAt?: Date | string
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
   }
@@ -12441,6 +26795,60 @@ export namespace Prisma {
   export type UserCreateOrConnectWithoutImportJobsInput = {
     where: UserWhereUniqueInput
     create: XOR<UserCreateWithoutImportJobsInput, UserUncheckedCreateWithoutImportJobsInput>
+  }
+
+  export type ContactCreateWithoutImportJobInput = {
+    id?: string
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    notes?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutContactsInput
+    leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
+    mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactUncheckedCreateWithoutImportJobInput = {
+    id?: string
+    userId: string
+    mergedIntoContactId?: string | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    notes?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactCreateOrConnectWithoutImportJobInput = {
+    where: ContactWhereUniqueInput
+    create: XOR<ContactCreateWithoutImportJobInput, ContactUncheckedCreateWithoutImportJobInput>
+  }
+
+  export type ContactCreateManyImportJobInputEnvelope = {
+    data: ContactCreateManyImportJobInput | ContactCreateManyImportJobInput[]
+    skipDuplicates?: boolean
   }
 
   export type UserUpsertWithoutImportJobsInput = {
@@ -12464,6 +26872,9 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
   }
@@ -12478,8 +26889,27 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type ContactUpsertWithWhereUniqueWithoutImportJobInput = {
+    where: ContactWhereUniqueInput
+    update: XOR<ContactUpdateWithoutImportJobInput, ContactUncheckedUpdateWithoutImportJobInput>
+    create: XOR<ContactCreateWithoutImportJobInput, ContactUncheckedCreateWithoutImportJobInput>
+  }
+
+  export type ContactUpdateWithWhereUniqueWithoutImportJobInput = {
+    where: ContactWhereUniqueInput
+    data: XOR<ContactUpdateWithoutImportJobInput, ContactUncheckedUpdateWithoutImportJobInput>
+  }
+
+  export type ContactUpdateManyWithWhereWithoutImportJobInput = {
+    where: ContactScalarWhereInput
+    data: XOR<ContactUpdateManyMutationInput, ContactUncheckedUpdateManyWithoutImportJobInput>
   }
 
   export type UserCreateWithoutExportJobsInput = {
@@ -12492,6 +26922,9 @@ export namespace Prisma {
     updatedAt?: Date | string
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
   }
@@ -12506,6 +26939,9 @@ export namespace Prisma {
     updatedAt?: Date | string
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
   }
@@ -12536,6 +26972,9 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
   }
@@ -12550,12 +26989,1600 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
   }
 
+  export type UserCreateWithoutMergeSuggestionsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutMergeSuggestionsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutMergeSuggestionsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutMergeSuggestionsInput, UserUncheckedCreateWithoutMergeSuggestionsInput>
+  }
+
+  export type ContactCreateWithoutLeftMergeSuggestionsInput = {
+    id?: string
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    notes?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutContactsInput
+    importJob?: ImportJobCreateNestedOneWithoutContactsInput
+    rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
+    mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactUncheckedCreateWithoutLeftMergeSuggestionsInput = {
+    id?: string
+    userId: string
+    importJobId?: string | null
+    mergedIntoContactId?: string | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    notes?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactCreateOrConnectWithoutLeftMergeSuggestionsInput = {
+    where: ContactWhereUniqueInput
+    create: XOR<ContactCreateWithoutLeftMergeSuggestionsInput, ContactUncheckedCreateWithoutLeftMergeSuggestionsInput>
+  }
+
+  export type ContactCreateWithoutRightMergeSuggestionsInput = {
+    id?: string
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    notes?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutContactsInput
+    importJob?: ImportJobCreateNestedOneWithoutContactsInput
+    leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
+    mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactUncheckedCreateWithoutRightMergeSuggestionsInput = {
+    id?: string
+    userId: string
+    importJobId?: string | null
+    mergedIntoContactId?: string | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    notes?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactCreateOrConnectWithoutRightMergeSuggestionsInput = {
+    where: ContactWhereUniqueInput
+    create: XOR<ContactCreateWithoutRightMergeSuggestionsInput, ContactUncheckedCreateWithoutRightMergeSuggestionsInput>
+  }
+
+  export type MergeDecisionCreateWithoutSuggestionInput = {
+    id?: string
+    status: $Enums.MergeDecisionStatus
+    source: string
+    notes?: string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    decidedAt?: Date | string
+    reversedAt?: Date | string | null
+    reversalSource?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutMergeDecisionsInput
+  }
+
+  export type MergeDecisionUncheckedCreateWithoutSuggestionInput = {
+    id?: string
+    userId: string
+    status: $Enums.MergeDecisionStatus
+    source: string
+    notes?: string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    decidedAt?: Date | string
+    reversedAt?: Date | string | null
+    reversalSource?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MergeDecisionCreateOrConnectWithoutSuggestionInput = {
+    where: MergeDecisionWhereUniqueInput
+    create: XOR<MergeDecisionCreateWithoutSuggestionInput, MergeDecisionUncheckedCreateWithoutSuggestionInput>
+  }
+
+  export type MergeDecisionCreateManySuggestionInputEnvelope = {
+    data: MergeDecisionCreateManySuggestionInput | MergeDecisionCreateManySuggestionInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type UserUpsertWithoutMergeSuggestionsInput = {
+    update: XOR<UserUpdateWithoutMergeSuggestionsInput, UserUncheckedUpdateWithoutMergeSuggestionsInput>
+    create: XOR<UserCreateWithoutMergeSuggestionsInput, UserUncheckedCreateWithoutMergeSuggestionsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutMergeSuggestionsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutMergeSuggestionsInput, UserUncheckedUpdateWithoutMergeSuggestionsInput>
+  }
+
+  export type UserUpdateWithoutMergeSuggestionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutMergeSuggestionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type ContactUpsertWithoutLeftMergeSuggestionsInput = {
+    update: XOR<ContactUpdateWithoutLeftMergeSuggestionsInput, ContactUncheckedUpdateWithoutLeftMergeSuggestionsInput>
+    create: XOR<ContactCreateWithoutLeftMergeSuggestionsInput, ContactUncheckedCreateWithoutLeftMergeSuggestionsInput>
+    where?: ContactWhereInput
+  }
+
+  export type ContactUpdateToOneWithWhereWithoutLeftMergeSuggestionsInput = {
+    where?: ContactWhereInput
+    data: XOR<ContactUpdateWithoutLeftMergeSuggestionsInput, ContactUncheckedUpdateWithoutLeftMergeSuggestionsInput>
+  }
+
+  export type ContactUpdateWithoutLeftMergeSuggestionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutContactsNestedInput
+    importJob?: ImportJobUpdateOneWithoutContactsNestedInput
+    rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
+    mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+  }
+
+  export type ContactUncheckedUpdateWithoutLeftMergeSuggestionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
+  }
+
+  export type ContactUpsertWithoutRightMergeSuggestionsInput = {
+    update: XOR<ContactUpdateWithoutRightMergeSuggestionsInput, ContactUncheckedUpdateWithoutRightMergeSuggestionsInput>
+    create: XOR<ContactCreateWithoutRightMergeSuggestionsInput, ContactUncheckedCreateWithoutRightMergeSuggestionsInput>
+    where?: ContactWhereInput
+  }
+
+  export type ContactUpdateToOneWithWhereWithoutRightMergeSuggestionsInput = {
+    where?: ContactWhereInput
+    data: XOR<ContactUpdateWithoutRightMergeSuggestionsInput, ContactUncheckedUpdateWithoutRightMergeSuggestionsInput>
+  }
+
+  export type ContactUpdateWithoutRightMergeSuggestionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutContactsNestedInput
+    importJob?: ImportJobUpdateOneWithoutContactsNestedInput
+    leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
+    mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+  }
+
+  export type ContactUncheckedUpdateWithoutRightMergeSuggestionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
+  }
+
+  export type MergeDecisionUpsertWithWhereUniqueWithoutSuggestionInput = {
+    where: MergeDecisionWhereUniqueInput
+    update: XOR<MergeDecisionUpdateWithoutSuggestionInput, MergeDecisionUncheckedUpdateWithoutSuggestionInput>
+    create: XOR<MergeDecisionCreateWithoutSuggestionInput, MergeDecisionUncheckedCreateWithoutSuggestionInput>
+  }
+
+  export type MergeDecisionUpdateWithWhereUniqueWithoutSuggestionInput = {
+    where: MergeDecisionWhereUniqueInput
+    data: XOR<MergeDecisionUpdateWithoutSuggestionInput, MergeDecisionUncheckedUpdateWithoutSuggestionInput>
+  }
+
+  export type MergeDecisionUpdateManyWithWhereWithoutSuggestionInput = {
+    where: MergeDecisionScalarWhereInput
+    data: XOR<MergeDecisionUpdateManyMutationInput, MergeDecisionUncheckedUpdateManyWithoutSuggestionInput>
+  }
+
+  export type MergeSuggestionCreateWithoutDecisionsInput = {
+    id?: string
+    pairKey: string
+    status?: $Enums.MergeSuggestionStatus
+    confidence: $Enums.MergeSuggestionConfidence
+    score: number
+    hardMatch?: boolean
+    signals: JsonNullValueInput | InputJsonValue
+    reasons: JsonNullValueInput | InputJsonValue
+    source: string
+    generatedAt?: Date | string
+    reviewedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutMergeSuggestionsInput
+    leftContact: ContactCreateNestedOneWithoutLeftMergeSuggestionsInput
+    rightContact: ContactCreateNestedOneWithoutRightMergeSuggestionsInput
+  }
+
+  export type MergeSuggestionUncheckedCreateWithoutDecisionsInput = {
+    id?: string
+    userId: string
+    leftContactId: string
+    rightContactId: string
+    pairKey: string
+    status?: $Enums.MergeSuggestionStatus
+    confidence: $Enums.MergeSuggestionConfidence
+    score: number
+    hardMatch?: boolean
+    signals: JsonNullValueInput | InputJsonValue
+    reasons: JsonNullValueInput | InputJsonValue
+    source: string
+    generatedAt?: Date | string
+    reviewedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MergeSuggestionCreateOrConnectWithoutDecisionsInput = {
+    where: MergeSuggestionWhereUniqueInput
+    create: XOR<MergeSuggestionCreateWithoutDecisionsInput, MergeSuggestionUncheckedCreateWithoutDecisionsInput>
+  }
+
+  export type UserCreateWithoutMergeDecisionsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutMergeDecisionsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutMergeDecisionsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutMergeDecisionsInput, UserUncheckedCreateWithoutMergeDecisionsInput>
+  }
+
+  export type MergeSuggestionUpsertWithoutDecisionsInput = {
+    update: XOR<MergeSuggestionUpdateWithoutDecisionsInput, MergeSuggestionUncheckedUpdateWithoutDecisionsInput>
+    create: XOR<MergeSuggestionCreateWithoutDecisionsInput, MergeSuggestionUncheckedCreateWithoutDecisionsInput>
+    where?: MergeSuggestionWhereInput
+  }
+
+  export type MergeSuggestionUpdateToOneWithWhereWithoutDecisionsInput = {
+    where?: MergeSuggestionWhereInput
+    data: XOR<MergeSuggestionUpdateWithoutDecisionsInput, MergeSuggestionUncheckedUpdateWithoutDecisionsInput>
+  }
+
+  export type MergeSuggestionUpdateWithoutDecisionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    pairKey?: StringFieldUpdateOperationsInput | string
+    status?: EnumMergeSuggestionStatusFieldUpdateOperationsInput | $Enums.MergeSuggestionStatus
+    confidence?: EnumMergeSuggestionConfidenceFieldUpdateOperationsInput | $Enums.MergeSuggestionConfidence
+    score?: IntFieldUpdateOperationsInput | number
+    hardMatch?: BoolFieldUpdateOperationsInput | boolean
+    signals?: JsonNullValueInput | InputJsonValue
+    reasons?: JsonNullValueInput | InputJsonValue
+    source?: StringFieldUpdateOperationsInput | string
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutMergeSuggestionsNestedInput
+    leftContact?: ContactUpdateOneRequiredWithoutLeftMergeSuggestionsNestedInput
+    rightContact?: ContactUpdateOneRequiredWithoutRightMergeSuggestionsNestedInput
+  }
+
+  export type MergeSuggestionUncheckedUpdateWithoutDecisionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    leftContactId?: StringFieldUpdateOperationsInput | string
+    rightContactId?: StringFieldUpdateOperationsInput | string
+    pairKey?: StringFieldUpdateOperationsInput | string
+    status?: EnumMergeSuggestionStatusFieldUpdateOperationsInput | $Enums.MergeSuggestionStatus
+    confidence?: EnumMergeSuggestionConfidenceFieldUpdateOperationsInput | $Enums.MergeSuggestionConfidence
+    score?: IntFieldUpdateOperationsInput | number
+    hardMatch?: BoolFieldUpdateOperationsInput | boolean
+    signals?: JsonNullValueInput | InputJsonValue
+    reasons?: JsonNullValueInput | InputJsonValue
+    source?: StringFieldUpdateOperationsInput | string
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserUpsertWithoutMergeDecisionsInput = {
+    update: XOR<UserUpdateWithoutMergeDecisionsInput, UserUncheckedUpdateWithoutMergeDecisionsInput>
+    create: XOR<UserCreateWithoutMergeDecisionsInput, UserUncheckedCreateWithoutMergeDecisionsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutMergeDecisionsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutMergeDecisionsInput, UserUncheckedUpdateWithoutMergeDecisionsInput>
+  }
+
+  export type UserUpdateWithoutMergeDecisionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutMergeDecisionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutSyncAccountsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutSyncAccountsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutSyncAccountsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutSyncAccountsInput, UserUncheckedCreateWithoutSyncAccountsInput>
+  }
+
+  export type SyncContactLinkCreateWithoutSyncAccountInput = {
+    id?: string
+    remoteHref?: string | null
+    remoteUid?: string | null
+    remoteETag?: string | null
+    lastSyncedAt?: Date | string | null
+    tombstonedAt?: Date | string | null
+    remoteDeletedAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contact: ContactCreateNestedOneWithoutSyncLinksInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutSyncContactLinkInput
+  }
+
+  export type SyncContactLinkUncheckedCreateWithoutSyncAccountInput = {
+    id?: string
+    contactId: string
+    remoteHref?: string | null
+    remoteUid?: string | null
+    remoteETag?: string | null
+    lastSyncedAt?: Date | string | null
+    tombstonedAt?: Date | string | null
+    remoteDeletedAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncContactLinkInput
+  }
+
+  export type SyncContactLinkCreateOrConnectWithoutSyncAccountInput = {
+    where: SyncContactLinkWhereUniqueInput
+    create: XOR<SyncContactLinkCreateWithoutSyncAccountInput, SyncContactLinkUncheckedCreateWithoutSyncAccountInput>
+  }
+
+  export type SyncContactLinkCreateManySyncAccountInputEnvelope = {
+    data: SyncContactLinkCreateManySyncAccountInput | SyncContactLinkCreateManySyncAccountInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SyncJobCreateWithoutSyncAccountInput = {
+    id?: string
+    status?: $Enums.SyncJobStatus
+    trigger?: $Enums.SyncJobTrigger
+    syncDirection: $Enums.SyncDirection
+    attemptCount?: number
+    maxAttempts?: number
+    nextRetryAt?: Date | string | null
+    leaseExpiresAt?: Date | string | null
+    workerId?: string | null
+    idempotencyKey?: string | null
+    cursorBefore?: string | null
+    cursorAfter?: string | null
+    createdCount?: number
+    updatedCount?: number
+    deletedCount?: number
+    conflictCount?: number
+    skippedCount?: number
+    errorCode?: string | null
+    errorSummary?: string | null
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SyncJobUncheckedCreateWithoutSyncAccountInput = {
+    id?: string
+    status?: $Enums.SyncJobStatus
+    trigger?: $Enums.SyncJobTrigger
+    syncDirection: $Enums.SyncDirection
+    attemptCount?: number
+    maxAttempts?: number
+    nextRetryAt?: Date | string | null
+    leaseExpiresAt?: Date | string | null
+    workerId?: string | null
+    idempotencyKey?: string | null
+    cursorBefore?: string | null
+    cursorAfter?: string | null
+    createdCount?: number
+    updatedCount?: number
+    deletedCount?: number
+    conflictCount?: number
+    skippedCount?: number
+    errorCode?: string | null
+    errorSummary?: string | null
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SyncJobCreateOrConnectWithoutSyncAccountInput = {
+    where: SyncJobWhereUniqueInput
+    create: XOR<SyncJobCreateWithoutSyncAccountInput, SyncJobUncheckedCreateWithoutSyncAccountInput>
+  }
+
+  export type SyncJobCreateManySyncAccountInputEnvelope = {
+    data: SyncJobCreateManySyncAccountInput | SyncJobCreateManySyncAccountInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SyncConflictCreateWithoutSyncAccountInput = {
+    id?: string
+    conflictType: $Enums.SyncConflictType
+    status?: $Enums.SyncConflictStatus
+    resolutionStrategy?: $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: number | null
+    remoteETag?: string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: string | null
+    detectedAt?: Date | string
+    resolvedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    syncContactLink?: SyncContactLinkCreateNestedOneWithoutSyncConflictsInput
+    contact?: ContactCreateNestedOneWithoutSyncConflictsInput
+  }
+
+  export type SyncConflictUncheckedCreateWithoutSyncAccountInput = {
+    id?: string
+    syncContactLinkId?: string | null
+    contactId?: string | null
+    conflictType: $Enums.SyncConflictType
+    status?: $Enums.SyncConflictStatus
+    resolutionStrategy?: $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: number | null
+    remoteETag?: string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: string | null
+    detectedAt?: Date | string
+    resolvedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SyncConflictCreateOrConnectWithoutSyncAccountInput = {
+    where: SyncConflictWhereUniqueInput
+    create: XOR<SyncConflictCreateWithoutSyncAccountInput, SyncConflictUncheckedCreateWithoutSyncAccountInput>
+  }
+
+  export type SyncConflictCreateManySyncAccountInputEnvelope = {
+    data: SyncConflictCreateManySyncAccountInput | SyncConflictCreateManySyncAccountInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type UserUpsertWithoutSyncAccountsInput = {
+    update: XOR<UserUpdateWithoutSyncAccountsInput, UserUncheckedUpdateWithoutSyncAccountsInput>
+    create: XOR<UserCreateWithoutSyncAccountsInput, UserUncheckedCreateWithoutSyncAccountsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutSyncAccountsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutSyncAccountsInput, UserUncheckedUpdateWithoutSyncAccountsInput>
+  }
+
+  export type UserUpdateWithoutSyncAccountsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutSyncAccountsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type SyncContactLinkUpsertWithWhereUniqueWithoutSyncAccountInput = {
+    where: SyncContactLinkWhereUniqueInput
+    update: XOR<SyncContactLinkUpdateWithoutSyncAccountInput, SyncContactLinkUncheckedUpdateWithoutSyncAccountInput>
+    create: XOR<SyncContactLinkCreateWithoutSyncAccountInput, SyncContactLinkUncheckedCreateWithoutSyncAccountInput>
+  }
+
+  export type SyncContactLinkUpdateWithWhereUniqueWithoutSyncAccountInput = {
+    where: SyncContactLinkWhereUniqueInput
+    data: XOR<SyncContactLinkUpdateWithoutSyncAccountInput, SyncContactLinkUncheckedUpdateWithoutSyncAccountInput>
+  }
+
+  export type SyncContactLinkUpdateManyWithWhereWithoutSyncAccountInput = {
+    where: SyncContactLinkScalarWhereInput
+    data: XOR<SyncContactLinkUpdateManyMutationInput, SyncContactLinkUncheckedUpdateManyWithoutSyncAccountInput>
+  }
+
+  export type SyncJobUpsertWithWhereUniqueWithoutSyncAccountInput = {
+    where: SyncJobWhereUniqueInput
+    update: XOR<SyncJobUpdateWithoutSyncAccountInput, SyncJobUncheckedUpdateWithoutSyncAccountInput>
+    create: XOR<SyncJobCreateWithoutSyncAccountInput, SyncJobUncheckedCreateWithoutSyncAccountInput>
+  }
+
+  export type SyncJobUpdateWithWhereUniqueWithoutSyncAccountInput = {
+    where: SyncJobWhereUniqueInput
+    data: XOR<SyncJobUpdateWithoutSyncAccountInput, SyncJobUncheckedUpdateWithoutSyncAccountInput>
+  }
+
+  export type SyncJobUpdateManyWithWhereWithoutSyncAccountInput = {
+    where: SyncJobScalarWhereInput
+    data: XOR<SyncJobUpdateManyMutationInput, SyncJobUncheckedUpdateManyWithoutSyncAccountInput>
+  }
+
+  export type SyncJobScalarWhereInput = {
+    AND?: SyncJobScalarWhereInput | SyncJobScalarWhereInput[]
+    OR?: SyncJobScalarWhereInput[]
+    NOT?: SyncJobScalarWhereInput | SyncJobScalarWhereInput[]
+    id?: StringFilter<"SyncJob"> | string
+    syncAccountId?: StringFilter<"SyncJob"> | string
+    status?: EnumSyncJobStatusFilter<"SyncJob"> | $Enums.SyncJobStatus
+    trigger?: EnumSyncJobTriggerFilter<"SyncJob"> | $Enums.SyncJobTrigger
+    syncDirection?: EnumSyncDirectionFilter<"SyncJob"> | $Enums.SyncDirection
+    attemptCount?: IntFilter<"SyncJob"> | number
+    maxAttempts?: IntFilter<"SyncJob"> | number
+    nextRetryAt?: DateTimeNullableFilter<"SyncJob"> | Date | string | null
+    leaseExpiresAt?: DateTimeNullableFilter<"SyncJob"> | Date | string | null
+    workerId?: StringNullableFilter<"SyncJob"> | string | null
+    idempotencyKey?: StringNullableFilter<"SyncJob"> | string | null
+    cursorBefore?: StringNullableFilter<"SyncJob"> | string | null
+    cursorAfter?: StringNullableFilter<"SyncJob"> | string | null
+    createdCount?: IntFilter<"SyncJob"> | number
+    updatedCount?: IntFilter<"SyncJob"> | number
+    deletedCount?: IntFilter<"SyncJob"> | number
+    conflictCount?: IntFilter<"SyncJob"> | number
+    skippedCount?: IntFilter<"SyncJob"> | number
+    errorCode?: StringNullableFilter<"SyncJob"> | string | null
+    errorSummary?: StringNullableFilter<"SyncJob"> | string | null
+    startedAt?: DateTimeNullableFilter<"SyncJob"> | Date | string | null
+    completedAt?: DateTimeNullableFilter<"SyncJob"> | Date | string | null
+    createdAt?: DateTimeFilter<"SyncJob"> | Date | string
+    updatedAt?: DateTimeFilter<"SyncJob"> | Date | string
+  }
+
+  export type SyncConflictUpsertWithWhereUniqueWithoutSyncAccountInput = {
+    where: SyncConflictWhereUniqueInput
+    update: XOR<SyncConflictUpdateWithoutSyncAccountInput, SyncConflictUncheckedUpdateWithoutSyncAccountInput>
+    create: XOR<SyncConflictCreateWithoutSyncAccountInput, SyncConflictUncheckedCreateWithoutSyncAccountInput>
+  }
+
+  export type SyncConflictUpdateWithWhereUniqueWithoutSyncAccountInput = {
+    where: SyncConflictWhereUniqueInput
+    data: XOR<SyncConflictUpdateWithoutSyncAccountInput, SyncConflictUncheckedUpdateWithoutSyncAccountInput>
+  }
+
+  export type SyncConflictUpdateManyWithWhereWithoutSyncAccountInput = {
+    where: SyncConflictScalarWhereInput
+    data: XOR<SyncConflictUpdateManyMutationInput, SyncConflictUncheckedUpdateManyWithoutSyncAccountInput>
+  }
+
+  export type SyncAccountCreateWithoutSyncLinksInput = {
+    id?: string
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutSyncAccountsInput
+    syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
+  }
+
+  export type SyncAccountUncheckedCreateWithoutSyncLinksInput = {
+    id?: string
+    userId: string
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
+  }
+
+  export type SyncAccountCreateOrConnectWithoutSyncLinksInput = {
+    where: SyncAccountWhereUniqueInput
+    create: XOR<SyncAccountCreateWithoutSyncLinksInput, SyncAccountUncheckedCreateWithoutSyncLinksInput>
+  }
+
+  export type ContactCreateWithoutSyncLinksInput = {
+    id?: string
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    notes?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutContactsInput
+    importJob?: ImportJobCreateNestedOneWithoutContactsInput
+    leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
+    mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactUncheckedCreateWithoutSyncLinksInput = {
+    id?: string
+    userId: string
+    importJobId?: string | null
+    mergedIntoContactId?: string | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    notes?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactCreateOrConnectWithoutSyncLinksInput = {
+    where: ContactWhereUniqueInput
+    create: XOR<ContactCreateWithoutSyncLinksInput, ContactUncheckedCreateWithoutSyncLinksInput>
+  }
+
+  export type SyncConflictCreateWithoutSyncContactLinkInput = {
+    id?: string
+    conflictType: $Enums.SyncConflictType
+    status?: $Enums.SyncConflictStatus
+    resolutionStrategy?: $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: number | null
+    remoteETag?: string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: string | null
+    detectedAt?: Date | string
+    resolvedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    syncAccount: SyncAccountCreateNestedOneWithoutSyncConflictsInput
+    contact?: ContactCreateNestedOneWithoutSyncConflictsInput
+  }
+
+  export type SyncConflictUncheckedCreateWithoutSyncContactLinkInput = {
+    id?: string
+    syncAccountId: string
+    contactId?: string | null
+    conflictType: $Enums.SyncConflictType
+    status?: $Enums.SyncConflictStatus
+    resolutionStrategy?: $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: number | null
+    remoteETag?: string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: string | null
+    detectedAt?: Date | string
+    resolvedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SyncConflictCreateOrConnectWithoutSyncContactLinkInput = {
+    where: SyncConflictWhereUniqueInput
+    create: XOR<SyncConflictCreateWithoutSyncContactLinkInput, SyncConflictUncheckedCreateWithoutSyncContactLinkInput>
+  }
+
+  export type SyncConflictCreateManySyncContactLinkInputEnvelope = {
+    data: SyncConflictCreateManySyncContactLinkInput | SyncConflictCreateManySyncContactLinkInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SyncAccountUpsertWithoutSyncLinksInput = {
+    update: XOR<SyncAccountUpdateWithoutSyncLinksInput, SyncAccountUncheckedUpdateWithoutSyncLinksInput>
+    create: XOR<SyncAccountCreateWithoutSyncLinksInput, SyncAccountUncheckedCreateWithoutSyncLinksInput>
+    where?: SyncAccountWhereInput
+  }
+
+  export type SyncAccountUpdateToOneWithWhereWithoutSyncLinksInput = {
+    where?: SyncAccountWhereInput
+    data: XOR<SyncAccountUpdateWithoutSyncLinksInput, SyncAccountUncheckedUpdateWithoutSyncLinksInput>
+  }
+
+  export type SyncAccountUpdateWithoutSyncLinksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
+  }
+
+  export type SyncAccountUncheckedUpdateWithoutSyncLinksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
+  }
+
+  export type ContactUpsertWithoutSyncLinksInput = {
+    update: XOR<ContactUpdateWithoutSyncLinksInput, ContactUncheckedUpdateWithoutSyncLinksInput>
+    create: XOR<ContactCreateWithoutSyncLinksInput, ContactUncheckedCreateWithoutSyncLinksInput>
+    where?: ContactWhereInput
+  }
+
+  export type ContactUpdateToOneWithWhereWithoutSyncLinksInput = {
+    where?: ContactWhereInput
+    data: XOR<ContactUpdateWithoutSyncLinksInput, ContactUncheckedUpdateWithoutSyncLinksInput>
+  }
+
+  export type ContactUpdateWithoutSyncLinksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutContactsNestedInput
+    importJob?: ImportJobUpdateOneWithoutContactsNestedInput
+    leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
+    mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+  }
+
+  export type ContactUncheckedUpdateWithoutSyncLinksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
+  }
+
+  export type SyncConflictUpsertWithWhereUniqueWithoutSyncContactLinkInput = {
+    where: SyncConflictWhereUniqueInput
+    update: XOR<SyncConflictUpdateWithoutSyncContactLinkInput, SyncConflictUncheckedUpdateWithoutSyncContactLinkInput>
+    create: XOR<SyncConflictCreateWithoutSyncContactLinkInput, SyncConflictUncheckedCreateWithoutSyncContactLinkInput>
+  }
+
+  export type SyncConflictUpdateWithWhereUniqueWithoutSyncContactLinkInput = {
+    where: SyncConflictWhereUniqueInput
+    data: XOR<SyncConflictUpdateWithoutSyncContactLinkInput, SyncConflictUncheckedUpdateWithoutSyncContactLinkInput>
+  }
+
+  export type SyncConflictUpdateManyWithWhereWithoutSyncContactLinkInput = {
+    where: SyncConflictScalarWhereInput
+    data: XOR<SyncConflictUpdateManyMutationInput, SyncConflictUncheckedUpdateManyWithoutSyncContactLinkInput>
+  }
+
+  export type SyncAccountCreateWithoutSyncJobsInput = {
+    id?: string
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutSyncAccountsInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
+  }
+
+  export type SyncAccountUncheckedCreateWithoutSyncJobsInput = {
+    id?: string
+    userId: string
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
+  }
+
+  export type SyncAccountCreateOrConnectWithoutSyncJobsInput = {
+    where: SyncAccountWhereUniqueInput
+    create: XOR<SyncAccountCreateWithoutSyncJobsInput, SyncAccountUncheckedCreateWithoutSyncJobsInput>
+  }
+
+  export type SyncAccountUpsertWithoutSyncJobsInput = {
+    update: XOR<SyncAccountUpdateWithoutSyncJobsInput, SyncAccountUncheckedUpdateWithoutSyncJobsInput>
+    create: XOR<SyncAccountCreateWithoutSyncJobsInput, SyncAccountUncheckedCreateWithoutSyncJobsInput>
+    where?: SyncAccountWhereInput
+  }
+
+  export type SyncAccountUpdateToOneWithWhereWithoutSyncJobsInput = {
+    where?: SyncAccountWhereInput
+    data: XOR<SyncAccountUpdateWithoutSyncJobsInput, SyncAccountUncheckedUpdateWithoutSyncJobsInput>
+  }
+
+  export type SyncAccountUpdateWithoutSyncJobsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
+  }
+
+  export type SyncAccountUncheckedUpdateWithoutSyncJobsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
+  }
+
+  export type SyncAccountCreateWithoutSyncConflictsInput = {
+    id?: string
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutSyncAccountsInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
+    syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
+  }
+
+  export type SyncAccountUncheckedCreateWithoutSyncConflictsInput = {
+    id?: string
+    userId: string
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
+    syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
+  }
+
+  export type SyncAccountCreateOrConnectWithoutSyncConflictsInput = {
+    where: SyncAccountWhereUniqueInput
+    create: XOR<SyncAccountCreateWithoutSyncConflictsInput, SyncAccountUncheckedCreateWithoutSyncConflictsInput>
+  }
+
+  export type SyncContactLinkCreateWithoutSyncConflictsInput = {
+    id?: string
+    remoteHref?: string | null
+    remoteUid?: string | null
+    remoteETag?: string | null
+    lastSyncedAt?: Date | string | null
+    tombstonedAt?: Date | string | null
+    remoteDeletedAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    syncAccount: SyncAccountCreateNestedOneWithoutSyncLinksInput
+    contact: ContactCreateNestedOneWithoutSyncLinksInput
+  }
+
+  export type SyncContactLinkUncheckedCreateWithoutSyncConflictsInput = {
+    id?: string
+    syncAccountId: string
+    contactId: string
+    remoteHref?: string | null
+    remoteUid?: string | null
+    remoteETag?: string | null
+    lastSyncedAt?: Date | string | null
+    tombstonedAt?: Date | string | null
+    remoteDeletedAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SyncContactLinkCreateOrConnectWithoutSyncConflictsInput = {
+    where: SyncContactLinkWhereUniqueInput
+    create: XOR<SyncContactLinkCreateWithoutSyncConflictsInput, SyncContactLinkUncheckedCreateWithoutSyncConflictsInput>
+  }
+
+  export type ContactCreateWithoutSyncConflictsInput = {
+    id?: string
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    notes?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutContactsInput
+    importJob?: ImportJobCreateNestedOneWithoutContactsInput
+    leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
+    mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
+    mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactUncheckedCreateWithoutSyncConflictsInput = {
+    id?: string
+    userId: string
+    importJobId?: string | null
+    mergedIntoContactId?: string | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    notes?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
+    mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactCreateOrConnectWithoutSyncConflictsInput = {
+    where: ContactWhereUniqueInput
+    create: XOR<ContactCreateWithoutSyncConflictsInput, ContactUncheckedCreateWithoutSyncConflictsInput>
+  }
+
+  export type SyncAccountUpsertWithoutSyncConflictsInput = {
+    update: XOR<SyncAccountUpdateWithoutSyncConflictsInput, SyncAccountUncheckedUpdateWithoutSyncConflictsInput>
+    create: XOR<SyncAccountCreateWithoutSyncConflictsInput, SyncAccountUncheckedCreateWithoutSyncConflictsInput>
+    where?: SyncAccountWhereInput
+  }
+
+  export type SyncAccountUpdateToOneWithWhereWithoutSyncConflictsInput = {
+    where?: SyncAccountWhereInput
+    data: XOR<SyncAccountUpdateWithoutSyncConflictsInput, SyncAccountUncheckedUpdateWithoutSyncConflictsInput>
+  }
+
+  export type SyncAccountUpdateWithoutSyncConflictsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
+    syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
+  }
+
+  export type SyncAccountUncheckedUpdateWithoutSyncConflictsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
+    syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
+  }
+
+  export type SyncContactLinkUpsertWithoutSyncConflictsInput = {
+    update: XOR<SyncContactLinkUpdateWithoutSyncConflictsInput, SyncContactLinkUncheckedUpdateWithoutSyncConflictsInput>
+    create: XOR<SyncContactLinkCreateWithoutSyncConflictsInput, SyncContactLinkUncheckedCreateWithoutSyncConflictsInput>
+    where?: SyncContactLinkWhereInput
+  }
+
+  export type SyncContactLinkUpdateToOneWithWhereWithoutSyncConflictsInput = {
+    where?: SyncContactLinkWhereInput
+    data: XOR<SyncContactLinkUpdateWithoutSyncConflictsInput, SyncContactLinkUncheckedUpdateWithoutSyncConflictsInput>
+  }
+
+  export type SyncContactLinkUpdateWithoutSyncConflictsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    remoteHref?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteUid?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncAccount?: SyncAccountUpdateOneRequiredWithoutSyncLinksNestedInput
+    contact?: ContactUpdateOneRequiredWithoutSyncLinksNestedInput
+  }
+
+  export type SyncContactLinkUncheckedUpdateWithoutSyncConflictsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: StringFieldUpdateOperationsInput | string
+    contactId?: StringFieldUpdateOperationsInput | string
+    remoteHref?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteUid?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactUpsertWithoutSyncConflictsInput = {
+    update: XOR<ContactUpdateWithoutSyncConflictsInput, ContactUncheckedUpdateWithoutSyncConflictsInput>
+    create: XOR<ContactCreateWithoutSyncConflictsInput, ContactUncheckedCreateWithoutSyncConflictsInput>
+    where?: ContactWhereInput
+  }
+
+  export type ContactUpdateToOneWithWhereWithoutSyncConflictsInput = {
+    where?: ContactWhereInput
+    data: XOR<ContactUpdateWithoutSyncConflictsInput, ContactUncheckedUpdateWithoutSyncConflictsInput>
+  }
+
+  export type ContactUpdateWithoutSyncConflictsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutContactsNestedInput
+    importJob?: ImportJobUpdateOneWithoutContactsNestedInput
+    leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
+    mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
+    mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+  }
+
+  export type ContactUncheckedUpdateWithoutSyncConflictsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
+    mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
+  }
+
   export type ContactCreateManyUserInput = {
     id?: string
+    importJobId?: string | null
+    mergedIntoContactId?: string | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
     fullName: string
     email?: string | null
     phone?: string | null
@@ -12569,13 +28596,21 @@ export namespace Prisma {
   export type ImportJobCreateManyUserInput = {
     id?: string
     format: $Enums.ContactImportFormat
+    sourceProfile?: $Enums.ImportSourceProfile | null
     status?: $Enums.ImportExportJobStatus
     sourceFileName?: string | null
+    sourceFileSizeBytes?: number | null
     rowCount?: number
+    previewContactCount?: number
     importedCount?: number
     skippedCount?: number
     errorCount?: number
+    warningCount?: number
+    rolledBackCount?: number
     errorSummary?: string | null
+    previewedAt?: Date | string | null
+    committedAt?: Date | string | null
+    rolledBackAt?: Date | string | null
     createdAt?: Date | string
     startedAt?: Date | string
     completedAt?: Date | string | null
@@ -12587,11 +28622,71 @@ export namespace Prisma {
     format: $Enums.ContactExportFormat
     status?: $Enums.ImportExportJobStatus
     includeArchived?: boolean
+    filterQuery?: string | null
+    resultFileName?: string | null
     exportedCount?: number
     errorSummary?: string | null
     createdAt?: Date | string
     startedAt?: Date | string
     completedAt?: Date | string | null
+    updatedAt?: Date | string
+  }
+
+  export type MergeSuggestionCreateManyUserInput = {
+    id?: string
+    leftContactId: string
+    rightContactId: string
+    pairKey: string
+    status?: $Enums.MergeSuggestionStatus
+    confidence: $Enums.MergeSuggestionConfidence
+    score: number
+    hardMatch?: boolean
+    signals: JsonNullValueInput | InputJsonValue
+    reasons: JsonNullValueInput | InputJsonValue
+    source: string
+    generatedAt?: Date | string
+    reviewedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MergeDecisionCreateManyUserInput = {
+    id?: string
+    suggestionId: string
+    status: $Enums.MergeDecisionStatus
+    source: string
+    notes?: string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    decidedAt?: Date | string
+    reversedAt?: Date | string | null
+    reversalSource?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SyncAccountCreateManyUserInput = {
+    id?: string
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    createdAt?: Date | string
     updatedAt?: Date | string
   }
 
@@ -12623,6 +28718,9 @@ export namespace Prisma {
 
   export type ContactUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -12631,10 +28729,22 @@ export namespace Prisma {
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    importJob?: ImportJobUpdateOneWithoutContactsNestedInput
+    leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
+    mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
 
   export type ContactUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
+    importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -12643,10 +28753,20 @@ export namespace Prisma {
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
   export type ContactUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
+    importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -12660,45 +28780,71 @@ export namespace Prisma {
   export type ImportJobUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     format?: EnumContactImportFormatFieldUpdateOperationsInput | $Enums.ContactImportFormat
+    sourceProfile?: NullableEnumImportSourceProfileFieldUpdateOperationsInput | $Enums.ImportSourceProfile | null
     status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
     sourceFileName?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
     rowCount?: IntFieldUpdateOperationsInput | number
+    previewContactCount?: IntFieldUpdateOperationsInput | number
     importedCount?: IntFieldUpdateOperationsInput | number
     skippedCount?: IntFieldUpdateOperationsInput | number
     errorCount?: IntFieldUpdateOperationsInput | number
+    warningCount?: IntFieldUpdateOperationsInput | number
+    rolledBackCount?: IntFieldUpdateOperationsInput | number
     errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    previewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    committedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rolledBackAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: ContactUpdateManyWithoutImportJobNestedInput
   }
 
   export type ImportJobUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     format?: EnumContactImportFormatFieldUpdateOperationsInput | $Enums.ContactImportFormat
+    sourceProfile?: NullableEnumImportSourceProfileFieldUpdateOperationsInput | $Enums.ImportSourceProfile | null
     status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
     sourceFileName?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
     rowCount?: IntFieldUpdateOperationsInput | number
+    previewContactCount?: IntFieldUpdateOperationsInput | number
     importedCount?: IntFieldUpdateOperationsInput | number
     skippedCount?: IntFieldUpdateOperationsInput | number
     errorCount?: IntFieldUpdateOperationsInput | number
+    warningCount?: IntFieldUpdateOperationsInput | number
+    rolledBackCount?: IntFieldUpdateOperationsInput | number
     errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    previewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    committedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rolledBackAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: ContactUncheckedUpdateManyWithoutImportJobNestedInput
   }
 
   export type ImportJobUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     format?: EnumContactImportFormatFieldUpdateOperationsInput | $Enums.ContactImportFormat
+    sourceProfile?: NullableEnumImportSourceProfileFieldUpdateOperationsInput | $Enums.ImportSourceProfile | null
     status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
     sourceFileName?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceFileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
     rowCount?: IntFieldUpdateOperationsInput | number
+    previewContactCount?: IntFieldUpdateOperationsInput | number
     importedCount?: IntFieldUpdateOperationsInput | number
     skippedCount?: IntFieldUpdateOperationsInput | number
     errorCount?: IntFieldUpdateOperationsInput | number
+    warningCount?: IntFieldUpdateOperationsInput | number
+    rolledBackCount?: IntFieldUpdateOperationsInput | number
     errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    previewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    committedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    rolledBackAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -12710,6 +28856,8 @@ export namespace Prisma {
     format?: EnumContactExportFormatFieldUpdateOperationsInput | $Enums.ContactExportFormat
     status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
     includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    filterQuery?: NullableStringFieldUpdateOperationsInput | string | null
+    resultFileName?: NullableStringFieldUpdateOperationsInput | string | null
     exportedCount?: IntFieldUpdateOperationsInput | number
     errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -12723,6 +28871,8 @@ export namespace Prisma {
     format?: EnumContactExportFormatFieldUpdateOperationsInput | $Enums.ContactExportFormat
     status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
     includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    filterQuery?: NullableStringFieldUpdateOperationsInput | string | null
+    resultFileName?: NullableStringFieldUpdateOperationsInput | string | null
     exportedCount?: IntFieldUpdateOperationsInput | number
     errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -12736,11 +28886,195 @@ export namespace Prisma {
     format?: EnumContactExportFormatFieldUpdateOperationsInput | $Enums.ContactExportFormat
     status?: EnumImportExportJobStatusFieldUpdateOperationsInput | $Enums.ImportExportJobStatus
     includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    filterQuery?: NullableStringFieldUpdateOperationsInput | string | null
+    resultFileName?: NullableStringFieldUpdateOperationsInput | string | null
     exportedCount?: IntFieldUpdateOperationsInput | number
     errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergeSuggestionUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    pairKey?: StringFieldUpdateOperationsInput | string
+    status?: EnumMergeSuggestionStatusFieldUpdateOperationsInput | $Enums.MergeSuggestionStatus
+    confidence?: EnumMergeSuggestionConfidenceFieldUpdateOperationsInput | $Enums.MergeSuggestionConfidence
+    score?: IntFieldUpdateOperationsInput | number
+    hardMatch?: BoolFieldUpdateOperationsInput | boolean
+    signals?: JsonNullValueInput | InputJsonValue
+    reasons?: JsonNullValueInput | InputJsonValue
+    source?: StringFieldUpdateOperationsInput | string
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leftContact?: ContactUpdateOneRequiredWithoutLeftMergeSuggestionsNestedInput
+    rightContact?: ContactUpdateOneRequiredWithoutRightMergeSuggestionsNestedInput
+    decisions?: MergeDecisionUpdateManyWithoutSuggestionNestedInput
+  }
+
+  export type MergeSuggestionUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    leftContactId?: StringFieldUpdateOperationsInput | string
+    rightContactId?: StringFieldUpdateOperationsInput | string
+    pairKey?: StringFieldUpdateOperationsInput | string
+    status?: EnumMergeSuggestionStatusFieldUpdateOperationsInput | $Enums.MergeSuggestionStatus
+    confidence?: EnumMergeSuggestionConfidenceFieldUpdateOperationsInput | $Enums.MergeSuggestionConfidence
+    score?: IntFieldUpdateOperationsInput | number
+    hardMatch?: BoolFieldUpdateOperationsInput | boolean
+    signals?: JsonNullValueInput | InputJsonValue
+    reasons?: JsonNullValueInput | InputJsonValue
+    source?: StringFieldUpdateOperationsInput | string
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    decisions?: MergeDecisionUncheckedUpdateManyWithoutSuggestionNestedInput
+  }
+
+  export type MergeSuggestionUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    leftContactId?: StringFieldUpdateOperationsInput | string
+    rightContactId?: StringFieldUpdateOperationsInput | string
+    pairKey?: StringFieldUpdateOperationsInput | string
+    status?: EnumMergeSuggestionStatusFieldUpdateOperationsInput | $Enums.MergeSuggestionStatus
+    confidence?: EnumMergeSuggestionConfidenceFieldUpdateOperationsInput | $Enums.MergeSuggestionConfidence
+    score?: IntFieldUpdateOperationsInput | number
+    hardMatch?: BoolFieldUpdateOperationsInput | boolean
+    signals?: JsonNullValueInput | InputJsonValue
+    reasons?: JsonNullValueInput | InputJsonValue
+    source?: StringFieldUpdateOperationsInput | string
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergeDecisionUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumMergeDecisionStatusFieldUpdateOperationsInput | $Enums.MergeDecisionStatus
+    source?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    decidedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reversalSource?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    suggestion?: MergeSuggestionUpdateOneRequiredWithoutDecisionsNestedInput
+  }
+
+  export type MergeDecisionUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    suggestionId?: StringFieldUpdateOperationsInput | string
+    status?: EnumMergeDecisionStatusFieldUpdateOperationsInput | $Enums.MergeDecisionStatus
+    source?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    decidedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reversalSource?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergeDecisionUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    suggestionId?: StringFieldUpdateOperationsInput | string
+    status?: EnumMergeDecisionStatusFieldUpdateOperationsInput | $Enums.MergeDecisionStatus
+    source?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    decidedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reversalSource?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncAccountUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
+    syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
+  }
+
+  export type SyncAccountUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
+    syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
+  }
+
+  export type SyncAccountUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -12818,6 +29152,366 @@ export namespace Prisma {
     cancelAtPeriodEnd?: BoolFieldUpdateOperationsInput | boolean
     canceledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergeSuggestionCreateManyLeftContactInput = {
+    id?: string
+    userId: string
+    rightContactId: string
+    pairKey: string
+    status?: $Enums.MergeSuggestionStatus
+    confidence: $Enums.MergeSuggestionConfidence
+    score: number
+    hardMatch?: boolean
+    signals: JsonNullValueInput | InputJsonValue
+    reasons: JsonNullValueInput | InputJsonValue
+    source: string
+    generatedAt?: Date | string
+    reviewedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MergeSuggestionCreateManyRightContactInput = {
+    id?: string
+    userId: string
+    leftContactId: string
+    pairKey: string
+    status?: $Enums.MergeSuggestionStatus
+    confidence: $Enums.MergeSuggestionConfidence
+    score: number
+    hardMatch?: boolean
+    signals: JsonNullValueInput | InputJsonValue
+    reasons: JsonNullValueInput | InputJsonValue
+    source: string
+    generatedAt?: Date | string
+    reviewedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SyncContactLinkCreateManyContactInput = {
+    id?: string
+    syncAccountId: string
+    remoteHref?: string | null
+    remoteUid?: string | null
+    remoteETag?: string | null
+    lastSyncedAt?: Date | string | null
+    tombstonedAt?: Date | string | null
+    remoteDeletedAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SyncConflictCreateManyContactInput = {
+    id?: string
+    syncAccountId: string
+    syncContactLinkId?: string | null
+    conflictType: $Enums.SyncConflictType
+    status?: $Enums.SyncConflictStatus
+    resolutionStrategy?: $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: number | null
+    remoteETag?: string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: string | null
+    detectedAt?: Date | string
+    resolvedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactCreateManyMergedIntoContactInput = {
+    id?: string
+    userId: string
+    importJobId?: string | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    notes?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MergeSuggestionUpdateWithoutLeftContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    pairKey?: StringFieldUpdateOperationsInput | string
+    status?: EnumMergeSuggestionStatusFieldUpdateOperationsInput | $Enums.MergeSuggestionStatus
+    confidence?: EnumMergeSuggestionConfidenceFieldUpdateOperationsInput | $Enums.MergeSuggestionConfidence
+    score?: IntFieldUpdateOperationsInput | number
+    hardMatch?: BoolFieldUpdateOperationsInput | boolean
+    signals?: JsonNullValueInput | InputJsonValue
+    reasons?: JsonNullValueInput | InputJsonValue
+    source?: StringFieldUpdateOperationsInput | string
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutMergeSuggestionsNestedInput
+    rightContact?: ContactUpdateOneRequiredWithoutRightMergeSuggestionsNestedInput
+    decisions?: MergeDecisionUpdateManyWithoutSuggestionNestedInput
+  }
+
+  export type MergeSuggestionUncheckedUpdateWithoutLeftContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    rightContactId?: StringFieldUpdateOperationsInput | string
+    pairKey?: StringFieldUpdateOperationsInput | string
+    status?: EnumMergeSuggestionStatusFieldUpdateOperationsInput | $Enums.MergeSuggestionStatus
+    confidence?: EnumMergeSuggestionConfidenceFieldUpdateOperationsInput | $Enums.MergeSuggestionConfidence
+    score?: IntFieldUpdateOperationsInput | number
+    hardMatch?: BoolFieldUpdateOperationsInput | boolean
+    signals?: JsonNullValueInput | InputJsonValue
+    reasons?: JsonNullValueInput | InputJsonValue
+    source?: StringFieldUpdateOperationsInput | string
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    decisions?: MergeDecisionUncheckedUpdateManyWithoutSuggestionNestedInput
+  }
+
+  export type MergeSuggestionUncheckedUpdateManyWithoutLeftContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    rightContactId?: StringFieldUpdateOperationsInput | string
+    pairKey?: StringFieldUpdateOperationsInput | string
+    status?: EnumMergeSuggestionStatusFieldUpdateOperationsInput | $Enums.MergeSuggestionStatus
+    confidence?: EnumMergeSuggestionConfidenceFieldUpdateOperationsInput | $Enums.MergeSuggestionConfidence
+    score?: IntFieldUpdateOperationsInput | number
+    hardMatch?: BoolFieldUpdateOperationsInput | boolean
+    signals?: JsonNullValueInput | InputJsonValue
+    reasons?: JsonNullValueInput | InputJsonValue
+    source?: StringFieldUpdateOperationsInput | string
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergeSuggestionUpdateWithoutRightContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    pairKey?: StringFieldUpdateOperationsInput | string
+    status?: EnumMergeSuggestionStatusFieldUpdateOperationsInput | $Enums.MergeSuggestionStatus
+    confidence?: EnumMergeSuggestionConfidenceFieldUpdateOperationsInput | $Enums.MergeSuggestionConfidence
+    score?: IntFieldUpdateOperationsInput | number
+    hardMatch?: BoolFieldUpdateOperationsInput | boolean
+    signals?: JsonNullValueInput | InputJsonValue
+    reasons?: JsonNullValueInput | InputJsonValue
+    source?: StringFieldUpdateOperationsInput | string
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutMergeSuggestionsNestedInput
+    leftContact?: ContactUpdateOneRequiredWithoutLeftMergeSuggestionsNestedInput
+    decisions?: MergeDecisionUpdateManyWithoutSuggestionNestedInput
+  }
+
+  export type MergeSuggestionUncheckedUpdateWithoutRightContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    leftContactId?: StringFieldUpdateOperationsInput | string
+    pairKey?: StringFieldUpdateOperationsInput | string
+    status?: EnumMergeSuggestionStatusFieldUpdateOperationsInput | $Enums.MergeSuggestionStatus
+    confidence?: EnumMergeSuggestionConfidenceFieldUpdateOperationsInput | $Enums.MergeSuggestionConfidence
+    score?: IntFieldUpdateOperationsInput | number
+    hardMatch?: BoolFieldUpdateOperationsInput | boolean
+    signals?: JsonNullValueInput | InputJsonValue
+    reasons?: JsonNullValueInput | InputJsonValue
+    source?: StringFieldUpdateOperationsInput | string
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    decisions?: MergeDecisionUncheckedUpdateManyWithoutSuggestionNestedInput
+  }
+
+  export type MergeSuggestionUncheckedUpdateManyWithoutRightContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    leftContactId?: StringFieldUpdateOperationsInput | string
+    pairKey?: StringFieldUpdateOperationsInput | string
+    status?: EnumMergeSuggestionStatusFieldUpdateOperationsInput | $Enums.MergeSuggestionStatus
+    confidence?: EnumMergeSuggestionConfidenceFieldUpdateOperationsInput | $Enums.MergeSuggestionConfidence
+    score?: IntFieldUpdateOperationsInput | number
+    hardMatch?: BoolFieldUpdateOperationsInput | boolean
+    signals?: JsonNullValueInput | InputJsonValue
+    reasons?: JsonNullValueInput | InputJsonValue
+    source?: StringFieldUpdateOperationsInput | string
+    generatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncContactLinkUpdateWithoutContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    remoteHref?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteUid?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncAccount?: SyncAccountUpdateOneRequiredWithoutSyncLinksNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutSyncContactLinkNestedInput
+  }
+
+  export type SyncContactLinkUncheckedUpdateWithoutContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: StringFieldUpdateOperationsInput | string
+    remoteHref?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteUid?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncContactLinkNestedInput
+  }
+
+  export type SyncContactLinkUncheckedUpdateManyWithoutContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: StringFieldUpdateOperationsInput | string
+    remoteHref?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteUid?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncConflictUpdateWithoutContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
+    resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncAccount?: SyncAccountUpdateOneRequiredWithoutSyncConflictsNestedInput
+    syncContactLink?: SyncContactLinkUpdateOneWithoutSyncConflictsNestedInput
+  }
+
+  export type SyncConflictUncheckedUpdateWithoutContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: StringFieldUpdateOperationsInput | string
+    syncContactLinkId?: NullableStringFieldUpdateOperationsInput | string | null
+    conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
+    resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncConflictUncheckedUpdateManyWithoutContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: StringFieldUpdateOperationsInput | string
+    syncContactLinkId?: NullableStringFieldUpdateOperationsInput | string | null
+    conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
+    resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactUpdateWithoutMergedIntoContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutContactsNestedInput
+    importJob?: ImportJobUpdateOneWithoutContactsNestedInput
+    leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+  }
+
+  export type ContactUncheckedUpdateWithoutMergedIntoContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
+  }
+
+  export type ContactUncheckedUpdateManyWithoutMergedIntoContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -12922,6 +29616,450 @@ export namespace Prisma {
     cancelAtPeriodEnd?: BoolFieldUpdateOperationsInput | boolean
     canceledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactCreateManyImportJobInput = {
+    id?: string
+    userId: string
+    mergedIntoContactId?: string | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    notes?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactUpdateWithoutImportJobInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutContactsNestedInput
+    leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
+    mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+  }
+
+  export type ContactUncheckedUpdateWithoutImportJobInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
+  }
+
+  export type ContactUncheckedUpdateManyWithoutImportJobInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergeDecisionCreateManySuggestionInput = {
+    id?: string
+    userId: string
+    status: $Enums.MergeDecisionStatus
+    source: string
+    notes?: string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    decidedAt?: Date | string
+    reversedAt?: Date | string | null
+    reversalSource?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type MergeDecisionUpdateWithoutSuggestionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumMergeDecisionStatusFieldUpdateOperationsInput | $Enums.MergeDecisionStatus
+    source?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    decidedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reversalSource?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutMergeDecisionsNestedInput
+  }
+
+  export type MergeDecisionUncheckedUpdateWithoutSuggestionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    status?: EnumMergeDecisionStatusFieldUpdateOperationsInput | $Enums.MergeDecisionStatus
+    source?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    decidedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reversalSource?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergeDecisionUncheckedUpdateManyWithoutSuggestionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    status?: EnumMergeDecisionStatusFieldUpdateOperationsInput | $Enums.MergeDecisionStatus
+    source?: StringFieldUpdateOperationsInput | string
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: NullableJsonNullValueInput | InputJsonValue
+    decidedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    reversedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reversalSource?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncContactLinkCreateManySyncAccountInput = {
+    id?: string
+    contactId: string
+    remoteHref?: string | null
+    remoteUid?: string | null
+    remoteETag?: string | null
+    lastSyncedAt?: Date | string | null
+    tombstonedAt?: Date | string | null
+    remoteDeletedAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SyncJobCreateManySyncAccountInput = {
+    id?: string
+    status?: $Enums.SyncJobStatus
+    trigger?: $Enums.SyncJobTrigger
+    syncDirection: $Enums.SyncDirection
+    attemptCount?: number
+    maxAttempts?: number
+    nextRetryAt?: Date | string | null
+    leaseExpiresAt?: Date | string | null
+    workerId?: string | null
+    idempotencyKey?: string | null
+    cursorBefore?: string | null
+    cursorAfter?: string | null
+    createdCount?: number
+    updatedCount?: number
+    deletedCount?: number
+    conflictCount?: number
+    skippedCount?: number
+    errorCode?: string | null
+    errorSummary?: string | null
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SyncConflictCreateManySyncAccountInput = {
+    id?: string
+    syncContactLinkId?: string | null
+    contactId?: string | null
+    conflictType: $Enums.SyncConflictType
+    status?: $Enums.SyncConflictStatus
+    resolutionStrategy?: $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: number | null
+    remoteETag?: string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: string | null
+    detectedAt?: Date | string
+    resolvedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SyncContactLinkUpdateWithoutSyncAccountInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    remoteHref?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteUid?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contact?: ContactUpdateOneRequiredWithoutSyncLinksNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutSyncContactLinkNestedInput
+  }
+
+  export type SyncContactLinkUncheckedUpdateWithoutSyncAccountInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contactId?: StringFieldUpdateOperationsInput | string
+    remoteHref?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteUid?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncContactLinkNestedInput
+  }
+
+  export type SyncContactLinkUncheckedUpdateManyWithoutSyncAccountInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contactId?: StringFieldUpdateOperationsInput | string
+    remoteHref?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteUid?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    tombstonedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    remoteDeletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncJobUpdateWithoutSyncAccountInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumSyncJobStatusFieldUpdateOperationsInput | $Enums.SyncJobStatus
+    trigger?: EnumSyncJobTriggerFieldUpdateOperationsInput | $Enums.SyncJobTrigger
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    attemptCount?: IntFieldUpdateOperationsInput | number
+    maxAttempts?: IntFieldUpdateOperationsInput | number
+    nextRetryAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    leaseExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    workerId?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    cursorBefore?: NullableStringFieldUpdateOperationsInput | string | null
+    cursorAfter?: NullableStringFieldUpdateOperationsInput | string | null
+    createdCount?: IntFieldUpdateOperationsInput | number
+    updatedCount?: IntFieldUpdateOperationsInput | number
+    deletedCount?: IntFieldUpdateOperationsInput | number
+    conflictCount?: IntFieldUpdateOperationsInput | number
+    skippedCount?: IntFieldUpdateOperationsInput | number
+    errorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncJobUncheckedUpdateWithoutSyncAccountInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumSyncJobStatusFieldUpdateOperationsInput | $Enums.SyncJobStatus
+    trigger?: EnumSyncJobTriggerFieldUpdateOperationsInput | $Enums.SyncJobTrigger
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    attemptCount?: IntFieldUpdateOperationsInput | number
+    maxAttempts?: IntFieldUpdateOperationsInput | number
+    nextRetryAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    leaseExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    workerId?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    cursorBefore?: NullableStringFieldUpdateOperationsInput | string | null
+    cursorAfter?: NullableStringFieldUpdateOperationsInput | string | null
+    createdCount?: IntFieldUpdateOperationsInput | number
+    updatedCount?: IntFieldUpdateOperationsInput | number
+    deletedCount?: IntFieldUpdateOperationsInput | number
+    conflictCount?: IntFieldUpdateOperationsInput | number
+    skippedCount?: IntFieldUpdateOperationsInput | number
+    errorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncJobUncheckedUpdateManyWithoutSyncAccountInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumSyncJobStatusFieldUpdateOperationsInput | $Enums.SyncJobStatus
+    trigger?: EnumSyncJobTriggerFieldUpdateOperationsInput | $Enums.SyncJobTrigger
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    attemptCount?: IntFieldUpdateOperationsInput | number
+    maxAttempts?: IntFieldUpdateOperationsInput | number
+    nextRetryAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    leaseExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    workerId?: NullableStringFieldUpdateOperationsInput | string | null
+    idempotencyKey?: NullableStringFieldUpdateOperationsInput | string | null
+    cursorBefore?: NullableStringFieldUpdateOperationsInput | string | null
+    cursorAfter?: NullableStringFieldUpdateOperationsInput | string | null
+    createdCount?: IntFieldUpdateOperationsInput | number
+    updatedCount?: IntFieldUpdateOperationsInput | number
+    deletedCount?: IntFieldUpdateOperationsInput | number
+    conflictCount?: IntFieldUpdateOperationsInput | number
+    skippedCount?: IntFieldUpdateOperationsInput | number
+    errorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    errorSummary?: NullableStringFieldUpdateOperationsInput | string | null
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncConflictUpdateWithoutSyncAccountInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
+    resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncContactLink?: SyncContactLinkUpdateOneWithoutSyncConflictsNestedInput
+    contact?: ContactUpdateOneWithoutSyncConflictsNestedInput
+  }
+
+  export type SyncConflictUncheckedUpdateWithoutSyncAccountInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncContactLinkId?: NullableStringFieldUpdateOperationsInput | string | null
+    contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
+    resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncConflictUncheckedUpdateManyWithoutSyncAccountInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncContactLinkId?: NullableStringFieldUpdateOperationsInput | string | null
+    contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
+    resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncConflictCreateManySyncContactLinkInput = {
+    id?: string
+    syncAccountId: string
+    contactId?: string | null
+    conflictType: $Enums.SyncConflictType
+    status?: $Enums.SyncConflictStatus
+    resolutionStrategy?: $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: number | null
+    remoteETag?: string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: string | null
+    detectedAt?: Date | string
+    resolvedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SyncConflictUpdateWithoutSyncContactLinkInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
+    resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncAccount?: SyncAccountUpdateOneRequiredWithoutSyncConflictsNestedInput
+    contact?: ContactUpdateOneWithoutSyncConflictsNestedInput
+  }
+
+  export type SyncConflictUncheckedUpdateWithoutSyncContactLinkInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: StringFieldUpdateOperationsInput | string
+    contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
+    resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncConflictUncheckedUpdateManyWithoutSyncContactLinkInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: StringFieldUpdateOperationsInput | string
+    contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
+    resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

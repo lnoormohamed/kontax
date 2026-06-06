@@ -3,7 +3,7 @@ import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { contactsToVCard } from "~/server/contact-portability";
 
-export async function GET() {
+export async function GET(request: Request) {
   const session = await auth();
   const userId = session?.user?.id;
 
@@ -11,12 +11,18 @@ export async function GET() {
     return new Response("Unauthorized", { status: 401 });
   }
 
+  const url = new URL(request.url);
+  const query = url.searchParams.get("q")?.trim() ?? "";
+  const resultFileName = `kontax-contacts-${new Date().toISOString().slice(0, 10)}.vcf`;
+
   const job = await db.exportJob.create({
     data: {
       userId,
       format: "VCARD_4",
       status: "PROCESSING",
       includeArchived: false,
+      filterQuery: query || null,
+      resultFileName,
     },
   });
 
@@ -27,6 +33,16 @@ export async function GET() {
       where: {
         userId,
         archivedAt: null,
+        ...(query
+          ? {
+              OR: [
+                { fullName: { contains: query, mode: "insensitive" } },
+                { email: { contains: query, mode: "insensitive" } },
+                { phone: { contains: query, mode: "insensitive" } },
+                { company: { contains: query, mode: "insensitive" } },
+              ],
+            }
+          : {}),
       },
       orderBy: { updatedAt: "desc" },
       select: {
@@ -45,6 +61,8 @@ export async function GET() {
       data: {
         status: "COMPLETED",
         exportedCount: contacts.length,
+        filterQuery: query || null,
+        resultFileName,
         completedAt: new Date(),
       },
     });
@@ -53,7 +71,7 @@ export async function GET() {
       status: 200,
       headers: {
         "Content-Type": "text/vcard; charset=utf-8",
-        "Content-Disposition": `attachment; filename="kontax-contacts-${new Date().toISOString().slice(0, 10)}.vcf"`,
+        "Content-Disposition": `attachment; filename="${resultFileName}"`,
       },
     });
   } catch (error) {
@@ -61,6 +79,8 @@ export async function GET() {
       where: { id: job.id },
       data: {
         status: "FAILED",
+        filterQuery: query || null,
+        resultFileName,
         errorSummary: error instanceof Error ? error.message : "vCard export failed.",
         completedAt: new Date(),
       },
