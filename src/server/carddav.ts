@@ -391,11 +391,11 @@ const parseNameParts = (value: string) => {
     .map((part) => unescapeVCardValue(part));
 
   return {
-    firstName: firstName || null,
-    middleName: middleName || null,
-    lastName: lastName || null,
-    namePrefix: namePrefix || null,
-    nameSuffix: nameSuffix || null,
+    firstName: firstName ?? null,
+    middleName: middleName ?? null,
+    lastName: lastName ?? null,
+    namePrefix: namePrefix ?? null,
+    nameSuffix: nameSuffix ?? null,
   };
 };
 
@@ -415,11 +415,11 @@ const parseAdrValue = (value: string, label: string) => {
     label,
     formatted,
     isPrimary: false,
-    countryOrRegion: countryOrRegion || region || undefined,
-    streetLine1: streetLine1 || undefined,
-    cityOrTown: cityOrTown || undefined,
-    postcode: postcode || undefined,
-    poBox: poBox || undefined,
+    countryOrRegion: countryOrRegion ?? region ?? undefined,
+    streetLine1: streetLine1 ?? undefined,
+    cityOrTown: cityOrTown ?? undefined,
+    postcode: postcode ?? undefined,
+    poBox: poBox ?? undefined,
   };
 };
 
@@ -481,15 +481,21 @@ const parseCardDavContactCard = (
     formatted: entry.formatted,
   }));
   const nameParts = nLine ? parseNameParts(nLine.value) : null;
+  const derivedFullName = [
+    nameParts?.namePrefix,
+    nameParts?.firstName,
+    nameParts?.middleName,
+    nameParts?.lastName,
+    nameParts?.nameSuffix,
+  ]
+    .filter(Boolean)
+    .join(" ");
+  const resolvedDerivedFullName = derivedFullName.length > 0 ? derivedFullName : null;
 
   return {
     ...entry,
     fullName:
-      fnLine?.value ||
-      [nameParts?.namePrefix, nameParts?.firstName, nameParts?.middleName, nameParts?.lastName, nameParts?.nameSuffix]
-        .filter(Boolean)
-        .join(" ") ||
-      `Imported contact ${entry.uid}`,
+      fnLine?.value ?? resolvedDerivedFullName ?? `Imported contact ${entry.uid}`,
     firstName: nameParts?.firstName ?? null,
     middleName: nameParts?.middleName ?? null,
     lastName: nameParts?.lastName ?? null,
@@ -500,7 +506,7 @@ const parseCardDavContactCard = (
     emailEntries,
     phoneNumbers: phoneEntries.map((item) => item.value),
     phoneEntries,
-    company: orgLine?.value.split(";")[0]?.trim() || null,
+    company: orgLine?.value.split(";")[0]?.trim() ?? null,
     jobTitle: titleLine?.value ?? null,
     website: websiteEntries[0]?.value ?? null,
     websiteEntries,
