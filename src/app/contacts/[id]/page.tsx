@@ -25,6 +25,23 @@ const formatTimestamp = (value: Date) =>
     year: "numeric",
   }).format(value);
 
+const getStringArray = (value: unknown) =>
+  Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string" && item.trim().length > 0)
+    : [];
+
+const getFormattedAddressArray = (value: unknown) =>
+  Array.isArray(value)
+    ? value.flatMap((item) => {
+        if (typeof item !== "object" || item == null) {
+          return [];
+        }
+
+        const formatted = "formatted" in item ? item.formatted : undefined;
+        return typeof formatted === "string" && formatted.trim().length > 0 ? [formatted] : [];
+      })
+    : [];
+
 export default async function ContactDetailPage({ params, searchParams }: ContactDetailPageProps) {
   const session = await auth();
 
@@ -57,12 +74,15 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
       fullName: true,
       nickname: true,
       email: true,
+      emailAddresses: true,
       phone: true,
+      phoneNumbers: true,
       company: true,
       jobTitle: true,
       website: true,
       birthday: true,
       address: true,
+      postalAddresses: true,
       notes: true,
       archivedAt: true,
       createdAt: true,
@@ -73,6 +93,16 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
   if (!contact) {
     notFound();
   }
+
+  const additionalEmails = getStringArray(contact.emailAddresses)
+    .filter((item) => item !== contact.email)
+    .join("\n");
+  const additionalPhones = getStringArray(contact.phoneNumbers)
+    .filter((item) => item !== contact.phone)
+    .join("\n");
+  const additionalAddresses = getFormattedAddressArray(contact.postalAddresses)
+    .filter((item) => item !== contact.address)
+    .join("\n");
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),_transparent_30%),linear-gradient(180deg,#020617_0%,#07111d_45%,#0f172a_100%)] text-white">
@@ -170,6 +200,15 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 />
               </label>
 
+              <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
+                <span>Additional emails</span>
+                <textarea
+                  className="min-h-24 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
+                  defaultValue={additionalEmails}
+                  name="additionalEmails"
+                />
+              </label>
+
               <label className="grid gap-2 text-sm text-slate-200">
                 <span>Phone</span>
                 <input
@@ -177,6 +216,15 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                   defaultValue={contact.phone ?? ""}
                   name="phone"
                   type="text"
+                />
+              </label>
+
+              <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
+                <span>Additional phones</span>
+                <textarea
+                  className="min-h-24 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
+                  defaultValue={additionalPhones}
+                  name="additionalPhones"
                 />
               </label>
 
@@ -226,6 +274,15 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                   className="min-h-24 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
                   defaultValue={contact.address ?? ""}
                   name="address"
+                />
+              </label>
+
+              <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
+                <span>Additional addresses</span>
+                <textarea
+                  className="min-h-24 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
+                  defaultValue={additionalAddresses}
+                  name="additionalAddresses"
                 />
               </label>
 

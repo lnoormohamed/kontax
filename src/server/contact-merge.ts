@@ -5,12 +5,15 @@ type MergeCandidateContact = {
   fullName: string;
   nickname?: string | null;
   email: string | null;
+  emailAddresses?: unknown;
   phone: string | null;
+  phoneNumbers?: unknown;
   company: string | null;
   jobTitle?: string | null;
   website?: string | null;
   birthday?: string | null;
   address?: string | null;
+  postalAddresses?: unknown;
   importJobId?: string | null;
   updatedAt: Date;
 };
@@ -74,63 +77,75 @@ export type MergePreview = {
   mergedContact: {
     fullName: string;
     email: string | null;
+    emailAddresses: string[] | null;
     phone: string | null;
+    phoneNumbers: string[] | null;
     company: string | null;
     nickname: string | null;
     jobTitle: string | null;
     website: string | null;
     birthday: string | null;
     address: string | null;
+    postalAddresses: Array<{ label: string; formatted: string }> | null;
     notes: string | null;
   };
   mergeNotes: string[];
 };
 
 type MergeDecisionSnapshot = {
-    primaryBefore: {
-      id: string;
-      fullName: string;
-      nickname: string | null;
-      email: string | null;
-      phone: string | null;
-      company: string | null;
-      jobTitle: string | null;
-      website: string | null;
-      birthday: string | null;
-      address: string | null;
-      notes: string | null;
+  primaryBefore: {
+    id: string;
+    fullName: string;
+    nickname: string | null;
+    email: string | null;
+    emailAddresses: string[] | null;
+    phone: string | null;
+    phoneNumbers: string[] | null;
+    company: string | null;
+    jobTitle: string | null;
+    website: string | null;
+    birthday: string | null;
+    address: string | null;
+    postalAddresses: Array<{ label: string; formatted: string }> | null;
+    notes: string | null;
     archivedAt: string | null;
     syncTombstoneAt: string | null;
     mergedIntoContactId: string | null;
   };
-    secondaryBefore: {
-      id: string;
-      fullName: string;
-      nickname: string | null;
-      email: string | null;
-      phone: string | null;
-      company: string | null;
-      jobTitle: string | null;
-      website: string | null;
-      birthday: string | null;
-      address: string | null;
-      notes: string | null;
+  secondaryBefore: {
+    id: string;
+    fullName: string;
+    nickname: string | null;
+    email: string | null;
+    emailAddresses: string[] | null;
+    phone: string | null;
+    phoneNumbers: string[] | null;
+    company: string | null;
+    jobTitle: string | null;
+    website: string | null;
+    birthday: string | null;
+    address: string | null;
+    postalAddresses: Array<{ label: string; formatted: string }> | null;
+    notes: string | null;
     archivedAt: string | null;
     syncTombstoneAt: string | null;
     mergedIntoContactId: string | null;
   };
-    mergedAfter: {
-      fullName: string;
-      nickname: string | null;
-      email: string | null;
-      phone: string | null;
-      company: string | null;
-      jobTitle: string | null;
-      website: string | null;
-      birthday: string | null;
-      address: string | null;
-      notes: string | null;
-    };
+  mergedAfter: {
+    fullName: string;
+    nickname: string | null;
+    email: string | null;
+    emailAddresses: string[] | null;
+    phone: string | null;
+    phoneNumbers: string[] | null;
+    company: string | null;
+    jobTitle: string | null;
+    website: string | null;
+    birthday: string | null;
+    address: string | null;
+    postalAddresses: Array<{ label: string; formatted: string }> | null;
+    notes: string | null;
+  };
   fieldChoices: MergeFieldChoices;
 };
 
@@ -183,6 +198,81 @@ const combineNotes = (primaryNotes: string | null, secondaryNotes: string | null
   }
 
   return `${trimmedPrimary}\n\n---\nMerged notes\n${trimmedSecondary}`;
+};
+
+const parseStringArray = (value: unknown) =>
+  Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string" && item.trim().length > 0)
+    : [];
+
+const parsePostalAddressArray = (value: unknown) =>
+  Array.isArray(value)
+    ? value.flatMap((item) => {
+        if (typeof item !== "object" || item == null) {
+          return [];
+        }
+
+        const label = "label" in item && typeof item.label === "string" ? item.label : "other";
+        const formatted =
+          "formatted" in item && typeof item.formatted === "string" ? item.formatted : null;
+
+        if (!formatted || formatted.trim().length === 0) {
+          return [];
+        }
+
+        return [{ label, formatted }];
+      })
+    : [];
+
+const mergeUniqueStrings = (...groups: Array<Array<string | null | undefined>>) => {
+  const seen = new Set<string>();
+  const result: string[] = [];
+
+  for (const group of groups) {
+    for (const value of group) {
+      const trimmed = value?.trim();
+      if (!trimmed) {
+        continue;
+      }
+
+      const key = trimmed.toLowerCase();
+      if (seen.has(key)) {
+        continue;
+      }
+
+      seen.add(key);
+      result.push(trimmed);
+    }
+  }
+
+  return result;
+};
+
+const mergePostalAddresses = (
+  primaryAddress: string | null | undefined,
+  primaryPostalAddresses: Array<{ label: string; formatted: string }>,
+  secondaryAddress: string | null | undefined,
+  secondaryPostalAddresses: Array<{ label: string; formatted: string }>,
+) => {
+  const seen = new Set<string>();
+  const result: Array<{ label: string; formatted: string }> = [];
+
+  for (const entry of [
+    ...(primaryAddress ? [{ label: "primary", formatted: primaryAddress }] : []),
+    ...primaryPostalAddresses,
+    ...(secondaryAddress ? [{ label: "other", formatted: secondaryAddress }] : []),
+    ...secondaryPostalAddresses,
+  ]) {
+    const key = entry.formatted.trim().toLowerCase();
+    if (!key || seen.has(key)) {
+      continue;
+    }
+
+    seen.add(key);
+    result.push(entry);
+  }
+
+  return result;
 };
 
 const getDefaultFieldChoice = ({
@@ -438,10 +528,16 @@ export const buildMergedContactPreview = (
   const normalizedPrimary = {
     ...primaryContact,
     sourceKind: primaryContact.sourceKind ?? getSourceKind(primaryContact),
+    emailAddresses: parseStringArray(primaryContact.emailAddresses),
+    phoneNumbers: parseStringArray(primaryContact.phoneNumbers),
+    postalAddresses: parsePostalAddressArray(primaryContact.postalAddresses),
   };
   const normalizedSecondary = {
     ...secondaryContact,
     sourceKind: secondaryContact.sourceKind ?? getSourceKind(secondaryContact),
+    emailAddresses: parseStringArray(secondaryContact.emailAddresses),
+    phoneNumbers: parseStringArray(secondaryContact.phoneNumbers),
+    postalAddresses: parsePostalAddressArray(secondaryContact.postalAddresses),
   };
 
   const defaultChoices: Required<MergeFieldChoices> = {
@@ -498,11 +594,23 @@ export const buildMergedContactPreview = (
       secondaryValue: normalizedSecondary.email,
       choice: resolvedChoices.email,
     }),
+    emailAddresses: mergeUniqueStrings(
+      [normalizedPrimary.email],
+      normalizedPrimary.emailAddresses,
+      [normalizedSecondary.email],
+      normalizedSecondary.emailAddresses,
+    ),
     phone: pickFieldValue({
       primaryValue: normalizedPrimary.phone,
       secondaryValue: normalizedSecondary.phone,
       choice: resolvedChoices.phone,
     }),
+    phoneNumbers: mergeUniqueStrings(
+      [normalizedPrimary.phone],
+      normalizedPrimary.phoneNumbers,
+      [normalizedSecondary.phone],
+      normalizedSecondary.phoneNumbers,
+    ),
     company: pickFieldValue({
       primaryValue: normalizedPrimary.company,
       secondaryValue: normalizedSecondary.company,
@@ -563,6 +671,12 @@ export const buildMergedContactPreview = (
           secondaryContact: normalizedSecondary,
         }),
       }) ?? null,
+    postalAddresses: mergePostalAddresses(
+      normalizedPrimary.address,
+      normalizedPrimary.postalAddresses,
+      normalizedSecondary.address,
+      normalizedSecondary.postalAddresses,
+    ),
     notes:
       resolvedChoices.notes === "combine"
         ? combineNotes(normalizedPrimary.notes, normalizedSecondary.notes)
@@ -879,12 +993,15 @@ export const mergeContactsForUser = async ({
         fullName: true,
         nickname: true,
         email: true,
+        emailAddresses: true,
         phone: true,
+        phoneNumbers: true,
         company: true,
         jobTitle: true,
         website: true,
         birthday: true,
         address: true,
+        postalAddresses: true,
         notes: true,
         archivedAt: true,
         syncTombstoneAt: true,
@@ -1027,12 +1144,15 @@ export const mergeContactsForUser = async ({
               fullName: primaryContact.fullName,
               nickname: primaryContact.nickname ?? null,
               email: primaryContact.email,
+              emailAddresses: parseStringArray(primaryContact.emailAddresses),
               phone: primaryContact.phone,
+              phoneNumbers: parseStringArray(primaryContact.phoneNumbers),
               company: primaryContact.company,
               jobTitle: primaryContact.jobTitle ?? null,
               website: primaryContact.website ?? null,
               birthday: primaryContact.birthday ?? null,
               address: primaryContact.address ?? null,
+              postalAddresses: parsePostalAddressArray(primaryContact.postalAddresses),
               notes: primaryContact.notes,
               archivedAt: primaryContact.archivedAt?.toISOString() ?? null,
               syncTombstoneAt: primaryContact.syncTombstoneAt?.toISOString() ?? null,
@@ -1043,12 +1163,15 @@ export const mergeContactsForUser = async ({
               fullName: secondaryContact.fullName,
               nickname: secondaryContact.nickname ?? null,
               email: secondaryContact.email,
+              emailAddresses: parseStringArray(secondaryContact.emailAddresses),
               phone: secondaryContact.phone,
+              phoneNumbers: parseStringArray(secondaryContact.phoneNumbers),
               company: secondaryContact.company,
               jobTitle: secondaryContact.jobTitle ?? null,
               website: secondaryContact.website ?? null,
               birthday: secondaryContact.birthday ?? null,
               address: secondaryContact.address ?? null,
+              postalAddresses: parsePostalAddressArray(secondaryContact.postalAddresses),
               notes: secondaryContact.notes,
               archivedAt: secondaryContact.archivedAt?.toISOString() ?? null,
               syncTombstoneAt: secondaryContact.syncTombstoneAt?.toISOString() ?? null,
@@ -1134,12 +1257,15 @@ export const undoMergedContactsForUser = async ({
         fullName: details.primaryBefore.fullName,
         nickname: details.primaryBefore.nickname,
         email: details.primaryBefore.email,
+        emailAddresses: details.primaryBefore.emailAddresses,
         phone: details.primaryBefore.phone,
+        phoneNumbers: details.primaryBefore.phoneNumbers,
         company: details.primaryBefore.company,
         jobTitle: details.primaryBefore.jobTitle,
         website: details.primaryBefore.website,
         birthday: details.primaryBefore.birthday,
         address: details.primaryBefore.address,
+        postalAddresses: details.primaryBefore.postalAddresses,
         notes: details.primaryBefore.notes,
         archivedAt: details.primaryBefore.archivedAt
           ? new Date(details.primaryBefore.archivedAt)
@@ -1162,12 +1288,15 @@ export const undoMergedContactsForUser = async ({
         fullName: details.secondaryBefore.fullName,
         nickname: details.secondaryBefore.nickname,
         email: details.secondaryBefore.email,
+        emailAddresses: details.secondaryBefore.emailAddresses,
         phone: details.secondaryBefore.phone,
+        phoneNumbers: details.secondaryBefore.phoneNumbers,
         company: details.secondaryBefore.company,
         jobTitle: details.secondaryBefore.jobTitle,
         website: details.secondaryBefore.website,
         birthday: details.secondaryBefore.birthday,
         address: details.secondaryBefore.address,
+        postalAddresses: details.secondaryBefore.postalAddresses,
         notes: details.secondaryBefore.notes,
         archivedAt: details.secondaryBefore.archivedAt
           ? new Date(details.secondaryBefore.archivedAt)

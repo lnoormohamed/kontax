@@ -179,6 +179,9 @@ model Contact {
     website     String?
     birthday    String?
     address     String?
+    emailAddresses Json?
+    phoneNumbers   Json?
+    postalAddresses Json?
     notes       String?
     archivedAt  DateTime?
     createdAt   DateTime  @default(now())

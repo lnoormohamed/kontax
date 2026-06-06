@@ -9,11 +9,15 @@ import { assertCanCreateContacts } from "~/server/billing";
 import { mergeContactsForUser, undoMergedContactsForUser } from "~/server/contact-merge";
 import { db } from "~/server/db";
 
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 const contactSchema = z.object({
   fullName: z.string().trim().min(1, "Full name is required.").max(120),
   nickname: z.string().trim().max(80).optional(),
   email: z.string().trim().email("Enter a valid email address.").max(320).optional(),
+  additionalEmails: z.string().trim().max(4000).optional(),
   phone: z.string().trim().max(40).optional(),
+  additionalPhones: z.string().trim().max(4000).optional(),
   company: z.string().trim().max(120).optional(),
   jobTitle: z.string().trim().max(120).optional(),
   website: z.string().trim().url("Enter a valid website URL.").max(500).optional(),
@@ -23,6 +27,7 @@ const contactSchema = z.object({
     .regex(/^\d{4}-\d{2}-\d{2}$/, "Enter a valid birthday in YYYY-MM-DD format.")
     .optional(),
   address: z.string().trim().max(500).optional(),
+  additionalAddresses: z.string().trim().max(4000).optional(),
   notes: z.string().trim().max(2000).optional(),
 });
 
@@ -73,6 +78,47 @@ const getRedirectTarget = (formData: FormData) => {
   return typeof value === "string" && value.startsWith("/") ? value : undefined;
 };
 
+const getLineSeparatedValues = (value: string | undefined) =>
+  value
+    ?.split(/\r?\n/)
+    .map((item) => item.trim())
+    .filter((item) => item.length > 0) ?? [];
+
+const dedupeValues = (values: Array<string | null | undefined>) => {
+  const seen = new Set<string>();
+  const result: string[] = [];
+
+  for (const value of values) {
+    const trimmed = value?.trim();
+    if (!trimmed) {
+      continue;
+    }
+
+    const key = trimmed.toLowerCase();
+    if (seen.has(key)) {
+      continue;
+    }
+
+    seen.add(key);
+    result.push(trimmed);
+  }
+
+  return result;
+};
+
+const buildPostalAddresses = (primaryAddress: string | undefined, additionalAddresses: string[]) => {
+  const values = dedupeValues([primaryAddress, ...additionalAddresses]);
+
+  if (values.length === 0) {
+    return undefined;
+  }
+
+  return values.map((formatted, index) => ({
+    label: index === 0 ? "primary" : "other",
+    formatted,
+  }));
+};
+
 const revalidateContactViews = (contactId?: string) => {
   revalidatePath("/");
   revalidatePath("/import-export");
@@ -88,12 +134,15 @@ const parseContactInput = (formData: FormData) => {
     fullName: formData.get("fullName"),
     nickname: getOptionalString(formData, "nickname"),
     email: getOptionalString(formData, "email")?.toLowerCase(),
+    additionalEmails: getOptionalString(formData, "additionalEmails"),
     phone: getOptionalString(formData, "phone"),
+    additionalPhones: getOptionalString(formData, "additionalPhones"),
     company: getOptionalString(formData, "company"),
     jobTitle: getOptionalString(formData, "jobTitle"),
     website: getOptionalString(formData, "website"),
     birthday: getOptionalString(formData, "birthday"),
     address: getOptionalString(formData, "address"),
+    additionalAddresses: getOptionalString(formData, "additionalAddresses"),
     notes: getOptionalString(formData, "notes"),
   });
 
@@ -101,7 +150,32 @@ const parseContactInput = (formData: FormData) => {
     throw new Error(parsed.error.issues[0]?.message ?? "Invalid contact details.");
   }
 
-  return parsed.data;
+  const additionalEmails = getLineSeparatedValues(parsed.data.additionalEmails).map((email) =>
+    email.toLowerCase(),
+  );
+  const additionalPhones = getLineSeparatedValues(parsed.data.additionalPhones);
+  const additionalAddresses = getLineSeparatedValues(parsed.data.additionalAddresses);
+
+  const invalidAdditionalEmail = additionalEmails.find((email) => !emailPattern.test(email));
+  if (invalidAdditionalEmail) {
+    throw new Error(`Enter a valid additional email address: ${invalidAdditionalEmail}.`);
+  }
+
+  return {
+    fullName: parsed.data.fullName,
+    nickname: parsed.data.nickname,
+    email: parsed.data.email,
+    emailAddresses: dedupeValues([parsed.data.email, ...additionalEmails]),
+    phone: parsed.data.phone,
+    phoneNumbers: dedupeValues([parsed.data.phone, ...additionalPhones]),
+    company: parsed.data.company,
+    jobTitle: parsed.data.jobTitle,
+    website: parsed.data.website,
+    birthday: parsed.data.birthday,
+    address: parsed.data.address,
+    postalAddresses: buildPostalAddresses(parsed.data.address, additionalAddresses),
+    notes: parsed.data.notes,
+  };
 };
 
 const parseContactId = (formData: FormData) => {

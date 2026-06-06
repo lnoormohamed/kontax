@@ -1,13 +1,21 @@
+export type ContactPostalAddressInput = {
+  label: string;
+  formatted: string;
+};
+
 export type PortableContactInput = {
   fullName: string;
   nickname?: string | null;
   email?: string | null;
+  emailAddresses?: string[] | null;
   phone?: string | null;
+  phoneNumbers?: string[] | null;
   company?: string | null;
   jobTitle?: string | null;
   website?: string | null;
   birthday?: string | null;
   address?: string | null;
+  postalAddresses?: ContactPostalAddressInput[] | null;
   notes?: string | null;
 };
 
@@ -342,6 +350,28 @@ const getFirstValue = (row: string[], indexes: number[]) => {
   return undefined;
 };
 
+const getAllValues = (row: string[], indexes: number[]) => {
+  const seen = new Set<string>();
+  const values: string[] = [];
+
+  for (const index of indexes) {
+    const value = getValue(row, index);
+    if (!value) {
+      continue;
+    }
+
+    const key = value.toLowerCase();
+    if (seen.has(key)) {
+      continue;
+    }
+
+    seen.add(key);
+    values.push(value);
+  }
+
+  return values;
+};
+
 const escapeCsv = (value: string) => {
   if (/[",\n]/.test(value)) {
     return `"${value.replace(/"/g, '""')}"`;
@@ -462,12 +492,15 @@ export const parseCsvContacts = (
     const lastName = getFirstValue(row, lastNameIndexes);
     const nickname = getFirstValue(row, nicknameIndexes);
     const email = getFirstValue(row, emailIndexes)?.toLowerCase();
+    const emailAddresses = getAllValues(row, emailIndexes).map((value) => value.toLowerCase());
     const phone = getFirstValue(row, phoneIndexes);
+    const phoneNumbers = getAllValues(row, phoneIndexes);
     const company = getFirstValue(row, companyIndexes);
     const jobTitle = getFirstValue(row, jobTitleIndexes);
     const website = getFirstValue(row, websiteIndexes);
     const birthday = getFirstValue(row, birthdayIndexes);
     const address = getFirstValue(row, addressIndexes);
+    const postalAddressValues = getAllValues(row, addressIndexes);
     const notes = getFirstValue(row, notesIndexes);
     const fallbackName = [firstName, lastName].filter(Boolean).join(" ").trim();
     const usedFallbackIdentifier =
@@ -498,38 +531,40 @@ export const parseCsvContacts = (
       });
     }
 
-    if (email && !emailPattern.test(email)) {
+    const invalidEmailValue = emailAddresses.find((value) => !emailPattern.test(value));
+
+    if (invalidEmailValue) {
       skippedCount += 1;
       issues.push({
         rowNumber,
         severity: "error",
-        message: `Skipped because "${email}" is not a valid email address.`,
+        message: `Skipped because "${invalidEmailValue}" is not a valid email address.`,
       });
       return;
     }
 
-    if (email) {
-      const duplicateEmailRows = seenEmails.get(email) ?? [];
+    for (const emailValue of emailAddresses) {
+      const duplicateEmailRows = seenEmails.get(emailValue) ?? [];
       if (duplicateEmailRows.length > 0) {
         issues.push({
           rowNumber,
           severity: "warning",
-          message: `Shares email ${email} with row ${duplicateEmailRows[0]}.`,
+          message: `Shares email ${emailValue} with row ${duplicateEmailRows[0]}.`,
         });
       }
-      seenEmails.set(email, [...duplicateEmailRows, rowNumber]);
+      seenEmails.set(emailValue, [...duplicateEmailRows, rowNumber]);
     }
 
-    if (phone) {
-      const duplicatePhoneRows = seenPhones.get(phone) ?? [];
+    for (const phoneValue of phoneNumbers) {
+      const duplicatePhoneRows = seenPhones.get(phoneValue) ?? [];
       if (duplicatePhoneRows.length > 0) {
         issues.push({
           rowNumber,
           severity: "warning",
-          message: `Shares phone ${phone} with row ${duplicatePhoneRows[0]}.`,
+          message: `Shares phone ${phoneValue} with row ${duplicatePhoneRows[0]}.`,
         });
       }
-      seenPhones.set(phone, [...duplicatePhoneRows, rowNumber]);
+      seenPhones.set(phoneValue, [...duplicatePhoneRows, rowNumber]);
     }
 
     if (usedFallbackIdentifier) {
@@ -578,12 +613,21 @@ export const parseCsvContacts = (
       fullName,
       nickname,
       email,
+      emailAddresses,
       phone,
+      phoneNumbers,
       company,
       jobTitle,
       website,
       birthday,
       address,
+      postalAddresses:
+        postalAddressValues.length > 0
+          ? postalAddressValues.map((formatted, index) => ({
+              label: index === 0 ? "primary" : "other",
+              formatted,
+            }))
+          : undefined,
       notes,
     });
   });
@@ -647,24 +691,43 @@ export const contactsToCsv = (contacts: PortableContactInput[]) => {
     "Full Name",
     "Nickname",
     "Email",
+    "Additional Emails",
     "Phone",
+    "Additional Phones",
     "Company",
     "Job Title",
     "Website",
     "Birthday",
     "Address",
+    "Additional Addresses",
     "Notes",
   ];
   const rows = contacts.map((contact) => [
     escapeCsv(contact.fullName),
     escapeCsv(contact.nickname ?? ""),
     escapeCsv(contact.email ?? ""),
+    escapeCsv(
+      (contact.emailAddresses ?? [])
+        .filter((value) => value !== contact.email)
+        .join(" | "),
+    ),
     escapeCsv(contact.phone ?? ""),
+    escapeCsv(
+      (contact.phoneNumbers ?? [])
+        .filter((value) => value !== contact.phone)
+        .join(" | "),
+    ),
     escapeCsv(contact.company ?? ""),
     escapeCsv(contact.jobTitle ?? ""),
     escapeCsv(contact.website ?? ""),
     escapeCsv(contact.birthday ?? ""),
     escapeCsv(contact.address ?? ""),
+    escapeCsv(
+      (contact.postalAddresses ?? [])
+        .filter((value) => value.formatted !== contact.address)
+        .map((value) => value.formatted)
+        .join(" | "),
+    ),
     escapeCsv(contact.notes ?? ""),
   ]);
 
@@ -684,8 +747,20 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
         lines.push(`EMAIL:${escapeVCard(contact.email)}`);
       }
 
+      for (const emailValue of (contact.emailAddresses ?? []).filter(
+        (value) => value !== contact.email,
+      )) {
+        lines.push(`EMAIL:${escapeVCard(emailValue)}`);
+      }
+
       if (contact.phone) {
         lines.push(`TEL:${escapeVCard(contact.phone)}`);
+      }
+
+      for (const phoneValue of (contact.phoneNumbers ?? []).filter(
+        (value) => value !== contact.phone,
+      )) {
+        lines.push(`TEL:${escapeVCard(phoneValue)}`);
       }
 
       if (contact.nickname) {
@@ -710,6 +785,12 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
 
       if (contact.address) {
         lines.push(`ADR:;;${escapeVCard(contact.address)};;;;`);
+      }
+
+      for (const postalAddress of (contact.postalAddresses ?? []).filter(
+        (value) => value.formatted !== contact.address,
+      )) {
+        lines.push(`ADR:;;${escapeVCard(postalAddress.formatted)};;;;`);
       }
 
       if (contact.notes) {

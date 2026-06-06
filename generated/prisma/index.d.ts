@@ -3829,6 +3829,9 @@ export namespace Prisma {
     website: number
     birthday: number
     address: number
+    emailAddresses: number
+    phoneNumbers: number
+    postalAddresses: number
     notes: number
     archivedAt: number
     createdAt: number
@@ -3908,6 +3911,9 @@ export namespace Prisma {
     website?: true
     birthday?: true
     address?: true
+    emailAddresses?: true
+    phoneNumbers?: true
+    postalAddresses?: true
     notes?: true
     archivedAt?: true
     createdAt?: true
@@ -4018,6 +4024,9 @@ export namespace Prisma {
     website: string | null
     birthday: string | null
     address: string | null
+    emailAddresses: JsonValue | null
+    phoneNumbers: JsonValue | null
+    postalAddresses: JsonValue | null
     notes: string | null
     archivedAt: Date | null
     createdAt: Date
@@ -4060,6 +4069,9 @@ export namespace Prisma {
     website?: boolean
     birthday?: boolean
     address?: boolean
+    emailAddresses?: boolean
+    phoneNumbers?: boolean
+    postalAddresses?: boolean
     notes?: boolean
     archivedAt?: boolean
     createdAt?: boolean
@@ -4092,6 +4104,9 @@ export namespace Prisma {
     website?: boolean
     birthday?: boolean
     address?: boolean
+    emailAddresses?: boolean
+    phoneNumbers?: boolean
+    postalAddresses?: boolean
     notes?: boolean
     archivedAt?: boolean
     createdAt?: boolean
@@ -4118,6 +4133,9 @@ export namespace Prisma {
     website?: boolean
     birthday?: boolean
     address?: boolean
+    emailAddresses?: boolean
+    phoneNumbers?: boolean
+    postalAddresses?: boolean
     notes?: boolean
     archivedAt?: boolean
     createdAt?: boolean
@@ -4144,13 +4162,16 @@ export namespace Prisma {
     website?: boolean
     birthday?: boolean
     address?: boolean
+    emailAddresses?: boolean
+    phoneNumbers?: boolean
+    postalAddresses?: boolean
     notes?: boolean
     archivedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ContactOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "importJobId" | "mergedIntoContactId" | "syncUid" | "syncVersion" | "syncTombstoneAt" | "fullName" | "nickname" | "email" | "phone" | "company" | "jobTitle" | "website" | "birthday" | "address" | "notes" | "archivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["contact"]>
+  export type ContactOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "importJobId" | "mergedIntoContactId" | "syncUid" | "syncVersion" | "syncTombstoneAt" | "fullName" | "nickname" | "email" | "phone" | "company" | "jobTitle" | "website" | "birthday" | "address" | "emailAddresses" | "phoneNumbers" | "postalAddresses" | "notes" | "archivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["contact"]>
   export type ContactInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     importJob?: boolean | Contact$importJobArgs<ExtArgs>
@@ -4202,6 +4223,9 @@ export namespace Prisma {
       website: string | null
       birthday: string | null
       address: string | null
+      emailAddresses: Prisma.JsonValue | null
+      phoneNumbers: Prisma.JsonValue | null
+      postalAddresses: Prisma.JsonValue | null
       notes: string | null
       archivedAt: Date | null
       createdAt: Date
@@ -4653,6 +4677,9 @@ export namespace Prisma {
     readonly website: FieldRef<"Contact", 'String'>
     readonly birthday: FieldRef<"Contact", 'String'>
     readonly address: FieldRef<"Contact", 'String'>
+    readonly emailAddresses: FieldRef<"Contact", 'Json'>
+    readonly phoneNumbers: FieldRef<"Contact", 'Json'>
+    readonly postalAddresses: FieldRef<"Contact", 'Json'>
     readonly notes: FieldRef<"Contact", 'String'>
     readonly archivedAt: FieldRef<"Contact", 'DateTime'>
     readonly createdAt: FieldRef<"Contact", 'DateTime'>
@@ -18004,6 +18031,9 @@ export namespace Prisma {
     website: 'website',
     birthday: 'birthday',
     address: 'address',
+    emailAddresses: 'emailAddresses',
+    phoneNumbers: 'phoneNumbers',
+    postalAddresses: 'postalAddresses',
     notes: 'notes',
     archivedAt: 'archivedAt',
     createdAt: 'createdAt',
@@ -18252,19 +18282,19 @@ export namespace Prisma {
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
-  export const JsonNullValueInput: {
-    JsonNull: typeof JsonNull
-  };
-
-  export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
-
-
   export const NullableJsonNullValueInput: {
     DbNull: typeof DbNull,
     JsonNull: typeof JsonNull
   };
 
   export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
+
+
+  export const JsonNullValueInput: {
+    JsonNull: typeof JsonNull
+  };
+
+  export type JsonNullValueInput = (typeof JsonNullValueInput)[keyof typeof JsonNullValueInput]
 
 
   export const QueryMode: {
@@ -18350,6 +18380,20 @@ export namespace Prisma {
    * Reference to a field of type 'Int[]'
    */
   export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -18497,20 +18541,6 @@ export namespace Prisma {
    * Reference to a field of type 'MergeSuggestionConfidence[]'
    */
   export type ListEnumMergeSuggestionConfidenceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'MergeSuggestionConfidence[]'>
-    
-
-
-  /**
-   * Reference to a field of type 'Json'
-   */
-  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
-    
-
-
-  /**
-   * Reference to a field of type 'QueryMode'
-   */
-  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
 
@@ -18763,6 +18793,9 @@ export namespace Prisma {
     website?: StringNullableFilter<"Contact"> | string | null
     birthday?: StringNullableFilter<"Contact"> | string | null
     address?: StringNullableFilter<"Contact"> | string | null
+    emailAddresses?: JsonNullableFilter<"Contact">
+    phoneNumbers?: JsonNullableFilter<"Contact">
+    postalAddresses?: JsonNullableFilter<"Contact">
     notes?: StringNullableFilter<"Contact"> | string | null
     archivedAt?: DateTimeNullableFilter<"Contact"> | Date | string | null
     createdAt?: DateTimeFilter<"Contact"> | Date | string
@@ -18794,6 +18827,9 @@ export namespace Prisma {
     website?: SortOrderInput | SortOrder
     birthday?: SortOrderInput | SortOrder
     address?: SortOrderInput | SortOrder
+    emailAddresses?: SortOrderInput | SortOrder
+    phoneNumbers?: SortOrderInput | SortOrder
+    postalAddresses?: SortOrderInput | SortOrder
     notes?: SortOrderInput | SortOrder
     archivedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -18828,6 +18864,9 @@ export namespace Prisma {
     website?: StringNullableFilter<"Contact"> | string | null
     birthday?: StringNullableFilter<"Contact"> | string | null
     address?: StringNullableFilter<"Contact"> | string | null
+    emailAddresses?: JsonNullableFilter<"Contact">
+    phoneNumbers?: JsonNullableFilter<"Contact">
+    postalAddresses?: JsonNullableFilter<"Contact">
     notes?: StringNullableFilter<"Contact"> | string | null
     archivedAt?: DateTimeNullableFilter<"Contact"> | Date | string | null
     createdAt?: DateTimeFilter<"Contact"> | Date | string
@@ -18859,6 +18898,9 @@ export namespace Prisma {
     website?: SortOrderInput | SortOrder
     birthday?: SortOrderInput | SortOrder
     address?: SortOrderInput | SortOrder
+    emailAddresses?: SortOrderInput | SortOrder
+    phoneNumbers?: SortOrderInput | SortOrder
+    postalAddresses?: SortOrderInput | SortOrder
     notes?: SortOrderInput | SortOrder
     archivedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -18890,6 +18932,9 @@ export namespace Prisma {
     website?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     birthday?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     address?: StringNullableWithAggregatesFilter<"Contact"> | string | null
+    emailAddresses?: JsonNullableWithAggregatesFilter<"Contact">
+    phoneNumbers?: JsonNullableWithAggregatesFilter<"Contact">
+    postalAddresses?: JsonNullableWithAggregatesFilter<"Contact">
     notes?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     archivedAt?: DateTimeNullableWithAggregatesFilter<"Contact"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Contact"> | Date | string
@@ -20231,6 +20276,9 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -20262,6 +20310,9 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -20287,6 +20338,9 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20318,6 +20372,9 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20346,6 +20403,9 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -20366,6 +20426,9 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20389,6 +20452,9 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22052,6 +22118,29 @@ export namespace Prisma {
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type UserScalarRelationFilter = {
     is?: UserWhereInput
@@ -22105,6 +22194,9 @@ export namespace Prisma {
     website?: SortOrder
     birthday?: SortOrder
     address?: SortOrder
+    emailAddresses?: SortOrder
+    phoneNumbers?: SortOrder
+    postalAddresses?: SortOrder
     notes?: SortOrder
     archivedAt?: SortOrder
     createdAt?: SortOrder
@@ -22193,6 +22285,32 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type EnumBillingProviderFilter<$PrismaModel = never> = {
@@ -22822,29 +22940,6 @@ export namespace Prisma {
     notIn?: $Enums.MergeDecisionStatus[] | ListEnumMergeDecisionStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumMergeDecisionStatusFilter<$PrismaModel> | $Enums.MergeDecisionStatus
   }
-  export type JsonNullableFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
 
   export type MergeSuggestionScalarRelationFilter = {
     is?: MergeSuggestionWhereInput
@@ -22902,32 +22997,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumMergeDecisionStatusFilter<$PrismaModel>
     _max?: NestedEnumMergeDecisionStatusFilter<$PrismaModel>
-  }
-  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedJsonNullableFilter<$PrismaModel>
-    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type EnumSyncProviderFilter<$PrismaModel = never> = {
@@ -24822,6 +24891,29 @@ export namespace Prisma {
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type NestedEnumBillingProviderFilter<$PrismaModel = never> = {
     equals?: $Enums.BillingProvider | EnumBillingProviderFieldRefInput<$PrismaModel>
@@ -25072,29 +25164,6 @@ export namespace Prisma {
     _min?: NestedEnumMergeDecisionStatusFilter<$PrismaModel>
     _max?: NestedEnumMergeDecisionStatusFilter<$PrismaModel>
   }
-  export type NestedJsonNullableFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<NestedJsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
-
-  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
 
   export type NestedEnumSyncProviderFilter<$PrismaModel = never> = {
     equals?: $Enums.SyncProvider | EnumSyncProviderFieldRefInput<$PrismaModel>
@@ -25246,6 +25315,9 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -25275,6 +25347,9 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -25673,6 +25748,9 @@ export namespace Prisma {
     website?: StringNullableFilter<"Contact"> | string | null
     birthday?: StringNullableFilter<"Contact"> | string | null
     address?: StringNullableFilter<"Contact"> | string | null
+    emailAddresses?: JsonNullableFilter<"Contact">
+    phoneNumbers?: JsonNullableFilter<"Contact">
+    postalAddresses?: JsonNullableFilter<"Contact">
     notes?: StringNullableFilter<"Contact"> | string | null
     archivedAt?: DateTimeNullableFilter<"Contact"> | Date | string | null
     createdAt?: DateTimeFilter<"Contact"> | Date | string
@@ -26245,6 +26323,9 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -26275,6 +26356,9 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -26304,6 +26388,9 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -26333,6 +26420,9 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -26590,6 +26680,9 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26620,6 +26713,9 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -27001,6 +27097,9 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -27030,6 +27129,9 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -27249,6 +27351,9 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -27279,6 +27384,9 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -27308,6 +27416,9 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -27338,6 +27449,9 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -27461,6 +27575,9 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -27491,6 +27608,9 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -27526,6 +27646,9 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -27556,6 +27679,9 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -28147,6 +28273,9 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -28177,6 +28306,9 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -28332,6 +28464,9 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -28362,6 +28497,9 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -28634,6 +28772,9 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -28664,6 +28805,9 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -28816,6 +28960,9 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -28846,6 +28993,9 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -28872,6 +29022,9 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -29015,6 +29168,9 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29044,6 +29200,9 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29071,6 +29230,9 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29541,6 +29703,9 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -29774,6 +29939,9 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29803,6 +29971,9 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29830,6 +30001,9 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29956,6 +30130,9 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -29976,6 +30153,9 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30005,6 +30185,9 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30032,6 +30215,9 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

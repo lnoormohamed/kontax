@@ -233,6 +233,15 @@ export function ContactDashboard({
                   />
                 </label>
 
+                <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
+                  <span>Additional emails</span>
+                  <textarea
+                    className="min-h-24 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
+                    name="additionalEmails"
+                    placeholder={"One extra email per line\nada.work@example.com\nada.family@example.com"}
+                  />
+                </label>
+
                 <label className="grid gap-2 text-sm text-slate-200">
                   <span>Phone</span>
                   <input
@@ -240,6 +249,15 @@ export function ContactDashboard({
                     name="phone"
                     placeholder="+44 20 7946 0958"
                     type="text"
+                  />
+                </label>
+
+                <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
+                  <span>Additional phones</span>
+                  <textarea
+                    className="min-h-24 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
+                    name="additionalPhones"
+                    placeholder={"One extra phone per line\n+44 20 7000 1000\n+44 20 7000 2000"}
                   />
                 </label>
 
@@ -288,6 +306,15 @@ export function ContactDashboard({
                     className="min-h-24 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
                     name="address"
                     placeholder="123 Example Street&#10;London&#10;SW1A 1AA"
+                  />
+                </label>
+
+                <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
+                  <span>Additional addresses</span>
+                  <textarea
+                    className="min-h-24 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
+                    name="additionalAddresses"
+                    placeholder={"One extra address per line\nOffice, 45 Fleet Street, London\nParents, 8 Example Road, Leeds"}
                   />
                 </label>
 

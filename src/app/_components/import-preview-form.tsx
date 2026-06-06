@@ -15,12 +15,15 @@ type PreviewContact = {
   fullName: string;
   nickname?: string | null;
   email?: string | null;
+  emailAddresses?: string[] | null;
   phone?: string | null;
+  phoneNumbers?: string[] | null;
   company?: string | null;
   jobTitle?: string | null;
   website?: string | null;
   birthday?: string | null;
   address?: string | null;
+  postalAddresses?: Array<{ label: string; formatted: string }> | null;
   notes?: string | null;
 };
 
@@ -384,7 +387,19 @@ export function ImportPreviewForm() {
                       <span className="text-slate-500">Email:</span> {contact.email ?? "Not provided"}
                     </p>
                     <p>
+                      <span className="text-slate-500">More emails:</span>{" "}
+                      {(contact.emailAddresses ?? [])
+                        .filter((value) => value !== contact.email)
+                        .join(", ") || "None"}
+                    </p>
+                    <p>
                       <span className="text-slate-500">Phone:</span> {contact.phone ?? "Not provided"}
+                    </p>
+                    <p>
+                      <span className="text-slate-500">More phones:</span>{" "}
+                      {(contact.phoneNumbers ?? [])
+                        .filter((value) => value !== contact.phone)
+                        .join(", ") || "None"}
                     </p>
                     <p>
                       <span className="text-slate-500">Company:</span> {contact.company ?? "Not provided"}
@@ -400,6 +415,13 @@ export function ImportPreviewForm() {
                     </p>
                     <p className="sm:col-span-2">
                       <span className="text-slate-500">Address:</span> {contact.address ?? "Not provided"}
+                    </p>
+                    <p className="sm:col-span-2">
+                      <span className="text-slate-500">More addresses:</span>{" "}
+                      {(contact.postalAddresses ?? [])
+                        .filter((value) => value.formatted !== contact.address)
+                        .map((value) => value.formatted)
+                        .join(" | ") || "None"}
                     </p>
                     <p>
                       <span className="text-slate-500">Notes:</span> {contact.notes ?? "Not provided"}
