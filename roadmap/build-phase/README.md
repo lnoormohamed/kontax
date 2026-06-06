@@ -52,10 +52,10 @@ This roadmap is the implementation source of truth for phases 1-5. Each phase fi
 | P4-06 | 4 | In Progress | P2 | P4-01, P4-04 | Unassigned | Edge-case merge scenarios and review-first guards covered |
 | P5-01 | 5 | In Progress | P0 | P1-02, P3-01 | Unassigned | CardDAV-ready sync account, link, and job model defined |
 | P5-02 | 5 | In Progress | P0 | P5-01 | Unassigned | Sync scope, two-way target, and bootstrap fallback strategy locked |
-| P5-03 | 5 | In Progress | P1 | P5-01, P1-04 | Unassigned | Sync credential protection, rotation metadata, and job orchestration documented |
-| P5-04 | 5 | In Progress | P1 | P5-02, P4-05 | Unassigned | Conflict model, tombstones, merge lineage, and versioning rules defined |
-| P5-05 | 5 | In Progress | P2 | P5-02 | Unassigned | iPhone and Android compatibility assumptions and limitations captured |
-| P5-06 | 5 | In Progress | P2 | P5-03, P5-04 | Unassigned | Beta rollout, support tooling, and recovery plan documented |
+| P5-03 | 5 | Done | P1 | P5-01, P1-04 | Unassigned | Sync credential protection, rotation metadata, and job orchestration documented |
+| P5-04 | 5 | Done | P1 | P5-02, P4-05 | Unassigned | Conflict model, tombstones, merge lineage, and versioning rules defined |
+| P5-05 | 5 | Done | P2 | P5-02 | Unassigned | iPhone and Android compatibility assumptions and limitations captured |
+| P5-06 | 5 | Done | P2 | P5-03, P5-04 | Unassigned | Beta rollout, support tooling, and recovery plan documented |
 
 ## Dependency Map
 - Phase 1 defines the contact model, security baseline, and consumer scope.

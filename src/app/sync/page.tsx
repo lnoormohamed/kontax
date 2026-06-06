@@ -40,6 +40,122 @@ const getSearchValue = (
   return Array.isArray(value) ? value[0] : value;
 };
 
+const getEncryptionModeLabel = (mode: "dedicated" | "auth-secret-fallback" | "missing") => {
+  switch (mode) {
+    case "dedicated":
+      return "Dedicated sync key";
+    case "auth-secret-fallback":
+      return "AUTH_SECRET fallback";
+    default:
+      return "Not configured";
+  }
+};
+
+const getCredentialStateLabel = (account: {
+  credentialReference: string | null;
+  credentialRevokedAt: Date | null;
+}) => {
+  if (!account.credentialReference) {
+    return "Missing";
+  }
+
+  if (account.credentialRevokedAt) {
+    return "Revoked";
+  }
+
+  return "Active";
+};
+
+const getJobFailureClass = (errorCode: string | null) => {
+  if (!errorCode) {
+    return "none";
+  }
+
+  if (errorCode.includes("CREDENTIAL")) {
+    return "authentication";
+  }
+
+  if (errorCode.includes("RATE")) {
+    return "rate-limit";
+  }
+
+  if (errorCode.includes("CONFLICT")) {
+    return "conflict";
+  }
+
+  if (errorCode.includes("NETWORK") || errorCode.includes("TIMEOUT")) {
+    return "connectivity";
+  }
+
+  return "protocol-or-data";
+};
+
+const conflictPolicyItems = [
+  {
+    title: "Edit vs edit",
+    body:
+      "If Kontax and the remote address book both changed after the last healthy cursor, we record a sync conflict instead of silently overwriting one side.",
+  },
+  {
+    title: "Archive and delete intent",
+    body:
+      "Archive actions stamp a tombstone locally so future CardDAV runs can propagate delete intent deliberately instead of treating removal like a missing row.",
+  },
+  {
+    title: "Merge lineage",
+    body:
+      "The surviving contact keeps its stable sync UID while the merged-away contact is archived with lineage metadata for support and recovery visibility.",
+  },
+  {
+    title: "Undo remains visible",
+    body:
+      "Merge undo restores pre-merge tombstone state and increments sync versions again, so recovery actions become first-class local changes rather than hidden rewrites.",
+  },
+] as const;
+
+const resolutionStrategyItems = [
+  "Keep local when Kontax holds the trusted final edit.",
+  "Keep remote when the device-side change should win.",
+  "Duplicate local when neither side should overwrite the other yet.",
+  "Archive local when the remote deletion or cleanup is intentional.",
+  "Manual merge when fields need a human-reviewed combination.",
+] as const;
+
+const compatibilityBands = [
+  {
+    label: "Expected to travel well",
+    value: "Full name, primary email, primary phone, company, notes",
+  },
+  {
+    label: "Likely client-dependent",
+    value: "Secondary identifiers, website, birthday, archive state, merge lineage",
+  },
+  {
+    label: "Kontax-local only",
+    value: "Billing entitlements, merge decisions, import/export history, sync conflict records",
+  },
+] as const;
+
+const iphoneNotes = [
+  "Best target is the native Contacts app through iOS Settings and a CardDAV account.",
+  "Core fields should round-trip most reliably; richer app-only metadata stays in Kontax.",
+  "Sync timing is mostly OS-controlled, so first-wave messaging should avoid promising instant propagation.",
+  "Support should expect account discovery, provider app-passwords, and limited in-app sync controls.",
+] as const;
+
+const androidNotes = [
+  "Treat third-party CardDAV clients such as DAVx5-style setups as the reference path.",
+  "Vendor Android builds vary, so Google Contacts alone is not a safe universal assumption.",
+  "Battery optimization and background restrictions can delay or suppress sync runs.",
+  "Support should assume extra setup friction around client install, permissions, and vendor-specific throttling.",
+] as const;
+
+const rolloutStages = [
+  "Stage 1: founder-only testing against a narrow provider and client mix.",
+  "Stage 2: invited power users with explicit recovery expectations and portability fallback ready.",
+  "Stage 3: broader beta only after conflict handling, credential rotation, and recovery tooling stay stable under load.",
+] as const;
+
 export default async function SyncPage({ searchParams }: SyncPageProps) {
   const session = await auth();
 
@@ -232,6 +348,92 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
           </div>
         ) : null}
 
+        <section className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
+          <div className="rounded-[2rem] border border-white/10 bg-[#08101c]/88 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.35)]">
+            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P5-04 conflict policy</p>
+            <h2 className="mt-3 text-2xl font-semibold text-white">
+              Deterministic sync rules before real device traffic lands
+            </h2>
+            <p className="mt-3 max-w-3xl text-sm text-slate-400">
+              The sync center now makes the intended conflict and tombstone model explicit so later
+              CardDAV execution does not invent behavior ad hoc. When local and remote state both
+              move, we prefer recorded conflict state over silent mutation.
+            </p>
+            <div className="mt-5 grid gap-4 lg:grid-cols-2">
+              {conflictPolicyItems.map((item) => (
+                <div
+                  className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4"
+                  key={item.title}
+                >
+                  <p className="text-sm font-semibold text-white">{item.title}</p>
+                  <p className="mt-2 text-sm text-slate-400">{item.body}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)]">
+              <div className="rounded-[1.5rem] border border-white/10 bg-[#020617] p-4 text-sm text-slate-300">
+                <p className="font-semibold text-white">Resolution strategies</p>
+                <div className="mt-3 grid gap-2">
+                  {resolutionStrategyItems.map((item) => (
+                    <p key={item}>{item}</p>
+                  ))}
+                </div>
+              </div>
+              <div className="rounded-[1.5rem] border border-white/10 bg-[#020617] p-4 text-sm text-slate-300">
+                <p className="font-semibold text-white">Current signal</p>
+                <p className="mt-3">Open conflicts: {openConflictsCount}</p>
+                <p className="mt-1">Queued sync jobs: {queuedJobsCount}</p>
+                <p className="mt-1">
+                  Archive and delete intent should move through tombstones, while merges keep
+                  stable sync IDs for the surviving contact.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.25)]">
+            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P5-05 compatibility</p>
+            <h2 className="mt-3 text-2xl font-semibold text-white">
+              iPhone and Android support posture
+            </h2>
+            <p className="mt-3 text-sm text-slate-400">
+              First-wave CardDAV messaging should optimize for reliable core-contact interoperability
+              rather than perfect parity across every provider, client, and phone vendor.
+            </p>
+            <div className="mt-5 grid gap-4">
+              <div className="rounded-[1.5rem] border border-white/10 bg-[#08101c] p-4">
+                <p className="text-sm font-semibold text-white">Field support bands</p>
+                <div className="mt-3 grid gap-3">
+                  {compatibilityBands.map((band) => (
+                    <div key={band.label}>
+                      <p className="text-sm font-semibold text-cyan-100">{band.label}</p>
+                      <p className="mt-1 text-sm text-slate-400">{band.value}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="grid gap-4 lg:grid-cols-2">
+                <div className="rounded-[1.5rem] border border-white/10 bg-[#08101c] p-4">
+                  <p className="text-sm font-semibold text-white">iPhone</p>
+                  <div className="mt-3 grid gap-2 text-sm text-slate-400">
+                    {iphoneNotes.map((item) => (
+                      <p key={item}>{item}</p>
+                    ))}
+                  </div>
+                </div>
+                <div className="rounded-[1.5rem] border border-white/10 bg-[#08101c] p-4">
+                  <p className="text-sm font-semibold text-white">Android</p>
+                  <div className="mt-3 grid gap-2 text-sm text-slate-400">
+                    {androidNotes.map((item) => (
+                      <p key={item}>{item}</p>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
         <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
           <div className="grid gap-6">
             <div className="rounded-[2rem] border border-white/10 bg-[#08101c]/88 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.35)]">
@@ -314,12 +516,7 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
 
                   <div className="rounded-2xl border border-white/10 bg-[#08101c] p-4 text-sm text-slate-300">
                     <p>
-                      Encryption backend:{" "}
-                      {encryptionStatus.available
-                        ? encryptionStatus.mode === "dedicated"
-                          ? "Dedicated sync key"
-                          : "AUTH_SECRET fallback"
-                        : "Not configured"}
+                      Encryption backend: {getEncryptionModeLabel(encryptionStatus.mode)}
                     </p>
                     <p className="mt-1 text-slate-500">
                       Key reference: {encryptionStatus.keyRef ?? "Missing"}
@@ -377,10 +574,7 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                                 ? "Attached"
                                 : "Missing"}
                             </p>
-                            <p>
-                              Credential state:{" "}
-                              {account.credentialRevokedAt ? "Revoked" : "Ready for rotation"}
-                            </p>
+                            <p>Credential state: {getCredentialStateLabel(account)}</p>
                             <p>
                               Credential version: {account.credentialVersion}
                             </p>
@@ -503,12 +697,7 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                             </form>
                             <div className="grid gap-3 self-start">
                               <div className="rounded-2xl border border-white/10 bg-[#020617] p-4 text-sm text-slate-400">
-                                <p>
-                                  Backend mode:{" "}
-                                  {encryptionStatus.mode === "dedicated"
-                                    ? "Dedicated sync key"
-                                    : "AUTH_SECRET fallback"}
-                                </p>
+                                <p>Backend mode: {getEncryptionModeLabel(encryptionStatus.mode)}</p>
                                 <p className="mt-1">
                                   Active key ref: {encryptionStatus.keyRef ?? "Missing"}
                                 </p>
@@ -542,6 +731,32 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                             blocked until one of those server secrets exists.
                           </div>
                         )}
+                      </div>
+
+                      <div className="mt-4 rounded-[1.5rem] border border-white/10 bg-[#08101c]/80 p-4">
+                        <p className="text-sm font-semibold text-white">Credential lifecycle and audit posture</p>
+                        <p className="mt-2 text-sm text-slate-400">
+                          Ticket `P5-03`: credentials stay out of primary relational fields. What
+                          we keep here is the audit-facing metadata needed for rotation, revoke,
+                          reauth, and support inspection.
+                        </p>
+                        <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)]">
+                          <div className="rounded-2xl border border-white/10 bg-[#020617] p-4 text-sm text-slate-300">
+                            <p className="font-semibold text-white">Stored metadata</p>
+                            <p className="mt-2">Credential state: {getCredentialStateLabel(account)}</p>
+                            <p className="mt-1">Credential version: {account.credentialVersion}</p>
+                            <p className="mt-1">Updated at: {formatTimestamp(account.credentialUpdatedAt)}</p>
+                            <p className="mt-1">Revoked at: {formatTimestamp(account.credentialRevokedAt)}</p>
+                            <p className="mt-1">Encryption key ref: {account.encryptionKeyRef ?? "Missing"}</p>
+                          </div>
+                          <div className="rounded-2xl border border-white/10 bg-[#020617] p-4 text-sm text-slate-300">
+                            <p className="font-semibold text-white">Operational expectations</p>
+                            <p className="mt-2">1. Rotate credentials by attaching a fresh encrypted set.</p>
+                            <p className="mt-1">2. Revoke when a provider app password or token is no longer trusted.</p>
+                            <p className="mt-1">3. Treat `NEEDS_REAUTH` as a hard stop for queued sync work.</p>
+                            <p className="mt-1">4. Keep raw usernames and passwords out of logs and recovery exports.</p>
+                          </div>
+                        </div>
                       </div>
 
                       <div className="mt-4 rounded-[1.5rem] border border-white/10 bg-[#08101c]/80 p-4">
@@ -623,6 +838,52 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
             </div>
 
             <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
+              <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P5-06 rollout</p>
+              <p className="mt-4 text-sm text-slate-300">
+                Ticket `P5-06`: the sync center now pairs recovery actions with an explicit staged
+                rollout and support posture so we can introduce CardDAV gradually instead of all at
+                once.
+              </p>
+              <div className="mt-4 rounded-2xl border border-white/10 bg-[#08101c] p-4">
+                <div className="grid gap-2">
+                  {rolloutStages.map((item) => (
+                    <p key={item}>{item}</p>
+                  ))}
+                </div>
+              </div>
+              <div className="mt-4 rounded-2xl border border-white/10 bg-[#08101c] p-4">
+                <p className="font-semibold text-white">Support checklist</p>
+                <p className="mt-2">1. Pause the account before risky recovery steps.</p>
+                <p className="mt-1">2. Export the recovery package before resetting links.</p>
+                <p className="mt-1">3. Review recent job failures and open conflicts together.</p>
+                <p className="mt-1">
+                  4. Prefer relink or bootstrap recovery over silent destructive repair.
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
+              <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P5-03 orchestration</p>
+              <p className="mt-4 text-sm text-slate-300">
+                Queue and retry behavior should stay inspectable before background workers become
+                more autonomous. The current surface exposes the metadata we need for safer support
+                triage.
+              </p>
+              <div className="mt-4 rounded-2xl border border-white/10 bg-[#08101c] p-4">
+                <p>Retry model: bounded attempts with backoff and idempotency.</p>
+                <p className="mt-1">
+                  Failure buckets: authentication, connectivity, conflict, rate-limit, protocol/data.
+                </p>
+                <p className="mt-1">
+                  Cursor posture: resume from the most recent known before/after marker.
+                </p>
+                <p className="mt-1">
+                  Worker posture: one lease per job attempt, inspectable from job history.
+                </p>
+              </div>
+            </div>
+
+            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
               <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Recent jobs</p>
               <div className="mt-4 grid gap-3">
                 {recentJobs.length === 0 ? (
@@ -642,6 +903,17 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                       </p>
                       <p className="mt-1 text-slate-500">
                         Next retry {formatTimestamp(job.nextRetryAt)} · conflicts {job.conflictCount}
+                      </p>
+                      <p className="mt-1 text-slate-500">
+                        Failure class {getJobFailureClass(job.errorCode)} · cursor{" "}
+                        {job.cursorAfter ?? job.cursorBefore ?? "not recorded"}
+                      </p>
+                      <p className="mt-1 text-slate-500">
+                        Lease {formatTimestamp(job.leaseExpiresAt)} · worker {job.workerId ?? "unassigned"}
+                      </p>
+                      <p className="mt-1 text-slate-500">
+                        Result counts C:{job.createdCount} U:{job.updatedCount} D:{job.deletedCount} S:
+                        {job.skippedCount}
                       </p>
                       {job.errorSummary ? (
                         <p className="mt-2 text-sm text-amber-100">

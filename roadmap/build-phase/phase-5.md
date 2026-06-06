@@ -18,9 +18,9 @@ Prepare Kontax for reliable iPhone and Android contact sync via CardDAV by defin
 | --- | --- | --- | --- |
 | P5-01 | In Progress | P0 | P1-02, P3-01 |
 | P5-02 | In Progress | P0 | P5-01 |
-| P5-03 | In Progress | P1 | P5-01, P1-04 |
-| P5-04 | In Progress | P1 | P5-02, P4-05 |
-| P5-05 | In Progress | P2 | P5-02 |
+| P5-03 | Done | P1 | P5-01, P1-04 |
+| P5-04 | Done | P1 | P5-02, P4-05 |
+| P5-05 | Done | P2 | P5-02 |
 | P5-06 | Done | P2 | P5-03, P5-04 |
 
 ## P5-01 — Define sync data model for CardDAV readiness
@@ -64,7 +64,7 @@ Prepare Kontax for reliable iPhone and Android contact sync via CardDAV by defin
   - Some CardDAV clients may behave more like eventual export/import bridges than truly cooperative two-way peers.
 
 ## P5-03 — Define sync credential protection and job orchestration
-- Status: `In Progress`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P5-01`, `P1-04`
 - Implementation Notes:
@@ -76,6 +76,7 @@ Prepare Kontax for reliable iPhone and Android contact sync via CardDAV by defin
   - `SyncJob` now carries orchestration metadata for retries and workers: `attemptCount`, `maxAttempts`, `nextRetryAt`, `leaseExpiresAt`, `workerId`, and `idempotencyKey`.
   - The operational expectation is an idempotent queue/worker model: one active lease per job attempt, bounded retries with backoff, resumable cursors, and explicit partial/failure states instead of silent re-runs.
   - Credential create, update, revoke, and failed-auth events should be emitted into the future audit layer, while sync jobs should classify failures into authentication, connectivity, protocol/data-shape, rate-limit, and conflict buckets for support visibility.
+  - The sync center now surfaces credential lifecycle metadata, encryption backend mode, key references, and job orchestration details such as retry windows, worker lease hints, cursor posture, failure classes, and result counts so support and operators can inspect this state without exposing raw secrets.
 - Acceptance Criteria:
   - Credential handling and sync job expectations are documented.
   - Security posture aligns with the earlier encryption baseline.
@@ -84,7 +85,7 @@ Prepare Kontax for reliable iPhone and Android contact sync via CardDAV by defin
   - Some CardDAV providers only support app passwords, which may need provider-specific revoke guidance in the UI later.
 
 ## P5-04 — Define conflict handling, tombstones, and versioning
-- Status: `In Progress`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P5-02`, `P4-05`
 - Implementation Notes:
@@ -96,6 +97,7 @@ Prepare Kontax for reliable iPhone and Android contact sync via CardDAV by defin
   - Merge lineage is now recorded on contacts through `mergedIntoContactId`, and merge execution archives the secondary contact with both a local tombstone timestamp and a lineage pointer to the surviving primary record.
   - Merge undo restores the archived secondary contact, clears merge lineage, restores pre-merge tombstone state from audit snapshot data, and advances sync versions again so the undo itself is visible as a new local change.
   - The intended conflict policy is now clearer: simultaneous local and remote edits should become `SyncConflict` records, local archive/delete intent should travel through tombstones, and merge outcomes should preserve stable `syncUid` values rather than pretending merged records were never separate.
+  - The sync center now exposes this policy in-product through a dedicated `P5-04` guidance panel, resolution strategy summary, and live conflict/job counts so support and product behavior can align before background workers start writing protocol conflicts at scale.
 - Acceptance Criteria:
   - Conflict rules are deterministic and testable.
   - Deletes and merge outcomes remain compatible with sync semantics.
@@ -104,7 +106,7 @@ Prepare Kontax for reliable iPhone and Android contact sync via CardDAV by defin
   - The app still needs actual sync execution logic to create `SyncConflict` rows in practice; this phase establishes the model and local mutation semantics first.
 
 ## P5-05 — Document iPhone and Android compatibility expectations
-- Status: `In Progress`
+- Status: `Done`
 - Priority: `P2`
 - Dependencies: `P5-02`
 - Implementation Notes:
@@ -119,6 +121,7 @@ Prepare Kontax for reliable iPhone and Android contact sync via CardDAV by defin
     - expected to round-trip well: full name, primary email, primary phone, company, notes
     - likely degraded or client-dependent: secondary identifiers, archive state, merge lineage, audit state, plan metadata
     - Kontax-local only: billing entitlements, merge decisions, import/export job history, sync conflict records
+  - The sync center now includes an in-product compatibility section covering iPhone and Android onboarding posture, timing expectations, and field-support bands so support guidance is visible before full device sync ships.
 - Acceptance Criteria:
   - Platform notes are captured clearly enough for support and QA planning.
   - Known compatibility limitations are documented up front.
