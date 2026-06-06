@@ -513,16 +513,16 @@ export const buildMergedContactPreview = (
   const normalizedPrimary = {
     ...primaryContact,
     sourceKind: primaryContact.sourceKind ?? getSourceKind(primaryContact),
-    emailAddresses: parseStringArray(primaryContact.emailAddresses),
-    phoneNumbers: parseStringArray(primaryContact.phoneNumbers),
-    postalAddresses: parsePostalAddressArray(primaryContact.postalAddresses),
+    emailAddresses: parseContactStringArray(primaryContact.emailAddresses),
+    phoneNumbers: parseContactStringArray(primaryContact.phoneNumbers),
+    postalAddresses: parseContactPostalAddresses(primaryContact.postalAddresses),
   };
   const normalizedSecondary = {
     ...secondaryContact,
     sourceKind: secondaryContact.sourceKind ?? getSourceKind(secondaryContact),
-    emailAddresses: parseStringArray(secondaryContact.emailAddresses),
-    phoneNumbers: parseStringArray(secondaryContact.phoneNumbers),
-    postalAddresses: parsePostalAddressArray(secondaryContact.postalAddresses),
+    emailAddresses: parseContactStringArray(secondaryContact.emailAddresses),
+    phoneNumbers: parseContactStringArray(secondaryContact.phoneNumbers),
+    postalAddresses: parseContactPostalAddresses(secondaryContact.postalAddresses),
   };
 
   const defaultChoices: Required<MergeFieldChoices> = {
