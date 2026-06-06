@@ -7,6 +7,9 @@ import { assertCanImportContacts } from "~/server/billing";
 import { db } from "~/server/db";
 import { parseCsvContacts } from "~/server/contact-portability";
 
+const getOptionalJsonArray = <T>(value: T[] | null | undefined) =>
+  value && value.length > 0 ? value : undefined;
+
 const getRequiredUserId = async () => {
   const session = await auth();
   const userId = session?.user?.id;
@@ -66,15 +69,15 @@ export const importContactsCsv = async (formData: FormData) => {
         fullName: contact.fullName,
         nickname: contact.nickname,
         email: contact.email,
-        emailAddresses: contact.emailAddresses,
+        emailAddresses: getOptionalJsonArray(contact.emailAddresses),
         phone: contact.phone,
-        phoneNumbers: contact.phoneNumbers,
+        phoneNumbers: getOptionalJsonArray(contact.phoneNumbers),
         company: contact.company,
         jobTitle: contact.jobTitle,
         website: contact.website,
         birthday: contact.birthday,
         address: contact.address,
-        postalAddresses: contact.postalAddresses,
+        postalAddresses: getOptionalJsonArray(contact.postalAddresses),
         notes: contact.notes,
       })),
     });

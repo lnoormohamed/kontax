@@ -5,6 +5,9 @@ import { assertCanImportContacts } from "~/server/billing";
 import { parseCsvContacts } from "~/server/contact-portability";
 import { db } from "~/server/db";
 
+const getOptionalJsonArray = <T>(value: T[] | null | undefined) =>
+  value && value.length > 0 ? value : undefined;
+
 const commitRequestSchema = z.object({
   csvText: z.string().min(1, "Paste CSV data or choose a CSV file."),
   profile: z.enum(["GENERIC", "GOOGLE", "APPLE", "OUTLOOK"]),
@@ -88,15 +91,15 @@ export async function POST(request: Request) {
         fullName: contact.fullName,
         nickname: contact.nickname,
         email: contact.email,
-        emailAddresses: contact.emailAddresses,
+        emailAddresses: getOptionalJsonArray(contact.emailAddresses),
         phone: contact.phone,
-        phoneNumbers: contact.phoneNumbers,
+        phoneNumbers: getOptionalJsonArray(contact.phoneNumbers),
         company: contact.company,
         jobTitle: contact.jobTitle,
         website: contact.website,
         birthday: contact.birthday,
         address: contact.address,
-        postalAddresses: contact.postalAddresses,
+        postalAddresses: getOptionalJsonArray(contact.postalAddresses),
         notes: contact.notes,
       })),
     });
