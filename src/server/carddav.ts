@@ -334,7 +334,11 @@ const parseVCardLines = (value: string) =>
       const left = line.slice(0, separatorIndex);
       const rawValue = line.slice(separatorIndex + 1);
       const [rawName, ...paramParts] = left.split(";");
-      const name = rawName.trim().toUpperCase();
+      const name = rawName?.trim().toUpperCase();
+
+      if (!name) {
+        return null;
+      }
 
       return {
         name,
