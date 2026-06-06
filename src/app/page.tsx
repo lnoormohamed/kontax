@@ -159,7 +159,7 @@ export default async function Home({ searchParams }: HomePageProps) {
     await signOut({ redirectTo: "/login" });
   };
 
-  const userLabel = session.user.name?.trim() || session.user.email?.split("@")[0] || "friend";
+  const userLabel = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "friend";
 
   return (
     <>

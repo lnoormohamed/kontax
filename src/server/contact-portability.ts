@@ -82,7 +82,11 @@ const getValue = (row: string[], index: number) => {
   }
 
   const value = row[index]?.trim();
-  return value ? value : undefined;
+  if (value === "") {
+    return undefined;
+  }
+
+  return value;
 };
 
 const escapeCsv = (value: string) => {
@@ -130,7 +134,12 @@ export const parseCsvContacts = (csvText: string): CsvParseResult => {
     const company = getValue(row, companyIndex);
     const notes = getValue(row, notesIndex);
     const fallbackName = [firstName, lastName].filter(Boolean).join(" ").trim();
-    const fullName = explicitFullName || fallbackName || email || phone || company;
+    const fullName =
+      explicitFullName ??
+      (fallbackName === "" ? undefined : fallbackName) ??
+      email ??
+      phone ??
+      company;
 
     if (!fullName) {
       skippedCount += 1;
