@@ -8,17 +8,32 @@ import { db } from "~/server/db";
 type MergeCandidateContact = {
   id: string;
   fullName: string;
+  firstName?: string | null;
+  middleName?: string | null;
+  lastName?: string | null;
+  namePrefix?: string | null;
+  nameSuffix?: string | null;
   nickname?: string | null;
   email: string | null;
   emailAddresses?: unknown;
+  emailEntries?: unknown;
   phone: string | null;
   phoneNumbers?: unknown;
+  phoneEntries?: unknown;
   company: string | null;
   jobTitle?: string | null;
   website?: string | null;
+  websiteEntries?: unknown;
   birthday?: string | null;
   address?: string | null;
   postalAddresses?: unknown;
+  addressEntries?: unknown;
+  avatarUrl?: string | null;
+  isFavorite?: boolean;
+  labels?: unknown;
+  significantDates?: unknown;
+  relatedPeople?: unknown;
+  customFields?: unknown;
   importJobId?: string | null;
   updatedAt: Date;
 };
@@ -81,17 +96,42 @@ export type MergePreview = {
   edgeCaseWarnings: string[];
   mergedContact: {
     fullName: string;
+    firstName: string | null;
+    middleName: string | null;
+    lastName: string | null;
+    namePrefix: string | null;
+    nameSuffix: string | null;
     email: string | null;
     emailAddresses: string[] | null;
+    emailEntries: Array<{ label: string; value: string; isPrimary: boolean }> | null;
     phone: string | null;
     phoneNumbers: string[] | null;
+    phoneEntries: Array<{ label: string; value: string; isPrimary: boolean }> | null;
     company: string | null;
     nickname: string | null;
     jobTitle: string | null;
     website: string | null;
+    websiteEntries: Array<{ label: string; value: string; isPrimary: boolean }> | null;
     birthday: string | null;
     address: string | null;
     postalAddresses: Array<{ label: string; formatted: string }> | null;
+    addressEntries: Array<{
+      label: string;
+      formatted: string;
+      isPrimary: boolean;
+      countryOrRegion?: string;
+      streetLine1?: string;
+      streetLine2?: string;
+      cityOrTown?: string;
+      postcode?: string;
+      poBox?: string;
+    }> | null;
+    avatarUrl: string | null;
+    isFavorite: boolean;
+    labels: string[] | null;
+    significantDates: Array<{ label: string; date: string; isPrimary: boolean }> | null;
+    relatedPeople: Array<{ relationship: string; name: string }> | null;
+    customFields: Array<{ label: string; value: string }> | null;
     notes: string | null;
   };
   mergeNotes: string[];
@@ -101,17 +141,42 @@ type MergeDecisionSnapshot = {
   primaryBefore: {
     id: string;
     fullName: string;
+    firstName: string | null;
+    middleName: string | null;
+    lastName: string | null;
+    namePrefix: string | null;
+    nameSuffix: string | null;
     nickname: string | null;
     email: string | null;
     emailAddresses: string[] | null;
+    emailEntries: Array<{ label: string; value: string; isPrimary: boolean }> | null;
     phone: string | null;
     phoneNumbers: string[] | null;
+    phoneEntries: Array<{ label: string; value: string; isPrimary: boolean }> | null;
     company: string | null;
     jobTitle: string | null;
     website: string | null;
+    websiteEntries: Array<{ label: string; value: string; isPrimary: boolean }> | null;
     birthday: string | null;
     address: string | null;
     postalAddresses: Array<{ label: string; formatted: string }> | null;
+    addressEntries: Array<{
+      label: string;
+      formatted: string;
+      isPrimary: boolean;
+      countryOrRegion?: string;
+      streetLine1?: string;
+      streetLine2?: string;
+      cityOrTown?: string;
+      postcode?: string;
+      poBox?: string;
+    }> | null;
+    avatarUrl: string | null;
+    isFavorite: boolean;
+    labels: string[] | null;
+    significantDates: Array<{ label: string; date: string; isPrimary: boolean }> | null;
+    relatedPeople: Array<{ relationship: string; name: string }> | null;
+    customFields: Array<{ label: string; value: string }> | null;
     notes: string | null;
     archivedAt: string | null;
     syncTombstoneAt: string | null;
@@ -120,17 +185,42 @@ type MergeDecisionSnapshot = {
   secondaryBefore: {
     id: string;
     fullName: string;
+    firstName: string | null;
+    middleName: string | null;
+    lastName: string | null;
+    namePrefix: string | null;
+    nameSuffix: string | null;
     nickname: string | null;
     email: string | null;
     emailAddresses: string[] | null;
+    emailEntries: Array<{ label: string; value: string; isPrimary: boolean }> | null;
     phone: string | null;
     phoneNumbers: string[] | null;
+    phoneEntries: Array<{ label: string; value: string; isPrimary: boolean }> | null;
     company: string | null;
     jobTitle: string | null;
     website: string | null;
+    websiteEntries: Array<{ label: string; value: string; isPrimary: boolean }> | null;
     birthday: string | null;
     address: string | null;
     postalAddresses: Array<{ label: string; formatted: string }> | null;
+    addressEntries: Array<{
+      label: string;
+      formatted: string;
+      isPrimary: boolean;
+      countryOrRegion?: string;
+      streetLine1?: string;
+      streetLine2?: string;
+      cityOrTown?: string;
+      postcode?: string;
+      poBox?: string;
+    }> | null;
+    avatarUrl: string | null;
+    isFavorite: boolean;
+    labels: string[] | null;
+    significantDates: Array<{ label: string; date: string; isPrimary: boolean }> | null;
+    relatedPeople: Array<{ relationship: string; name: string }> | null;
+    customFields: Array<{ label: string; value: string }> | null;
     notes: string | null;
     archivedAt: string | null;
     syncTombstoneAt: string | null;
@@ -138,17 +228,42 @@ type MergeDecisionSnapshot = {
   };
   mergedAfter: {
     fullName: string;
+    firstName: string | null;
+    middleName: string | null;
+    lastName: string | null;
+    namePrefix: string | null;
+    nameSuffix: string | null;
     nickname: string | null;
     email: string | null;
     emailAddresses: string[] | null;
+    emailEntries: Array<{ label: string; value: string; isPrimary: boolean }> | null;
     phone: string | null;
     phoneNumbers: string[] | null;
+    phoneEntries: Array<{ label: string; value: string; isPrimary: boolean }> | null;
     company: string | null;
     jobTitle: string | null;
     website: string | null;
+    websiteEntries: Array<{ label: string; value: string; isPrimary: boolean }> | null;
     birthday: string | null;
     address: string | null;
     postalAddresses: Array<{ label: string; formatted: string }> | null;
+    addressEntries: Array<{
+      label: string;
+      formatted: string;
+      isPrimary: boolean;
+      countryOrRegion?: string;
+      streetLine1?: string;
+      streetLine2?: string;
+      cityOrTown?: string;
+      postcode?: string;
+      poBox?: string;
+    }> | null;
+    avatarUrl: string | null;
+    isFavorite: boolean;
+    labels: string[] | null;
+    significantDates: Array<{ label: string; date: string; isPrimary: boolean }> | null;
+    relatedPeople: Array<{ relationship: string; name: string }> | null;
+    customFields: Array<{ label: string; value: string }> | null;
     notes: string | null;
   };
   fieldChoices: MergeFieldChoices;
@@ -206,8 +321,30 @@ const combineNotes = (primaryNotes: string | null, secondaryNotes: string | null
 };
 
 const toNullableJsonField = (
-  value: string[] | Array<{ label: string; formatted: string }> | null | undefined,
+  value:
+    | string[]
+    | Array<{ label: string; formatted: string }>
+    | Array<{ label: string; value: string; isPrimary: boolean }>
+    | Array<{
+        label: string;
+        formatted: string;
+        isPrimary: boolean;
+        countryOrRegion?: string;
+        streetLine1?: string;
+        streetLine2?: string;
+        cityOrTown?: string;
+        postcode?: string;
+        poBox?: string;
+      }>
+    | Array<{ label: string; date: string; isPrimary: boolean }>
+    | Array<{ relationship: string; name: string }>
+    | Array<{ label: string; value: string }>
+    | null
+    | undefined,
 ) => value ?? Prisma.DbNull;
+
+const parseObjectArray = <T extends Record<string, unknown>>(value: unknown) =>
+  Array.isArray(value) ? (value.filter((item): item is T => Boolean(item) && typeof item === "object")) : [];
 
 const mergeUniqueStrings = (...groups: Array<Array<string | null | undefined>>) => {
   const seen = new Set<string>();
@@ -250,6 +387,147 @@ const mergePostalAddresses = (
   ]) {
     const key = entry.formatted.trim().toLowerCase();
     if (!key || seen.has(key)) {
+      continue;
+    }
+
+    seen.add(key);
+    result.push(entry);
+  }
+
+  return result;
+};
+
+const mergeStructuredValueEntries = (
+  primaryEntries: Array<{ label: string; value: string; isPrimary?: boolean }>,
+  secondaryEntries: Array<{ label: string; value: string; isPrimary?: boolean }>,
+) => {
+  const seen = new Set<string>();
+  const result: Array<{ label: string; value: string; isPrimary: boolean }> = [];
+
+  for (const entry of [...primaryEntries, ...secondaryEntries]) {
+    const key = entry.value.trim().toLowerCase();
+    if (!key || seen.has(key)) {
+      continue;
+    }
+
+    seen.add(key);
+    result.push({
+      label: entry.label,
+      value: entry.value,
+      isPrimary: result.length === 0,
+    });
+  }
+
+  return result;
+};
+
+const mergeAddressEntries = (
+  primaryEntries: Array<{
+    label: string;
+    formatted: string;
+    isPrimary?: boolean;
+    countryOrRegion?: string;
+    streetLine1?: string;
+    streetLine2?: string;
+    cityOrTown?: string;
+    postcode?: string;
+    poBox?: string;
+  }>,
+  secondaryEntries: Array<{
+    label: string;
+    formatted: string;
+    isPrimary?: boolean;
+    countryOrRegion?: string;
+    streetLine1?: string;
+    streetLine2?: string;
+    cityOrTown?: string;
+    postcode?: string;
+    poBox?: string;
+  }>,
+) => {
+  const seen = new Set<string>();
+  const result: Array<{
+    label: string;
+    formatted: string;
+    isPrimary: boolean;
+    countryOrRegion?: string;
+    streetLine1?: string;
+    streetLine2?: string;
+    cityOrTown?: string;
+    postcode?: string;
+    poBox?: string;
+  }> = [];
+
+  for (const entry of [...primaryEntries, ...secondaryEntries]) {
+    const key = entry.formatted.trim().toLowerCase();
+    if (!key || seen.has(key)) {
+      continue;
+    }
+
+    seen.add(key);
+    result.push({
+      ...entry,
+      isPrimary: result.length === 0,
+    });
+  }
+
+  return result;
+};
+
+const mergeLabelValuePairs = (
+  primaryEntries: Array<{ label: string; value: string }>,
+  secondaryEntries: Array<{ label: string; value: string }>,
+) => {
+  const seen = new Set<string>();
+  const result: Array<{ label: string; value: string }> = [];
+
+  for (const entry of [...primaryEntries, ...secondaryEntries]) {
+    const key = `${entry.label.trim().toLowerCase()}::${entry.value.trim().toLowerCase()}`;
+    if (!entry.label.trim() || !entry.value.trim() || seen.has(key)) {
+      continue;
+    }
+
+    seen.add(key);
+    result.push(entry);
+  }
+
+  return result;
+};
+
+const mergeDates = (
+  primaryEntries: Array<{ label: string; date: string; isPrimary?: boolean }>,
+  secondaryEntries: Array<{ label: string; date: string; isPrimary?: boolean }>,
+) => {
+  const seen = new Set<string>();
+  const result: Array<{ label: string; date: string; isPrimary: boolean }> = [];
+
+  for (const entry of [...primaryEntries, ...secondaryEntries]) {
+    const key = `${entry.label.trim().toLowerCase()}::${entry.date.trim()}`;
+    if (!entry.label.trim() || !entry.date.trim() || seen.has(key)) {
+      continue;
+    }
+
+    seen.add(key);
+    result.push({
+      label: entry.label,
+      date: entry.date,
+      isPrimary: result.length === 0 ? entry.label.trim().toLowerCase() === "birthday" : false,
+    });
+  }
+
+  return result;
+};
+
+const mergeRelatedPeople = (
+  primaryEntries: Array<{ relationship: string; name: string }>,
+  secondaryEntries: Array<{ relationship: string; name: string }>,
+) => {
+  const seen = new Set<string>();
+  const result: Array<{ relationship: string; name: string }> = [];
+
+  for (const entry of [...primaryEntries, ...secondaryEntries]) {
+    const key = `${entry.relationship.trim().toLowerCase()}::${entry.name.trim().toLowerCase()}`;
+    if (!entry.relationship.trim() || !entry.name.trim() || seen.has(key)) {
       continue;
     }
 
@@ -514,15 +792,73 @@ export const buildMergedContactPreview = (
     ...primaryContact,
     sourceKind: primaryContact.sourceKind ?? getSourceKind(primaryContact),
     emailAddresses: parseContactStringArray(primaryContact.emailAddresses),
+    emailEntries: parseObjectArray<{ label: string; value: string; isPrimary?: boolean }>(
+      primaryContact.emailEntries,
+    ),
     phoneNumbers: parseContactStringArray(primaryContact.phoneNumbers),
+    phoneEntries: parseObjectArray<{ label: string; value: string; isPrimary?: boolean }>(
+      primaryContact.phoneEntries,
+    ),
     postalAddresses: parseContactPostalAddresses(primaryContact.postalAddresses),
+    addressEntries: parseObjectArray<{
+      label: string;
+      formatted: string;
+      isPrimary?: boolean;
+      countryOrRegion?: string;
+      streetLine1?: string;
+      streetLine2?: string;
+      cityOrTown?: string;
+      postcode?: string;
+      poBox?: string;
+    }>(primaryContact.addressEntries),
+    websiteEntries: parseObjectArray<{ label: string; value: string; isPrimary?: boolean }>(
+      primaryContact.websiteEntries,
+    ),
+    labels: parseContactStringArray(primaryContact.labels),
+    significantDates: parseObjectArray<{ label: string; date: string; isPrimary?: boolean }>(
+      primaryContact.significantDates,
+    ),
+    relatedPeople: parseObjectArray<{ relationship: string; name: string }>(
+      primaryContact.relatedPeople,
+    ),
+    customFields: parseObjectArray<{ label: string; value: string }>(primaryContact.customFields),
   };
   const normalizedSecondary = {
     ...secondaryContact,
     sourceKind: secondaryContact.sourceKind ?? getSourceKind(secondaryContact),
     emailAddresses: parseContactStringArray(secondaryContact.emailAddresses),
+    emailEntries: parseObjectArray<{ label: string; value: string; isPrimary?: boolean }>(
+      secondaryContact.emailEntries,
+    ),
     phoneNumbers: parseContactStringArray(secondaryContact.phoneNumbers),
+    phoneEntries: parseObjectArray<{ label: string; value: string; isPrimary?: boolean }>(
+      secondaryContact.phoneEntries,
+    ),
     postalAddresses: parseContactPostalAddresses(secondaryContact.postalAddresses),
+    addressEntries: parseObjectArray<{
+      label: string;
+      formatted: string;
+      isPrimary?: boolean;
+      countryOrRegion?: string;
+      streetLine1?: string;
+      streetLine2?: string;
+      cityOrTown?: string;
+      postcode?: string;
+      poBox?: string;
+    }>(secondaryContact.addressEntries),
+    websiteEntries: parseObjectArray<{ label: string; value: string; isPrimary?: boolean }>(
+      secondaryContact.websiteEntries,
+    ),
+    labels: parseContactStringArray(secondaryContact.labels),
+    significantDates: parseObjectArray<{ label: string; date: string; isPrimary?: boolean }>(
+      secondaryContact.significantDates,
+    ),
+    relatedPeople: parseObjectArray<{ relationship: string; name: string }>(
+      secondaryContact.relatedPeople,
+    ),
+    customFields: parseObjectArray<{ label: string; value: string }>(
+      secondaryContact.customFields,
+    ),
   };
 
   const defaultChoices: Required<MergeFieldChoices> = {
@@ -574,6 +910,61 @@ export const buildMergedContactPreview = (
         secondaryValue: normalizedSecondary.fullName,
         choice: resolvedChoices.fullName,
       }) ?? normalizedPrimary.fullName,
+    firstName:
+      pickFieldValue({
+        primaryValue: normalizedPrimary.firstName,
+        secondaryValue: normalizedSecondary.firstName,
+        choice: getDefaultFieldChoice({
+          primaryValue: normalizedPrimary.firstName,
+          secondaryValue: normalizedSecondary.firstName,
+          primaryContact: normalizedPrimary,
+          secondaryContact: normalizedSecondary,
+        }),
+      }) ?? null,
+    middleName:
+      pickFieldValue({
+        primaryValue: normalizedPrimary.middleName,
+        secondaryValue: normalizedSecondary.middleName,
+        choice: getDefaultFieldChoice({
+          primaryValue: normalizedPrimary.middleName,
+          secondaryValue: normalizedSecondary.middleName,
+          primaryContact: normalizedPrimary,
+          secondaryContact: normalizedSecondary,
+        }),
+      }) ?? null,
+    lastName:
+      pickFieldValue({
+        primaryValue: normalizedPrimary.lastName,
+        secondaryValue: normalizedSecondary.lastName,
+        choice: getDefaultFieldChoice({
+          primaryValue: normalizedPrimary.lastName,
+          secondaryValue: normalizedSecondary.lastName,
+          primaryContact: normalizedPrimary,
+          secondaryContact: normalizedSecondary,
+        }),
+      }) ?? null,
+    namePrefix:
+      pickFieldValue({
+        primaryValue: normalizedPrimary.namePrefix,
+        secondaryValue: normalizedSecondary.namePrefix,
+        choice: getDefaultFieldChoice({
+          primaryValue: normalizedPrimary.namePrefix,
+          secondaryValue: normalizedSecondary.namePrefix,
+          primaryContact: normalizedPrimary,
+          secondaryContact: normalizedSecondary,
+        }),
+      }) ?? null,
+    nameSuffix:
+      pickFieldValue({
+        primaryValue: normalizedPrimary.nameSuffix,
+        secondaryValue: normalizedSecondary.nameSuffix,
+        choice: getDefaultFieldChoice({
+          primaryValue: normalizedPrimary.nameSuffix,
+          secondaryValue: normalizedSecondary.nameSuffix,
+          primaryContact: normalizedPrimary,
+          secondaryContact: normalizedSecondary,
+        }),
+      }) ?? null,
     email: pickFieldValue({
       primaryValue: normalizedPrimary.email,
       secondaryValue: normalizedSecondary.email,
@@ -585,6 +976,10 @@ export const buildMergedContactPreview = (
       [normalizedSecondary.email],
       normalizedSecondary.emailAddresses,
     ),
+    emailEntries: mergeStructuredValueEntries(
+      normalizedPrimary.emailEntries,
+      normalizedSecondary.emailEntries,
+    ),
     phone: pickFieldValue({
       primaryValue: normalizedPrimary.phone,
       secondaryValue: normalizedSecondary.phone,
@@ -595,6 +990,10 @@ export const buildMergedContactPreview = (
       normalizedPrimary.phoneNumbers,
       [normalizedSecondary.phone],
       normalizedSecondary.phoneNumbers,
+    ),
+    phoneEntries: mergeStructuredValueEntries(
+      normalizedPrimary.phoneEntries,
+      normalizedSecondary.phoneEntries,
     ),
     company: pickFieldValue({
       primaryValue: normalizedPrimary.company,
@@ -634,6 +1033,10 @@ export const buildMergedContactPreview = (
           secondaryContact: normalizedSecondary,
         }),
       }) ?? null,
+    websiteEntries: mergeStructuredValueEntries(
+      normalizedPrimary.websiteEntries,
+      normalizedSecondary.websiteEntries,
+    ),
     birthday:
       pickFieldValue({
         primaryValue: normalizedPrimary.birthday,
@@ -661,6 +1064,35 @@ export const buildMergedContactPreview = (
       normalizedPrimary.postalAddresses,
       normalizedSecondary.address,
       normalizedSecondary.postalAddresses,
+    ),
+    addressEntries: mergeAddressEntries(
+      normalizedPrimary.addressEntries,
+      normalizedSecondary.addressEntries,
+    ),
+    avatarUrl:
+      pickFieldValue({
+        primaryValue: normalizedPrimary.avatarUrl,
+        secondaryValue: normalizedSecondary.avatarUrl,
+        choice: getDefaultFieldChoice({
+          primaryValue: normalizedPrimary.avatarUrl,
+          secondaryValue: normalizedSecondary.avatarUrl,
+          primaryContact: normalizedPrimary,
+          secondaryContact: normalizedSecondary,
+        }),
+      }) ?? null,
+    isFavorite: Boolean(normalizedPrimary.isFavorite || normalizedSecondary.isFavorite),
+    labels: mergeUniqueStrings(normalizedPrimary.labels, normalizedSecondary.labels),
+    significantDates: mergeDates(
+      normalizedPrimary.significantDates,
+      normalizedSecondary.significantDates,
+    ),
+    relatedPeople: mergeRelatedPeople(
+      normalizedPrimary.relatedPeople,
+      normalizedSecondary.relatedPeople,
+    ),
+    customFields: mergeLabelValuePairs(
+      normalizedPrimary.customFields,
+      normalizedSecondary.customFields,
     ),
     notes:
       resolvedChoices.notes === "combine"
@@ -696,6 +1128,12 @@ export const buildMergedContactPreview = (
     normalizedPrimary.notes !== normalizedSecondary.notes &&
     resolvedChoices.notes === "combine"
       ? "Both notes fields will be combined into the merged record."
+      : null,
+    normalizedPrimary.labels.length > 0 || normalizedSecondary.labels.length > 0
+      ? "Labels, related people, custom fields, websites, and significant dates merge by union so richer context is preserved across records."
+      : null,
+    normalizedPrimary.sourceKind !== normalizedSecondary.sourceKind
+      ? "Rich scalar fields such as avatar, name parts, and structured address details follow the same manual-over-imported precedence as the canonical fields."
       : null,
     "The secondary record will be archived after merge so the action stays reversible at the record level.",
   ].filter((note): note is string => note != null);
@@ -976,17 +1414,32 @@ export const mergeContactsForUser = async ({
       select: {
         id: true,
         fullName: true,
+        firstName: true,
+        middleName: true,
+        lastName: true,
+        namePrefix: true,
+        nameSuffix: true,
         nickname: true,
         email: true,
         emailAddresses: true,
+        emailEntries: true,
         phone: true,
         phoneNumbers: true,
+        phoneEntries: true,
         company: true,
         jobTitle: true,
         website: true,
+        websiteEntries: true,
         birthday: true,
         address: true,
         postalAddresses: true,
+        addressEntries: true,
+        avatarUrl: true,
+        isFavorite: true,
+        labels: true,
+        significantDates: true,
+        relatedPeople: true,
+        customFields: true,
         notes: true,
         archivedAt: true,
         syncTombstoneAt: true,
@@ -1083,17 +1536,32 @@ export const mergeContactsForUser = async ({
       },
       data: {
         fullName: preview.mergedContact.fullName,
+        firstName: preview.mergedContact.firstName,
+        middleName: preview.mergedContact.middleName,
+        lastName: preview.mergedContact.lastName,
+        namePrefix: preview.mergedContact.namePrefix,
+        nameSuffix: preview.mergedContact.nameSuffix,
         email: preview.mergedContact.email,
         emailAddresses: toNullableJsonField(preview.mergedContact.emailAddresses),
+        emailEntries: toNullableJsonField(preview.mergedContact.emailEntries),
         phone: preview.mergedContact.phone,
         phoneNumbers: toNullableJsonField(preview.mergedContact.phoneNumbers),
+        phoneEntries: toNullableJsonField(preview.mergedContact.phoneEntries),
         company: preview.mergedContact.company,
         nickname: preview.mergedContact.nickname,
         jobTitle: preview.mergedContact.jobTitle,
         website: preview.mergedContact.website,
+        websiteEntries: toNullableJsonField(preview.mergedContact.websiteEntries),
         birthday: preview.mergedContact.birthday,
         address: preview.mergedContact.address,
         postalAddresses: toNullableJsonField(preview.mergedContact.postalAddresses),
+        addressEntries: toNullableJsonField(preview.mergedContact.addressEntries),
+        avatarUrl: preview.mergedContact.avatarUrl,
+        isFavorite: preview.mergedContact.isFavorite,
+        labels: toNullableJsonField(preview.mergedContact.labels),
+        significantDates: toNullableJsonField(preview.mergedContact.significantDates),
+        relatedPeople: toNullableJsonField(preview.mergedContact.relatedPeople),
+        customFields: toNullableJsonField(preview.mergedContact.customFields),
         notes: preview.mergedContact.notes,
         syncVersion: {
           increment: 1,
@@ -1139,17 +1607,56 @@ export const mergeContactsForUser = async ({
             primaryBefore: {
               id: primaryContact.id,
               fullName: primaryContact.fullName,
+              firstName: primaryContact.firstName ?? null,
+              middleName: primaryContact.middleName ?? null,
+              lastName: primaryContact.lastName ?? null,
+              namePrefix: primaryContact.namePrefix ?? null,
+              nameSuffix: primaryContact.nameSuffix ?? null,
               nickname: primaryContact.nickname ?? null,
               email: primaryContact.email,
               emailAddresses: parseContactStringArray(primaryContact.emailAddresses),
+              emailEntries: parseObjectArray<{ label: string; value: string; isPrimary: boolean }>(
+                primaryContact.emailEntries,
+              ),
               phone: primaryContact.phone,
               phoneNumbers: parseContactStringArray(primaryContact.phoneNumbers),
+              phoneEntries: parseObjectArray<{ label: string; value: string; isPrimary: boolean }>(
+                primaryContact.phoneEntries,
+              ),
               company: primaryContact.company,
               jobTitle: primaryContact.jobTitle ?? null,
               website: primaryContact.website ?? null,
+              websiteEntries: parseObjectArray<{ label: string; value: string; isPrimary: boolean }>(
+                primaryContact.websiteEntries,
+              ),
               birthday: primaryContact.birthday ?? null,
               address: primaryContact.address ?? null,
               postalAddresses: parseContactPostalAddresses(primaryContact.postalAddresses),
+              addressEntries: parseObjectArray<{
+                label: string;
+                formatted: string;
+                isPrimary: boolean;
+                countryOrRegion?: string;
+                streetLine1?: string;
+                streetLine2?: string;
+                cityOrTown?: string;
+                postcode?: string;
+                poBox?: string;
+              }>(primaryContact.addressEntries),
+              avatarUrl: primaryContact.avatarUrl ?? null,
+              isFavorite: primaryContact.isFavorite ?? false,
+              labels: parseContactStringArray(primaryContact.labels),
+              significantDates: parseObjectArray<{
+                label: string;
+                date: string;
+                isPrimary: boolean;
+              }>(primaryContact.significantDates),
+              relatedPeople: parseObjectArray<{ relationship: string; name: string }>(
+                primaryContact.relatedPeople,
+              ),
+              customFields: parseObjectArray<{ label: string; value: string }>(
+                primaryContact.customFields,
+              ),
               notes: primaryContact.notes,
               archivedAt: primaryContact.archivedAt?.toISOString() ?? null,
               syncTombstoneAt: primaryContact.syncTombstoneAt?.toISOString() ?? null,
@@ -1158,17 +1665,58 @@ export const mergeContactsForUser = async ({
             secondaryBefore: {
               id: secondaryContact.id,
               fullName: secondaryContact.fullName,
+              firstName: secondaryContact.firstName ?? null,
+              middleName: secondaryContact.middleName ?? null,
+              lastName: secondaryContact.lastName ?? null,
+              namePrefix: secondaryContact.namePrefix ?? null,
+              nameSuffix: secondaryContact.nameSuffix ?? null,
               nickname: secondaryContact.nickname ?? null,
               email: secondaryContact.email,
               emailAddresses: parseContactStringArray(secondaryContact.emailAddresses),
+              emailEntries: parseObjectArray<{ label: string; value: string; isPrimary: boolean }>(
+                secondaryContact.emailEntries,
+              ),
               phone: secondaryContact.phone,
               phoneNumbers: parseContactStringArray(secondaryContact.phoneNumbers),
+              phoneEntries: parseObjectArray<{ label: string; value: string; isPrimary: boolean }>(
+                secondaryContact.phoneEntries,
+              ),
               company: secondaryContact.company,
               jobTitle: secondaryContact.jobTitle ?? null,
               website: secondaryContact.website ?? null,
+              websiteEntries: parseObjectArray<{
+                label: string;
+                value: string;
+                isPrimary: boolean;
+              }>(secondaryContact.websiteEntries),
               birthday: secondaryContact.birthday ?? null,
               address: secondaryContact.address ?? null,
               postalAddresses: parseContactPostalAddresses(secondaryContact.postalAddresses),
+              addressEntries: parseObjectArray<{
+                label: string;
+                formatted: string;
+                isPrimary: boolean;
+                countryOrRegion?: string;
+                streetLine1?: string;
+                streetLine2?: string;
+                cityOrTown?: string;
+                postcode?: string;
+                poBox?: string;
+              }>(secondaryContact.addressEntries),
+              avatarUrl: secondaryContact.avatarUrl ?? null,
+              isFavorite: secondaryContact.isFavorite ?? false,
+              labels: parseContactStringArray(secondaryContact.labels),
+              significantDates: parseObjectArray<{
+                label: string;
+                date: string;
+                isPrimary: boolean;
+              }>(secondaryContact.significantDates),
+              relatedPeople: parseObjectArray<{ relationship: string; name: string }>(
+                secondaryContact.relatedPeople,
+              ),
+              customFields: parseObjectArray<{ label: string; value: string }>(
+                secondaryContact.customFields,
+              ),
               notes: secondaryContact.notes,
               archivedAt: secondaryContact.archivedAt?.toISOString() ?? null,
               syncTombstoneAt: secondaryContact.syncTombstoneAt?.toISOString() ?? null,
@@ -1252,17 +1800,32 @@ export const undoMergedContactsForUser = async ({
       },
       data: {
         fullName: details.primaryBefore.fullName,
+        firstName: details.primaryBefore.firstName,
+        middleName: details.primaryBefore.middleName,
+        lastName: details.primaryBefore.lastName,
+        namePrefix: details.primaryBefore.namePrefix,
+        nameSuffix: details.primaryBefore.nameSuffix,
         nickname: details.primaryBefore.nickname,
         email: details.primaryBefore.email,
         emailAddresses: toNullableJsonField(details.primaryBefore.emailAddresses),
+        emailEntries: toNullableJsonField(details.primaryBefore.emailEntries),
         phone: details.primaryBefore.phone,
         phoneNumbers: toNullableJsonField(details.primaryBefore.phoneNumbers),
+        phoneEntries: toNullableJsonField(details.primaryBefore.phoneEntries),
         company: details.primaryBefore.company,
         jobTitle: details.primaryBefore.jobTitle,
         website: details.primaryBefore.website,
+        websiteEntries: toNullableJsonField(details.primaryBefore.websiteEntries),
         birthday: details.primaryBefore.birthday,
         address: details.primaryBefore.address,
         postalAddresses: toNullableJsonField(details.primaryBefore.postalAddresses),
+        addressEntries: toNullableJsonField(details.primaryBefore.addressEntries),
+        avatarUrl: details.primaryBefore.avatarUrl,
+        isFavorite: details.primaryBefore.isFavorite,
+        labels: toNullableJsonField(details.primaryBefore.labels),
+        significantDates: toNullableJsonField(details.primaryBefore.significantDates),
+        relatedPeople: toNullableJsonField(details.primaryBefore.relatedPeople),
+        customFields: toNullableJsonField(details.primaryBefore.customFields),
         notes: details.primaryBefore.notes,
         archivedAt: details.primaryBefore.archivedAt
           ? new Date(details.primaryBefore.archivedAt)
@@ -1283,17 +1846,32 @@ export const undoMergedContactsForUser = async ({
       },
       data: {
         fullName: details.secondaryBefore.fullName,
+        firstName: details.secondaryBefore.firstName,
+        middleName: details.secondaryBefore.middleName,
+        lastName: details.secondaryBefore.lastName,
+        namePrefix: details.secondaryBefore.namePrefix,
+        nameSuffix: details.secondaryBefore.nameSuffix,
         nickname: details.secondaryBefore.nickname,
         email: details.secondaryBefore.email,
         emailAddresses: toNullableJsonField(details.secondaryBefore.emailAddresses),
+        emailEntries: toNullableJsonField(details.secondaryBefore.emailEntries),
         phone: details.secondaryBefore.phone,
         phoneNumbers: toNullableJsonField(details.secondaryBefore.phoneNumbers),
+        phoneEntries: toNullableJsonField(details.secondaryBefore.phoneEntries),
         company: details.secondaryBefore.company,
         jobTitle: details.secondaryBefore.jobTitle,
         website: details.secondaryBefore.website,
+        websiteEntries: toNullableJsonField(details.secondaryBefore.websiteEntries),
         birthday: details.secondaryBefore.birthday,
         address: details.secondaryBefore.address,
         postalAddresses: toNullableJsonField(details.secondaryBefore.postalAddresses),
+        addressEntries: toNullableJsonField(details.secondaryBefore.addressEntries),
+        avatarUrl: details.secondaryBefore.avatarUrl,
+        isFavorite: details.secondaryBefore.isFavorite,
+        labels: toNullableJsonField(details.secondaryBefore.labels),
+        significantDates: toNullableJsonField(details.secondaryBefore.significantDates),
+        relatedPeople: toNullableJsonField(details.secondaryBefore.relatedPeople),
+        customFields: toNullableJsonField(details.secondaryBefore.customFields),
         notes: details.secondaryBefore.notes,
         archivedAt: details.secondaryBefore.archivedAt
           ? new Date(details.secondaryBefore.archivedAt)

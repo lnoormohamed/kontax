@@ -3775,6 +3775,11 @@ export namespace Prisma {
     syncVersion: number | null
     syncTombstoneAt: Date | null
     fullName: string | null
+    firstName: string | null
+    middleName: string | null
+    lastName: string | null
+    namePrefix: string | null
+    nameSuffix: string | null
     nickname: string | null
     email: string | null
     phone: string | null
@@ -3783,6 +3788,8 @@ export namespace Prisma {
     website: string | null
     birthday: string | null
     address: string | null
+    avatarUrl: string | null
+    isFavorite: boolean | null
     notes: string | null
     archivedAt: Date | null
     createdAt: Date | null
@@ -3798,6 +3805,11 @@ export namespace Prisma {
     syncVersion: number | null
     syncTombstoneAt: Date | null
     fullName: string | null
+    firstName: string | null
+    middleName: string | null
+    lastName: string | null
+    namePrefix: string | null
+    nameSuffix: string | null
     nickname: string | null
     email: string | null
     phone: string | null
@@ -3806,6 +3818,8 @@ export namespace Prisma {
     website: string | null
     birthday: string | null
     address: string | null
+    avatarUrl: string | null
+    isFavorite: boolean | null
     notes: string | null
     archivedAt: Date | null
     createdAt: Date | null
@@ -3821,6 +3835,11 @@ export namespace Prisma {
     syncVersion: number
     syncTombstoneAt: number
     fullName: number
+    firstName: number
+    middleName: number
+    lastName: number
+    namePrefix: number
+    nameSuffix: number
     nickname: number
     email: number
     phone: number
@@ -3829,9 +3848,19 @@ export namespace Prisma {
     website: number
     birthday: number
     address: number
+    avatarUrl: number
+    isFavorite: number
+    labels: number
+    websiteEntries: number
     emailAddresses: number
     phoneNumbers: number
     postalAddresses: number
+    emailEntries: number
+    phoneEntries: number
+    addressEntries: number
+    significantDates: number
+    relatedPeople: number
+    customFields: number
     notes: number
     archivedAt: number
     createdAt: number
@@ -3857,6 +3886,11 @@ export namespace Prisma {
     syncVersion?: true
     syncTombstoneAt?: true
     fullName?: true
+    firstName?: true
+    middleName?: true
+    lastName?: true
+    namePrefix?: true
+    nameSuffix?: true
     nickname?: true
     email?: true
     phone?: true
@@ -3865,6 +3899,8 @@ export namespace Prisma {
     website?: true
     birthday?: true
     address?: true
+    avatarUrl?: true
+    isFavorite?: true
     notes?: true
     archivedAt?: true
     createdAt?: true
@@ -3880,6 +3916,11 @@ export namespace Prisma {
     syncVersion?: true
     syncTombstoneAt?: true
     fullName?: true
+    firstName?: true
+    middleName?: true
+    lastName?: true
+    namePrefix?: true
+    nameSuffix?: true
     nickname?: true
     email?: true
     phone?: true
@@ -3888,6 +3929,8 @@ export namespace Prisma {
     website?: true
     birthday?: true
     address?: true
+    avatarUrl?: true
+    isFavorite?: true
     notes?: true
     archivedAt?: true
     createdAt?: true
@@ -3903,6 +3946,11 @@ export namespace Prisma {
     syncVersion?: true
     syncTombstoneAt?: true
     fullName?: true
+    firstName?: true
+    middleName?: true
+    lastName?: true
+    namePrefix?: true
+    nameSuffix?: true
     nickname?: true
     email?: true
     phone?: true
@@ -3911,9 +3959,19 @@ export namespace Prisma {
     website?: true
     birthday?: true
     address?: true
+    avatarUrl?: true
+    isFavorite?: true
+    labels?: true
+    websiteEntries?: true
     emailAddresses?: true
     phoneNumbers?: true
     postalAddresses?: true
+    emailEntries?: true
+    phoneEntries?: true
+    addressEntries?: true
+    significantDates?: true
+    relatedPeople?: true
+    customFields?: true
     notes?: true
     archivedAt?: true
     createdAt?: true
@@ -4016,6 +4074,11 @@ export namespace Prisma {
     syncVersion: number
     syncTombstoneAt: Date | null
     fullName: string
+    firstName: string | null
+    middleName: string | null
+    lastName: string | null
+    namePrefix: string | null
+    nameSuffix: string | null
     nickname: string | null
     email: string | null
     phone: string | null
@@ -4024,9 +4087,19 @@ export namespace Prisma {
     website: string | null
     birthday: string | null
     address: string | null
+    avatarUrl: string | null
+    isFavorite: boolean
+    labels: JsonValue | null
+    websiteEntries: JsonValue | null
     emailAddresses: JsonValue | null
     phoneNumbers: JsonValue | null
     postalAddresses: JsonValue | null
+    emailEntries: JsonValue | null
+    phoneEntries: JsonValue | null
+    addressEntries: JsonValue | null
+    significantDates: JsonValue | null
+    relatedPeople: JsonValue | null
+    customFields: JsonValue | null
     notes: string | null
     archivedAt: Date | null
     createdAt: Date
@@ -4061,6 +4134,11 @@ export namespace Prisma {
     syncVersion?: boolean
     syncTombstoneAt?: boolean
     fullName?: boolean
+    firstName?: boolean
+    middleName?: boolean
+    lastName?: boolean
+    namePrefix?: boolean
+    nameSuffix?: boolean
     nickname?: boolean
     email?: boolean
     phone?: boolean
@@ -4069,9 +4147,19 @@ export namespace Prisma {
     website?: boolean
     birthday?: boolean
     address?: boolean
+    avatarUrl?: boolean
+    isFavorite?: boolean
+    labels?: boolean
+    websiteEntries?: boolean
     emailAddresses?: boolean
     phoneNumbers?: boolean
     postalAddresses?: boolean
+    emailEntries?: boolean
+    phoneEntries?: boolean
+    addressEntries?: boolean
+    significantDates?: boolean
+    relatedPeople?: boolean
+    customFields?: boolean
     notes?: boolean
     archivedAt?: boolean
     createdAt?: boolean
@@ -4096,6 +4184,11 @@ export namespace Prisma {
     syncVersion?: boolean
     syncTombstoneAt?: boolean
     fullName?: boolean
+    firstName?: boolean
+    middleName?: boolean
+    lastName?: boolean
+    namePrefix?: boolean
+    nameSuffix?: boolean
     nickname?: boolean
     email?: boolean
     phone?: boolean
@@ -4104,9 +4197,19 @@ export namespace Prisma {
     website?: boolean
     birthday?: boolean
     address?: boolean
+    avatarUrl?: boolean
+    isFavorite?: boolean
+    labels?: boolean
+    websiteEntries?: boolean
     emailAddresses?: boolean
     phoneNumbers?: boolean
     postalAddresses?: boolean
+    emailEntries?: boolean
+    phoneEntries?: boolean
+    addressEntries?: boolean
+    significantDates?: boolean
+    relatedPeople?: boolean
+    customFields?: boolean
     notes?: boolean
     archivedAt?: boolean
     createdAt?: boolean
@@ -4125,6 +4228,11 @@ export namespace Prisma {
     syncVersion?: boolean
     syncTombstoneAt?: boolean
     fullName?: boolean
+    firstName?: boolean
+    middleName?: boolean
+    lastName?: boolean
+    namePrefix?: boolean
+    nameSuffix?: boolean
     nickname?: boolean
     email?: boolean
     phone?: boolean
@@ -4133,9 +4241,19 @@ export namespace Prisma {
     website?: boolean
     birthday?: boolean
     address?: boolean
+    avatarUrl?: boolean
+    isFavorite?: boolean
+    labels?: boolean
+    websiteEntries?: boolean
     emailAddresses?: boolean
     phoneNumbers?: boolean
     postalAddresses?: boolean
+    emailEntries?: boolean
+    phoneEntries?: boolean
+    addressEntries?: boolean
+    significantDates?: boolean
+    relatedPeople?: boolean
+    customFields?: boolean
     notes?: boolean
     archivedAt?: boolean
     createdAt?: boolean
@@ -4154,6 +4272,11 @@ export namespace Prisma {
     syncVersion?: boolean
     syncTombstoneAt?: boolean
     fullName?: boolean
+    firstName?: boolean
+    middleName?: boolean
+    lastName?: boolean
+    namePrefix?: boolean
+    nameSuffix?: boolean
     nickname?: boolean
     email?: boolean
     phone?: boolean
@@ -4162,16 +4285,26 @@ export namespace Prisma {
     website?: boolean
     birthday?: boolean
     address?: boolean
+    avatarUrl?: boolean
+    isFavorite?: boolean
+    labels?: boolean
+    websiteEntries?: boolean
     emailAddresses?: boolean
     phoneNumbers?: boolean
     postalAddresses?: boolean
+    emailEntries?: boolean
+    phoneEntries?: boolean
+    addressEntries?: boolean
+    significantDates?: boolean
+    relatedPeople?: boolean
+    customFields?: boolean
     notes?: boolean
     archivedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ContactOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "importJobId" | "mergedIntoContactId" | "syncUid" | "syncVersion" | "syncTombstoneAt" | "fullName" | "nickname" | "email" | "phone" | "company" | "jobTitle" | "website" | "birthday" | "address" | "emailAddresses" | "phoneNumbers" | "postalAddresses" | "notes" | "archivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["contact"]>
+  export type ContactOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "importJobId" | "mergedIntoContactId" | "syncUid" | "syncVersion" | "syncTombstoneAt" | "fullName" | "firstName" | "middleName" | "lastName" | "namePrefix" | "nameSuffix" | "nickname" | "email" | "phone" | "company" | "jobTitle" | "website" | "birthday" | "address" | "avatarUrl" | "isFavorite" | "labels" | "websiteEntries" | "emailAddresses" | "phoneNumbers" | "postalAddresses" | "emailEntries" | "phoneEntries" | "addressEntries" | "significantDates" | "relatedPeople" | "customFields" | "notes" | "archivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["contact"]>
   export type ContactInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     importJob?: boolean | Contact$importJobArgs<ExtArgs>
@@ -4215,6 +4348,11 @@ export namespace Prisma {
       syncVersion: number
       syncTombstoneAt: Date | null
       fullName: string
+      firstName: string | null
+      middleName: string | null
+      lastName: string | null
+      namePrefix: string | null
+      nameSuffix: string | null
       nickname: string | null
       email: string | null
       phone: string | null
@@ -4223,9 +4361,19 @@ export namespace Prisma {
       website: string | null
       birthday: string | null
       address: string | null
+      avatarUrl: string | null
+      isFavorite: boolean
+      labels: Prisma.JsonValue | null
+      websiteEntries: Prisma.JsonValue | null
       emailAddresses: Prisma.JsonValue | null
       phoneNumbers: Prisma.JsonValue | null
       postalAddresses: Prisma.JsonValue | null
+      emailEntries: Prisma.JsonValue | null
+      phoneEntries: Prisma.JsonValue | null
+      addressEntries: Prisma.JsonValue | null
+      significantDates: Prisma.JsonValue | null
+      relatedPeople: Prisma.JsonValue | null
+      customFields: Prisma.JsonValue | null
       notes: string | null
       archivedAt: Date | null
       createdAt: Date
@@ -4669,6 +4817,11 @@ export namespace Prisma {
     readonly syncVersion: FieldRef<"Contact", 'Int'>
     readonly syncTombstoneAt: FieldRef<"Contact", 'DateTime'>
     readonly fullName: FieldRef<"Contact", 'String'>
+    readonly firstName: FieldRef<"Contact", 'String'>
+    readonly middleName: FieldRef<"Contact", 'String'>
+    readonly lastName: FieldRef<"Contact", 'String'>
+    readonly namePrefix: FieldRef<"Contact", 'String'>
+    readonly nameSuffix: FieldRef<"Contact", 'String'>
     readonly nickname: FieldRef<"Contact", 'String'>
     readonly email: FieldRef<"Contact", 'String'>
     readonly phone: FieldRef<"Contact", 'String'>
@@ -4677,9 +4830,19 @@ export namespace Prisma {
     readonly website: FieldRef<"Contact", 'String'>
     readonly birthday: FieldRef<"Contact", 'String'>
     readonly address: FieldRef<"Contact", 'String'>
+    readonly avatarUrl: FieldRef<"Contact", 'String'>
+    readonly isFavorite: FieldRef<"Contact", 'Boolean'>
+    readonly labels: FieldRef<"Contact", 'Json'>
+    readonly websiteEntries: FieldRef<"Contact", 'Json'>
     readonly emailAddresses: FieldRef<"Contact", 'Json'>
     readonly phoneNumbers: FieldRef<"Contact", 'Json'>
     readonly postalAddresses: FieldRef<"Contact", 'Json'>
+    readonly emailEntries: FieldRef<"Contact", 'Json'>
+    readonly phoneEntries: FieldRef<"Contact", 'Json'>
+    readonly addressEntries: FieldRef<"Contact", 'Json'>
+    readonly significantDates: FieldRef<"Contact", 'Json'>
+    readonly relatedPeople: FieldRef<"Contact", 'Json'>
+    readonly customFields: FieldRef<"Contact", 'Json'>
     readonly notes: FieldRef<"Contact", 'String'>
     readonly archivedAt: FieldRef<"Contact", 'DateTime'>
     readonly createdAt: FieldRef<"Contact", 'DateTime'>
@@ -18023,6 +18186,11 @@ export namespace Prisma {
     syncVersion: 'syncVersion',
     syncTombstoneAt: 'syncTombstoneAt',
     fullName: 'fullName',
+    firstName: 'firstName',
+    middleName: 'middleName',
+    lastName: 'lastName',
+    namePrefix: 'namePrefix',
+    nameSuffix: 'nameSuffix',
     nickname: 'nickname',
     email: 'email',
     phone: 'phone',
@@ -18031,9 +18199,19 @@ export namespace Prisma {
     website: 'website',
     birthday: 'birthday',
     address: 'address',
+    avatarUrl: 'avatarUrl',
+    isFavorite: 'isFavorite',
+    labels: 'labels',
+    websiteEntries: 'websiteEntries',
     emailAddresses: 'emailAddresses',
     phoneNumbers: 'phoneNumbers',
     postalAddresses: 'postalAddresses',
+    emailEntries: 'emailEntries',
+    phoneEntries: 'phoneEntries',
+    addressEntries: 'addressEntries',
+    significantDates: 'significantDates',
+    relatedPeople: 'relatedPeople',
+    customFields: 'customFields',
     notes: 'notes',
     archivedAt: 'archivedAt',
     createdAt: 'createdAt',
@@ -18384,6 +18562,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
    * Reference to a field of type 'Json'
    */
   export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
@@ -18450,13 +18635,6 @@ export namespace Prisma {
    * Reference to a field of type 'SubscriptionInterval[]'
    */
   export type ListEnumSubscriptionIntervalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SubscriptionInterval[]'>
-    
-
-
-  /**
-   * Reference to a field of type 'Boolean'
-   */
-  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -18785,6 +18963,11 @@ export namespace Prisma {
     syncVersion?: IntFilter<"Contact"> | number
     syncTombstoneAt?: DateTimeNullableFilter<"Contact"> | Date | string | null
     fullName?: StringFilter<"Contact"> | string
+    firstName?: StringNullableFilter<"Contact"> | string | null
+    middleName?: StringNullableFilter<"Contact"> | string | null
+    lastName?: StringNullableFilter<"Contact"> | string | null
+    namePrefix?: StringNullableFilter<"Contact"> | string | null
+    nameSuffix?: StringNullableFilter<"Contact"> | string | null
     nickname?: StringNullableFilter<"Contact"> | string | null
     email?: StringNullableFilter<"Contact"> | string | null
     phone?: StringNullableFilter<"Contact"> | string | null
@@ -18793,9 +18976,19 @@ export namespace Prisma {
     website?: StringNullableFilter<"Contact"> | string | null
     birthday?: StringNullableFilter<"Contact"> | string | null
     address?: StringNullableFilter<"Contact"> | string | null
+    avatarUrl?: StringNullableFilter<"Contact"> | string | null
+    isFavorite?: BoolFilter<"Contact"> | boolean
+    labels?: JsonNullableFilter<"Contact">
+    websiteEntries?: JsonNullableFilter<"Contact">
     emailAddresses?: JsonNullableFilter<"Contact">
     phoneNumbers?: JsonNullableFilter<"Contact">
     postalAddresses?: JsonNullableFilter<"Contact">
+    emailEntries?: JsonNullableFilter<"Contact">
+    phoneEntries?: JsonNullableFilter<"Contact">
+    addressEntries?: JsonNullableFilter<"Contact">
+    significantDates?: JsonNullableFilter<"Contact">
+    relatedPeople?: JsonNullableFilter<"Contact">
+    customFields?: JsonNullableFilter<"Contact">
     notes?: StringNullableFilter<"Contact"> | string | null
     archivedAt?: DateTimeNullableFilter<"Contact"> | Date | string | null
     createdAt?: DateTimeFilter<"Contact"> | Date | string
@@ -18819,6 +19012,11 @@ export namespace Prisma {
     syncVersion?: SortOrder
     syncTombstoneAt?: SortOrderInput | SortOrder
     fullName?: SortOrder
+    firstName?: SortOrderInput | SortOrder
+    middleName?: SortOrderInput | SortOrder
+    lastName?: SortOrderInput | SortOrder
+    namePrefix?: SortOrderInput | SortOrder
+    nameSuffix?: SortOrderInput | SortOrder
     nickname?: SortOrderInput | SortOrder
     email?: SortOrderInput | SortOrder
     phone?: SortOrderInput | SortOrder
@@ -18827,9 +19025,19 @@ export namespace Prisma {
     website?: SortOrderInput | SortOrder
     birthday?: SortOrderInput | SortOrder
     address?: SortOrderInput | SortOrder
+    avatarUrl?: SortOrderInput | SortOrder
+    isFavorite?: SortOrder
+    labels?: SortOrderInput | SortOrder
+    websiteEntries?: SortOrderInput | SortOrder
     emailAddresses?: SortOrderInput | SortOrder
     phoneNumbers?: SortOrderInput | SortOrder
     postalAddresses?: SortOrderInput | SortOrder
+    emailEntries?: SortOrderInput | SortOrder
+    phoneEntries?: SortOrderInput | SortOrder
+    addressEntries?: SortOrderInput | SortOrder
+    significantDates?: SortOrderInput | SortOrder
+    relatedPeople?: SortOrderInput | SortOrder
+    customFields?: SortOrderInput | SortOrder
     notes?: SortOrderInput | SortOrder
     archivedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -18856,6 +19064,11 @@ export namespace Prisma {
     syncVersion?: IntFilter<"Contact"> | number
     syncTombstoneAt?: DateTimeNullableFilter<"Contact"> | Date | string | null
     fullName?: StringFilter<"Contact"> | string
+    firstName?: StringNullableFilter<"Contact"> | string | null
+    middleName?: StringNullableFilter<"Contact"> | string | null
+    lastName?: StringNullableFilter<"Contact"> | string | null
+    namePrefix?: StringNullableFilter<"Contact"> | string | null
+    nameSuffix?: StringNullableFilter<"Contact"> | string | null
     nickname?: StringNullableFilter<"Contact"> | string | null
     email?: StringNullableFilter<"Contact"> | string | null
     phone?: StringNullableFilter<"Contact"> | string | null
@@ -18864,9 +19077,19 @@ export namespace Prisma {
     website?: StringNullableFilter<"Contact"> | string | null
     birthday?: StringNullableFilter<"Contact"> | string | null
     address?: StringNullableFilter<"Contact"> | string | null
+    avatarUrl?: StringNullableFilter<"Contact"> | string | null
+    isFavorite?: BoolFilter<"Contact"> | boolean
+    labels?: JsonNullableFilter<"Contact">
+    websiteEntries?: JsonNullableFilter<"Contact">
     emailAddresses?: JsonNullableFilter<"Contact">
     phoneNumbers?: JsonNullableFilter<"Contact">
     postalAddresses?: JsonNullableFilter<"Contact">
+    emailEntries?: JsonNullableFilter<"Contact">
+    phoneEntries?: JsonNullableFilter<"Contact">
+    addressEntries?: JsonNullableFilter<"Contact">
+    significantDates?: JsonNullableFilter<"Contact">
+    relatedPeople?: JsonNullableFilter<"Contact">
+    customFields?: JsonNullableFilter<"Contact">
     notes?: StringNullableFilter<"Contact"> | string | null
     archivedAt?: DateTimeNullableFilter<"Contact"> | Date | string | null
     createdAt?: DateTimeFilter<"Contact"> | Date | string
@@ -18890,6 +19113,11 @@ export namespace Prisma {
     syncVersion?: SortOrder
     syncTombstoneAt?: SortOrderInput | SortOrder
     fullName?: SortOrder
+    firstName?: SortOrderInput | SortOrder
+    middleName?: SortOrderInput | SortOrder
+    lastName?: SortOrderInput | SortOrder
+    namePrefix?: SortOrderInput | SortOrder
+    nameSuffix?: SortOrderInput | SortOrder
     nickname?: SortOrderInput | SortOrder
     email?: SortOrderInput | SortOrder
     phone?: SortOrderInput | SortOrder
@@ -18898,9 +19126,19 @@ export namespace Prisma {
     website?: SortOrderInput | SortOrder
     birthday?: SortOrderInput | SortOrder
     address?: SortOrderInput | SortOrder
+    avatarUrl?: SortOrderInput | SortOrder
+    isFavorite?: SortOrder
+    labels?: SortOrderInput | SortOrder
+    websiteEntries?: SortOrderInput | SortOrder
     emailAddresses?: SortOrderInput | SortOrder
     phoneNumbers?: SortOrderInput | SortOrder
     postalAddresses?: SortOrderInput | SortOrder
+    emailEntries?: SortOrderInput | SortOrder
+    phoneEntries?: SortOrderInput | SortOrder
+    addressEntries?: SortOrderInput | SortOrder
+    significantDates?: SortOrderInput | SortOrder
+    relatedPeople?: SortOrderInput | SortOrder
+    customFields?: SortOrderInput | SortOrder
     notes?: SortOrderInput | SortOrder
     archivedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -18924,6 +19162,11 @@ export namespace Prisma {
     syncVersion?: IntWithAggregatesFilter<"Contact"> | number
     syncTombstoneAt?: DateTimeNullableWithAggregatesFilter<"Contact"> | Date | string | null
     fullName?: StringWithAggregatesFilter<"Contact"> | string
+    firstName?: StringNullableWithAggregatesFilter<"Contact"> | string | null
+    middleName?: StringNullableWithAggregatesFilter<"Contact"> | string | null
+    lastName?: StringNullableWithAggregatesFilter<"Contact"> | string | null
+    namePrefix?: StringNullableWithAggregatesFilter<"Contact"> | string | null
+    nameSuffix?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     nickname?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     email?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     phone?: StringNullableWithAggregatesFilter<"Contact"> | string | null
@@ -18932,9 +19175,19 @@ export namespace Prisma {
     website?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     birthday?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     address?: StringNullableWithAggregatesFilter<"Contact"> | string | null
+    avatarUrl?: StringNullableWithAggregatesFilter<"Contact"> | string | null
+    isFavorite?: BoolWithAggregatesFilter<"Contact"> | boolean
+    labels?: JsonNullableWithAggregatesFilter<"Contact">
+    websiteEntries?: JsonNullableWithAggregatesFilter<"Contact">
     emailAddresses?: JsonNullableWithAggregatesFilter<"Contact">
     phoneNumbers?: JsonNullableWithAggregatesFilter<"Contact">
     postalAddresses?: JsonNullableWithAggregatesFilter<"Contact">
+    emailEntries?: JsonNullableWithAggregatesFilter<"Contact">
+    phoneEntries?: JsonNullableWithAggregatesFilter<"Contact">
+    addressEntries?: JsonNullableWithAggregatesFilter<"Contact">
+    significantDates?: JsonNullableWithAggregatesFilter<"Contact">
+    relatedPeople?: JsonNullableWithAggregatesFilter<"Contact">
+    customFields?: JsonNullableWithAggregatesFilter<"Contact">
     notes?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     archivedAt?: DateTimeNullableWithAggregatesFilter<"Contact"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Contact"> | Date | string
@@ -20268,6 +20521,11 @@ export namespace Prisma {
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
     fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
@@ -20276,9 +20534,19 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -20302,6 +20570,11 @@ export namespace Prisma {
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
     fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
@@ -20310,9 +20583,19 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -20330,6 +20613,11 @@ export namespace Prisma {
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -20338,9 +20626,19 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20364,6 +20662,11 @@ export namespace Prisma {
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -20372,9 +20675,19 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20395,6 +20708,11 @@ export namespace Prisma {
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
     fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
@@ -20403,9 +20721,19 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -20418,6 +20746,11 @@ export namespace Prisma {
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -20426,9 +20759,19 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -20444,6 +20787,11 @@ export namespace Prisma {
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -20452,9 +20800,19 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -22118,6 +22476,11 @@ export namespace Prisma {
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
+
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
   export type JsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -22186,6 +22549,11 @@ export namespace Prisma {
     syncVersion?: SortOrder
     syncTombstoneAt?: SortOrder
     fullName?: SortOrder
+    firstName?: SortOrder
+    middleName?: SortOrder
+    lastName?: SortOrder
+    namePrefix?: SortOrder
+    nameSuffix?: SortOrder
     nickname?: SortOrder
     email?: SortOrder
     phone?: SortOrder
@@ -22194,9 +22562,19 @@ export namespace Prisma {
     website?: SortOrder
     birthday?: SortOrder
     address?: SortOrder
+    avatarUrl?: SortOrder
+    isFavorite?: SortOrder
+    labels?: SortOrder
+    websiteEntries?: SortOrder
     emailAddresses?: SortOrder
     phoneNumbers?: SortOrder
     postalAddresses?: SortOrder
+    emailEntries?: SortOrder
+    phoneEntries?: SortOrder
+    addressEntries?: SortOrder
+    significantDates?: SortOrder
+    relatedPeople?: SortOrder
+    customFields?: SortOrder
     notes?: SortOrder
     archivedAt?: SortOrder
     createdAt?: SortOrder
@@ -22216,6 +22594,11 @@ export namespace Prisma {
     syncVersion?: SortOrder
     syncTombstoneAt?: SortOrder
     fullName?: SortOrder
+    firstName?: SortOrder
+    middleName?: SortOrder
+    lastName?: SortOrder
+    namePrefix?: SortOrder
+    nameSuffix?: SortOrder
     nickname?: SortOrder
     email?: SortOrder
     phone?: SortOrder
@@ -22224,6 +22607,8 @@ export namespace Prisma {
     website?: SortOrder
     birthday?: SortOrder
     address?: SortOrder
+    avatarUrl?: SortOrder
+    isFavorite?: SortOrder
     notes?: SortOrder
     archivedAt?: SortOrder
     createdAt?: SortOrder
@@ -22239,6 +22624,11 @@ export namespace Prisma {
     syncVersion?: SortOrder
     syncTombstoneAt?: SortOrder
     fullName?: SortOrder
+    firstName?: SortOrder
+    middleName?: SortOrder
+    lastName?: SortOrder
+    namePrefix?: SortOrder
+    nameSuffix?: SortOrder
     nickname?: SortOrder
     email?: SortOrder
     phone?: SortOrder
@@ -22247,6 +22637,8 @@ export namespace Prisma {
     website?: SortOrder
     birthday?: SortOrder
     address?: SortOrder
+    avatarUrl?: SortOrder
+    isFavorite?: SortOrder
     notes?: SortOrder
     archivedAt?: SortOrder
     createdAt?: SortOrder
@@ -22285,6 +22677,14 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
   export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -22395,11 +22795,6 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type SubscriptionCustomerScalarRelationFilter = {
@@ -22549,14 +22944,6 @@ export namespace Prisma {
     _sum?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedIntNullableFilter<$PrismaModel>
     _max?: NestedIntNullableFilter<$PrismaModel>
-  }
-
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type EnumContactImportFormatFilter<$PrismaModel = never> = {
@@ -23922,6 +24309,10 @@ export namespace Prisma {
     set?: Date | string | null
   }
 
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
+  }
+
   export type UserUpdateOneRequiredWithoutContactsNestedInput = {
     create?: XOR<UserCreateWithoutContactsInput, UserUncheckedCreateWithoutContactsInput>
     connectOrCreate?: UserCreateOrConnectWithoutContactsInput
@@ -24180,10 +24571,6 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
-  }
-
-  export type BoolFieldUpdateOperationsInput = {
-    set?: boolean
   }
 
   export type UserUpdateOneRequiredWithoutSubscriptionsNestedInput = {
@@ -24851,6 +25238,11 @@ export namespace Prisma {
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -24890,6 +25282,14 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
   }
   export type NestedJsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -24953,11 +25353,6 @@ export namespace Prisma {
     not?: NestedEnumSubscriptionIntervalFilter<$PrismaModel> | $Enums.SubscriptionInterval
   }
 
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
-  }
-
   export type NestedEnumSubscriptionPlanWithAggregatesFilter<$PrismaModel = never> = {
     equals?: $Enums.SubscriptionPlan | EnumSubscriptionPlanFieldRefInput<$PrismaModel>
     in?: $Enums.SubscriptionPlan[] | ListEnumSubscriptionPlanFieldRefInput<$PrismaModel>
@@ -25013,14 +25408,6 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
 
   export type NestedEnumContactImportFormatFilter<$PrismaModel = never> = {
@@ -25307,6 +25694,11 @@ export namespace Prisma {
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
     fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
@@ -25315,9 +25707,19 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -25339,6 +25741,11 @@ export namespace Prisma {
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
     fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
@@ -25347,9 +25754,19 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -25740,6 +26157,11 @@ export namespace Prisma {
     syncVersion?: IntFilter<"Contact"> | number
     syncTombstoneAt?: DateTimeNullableFilter<"Contact"> | Date | string | null
     fullName?: StringFilter<"Contact"> | string
+    firstName?: StringNullableFilter<"Contact"> | string | null
+    middleName?: StringNullableFilter<"Contact"> | string | null
+    lastName?: StringNullableFilter<"Contact"> | string | null
+    namePrefix?: StringNullableFilter<"Contact"> | string | null
+    nameSuffix?: StringNullableFilter<"Contact"> | string | null
     nickname?: StringNullableFilter<"Contact"> | string | null
     email?: StringNullableFilter<"Contact"> | string | null
     phone?: StringNullableFilter<"Contact"> | string | null
@@ -25748,9 +26170,19 @@ export namespace Prisma {
     website?: StringNullableFilter<"Contact"> | string | null
     birthday?: StringNullableFilter<"Contact"> | string | null
     address?: StringNullableFilter<"Contact"> | string | null
+    avatarUrl?: StringNullableFilter<"Contact"> | string | null
+    isFavorite?: BoolFilter<"Contact"> | boolean
+    labels?: JsonNullableFilter<"Contact">
+    websiteEntries?: JsonNullableFilter<"Contact">
     emailAddresses?: JsonNullableFilter<"Contact">
     phoneNumbers?: JsonNullableFilter<"Contact">
     postalAddresses?: JsonNullableFilter<"Contact">
+    emailEntries?: JsonNullableFilter<"Contact">
+    phoneEntries?: JsonNullableFilter<"Contact">
+    addressEntries?: JsonNullableFilter<"Contact">
+    significantDates?: JsonNullableFilter<"Contact">
+    relatedPeople?: JsonNullableFilter<"Contact">
+    customFields?: JsonNullableFilter<"Contact">
     notes?: StringNullableFilter<"Contact"> | string | null
     archivedAt?: DateTimeNullableFilter<"Contact"> | Date | string | null
     createdAt?: DateTimeFilter<"Contact"> | Date | string
@@ -26315,6 +26747,11 @@ export namespace Prisma {
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
     fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
@@ -26323,9 +26760,19 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -26348,6 +26795,11 @@ export namespace Prisma {
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
     fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
@@ -26356,9 +26808,19 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -26380,6 +26842,11 @@ export namespace Prisma {
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
     fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
@@ -26388,9 +26855,19 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -26412,6 +26889,11 @@ export namespace Prisma {
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
     fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
@@ -26420,9 +26902,19 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -26672,6 +27164,11 @@ export namespace Prisma {
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -26680,9 +27177,19 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -26705,6 +27212,11 @@ export namespace Prisma {
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -26713,9 +27225,19 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -27089,6 +27611,11 @@ export namespace Prisma {
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
     fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
@@ -27097,9 +27624,19 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -27121,6 +27658,11 @@ export namespace Prisma {
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
     fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
@@ -27129,9 +27671,19 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -27343,6 +27895,11 @@ export namespace Prisma {
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
     fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
@@ -27351,9 +27908,19 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -27376,6 +27943,11 @@ export namespace Prisma {
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
     fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
@@ -27384,9 +27956,19 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -27408,6 +27990,11 @@ export namespace Prisma {
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
     fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
@@ -27416,9 +28003,19 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -27441,6 +28038,11 @@ export namespace Prisma {
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
     fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
@@ -27449,9 +28051,19 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -27567,6 +28179,11 @@ export namespace Prisma {
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27575,9 +28192,19 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -27600,6 +28227,11 @@ export namespace Prisma {
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27608,9 +28240,19 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -27638,6 +28280,11 @@ export namespace Prisma {
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27646,9 +28293,19 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -27671,6 +28328,11 @@ export namespace Prisma {
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27679,9 +28341,19 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -28265,6 +28937,11 @@ export namespace Prisma {
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
     fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
@@ -28273,9 +28950,19 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -28298,6 +28985,11 @@ export namespace Prisma {
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
     fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
@@ -28306,9 +28998,19 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -28456,6 +29158,11 @@ export namespace Prisma {
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28464,9 +29171,19 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -28489,6 +29206,11 @@ export namespace Prisma {
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28497,9 +29219,19 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -28764,6 +29496,11 @@ export namespace Prisma {
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
     fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
@@ -28772,9 +29509,19 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -28797,6 +29544,11 @@ export namespace Prisma {
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
     fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
@@ -28805,9 +29557,19 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -28952,6 +29714,11 @@ export namespace Prisma {
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28960,9 +29727,19 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -28985,6 +29762,11 @@ export namespace Prisma {
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28993,9 +29775,19 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29014,6 +29806,11 @@ export namespace Prisma {
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
     fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
@@ -29022,9 +29819,19 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -29160,6 +29967,11 @@ export namespace Prisma {
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29168,9 +29980,19 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29192,6 +30014,11 @@ export namespace Prisma {
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29200,9 +30027,19 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29222,6 +30059,11 @@ export namespace Prisma {
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29230,9 +30072,19 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29695,6 +30547,11 @@ export namespace Prisma {
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
     fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
@@ -29703,9 +30560,19 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -29931,6 +30798,11 @@ export namespace Prisma {
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29939,9 +30811,19 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29963,6 +30845,11 @@ export namespace Prisma {
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29971,9 +30858,19 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -29993,6 +30890,11 @@ export namespace Prisma {
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30001,9 +30903,19 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30122,6 +31034,11 @@ export namespace Prisma {
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
     fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
@@ -30130,9 +31047,19 @@ export namespace Prisma {
     website?: string | null
     birthday?: string | null
     address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -30145,6 +31072,11 @@ export namespace Prisma {
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30153,9 +31085,19 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30177,6 +31119,11 @@ export namespace Prisma {
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30185,9 +31132,19 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -30207,6 +31164,11 @@ export namespace Prisma {
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30215,9 +31177,19 @@ export namespace Prisma {
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
     phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
     postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

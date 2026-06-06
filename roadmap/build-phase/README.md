@@ -3,7 +3,7 @@
 ## Summary
 Kontax is being built as a consumer-first SaaS contacts platform with single-user ownership in v1, practical strong security defaults, import/export before CardDAV, and billing foundations introduced early without blocking the core contact experience.
 
-This roadmap is the implementation source of truth for phases 1-5. Each phase file contains detailed tickets, dependencies, implementation notes, acceptance criteria, and progress tracking.
+This roadmap is the implementation source of truth for phases 1-6. Each phase file contains detailed tickets, dependencies, implementation notes, acceptance criteria, and progress tracking.
 
 ## Goals
 - Ship a trustworthy personal contacts product with strong foundations for future SaaS growth.
@@ -56,6 +56,12 @@ This roadmap is the implementation source of truth for phases 1-5. Each phase fi
 | P5-04 | 5 | Done | P1 | P5-02, P4-05 | Unassigned | Conflict model, tombstones, merge lineage, and versioning rules defined |
 | P5-05 | 5 | Done | P2 | P5-02 | Unassigned | iPhone and Android compatibility assumptions and limitations captured |
 | P5-06 | 5 | Done | P2 | P5-03, P5-04 | Unassigned | Beta rollout, support tooling, and recovery plan documented |
+| P6-01 | 6 | Done | P0 | P1-01, P3-01 | Unassigned | Rich person/profile fields and labels planned |
+| P6-02 | 6 | Done | P0 | P6-01 | Unassigned | Structured multi-value email, phone, and address model defined |
+| P6-03 | 6 | Done | P1 | P6-01, P4-04 | Unassigned | Dates, websites, related people, and custom fields planned |
+| P6-04 | 6 | Done | P1 | P6-02, P5-01 | Unassigned | Rich-field schema, merge, and sync treatment documented |
+| P6-05 | 6 | Done | P2 | P6-02, P3-03 | Unassigned | Rich contact editing and portability UX expectations defined |
+| P6-06 | 6 | Done | P2 | P6-03, P5-05 | Unassigned | Mobile parity and compatibility expectations documented |
 
 ## Dependency Map
 - Phase 1 defines the contact model, security baseline, and consumer scope.
@@ -63,6 +69,7 @@ This roadmap is the implementation source of truth for phases 1-5. Each phase fi
 - Phase 3 depends on Phase 1 because import/export requires a stable contact schema and normalization rules.
 - Phase 4 depends on Phase 3 because merge quality relies on normalized imported data and source metadata.
 - Phase 5 depends on Phases 1, 3, and 4 because sync requires stable identifiers, import-compatible mappings, and deterministic conflict/merge behavior.
+- Phase 6 depends on Phases 1, 3, 4, and 5 because richer contact detail needs a stable schema base, portability rules, deterministic merge behavior, and clear sync compatibility expectations.
 
 ## Cross-Phase Validation Scenarios
 - A new account can sign up, authenticate, and save contacts without schema redesign between phases.

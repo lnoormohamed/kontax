@@ -171,6 +171,11 @@ model Contact {
     syncVersion Int       @default(1)
     syncTombstoneAt DateTime?
     fullName    String
+    firstName   String?
+    middleName  String?
+    lastName    String?
+    namePrefix  String?
+    nameSuffix  String?
     nickname    String?
     email       String?
     phone       String?
@@ -179,9 +184,19 @@ model Contact {
     website     String?
     birthday    String?
     address     String?
+    avatarUrl   String?
+    isFavorite  Boolean   @default(false)
+    labels      Json?
+    websiteEntries Json?
     emailAddresses Json?
     phoneNumbers   Json?
     postalAddresses Json?
+    emailEntries   Json?
+    phoneEntries   Json?
+    addressEntries Json?
+    significantDates Json?
+    relatedPeople Json?
+    customFields  Json?
     notes       String?
     archivedAt  DateTime?
     createdAt   DateTime  @default(now())

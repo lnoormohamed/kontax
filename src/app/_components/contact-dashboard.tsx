@@ -63,31 +63,47 @@ const getInitials = (value: string) =>
     .join("")
     .toUpperCase();
 
+const getLifecycleTone = (state: BillingLifecycleState) => {
+  if (state === "ACTIVE" || state === "TRIALING") {
+    return "border-emerald-200 bg-emerald-50 text-emerald-700";
+  }
+
+  if (state === "GRACE") {
+    return "border-amber-200 bg-amber-50 text-amber-700";
+  }
+
+  return "border-rose-200 bg-rose-50 text-rose-700";
+};
+
+const getContactMeta = (contact: DashboardContact) => {
+  const parts = [contact.email, contact.phone, contact.company].filter(Boolean);
+  return parts.length > 0 ? parts.join(" · ") : "No primary contact method yet";
+};
+
 const ContactRow = ({ contact }: { contact: DashboardContact }) => (
-  <article className="grid gap-4 border-t border-white/10 px-4 py-4 text-sm text-slate-300 lg:grid-cols-[minmax(220px,1.4fr)_minmax(180px,1fr)_minmax(160px,0.9fr)_minmax(220px,1.1fr)_auto] lg:items-center lg:px-6">
+  <article className="grid gap-4 border-t border-slate-200 px-4 py-4 text-sm text-slate-600 transition hover:bg-slate-50 lg:grid-cols-[minmax(220px,1.2fr)_minmax(220px,1fr)_minmax(180px,0.8fr)_minmax(220px,1fr)_auto] lg:items-center lg:px-6">
     <div className="flex items-center gap-3">
-      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-cyan-300/15 text-sm font-semibold text-cyan-100">
+      <div className="flex h-11 w-11 items-center justify-center rounded-full bg-sky-100 text-sm font-semibold text-sky-700">
         {getInitials(contact.fullName)}
       </div>
-      <div>
-        <p className="font-semibold text-white">{contact.fullName}</p>
-        <p className="text-xs text-slate-500">
-          Updated {formatTimestamp(contact.updatedAt)}
-          {contact.nickname ? ` · ${contact.nickname}` : ""}
+      <div className="min-w-0">
+        <p className="truncate font-semibold text-slate-900">{contact.fullName}</p>
+        <p className="truncate text-xs text-slate-500">
+          {contact.nickname ? `${contact.nickname} · ` : ""}Updated {formatTimestamp(contact.updatedAt)}
         </p>
       </div>
     </div>
 
-    <p className="break-words text-slate-300">{contact.email ?? "No email"}</p>
-    <p className="text-slate-300">{contact.phone ?? "No phone"}</p>
-    <div>
-      <p className="text-slate-300">{contact.company ?? "No company"}</p>
-      <p className="text-xs text-slate-500">{contact.jobTitle ?? "No role"}</p>
+    <p className="truncate text-slate-600">{contact.email ?? "No email"}</p>
+    <p className="truncate text-slate-600">{contact.phone ?? "No phone"}</p>
+    <div className="min-w-0">
+      <p className="truncate text-slate-700">{contact.jobTitle ?? "No role"}</p>
+      <p className="truncate text-xs text-slate-500">{contact.company ?? "No company"}</p>
     </div>
 
     <div className="flex flex-wrap gap-2 lg:justify-end">
       <Link
-        className="rounded-full border border-white/10 px-3 py-2 text-xs font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-100"
+        className="rounded-full border border-slate-200 px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-sky-300 hover:text-sky-700"
         href={`/contacts/${contact.id}`}
       >
         Open
@@ -96,7 +112,7 @@ const ContactRow = ({ contact }: { contact: DashboardContact }) => (
         <form action={restoreContact}>
           <input name="contactId" type="hidden" value={contact.id} />
           <button
-            className="rounded-full bg-cyan-300 px-3 py-2 text-xs font-semibold text-slate-950 transition hover:bg-cyan-200"
+            className="rounded-full bg-sky-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-sky-500"
             type="submit"
           >
             Restore
@@ -106,7 +122,7 @@ const ContactRow = ({ contact }: { contact: DashboardContact }) => (
         <form action={archiveContact}>
           <input name="contactId" type="hidden" value={contact.id} />
           <button
-            className="rounded-full border border-amber-300/30 px-3 py-2 text-xs font-semibold text-amber-200 transition hover:border-amber-200 hover:text-white"
+            className="rounded-full border border-amber-300 px-3 py-2 text-xs font-semibold text-amber-700 transition hover:border-amber-400 hover:bg-amber-50"
             type="submit"
           >
             Archive
@@ -129,89 +145,67 @@ export function ContactDashboard({
   const visibleCount = activeContacts.length + archivedContacts.length;
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.14),_transparent_35%),linear-gradient(180deg,#020617_0%,#07111d_45%,#0f172a_100%)] text-white">
-      <div className="mx-auto flex w-full max-w-[1600px] flex-col gap-6 px-4 py-6 lg:px-8 lg:py-8">
-        <section className="rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-[0_30px_120px_rgba(2,8,23,0.35)] backdrop-blur">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <p className="text-sm uppercase tracking-[0.32em] text-cyan-200">Kontax contacts</p>
-              <h1 className="mt-2 text-4xl font-semibold tracking-tight text-white">
-                Contact index for {userLabel}
-              </h1>
-              <p className="mt-2 max-w-3xl text-sm text-slate-300 sm:text-base">
-                Search, scan, and manage your contacts from a denser list-first workspace that is
-                ready for imports, merges, billing rules, and future sync.
+    <main className="min-h-screen bg-[#f3f7fb] text-slate-900">
+      <div className="mx-auto flex w-full max-w-[1680px] flex-col gap-6 px-4 py-6 lg:px-6 lg:py-8">
+        <section className="grid gap-6 xl:grid-cols-[280px_minmax(0,1fr)_320px]">
+          <aside className="grid gap-5 self-start xl:sticky xl:top-24">
+            <div className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-sky-600">Workspace</p>
+              <h1 className="mt-3 text-3xl font-semibold tracking-tight text-slate-900">Contacts</h1>
+              <p className="mt-2 text-sm text-slate-500">
+                {userLabel}, this is your list-first contact home for quick scanning, quick capture, and safer cleanup.
               </p>
-            </div>
-
-            <div className="grid gap-3 rounded-[1.5rem] border border-white/10 bg-[#08101c] p-4 text-sm text-slate-300 sm:grid-cols-2 lg:min-w-[360px]">
-              <div>
-                <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Plan</p>
-                <p className="mt-2 text-lg font-semibold text-white">{planSummary.planLabel}</p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Lifecycle</p>
-                <p className="mt-2 text-lg font-semibold text-white">{planSummary.lifecycleLabel}</p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Contacts</p>
-                <p className="mt-2 text-white">
-                  {planSummary.contactsUsed} / {planSummary.contactsLimit}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Imports this month</p>
-                <p className="mt-2 text-white">
-                  {planSummary.importedThisMonth} / {planSummary.monthlyImportLimit}
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {mergeSuggestionsRefreshed ? (
-          <div className="rounded-[1.75rem] border border-emerald-300/25 bg-emerald-300/10 p-4 text-sm text-emerald-100 shadow-[0_20px_60px_rgba(16,185,129,0.12)]">
-            Duplicate suggestions refreshed successfully.
-          </div>
-        ) : null}
-
-        <section className="grid gap-6 xl:grid-cols-[260px_minmax(0,1fr)_340px]">
-          <aside className="grid gap-6 self-start">
-            <div className="rounded-[2rem] border border-white/10 bg-[#08101c]/90 p-5 shadow-[0_20px_80px_rgba(2,8,23,0.35)]">
-              <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Views</p>
-              <div className="mt-4 grid gap-3 text-sm text-slate-300">
-                <div className="rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-4">
-                  <p className="font-semibold text-white">All contacts</p>
-                  <p className="mt-1 text-slate-300">{visibleCount} visible in the current workspace</p>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <p className="font-semibold text-white">Active</p>
-                  <p className="mt-1 text-slate-400">{activeContacts.length} contacts</p>
-                </div>
-                <div className="rounded-2xl border border-white/10 bg-white/5 p-4">
-                  <p className="font-semibold text-white">Archived</p>
-                  <p className="mt-1 text-slate-400">{archivedContacts.length} contacts</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-5 text-sm text-slate-300">
-              <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Quick actions</p>
-              <div className="mt-4 grid gap-3">
+              <div className="mt-5">
                 <Link
-                  className="rounded-full bg-cyan-300 px-4 py-3 text-center font-semibold text-slate-950 transition hover:bg-cyan-200"
+                  className="inline-flex w-full items-center justify-center rounded-[1.3rem] bg-sky-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-sky-500"
+                  href="#quick-add"
+                >
+                  Create contact
+                </Link>
+              </div>
+            </div>
+
+            <div className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
+              <p className="px-3 text-xs font-semibold uppercase tracking-[0.28em] text-slate-400">Views</p>
+              <div className="mt-3 grid gap-2 text-sm">
+                <div className="rounded-[1.35rem] bg-sky-50 px-4 py-3 text-slate-900 ring-1 ring-sky-100">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-semibold">All contacts</span>
+                    <span className="text-sm text-slate-500">{visibleCount}</span>
+                  </div>
+                </div>
+                <div className="rounded-[1.35rem] px-4 py-3 text-slate-600 ring-1 ring-slate-200">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-medium">Active</span>
+                    <span>{activeContacts.length}</span>
+                  </div>
+                </div>
+                <div className="rounded-[1.35rem] px-4 py-3 text-slate-600 ring-1 ring-slate-200">
+                  <div className="flex items-center justify-between gap-3">
+                    <span className="font-medium">Archived</span>
+                    <span>{archivedContacts.length}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-[2rem] border border-slate-200 bg-white p-4 shadow-sm">
+              <p className="px-3 text-xs font-semibold uppercase tracking-[0.28em] text-slate-400">Fix and manage</p>
+              <div className="mt-3 grid gap-2 text-sm">
+                <Link
+                  className="rounded-[1.35rem] px-4 py-3 text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50"
                   href="/merge/manual"
                 >
                   Manual merge
                 </Link>
                 <Link
-                  className="rounded-full border border-white/10 px-4 py-3 text-center font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-100"
+                  className="rounded-[1.35rem] px-4 py-3 text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50"
                   href="/import-export"
                 >
-                  Import / export
+                  Import and export
                 </Link>
                 <Link
-                  className="rounded-full border border-white/10 px-4 py-3 text-center font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-100"
+                  className="rounded-[1.35rem] px-4 py-3 text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50"
                   href="/sync"
                 >
                   Sync center
@@ -219,178 +213,230 @@ export function ContactDashboard({
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-5 text-sm text-slate-300">
-              <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Quick add</p>
-              <p className="mt-3 text-sm text-slate-400">
-                Keep first-touch contact creation lightweight, then open the detail page for richer
-                fields later.
+            <div className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm" id="quick-add">
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-sky-600">Quick add</p>
+              <p className="mt-2 text-sm text-slate-500">
+                Capture a contact fast here, then open the detail page when you want all the richer Phase 6 fields.
               </p>
               {!planSummary.canWrite ? (
-                <div className="mt-4 rounded-2xl border border-amber-300/20 bg-amber-300/10 p-3 text-sm text-amber-100">
-                  This account is currently read-only. Reactivate billing before creating or
-                  editing contacts.
+                <div className="mt-4 rounded-[1.25rem] border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">
+                  This account is read-only right now.
                 </div>
               ) : null}
               <form action={createContact} className="mt-4 grid gap-3">
                 <input
-                  className="rounded-2xl border border-white/10 bg-[#08101c] px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
+                  className="rounded-[1.25rem] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-sky-300 focus:bg-white"
                   name="fullName"
                   placeholder="Full name"
                   required
                   type="text"
                 />
                 <input
-                  className="rounded-2xl border border-white/10 bg-[#08101c] px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
+                  className="rounded-[1.25rem] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-sky-300 focus:bg-white"
                   name="email"
                   placeholder="Email"
                   type="email"
                 />
                 <input
-                  className="rounded-2xl border border-white/10 bg-[#08101c] px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
+                  className="rounded-[1.25rem] border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-sky-300 focus:bg-white"
                   name="phone"
                   placeholder="Phone"
                   type="text"
                 />
-                <input
-                  className="rounded-2xl border border-white/10 bg-[#08101c] px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
-                  name="company"
-                  placeholder="Company"
-                  type="text"
-                />
                 <button
-                  className="rounded-full bg-white px-4 py-3 font-semibold text-slate-950 transition hover:bg-cyan-100 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="rounded-[1.25rem] bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50"
                   disabled={!planSummary.canWrite}
                   type="submit"
                 >
-                  {planSummary.canWrite ? "Create contact" : "Read-only account"}
+                  {planSummary.canWrite ? "Save quick contact" : "Read-only account"}
                 </button>
               </form>
             </div>
           </aside>
 
-          <section className="grid gap-6">
-            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-[0_20px_80px_rgba(2,8,23,0.35)]">
-              <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <section className="grid gap-5">
+            <div className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
                 <div>
-                  <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Contacts</p>
-                  <h2 className="mt-2 text-2xl font-semibold text-white">
-                    {query ? `Results for \"${query}\"` : "List view"}
+                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-sky-600">Contact list</p>
+                  <h2 className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">
+                    {query ? `Results for "${query}"` : `Contacts (${activeContacts.length})`}
                   </h2>
-                  <p className="mt-2 text-sm text-slate-400">
+                  <p className="mt-2 text-sm text-slate-500">
                     {query
-                      ? `${visibleCount} matching contacts across active and archived records.`
-                      : `You have room for ${planSummary.contactsRemaining} more contacts on the ${planSummary.planLabel} plan.`}
+                      ? `${visibleCount} matches across active and archived records.`
+                      : `You can still add ${planSummary.contactsRemaining} more contacts on your current plan.`}
                   </p>
                 </div>
 
-                <form className="flex w-full max-w-2xl gap-3" method="get">
+                <form className="flex w-full max-w-3xl gap-3" method="get">
                   <input
-                    className="w-full rounded-full border border-white/10 bg-[#08101c] px-5 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
+                    className="w-full rounded-full border border-slate-200 bg-slate-50 px-5 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-sky-300 focus:bg-white"
                     defaultValue={query}
                     name="q"
-                    placeholder="Search by name, email, phone, company, or role"
+                    placeholder="Search contacts by name, email, phone, company, role, or address"
                     type="search"
                   />
                   <button
-                    className="rounded-full border border-white/10 px-5 py-3 text-sm font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-100"
+                    className="rounded-full border border-slate-200 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-sky-300 hover:text-sky-700"
                     type="submit"
                   >
                     Search
                   </button>
                 </form>
               </div>
+            </div>
 
-              <div className="mt-5 overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#08101c]/80">
-                <div className="hidden border-b border-white/10 px-6 py-3 text-xs font-semibold uppercase tracking-[0.24em] text-slate-500 lg:grid lg:grid-cols-[minmax(220px,1.4fr)_minmax(180px,1fr)_minmax(160px,0.9fr)_minmax(220px,1.1fr)_auto]">
-                  <p>Name</p>
-                  <p>Email</p>
-                  <p>Phone</p>
-                  <p>Job title and company</p>
-                  <p className="text-right">Actions</p>
-                </div>
-
-                {activeContacts.length === 0 ? (
-                  <div className="px-6 py-10 text-sm text-slate-400">
-                    No active contacts match this view yet.
-                  </div>
-                ) : (
-                  activeContacts.map((contact) => <ContactRow contact={contact} key={contact.id} />)
-                )}
+            {mergeSuggestionsRefreshed ? (
+              <div className="rounded-[1.5rem] border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700 shadow-sm">
+                Duplicate suggestions refreshed successfully.
               </div>
+            ) : null}
+
+            <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4">
+                <div className="flex items-center gap-3">
+                  <p className="text-sm font-semibold text-slate-900">Primary contacts</p>
+                  <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                    {activeContacts.length} records
+                  </span>
+                </div>
+                <p className="text-xs uppercase tracking-[0.22em] text-slate-400">
+                  List-first workspace
+                </p>
+              </div>
+
+              <div className="hidden border-b border-slate-200 px-6 py-3 text-xs font-semibold uppercase tracking-[0.22em] text-slate-400 lg:grid lg:grid-cols-[minmax(220px,1.2fr)_minmax(220px,1fr)_minmax(180px,0.8fr)_minmax(220px,1fr)_auto]">
+                <p>Name</p>
+                <p>Email</p>
+                <p>Phone</p>
+                <p>Job title and company</p>
+                <p className="text-right">Actions</p>
+              </div>
+
+              {activeContacts.length === 0 ? (
+                <div className="px-6 py-12 text-sm text-slate-500">No active contacts match this view yet.</div>
+              ) : (
+                activeContacts.map((contact) => <ContactRow contact={contact} key={contact.id} />)
+              )}
             </div>
 
             {archivedContacts.length > 0 ? (
-              <div className="rounded-[2rem] border border-white/10 bg-white/5 p-5 shadow-[0_20px_80px_rgba(2,8,23,0.28)]">
-                <div className="flex items-center justify-between gap-3">
+              <div className="overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-sm">
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-5 py-4">
                   <div>
-                    <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Archived</p>
-                    <h3 className="mt-2 text-2xl font-semibold text-white">Reversible cleanup</h3>
+                    <p className="text-sm font-semibold text-slate-900">Archived contacts</p>
+                    <p className="mt-1 text-sm text-slate-500">
+                      Reversible cleanup stays close to the main list instead of disappearing into a separate tool.
+                    </p>
                   </div>
-                  <span className="rounded-full border border-amber-300/30 bg-amber-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-amber-200">
+                  <span className="rounded-full border border-amber-200 bg-amber-50 px-3 py-1 text-xs font-medium text-amber-700">
                     {archivedContacts.length} archived
                   </span>
                 </div>
-                <div className="mt-5 overflow-hidden rounded-[1.5rem] border border-white/10 bg-[#08101c]/80">
-                  {archivedContacts.map((contact) => (
-                    <ContactRow contact={contact} key={contact.id} />
-                  ))}
-                </div>
+                {archivedContacts.map((contact) => (
+                  <ContactRow contact={contact} key={contact.id} />
+                ))}
               </div>
             ) : null}
           </section>
 
-          <aside className="grid gap-6 self-start">
-            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-5 text-sm text-slate-300 shadow-[0_20px_80px_rgba(2,8,23,0.25)]">
-              <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Merge and fix</p>
-              <p className="mt-3 text-sm text-slate-400">
-                Review likely duplicates from the list workspace and keep merge decisions auditable.
-              </p>
-              <div className="mt-4 flex items-center gap-3">
-                <MergeSuggestionRefreshButton />
-                <span className="text-xs text-slate-500">
-                  {mergeSuggestions.length} open suggestion{mergeSuggestions.length === 1 ? "" : "s"}
+          <aside className="grid gap-5 self-start xl:sticky xl:top-24">
+            <div className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-sky-600">Account</p>
+                  <h3 className="mt-2 text-xl font-semibold text-slate-900">{planSummary.planLabel}</h3>
+                </div>
+                <span
+                  className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${getLifecycleTone(
+                    planSummary.lifecycleState,
+                  )}`}
+                >
+                  {planSummary.lifecycleLabel}
                 </span>
+              </div>
+              <p className="mt-3 text-sm text-slate-500">{planSummary.lifecycleDescription}</p>
+              <div className="mt-4 grid gap-3 rounded-[1.5rem] bg-slate-50 p-4 text-sm text-slate-600">
+                <div className="flex items-center justify-between gap-3">
+                  <span>Contacts used</span>
+                  <span className="font-semibold text-slate-900">
+                    {planSummary.contactsUsed} / {planSummary.contactsLimit}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <span>Imports this month</span>
+                  <span className="font-semibold text-slate-900">
+                    {planSummary.importedThisMonth} / {planSummary.monthlyImportLimit}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <span>Basic export</span>
+                  <span className="font-semibold text-slate-900">
+                    {planSummary.canUseBasicExport ? "Available" : "Restricted"}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <span>Premium vCard export</span>
+                  <span className="font-semibold text-slate-900">
+                    {planSummary.premiumExportEnabled ? "Enabled" : "Upgrade required"}
+                  </span>
+                </div>
               </div>
             </div>
 
-            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-5 text-sm text-slate-300 shadow-[0_20px_80px_rgba(2,8,23,0.25)]">
-              <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Suggestions</p>
+            <div className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="flex items-center justify-between gap-3">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.28em] text-sky-600">Merge and fix</p>
+                  <p className="mt-2 text-sm text-slate-500">
+                    Keep duplicate review visible from the same list workspace.
+                  </p>
+                </div>
+                <MergeSuggestionRefreshButton />
+              </div>
+            </div>
+
+            <div className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="flex items-center justify-between gap-3">
+                <p className="text-sm font-semibold text-slate-900">Open suggestions</p>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600">
+                  {mergeSuggestions.length}
+                </span>
+              </div>
               {mergeSuggestions.length === 0 ? (
-                <div className="mt-4 rounded-2xl border border-dashed border-white/15 bg-[#08101c]/70 p-4 text-slate-400">
-                  No open duplicate suggestions are showing up right now.
+                <div className="mt-4 rounded-[1.5rem] border border-dashed border-slate-200 bg-slate-50 p-4 text-sm text-slate-500">
+                  No duplicate suggestions are open right now.
                 </div>
               ) : (
                 <div className="mt-4 grid gap-3">
                   {mergeSuggestions.map((suggestion) => (
-                    <article
-                      className="rounded-2xl border border-white/10 bg-[#08101c]/70 p-4"
-                      key={suggestion.id}
-                    >
+                    <article className="rounded-[1.5rem] border border-slate-200 bg-slate-50 p-4" key={suggestion.id}>
                       <div className="flex items-center justify-between gap-3">
-                        <p className="font-semibold text-white">
+                        <p className="font-semibold text-slate-900">
                           {suggestion.leftContact.fullName} ↔ {suggestion.rightContact.fullName}
                         </p>
                         <span
-                          className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${
+                          className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${
                             suggestion.confidence === "high"
-                              ? "border border-rose-300/30 bg-rose-300/10 text-rose-100"
-                              : "border border-amber-300/30 bg-amber-300/10 text-amber-100"
+                              ? "bg-rose-100 text-rose-700"
+                              : "bg-amber-100 text-amber-700"
                           }`}
                         >
                           {suggestion.confidence}
                         </span>
                       </div>
-                      <p className="mt-2 text-xs uppercase tracking-[0.24em] text-slate-500">
+                      <p className="mt-2 text-xs text-slate-500">
                         Score {suggestion.score} · {suggestion.hardMatch ? "hard match" : "review"}
                       </p>
-                      <div className="mt-3 grid gap-2 text-sm text-slate-300">
+                      <div className="mt-3 grid gap-2 text-sm text-slate-600">
                         {suggestion.reasons.slice(0, 2).map((reason) => (
                           <p key={reason}>{reason}</p>
                         ))}
                       </div>
                       <div className="mt-4 flex flex-wrap gap-2">
                         <Link
-                          className="rounded-full bg-cyan-300 px-3 py-2 text-xs font-semibold text-slate-950 transition hover:bg-cyan-200"
+                          className="rounded-full bg-sky-600 px-3 py-2 text-xs font-semibold text-white transition hover:bg-sky-500"
                           href={`/merge-suggestions/${suggestion.id}`}
                         >
                           Review
@@ -403,13 +449,12 @@ export function ContactDashboard({
               )}
             </div>
 
-            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-5 text-sm text-slate-300 shadow-[0_20px_80px_rgba(2,8,23,0.25)]">
-              <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Account posture</p>
-              <p className="mt-3 text-sm text-slate-400">{planSummary.lifecycleDescription}</p>
-              <div className="mt-4 rounded-2xl border border-white/10 bg-[#08101c] p-4 text-sm text-slate-300">
-                <p>Writes allowed: {planSummary.canWrite ? "Yes" : "No"}</p>
-                <p className="mt-1">Basic export preserved: {planSummary.canUseBasicExport ? "Yes" : "No"}</p>
-                <p className="mt-1">Premium vCard export: {planSummary.premiumExportEnabled ? "Enabled" : "Upgrade required"}</p>
+            <div className="rounded-[2rem] border border-slate-200 bg-white p-5 shadow-sm">
+              <p className="text-xs font-semibold uppercase tracking-[0.28em] text-sky-600">List posture</p>
+              <div className="mt-4 space-y-3 text-sm text-slate-500">
+                <p>The homepage is now optimized for scanning, quick contact actions, and staying close to merge and archive workflows.</p>
+                <p>Richer Phase 6 detail still lives one click away inside the contact page instead of overwhelming the main list view.</p>
+                <p>{activeContacts[0] ? getContactMeta(activeContacts[0]) : "Add a contact to start filling the list."}</p>
               </div>
             </div>
           </aside>

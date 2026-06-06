@@ -29,6 +29,14 @@ const formatTimestamp = (value: Date) =>
 const getFormattedAddressArray = (value: unknown) =>
   parseContactPostalAddresses(value).map((item) => item.formatted);
 
+const getPrimaryStructuredEntry = <T,>(value: unknown) => {
+  if (!Array.isArray(value) || value.length === 0) {
+    return undefined;
+  }
+
+  return value[0] as T;
+};
+
 export default async function ContactDetailPage({ params, searchParams }: ContactDetailPageProps) {
   const session = await auth();
 
@@ -51,6 +59,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
   const wasMergeUndone = mergeUndoneState === "1";
   const decisionParam = resolvedSearchParams?.decisionId;
   const decisionId = Array.isArray(decisionParam) ? decisionParam[0] : decisionParam;
+
   const contact = await db.contact.findFirst({
     where: {
       id,
@@ -59,17 +68,32 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     select: {
       id: true,
       fullName: true,
+      firstName: true,
+      middleName: true,
+      lastName: true,
+      namePrefix: true,
+      nameSuffix: true,
       nickname: true,
       email: true,
       emailAddresses: true,
+      emailEntries: true,
       phone: true,
       phoneNumbers: true,
+      phoneEntries: true,
       company: true,
       jobTitle: true,
       website: true,
+      websiteEntries: true,
       birthday: true,
       address: true,
       postalAddresses: true,
+      addressEntries: true,
+      avatarUrl: true,
+      isFavorite: true,
+      labels: true,
+      significantDates: true,
+      relatedPeople: true,
+      customFields: true,
       notes: true,
       archivedAt: true,
       createdAt: true,
@@ -90,6 +114,88 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
   const additionalAddresses = getFormattedAddressArray(contact.postalAddresses)
     .filter((item) => item !== contact.address)
     .join("\n");
+  const primaryEmailEntry = getPrimaryStructuredEntry<{ label?: string }>(contact.emailEntries);
+  const primaryPhoneEntry = getPrimaryStructuredEntry<{ label?: string }>(contact.phoneEntries);
+  const primaryAddressEntry = getPrimaryStructuredEntry<{
+    label?: string;
+    countryOrRegion?: string;
+    streetLine1?: string;
+    streetLine2?: string;
+    cityOrTown?: string;
+    postcode?: string;
+    poBox?: string;
+  }>(contact.addressEntries);
+  const primaryWebsiteEntry = getPrimaryStructuredEntry<{ label?: string }>(contact.websiteEntries);
+  const labelsValue = Array.isArray(contact.labels) ? contact.labels.join(", ") : "";
+  const additionalWebsites =
+    Array.isArray(contact.websiteEntries)
+      ? contact.websiteEntries
+          .map((entry) => {
+            if (!entry || typeof entry !== "object" || !("value" in entry)) {
+              return undefined;
+            }
+
+            const value = (entry as { value?: string }).value;
+            return typeof value === "string" && value !== contact.website ? value : undefined;
+          })
+          .filter((item): item is string => Boolean(item))
+          .join("\n")
+      : "";
+  const significantDatesValue =
+    Array.isArray(contact.significantDates)
+      ? contact.significantDates
+          .map((entry) => {
+            if (!entry || typeof entry !== "object") {
+              return undefined;
+            }
+
+            const label = "label" in entry ? (entry as { label?: string }).label : undefined;
+            const date = "date" in entry ? (entry as { date?: string }).date : undefined;
+
+            if (!label || !date || (label.toLowerCase() === "birthday" && date === contact.birthday)) {
+              return undefined;
+            }
+
+            return `${label} | ${date}`;
+          })
+          .filter((item): item is string => Boolean(item))
+          .join("\n")
+      : "";
+  const relatedPeopleValue =
+    Array.isArray(contact.relatedPeople)
+      ? contact.relatedPeople
+          .map((entry) => {
+            if (!entry || typeof entry !== "object") {
+              return undefined;
+            }
+
+            const relationship =
+              "relationship" in entry
+                ? (entry as { relationship?: string }).relationship
+                : undefined;
+            const name = "name" in entry ? (entry as { name?: string }).name : undefined;
+
+            return relationship && name ? `${relationship} | ${name}` : undefined;
+          })
+          .filter((item): item is string => Boolean(item))
+          .join("\n")
+      : "";
+  const customFieldsValue =
+    Array.isArray(contact.customFields)
+      ? contact.customFields
+          .map((entry) => {
+            if (!entry || typeof entry !== "object") {
+              return undefined;
+            }
+
+            const label = "label" in entry ? (entry as { label?: string }).label : undefined;
+            const value = "value" in entry ? (entry as { value?: string }).value : undefined;
+
+            return label && value ? `${label} | ${value}` : undefined;
+          })
+          .filter((item): item is string => Boolean(item))
+          .join("\n")
+      : "";
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),_transparent_30%),linear-gradient(180deg,#020617_0%,#07111d_45%,#0f172a_100%)] text-white">
@@ -110,10 +216,14 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                   Active
                 </span>
               )}
+              {contact.isFavorite ? (
+                <span className="rounded-full border border-cyan-300/30 bg-cyan-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-100">
+                  Favorite
+                </span>
+              ) : null}
             </div>
             <p className="mt-3 max-w-2xl text-sm text-slate-300">
-              Edit the canonical details here, archive when you want a reversible cleanup path, and
-              reserve permanent deletion for true removal.
+              Quick-save the core fields people update most often, then expand the advanced panels when you want richer structured detail for portability, merge quality, and future sync.
             </p>
           </div>
 
@@ -134,14 +244,12 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
         ) : null}
         {wasMerged ? (
           <div className="rounded-[1.75rem] border border-cyan-300/25 bg-cyan-300/10 p-4 text-sm text-cyan-100 shadow-[0_20px_60px_rgba(34,211,238,0.12)]">
-            Merge completed successfully. You can undo this merge from the merge audit card below
-            while we are still in the Phase 4 reversible merge model.
+            Merge completed successfully. You can undo this merge from the merge audit card below while we are still in the reversible merge model.
           </div>
         ) : null}
         {wasMergeUndone ? (
           <div className="rounded-[1.75rem] border border-amber-300/25 bg-amber-300/10 p-4 text-sm text-amber-100 shadow-[0_20px_60px_rgba(251,191,36,0.12)]">
-            Merge undo completed. The archived secondary contact has been restored and the primary
-            contact has been rolled back to its pre-merge state.
+            Merge undo completed. The archived secondary contact has been restored and the primary contact has been rolled back to its pre-merge state.
           </div>
         ) : null}
 
@@ -149,144 +257,267 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
           <div className="rounded-[2rem] border border-white/10 bg-[#08101c]/88 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.35)]">
             <div className="space-y-2">
               <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Contact details</p>
-              <h2 className="text-2xl font-semibold text-white">Update this record</h2>
+              <h2 className="text-2xl font-semibold text-white">Quick save first, expand when needed</h2>
             </div>
 
-            <form action={updateContact} className="mt-6 grid gap-4 lg:grid-cols-2">
+            <form action={updateContact} className="mt-6 grid gap-6">
               <input name="contactId" type="hidden" value={contact.id} />
               <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}?saved=1`} />
 
-              <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
-                <span>Full name</span>
-                <input
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
-                  defaultValue={contact.fullName}
-                  name="fullName"
-                  required
-                  type="text"
-                />
-              </label>
+              <section className="grid gap-4 rounded-[1.5rem] border border-white/10 bg-white/5 p-5 lg:grid-cols-2">
+                <div className="lg:col-span-2">
+                  <p className="text-sm font-semibold text-white">Essentials</p>
+                  <p className="mt-1 text-sm text-slate-400">
+                    These are the fields we expect to round-trip most cleanly across CSV, vCard, merge, and future sync flows.
+                  </p>
+                </div>
 
-              <label className="grid gap-2 text-sm text-slate-200">
-                <span>Nickname</span>
-                <input
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
-                  defaultValue={contact.nickname ?? ""}
-                  name="nickname"
-                  type="text"
-                />
-              </label>
+                <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
+                  <span>Full name</span>
+                  <input
+                    className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
+                    defaultValue={contact.fullName}
+                    name="fullName"
+                    required
+                    type="text"
+                  />
+                </label>
 
-              <label className="grid gap-2 text-sm text-slate-200">
-                <span>Email</span>
-                <input
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
-                  defaultValue={contact.email ?? ""}
-                  name="email"
-                  type="email"
-                />
-              </label>
+                <label className="grid gap-2 text-sm text-slate-200">
+                  <span>Email</span>
+                  <input
+                    className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
+                    defaultValue={contact.email ?? ""}
+                    name="email"
+                    type="email"
+                  />
+                </label>
 
-              <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
-                <span>Additional emails</span>
-                <textarea
-                  className="min-h-24 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
-                  defaultValue={additionalEmails}
-                  name="additionalEmails"
-                />
-              </label>
+                <label className="grid gap-2 text-sm text-slate-200">
+                  <span>Phone</span>
+                  <input
+                    className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
+                    defaultValue={contact.phone ?? ""}
+                    name="phone"
+                    type="text"
+                  />
+                </label>
 
-              <label className="grid gap-2 text-sm text-slate-200">
-                <span>Phone</span>
-                <input
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
-                  defaultValue={contact.phone ?? ""}
-                  name="phone"
-                  type="text"
-                />
-              </label>
+                <label className="grid gap-2 text-sm text-slate-200">
+                  <span>Company</span>
+                  <input
+                    className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
+                    defaultValue={contact.company ?? ""}
+                    name="company"
+                    type="text"
+                  />
+                </label>
 
-              <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
-                <span>Additional phones</span>
-                <textarea
-                  className="min-h-24 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
-                  defaultValue={additionalPhones}
-                  name="additionalPhones"
-                />
-              </label>
+                <label className="grid gap-2 text-sm text-slate-200">
+                  <span>Job title</span>
+                  <input
+                    className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
+                    defaultValue={contact.jobTitle ?? ""}
+                    name="jobTitle"
+                    type="text"
+                  />
+                </label>
 
-              <label className="grid gap-2 text-sm text-slate-200">
-                <span>Company</span>
-                <input
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
-                  defaultValue={contact.company ?? ""}
-                  name="company"
-                  type="text"
-                />
-              </label>
+                <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
+                  <span>Notes</span>
+                  <textarea
+                    className="min-h-32 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
+                    defaultValue={contact.notes ?? ""}
+                    name="notes"
+                  />
+                </label>
+              </section>
 
-              <label className="grid gap-2 text-sm text-slate-200">
-                <span>Job title</span>
-                <input
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
-                  defaultValue={contact.jobTitle ?? ""}
-                  name="jobTitle"
-                  type="text"
-                />
-              </label>
+              <details className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+                <summary className="cursor-pointer list-none">
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-white">Profile and organization</p>
+                      <p className="text-sm text-slate-400">
+                        Split names, labels, favorite state, and avatar metadata for a richer personal profile.
+                      </p>
+                    </div>
+                    <span className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">
+                      Advanced
+                    </span>
+                  </div>
+                </summary>
 
-              <label className="grid gap-2 text-sm text-slate-200">
-                <span>Website</span>
-                <input
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
-                  defaultValue={contact.website ?? ""}
-                  name="website"
-                  type="url"
-                />
-              </label>
+                <div className="mt-5 grid gap-4 lg:grid-cols-2">
+                  <label className="grid gap-2 text-sm text-slate-200">
+                    <span>Prefix</span>
+                    <input className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={contact.namePrefix ?? ""} name="namePrefix" type="text" />
+                  </label>
+                  <label className="grid gap-2 text-sm text-slate-200">
+                    <span>First name</span>
+                    <input className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={contact.firstName ?? ""} name="firstName" type="text" />
+                  </label>
+                  <label className="grid gap-2 text-sm text-slate-200">
+                    <span>Middle name</span>
+                    <input className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={contact.middleName ?? ""} name="middleName" type="text" />
+                  </label>
+                  <label className="grid gap-2 text-sm text-slate-200">
+                    <span>Last name</span>
+                    <input className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={contact.lastName ?? ""} name="lastName" type="text" />
+                  </label>
+                  <label className="grid gap-2 text-sm text-slate-200">
+                    <span>Suffix</span>
+                    <input className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={contact.nameSuffix ?? ""} name="nameSuffix" type="text" />
+                  </label>
+                  <label className="grid gap-2 text-sm text-slate-200">
+                    <span>Nickname</span>
+                    <input className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={contact.nickname ?? ""} name="nickname" type="text" />
+                  </label>
+                  <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
+                    <span>Avatar URL</span>
+                    <input className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={contact.avatarUrl ?? ""} name="avatarUrl" type="url" />
+                  </label>
+                  <label className="grid gap-2 text-sm text-slate-200">
+                    <span>Labels</span>
+                    <input className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={labelsValue} name="labels" placeholder="Family, VIP, School" type="text" />
+                  </label>
+                  <label className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200">
+                    <input className="h-4 w-4 rounded border-white/20 bg-transparent text-cyan-300 focus:ring-cyan-300" defaultChecked={contact.isFavorite} name="isFavorite" type="checkbox" value="true" />
+                    <span>Favorite contact</span>
+                  </label>
+                </div>
+              </details>
 
-              <label className="grid gap-2 text-sm text-slate-200">
-                <span>Birthday</span>
-                <input
-                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
-                  defaultValue={contact.birthday ?? ""}
-                  name="birthday"
-                  type="date"
-                />
-              </label>
+              <details className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+                <summary className="cursor-pointer list-none">
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-white">Structured communication and addresses</p>
+                      <p className="text-sm text-slate-400">
+                        Add labels, secondary values, and structured address parts without cluttering the quick-edit surface.
+                      </p>
+                    </div>
+                    <span className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">
+                      Advanced
+                    </span>
+                  </div>
+                </summary>
 
-              <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
-                <span>Address</span>
-                <textarea
-                  className="min-h-24 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
-                  defaultValue={contact.address ?? ""}
-                  name="address"
-                />
-              </label>
+                <div className="mt-5 grid gap-4 lg:grid-cols-2">
+                  <label className="grid gap-2 text-sm text-slate-200">
+                    <span>Email label</span>
+                    <input className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={primaryEmailEntry?.label ?? ""} name="emailLabel" type="text" />
+                  </label>
+                  <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
+                    <span>Additional emails</span>
+                    <textarea className="min-h-24 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={additionalEmails} name="additionalEmails" />
+                  </label>
+                  <label className="grid gap-2 text-sm text-slate-200">
+                    <span>Phone label</span>
+                    <input className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={primaryPhoneEntry?.label ?? ""} name="phoneLabel" type="text" />
+                  </label>
+                  <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
+                    <span>Additional phones</span>
+                    <textarea className="min-h-24 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={additionalPhones} name="additionalPhones" />
+                  </label>
+                  <label className="grid gap-2 text-sm text-slate-200">
+                    <span>Address</span>
+                    <textarea className="min-h-24 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={contact.address ?? ""} name="address" />
+                  </label>
+                  <label className="grid gap-2 text-sm text-slate-200">
+                    <span>Address label</span>
+                    <input className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={primaryAddressEntry?.label ?? ""} name="addressLabel" type="text" />
+                  </label>
+                  <label className="grid gap-2 text-sm text-slate-200">
+                    <span>Country or region</span>
+                    <input className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={primaryAddressEntry?.countryOrRegion ?? ""} name="countryOrRegion" type="text" />
+                  </label>
+                  <label className="grid gap-2 text-sm text-slate-200">
+                    <span>Street line 1</span>
+                    <input className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={primaryAddressEntry?.streetLine1 ?? ""} name="streetLine1" type="text" />
+                  </label>
+                  <label className="grid gap-2 text-sm text-slate-200">
+                    <span>Street line 2</span>
+                    <input className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={primaryAddressEntry?.streetLine2 ?? ""} name="streetLine2" type="text" />
+                  </label>
+                  <label className="grid gap-2 text-sm text-slate-200">
+                    <span>City or town</span>
+                    <input className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={primaryAddressEntry?.cityOrTown ?? ""} name="cityOrTown" type="text" />
+                  </label>
+                  <label className="grid gap-2 text-sm text-slate-200">
+                    <span>Postcode</span>
+                    <input className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={primaryAddressEntry?.postcode ?? ""} name="postcode" type="text" />
+                  </label>
+                  <label className="grid gap-2 text-sm text-slate-200">
+                    <span>PO box</span>
+                    <input className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={primaryAddressEntry?.poBox ?? ""} name="poBox" type="text" />
+                  </label>
+                  <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
+                    <span>Additional addresses</span>
+                    <textarea className="min-h-24 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={additionalAddresses} name="additionalAddresses" />
+                  </label>
+                </div>
+              </details>
 
-              <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
-                <span>Additional addresses</span>
-                <textarea
-                  className="min-h-24 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
-                  defaultValue={additionalAddresses}
-                  name="additionalAddresses"
-                />
-              </label>
+              <details className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5">
+                <summary className="cursor-pointer list-none">
+                  <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                      <p className="text-sm font-semibold text-white">Dates, websites, relationships, and custom context</p>
+                      <p className="text-sm text-slate-400">
+                        These fields deepen the contact record. Some export cleanly to vCard, while others may remain Kontax-local depending on the target format.
+                      </p>
+                    </div>
+                    <span className="text-xs font-semibold uppercase tracking-[0.2em] text-cyan-200">
+                      Advanced
+                    </span>
+                  </div>
+                </summary>
 
-              <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
-                <span>Notes</span>
-                <textarea
-                  className="min-h-36 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
-                  defaultValue={contact.notes ?? ""}
-                  name="notes"
-                />
-              </label>
+                <div className="mt-5 grid gap-4 lg:grid-cols-2">
+                  <label className="grid gap-2 text-sm text-slate-200">
+                    <span>Website</span>
+                    <input className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={contact.website ?? ""} name="website" type="url" />
+                  </label>
+                  <label className="grid gap-2 text-sm text-slate-200">
+                    <span>Website label</span>
+                    <input className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={primaryWebsiteEntry?.label ?? ""} name="websiteLabel" type="text" />
+                  </label>
+                  <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
+                    <span>Additional websites</span>
+                    <textarea className="min-h-24 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={additionalWebsites} name="additionalWebsites" />
+                  </label>
+                  <label className="grid gap-2 text-sm text-slate-200">
+                    <span>Birthday</span>
+                    <input className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={contact.birthday ?? ""} name="birthday" type="date" />
+                  </label>
+                  <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
+                    <span>Significant dates</span>
+                    <textarea className="min-h-24 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={significantDatesValue} name="significantDates" placeholder="Anniversary | 2018-06-09" />
+                  </label>
+                  <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
+                    <span>Related people</span>
+                    <textarea className="min-h-24 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={relatedPeopleValue} name="relatedPeople" placeholder="Spouse | Alex Smith" />
+                  </label>
+                  <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
+                    <span>Custom fields</span>
+                    <textarea className="min-h-24 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300" defaultValue={customFieldsValue} name="customFields" placeholder="Assistant | Jamie" />
+                  </label>
+                </div>
+              </details>
 
-              <div className="lg:col-span-2">
-                <button
-                  className="rounded-full bg-cyan-300 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200"
-                  type="submit"
-                >
+              <div className="rounded-[1.5rem] border border-cyan-300/20 bg-cyan-300/10 p-5 text-sm text-cyan-100">
+                <p className="font-semibold text-white">Portability guidance</p>
+                <ul className="mt-3 space-y-2 text-sm text-cyan-50/90">
+                  <li>Canonical fields like full name, primary email, primary phone, birthday, and primary address should remain your safest export and sync anchors.</li>
+                  <li>Labeled secondary values and structured addresses improve merge quality and vCard fidelity, but CSV targets may flatten them depending on the mapping profile.</li>
+                  <li>Related people, labels, favorites, avatars, and custom fields are valuable in Kontax even when a destination format only supports them partially.</li>
+                  <li>iPhone Contacts and Android CardDAV clients should handle the core identity fields well, while richer metadata may degrade gracefully or stay Kontax-local until client support is confirmed.</li>
+                </ul>
+              </div>
+
+              <div>
+                <button className="rounded-full bg-cyan-300 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200" type="submit">
                   Save changes
                 </button>
               </div>
@@ -301,10 +532,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                   <form action={restoreContact}>
                     <input name="contactId" type="hidden" value={contact.id} />
                     <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}`} />
-                    <button
-                      className="w-full rounded-full bg-cyan-300 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200"
-                      type="submit"
-                    >
+                    <button className="w-full rounded-full bg-cyan-300 px-4 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-200" type="submit">
                       Restore contact
                     </button>
                   </form>
@@ -312,63 +540,46 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                   <form action={archiveContact}>
                     <input name="contactId" type="hidden" value={contact.id} />
                     <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}`} />
-                    <button
-                      className="w-full rounded-full border border-amber-300/30 px-4 py-3 text-sm font-semibold text-amber-200 transition hover:border-amber-200 hover:text-white"
-                      type="submit"
-                    >
+                    <button className="w-full rounded-full border border-amber-300/30 px-4 py-3 text-sm font-semibold text-amber-200 transition hover:border-amber-200 hover:text-white" type="submit">
                       Archive contact
                     </button>
                   </form>
                 )}
-                <p className="text-sm text-slate-400">
-                  Archive is reversible and keeps the record available for later restore.
-                </p>
-                {!contact.archivedAt ? (
-                  <Link
-                    className="inline-flex rounded-full border border-white/10 px-4 py-3 text-center text-sm font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-100"
-                    href={`/merge/manual?left=${contact.id}`}
-                  >
-                    Start manual merge
-                  </Link>
-                ) : null}
-              </div>
-            </div>
 
-            {decisionId ? (
-              <div className="rounded-[2rem] border border-cyan-300/20 bg-cyan-300/5 p-6 text-sm text-slate-300">
-                <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Merge audit</p>
-                <p className="mt-4 text-sm text-slate-300">
-                  Ticket `P4-05`: this merge stored a reversible snapshot so you can roll back the
-                  primary record and restore the archived secondary record if needed.
-                </p>
-                <form action={undoMergeContacts} className="mt-4">
-                  <input name="decisionId" type="hidden" value={decisionId} />
-                  <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}`} />
-                  <button
-                    className="w-full rounded-full border border-cyan-300/30 px-4 py-3 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200 hover:text-white"
-                    type="submit"
-                  >
-                    Undo last merge
+                {decisionId ? (
+                  <form action={undoMergeContacts}>
+                    <input name="decisionId" type="hidden" value={decisionId} />
+                    <button className="w-full rounded-full border border-cyan-300/30 px-4 py-3 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200 hover:text-white" type="submit">
+                      Undo latest merge
+                    </button>
+                  </form>
+                ) : null}
+
+                <form action={permanentlyDeleteContact}>
+                  <input name="contactId" type="hidden" value={contact.id} />
+                  <button className="w-full rounded-full border border-rose-300/30 px-4 py-3 text-sm font-semibold text-rose-200 transition hover:border-rose-200 hover:text-white" type="submit">
+                    Permanently delete
                   </button>
                 </form>
               </div>
-            ) : null}
+            </div>
 
-            <div className="rounded-[2rem] border border-rose-300/20 bg-rose-300/5 p-6 text-sm text-slate-300">
-              <p className="text-sm uppercase tracking-[0.3em] text-rose-200">Danger zone</p>
-              <p className="mt-4 text-sm text-slate-300">
-                Permanent delete removes this record completely. Use archive unless you want true removal.
-              </p>
-              <form action={permanentlyDeleteContact} className="mt-4">
-                <input name="contactId" type="hidden" value={contact.id} />
-                <input name="redirectTo" type="hidden" value="/" />
-                <button
-                  className="w-full rounded-full border border-rose-300/40 px-4 py-3 text-sm font-semibold text-rose-200 transition hover:border-rose-200 hover:text-white"
-                  type="submit"
-                >
-                  Permanently delete
-                </button>
-              </form>
+            <div className="rounded-[2rem] border border-white/10 bg-[#08101c]/88 p-6 text-sm text-slate-300 shadow-[0_20px_80px_rgba(2,8,23,0.35)]">
+              <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Editing mode</p>
+              <div className="mt-4 space-y-3">
+                <p>Quick fields stay visible so everyday edits feel light and fast.</p>
+                <p>Advanced panels let us keep richer consumer-grade detail without overwhelming simple contact maintenance.</p>
+                <p>That structure also lines up with our import, merge, and future CardDAV roadmap.</p>
+              </div>
+            </div>
+
+            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
+              <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Mobile parity</p>
+              <div className="mt-4 space-y-3">
+                <p>Kontax treats Apple and Android contact apps as parity targets for core fields, not as hard constraints on every richer field.</p>
+                <p>When a mobile client cannot round-trip labels, related people, custom fields, or avatar metadata cleanly, Kontax should preserve that detail in its own model instead of discarding it.</p>
+                <p>That gives us graceful degradation now and a cleaner path into CardDAV compatibility hardening later.</p>
+              </div>
             </div>
           </aside>
         </section>
