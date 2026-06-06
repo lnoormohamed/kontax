@@ -175,3 +175,33 @@ export const assertCanUsePremiumExport = async (userId: string) => {
 
   return summary;
 };
+
+export const assertCanUseCardDavSync = async (userId: string) => {
+  const summary = await getUserPlanSummary(userId);
+  assertWritableAccount(summary);
+
+  if (!summary.entitlements.cardDavSyncEnabled) {
+    throw new Error("CardDAV sync is available on the Pro plan.");
+  }
+
+  return summary;
+};
+
+export const assertCanCreateSyncAccount = async (userId: string) => {
+  const summary = await assertCanUseCardDavSync(userId);
+  const syncAccountsUsed = await db.syncAccount.count({
+    where: { userId },
+  });
+
+  if (syncAccountsUsed + 1 > summary.entitlements.syncAccountsLimit) {
+    throw new Error(
+      `${summary.planLabel} plan sync limit reached. You can connect up to ${summary.entitlements.syncAccountsLimit} sync account${summary.entitlements.syncAccountsLimit === 1 ? "" : "s"} on this plan.`,
+    );
+  }
+
+  return {
+    ...summary,
+    syncAccountsUsed,
+    syncAccountsRemaining: Math.max(summary.entitlements.syncAccountsLimit - syncAccountsUsed, 0),
+  };
+};

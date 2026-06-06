@@ -1,8 +1,13 @@
 export type PortableContactInput = {
   fullName: string;
+  nickname?: string | null;
   email?: string | null;
   phone?: string | null;
   company?: string | null;
+  jobTitle?: string | null;
+  website?: string | null;
+  birthday?: string | null;
+  address?: string | null;
   notes?: string | null;
 };
 
@@ -44,9 +49,14 @@ const HEADER_ALIASES: Record<
     fullName: string[];
     firstName: string[];
     lastName: string[];
+    nickname: string[];
     email: string[];
     phone: string[];
     company: string[];
+    jobTitle: string[];
+    website: string[];
+    birthday: string[];
+    address: string[];
     notes: string[];
   }
 > = {
@@ -78,6 +88,7 @@ const HEADER_ALIASES: Record<
       "last",
       "second name",
     ],
+    nickname: ["nickname", "nick name", "short name", "preferred name", "alias"],
     email: [
       "email",
       "email address",
@@ -130,6 +141,18 @@ const HEADER_ALIASES: Record<
       "employer",
       "business",
     ],
+    jobTitle: ["job title", "title", "role", "position", "profession"],
+    website: ["website", "web site", "url", "homepage", "home page"],
+    birthday: ["birthday", "birth date", "date of birth", "dob"],
+    address: [
+      "address",
+      "street address",
+      "home address",
+      "work address",
+      "mailing address",
+      "address 1 - formatted",
+      "formatted address",
+    ],
     notes: [
       "notes",
       "memo",
@@ -145,6 +168,7 @@ const HEADER_ALIASES: Record<
     fullName: ["name", "full name", "file as", "nickname"],
     firstName: ["given name", "first name", "additional name", "name prefix", "givenname"],
     lastName: ["family name", "last name", "name suffix", "familyname"],
+    nickname: ["nickname", "name"],
     email: [
       "e-mail 1 - value",
       "e-mail 2 - value",
@@ -168,12 +192,17 @@ const HEADER_ALIASES: Record<
       "organization",
       "organization 1 - title",
     ],
+    jobTitle: ["organization 1 - title", "organization 2 - title", "job title", "title"],
+    website: ["website 1 - value", "website 2 - value", "website", "homepage"],
+    birthday: ["birthday", "event 1 - value", "date of birth"],
+    address: ["address 1 - formatted", "address 2 - formatted", "formatted address", "home address"],
     notes: ["notes", "memo", "billing information", "directory server", "keywords"],
   },
   APPLE: {
     fullName: ["name", "full name", "display name", "card", "nickname"],
     firstName: ["first name", "given name", "first", "middle name"],
     lastName: ["last name", "family name", "last", "maiden name"],
+    nickname: ["nickname", "maiden name"],
     email: [
       "email",
       "email address",
@@ -192,12 +221,17 @@ const HEADER_ALIASES: Record<
       "other phone",
     ],
     company: ["company", "organization", "department", "job title", "organization name"],
+    jobTitle: ["job title", "title", "department"],
+    website: ["url", "website", "homepage"],
+    birthday: ["birthday", "date of birth"],
+    address: ["address", "home address", "work address", "street"],
     notes: ["note", "notes", "related names", "label"],
   },
   OUTLOOK: {
     fullName: ["name", "full name", "file as", "display name"],
     firstName: ["first name", "given name", "forename", "middle name"],
     lastName: ["last name", "surname", "family name", "last"],
+    nickname: ["nickname", "yomi first name"],
     email: [
       "e-mail address",
       "e-mail 2 address",
@@ -219,6 +253,10 @@ const HEADER_ALIASES: Record<
       "radio phone",
     ],
     company: ["company", "organization", "department", "office location", "profession"],
+    jobTitle: ["job title", "title", "profession", "department"],
+    website: ["web page", "website", "homepage", "personal web page"],
+    birthday: ["birthday", "anniversary", "date of birth"],
+    address: ["business street", "home street", "other street", "street address", "address"],
     notes: ["notes", "description", "billing information", "location", "keywords"],
   },
 };
@@ -349,17 +387,27 @@ export const parseCsvContacts = (
   const fullNameIndexes = getIndexes(headers, getAliasesForField(profile, "fullName"));
   const firstNameIndexes = getIndexes(headers, getAliasesForField(profile, "firstName"));
   const lastNameIndexes = getIndexes(headers, getAliasesForField(profile, "lastName"));
+  const nicknameIndexes = getIndexes(headers, getAliasesForField(profile, "nickname"));
   const emailIndexes = getIndexes(headers, getAliasesForField(profile, "email"));
   const phoneIndexes = getIndexes(headers, getAliasesForField(profile, "phone"));
   const companyIndexes = getIndexes(headers, getAliasesForField(profile, "company"));
+  const jobTitleIndexes = getIndexes(headers, getAliasesForField(profile, "jobTitle"));
+  const websiteIndexes = getIndexes(headers, getAliasesForField(profile, "website"));
+  const birthdayIndexes = getIndexes(headers, getAliasesForField(profile, "birthday"));
+  const addressIndexes = getIndexes(headers, getAliasesForField(profile, "address"));
   const notesIndexes = getIndexes(headers, getAliasesForField(profile, "notes"));
   const recognizedFieldIndexes = [
     ...fullNameIndexes,
     ...firstNameIndexes,
     ...lastNameIndexes,
+    ...nicknameIndexes,
     ...emailIndexes,
     ...phoneIndexes,
     ...companyIndexes,
+    ...jobTitleIndexes,
+    ...websiteIndexes,
+    ...birthdayIndexes,
+    ...addressIndexes,
     ...notesIndexes,
   ];
 
@@ -412,9 +460,14 @@ export const parseCsvContacts = (
     const explicitFullName = getFirstValue(row, fullNameIndexes);
     const firstName = getFirstValue(row, firstNameIndexes);
     const lastName = getFirstValue(row, lastNameIndexes);
+    const nickname = getFirstValue(row, nicknameIndexes);
     const email = getFirstValue(row, emailIndexes)?.toLowerCase();
     const phone = getFirstValue(row, phoneIndexes);
     const company = getFirstValue(row, companyIndexes);
+    const jobTitle = getFirstValue(row, jobTitleIndexes);
+    const website = getFirstValue(row, websiteIndexes);
+    const birthday = getFirstValue(row, birthdayIndexes);
+    const address = getFirstValue(row, addressIndexes);
     const notes = getFirstValue(row, notesIndexes);
     const fallbackName = [firstName, lastName].filter(Boolean).join(" ").trim();
     const usedFallbackIdentifier =
@@ -523,9 +576,14 @@ export const parseCsvContacts = (
     contacts.push({
       rowNumber,
       fullName,
+      nickname,
       email,
       phone,
       company,
+      jobTitle,
+      website,
+      birthday,
+      address,
       notes,
     });
   });
@@ -585,12 +643,28 @@ export const parseCsvContacts = (
 };
 
 export const contactsToCsv = (contacts: PortableContactInput[]) => {
-  const header = ["Full Name", "Email", "Phone", "Company", "Notes"];
+  const header = [
+    "Full Name",
+    "Nickname",
+    "Email",
+    "Phone",
+    "Company",
+    "Job Title",
+    "Website",
+    "Birthday",
+    "Address",
+    "Notes",
+  ];
   const rows = contacts.map((contact) => [
     escapeCsv(contact.fullName),
+    escapeCsv(contact.nickname ?? ""),
     escapeCsv(contact.email ?? ""),
     escapeCsv(contact.phone ?? ""),
     escapeCsv(contact.company ?? ""),
+    escapeCsv(contact.jobTitle ?? ""),
+    escapeCsv(contact.website ?? ""),
+    escapeCsv(contact.birthday ?? ""),
+    escapeCsv(contact.address ?? ""),
     escapeCsv(contact.notes ?? ""),
   ]);
 
@@ -614,8 +688,28 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
         lines.push(`TEL:${escapeVCard(contact.phone)}`);
       }
 
+      if (contact.nickname) {
+        lines.push(`NICKNAME:${escapeVCard(contact.nickname)}`);
+      }
+
       if (contact.company) {
         lines.push(`ORG:${escapeVCard(contact.company)}`);
+      }
+
+      if (contact.jobTitle) {
+        lines.push(`TITLE:${escapeVCard(contact.jobTitle)}`);
+      }
+
+      if (contact.website) {
+        lines.push(`URL:${escapeVCard(contact.website)}`);
+      }
+
+      if (contact.birthday) {
+        lines.push(`BDAY:${escapeVCard(contact.birthday)}`);
+      }
+
+      if (contact.address) {
+        lines.push(`ADR:;;${escapeVCard(contact.address)};;;;`);
       }
 
       if (contact.notes) {

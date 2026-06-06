@@ -21,7 +21,7 @@ Prepare Kontax for reliable iPhone and Android contact sync via CardDAV by defin
 | P5-03 | In Progress | P1 | P5-01, P1-04 |
 | P5-04 | In Progress | P1 | P5-02, P4-05 |
 | P5-05 | In Progress | P2 | P5-02 |
-| P5-06 | In Progress | P2 | P5-03, P5-04 |
+| P5-06 | Done | P2 | P5-03, P5-04 |
 
 ## P5-01 — Define sync data model for CardDAV readiness
 - Status: `In Progress`
@@ -127,7 +127,7 @@ Prepare Kontax for reliable iPhone and Android contact sync via CardDAV by defin
   - iPhone and Android may each appear “correct” while still exposing different contact-edit UIs for the same CardDAV record, which can create support confusion without careful documentation.
 
 ## P5-06 — Define beta rollout, support tooling, and recovery flow
-- Status: `In Progress`
+- Status: `Done`
 - Priority: `P2`
 - Dependencies: `P5-03`, `P5-04`
 - Implementation Notes:
@@ -163,6 +163,11 @@ Prepare Kontax for reliable iPhone and Android contact sync via CardDAV by defin
     - re-import into Kontax
     - clean relink to a new or reset CardDAV account
   - User messaging should acknowledge that sync failures can lag behind remote edits. Recovery UX must explain whether the next step preserves local state, remote state, or both before executing any destructive action.
+  - Kontax now exposes a first recovery toolkit in the sync center:
+    - export a user-safe sync recovery package that excludes raw credentials but includes account state, recent jobs, conflicts, and related contacts
+    - prepare a relink reset that clears local sync links, resets cursors/remote collection markers, and closes open conflicts without mutating canonical contacts
+    - keep pause, credential revoke, preflight, and recovery retry actions together in the same support-oriented surface
+  - The recovery package export now lives at a dedicated application route and is positioned before reset actions so operators and end users can capture state before attempting relink or rebootstrap flows.
 - Acceptance Criteria:
   - Rollout and support requirements are documented.
   - Sync can be introduced gradually without compromising user trust.

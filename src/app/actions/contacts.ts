@@ -11,9 +11,18 @@ import { db } from "~/server/db";
 
 const contactSchema = z.object({
   fullName: z.string().trim().min(1, "Full name is required.").max(120),
+  nickname: z.string().trim().max(80).optional(),
   email: z.string().trim().email("Enter a valid email address.").max(320).optional(),
   phone: z.string().trim().max(40).optional(),
   company: z.string().trim().max(120).optional(),
+  jobTitle: z.string().trim().max(120).optional(),
+  website: z.string().trim().url("Enter a valid website URL.").max(500).optional(),
+  birthday: z
+    .string()
+    .trim()
+    .regex(/^\d{4}-\d{2}-\d{2}$/, "Enter a valid birthday in YYYY-MM-DD format.")
+    .optional(),
+  address: z.string().trim().max(500).optional(),
   notes: z.string().trim().max(2000).optional(),
 });
 
@@ -77,9 +86,14 @@ const revalidateContactViews = (contactId?: string) => {
 const parseContactInput = (formData: FormData) => {
   const parsed = contactSchema.safeParse({
     fullName: formData.get("fullName"),
+    nickname: getOptionalString(formData, "nickname"),
     email: getOptionalString(formData, "email")?.toLowerCase(),
     phone: getOptionalString(formData, "phone"),
     company: getOptionalString(formData, "company"),
+    jobTitle: getOptionalString(formData, "jobTitle"),
+    website: getOptionalString(formData, "website"),
+    birthday: getOptionalString(formData, "birthday"),
+    address: getOptionalString(formData, "address"),
     notes: getOptionalString(formData, "notes"),
   });
 

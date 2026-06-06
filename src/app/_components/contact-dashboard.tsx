@@ -8,9 +8,14 @@ import type { PersistedMergeSuggestion } from "~/server/contact-merge";
 type DashboardContact = {
   id: string;
   fullName: string;
+  nickname: string | null;
   email: string | null;
   phone: string | null;
   company: string | null;
+  jobTitle: string | null;
+  website: string | null;
+  birthday: string | null;
+  address: string | null;
   notes: string | null;
   archivedAt: Date | null;
   updatedAt: Date;
@@ -49,6 +54,11 @@ const ContactCard = ({ contact }: { contact: DashboardContact }) => (
       <div>
         <div className="flex flex-wrap items-center gap-3">
           <h3 className="text-2xl font-semibold text-white">{contact.fullName}</h3>
+          {contact.nickname ? (
+            <span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-100">
+              {contact.nickname}
+            </span>
+          ) : null}
           {contact.archivedAt ? (
             <span className="rounded-full border border-amber-300/30 bg-amber-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-amber-200">
               Archived
@@ -78,6 +88,22 @@ const ContactCard = ({ contact }: { contact: DashboardContact }) => (
       <div className="rounded-2xl border border-white/8 bg-white/5 p-4">
         <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Company</p>
         <p className="mt-2 text-white">{contact.company ?? "Not added yet"}</p>
+      </div>
+      <div className="rounded-2xl border border-white/8 bg-white/5 p-4">
+        <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Role</p>
+        <p className="mt-2 text-white">{contact.jobTitle ?? "Not added yet"}</p>
+      </div>
+      <div className="rounded-2xl border border-white/8 bg-white/5 p-4">
+        <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Website</p>
+        <p className="mt-2 break-words text-white">{contact.website ?? "Not added yet"}</p>
+      </div>
+      <div className="rounded-2xl border border-white/8 bg-white/5 p-4">
+        <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Birthday</p>
+        <p className="mt-2 text-white">{contact.birthday ?? "Not added yet"}</p>
+      </div>
+      <div className="rounded-2xl border border-white/8 bg-white/5 p-4 sm:col-span-2">
+        <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Address</p>
+        <p className="mt-2 whitespace-pre-wrap text-white">{contact.address ?? "Not added yet"}</p>
       </div>
       <div className="rounded-2xl border border-white/8 bg-white/5 p-4 sm:col-span-2">
         <p className="text-xs uppercase tracking-[0.28em] text-slate-500">Notes</p>
@@ -175,14 +201,24 @@ export function ContactDashboard({
                 </p>
               </div>
 
-              <form action={createContact} className="mt-6 grid gap-4">
-                <label className="grid gap-2 text-sm text-slate-200">
+              <form action={createContact} className="mt-6 grid gap-4 lg:grid-cols-2">
+                <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
                   <span>Full name</span>
                   <input
                     className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
                     name="fullName"
                     placeholder="Ada Lovelace"
                     required
+                    type="text"
+                  />
+                </label>
+
+                <label className="grid gap-2 text-sm text-slate-200">
+                  <span>Nickname</span>
+                  <input
+                    className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
+                    name="nickname"
+                    placeholder="Ada"
                     type="text"
                   />
                 </label>
@@ -218,6 +254,44 @@ export function ContactDashboard({
                 </label>
 
                 <label className="grid gap-2 text-sm text-slate-200">
+                  <span>Job title</span>
+                  <input
+                    className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
+                    name="jobTitle"
+                    placeholder="Mathematician"
+                    type="text"
+                  />
+                </label>
+
+                <label className="grid gap-2 text-sm text-slate-200">
+                  <span>Website</span>
+                  <input
+                    className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
+                    name="website"
+                    placeholder="https://example.com"
+                    type="url"
+                  />
+                </label>
+
+                <label className="grid gap-2 text-sm text-slate-200">
+                  <span>Birthday</span>
+                  <input
+                    className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
+                    name="birthday"
+                    type="date"
+                  />
+                </label>
+
+                <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
+                  <span>Address</span>
+                  <textarea
+                    className="min-h-24 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
+                    name="address"
+                    placeholder="123 Example Street&#10;London&#10;SW1A 1AA"
+                  />
+                </label>
+
+                <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
                   <span>Notes</span>
                   <textarea
                     className="min-h-28 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
@@ -227,7 +301,7 @@ export function ContactDashboard({
                 </label>
 
                 <button
-                  className="mt-2 rounded-full bg-white px-5 py-3 font-semibold text-slate-950 transition hover:bg-cyan-100"
+                  className="mt-2 rounded-full bg-white px-5 py-3 font-semibold text-slate-950 transition hover:bg-cyan-100 lg:col-span-2"
                   type="submit"
                 >
                   Save contact
@@ -246,6 +320,20 @@ export function ContactDashboard({
                 href="/import-export"
               >
                 Open import / export center
+              </Link>
+            </div>
+
+            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
+              <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Sync foundation</p>
+              <p className="mt-4 text-sm text-slate-300">
+                Ticket `P5-01`: start capturing CardDAV account topology now so jobs, conflicts,
+                encryption, and device compatibility can layer on top of a stable sync model.
+              </p>
+              <Link
+                className="mt-5 inline-flex rounded-full border border-white/10 px-4 py-2 font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-100"
+                href="/sync"
+              >
+                Open sync center
               </Link>
             </div>
 

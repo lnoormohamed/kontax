@@ -64,9 +64,14 @@ export const importContactsCsv = async (formData: FormData) => {
       data: parsed.contacts.map((contact) => ({
         userId,
         fullName: contact.fullName,
+        nickname: contact.nickname,
         email: contact.email,
         phone: contact.phone,
         company: contact.company,
+        jobTitle: contact.jobTitle,
+        website: contact.website,
+        birthday: contact.birthday,
+        address: contact.address,
         notes: contact.notes,
       })),
     });

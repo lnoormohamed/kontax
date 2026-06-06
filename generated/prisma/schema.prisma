@@ -171,15 +171,21 @@ model Contact {
   syncVersion           Int               @default(1)
   syncTombstoneAt       DateTime?
   fullName              String
+  nickname              String?
   email                 String?
   phone                 String?
   company               String?
+  jobTitle              String?
+  website               String?
+  birthday              String?
+  address               String?
   notes                 String?
   archivedAt            DateTime?
   createdAt             DateTime          @default(now())
   updatedAt             DateTime          @updatedAt
 
   @@index([userId, archivedAt, fullName])
+  @@index([userId, archivedAt, nickname])
   @@index([userId, archivedAt, email])
   @@index([userId, archivedAt, phone])
   @@index([userId, importJobId])

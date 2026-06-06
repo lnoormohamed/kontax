@@ -40,6 +40,10 @@ export async function GET(request: Request) {
                 { email: { contains: query, mode: "insensitive" } },
                 { phone: { contains: query, mode: "insensitive" } },
                 { company: { contains: query, mode: "insensitive" } },
+                { nickname: { contains: query, mode: "insensitive" } },
+                { jobTitle: { contains: query, mode: "insensitive" } },
+                { website: { contains: query, mode: "insensitive" } },
+                { address: { contains: query, mode: "insensitive" } },
               ],
             }
           : {}),
@@ -47,9 +51,14 @@ export async function GET(request: Request) {
       orderBy: { updatedAt: "desc" },
       select: {
         fullName: true,
+        nickname: true,
         email: true,
         phone: true,
         company: true,
+        jobTitle: true,
+        website: true,
+        birthday: true,
+        address: true,
         notes: true,
       },
     });

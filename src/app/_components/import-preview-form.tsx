@@ -13,9 +13,14 @@ type PreviewIssue = {
 type PreviewContact = {
   rowNumber: number;
   fullName: string;
+  nickname?: string | null;
   email?: string | null;
   phone?: string | null;
   company?: string | null;
+  jobTitle?: string | null;
+  website?: string | null;
+  birthday?: string | null;
+  address?: string | null;
   notes?: string | null;
 };
 
@@ -230,7 +235,7 @@ export function ImportPreviewForm() {
                 setError("");
               }}
               placeholder={
-                "Full Name,Email,Phone,Company,Notes\nAda Lovelace,ada@example.com,+44 20 7946 0958,Analytical Engines Ltd,First imported contact"
+                "Full Name,Nickname,Email,Phone,Company,Job Title,Website,Birthday,Address,Notes\nAda Lovelace,Ada,ada@example.com,+44 20 7946 0958,Analytical Engines Ltd,Mathematician,https://example.com,1815-12-10,\"12 St James's Square, London\",First imported contact"
               }
               value={csvText}
             />
@@ -373,6 +378,9 @@ export function ImportPreviewForm() {
                   </div>
                   <div className="mt-3 grid gap-3 sm:grid-cols-2">
                     <p>
+                      <span className="text-slate-500">Nickname:</span> {contact.nickname ?? "Not provided"}
+                    </p>
+                    <p>
                       <span className="text-slate-500">Email:</span> {contact.email ?? "Not provided"}
                     </p>
                     <p>
@@ -380,6 +388,18 @@ export function ImportPreviewForm() {
                     </p>
                     <p>
                       <span className="text-slate-500">Company:</span> {contact.company ?? "Not provided"}
+                    </p>
+                    <p>
+                      <span className="text-slate-500">Job title:</span> {contact.jobTitle ?? "Not provided"}
+                    </p>
+                    <p>
+                      <span className="text-slate-500">Website:</span> {contact.website ?? "Not provided"}
+                    </p>
+                    <p>
+                      <span className="text-slate-500">Birthday:</span> {contact.birthday ?? "Not provided"}
+                    </p>
+                    <p className="sm:col-span-2">
+                      <span className="text-slate-500">Address:</span> {contact.address ?? "Not provided"}
                     </p>
                     <p>
                       <span className="text-slate-500">Notes:</span> {contact.notes ?? "Not provided"}

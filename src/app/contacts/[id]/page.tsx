@@ -55,9 +55,14 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     select: {
       id: true,
       fullName: true,
+      nickname: true,
       email: true,
       phone: true,
       company: true,
+      jobTitle: true,
+      website: true,
+      birthday: true,
+      address: true,
       notes: true,
       archivedAt: true,
       createdAt: true,
@@ -146,6 +151,16 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               </label>
 
               <label className="grid gap-2 text-sm text-slate-200">
+                <span>Nickname</span>
+                <input
+                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
+                  defaultValue={contact.nickname ?? ""}
+                  name="nickname"
+                  type="text"
+                />
+              </label>
+
+              <label className="grid gap-2 text-sm text-slate-200">
                 <span>Email</span>
                 <input
                   className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
@@ -172,6 +187,45 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                   defaultValue={contact.company ?? ""}
                   name="company"
                   type="text"
+                />
+              </label>
+
+              <label className="grid gap-2 text-sm text-slate-200">
+                <span>Job title</span>
+                <input
+                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
+                  defaultValue={contact.jobTitle ?? ""}
+                  name="jobTitle"
+                  type="text"
+                />
+              </label>
+
+              <label className="grid gap-2 text-sm text-slate-200">
+                <span>Website</span>
+                <input
+                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
+                  defaultValue={contact.website ?? ""}
+                  name="website"
+                  type="url"
+                />
+              </label>
+
+              <label className="grid gap-2 text-sm text-slate-200">
+                <span>Birthday</span>
+                <input
+                  className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
+                  defaultValue={contact.birthday ?? ""}
+                  name="birthday"
+                  type="date"
+                />
+              </label>
+
+              <label className="grid gap-2 text-sm text-slate-200 lg:col-span-2">
+                <span>Address</span>
+                <textarea
+                  className="min-h-24 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
+                  defaultValue={contact.address ?? ""}
+                  name="address"
                 />
               </label>
 

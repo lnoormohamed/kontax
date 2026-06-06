@@ -30,6 +30,12 @@ const getSearchConditions = (query: string) =>
             },
           },
           {
+            nickname: {
+              contains: query,
+              mode: "insensitive" as const,
+            },
+          },
+          {
             email: {
               contains: query,
               mode: "insensitive" as const,
@@ -43,6 +49,24 @@ const getSearchConditions = (query: string) =>
           },
           {
             company: {
+              contains: query,
+              mode: "insensitive" as const,
+            },
+          },
+          {
+            jobTitle: {
+              contains: query,
+              mode: "insensitive" as const,
+            },
+          },
+          {
+            website: {
+              contains: query,
+              mode: "insensitive" as const,
+            },
+          },
+          {
+            address: {
               contains: query,
               mode: "insensitive" as const,
             },
@@ -127,9 +151,14 @@ export default async function Home({ searchParams }: HomePageProps) {
       select: {
         id: true,
         fullName: true,
+        nickname: true,
         email: true,
         phone: true,
         company: true,
+        jobTitle: true,
+        website: true,
+        birthday: true,
+        address: true,
         notes: true,
         archivedAt: true,
         updatedAt: true,
@@ -149,9 +178,14 @@ export default async function Home({ searchParams }: HomePageProps) {
       select: {
         id: true,
         fullName: true,
+        nickname: true,
         email: true,
         phone: true,
         company: true,
+        jobTitle: true,
+        website: true,
+        birthday: true,
+        address: true,
         notes: true,
         archivedAt: true,
         updatedAt: true,
