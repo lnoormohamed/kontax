@@ -202,6 +202,7 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
   const queued = getSearchValue(resolvedSearchParams, "queued") === "1";
   const retryQueued = getSearchValue(resolvedSearchParams, "retryQueued") === "1";
   const preflightFailed = getSearchValue(resolvedSearchParams, "preflightFailed") === "1";
+  const preflightCompleted = getSearchValue(resolvedSearchParams, "preflightCompleted") === "1";
   const conflictResolved = getSearchValue(resolvedSearchParams, "conflictResolved") === "1";
   const credentialsSaved = getSearchValue(resolvedSearchParams, "credentialsSaved") === "1";
   const credentialsRevoked = getSearchValue(resolvedSearchParams, "credentialsRevoked") === "1";
@@ -351,10 +352,16 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
             Recovery retry queued successfully.
           </div>
         ) : null}
+        {preflightCompleted ? (
+          <div className="rounded-[1.75rem] border border-emerald-300/25 bg-emerald-300/10 p-4 text-sm text-emerald-100 shadow-[0_20px_60px_rgba(16,185,129,0.12)]">
+            CardDAV preflight completed successfully. Kontax discovered the remote principal and
+            address book metadata so the next run can move into queued sync execution.
+          </div>
+        ) : null}
         {preflightFailed ? (
           <div className="rounded-[1.75rem] border border-amber-300/25 bg-amber-300/10 p-4 text-sm text-amber-100 shadow-[0_20px_60px_rgba(251,191,36,0.12)]">
-            Sync preflight was blocked because encrypted credentials are not attached yet. The
-            failed preflight is now recorded in job history with a retry window.
+            CardDAV preflight failed or was blocked. Check the latest sync job and the account
+            error state for the exact credential, network, or discovery issue before retrying.
           </div>
         ) : null}
         {conflictResolved ? (
@@ -717,9 +724,15 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                               name="redirectTo"
                               type="hidden"
                               value={
-                                account.credentialReference && !account.credentialRevokedAt
+                                account.credentialReference &&
+                                !account.credentialRevokedAt &&
+                                account.remoteAccountId &&
+                                account.principalUrl &&
+                                account.addressBookUrl
                                   ? "/sync?queued=1"
-                                  : "/sync?preflightFailed=1"
+                                  : account.credentialReference && !account.credentialRevokedAt
+                                    ? "/sync?preflightCompleted=1"
+                                    : "/sync?preflightFailed=1"
                               }
                             />
                             <input name="syncAccountId" type="hidden" value={account.id} />
@@ -727,7 +740,11 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                               className="w-full rounded-full border border-white/10 px-4 py-3 font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-100"
                               type="submit"
                             >
-                              {account.credentialReference && !account.credentialRevokedAt
+                              {account.credentialReference &&
+                              !account.credentialRevokedAt &&
+                              account.remoteAccountId &&
+                              account.principalUrl &&
+                              account.addressBookUrl
                                 ? "Queue sync run"
                                 : "Run sync preflight"}
                             </button>
