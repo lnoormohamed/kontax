@@ -43,6 +43,24 @@ const formatTimestamp = (value: Date) =>
     year: "numeric",
   }).format(new Date(value));
 
+const formatBirthday = (value: string | null) => {
+  if (!value?.trim()) {
+    return "No birthday saved";
+  }
+
+  const birthday = new Date(value);
+
+  if (Number.isNaN(birthday.getTime())) {
+    return "No birthday saved";
+  }
+
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(birthday);
+};
+
 const getInitials = (value: string) =>
   value
     .split(" ")
@@ -300,7 +318,7 @@ export function ContactsWorkspaceTable({
                         {contact.isFavorite ? (
                           <span
                             aria-label="Favorite contact"
-                            className="rounded-full border border-yellow-300 bg-amber-50 px-2 py-0.5 text-[13px] text-amber-500"
+                            className="rounded-full border border-yellow-300 px-2 py-0.5 text-[13px] text-amber-500"
                             title="Favorite contact"
                           >
                             ★
@@ -324,9 +342,6 @@ export function ContactsWorkspaceTable({
 
                 <div className="hidden text-sm text-slate-700 lg:block">
                   <p className="font-medium">{contact.phone ?? "No phone saved"}</p>
-                  <p className="mt-0.5 text-[13px] text-slate-500">
-                    {contact.birthday ?? "No birthday saved"}
-                  </p>
                 </div>
 
                 <div className="hidden text-sm text-slate-700 lg:block">
@@ -337,7 +352,7 @@ export function ContactsWorkspaceTable({
                 </div>
 
                 <div className="hidden text-sm text-slate-500 lg:block">
-                  {contact.birthday ?? "No birthday saved"}
+                  {formatBirthday(contact.birthday)}
                 </div>
 
                 <div className="hidden items-center justify-end gap-2 lg:flex">
