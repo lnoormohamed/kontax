@@ -143,6 +143,89 @@ const getInitials = (value: string) =>
     .join("")
     .toUpperCase();
 
+const normalizeSortText = (value: string | null | undefined) => value?.trim().toLowerCase() ?? "";
+
+const getNameAwareSortKeys = ({
+  firstName,
+  lastName,
+  company,
+  fullName,
+}: {
+  firstName: string | null;
+  lastName: string | null;
+  company: string | null;
+  fullName: string | null;
+}) => {
+  const first = normalizeSortText(firstName);
+  const last = normalizeSortText(lastName);
+  const companyValue = normalizeSortText(company);
+  const full = normalizeSortText(fullName);
+
+  if (!first || !last) {
+    const fallback = companyValue || full;
+    return {
+      primary: fallback,
+      secondary: fallback,
+      company: companyValue,
+      full: full || companyValue,
+    };
+  }
+
+  return {
+    primary: last,
+    secondary: first,
+    company: companyValue,
+    full: full,
+  };
+};
+
+const compareWorkspaceContacts = (
+  left: {
+    isFavorite: boolean;
+    firstName: string | null;
+    lastName: string | null;
+    company: string | null;
+    fullName: string | null;
+  },
+  right: {
+    isFavorite: boolean;
+    firstName: string | null;
+    lastName: string | null;
+    company: string | null;
+    fullName: string | null;
+  },
+) => {
+  if (left.isFavorite !== right.isFavorite) {
+    return left.isFavorite ? -1 : 1;
+  }
+
+  const leftKeys = getNameAwareSortKeys(left);
+  const rightKeys = getNameAwareSortKeys(right);
+  const collation = new Intl.Collator("en", { sensitivity: "base", numeric: true });
+
+  const primaryCompare = collation.compare(leftKeys.primary, rightKeys.primary);
+  if (primaryCompare !== 0) {
+    return primaryCompare;
+  }
+
+  const secondaryCompare = collation.compare(leftKeys.secondary, rightKeys.secondary);
+  if (secondaryCompare !== 0) {
+    return secondaryCompare;
+  }
+
+  const companyCompare = collation.compare(leftKeys.company, rightKeys.company);
+  if (companyCompare !== 0) {
+    return companyCompare;
+  }
+
+  const fullCompare = collation.compare(leftKeys.full, rightKeys.full);
+  if (fullCompare !== 0) {
+    return fullCompare;
+  }
+
+  return 0;
+};
+
 const PublicLanding = () => (
   <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),_transparent_30%),linear-gradient(180deg,#020617_0%,#07111d_45%,#0f172a_100%)] text-white">
     <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-center gap-12 px-6 py-12 lg:flex-row lg:items-center lg:justify-between lg:px-10">
@@ -230,18 +313,6 @@ export default async function Home({ searchParams }: HomePageProps) {
               isFavorite: true,
             }
         : {};
-  const activeOrderBy =
-    selectedSort === "name"
-      ? [
-          { isFavorite: "desc" as const },
-          { lastName: "asc" as const },
-          { firstName: "asc" as const },
-          { company: "asc" as const },
-          { fullName: "asc" as const },
-        ]
-      : {
-          updatedAt: "desc" as const,
-        };
   const [activeContacts, archivedContacts, mergeSuggestions, planSummary] = await Promise.all([
     db.contact.findMany({
       where: {
@@ -250,10 +321,19 @@ export default async function Home({ searchParams }: HomePageProps) {
         ...searchConditions,
         ...filterConditions,
       },
-      orderBy: activeOrderBy,
+      orderBy:
+        selectedSort === "name"
+          ? {
+              isFavorite: "desc" as const,
+            }
+          : {
+              updatedAt: "desc" as const,
+            },
       select: {
         id: true,
         fullName: true,
+        firstName: true,
+        lastName: true,
         nickname: true,
         email: true,
         phone: true,
@@ -280,11 +360,12 @@ export default async function Home({ searchParams }: HomePageProps) {
       orderBy:
         selectedSort === "name"
           ? [
-              { isFavorite: "desc" as const },
-              { lastName: "asc" as const },
-              { firstName: "asc" as const },
-              { company: "asc" as const },
-              { fullName: "asc" as const },
+              {
+                isFavorite: "desc" as const,
+              },
+              {
+                archivedAt: "desc" as const,
+              },
             ]
           : {
               archivedAt: "desc",
@@ -292,6 +373,8 @@ export default async function Home({ searchParams }: HomePageProps) {
       select: {
         id: true,
         fullName: true,
+        firstName: true,
+        lastName: true,
         nickname: true,
         email: true,
         phone: true,
@@ -309,6 +392,15 @@ export default async function Home({ searchParams }: HomePageProps) {
     getOpenMergeSuggestionsForUser(session.user.id),
     getUserPlanSummary(session.user.id),
   ]);
+
+  const sortedActiveContacts =
+    selectedSort === "name"
+      ? [...activeContacts].sort(compareWorkspaceContacts)
+      : activeContacts;
+  const sortedArchivedContacts =
+    selectedSort === "name"
+      ? [...archivedContacts].sort(compareWorkspaceContacts)
+      : archivedContacts;
 
   const userLabel = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
   const userInitials = getInitials(userLabel);
@@ -384,8 +476,8 @@ export default async function Home({ searchParams }: HomePageProps) {
       </header>
 
       <ContactDashboard
-        activeContacts={activeContacts}
-        archivedContacts={archivedContacts}
+        activeContacts={sortedActiveContacts}
+        archivedContacts={sortedArchivedContacts}
         currentFilter={selectedFilter}
         currentSort={selectedSort}
         currentTab={selectedTab}
