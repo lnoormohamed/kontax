@@ -447,12 +447,12 @@ export function ContactsWorkspaceTable({
 
                 <div className="hidden text-sm text-slate-700 lg:block">
                   <p className="truncate font-medium text-[#3341c7]">
-                    {contact.email ?? "No email saved"}
+                    {contact.email ?? ""}
                   </p>
                 </div>
 
                 <div className="hidden text-sm text-slate-700 lg:block">
-                  <p className="font-medium">{contact.phone ?? "No phone saved"}</p>
+                  <p className="font-medium">{contact.phone ?? ""}</p>
                 </div>
 
                 <div className="hidden text-sm text-slate-700 lg:block">
