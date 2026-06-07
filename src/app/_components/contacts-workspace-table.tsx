@@ -43,20 +43,131 @@ const formatTimestamp = (value: Date) =>
     year: "numeric",
   }).format(new Date(value));
 
-const formatBirthday = (value: string | null) => {
-  if (!value?.trim()) {
-    return "No birthday saved";
+const parseBirthdayDate = (value: string): Date | null => {
+  const trimmed = value.trim();
+
+  if (!trimmed) {
+    return null;
   }
 
-  const birthday = new Date(value);
+  const direct = new Date(trimmed);
+  if (!Number.isNaN(direct.getTime())) {
+    return direct;
+  }
 
-  if (Number.isNaN(birthday.getTime())) {
-    return "No birthday saved";
+  const isValidDate = (year: number, month: number, day: number) => {
+    if (!Number.isFinite(year) || !Number.isFinite(month) || !Number.isFinite(day)) {
+      return null;
+    }
+
+    if (year < 1 || year > 9999 || month < 1 || month > 12 || day < 1 || day > 31) {
+      return null;
+    }
+
+    const candidate = new Date(year, month - 1, day);
+    if (
+      candidate.getFullYear() === year &&
+      candidate.getMonth() === month - 1 &&
+      candidate.getDate() === day
+    ) {
+      return candidate;
+    }
+
+    return null;
+  };
+
+  const normalizeTwoDigitYear = (year: number) => (year <= 40 ? 2000 + year : 1900 + year);
+
+  const normalized = trimmed.replace(/,/g, "");
+  const compactDigits = normalized.replace(/[-./\s]/g, "");
+
+  const separatorParts = normalized.split(/[-./]/);
+
+  if (separatorParts.length === 3) {
+    const [first, second, third] = separatorParts;
+    const rawFirst = Number(first);
+    const rawSecond = Number(second);
+    const rawThird = Number(third);
+
+    if (!Number.isNaN(rawFirst) && !Number.isNaN(rawSecond) && !Number.isNaN(rawThird)) {
+      const firstPartLooksYear = first.length === 4;
+      if (firstPartLooksYear) {
+        const candidate = isValidDate(rawFirst, rawSecond, rawThird);
+        if (candidate) {
+          return candidate;
+        }
+      }
+
+      if (rawFirst > 12 && rawSecond <= 12) {
+        const year = rawThird.toString().length === 2 ? normalizeTwoDigitYear(rawThird) : rawThird;
+        return isValidDate(year, rawSecond, rawFirst);
+      }
+
+      if (rawSecond > 12 && rawFirst <= 12) {
+        const year = rawThird.toString().length === 2 ? normalizeTwoDigitYear(rawThird) : rawThird;
+        return isValidDate(year, rawFirst, rawSecond);
+      }
+
+      // ambiguous separator format; prefer dd/mm/yyyy style
+      const ambiguousYear = rawThird.toString().length === 2 ? normalizeTwoDigitYear(rawThird) : rawThird;
+      const asDmy = isValidDate(ambiguousYear, rawSecond, rawFirst);
+      if (asDmy) {
+        return asDmy;
+      }
+
+      const asMdy = isValidDate(ambiguousYear, rawFirst, rawSecond);
+      if (asMdy) {
+        return asMdy;
+      }
+    }
+  }
+
+  const compactMatch = compactDigits.match(/^\d{8}$/);
+  if (compactMatch) {
+    const valueOnlyDigits = compactMatch[0];
+    const first4 = Number(valueOnlyDigits.slice(0, 4));
+
+    const candidateYmd = isValidDate(first4, Number(valueOnlyDigits.slice(4, 6)), Number(valueOnlyDigits.slice(6, 8)));
+    if (candidateYmd && first4 >= 1000) {
+      return candidateYmd;
+    }
+
+    const dmyDate = isValidDate(
+      Number(valueOnlyDigits.slice(4, 8)),
+      Number(valueOnlyDigits.slice(2, 4)),
+      Number(valueOnlyDigits.slice(0, 2)),
+    );
+    if (dmyDate) {
+      return dmyDate;
+    }
+
+    const mdyDate = isValidDate(
+      Number(valueOnlyDigits.slice(4, 8)),
+      Number(valueOnlyDigits.slice(0, 2)),
+      Number(valueOnlyDigits.slice(2, 4)),
+    );
+    if (mdyDate) {
+      return mdyDate;
+    }
+  }
+
+  return null;
+};
+
+const formatBirthday = (value: string | null) => {
+  if (!value?.trim()) {
+    return "";
+  }
+
+  const birthday = parseBirthdayDate(value);
+
+  if (!birthday) {
+    return value.trim();
   }
 
   return new Intl.DateTimeFormat("en-GB", {
     day: "2-digit",
-    month: "short",
+    month: "long",
     year: "numeric",
   }).format(birthday);
 };
@@ -318,7 +429,7 @@ export function ContactsWorkspaceTable({
                         {contact.isFavorite ? (
                           <span
                             aria-label="Favorite contact"
-                            className="rounded-full border border-yellow-300 px-2 py-0.5 text-[13px] text-amber-500"
+                            className="text-[13px] text-amber-500"
                             title="Favorite contact"
                           >
                             ★
