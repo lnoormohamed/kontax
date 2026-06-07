@@ -83,11 +83,29 @@ const IconEdit = () => (
   </span>
 );
 
+const IconPerson = () => (
+  <span aria-hidden="true" className="text-sm leading-none">
+    👤
+  </span>
+);
+
+const IconBuilding = () => (
+  <span aria-hidden="true" className="text-sm leading-none">
+    🏢
+  </span>
+);
+
 const IconMore = () => (
   <span aria-hidden="true" className="text-lg leading-none">
     ⋯
   </span>
 );
+
+const getDisplayName = (contact: WorkspaceContact) => {
+  const fullName = contact.fullName?.trim() ?? "";
+  const company = contact.company?.trim() ?? "";
+  return fullName || company || "Unnamed contact";
+};
 
 export function ContactsWorkspaceTable({
   contacts,
@@ -207,8 +225,11 @@ export function ContactsWorkspaceTable({
         const rowGapClass = viewMode === "cozy" ? "gap-5" : "gap-4";
         const previousContact = index > 0 ? contacts[index - 1] : undefined;
         const showFavoritesStart = mode === "active" && index === 0 && contact.isFavorite;
-        const showFavoritesEnd =
+                const showFavoritesEnd =
           mode === "active" && previousContact?.isFavorite === true && !contact.isFavorite;
+        const hasName = (contact.fullName?.trim().length ?? 0) > 0;
+        const hasCompany = (contact.company?.trim().length ?? 0) > 0;
+        const displayName = getDisplayName(contact);
 
         return (
           <div key={contact.id}>
@@ -250,7 +271,13 @@ export function ContactsWorkspaceTable({
                 <div className="min-w-0">
                   <div className="flex items-start gap-3">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#e8ecff] text-xs font-semibold text-[#4158f4]">
-                      {getInitials(contact.fullName)}
+                      {hasName ? (
+                        getInitials(contact.fullName)
+                      ) : hasCompany ? (
+                        <IconBuilding />
+                      ) : (
+                        <IconPerson />
+                      )}
                     </div>
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
@@ -258,7 +285,7 @@ export function ContactsWorkspaceTable({
                           className="truncate text-[15px] font-semibold text-slate-900 hover:text-[#3248db]"
                           href={`/contacts/${contact.id}`}
                         >
-                          {contact.fullName}
+                          {displayName}
                         </Link>
                         {contact.isFavorite ? (
                           <span className="rounded-full border border-cyan-200 bg-cyan-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-700">
@@ -296,9 +323,9 @@ export function ContactsWorkspaceTable({
                 </div>
 
                 <div className="hidden text-sm text-slate-700 lg:block">
-                  <p className="truncate font-medium">{contact.company ?? "Independent"}</p>
+                  <p className="truncate font-medium">{contact.company?.trim() ?? ""}</p>
                   <p className="mt-0.5 truncate text-[13px] text-slate-500">
-                    {contact.jobTitle ?? "No role saved"}
+                    {contact.jobTitle?.trim() ?? ""}
                   </p>
                 </div>
 
