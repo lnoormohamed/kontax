@@ -396,7 +396,7 @@ export function ContactsWorkspaceTable({
               <div
                 className={`grid ${rowGapClass} lg:grid-cols-[44px_minmax(280px,1.6fr)_minmax(210px,1fr)_minmax(170px,0.9fr)_minmax(180px,0.95fr)_110px_170px] lg:items-center`}
               >
-                <label className="hidden items-center justify-center pt-1 lg:flex lg:pt-0">
+                <label className="hidden items-center justify-center lg:flex">
                   <input
                     checked={isSelected}
                     className="h-4 w-4 rounded border-slate-300 text-[#4158f4] focus:ring-[#4158f4]"
@@ -406,7 +406,7 @@ export function ContactsWorkspaceTable({
                 </label>
 
                 <div className="min-w-0">
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-center gap-3">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#e8ecff] text-xs font-semibold text-[#4158f4]">
                       {hasName ? (
                         getInitials(contact.fullName)
