@@ -240,6 +240,95 @@ const getConflictComparisonRows = (localSnapshot: unknown, remoteSnapshot: unkno
   );
 };
 
+const getSnapshotScalarValue = (snapshot: unknown, key: string) => {
+  if (!isRecord(snapshot)) {
+    return null;
+  }
+
+  const value = snapshot[key];
+  return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
+};
+
+const mergeDisplayList = (values: string[]) => {
+  const seen = new Set<string>();
+  const merged: string[] = [];
+
+  for (const value of values) {
+    const normalized = value.trim();
+    if (!normalized) {
+      continue;
+    }
+
+    const key = normalized.toLowerCase();
+    if (seen.has(key)) {
+      continue;
+    }
+
+    seen.add(key);
+    merged.push(normalized);
+  }
+
+  return merged;
+};
+
+const getManualMergePreview = (localSnapshot: unknown, remoteSnapshot: unknown) => {
+  const localView = getConflictSnapshotView(localSnapshot);
+  const remoteView = getConflictSnapshotView(remoteSnapshot);
+
+  const fullName =
+    getSnapshotScalarValue(localSnapshot, "fullName") ??
+    getSnapshotScalarValue(remoteSnapshot, "fullName") ??
+    "—";
+  const emails = mergeDisplayList(
+    [localView?.emails, remoteView?.emails]
+      .flatMap((value) => (value && value !== "—" ? value.split("|") : []))
+      .map((value) => value.trim()),
+  );
+  const phones = mergeDisplayList(
+    [localView?.phones, remoteView?.phones]
+      .flatMap((value) => (value && value !== "—" ? value.split("|") : []))
+      .map((value) => value.trim()),
+  );
+  const address =
+    localView?.address && localView.address !== "—"
+      ? localView.address
+      : remoteView?.address ?? "—";
+  const company =
+    getSnapshotScalarValue(localSnapshot, "company") ??
+    getSnapshotScalarValue(remoteSnapshot, "company") ??
+    "—";
+  const jobTitle =
+    getSnapshotScalarValue(localSnapshot, "jobTitle") ??
+    getSnapshotScalarValue(remoteSnapshot, "jobTitle") ??
+    "—";
+  const website =
+    getSnapshotScalarValue(localSnapshot, "website") ??
+    getSnapshotScalarValue(remoteSnapshot, "website") ??
+    "—";
+  const birthday =
+    getSnapshotScalarValue(localSnapshot, "birthday") ??
+    getSnapshotScalarValue(remoteSnapshot, "birthday") ??
+    "—";
+  const notesLocal = getSnapshotScalarValue(localSnapshot, "notes");
+  const notesRemote = getSnapshotScalarValue(remoteSnapshot, "notes");
+  const notes =
+    notesLocal && notesRemote && notesLocal !== notesRemote
+      ? `${notesLocal} | Remote note: ${notesRemote}`
+      : notesLocal ?? notesRemote ?? "—";
+
+  return [
+    { label: "Full name", value: fullName },
+    { label: "Emails", value: emails.length > 0 ? emails.join(" | ") : "—" },
+    { label: "Phones", value: phones.length > 0 ? phones.join(" | ") : "—" },
+    { label: "Company", value: company },
+    { label: "Job title", value: jobTitle },
+    { label: "Website", value: website },
+    { label: "Birthday", value: birthday },
+    { label: "Address", value: address },
+    { label: "Notes", value: notes },
+  ];
+};
+
 const getResolutionGuidance = (strategy: string) => {
   switch (strategy) {
     case "KEEP_LOCAL":
@@ -374,6 +463,7 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
   const credentialsSaved = getSearchValue(resolvedSearchParams, "credentialsSaved") === "1";
   const credentialsRevoked = getSearchValue(resolvedSearchParams, "credentialsRevoked") === "1";
   const relinkPrepared = getSearchValue(resolvedSearchParams, "relinkPrepared") === "1";
+  const runnerProcessed = getSearchValue(resolvedSearchParams, "runnerProcessed") === "1";
   const encryptionStatus = getSyncCredentialEncryptionStatus();
 
   const [planSummary, syncAccounts, recentJobs, recentConflicts, queuedJobsCount, openConflictsCount] =
@@ -459,6 +549,37 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
     0,
   );
   const canUseCardDavSync = planSummary.entitlements.cardDavSyncEnabled;
+  const activityItems = [
+    ...recentJobs.map((job) => ({
+      id: `job-${job.id}`,
+      occurredAt: job.completedAt ?? job.startedAt ?? job.createdAt,
+      title: `${job.syncAccount.label} job ${job.status.toLowerCase()}`,
+      body:
+        job.errorSummary ??
+        `Trigger ${job.trigger.toLowerCase()} · ${job.syncDirection.toLowerCase().replaceAll("_", " ")} · conflicts ${job.conflictCount}`,
+      tone:
+        job.status === "FAILED"
+          ? "border-rose-300/20 bg-rose-300/10 text-rose-100"
+          : job.status === "PARTIAL"
+            ? "border-amber-300/20 bg-amber-300/10 text-amber-100"
+            : "border-cyan-300/20 bg-cyan-300/10 text-cyan-100",
+    })),
+    ...recentConflicts.map((conflict) => ({
+      id: `conflict-${conflict.id}`,
+      occurredAt: conflict.resolvedAt ?? conflict.detectedAt,
+      title: `${conflict.syncAccount.label} conflict ${conflict.status.toLowerCase()}`,
+      body:
+        conflict.contact?.fullName
+          ? `${conflict.conflictType} · ${conflict.contact.fullName}`
+          : `${conflict.conflictType} · detached contact`,
+      tone:
+        conflict.status === "OPEN"
+          ? "border-amber-300/20 bg-amber-300/10 text-amber-100"
+          : "border-emerald-300/20 bg-emerald-300/10 text-emerald-100",
+    })),
+  ]
+    .sort((left, right) => right.occurredAt.getTime() - left.occurredAt.getTime())
+    .slice(0, 8);
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),_transparent_30%),linear-gradient(180deg,#020617_0%,#07111d_45%,#0f172a_100%)] text-white">
@@ -551,6 +672,12 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
           <div className="rounded-[1.75rem] border border-cyan-300/25 bg-cyan-300/10 p-4 text-sm text-cyan-100 shadow-[0_20px_60px_rgba(34,211,238,0.12)]">
             Sync relink preparation completed. Local sync links were reset and open conflicts were
             closed out so you can review the account and then start a fresh recovery run.
+          </div>
+        ) : null}
+        {runnerProcessed ? (
+          <div className="rounded-[1.75rem] border border-emerald-300/25 bg-emerald-300/10 p-4 text-sm text-emerald-100 shadow-[0_20px_60px_rgba(16,185,129,0.12)]">
+            Queued sync jobs were handed to the background runner. Review recent jobs and conflict
+            activity below for the latest outcome.
           </div>
         ) : null}
 
@@ -1154,6 +1281,24 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
 
             <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
               <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Recent jobs</p>
+              <div className="mt-4 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-4 text-sm text-cyan-100">
+                <p className="font-semibold text-white">P7-02 background runner</p>
+                <p className="mt-2">
+                  Queue first, then process jobs through the dedicated runner so sync execution can
+                  be retried, inspected, and later scheduled without tying work to the request that
+                  queued it.
+                </p>
+                <form action="/api/sync/run" className="mt-4" method="post">
+                  <input name="redirectTo" type="hidden" value="/sync?runnerProcessed=1" />
+                  <input name="limit" type="hidden" value="5" />
+                  <button
+                    className="rounded-full border border-cyan-200/40 px-4 py-2 text-sm font-semibold text-white transition hover:border-cyan-100 hover:text-cyan-50"
+                    type="submit"
+                  >
+                    Run queued jobs now
+                  </button>
+                </form>
+              </div>
               <div className="mt-4 grid gap-3">
                 {recentJobs.length === 0 ? (
                   <div className="rounded-2xl border border-dashed border-white/15 bg-white/5 p-4 text-slate-400">
@@ -1210,6 +1355,29 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
             </div>
 
             <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
+              <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Activity timeline</p>
+              <div className="mt-4 grid gap-3">
+                {activityItems.length === 0 ? (
+                  <div className="rounded-2xl border border-dashed border-white/15 bg-white/5 p-4 text-slate-400">
+                    No sync activity yet.
+                  </div>
+                ) : (
+                  activityItems.map((item) => (
+                    <div className={`rounded-2xl border p-4 ${item.tone}`} key={item.id}>
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <p className="font-semibold text-white">{item.title}</p>
+                        <p className="text-xs uppercase tracking-[0.2em] text-slate-300">
+                          {formatTimestamp(item.occurredAt)}
+                        </p>
+                      </div>
+                      <p className="mt-2 text-sm">{item.body}</p>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
               <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Open conflicts</p>
               <div className="mt-4 grid gap-3">
                 {recentConflicts.length === 0 ? (
@@ -1224,6 +1392,10 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                     >
                       {(() => {
                         const comparisonRows = getConflictComparisonRows(
+                          conflict.localSnapshot,
+                          conflict.remoteSnapshot,
+                        );
+                        const manualMergePreview = getManualMergePreview(
                           conflict.localSnapshot,
                           conflict.remoteSnapshot,
                         );
@@ -1277,6 +1449,28 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                           </div>
                         </div>
                       ) : null}
+                      <div className="mt-4 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-4 text-sm text-cyan-100">
+                        <p className="font-semibold text-white">P7-01 manual merge preview</p>
+                        <p className="mt-2 text-cyan-100/80">
+                          Manual merge prefers the current local naming fields, keeps useful remote
+                          data when local values are blank, combines multi-value identifiers, and
+                          appends non-duplicate notes before writing the merged record back to
+                          CardDAV.
+                        </p>
+                        <div className="mt-3 grid gap-2">
+                          {manualMergePreview.map((row) => (
+                            <div
+                              className="grid gap-1 rounded-2xl border border-white/10 bg-[#020617]/60 px-3 py-2 sm:grid-cols-[120px_minmax(0,1fr)]"
+                              key={`${conflict.id}-merge-${row.label}`}
+                            >
+                              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                                {row.label}
+                              </p>
+                              <p className="text-sm text-white">{row.value}</p>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
                       {conflict.status === "OPEN" ? (
                         <form action={resolveSyncConflict} className="mt-3 grid gap-3">
                           <input

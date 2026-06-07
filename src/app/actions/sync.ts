@@ -4,16 +4,9 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
-import { Prisma } from "../../../generated/prisma";
 import { auth } from "~/server/auth";
 import { assertCanCreateSyncAccount, assertCanUseCardDavSync } from "~/server/billing";
-import {
-  CardDavPreflightError,
-  discoverCardDavAccount,
-  fetchCardDavAddressBookCards,
-  fetchCardDavAddressBookIndex,
-  pushCardDavContact,
-} from "~/server/carddav";
+import { CardDavPreflightError, discoverCardDavAccount, pushCardDavContact } from "~/server/carddav";
 import { parseContactPostalAddresses, parseContactStringArray } from "~/server/contact-portability";
 import { db } from "~/server/db";
 import {
@@ -202,52 +195,6 @@ const toPortableSyncContact = (contact: {
   notes: contact.notes,
 });
 
-const buildLocalConflictSnapshot = (contact: {
-  id: string;
-  syncUid: string;
-  syncVersion: number;
-  fullName: string;
-  firstName: string | null;
-  middleName: string | null;
-  lastName: string | null;
-  namePrefix: string | null;
-  nameSuffix: string | null;
-  nickname: string | null;
-  email: string | null;
-  emailAddresses: unknown;
-  phone: string | null;
-  phoneNumbers: unknown;
-  company: string | null;
-  jobTitle: string | null;
-  website: string | null;
-  birthday: string | null;
-  address: string | null;
-  postalAddresses: unknown;
-  notes: string | null;
-}) => ({
-  id: contact.id,
-  syncUid: contact.syncUid,
-  syncVersion: contact.syncVersion,
-  fullName: contact.fullName,
-  firstName: contact.firstName,
-  middleName: contact.middleName,
-  lastName: contact.lastName,
-  namePrefix: contact.namePrefix,
-  nameSuffix: contact.nameSuffix,
-  nickname: contact.nickname,
-  email: contact.email,
-  emailAddresses: parseContactStringArray(contact.emailAddresses),
-  phone: contact.phone,
-  phoneNumbers: parseContactStringArray(contact.phoneNumbers),
-  company: contact.company,
-  jobTitle: contact.jobTitle,
-  website: contact.website,
-  birthday: contact.birthday,
-  address: contact.address,
-  postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
-  notes: contact.notes,
-});
-
 const buildContactWriteDataFromRemoteSnapshot = (snapshot: unknown) => {
   if (!isRecord(snapshot)) {
     throw new Error("Remote sync snapshot is missing or invalid.");
@@ -289,6 +236,188 @@ const buildContactWriteDataFromRemoteSnapshot = (snapshot: unknown) => {
     postalAddresses: Array.isArray(snapshot.postalAddresses) ? snapshot.postalAddresses : undefined,
     addressEntries: Array.isArray(snapshot.addressEntries) ? snapshot.addressEntries : undefined,
     notes: typeof snapshot.notes === "string" ? snapshot.notes : null,
+  };
+};
+
+const getSnapshotStringValue = (snapshot: unknown, key: string) => {
+  if (!isRecord(snapshot)) {
+    return null;
+  }
+
+  const value = snapshot[key];
+  return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
+};
+
+const getSnapshotStringList = (snapshot: unknown, listKey: string, fallbackKey?: string) => {
+  if (!isRecord(snapshot)) {
+    return [];
+  }
+
+  const listValue = snapshot[listKey];
+  const list = Array.isArray(listValue)
+    ? listValue.filter((value): value is string => typeof value === "string" && value.trim().length > 0)
+    : [];
+
+  if (list.length > 0) {
+    return list;
+  }
+
+  if (!fallbackKey) {
+    return [];
+  }
+
+  const fallback = snapshot[fallbackKey];
+  return typeof fallback === "string" && fallback.trim().length > 0 ? [fallback.trim()] : [];
+};
+
+const getSnapshotObjectList = (snapshot: unknown, key: string) => {
+  if (!isRecord(snapshot)) {
+    return [];
+  }
+
+  const value = snapshot[key];
+  return Array.isArray(value) ? value.filter((item) => isRecord(item)) : [];
+};
+
+const mergeUniqueStrings = (...lists: string[][]) => {
+  const seen = new Set<string>();
+  const values: string[] = [];
+
+  for (const list of lists) {
+    for (const item of list) {
+      const normalized = item.trim();
+      if (!normalized) {
+        continue;
+      }
+
+      const key = normalized.toLowerCase();
+      if (seen.has(key)) {
+        continue;
+      }
+
+      seen.add(key);
+      values.push(normalized);
+    }
+  }
+
+  return values;
+};
+
+const mergeUniqueObjects = (localValues: Record<string, unknown>[], remoteValues: Record<string, unknown>[]) => {
+  const merged = [...localValues];
+  const seen = new Set(localValues.map((value) => JSON.stringify(value)));
+
+  for (const value of remoteValues) {
+    const key = JSON.stringify(value);
+    if (seen.has(key)) {
+      continue;
+    }
+
+    seen.add(key);
+    merged.push(value);
+  }
+
+  return merged;
+};
+
+const mergeNotesValue = (localValue: string | null, remoteValue: string | null) => {
+  const local = localValue?.trim();
+  const remote = remoteValue?.trim();
+
+  if (local && remote && local !== remote) {
+    return `${local}\n\nRemote note:\n${remote}`;
+  }
+
+  return local ?? remote ?? null;
+};
+
+const buildManualMergeWriteData = (localSnapshot: unknown, remoteSnapshot: unknown) => {
+  const fullName =
+    getSnapshotStringValue(localSnapshot, "fullName") ??
+    getSnapshotStringValue(remoteSnapshot, "fullName");
+
+  if (!fullName) {
+    throw new Error("Manual merge needs at least one valid contact name.");
+  }
+
+  const emailAddresses = mergeUniqueStrings(
+    getSnapshotStringList(localSnapshot, "emailAddresses", "email"),
+    getSnapshotStringList(remoteSnapshot, "emailAddresses", "email"),
+  );
+  const phoneNumbers = mergeUniqueStrings(
+    getSnapshotStringList(localSnapshot, "phoneNumbers", "phone"),
+    getSnapshotStringList(remoteSnapshot, "phoneNumbers", "phone"),
+  );
+  const postalAddresses = mergeUniqueObjects(
+    getSnapshotObjectList(localSnapshot, "postalAddresses"),
+    getSnapshotObjectList(remoteSnapshot, "postalAddresses"),
+  );
+
+  const emailEntries = mergeUniqueObjects(
+    getSnapshotObjectList(localSnapshot, "emailEntries"),
+    getSnapshotObjectList(remoteSnapshot, "emailEntries"),
+  );
+  const phoneEntries = mergeUniqueObjects(
+    getSnapshotObjectList(localSnapshot, "phoneEntries"),
+    getSnapshotObjectList(remoteSnapshot, "phoneEntries"),
+  );
+  const websiteEntries = mergeUniqueObjects(
+    getSnapshotObjectList(localSnapshot, "websiteEntries"),
+    getSnapshotObjectList(remoteSnapshot, "websiteEntries"),
+  );
+  const addressEntries = mergeUniqueObjects(
+    getSnapshotObjectList(localSnapshot, "addressEntries"),
+    getSnapshotObjectList(remoteSnapshot, "addressEntries"),
+  );
+
+  return {
+    fullName,
+    firstName:
+      getSnapshotStringValue(localSnapshot, "firstName") ??
+      getSnapshotStringValue(remoteSnapshot, "firstName"),
+    middleName:
+      getSnapshotStringValue(localSnapshot, "middleName") ??
+      getSnapshotStringValue(remoteSnapshot, "middleName"),
+    lastName:
+      getSnapshotStringValue(localSnapshot, "lastName") ??
+      getSnapshotStringValue(remoteSnapshot, "lastName"),
+    namePrefix:
+      getSnapshotStringValue(localSnapshot, "namePrefix") ??
+      getSnapshotStringValue(remoteSnapshot, "namePrefix"),
+    nameSuffix:
+      getSnapshotStringValue(localSnapshot, "nameSuffix") ??
+      getSnapshotStringValue(remoteSnapshot, "nameSuffix"),
+    nickname:
+      getSnapshotStringValue(localSnapshot, "nickname") ??
+      getSnapshotStringValue(remoteSnapshot, "nickname"),
+    email: emailAddresses[0] ?? null,
+    emailAddresses: emailAddresses.length > 0 ? emailAddresses : undefined,
+    emailEntries: emailEntries.length > 0 ? emailEntries : undefined,
+    phone: phoneNumbers[0] ?? null,
+    phoneNumbers: phoneNumbers.length > 0 ? phoneNumbers : undefined,
+    phoneEntries: phoneEntries.length > 0 ? phoneEntries : undefined,
+    company:
+      getSnapshotStringValue(localSnapshot, "company") ??
+      getSnapshotStringValue(remoteSnapshot, "company"),
+    jobTitle:
+      getSnapshotStringValue(localSnapshot, "jobTitle") ??
+      getSnapshotStringValue(remoteSnapshot, "jobTitle"),
+    website:
+      getSnapshotStringValue(localSnapshot, "website") ??
+      getSnapshotStringValue(remoteSnapshot, "website"),
+    websiteEntries: websiteEntries.length > 0 ? websiteEntries : undefined,
+    birthday:
+      getSnapshotStringValue(localSnapshot, "birthday") ??
+      getSnapshotStringValue(remoteSnapshot, "birthday"),
+    address:
+      getSnapshotStringValue(localSnapshot, "address") ??
+      getSnapshotStringValue(remoteSnapshot, "address"),
+    postalAddresses: postalAddresses.length > 0 ? postalAddresses : undefined,
+    addressEntries: addressEntries.length > 0 ? addressEntries : undefined,
+    notes: mergeNotesValue(
+      getSnapshotStringValue(localSnapshot, "notes"),
+      getSnapshotStringValue(remoteSnapshot, "notes"),
+    ),
   };
 };
 
@@ -583,6 +712,7 @@ export const queueSyncJob = async (formData: FormData) => {
       principalUrl: true,
       addressBookUrl: true,
       remoteAccountId: true,
+      remoteCTag: true,
       credentialReference: true,
       credentialRevokedAt: true,
     },
@@ -718,524 +848,19 @@ export const queueSyncJob = async (formData: FormData) => {
     }),
   ]);
 
-  if (!decryptedCredentials || !account.addressBookUrl) {
-    throw new Error("CardDAV sync account is missing decrypted credentials or an address book URL.");
-  }
-
-  try {
-    const remoteEntries = await fetchCardDavAddressBookIndex({
-      addressBookUrl: account.addressBookUrl,
-      credentials: {
-        username: decryptedCredentials.username,
-        password: decryptedCredentials.password,
-      },
-    });
-    const remoteCards = await fetchCardDavAddressBookCards({
-      addressBookUrl: account.addressBookUrl,
-      credentials: {
-        username: decryptedCredentials.username,
-        password: decryptedCredentials.password,
-      },
-    });
-
-    const remoteUids = remoteEntries.map((entry) => entry.uid);
-    const existingContacts =
-      remoteUids.length > 0
-        ? await db.contact.findMany({
-            where: {
-              userId,
-              syncUid: {
-                in: remoteUids,
-              },
-            },
-            select: {
-              id: true,
-              syncUid: true,
-              archivedAt: true,
-            },
-          })
-        : [];
-    const existingLinks = await db.syncContactLink.findMany({
-      where: {
-        syncAccountId: account.id,
-      },
-      select: {
-        id: true,
-        remoteUid: true,
-        remoteHref: true,
-        remoteETag: true,
-        lastSyncedAt: true,
-        contactId: true,
-        contact: {
-          select: {
-            id: true,
-            syncUid: true,
-            syncVersion: true,
-            updatedAt: true,
-            archivedAt: true,
-            fullName: true,
-            firstName: true,
-            middleName: true,
-            lastName: true,
-            namePrefix: true,
-            nameSuffix: true,
-            nickname: true,
-            email: true,
-            emailAddresses: true,
-            phone: true,
-            phoneNumbers: true,
-            company: true,
-            jobTitle: true,
-            website: true,
-            birthday: true,
-            address: true,
-            postalAddresses: true,
-            notes: true,
-          },
-        },
-      },
-    });
-    const exportCandidates =
-      account.syncDirection !== "IMPORT_ONLY"
-        ? await db.contact.findMany({
-            where: {
-              userId,
-              archivedAt: null,
-              syncTombstoneAt: null,
-              syncLinks: {
-                none: {
-                  syncAccountId: account.id,
-                },
-              },
-            },
-            select: {
-              id: true,
-              syncUid: true,
-              fullName: true,
-              nickname: true,
-              email: true,
-              emailAddresses: true,
-              phone: true,
-              phoneNumbers: true,
-              company: true,
-              jobTitle: true,
-              website: true,
-              birthday: true,
-              address: true,
-              postalAddresses: true,
-              notes: true,
-            },
-          })
-        : [];
-    const contactByUid = new Map(existingContacts.map((contact) => [contact.syncUid, contact]));
-    const remoteEntryByUid = new Map(remoteEntries.map((entry) => [entry.uid, entry]));
-    const remoteCardByUid = new Map(remoteCards.map((card) => [card.uid, card]));
-    const linkedRemoteUids = new Set(
-      existingLinks.map((link) => link.remoteUid ?? link.contact.syncUid),
-    );
-    const matchedEntries = remoteEntries.filter(
-      (entry) => contactByUid.has(entry.uid) && !linkedRemoteUids.has(entry.uid),
-    );
-    const unmatchedCards =
-      account.syncDirection === "EXPORT_ONLY"
-        ? []
-        : remoteCards.filter((card) => !contactByUid.has(card.uid));
-    const conflictEntries: Array<{
-      type: "LOCAL_REMOTE_MUTATION" | "DELETE_CONFLICT";
-      linkId: string;
-      contactId: string;
-      localSyncVersion: number;
-      remoteETag: string | null;
-      localSnapshot: ReturnType<typeof buildLocalConflictSnapshot>;
-      remoteSnapshot: unknown;
-      resolutionNotes: string;
-    }> = [];
-    const remoteApplyCandidates: Array<{
-      linkId: string;
-      contactId: string;
-      remoteETag: string | null;
-      remoteSnapshot: unknown;
-    }> = [];
-    const linkedPushCandidates: Array<{
-      linkId: string;
-      contactId: string;
-      remoteUid: string;
-      contact: ReturnType<typeof toPortableSyncContact>;
-    }> = [];
-
-    for (const link of existingLinks) {
-      const remoteUid = link.remoteUid ?? link.contact.syncUid;
-      const remoteEntry = remoteEntryByUid.get(remoteUid);
-      const remoteCard = remoteCardByUid.get(remoteUid);
-      const localChanged =
-        link.lastSyncedAt == null || link.contact.updatedAt.getTime() > link.lastSyncedAt.getTime();
-      const remoteChanged = remoteEntry != null && remoteEntry.etag !== link.remoteETag;
-
-      if (!remoteEntry) {
-        if (account.syncDirection !== "EXPORT_ONLY" && !link.contact.archivedAt) {
-          conflictEntries.push({
-            type: "DELETE_CONFLICT",
-            linkId: link.id,
-            contactId: link.contact.id,
-            localSyncVersion: link.contact.syncVersion,
-            remoteETag: link.remoteETag ?? null,
-            localSnapshot: buildLocalConflictSnapshot(link.contact),
-            remoteSnapshot: {
-              deleted: true,
-              remoteUid,
-              remoteHref: link.remoteHref,
-            },
-            resolutionNotes:
-              "Remote contact appears missing while the local contact is still active.",
-          });
-        }
-
-        continue;
-      }
-
-      if (
-        localChanged &&
-        remoteChanged &&
-        account.syncDirection === "TWO_WAY" &&
-        remoteCard
-      ) {
-        conflictEntries.push({
-          type: "LOCAL_REMOTE_MUTATION",
-          linkId: link.id,
-          contactId: link.contact.id,
-          localSyncVersion: link.contact.syncVersion,
-          remoteETag: remoteEntry.etag ?? null,
-          localSnapshot: buildLocalConflictSnapshot(link.contact),
-          remoteSnapshot: remoteCard,
-          resolutionNotes:
-            "Local and remote contact data both changed since the last healthy sync point.",
-        });
-        continue;
-      }
-
-      if (localChanged && account.syncDirection !== "IMPORT_ONLY") {
-        linkedPushCandidates.push({
-          linkId: link.id,
-          contactId: link.contact.id,
-          remoteUid,
-          contact: toPortableSyncContact(link.contact),
-        });
-        continue;
-      }
-
-      if (remoteChanged && remoteCard && account.syncDirection !== "EXPORT_ONLY") {
-        remoteApplyCandidates.push({
-          linkId: link.id,
-          contactId: link.contact.id,
-          remoteETag: remoteEntry.etag ?? null,
-          remoteSnapshot: remoteCard,
-        });
-      }
-    }
-    const pushedContacts =
-      exportCandidates.length > 0
-        ? await Promise.all(
-            exportCandidates.map(async (contact) => {
-              const remote = await pushCardDavContact({
-                addressBookUrl: account.addressBookUrl!,
-                credentials: {
-                  username: decryptedCredentials.username,
-                  password: decryptedCredentials.password,
-                },
-                remoteUid: contact.syncUid,
-                contact: {
-                  fullName: contact.fullName,
-                  nickname: contact.nickname,
-                  email: contact.email,
-                  emailAddresses: parseContactStringArray(contact.emailAddresses),
-                  phone: contact.phone,
-                  phoneNumbers: parseContactStringArray(contact.phoneNumbers),
-                  company: contact.company,
-                  jobTitle: contact.jobTitle,
-                  website: contact.website,
-                  birthday: contact.birthday,
-                  address: contact.address,
-                  postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
-                  notes: contact.notes,
-                },
-              });
-
-              return {
-                contactId: contact.id,
-                syncUid: contact.syncUid,
-                remoteHref: remote.href,
-                remoteETag: remote.etag,
-              };
-            }),
-          )
-        : [];
-    const pushedLinkedContacts =
-      linkedPushCandidates.length > 0
-        ? await Promise.all(
-            linkedPushCandidates.map(async (candidate) => {
-              const remote = await pushCardDavContact({
-                addressBookUrl: account.addressBookUrl!,
-                credentials: {
-                  username: decryptedCredentials.username,
-                  password: decryptedCredentials.password,
-                },
-                remoteUid: candidate.remoteUid,
-                contact: candidate.contact,
-              });
-
-              return {
-                linkId: candidate.linkId,
-                contactId: candidate.contactId,
-                remoteUid: candidate.remoteUid,
-                remoteHref: remote.href,
-                remoteETag: remote.etag,
-              };
-            }),
-          )
-        : [];
-
-    await db.$transaction(async (tx) => {
-      for (const entry of matchedEntries) {
-        const contact = contactByUid.get(entry.uid)!;
-
-        await tx.syncContactLink.upsert({
-          where: {
-            syncAccountId_contactId: {
-              syncAccountId: account.id,
-              contactId: contact.id,
-            },
-          },
-          create: {
-            syncAccountId: account.id,
-            contactId: contact.id,
-            remoteHref: entry.href,
-            remoteUid: entry.uid,
-            remoteETag: entry.etag,
-            lastSyncedAt: now,
-          },
-          update: {
-            remoteHref: entry.href,
-            remoteUid: entry.uid,
-            remoteETag: entry.etag,
-            remoteDeletedAt: null,
-            tombstonedAt: null,
-            lastErrorCode: null,
-            lastErrorMessage: null,
-            lastSyncedAt: now,
-          },
-        });
-      }
-
-      for (const card of unmatchedCards) {
-        const createdContact = await tx.contact.create({
-          data: {
-            userId,
-            syncUid: card.uid,
-            fullName: card.fullName,
-            firstName: card.firstName,
-            middleName: card.middleName,
-            lastName: card.lastName,
-            namePrefix: card.namePrefix,
-            nameSuffix: card.nameSuffix,
-            nickname: card.nickname,
-            email: card.emailAddresses[0] ?? null,
-            emailAddresses: card.emailAddresses.length > 0 ? card.emailAddresses : undefined,
-            emailEntries: card.emailEntries.length > 0 ? card.emailEntries : undefined,
-            phone: card.phoneNumbers[0] ?? null,
-            phoneNumbers: card.phoneNumbers.length > 0 ? card.phoneNumbers : undefined,
-            phoneEntries: card.phoneEntries.length > 0 ? card.phoneEntries : undefined,
-            company: card.company,
-            jobTitle: card.jobTitle,
-            website: card.website,
-            websiteEntries: card.websiteEntries.length > 0 ? card.websiteEntries : undefined,
-            birthday: card.birthday,
-            address: card.address,
-            postalAddresses:
-              card.postalAddresses.length > 0 ? card.postalAddresses : undefined,
-            addressEntries: card.addressEntries.length > 0 ? card.addressEntries : undefined,
-            notes: card.notes,
-          },
-          select: {
-            id: true,
-          },
-        });
-
-        const remoteEntry = remoteEntryByUid.get(card.uid);
-
-        await tx.syncContactLink.create({
-          data: {
-            syncAccountId: account.id,
-            contactId: createdContact.id,
-            remoteHref: remoteEntry?.href ?? card.href,
-            remoteUid: card.uid,
-            remoteETag: remoteEntry?.etag ?? card.etag,
-            lastSyncedAt: now,
-          },
-        });
-      }
-
-      for (const pushedContact of pushedContacts) {
-        await tx.syncContactLink.upsert({
-          where: {
-            syncAccountId_contactId: {
-              syncAccountId: account.id,
-              contactId: pushedContact.contactId,
-            },
-          },
-          create: {
-            syncAccountId: account.id,
-            contactId: pushedContact.contactId,
-            remoteHref: pushedContact.remoteHref,
-            remoteUid: pushedContact.syncUid,
-            remoteETag: pushedContact.remoteETag,
-            lastSyncedAt: now,
-          },
-          update: {
-            remoteHref: pushedContact.remoteHref,
-            remoteUid: pushedContact.syncUid,
-            remoteETag: pushedContact.remoteETag,
-            remoteDeletedAt: null,
-            tombstonedAt: null,
-            lastErrorCode: null,
-            lastErrorMessage: null,
-            lastSyncedAt: now,
-          },
-        });
-      }
-
-      for (const pushedLinkedContact of pushedLinkedContacts) {
-        await tx.syncContactLink.update({
-          where: {
-            id: pushedLinkedContact.linkId,
-          },
-          data: {
-            remoteHref: pushedLinkedContact.remoteHref,
-            remoteUid: pushedLinkedContact.remoteUid,
-            remoteETag: pushedLinkedContact.remoteETag,
-            remoteDeletedAt: null,
-            tombstonedAt: null,
-            lastErrorCode: null,
-            lastErrorMessage: null,
-            lastSyncedAt: now,
-          },
-        });
-      }
-
-      for (const remoteApply of remoteApplyCandidates) {
-        await tx.contact.update({
-          where: {
-            id: remoteApply.contactId,
-          },
-          data: {
-            ...buildContactWriteDataFromRemoteSnapshot(remoteApply.remoteSnapshot),
-            syncVersion: {
-              increment: 1,
-            },
-          },
-        });
-
-        await tx.syncContactLink.update({
-          where: {
-            id: remoteApply.linkId,
-          },
-          data: {
-            remoteETag: remoteApply.remoteETag,
-            remoteDeletedAt: null,
-            tombstonedAt: null,
-            lastErrorCode: null,
-            lastErrorMessage: null,
-            lastSyncedAt: now,
-          },
-        });
-      }
-
-      for (const conflictEntry of conflictEntries) {
-        await tx.syncConflict.create({
-          data: {
-            syncAccountId: account.id,
-            syncContactLinkId: conflictEntry.linkId,
-            contactId: conflictEntry.contactId,
-            conflictType: conflictEntry.type,
-            status: "OPEN",
-            localSyncVersion: conflictEntry.localSyncVersion,
-            remoteETag: conflictEntry.remoteETag,
-            localSnapshot: conflictEntry.localSnapshot,
-            remoteSnapshot: conflictEntry.remoteSnapshot as Prisma.InputJsonValue,
-            resolutionNotes: conflictEntry.resolutionNotes,
-          },
-        });
-      }
-
-      await tx.syncJob.create({
-        data: {
-          syncAccountId: account.id,
-          status: conflictEntries.length > 0 ? "PARTIAL" : "SUCCEEDED",
-          trigger: "MANUAL",
-          syncDirection: account.syncDirection,
-          attemptCount: 1,
-          maxAttempts: 5,
-          nextRetryAt: now,
-          startedAt: now,
-          completedAt: new Date(),
-          createdCount: unmatchedCards.length,
-          updatedCount: matchedEntries.length + remoteApplyCandidates.length,
-          deletedCount: pushedContacts.length + pushedLinkedContacts.length,
-          conflictCount: conflictEntries.length,
-          skippedCount: 0,
-          cursorBefore: account.remoteAccountId ?? account.addressBookUrl,
-          cursorAfter: String(remoteEntries.length),
-          idempotencyKey: createIdempotencyKey([account.id, "manual", "index"]),
-          errorCode: conflictEntries.length > 0 ? "SYNC_CONFLICTS_OPEN" : null,
-          errorSummary:
-            unmatchedCards.length > 0 ||
-            pushedContacts.length > 0 ||
-            pushedLinkedContacts.length > 0 ||
-            remoteApplyCandidates.length > 0 ||
-            conflictEntries.length > 0
-              ? `Imported ${unmatchedCards.length} remote contacts, refreshed ${
-                  matchedEntries.length + remoteApplyCandidates.length
-                } linked contacts, exported ${
-                  pushedContacts.length + pushedLinkedContacts.length
-                } local contacts, and opened ${conflictEntries.length} sync conflicts.`
-              : `Indexed ${matchedEntries.length} remote contacts and refreshed local sync links.`,
-        },
-      });
-
-      await tx.syncAccount.update({
-        where: { id: account.id },
-        data: {
-          status: account.status === "PAUSED" ? "PAUSED" : "ACTIVE",
-          lastSyncedAt: now,
-          lastSucceededAt: now,
-          lastErrorAt: conflictEntries.length > 0 ? now : null,
-          lastErrorCode: conflictEntries.length > 0 ? "SYNC_CONFLICTS_OPEN" : null,
-          lastErrorMessage:
-            conflictEntries.length > 0
-              ? `${conflictEntries.length} sync conflicts need review before the account is fully healthy again.`
-              : null,
-        },
-      });
-
-    });
-  } catch (error) {
-    const errorCode =
-      error instanceof CardDavPreflightError ? error.code : "CARDDAV_INDEX_FAILED";
-    const errorSummary =
-      error instanceof Error
-        ? error.message
-        : "CardDAV indexing failed before local sync links could be refreshed.";
-
-    await recordFailedPreflight({
-      accountId: account.id,
+  await db.syncJob.create({
+    data: {
+      syncAccountId: account.id,
+      status: "QUEUED",
+      trigger: "MANUAL",
       syncDirection: account.syncDirection,
-      accountStatus: account.status,
-      errorCode,
-      errorSummary,
-    });
-
-    revalidateSyncViews();
-    redirect("/sync?preflightFailed=1");
-  }
+      attemptCount: 1,
+      maxAttempts: 5,
+      nextRetryAt: now,
+      cursorBefore: account.remoteCTag ?? account.remoteAccountId ?? account.addressBookUrl,
+      idempotencyKey: createIdempotencyKey([account.id, "manual", "queue"]),
+    },
+  });
 
   revalidateSyncViews();
   redirect(redirectTo ?? "/sync?queued=1");
@@ -1519,6 +1144,75 @@ export const resolveSyncConflict = async (formData: FormData) => {
         where: { id: conflict.syncContactLinkId },
         data: {
           tombstonedAt: resolvedAt,
+          lastSyncedAt: resolvedAt,
+        },
+      });
+    }
+  }
+
+  if (input.resolutionStrategy === "MANUAL_MERGE") {
+    if (
+      !conflict.contactId ||
+      !conflict.contact ||
+      !conflict.syncAccount.addressBookUrl ||
+      !conflict.syncAccount.credentialReference
+    ) {
+      throw new Error(
+        "Manual merge needs an attached local contact plus active remote sync credentials.",
+      );
+    }
+
+    const mergedWriteData = buildManualMergeWriteData(
+      conflict.localSnapshot,
+      conflict.remoteSnapshot,
+    );
+
+    await db.contact.update({
+      where: { id: conflict.contactId },
+      data: {
+        ...mergedWriteData,
+        syncVersion: {
+          increment: 1,
+        },
+      },
+    });
+
+    const credentials = decryptSyncCredentialPayload(conflict.syncAccount.credentialReference);
+    const pushed = await pushCardDavContact({
+      addressBookUrl: conflict.syncAccount.addressBookUrl,
+      credentials: {
+        username: credentials.username,
+        password: credentials.password,
+      },
+      remoteUid: conflict.syncContactLink?.remoteUid ?? conflict.contact.syncUid,
+      contact: {
+        fullName: mergedWriteData.fullName,
+        nickname: mergedWriteData.nickname ?? null,
+        email: mergedWriteData.email ?? null,
+        emailAddresses: mergedWriteData.emailAddresses ?? [],
+        phone: mergedWriteData.phone ?? null,
+        phoneNumbers: mergedWriteData.phoneNumbers ?? [],
+        company: mergedWriteData.company ?? null,
+        jobTitle: mergedWriteData.jobTitle ?? null,
+        website: mergedWriteData.website ?? null,
+        birthday: mergedWriteData.birthday ?? null,
+        address: mergedWriteData.address ?? null,
+        postalAddresses: parseContactPostalAddresses(mergedWriteData.postalAddresses ?? []),
+        notes: mergedWriteData.notes ?? null,
+      },
+    });
+
+    if (conflict.syncContactLinkId) {
+      await db.syncContactLink.update({
+        where: { id: conflict.syncContactLinkId },
+        data: {
+          remoteHref: pushed.href,
+          remoteUid: conflict.syncContactLink?.remoteUid ?? conflict.contact.syncUid,
+          remoteETag: pushed.etag,
+          remoteDeletedAt: null,
+          tombstonedAt: null,
+          lastErrorCode: null,
+          lastErrorMessage: null,
           lastSyncedAt: resolvedAt,
         },
       });
