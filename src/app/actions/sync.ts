@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
+import { Prisma } from "../../../generated/prisma";
 import { auth } from "~/server/auth";
 import { assertCanCreateSyncAccount, assertCanUseCardDavSync } from "~/server/billing";
 import { CardDavPreflightError, discoverCardDavAccount, pushCardDavContact } from "~/server/carddav";
@@ -1170,7 +1171,28 @@ export const resolveSyncConflict = async (formData: FormData) => {
     await db.contact.update({
       where: { id: conflict.contactId },
       data: {
-        ...mergedWriteData,
+        fullName: mergedWriteData.fullName,
+        firstName: mergedWriteData.firstName,
+        middleName: mergedWriteData.middleName,
+        lastName: mergedWriteData.lastName,
+        namePrefix: mergedWriteData.namePrefix,
+        nameSuffix: mergedWriteData.nameSuffix,
+        nickname: mergedWriteData.nickname,
+        email: mergedWriteData.email,
+        emailAddresses: mergedWriteData.emailAddresses,
+        emailEntries: mergedWriteData.emailEntries as Prisma.InputJsonValue | undefined,
+        phone: mergedWriteData.phone,
+        phoneNumbers: mergedWriteData.phoneNumbers,
+        phoneEntries: mergedWriteData.phoneEntries as Prisma.InputJsonValue | undefined,
+        company: mergedWriteData.company,
+        jobTitle: mergedWriteData.jobTitle,
+        website: mergedWriteData.website,
+        websiteEntries: mergedWriteData.websiteEntries as Prisma.InputJsonValue | undefined,
+        birthday: mergedWriteData.birthday,
+        address: mergedWriteData.address,
+        postalAddresses: mergedWriteData.postalAddresses as Prisma.InputJsonValue | undefined,
+        addressEntries: mergedWriteData.addressEntries as Prisma.InputJsonValue | undefined,
+        notes: mergedWriteData.notes,
         syncVersion: {
           increment: 1,
         },
