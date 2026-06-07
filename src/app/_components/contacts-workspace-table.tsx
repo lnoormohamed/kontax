@@ -77,21 +77,15 @@ const IconStar = ({ filled }: { filled: boolean }) => (
   </span>
 );
 
-const IconOpen = () => (
+const IconEdit = () => (
   <span aria-hidden="true" className="text-sm leading-none">
-    ↗
+    ✎
   </span>
 );
 
-const IconArchive = () => (
-  <span aria-hidden="true" className="text-sm leading-none">
-    ⎘
-  </span>
-);
-
-const IconRestore = () => (
-  <span aria-hidden="true" className="text-sm leading-none">
-    ↻
+const IconMore = () => (
+  <span aria-hidden="true" className="text-lg leading-none">
+    ⋯
   </span>
 );
 
@@ -312,7 +306,7 @@ export function ContactsWorkspaceTable({
                   {formatTimestamp(contact.updatedAt)}
                 </div>
 
-                <div className="flex flex-wrap justify-start gap-2 lg:justify-end">
+                <div className="hidden items-center justify-end gap-2 lg:flex">
                   <form action={toggleFavoriteContact}>
                     <input name="contactId" type="hidden" value={contact.id} />
                     <input
@@ -340,96 +334,63 @@ export function ContactsWorkspaceTable({
                     className={`rounded-full w-9 h-9 p-0 flex items-center justify-center border text-xs font-semibold transition ${
                       showDesktopActions
                         ? "border-[#d8ddd6] text-slate-700 opacity-100 hover:border-[#c9d0c9] hover:bg-slate-50"
-                        : "pointer-events-none border-transparent text-slate-400 opacity-0"
+                        : "pointer-events-none border-transparent text-transparent opacity-0"
                     }`}
                     href={`/contacts/${contact.id}`}
                     tabIndex={showDesktopActions ? 0 : -1}
-                    aria-label="Open contact"
+                    aria-label="Edit contact"
                   >
-                    <span className="sr-only">Open</span>
-                    <IconOpen />
+                    <span className="sr-only">Edit contact</span>
+                    <IconEdit />
                   </Link>
-                  {contact.archivedAt ? (
-                    <form action={restoreContact}>
-                      <input name="contactId" type="hidden" value={contact.id} />
-                      <input name="redirectTo" type="hidden" value="/?tab=archived" />
-                      <button
-                        className={`rounded-full w-9 h-9 p-0 flex items-center justify-center text-xs font-semibold transition ${
-                          showDesktopActions
-                            ? "bg-[#4158f4] text-white opacity-100 hover:bg-[#3248db]"
-                            : "pointer-events-none bg-transparent text-transparent opacity-0"
-                        }`}
-                        tabIndex={showDesktopActions ? 0 : -1}
-                        type="submit"
-                        aria-label="Restore contact"
-                      >
-                        <span className="sr-only">Restore</span>
-                        <IconRestore />
-                      </button>
-                    </form>
-                  ) : (
-                    <form action={archiveContact}>
-                      <input name="contactId" type="hidden" value={contact.id} />
-                      <input name="redirectTo" type="hidden" value="/?tab=people" />
-                      <button
-                        className={`rounded-full border w-9 h-9 p-0 flex items-center justify-center text-xs font-semibold transition ${
-                          showDesktopActions
-                            ? "border-amber-300 text-amber-700 opacity-100 hover:border-amber-400 hover:bg-amber-50"
-                            : "pointer-events-none border-transparent text-transparent opacity-0"
-                        }`}
-                        tabIndex={showDesktopActions ? 0 : -1}
-                        type="submit"
-                        aria-label="Archive contact"
-                      >
-                        <span className="sr-only">Archive</span>
-                        <IconArchive />
-                      </button>
-                    </form>
-                  )}
-                </div>
-              </div>
-              <div className="mt-3 flex flex-wrap gap-2 lg:hidden">
-                <form action={toggleFavoriteContact}>
-                  <input name="contactId" type="hidden" value={contact.id} />
-                  <input
-                    name="redirectTo"
-                    type="hidden"
-                    value={mode === "active" ? "/?tab=people" : "/?tab=archived"}
-                  />
-                  <button
-                    className={`rounded-full px-3 py-2 text-xs font-semibold transition ${
-                      contact.isFavorite
-                        ? "border border-cyan-300 text-cyan-700 hover:border-cyan-400 hover:bg-cyan-50"
-                        : "border border-[#d8ddd6] text-slate-700 hover:border-[#c9d0c9] hover:bg-slate-50"
-                    }`}
-                    type="submit"
+                  <details
+                    className="relative"
+                    suppressHydrationWarning
                   >
-                    {contact.isFavorite ? "Unstar" : "Star"}
-                  </button>
-                </form>
-                {contact.archivedAt ? (
-                  <form action={restoreContact}>
-                    <input name="contactId" type="hidden" value={contact.id} />
-                    <input name="redirectTo" type="hidden" value="/?tab=archived" />
-                    <button
-                      className="rounded-full bg-[#4158f4] px-3 py-2 text-xs font-semibold text-white transition hover:bg-[#3248db]"
-                      type="submit"
+                    <summary
+                      className={`list-none cursor-pointer rounded-full w-9 h-9 p-0 flex items-center justify-center border text-xs font-semibold transition ${
+                        showDesktopActions
+                          ? "border-[#d8ddd6] text-slate-700 opacity-100 hover:border-[#c9d0c9] hover:bg-slate-50"
+                          : "pointer-events-none border-transparent text-transparent opacity-0"
+                      }`}
+                      role="button"
+                      aria-label="More actions"
+                      tabIndex={showDesktopActions ? 0 : -1}
                     >
-                      Restore
-                    </button>
-                  </form>
-                ) : (
-                  <form action={archiveContact}>
-                    <input name="contactId" type="hidden" value={contact.id} />
-                    <input name="redirectTo" type="hidden" value="/?tab=people" />
-                    <button
-                      className="rounded-full border border-amber-300 px-3 py-2 text-xs font-semibold text-amber-700 transition hover:border-amber-400 hover:bg-amber-50"
-                      type="submit"
+                      <span className="sr-only">More actions</span>
+                      <IconMore />
+                    </summary>
+                    <div
+                      className={`absolute right-0 top-full z-20 mt-2 min-w-[160px] overflow-hidden rounded-xl border border-[#d8ddd6] bg-white shadow-[0_16px_48px_rgba(15,23,42,0.15)] ${
+                        showDesktopActions ? "opacity-100" : "pointer-events-none opacity-0"
+                      }`}
                     >
-                      Archive
-                    </button>
-                  </form>
-                )}
+                      {contact.archivedAt ? (
+                        <form action={restoreContact}>
+                          <input name="contactId" type="hidden" value={contact.id} />
+                          <input name="redirectTo" type="hidden" value="/?tab=archived" />
+                          <button
+                            className="w-full px-3 py-2 text-left text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+                            type="submit"
+                          >
+                            Restore
+                          </button>
+                        </form>
+                      ) : (
+                        <form action={archiveContact}>
+                          <input name="contactId" type="hidden" value={contact.id} />
+                          <input name="redirectTo" type="hidden" value="/?tab=people" />
+                          <button
+                            className="w-full px-3 py-2 text-left text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+                            type="submit"
+                          >
+                            Archive
+                          </button>
+                        </form>
+                      )}
+                    </div>
+                  </details>
+                </div>
               </div>
             </article>
           </div>
