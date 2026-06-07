@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
+import { Prisma } from "../../../generated/prisma";
 import { auth } from "~/server/auth";
 import { assertCanCreateSyncAccount, assertCanUseCardDavSync } from "~/server/billing";
 import {
@@ -1159,7 +1160,7 @@ export const queueSyncJob = async (formData: FormData) => {
             localSyncVersion: conflictEntry.localSyncVersion,
             remoteETag: conflictEntry.remoteETag,
             localSnapshot: conflictEntry.localSnapshot,
-            remoteSnapshot: conflictEntry.remoteSnapshot,
+            remoteSnapshot: conflictEntry.remoteSnapshot as Prisma.InputJsonValue,
             resolutionNotes: conflictEntry.resolutionNotes,
           },
         });
