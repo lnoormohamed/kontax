@@ -121,8 +121,9 @@ Prepare Kontax for reliable iPhone and Android contact sync via CardDAV by defin
   - Compatibility messaging should make clear that first-wave sync aims for reliable core-contact interoperability, not perfect parity for every provider-specific field or every client-specific contact UI behavior.
   - Support and QA planning should treat these field classes differently:
     - expected to round-trip well: full name, primary email, primary phone, company, notes
-    - likely degraded or client-dependent: secondary identifiers, archive state, merge lineage, audit state, plan metadata
+    - likely degraded or client-dependent: secondary identifiers, favorite/starred state, archive state, merge lineage, audit state, plan metadata
     - Kontax-local only: billing entitlements, merge decisions, import/export job history, sync conflict records
+  - Favorites now exist as a visible consumer feature in the main workspace, so sync planning must decide whether they map to any CardDAV-compatible construct, degrade cleanly to local-only preference state, or require per-client translation that is too inconsistent for early rollout.
   - The sync center now includes an in-product compatibility section covering iPhone and Android onboarding posture, timing expectations, and field-support bands so support guidance is visible before full device sync ships.
 - Acceptance Criteria:
   - Platform notes are captured clearly enough for support and QA planning.

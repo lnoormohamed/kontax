@@ -392,6 +392,20 @@ const parseContactId = (formData: FormData) => {
   return parsed.data.contactId;
 };
 
+const parseContactIds = (formData: FormData) => {
+  const values = formData.getAll("contactIds");
+  const contactIds = values
+    .filter((value): value is string => typeof value === "string")
+    .map((value) => value.trim())
+    .filter((value) => value.length > 0);
+
+  if (contactIds.length === 0) {
+    throw new Error("Select at least one contact.");
+  }
+
+  return [...new Set(contactIds)];
+};
+
 const parseMergeDecisionId = (formData: FormData) => {
   const parsed = mergeDecisionSchema.safeParse({
     decisionId: formData.get("decisionId"),
@@ -427,10 +441,11 @@ const parseMergeContactInput = (formData: FormData) => {
 export const createContact = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const input = parseContactInput(formData);
+  const redirectTo = getRedirectTarget(formData);
 
   await assertCanCreateContacts(userId);
 
-  await db.contact.create({
+  const createdContact = await db.contact.create({
     data: {
       userId,
       ...input,
@@ -438,6 +453,10 @@ export const createContact = async (formData: FormData) => {
   });
 
   revalidateContactViews();
+
+  if (redirectTo) {
+    redirect(redirectTo.replace(":id", createdContact.id));
+  }
 };
 
 export const updateContact = async (formData: FormData) => {
@@ -453,6 +472,45 @@ export const updateContact = async (formData: FormData) => {
     },
     data: {
       ...input,
+      syncVersion: {
+        increment: 1,
+      },
+    },
+  });
+
+  revalidateContactViews(contactId);
+
+  if (redirectTo) {
+    redirect(redirectTo);
+  }
+};
+
+export const toggleFavoriteContact = async (formData: FormData) => {
+  const userId = await getRequiredUserId();
+  const contactId = parseContactId(formData);
+  const redirectTo = getRedirectTarget(formData);
+
+  const existingContact = await db.contact.findFirst({
+    where: {
+      id: contactId,
+      userId,
+    },
+    select: {
+      id: true,
+      isFavorite: true,
+    },
+  });
+
+  if (!existingContact) {
+    throw new Error("Contact not found.");
+  }
+
+  await db.contact.update({
+    where: {
+      id: existingContact.id,
+    },
+    data: {
+      isFavorite: !existingContact.isFavorite,
       syncVersion: {
         increment: 1,
       },
@@ -493,6 +551,35 @@ export const archiveContact = async (formData: FormData) => {
   }
 };
 
+export const archiveContactsBulk = async (formData: FormData) => {
+  const userId = await getRequiredUserId();
+  const contactIds = parseContactIds(formData);
+  const redirectTo = getRedirectTarget(formData);
+
+  await db.contact.updateMany({
+    where: {
+      id: {
+        in: contactIds,
+      },
+      userId,
+      archivedAt: null,
+    },
+    data: {
+      archivedAt: new Date(),
+      syncTombstoneAt: new Date(),
+      syncVersion: {
+        increment: 1,
+      },
+    },
+  });
+
+  revalidateContactViews();
+
+  if (redirectTo) {
+    redirect(redirectTo);
+  }
+};
+
 export const restoreContact = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const contactId = parseContactId(formData);
@@ -517,6 +604,37 @@ export const restoreContact = async (formData: FormData) => {
   revalidateContactViews(contactId);
 
   const redirectTo = getRedirectTarget(formData);
+  if (redirectTo) {
+    redirect(redirectTo);
+  }
+};
+
+export const restoreContactsBulk = async (formData: FormData) => {
+  const userId = await getRequiredUserId();
+  const contactIds = parseContactIds(formData);
+  const redirectTo = getRedirectTarget(formData);
+
+  await db.contact.updateMany({
+    where: {
+      id: {
+        in: contactIds,
+      },
+      userId,
+      NOT: {
+        archivedAt: null,
+      },
+    },
+    data: {
+      archivedAt: null,
+      syncTombstoneAt: null,
+      syncVersion: {
+        increment: 1,
+      },
+    },
+  });
+
+  revalidateContactViews();
+
   if (redirectTo) {
     redirect(redirectTo);
   }

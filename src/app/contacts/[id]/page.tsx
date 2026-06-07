@@ -6,6 +6,7 @@ import {
   undoMergeContacts,
   permanentlyDeleteContact,
   restoreContact,
+  toggleFavoriteContact,
   updateContact,
 } from "~/app/actions/contacts";
 import { auth } from "~/server/auth";
@@ -38,6 +39,8 @@ const getPrimaryStructuredEntry = <T,>(value: unknown) => {
 
   return value[0] as T;
 };
+
+const getStructuredEntryCount = (value: unknown) => (Array.isArray(value) ? value.length : 0);
 
 const getSyncLinkStatusLabel = (link: {
   lastSyncedAt: Date | null;
@@ -278,6 +281,16 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
           .filter((item): item is string => Boolean(item))
           .join("\n")
       : "";
+  const structuredCoverage = [
+    { label: "Emails", count: getStructuredEntryCount(contact.emailEntries) },
+    { label: "Phones", count: getStructuredEntryCount(contact.phoneEntries) },
+    { label: "Websites", count: getStructuredEntryCount(contact.websiteEntries) },
+    { label: "Addresses", count: getStructuredEntryCount(contact.addressEntries) },
+    { label: "Dates", count: getStructuredEntryCount(contact.significantDates) },
+    { label: "Relationships", count: getStructuredEntryCount(contact.relatedPeople) },
+    { label: "Custom fields", count: getStructuredEntryCount(contact.customFields) },
+  ];
+  const enrichedFieldCount = structuredCoverage.filter((item) => item.count > 0).length;
 
   const detailStats = [
     {
@@ -345,6 +358,23 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                       </div>
                     ))}
                   </div>
+
+                  <div className="mt-5 flex flex-wrap gap-2">
+                    <form action={toggleFavoriteContact}>
+                      <input name="contactId" type="hidden" value={contact.id} />
+                      <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}`} />
+                      <button
+                        className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
+                          contact.isFavorite
+                            ? "border border-cyan-300/40 bg-cyan-300/10 text-cyan-100 hover:bg-cyan-300/20"
+                            : "border border-white/15 bg-white/5 text-white hover:bg-white/10"
+                        }`}
+                        type="submit"
+                      >
+                        {contact.isFavorite ? "Unstar favorite" : "Star favorite"}
+                      </button>
+                    </form>
+                  </div>
                 </div>
               </div>
             </div>
@@ -365,6 +395,10 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               </p>
               <p>
                 <span className="text-[#9fd6c6]">Labels:</span> {labelsValue || "None yet"}
+              </p>
+              <p>
+                <span className="text-[#9fd6c6]">Structured coverage:</span> {enrichedFieldCount} /{" "}
+                {structuredCoverage.length} areas
               </p>
             </div>
           </div>
@@ -644,6 +678,19 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
 
                 <div className={helperCardClassName}>
                   <p className="font-semibold text-slate-900">Portability guidance</p>
+                  <div className="mt-3 grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
+                    {structuredCoverage.map((item) => (
+                      <div
+                        className="rounded-[1rem] border border-[#d8ddd6] bg-white px-3 py-2"
+                        key={item.label}
+                      >
+                        <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">
+                          {item.label}
+                        </p>
+                        <p className="mt-1 text-sm font-semibold text-slate-900">{item.count}</p>
+                      </div>
+                    ))}
+                  </div>
                   <ul className="mt-3 space-y-2">
                     <li>Core identity fields remain your safest export and sync anchors.</li>
                     <li>Structured secondary values improve merge quality and richer vCard output.</li>
