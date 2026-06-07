@@ -353,34 +353,37 @@ model MergeDecision {
 }
 
 model SyncAccount {
-  id                  String            @id @default(cuid())
-  userId              String
-  provider            SyncProvider      @default(CARDDAV)
-  status              SyncAccountStatus @default(PAUSED)
-  syncDirection       SyncDirection     @default(TWO_WAY)
-  label               String
-  baseUrl             String
-  principalUrl        String?
-  addressBookUrl      String?
-  remoteAccountId     String?
-  remoteCTag          String?
-  credentialReference String?
-  credentialVersion   Int               @default(1)
-  credentialUpdatedAt DateTime?
-  credentialRevokedAt DateTime?
-  encryptionKeyRef    String?
-  lastSyncCursor      String?
-  lastSyncedAt        DateTime?
-  lastSucceededAt     DateTime?
-  lastErrorAt         DateTime?
-  lastErrorCode       String?
-  lastErrorMessage    String?
-  createdAt           DateTime          @default(now())
-  updatedAt           DateTime          @updatedAt
-  user                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
-  syncLinks           SyncContactLink[]
-  syncJobs            SyncJob[]
-  syncConflicts       SyncConflict[]
+  id                        String            @id @default(cuid())
+  userId                    String
+  provider                  SyncProvider      @default(CARDDAV)
+  status                    SyncAccountStatus @default(PAUSED)
+  syncDirection             SyncDirection     @default(TWO_WAY)
+  label                     String
+  baseUrl                   String
+  principalUrl              String?
+  addressBookUrl            String?
+  addressBookDisplayName    String?
+  remoteAccountId           String?
+  remoteCTag                String?
+  credentialReference       String?
+  credentialVersion         Int               @default(1)
+  credentialUpdatedAt       DateTime?
+  credentialLastValidatedAt DateTime?
+  credentialRevokedAt       DateTime?
+  encryptionKeyRef          String?
+  connectionValidatedAt     DateTime?
+  lastSyncCursor            String?
+  lastSyncedAt              DateTime?
+  lastSucceededAt           DateTime?
+  lastErrorAt               DateTime?
+  lastErrorCode             String?
+  lastErrorMessage          String?
+  createdAt                 DateTime          @default(now())
+  updatedAt                 DateTime          @updatedAt
+  user                      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  syncLinks                 SyncContactLink[]
+  syncJobs                  SyncJob[]
+  syncConflicts             SyncConflict[]
 
   @@unique([userId, baseUrl, label])
   @@index([userId, status, updatedAt])

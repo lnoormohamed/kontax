@@ -25,15 +25,15 @@ Turn the CardDAV roadmap into a real product slice by connecting live CardDAV ac
 ## Phase Tracker
 | Ticket | Status | Priority | Depends On |
 | --- | --- | --- | --- |
-| P7-01 | Not Started | P0 | P5-01, P5-03 |
-| P7-02 | Not Started | P0 | P7-01, P6-04 |
+| P7-01 | Done | P0 | P5-01, P5-03 |
+| P7-02 | Done | P0 | P7-01, P6-04 |
 | P7-03 | Not Started | P0 | P7-02, P5-04 |
 | P7-04 | Not Started | P1 | P7-03, P6-05 |
 | P7-05 | Not Started | P1 | P7-03, P5-06 |
 | P7-06 | Not Started | P2 | P7-02, P7-05 |
 
 ## P7-01 — Build the live CardDAV account connection flow
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P0`
 - Dependencies: `P5-01`, `P5-03`
 - Implementation Notes:
@@ -41,6 +41,7 @@ Turn the CardDAV roadmap into a real product slice by connecting live CardDAV ac
   - Validate server reachability, authentication, and principal discovery before saving the connection as active.
   - Resolve and persist discovered `principalUrl`, `addressBookUrl`, `remoteAccountId`, and initial `remoteCTag` values when available.
   - Keep failure messages specific enough to distinguish invalid credentials, bad endpoints, TLS problems, and discovery mismatches.
+  - Kontax now validates the CardDAV endpoint before creating the account, encrypts credentials during setup, and records a successful connection-validation job when discovery completes.
 - Acceptance Criteria:
   - A real CardDAV account can be connected from the UI.
   - Successful connection persists enough metadata to schedule and run sync jobs later.
@@ -49,7 +50,7 @@ Turn the CardDAV roadmap into a real product slice by connecting live CardDAV ac
   - CardDAV providers vary in discovery behavior, so discovery may need provider-specific fallback logic early.
 
 ## P7-02 — Persist encrypted credentials and harden account validation
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P0`
 - Dependencies: `P7-01`, `P6-04`
 - Implementation Notes:
@@ -57,6 +58,8 @@ Turn the CardDAV roadmap into a real product slice by connecting live CardDAV ac
   - Persist credential versioning, key references, and last-validated timestamps so rotation and revocation behavior stay observable.
   - Add server-side validation rules that prevent incomplete or unencrypted credential records from becoming runnable sync accounts.
   - Ensure rich-field portability assumptions remain explicit at connection time so unsupported fields are not silently promised as sync-safe.
+  - Sync accounts now persist `credentialLastValidatedAt`, `connectionValidatedAt`, and discovered address book display metadata so validation posture is explicit in the UI and server logic.
+  - Rotating credentials now clears validation timestamps and forces a fresh connection validation before a sync job can queue.
 - Acceptance Criteria:
   - Sync credentials are encrypted before persistence.
   - Saved `SyncAccount` records contain clear validation state and credential metadata.

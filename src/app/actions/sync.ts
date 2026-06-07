@@ -94,7 +94,10 @@ const buildRedirectWithParams = (
   entries: Record<string, string | number | boolean | undefined>,
 ) => {
   const base = redirectTo ?? "/sync";
-  const [pathname, query = ""] = base.split("?", 2);
+  const separatorIndex = base.indexOf("?");
+  const pathname =
+    separatorIndex >= 0 ? base.slice(0, separatorIndex) || "/sync" : base || "/sync";
+  const query = separatorIndex >= 0 ? base.slice(separatorIndex + 1) : "";
   const params = new URLSearchParams(query);
 
   for (const [key, value] of Object.entries(entries)) {
@@ -188,6 +191,20 @@ const createRetrySchedule = (attemptNumber: number) => {
 };
 
 const createIdempotencyKey = (parts: string[]) => `${parts.join(":")}:${Date.now()}`;
+
+const isCredentialValidationFailure = (errorCode: string) =>
+  errorCode === "CARDDAV_AUTH_FAILED" ||
+  errorCode === "CREDENTIALS_MISSING" ||
+  errorCode === "CREDENTIALS_UNREADABLE" ||
+  errorCode === "CREDENTIALS_REVOKED";
+
+const isConnectionValidationFailure = (errorCode: string) =>
+  isCredentialValidationFailure(errorCode) ||
+  errorCode === "CARDDAV_DISCOVERY_EMPTY" ||
+  errorCode === "CARDDAV_ADDRESSBOOK_NOT_FOUND" ||
+  errorCode === "CARDDAV_ADDRESSBOOK_INVALID" ||
+  errorCode === "CARDDAV_ACCOUNT_ID_MISSING" ||
+  errorCode === "CARDDAV_NOT_FOUND";
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
@@ -463,9 +480,7 @@ const recordFailedPreflight = async ({
 }) => {
   const now = new Date();
   const nextStatus =
-    errorCode === "CARDDAV_AUTH_FAILED" ||
-    errorCode === "CREDENTIALS_MISSING" ||
-    errorCode === "CREDENTIALS_UNREADABLE"
+    isCredentialValidationFailure(errorCode)
       ? "NEEDS_REAUTH"
       : accountStatus === "PAUSED"
         ? "PAUSED"
@@ -492,6 +507,8 @@ const recordFailedPreflight = async ({
       where: { id: accountId },
       data: {
         status: nextStatus,
+        credentialLastValidatedAt: isCredentialValidationFailure(errorCode) ? null : undefined,
+        connectionValidatedAt: isConnectionValidationFailure(errorCode) ? null : undefined,
         lastErrorAt: now,
         lastErrorCode: errorCode,
         lastErrorMessage: errorSummary,
@@ -566,6 +583,7 @@ export const createSyncAccount = async (formData: FormData) => {
           baseUrl: input.baseUrl,
           principalUrl: discovery.principalUrl,
           addressBookUrl: discovery.addressBookUrl,
+          addressBookDisplayName: discovery.addressBookDisplayName,
           remoteAccountId: discovery.remoteAccountId,
           remoteCTag: discovery.remoteCTag,
           lastSyncCursor: discovery.remoteCTag,
@@ -573,8 +591,10 @@ export const createSyncAccount = async (formData: FormData) => {
           credentialReference: encrypted.credentialReference,
           credentialVersion: 1,
           credentialUpdatedAt: now,
+          credentialLastValidatedAt: now,
           credentialRevokedAt: null,
           encryptionKeyRef: encrypted.encryptionKeyRef,
+          connectionValidatedAt: now,
           status: "ACTIVE",
           lastSucceededAt: now,
           lastErrorAt: null,
@@ -693,9 +713,11 @@ export const attachSyncCredentials = async (formData: FormData) => {
         increment: 1,
       },
       credentialUpdatedAt: new Date(),
+      credentialLastValidatedAt: null,
       credentialRevokedAt: null,
       encryptionKeyRef: encrypted.encryptionKeyRef,
-      status: syncAccount.status === "NEEDS_REAUTH" ? "PAUSED" : syncAccount.status,
+      connectionValidatedAt: null,
+      status: "PAUSED",
       lastErrorAt: null,
       lastErrorCode: null,
       lastErrorMessage: null,
@@ -724,7 +746,9 @@ export const revokeSyncCredentials = async (formData: FormData) => {
         increment: 1,
       },
       credentialRevokedAt: new Date(),
+      credentialLastValidatedAt: null,
       encryptionKeyRef: null,
+      connectionValidatedAt: null,
       status: "NEEDS_REAUTH",
       lastErrorAt: new Date(),
       lastErrorCode: "CREDENTIALS_REVOKED",
@@ -785,6 +809,7 @@ export const prepareSyncRelink = async (formData: FormData) => {
       where: { id: account.id },
       data: {
         status: nextStatus,
+        connectionValidatedAt: null,
         remoteAccountId: null,
         remoteCTag: null,
         lastSyncCursor: null,
@@ -842,7 +867,10 @@ export const queueSyncJob = async (formData: FormData) => {
       remoteAccountId: true,
       remoteCTag: true,
       credentialReference: true,
+      credentialUpdatedAt: true,
+      credentialLastValidatedAt: true,
       credentialRevokedAt: true,
+      connectionValidatedAt: true,
     },
   });
 
@@ -893,10 +921,18 @@ export const queueSyncJob = async (formData: FormData) => {
     redirect(redirectTo ?? "/sync?preflightFailed=1");
   }
 
-  const needsDiscovery =
-    !account.remoteAccountId || !account.principalUrl || !account.addressBookUrl;
+  const needsCredentialValidation =
+    !account.credentialLastValidatedAt ||
+    (account.credentialUpdatedAt != null &&
+      account.credentialLastValidatedAt.getTime() < account.credentialUpdatedAt.getTime());
 
-  if (needsDiscovery && decryptedCredentials) {
+  const needsDiscovery =
+    !account.remoteAccountId ||
+    !account.principalUrl ||
+    !account.addressBookUrl ||
+    !account.connectionValidatedAt;
+
+  if ((needsDiscovery || needsCredentialValidation) && decryptedCredentials) {
     try {
       const discovery = await discoverCardDavAccount({
         baseUrl: account.baseUrl,
@@ -930,9 +966,12 @@ export const queueSyncJob = async (formData: FormData) => {
             status: account.status === "PAUSED" ? "PAUSED" : "ACTIVE",
             principalUrl: discovery.principalUrl,
             addressBookUrl: discovery.addressBookUrl,
+            addressBookDisplayName: discovery.addressBookDisplayName,
             remoteAccountId: discovery.remoteAccountId,
             remoteCTag: discovery.remoteCTag,
             lastSyncCursor: discovery.remoteCTag,
+            credentialLastValidatedAt: now,
+            connectionValidatedAt: now,
             lastSucceededAt: now,
             lastErrorAt: null,
             lastErrorCode: null,

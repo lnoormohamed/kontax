@@ -66,6 +66,35 @@ const getCredentialStateLabel = (account: {
   return "Active";
 };
 
+const getConnectionValidationLabel = (account: {
+  credentialReference: string | null;
+  credentialUpdatedAt: Date | null;
+  credentialLastValidatedAt: Date | null;
+  credentialRevokedAt: Date | null;
+  connectionValidatedAt: Date | null;
+}) => {
+  if (!account.credentialReference) {
+    return "Pending credentials";
+  }
+
+  if (account.credentialRevokedAt) {
+    return "Credentials revoked";
+  }
+
+  if (!account.credentialLastValidatedAt || !account.connectionValidatedAt) {
+    return "Validation required";
+  }
+
+  if (
+    account.credentialUpdatedAt &&
+    account.credentialLastValidatedAt.getTime() < account.credentialUpdatedAt.getTime()
+  ) {
+    return "Revalidation required";
+  }
+
+  return "Validated";
+};
+
 const getJobFailureClass = (errorCode: string | null) => {
   if (!errorCode) {
     return "none";
@@ -1004,6 +1033,7 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                           </div>
                           <p className="mt-2 break-all text-sm text-slate-400">{account.baseUrl}</p>
                           <div className="mt-3 grid gap-2 text-sm text-slate-400 sm:grid-cols-2">
+                            <p>Address book name: {account.addressBookDisplayName ?? "Not discovered yet"}</p>
                             <p>Principal: {account.principalUrl ?? "Not stored yet"}</p>
                             <p>Address book: {account.addressBookUrl ?? "Not stored yet"}</p>
                             <p>
@@ -1013,6 +1043,7 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                                 : "Missing"}
                             </p>
                             <p>Credential state: {getCredentialStateLabel(account)}</p>
+                            <p>Validation state: {getConnectionValidationLabel(account)}</p>
                             <p>
                               Credential version: {account.credentialVersion}
                             </p>
@@ -1023,7 +1054,13 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                               Updated: {formatTimestamp(account.credentialUpdatedAt)}
                             </p>
                             <p>
+                              Credential validated: {formatTimestamp(account.credentialLastValidatedAt)}
+                            </p>
+                            <p>
                               Revoked: {formatTimestamp(account.credentialRevokedAt)}
+                            </p>
+                            <p>
+                              Connection validated: {formatTimestamp(account.connectionValidatedAt)}
                             </p>
                             <p>Last success: {formatTimestamp(account.lastSucceededAt)}</p>
                             <p>Last sync: {formatTimestamp(account.lastSyncedAt)}</p>
@@ -1074,7 +1111,12 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                                 !account.credentialRevokedAt &&
                                 account.remoteAccountId &&
                                 account.principalUrl &&
-                                account.addressBookUrl
+                                account.addressBookUrl &&
+                                account.connectionValidatedAt &&
+                                account.credentialLastValidatedAt &&
+                                (!account.credentialUpdatedAt ||
+                                  account.credentialLastValidatedAt.getTime() >=
+                                    account.credentialUpdatedAt.getTime())
                                   ? "/sync?queued=1"
                                   : account.credentialReference && !account.credentialRevokedAt
                                     ? "/sync?preflightCompleted=1"
@@ -1090,9 +1132,14 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                               !account.credentialRevokedAt &&
                               account.remoteAccountId &&
                               account.principalUrl &&
-                              account.addressBookUrl
+                              account.addressBookUrl &&
+                              account.connectionValidatedAt &&
+                              account.credentialLastValidatedAt &&
+                              (!account.credentialUpdatedAt ||
+                                account.credentialLastValidatedAt.getTime() >=
+                                  account.credentialUpdatedAt.getTime())
                                 ? "Queue sync run"
-                                : "Run sync preflight"}
+                                : "Validate connection"}
                             </button>
                           </form>
                         </div>
@@ -1192,17 +1239,21 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                           <div className="rounded-2xl border border-white/10 bg-[#020617] p-4 text-sm text-slate-300">
                             <p className="font-semibold text-white">Stored metadata</p>
                             <p className="mt-2">Credential state: {getCredentialStateLabel(account)}</p>
+                            <p className="mt-1">Validation state: {getConnectionValidationLabel(account)}</p>
                             <p className="mt-1">Credential version: {account.credentialVersion}</p>
                             <p className="mt-1">Updated at: {formatTimestamp(account.credentialUpdatedAt)}</p>
+                            <p className="mt-1">Credential validated at: {formatTimestamp(account.credentialLastValidatedAt)}</p>
                             <p className="mt-1">Revoked at: {formatTimestamp(account.credentialRevokedAt)}</p>
+                            <p className="mt-1">Connection validated at: {formatTimestamp(account.connectionValidatedAt)}</p>
                             <p className="mt-1">Encryption key ref: {account.encryptionKeyRef ?? "Missing"}</p>
                           </div>
                           <div className="rounded-2xl border border-white/10 bg-[#020617] p-4 text-sm text-slate-300">
                             <p className="font-semibold text-white">Operational expectations</p>
                             <p className="mt-2">1. Rotate credentials by attaching a fresh encrypted set.</p>
-                            <p className="mt-1">2. Revoke when a provider app password or token is no longer trusted.</p>
-                            <p className="mt-1">3. Treat `NEEDS_REAUTH` as a hard stop for queued sync work.</p>
-                            <p className="mt-1">4. Keep raw usernames and passwords out of logs and recovery exports.</p>
+                            <p className="mt-1">2. Revalidate the connection after any credential change before queuing sync work.</p>
+                            <p className="mt-1">3. Revoke when a provider app password or token is no longer trusted.</p>
+                            <p className="mt-1">4. Treat `NEEDS_REAUTH` as a hard stop for queued sync work.</p>
+                            <p className="mt-1">5. Keep raw usernames and passwords out of logs and recovery exports.</p>
                           </div>
                         </div>
                       </div>

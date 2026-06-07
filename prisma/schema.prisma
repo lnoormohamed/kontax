@@ -362,13 +362,16 @@ model SyncAccount {
     baseUrl             String
     principalUrl        String?
     addressBookUrl      String?
+    addressBookDisplayName String?
     remoteAccountId     String?
     remoteCTag          String?
     credentialReference String?
     credentialVersion   Int               @default(1)
     credentialUpdatedAt DateTime?
+    credentialLastValidatedAt DateTime?
     credentialRevokedAt DateTime?
     encryptionKeyRef    String?
+    connectionValidatedAt DateTime?
     lastSyncCursor      String?
     lastSyncedAt        DateTime?
     lastSucceededAt     DateTime?

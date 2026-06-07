@@ -12911,13 +12911,16 @@ export namespace Prisma {
     baseUrl: string | null
     principalUrl: string | null
     addressBookUrl: string | null
+    addressBookDisplayName: string | null
     remoteAccountId: string | null
     remoteCTag: string | null
     credentialReference: string | null
     credentialVersion: number | null
     credentialUpdatedAt: Date | null
+    credentialLastValidatedAt: Date | null
     credentialRevokedAt: Date | null
     encryptionKeyRef: string | null
+    connectionValidatedAt: Date | null
     lastSyncCursor: string | null
     lastSyncedAt: Date | null
     lastSucceededAt: Date | null
@@ -12938,13 +12941,16 @@ export namespace Prisma {
     baseUrl: string | null
     principalUrl: string | null
     addressBookUrl: string | null
+    addressBookDisplayName: string | null
     remoteAccountId: string | null
     remoteCTag: string | null
     credentialReference: string | null
     credentialVersion: number | null
     credentialUpdatedAt: Date | null
+    credentialLastValidatedAt: Date | null
     credentialRevokedAt: Date | null
     encryptionKeyRef: string | null
+    connectionValidatedAt: Date | null
     lastSyncCursor: string | null
     lastSyncedAt: Date | null
     lastSucceededAt: Date | null
@@ -12965,13 +12971,16 @@ export namespace Prisma {
     baseUrl: number
     principalUrl: number
     addressBookUrl: number
+    addressBookDisplayName: number
     remoteAccountId: number
     remoteCTag: number
     credentialReference: number
     credentialVersion: number
     credentialUpdatedAt: number
+    credentialLastValidatedAt: number
     credentialRevokedAt: number
     encryptionKeyRef: number
+    connectionValidatedAt: number
     lastSyncCursor: number
     lastSyncedAt: number
     lastSucceededAt: number
@@ -13002,13 +13011,16 @@ export namespace Prisma {
     baseUrl?: true
     principalUrl?: true
     addressBookUrl?: true
+    addressBookDisplayName?: true
     remoteAccountId?: true
     remoteCTag?: true
     credentialReference?: true
     credentialVersion?: true
     credentialUpdatedAt?: true
+    credentialLastValidatedAt?: true
     credentialRevokedAt?: true
     encryptionKeyRef?: true
+    connectionValidatedAt?: true
     lastSyncCursor?: true
     lastSyncedAt?: true
     lastSucceededAt?: true
@@ -13029,13 +13041,16 @@ export namespace Prisma {
     baseUrl?: true
     principalUrl?: true
     addressBookUrl?: true
+    addressBookDisplayName?: true
     remoteAccountId?: true
     remoteCTag?: true
     credentialReference?: true
     credentialVersion?: true
     credentialUpdatedAt?: true
+    credentialLastValidatedAt?: true
     credentialRevokedAt?: true
     encryptionKeyRef?: true
+    connectionValidatedAt?: true
     lastSyncCursor?: true
     lastSyncedAt?: true
     lastSucceededAt?: true
@@ -13056,13 +13071,16 @@ export namespace Prisma {
     baseUrl?: true
     principalUrl?: true
     addressBookUrl?: true
+    addressBookDisplayName?: true
     remoteAccountId?: true
     remoteCTag?: true
     credentialReference?: true
     credentialVersion?: true
     credentialUpdatedAt?: true
+    credentialLastValidatedAt?: true
     credentialRevokedAt?: true
     encryptionKeyRef?: true
+    connectionValidatedAt?: true
     lastSyncCursor?: true
     lastSyncedAt?: true
     lastSucceededAt?: true
@@ -13170,13 +13188,16 @@ export namespace Prisma {
     baseUrl: string
     principalUrl: string | null
     addressBookUrl: string | null
+    addressBookDisplayName: string | null
     remoteAccountId: string | null
     remoteCTag: string | null
     credentialReference: string | null
     credentialVersion: number
     credentialUpdatedAt: Date | null
+    credentialLastValidatedAt: Date | null
     credentialRevokedAt: Date | null
     encryptionKeyRef: string | null
+    connectionValidatedAt: Date | null
     lastSyncCursor: string | null
     lastSyncedAt: Date | null
     lastSucceededAt: Date | null
@@ -13216,13 +13237,16 @@ export namespace Prisma {
     baseUrl?: boolean
     principalUrl?: boolean
     addressBookUrl?: boolean
+    addressBookDisplayName?: boolean
     remoteAccountId?: boolean
     remoteCTag?: boolean
     credentialReference?: boolean
     credentialVersion?: boolean
     credentialUpdatedAt?: boolean
+    credentialLastValidatedAt?: boolean
     credentialRevokedAt?: boolean
     encryptionKeyRef?: boolean
+    connectionValidatedAt?: boolean
     lastSyncCursor?: boolean
     lastSyncedAt?: boolean
     lastSucceededAt?: boolean
@@ -13248,13 +13272,16 @@ export namespace Prisma {
     baseUrl?: boolean
     principalUrl?: boolean
     addressBookUrl?: boolean
+    addressBookDisplayName?: boolean
     remoteAccountId?: boolean
     remoteCTag?: boolean
     credentialReference?: boolean
     credentialVersion?: boolean
     credentialUpdatedAt?: boolean
+    credentialLastValidatedAt?: boolean
     credentialRevokedAt?: boolean
     encryptionKeyRef?: boolean
+    connectionValidatedAt?: boolean
     lastSyncCursor?: boolean
     lastSyncedAt?: boolean
     lastSucceededAt?: boolean
@@ -13276,13 +13303,16 @@ export namespace Prisma {
     baseUrl?: boolean
     principalUrl?: boolean
     addressBookUrl?: boolean
+    addressBookDisplayName?: boolean
     remoteAccountId?: boolean
     remoteCTag?: boolean
     credentialReference?: boolean
     credentialVersion?: boolean
     credentialUpdatedAt?: boolean
+    credentialLastValidatedAt?: boolean
     credentialRevokedAt?: boolean
     encryptionKeyRef?: boolean
+    connectionValidatedAt?: boolean
     lastSyncCursor?: boolean
     lastSyncedAt?: boolean
     lastSucceededAt?: boolean
@@ -13304,13 +13334,16 @@ export namespace Prisma {
     baseUrl?: boolean
     principalUrl?: boolean
     addressBookUrl?: boolean
+    addressBookDisplayName?: boolean
     remoteAccountId?: boolean
     remoteCTag?: boolean
     credentialReference?: boolean
     credentialVersion?: boolean
     credentialUpdatedAt?: boolean
+    credentialLastValidatedAt?: boolean
     credentialRevokedAt?: boolean
     encryptionKeyRef?: boolean
+    connectionValidatedAt?: boolean
     lastSyncCursor?: boolean
     lastSyncedAt?: boolean
     lastSucceededAt?: boolean
@@ -13321,7 +13354,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type SyncAccountOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "provider" | "status" | "syncDirection" | "label" | "baseUrl" | "principalUrl" | "addressBookUrl" | "remoteAccountId" | "remoteCTag" | "credentialReference" | "credentialVersion" | "credentialUpdatedAt" | "credentialRevokedAt" | "encryptionKeyRef" | "lastSyncCursor" | "lastSyncedAt" | "lastSucceededAt" | "lastErrorAt" | "lastErrorCode" | "lastErrorMessage" | "createdAt" | "updatedAt", ExtArgs["result"]["syncAccount"]>
+  export type SyncAccountOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "provider" | "status" | "syncDirection" | "label" | "baseUrl" | "principalUrl" | "addressBookUrl" | "addressBookDisplayName" | "remoteAccountId" | "remoteCTag" | "credentialReference" | "credentialVersion" | "credentialUpdatedAt" | "credentialLastValidatedAt" | "credentialRevokedAt" | "encryptionKeyRef" | "connectionValidatedAt" | "lastSyncCursor" | "lastSyncedAt" | "lastSucceededAt" | "lastErrorAt" | "lastErrorCode" | "lastErrorMessage" | "createdAt" | "updatedAt", ExtArgs["result"]["syncAccount"]>
   export type SyncAccountInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     syncLinks?: boolean | SyncAccount$syncLinksArgs<ExtArgs>
@@ -13354,13 +13387,16 @@ export namespace Prisma {
       baseUrl: string
       principalUrl: string | null
       addressBookUrl: string | null
+      addressBookDisplayName: string | null
       remoteAccountId: string | null
       remoteCTag: string | null
       credentialReference: string | null
       credentialVersion: number
       credentialUpdatedAt: Date | null
+      credentialLastValidatedAt: Date | null
       credentialRevokedAt: Date | null
       encryptionKeyRef: string | null
+      connectionValidatedAt: Date | null
       lastSyncCursor: string | null
       lastSyncedAt: Date | null
       lastSucceededAt: Date | null
@@ -13805,13 +13841,16 @@ export namespace Prisma {
     readonly baseUrl: FieldRef<"SyncAccount", 'String'>
     readonly principalUrl: FieldRef<"SyncAccount", 'String'>
     readonly addressBookUrl: FieldRef<"SyncAccount", 'String'>
+    readonly addressBookDisplayName: FieldRef<"SyncAccount", 'String'>
     readonly remoteAccountId: FieldRef<"SyncAccount", 'String'>
     readonly remoteCTag: FieldRef<"SyncAccount", 'String'>
     readonly credentialReference: FieldRef<"SyncAccount", 'String'>
     readonly credentialVersion: FieldRef<"SyncAccount", 'Int'>
     readonly credentialUpdatedAt: FieldRef<"SyncAccount", 'DateTime'>
+    readonly credentialLastValidatedAt: FieldRef<"SyncAccount", 'DateTime'>
     readonly credentialRevokedAt: FieldRef<"SyncAccount", 'DateTime'>
     readonly encryptionKeyRef: FieldRef<"SyncAccount", 'String'>
+    readonly connectionValidatedAt: FieldRef<"SyncAccount", 'DateTime'>
     readonly lastSyncCursor: FieldRef<"SyncAccount", 'String'>
     readonly lastSyncedAt: FieldRef<"SyncAccount", 'DateTime'>
     readonly lastSucceededAt: FieldRef<"SyncAccount", 'DateTime'>
@@ -18361,13 +18400,16 @@ export namespace Prisma {
     baseUrl: 'baseUrl',
     principalUrl: 'principalUrl',
     addressBookUrl: 'addressBookUrl',
+    addressBookDisplayName: 'addressBookDisplayName',
     remoteAccountId: 'remoteAccountId',
     remoteCTag: 'remoteCTag',
     credentialReference: 'credentialReference',
     credentialVersion: 'credentialVersion',
     credentialUpdatedAt: 'credentialUpdatedAt',
+    credentialLastValidatedAt: 'credentialLastValidatedAt',
     credentialRevokedAt: 'credentialRevokedAt',
     encryptionKeyRef: 'encryptionKeyRef',
+    connectionValidatedAt: 'connectionValidatedAt',
     lastSyncCursor: 'lastSyncCursor',
     lastSyncedAt: 'lastSyncedAt',
     lastSucceededAt: 'lastSucceededAt',
@@ -19889,13 +19931,16 @@ export namespace Prisma {
     baseUrl?: StringFilter<"SyncAccount"> | string
     principalUrl?: StringNullableFilter<"SyncAccount"> | string | null
     addressBookUrl?: StringNullableFilter<"SyncAccount"> | string | null
+    addressBookDisplayName?: StringNullableFilter<"SyncAccount"> | string | null
     remoteAccountId?: StringNullableFilter<"SyncAccount"> | string | null
     remoteCTag?: StringNullableFilter<"SyncAccount"> | string | null
     credentialReference?: StringNullableFilter<"SyncAccount"> | string | null
     credentialVersion?: IntFilter<"SyncAccount"> | number
     credentialUpdatedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    credentialLastValidatedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     credentialRevokedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     encryptionKeyRef?: StringNullableFilter<"SyncAccount"> | string | null
+    connectionValidatedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     lastSyncCursor?: StringNullableFilter<"SyncAccount"> | string | null
     lastSyncedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     lastSucceededAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
@@ -19920,13 +19965,16 @@ export namespace Prisma {
     baseUrl?: SortOrder
     principalUrl?: SortOrderInput | SortOrder
     addressBookUrl?: SortOrderInput | SortOrder
+    addressBookDisplayName?: SortOrderInput | SortOrder
     remoteAccountId?: SortOrderInput | SortOrder
     remoteCTag?: SortOrderInput | SortOrder
     credentialReference?: SortOrderInput | SortOrder
     credentialVersion?: SortOrder
     credentialUpdatedAt?: SortOrderInput | SortOrder
+    credentialLastValidatedAt?: SortOrderInput | SortOrder
     credentialRevokedAt?: SortOrderInput | SortOrder
     encryptionKeyRef?: SortOrderInput | SortOrder
+    connectionValidatedAt?: SortOrderInput | SortOrder
     lastSyncCursor?: SortOrderInput | SortOrder
     lastSyncedAt?: SortOrderInput | SortOrder
     lastSucceededAt?: SortOrderInput | SortOrder
@@ -19955,13 +20003,16 @@ export namespace Prisma {
     baseUrl?: StringFilter<"SyncAccount"> | string
     principalUrl?: StringNullableFilter<"SyncAccount"> | string | null
     addressBookUrl?: StringNullableFilter<"SyncAccount"> | string | null
+    addressBookDisplayName?: StringNullableFilter<"SyncAccount"> | string | null
     remoteAccountId?: StringNullableFilter<"SyncAccount"> | string | null
     remoteCTag?: StringNullableFilter<"SyncAccount"> | string | null
     credentialReference?: StringNullableFilter<"SyncAccount"> | string | null
     credentialVersion?: IntFilter<"SyncAccount"> | number
     credentialUpdatedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    credentialLastValidatedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     credentialRevokedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     encryptionKeyRef?: StringNullableFilter<"SyncAccount"> | string | null
+    connectionValidatedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     lastSyncCursor?: StringNullableFilter<"SyncAccount"> | string | null
     lastSyncedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     lastSucceededAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
@@ -19986,13 +20037,16 @@ export namespace Prisma {
     baseUrl?: SortOrder
     principalUrl?: SortOrderInput | SortOrder
     addressBookUrl?: SortOrderInput | SortOrder
+    addressBookDisplayName?: SortOrderInput | SortOrder
     remoteAccountId?: SortOrderInput | SortOrder
     remoteCTag?: SortOrderInput | SortOrder
     credentialReference?: SortOrderInput | SortOrder
     credentialVersion?: SortOrder
     credentialUpdatedAt?: SortOrderInput | SortOrder
+    credentialLastValidatedAt?: SortOrderInput | SortOrder
     credentialRevokedAt?: SortOrderInput | SortOrder
     encryptionKeyRef?: SortOrderInput | SortOrder
+    connectionValidatedAt?: SortOrderInput | SortOrder
     lastSyncCursor?: SortOrderInput | SortOrder
     lastSyncedAt?: SortOrderInput | SortOrder
     lastSucceededAt?: SortOrderInput | SortOrder
@@ -20021,13 +20075,16 @@ export namespace Prisma {
     baseUrl?: StringWithAggregatesFilter<"SyncAccount"> | string
     principalUrl?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
     addressBookUrl?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
+    addressBookDisplayName?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
     remoteAccountId?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
     remoteCTag?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
     credentialReference?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
     credentialVersion?: IntWithAggregatesFilter<"SyncAccount"> | number
     credentialUpdatedAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
+    credentialLastValidatedAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
     credentialRevokedAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
     encryptionKeyRef?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
+    connectionValidatedAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
     lastSyncCursor?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
     lastSyncedAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
     lastSucceededAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
@@ -21614,13 +21671,16 @@ export namespace Prisma {
     baseUrl: string
     principalUrl?: string | null
     addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
     remoteAccountId?: string | null
     remoteCTag?: string | null
     credentialReference?: string | null
     credentialVersion?: number
     credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
     credentialRevokedAt?: Date | string | null
     encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
     lastSyncCursor?: string | null
     lastSyncedAt?: Date | string | null
     lastSucceededAt?: Date | string | null
@@ -21645,13 +21705,16 @@ export namespace Prisma {
     baseUrl: string
     principalUrl?: string | null
     addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
     remoteAccountId?: string | null
     remoteCTag?: string | null
     credentialReference?: string | null
     credentialVersion?: number
     credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
     credentialRevokedAt?: Date | string | null
     encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
     lastSyncCursor?: string | null
     lastSyncedAt?: Date | string | null
     lastSucceededAt?: Date | string | null
@@ -21674,13 +21737,16 @@ export namespace Prisma {
     baseUrl?: StringFieldUpdateOperationsInput | string
     principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
     addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
     remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
     credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
     credentialVersion?: IntFieldUpdateOperationsInput | number
     credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -21705,13 +21771,16 @@ export namespace Prisma {
     baseUrl?: StringFieldUpdateOperationsInput | string
     principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
     addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
     remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
     credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
     credentialVersion?: IntFieldUpdateOperationsInput | number
     credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -21735,13 +21804,16 @@ export namespace Prisma {
     baseUrl: string
     principalUrl?: string | null
     addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
     remoteAccountId?: string | null
     remoteCTag?: string | null
     credentialReference?: string | null
     credentialVersion?: number
     credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
     credentialRevokedAt?: Date | string | null
     encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
     lastSyncCursor?: string | null
     lastSyncedAt?: Date | string | null
     lastSucceededAt?: Date | string | null
@@ -21761,13 +21833,16 @@ export namespace Prisma {
     baseUrl?: StringFieldUpdateOperationsInput | string
     principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
     addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
     remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
     credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
     credentialVersion?: IntFieldUpdateOperationsInput | number
     credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -21788,13 +21863,16 @@ export namespace Prisma {
     baseUrl?: StringFieldUpdateOperationsInput | string
     principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
     addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
     remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
     credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
     credentialVersion?: IntFieldUpdateOperationsInput | number
     credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -23433,13 +23511,16 @@ export namespace Prisma {
     baseUrl?: SortOrder
     principalUrl?: SortOrder
     addressBookUrl?: SortOrder
+    addressBookDisplayName?: SortOrder
     remoteAccountId?: SortOrder
     remoteCTag?: SortOrder
     credentialReference?: SortOrder
     credentialVersion?: SortOrder
     credentialUpdatedAt?: SortOrder
+    credentialLastValidatedAt?: SortOrder
     credentialRevokedAt?: SortOrder
     encryptionKeyRef?: SortOrder
+    connectionValidatedAt?: SortOrder
     lastSyncCursor?: SortOrder
     lastSyncedAt?: SortOrder
     lastSucceededAt?: SortOrder
@@ -23464,13 +23545,16 @@ export namespace Prisma {
     baseUrl?: SortOrder
     principalUrl?: SortOrder
     addressBookUrl?: SortOrder
+    addressBookDisplayName?: SortOrder
     remoteAccountId?: SortOrder
     remoteCTag?: SortOrder
     credentialReference?: SortOrder
     credentialVersion?: SortOrder
     credentialUpdatedAt?: SortOrder
+    credentialLastValidatedAt?: SortOrder
     credentialRevokedAt?: SortOrder
     encryptionKeyRef?: SortOrder
+    connectionValidatedAt?: SortOrder
     lastSyncCursor?: SortOrder
     lastSyncedAt?: SortOrder
     lastSucceededAt?: SortOrder
@@ -23491,13 +23575,16 @@ export namespace Prisma {
     baseUrl?: SortOrder
     principalUrl?: SortOrder
     addressBookUrl?: SortOrder
+    addressBookDisplayName?: SortOrder
     remoteAccountId?: SortOrder
     remoteCTag?: SortOrder
     credentialReference?: SortOrder
     credentialVersion?: SortOrder
     credentialUpdatedAt?: SortOrder
+    credentialLastValidatedAt?: SortOrder
     credentialRevokedAt?: SortOrder
     encryptionKeyRef?: SortOrder
+    connectionValidatedAt?: SortOrder
     lastSyncCursor?: SortOrder
     lastSyncedAt?: SortOrder
     lastSucceededAt?: SortOrder
@@ -25983,13 +26070,16 @@ export namespace Prisma {
     baseUrl: string
     principalUrl?: string | null
     addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
     remoteAccountId?: string | null
     remoteCTag?: string | null
     credentialReference?: string | null
     credentialVersion?: number
     credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
     credentialRevokedAt?: Date | string | null
     encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
     lastSyncCursor?: string | null
     lastSyncedAt?: Date | string | null
     lastSucceededAt?: Date | string | null
@@ -26012,13 +26102,16 @@ export namespace Prisma {
     baseUrl: string
     principalUrl?: string | null
     addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
     remoteAccountId?: string | null
     remoteCTag?: string | null
     credentialReference?: string | null
     credentialVersion?: number
     credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
     credentialRevokedAt?: Date | string | null
     encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
     lastSyncCursor?: string | null
     lastSyncedAt?: Date | string | null
     lastSucceededAt?: Date | string | null
@@ -26369,13 +26462,16 @@ export namespace Prisma {
     baseUrl?: StringFilter<"SyncAccount"> | string
     principalUrl?: StringNullableFilter<"SyncAccount"> | string | null
     addressBookUrl?: StringNullableFilter<"SyncAccount"> | string | null
+    addressBookDisplayName?: StringNullableFilter<"SyncAccount"> | string | null
     remoteAccountId?: StringNullableFilter<"SyncAccount"> | string | null
     remoteCTag?: StringNullableFilter<"SyncAccount"> | string | null
     credentialReference?: StringNullableFilter<"SyncAccount"> | string | null
     credentialVersion?: IntFilter<"SyncAccount"> | number
     credentialUpdatedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    credentialLastValidatedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     credentialRevokedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     encryptionKeyRef?: StringNullableFilter<"SyncAccount"> | string | null
+    connectionValidatedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     lastSyncCursor?: StringNullableFilter<"SyncAccount"> | string | null
     lastSyncedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     lastSucceededAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
@@ -28877,13 +28973,16 @@ export namespace Prisma {
     baseUrl: string
     principalUrl?: string | null
     addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
     remoteAccountId?: string | null
     remoteCTag?: string | null
     credentialReference?: string | null
     credentialVersion?: number
     credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
     credentialRevokedAt?: Date | string | null
     encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
     lastSyncCursor?: string | null
     lastSyncedAt?: Date | string | null
     lastSucceededAt?: Date | string | null
@@ -28907,13 +29006,16 @@ export namespace Prisma {
     baseUrl: string
     principalUrl?: string | null
     addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
     remoteAccountId?: string | null
     remoteCTag?: string | null
     credentialReference?: string | null
     credentialVersion?: number
     credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
     credentialRevokedAt?: Date | string | null
     encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
     lastSyncCursor?: string | null
     lastSyncedAt?: Date | string | null
     lastSucceededAt?: Date | string | null
@@ -29092,13 +29194,16 @@ export namespace Prisma {
     baseUrl?: StringFieldUpdateOperationsInput | string
     principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
     addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
     remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
     credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
     credentialVersion?: IntFieldUpdateOperationsInput | number
     credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -29122,13 +29227,16 @@ export namespace Prisma {
     baseUrl?: StringFieldUpdateOperationsInput | string
     principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
     addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
     remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
     credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
     credentialVersion?: IntFieldUpdateOperationsInput | number
     credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -29267,13 +29375,16 @@ export namespace Prisma {
     baseUrl: string
     principalUrl?: string | null
     addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
     remoteAccountId?: string | null
     remoteCTag?: string | null
     credentialReference?: string | null
     credentialVersion?: number
     credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
     credentialRevokedAt?: Date | string | null
     encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
     lastSyncCursor?: string | null
     lastSyncedAt?: Date | string | null
     lastSucceededAt?: Date | string | null
@@ -29297,13 +29408,16 @@ export namespace Prisma {
     baseUrl: string
     principalUrl?: string | null
     addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
     remoteAccountId?: string | null
     remoteCTag?: string | null
     credentialReference?: string | null
     credentialVersion?: number
     credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
     credentialRevokedAt?: Date | string | null
     encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
     lastSyncCursor?: string | null
     lastSyncedAt?: Date | string | null
     lastSucceededAt?: Date | string | null
@@ -29341,13 +29455,16 @@ export namespace Prisma {
     baseUrl?: StringFieldUpdateOperationsInput | string
     principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
     addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
     remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
     credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
     credentialVersion?: IntFieldUpdateOperationsInput | number
     credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -29371,13 +29488,16 @@ export namespace Prisma {
     baseUrl?: StringFieldUpdateOperationsInput | string
     principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
     addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
     remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
     credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
     credentialVersion?: IntFieldUpdateOperationsInput | number
     credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -29399,13 +29519,16 @@ export namespace Prisma {
     baseUrl: string
     principalUrl?: string | null
     addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
     remoteAccountId?: string | null
     remoteCTag?: string | null
     credentialReference?: string | null
     credentialVersion?: number
     credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
     credentialRevokedAt?: Date | string | null
     encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
     lastSyncCursor?: string | null
     lastSyncedAt?: Date | string | null
     lastSucceededAt?: Date | string | null
@@ -29429,13 +29552,16 @@ export namespace Prisma {
     baseUrl: string
     principalUrl?: string | null
     addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
     remoteAccountId?: string | null
     remoteCTag?: string | null
     credentialReference?: string | null
     credentialVersion?: number
     credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
     credentialRevokedAt?: Date | string | null
     encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
     lastSyncCursor?: string | null
     lastSyncedAt?: Date | string | null
     lastSucceededAt?: Date | string | null
@@ -29605,13 +29731,16 @@ export namespace Prisma {
     baseUrl?: StringFieldUpdateOperationsInput | string
     principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
     addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
     remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
     credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
     credentialVersion?: IntFieldUpdateOperationsInput | number
     credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -29635,13 +29764,16 @@ export namespace Prisma {
     baseUrl?: StringFieldUpdateOperationsInput | string
     principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
     addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
     remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
     credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
     credentialVersion?: IntFieldUpdateOperationsInput | number
     credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -29918,13 +30050,16 @@ export namespace Prisma {
     baseUrl: string
     principalUrl?: string | null
     addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
     remoteAccountId?: string | null
     remoteCTag?: string | null
     credentialReference?: string | null
     credentialVersion?: number
     credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
     credentialRevokedAt?: Date | string | null
     encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
     lastSyncCursor?: string | null
     lastSyncedAt?: Date | string | null
     lastSucceededAt?: Date | string | null
@@ -30317,13 +30452,16 @@ export namespace Prisma {
     baseUrl?: StringFieldUpdateOperationsInput | string
     principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
     addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
     remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
     credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
     credentialVersion?: IntFieldUpdateOperationsInput | number
     credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -30346,13 +30484,16 @@ export namespace Prisma {
     baseUrl?: StringFieldUpdateOperationsInput | string
     principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
     addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
     remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
     credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
     credentialVersion?: IntFieldUpdateOperationsInput | number
     credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -30375,13 +30516,16 @@ export namespace Prisma {
     baseUrl?: StringFieldUpdateOperationsInput | string
     principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
     addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
     remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
     credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
     credentialVersion?: IntFieldUpdateOperationsInput | number
     credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
     lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
