@@ -36,13 +36,6 @@ type ContactsWorkspaceTableProps = {
   viewMode: "compact" | "cozy";
 };
 
-const formatTimestamp = (value: Date) =>
-  new Intl.DateTimeFormat("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  }).format(new Date(value));
-
 const parseBirthdayDate = (value: string): Date | null => {
   const trimmed = value.trim();
 
@@ -126,7 +119,8 @@ const parseBirthdayDate = (value: string): Date | null => {
     }
   }
 
-  const compactMatch = compactDigits.match(/^\d{8}$/);
+  const compactDigitsRegex = /^\d{8}$/u;
+  const compactMatch = compactDigitsRegex.exec(compactDigits);
   if (compactMatch) {
     const valueOnlyDigits = compactMatch[0];
     const first4 = Number(valueOnlyDigits.slice(0, 4));
