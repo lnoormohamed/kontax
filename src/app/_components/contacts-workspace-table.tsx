@@ -52,26 +52,6 @@ const getInitials = (value: string) =>
     .join("")
     .toUpperCase();
 
-const getPreviewLine = (contact: WorkspaceContact) => {
-  if (contact.notes?.trim()) {
-    return contact.notes.trim();
-  }
-
-  if (contact.jobTitle?.trim() || contact.company?.trim()) {
-    return [contact.jobTitle, contact.company].filter(Boolean).join(" at ");
-  }
-
-  if (contact.address?.trim()) {
-    return contact.address.trim();
-  }
-
-  if (contact.website?.trim()) {
-    return contact.website.trim();
-  }
-
-  return "Open the contact to add more detail.";
-};
-
 const IconStar = ({ filled }: { filled: boolean }) => (
   <span aria-hidden="true" className="text-sm leading-none">
     {filled ? "★" : "☆"}
@@ -332,10 +312,6 @@ export function ContactsWorkspaceTable({
                           </span>
                         ) : null}
                       </div>
-                      <p className="mt-0.5 truncate text-[13px] text-slate-500">
-                        {contact.nickname ? `${contact.nickname} · ` : ""}
-                        {getPreviewLine(contact)}
-                      </p>
                     </div>
                   </div>
                 </div>
