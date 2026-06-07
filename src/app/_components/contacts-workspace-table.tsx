@@ -220,7 +220,7 @@ export function ContactsWorkspaceTable({
               <div
                 className={`grid ${rowGapClass} lg:grid-cols-[44px_minmax(280px,1.6fr)_minmax(210px,1fr)_minmax(170px,0.9fr)_minmax(180px,0.95fr)_110px_170px] lg:items-center`}
               >
-                <label className="flex items-center justify-center pt-1 lg:pt-0">
+                <label className="hidden items-center justify-center pt-1 lg:flex lg:pt-0">
                   <input
                     checked={isSelected}
                     className="h-4 w-4 rounded border-slate-300 text-[#4158f4] focus:ring-[#4158f4]"
@@ -236,9 +236,12 @@ export function ContactsWorkspaceTable({
                     </div>
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
-                        <p className="truncate text-[15px] font-semibold text-slate-900">
+                        <Link
+                          className="truncate text-[15px] font-semibold text-slate-900 hover:text-[#3248db]"
+                          href={`/contacts/${contact.id}`}
+                        >
                           {contact.fullName}
-                        </p>
+                        </Link>
                         {contact.isFavorite ? (
                           <span className="rounded-full border border-cyan-200 bg-cyan-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-700">
                             Favorite
@@ -258,7 +261,7 @@ export function ContactsWorkspaceTable({
                   </div>
                 </div>
 
-                <div className="text-sm text-slate-700">
+                <div className="hidden text-sm text-slate-700 lg:block">
                   <p className="truncate font-medium text-[#3341c7]">
                     {contact.email ?? "No email saved"}
                   </p>
@@ -267,21 +270,23 @@ export function ContactsWorkspaceTable({
                   </p>
                 </div>
 
-                <div className="text-sm text-slate-700">
+                <div className="hidden text-sm text-slate-700 lg:block">
                   <p className="font-medium">{contact.phone ?? "No phone saved"}</p>
                   <p className="mt-0.5 text-[13px] text-slate-500">
                     {contact.birthday ?? "No birthday saved"}
                   </p>
                 </div>
 
-                <div className="text-sm text-slate-700">
+                <div className="hidden text-sm text-slate-700 lg:block">
                   <p className="truncate font-medium">{contact.company ?? "Independent"}</p>
                   <p className="mt-0.5 truncate text-[13px] text-slate-500">
                     {contact.jobTitle ?? "No role saved"}
                   </p>
                 </div>
 
-                <div className="text-sm text-slate-500">{formatTimestamp(contact.updatedAt)}</div>
+                <div className="hidden text-sm text-slate-500 lg:block">
+                  {formatTimestamp(contact.updatedAt)}
+                </div>
 
                 <div className="flex flex-wrap justify-start gap-2 lg:justify-end">
                   <form action={toggleFavoriteContact}>
