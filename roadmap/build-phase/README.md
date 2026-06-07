@@ -3,7 +3,7 @@
 ## Summary
 Kontax is being built as a consumer-first SaaS contacts platform with single-user ownership in v1, practical strong security defaults, import/export before CardDAV, and billing foundations introduced early without blocking the core contact experience.
 
-This roadmap is the implementation source of truth for phases 1-6. Each phase file contains detailed tickets, dependencies, implementation notes, acceptance criteria, and progress tracking.
+This roadmap is the implementation source of truth for phases 1-7. Each phase file contains detailed tickets, dependencies, implementation notes, acceptance criteria, and progress tracking.
 
 ## Goals
 - Ship a trustworthy personal contacts product with strong foundations for future SaaS growth.
@@ -62,6 +62,12 @@ This roadmap is the implementation source of truth for phases 1-6. Each phase fi
 | P6-04 | 6 | Done | P1 | P6-02, P5-01 | Unassigned | Rich-field schema, merge, and sync treatment documented |
 | P6-05 | 6 | Done | P2 | P6-02, P3-03 | Unassigned | Rich contact editing and portability UX expectations defined |
 | P6-06 | 6 | Done | P2 | P6-03, P5-05 | Unassigned | Mobile parity and compatibility expectations documented |
+| P7-01 | 7 | Not Started | P0 | P5-01, P5-03 | Unassigned | CardDAV account connection and discovery flow works end-to-end |
+| P7-02 | 7 | Not Started | P0 | P7-01, P6-04 | Unassigned | Encrypted credential persistence and account validation are production-safe |
+| P7-03 | 7 | Not Started | P0 | P7-02, P5-04 | Unassigned | First one-way CardDAV import sync completes with stable link mapping |
+| P7-04 | 7 | Not Started | P1 | P7-03, P6-05 | Unassigned | Sync status, retry, and recovery UX is usable from the app |
+| P7-05 | 7 | Not Started | P1 | P7-03, P5-06 | Unassigned | Failure handling, health telemetry, and support exports are in place |
+| P7-06 | 7 | Not Started | P2 | P7-02, P7-05 | Unassigned | Private beta checklist and launch validation scenarios are documented |
 
 ## Dependency Map
 - Phase 1 defines the contact model, security baseline, and consumer scope.
@@ -70,6 +76,7 @@ This roadmap is the implementation source of truth for phases 1-6. Each phase fi
 - Phase 4 depends on Phase 3 because merge quality relies on normalized imported data and source metadata.
 - Phase 5 depends on Phases 1, 3, and 4 because sync requires stable identifiers, import-compatible mappings, and deterministic conflict/merge behavior.
 - Phase 6 depends on Phases 1, 3, 4, and 5 because richer contact detail needs a stable schema base, portability rules, deterministic merge behavior, and clear sync compatibility expectations.
+- Phase 7 depends on Phases 5 and 6 because real CardDAV implementation needs stable sync models, secure credential handling, compatibility guidance, and rich-field portability expectations already defined.
 
 ## Cross-Phase Validation Scenarios
 - A new account can sign up, authenticate, and save contacts without schema redesign between phases.
@@ -78,6 +85,7 @@ This roadmap is the implementation source of truth for phases 1-6. Each phase fi
 - Subscription and plan checks can gate premium features without impacting access to already-owned contacts.
 - Security controls clearly differentiate password protection, app secret handling, backups, sync credentials, and audit records.
 - CardDAV planning does not assume unsupported field semantics from earlier import/export phases.
+- A real CardDAV account can connect, import safely, surface errors clearly, and avoid corrupting local contacts during first-sync rollout.
 
 ## Implementation Notes
 - Use the phase files as the detailed work queue.

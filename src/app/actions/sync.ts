@@ -31,6 +31,9 @@ const createSyncAccountSchema = z.object({
   principalUrl: z.string().trim().url("Enter a valid principal URL.").max(500).optional(),
   addressBookUrl: z.string().trim().url("Enter a valid address book URL.").max(500).optional(),
   syncDirection: syncDirectionSchema,
+  username: z.string().trim().min(1, "Username is required.").max(320),
+  password: z.string().min(6, "Password or app password is required.").max(500),
+  note: z.string().trim().max(200).optional(),
 });
 
 const attachSyncCredentialSchema = z.object({
@@ -86,6 +89,26 @@ const revalidateSyncViews = () => {
   revalidatePath("/sync");
 };
 
+const buildRedirectWithParams = (
+  redirectTo: string | undefined,
+  entries: Record<string, string | number | boolean | undefined>,
+) => {
+  const base = redirectTo ?? "/sync";
+  const [pathname, query = ""] = base.split("?", 2);
+  const params = new URLSearchParams(query);
+
+  for (const [key, value] of Object.entries(entries)) {
+    if (value === undefined) {
+      continue;
+    }
+
+    params.set(key, String(value));
+  }
+
+  const serialized = params.toString();
+  return serialized.length > 0 ? `${pathname}?${serialized}` : pathname;
+};
+
 const parseCreateSyncAccountInput = (formData: FormData) => {
   const parsed = createSyncAccountSchema.safeParse({
     label: formData.get("label"),
@@ -93,6 +116,9 @@ const parseCreateSyncAccountInput = (formData: FormData) => {
     principalUrl: getOptionalString(formData, "principalUrl"),
     addressBookUrl: getOptionalString(formData, "addressBookUrl"),
     syncDirection: formData.get("syncDirection"),
+    username: formData.get("username"),
+    password: formData.get("password"),
+    note: getOptionalString(formData, "note"),
   });
 
   if (!parsed.success) {
@@ -477,24 +503,125 @@ const recordFailedPreflight = async ({
 export const createSyncAccount = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const input = parseCreateSyncAccountInput(formData);
-  const redirectTo = getRedirectTarget(formData) ?? "/sync?created=1";
+  const redirectTo = getRedirectTarget(formData);
 
   await assertCanCreateSyncAccount(userId);
+  await assertCanUseCardDavSync(userId);
 
-  await db.syncAccount.create({
-    data: {
-      userId,
-      label: input.label,
+  const encryptionStatus = getSyncCredentialEncryptionStatus();
+  if (!encryptionStatus.available) {
+    redirect(
+      buildRedirectWithParams(redirectTo, {
+        connectFailed: 1,
+        connectError:
+          "Credential encryption is not configured. Set SYNC_CREDENTIAL_ENCRYPTION_KEY or AUTH_SECRET first.",
+      }),
+    );
+  }
+
+  const encrypted = encryptSyncCredentialPayload({
+    username: input.username,
+    password: input.password,
+    note: input.note,
+    provider: "CARDDAV",
+    version: 1,
+  });
+
+  let discovery: Awaited<ReturnType<typeof discoverCardDavAccount>>;
+
+  try {
+    discovery = await discoverCardDavAccount({
       baseUrl: input.baseUrl,
       principalUrl: input.principalUrl,
       addressBookUrl: input.addressBookUrl,
-      syncDirection: input.syncDirection,
-      credentialVersion: 1,
-    },
-  });
+      credentials: {
+        username: input.username,
+        password: input.password,
+      },
+    });
+  } catch (error) {
+    const connectError =
+      error instanceof CardDavPreflightError
+        ? error.message
+        : error instanceof Error
+          ? error.message
+          : "CardDAV connection validation failed before Kontax could save the account.";
+
+    redirect(
+      buildRedirectWithParams(redirectTo, {
+        connectFailed: 1,
+        connectError,
+      }),
+    );
+  }
+
+  const now = new Date();
+
+  try {
+    await db.$transaction(async (tx) => {
+      const syncAccount = await tx.syncAccount.create({
+        data: {
+          userId,
+          label: input.label,
+          baseUrl: input.baseUrl,
+          principalUrl: discovery.principalUrl,
+          addressBookUrl: discovery.addressBookUrl,
+          remoteAccountId: discovery.remoteAccountId,
+          remoteCTag: discovery.remoteCTag,
+          lastSyncCursor: discovery.remoteCTag,
+          syncDirection: input.syncDirection,
+          credentialReference: encrypted.credentialReference,
+          credentialVersion: 1,
+          credentialUpdatedAt: now,
+          credentialRevokedAt: null,
+          encryptionKeyRef: encrypted.encryptionKeyRef,
+          status: "ACTIVE",
+          lastSucceededAt: now,
+          lastErrorAt: null,
+          lastErrorCode: null,
+          lastErrorMessage: null,
+        },
+      });
+
+      await tx.syncJob.create({
+        data: {
+          syncAccountId: syncAccount.id,
+          status: "SUCCEEDED",
+          trigger: "MANUAL",
+          syncDirection: input.syncDirection,
+          attemptCount: 1,
+          maxAttempts: 5,
+          cursorAfter: discovery.remoteCTag,
+          startedAt: now,
+          completedAt: now,
+          idempotencyKey: createIdempotencyKey([syncAccount.id, "manual", "connect"]),
+          errorSummary: `Connection validated against ${discovery.addressBookDisplayName ?? "the CardDAV address book"}.`,
+        },
+      });
+    });
+  } catch (error) {
+    const duplicateAccountError =
+      error instanceof Prisma.PrismaClientKnownRequestError && error.code === "P2002";
+    const connectError = duplicateAccountError
+      ? "A sync account with this label and base URL already exists. Update the existing connection instead."
+      : error instanceof Error
+        ? error.message
+        : "Kontax could not save the validated CardDAV connection.";
+
+    redirect(
+      buildRedirectWithParams(redirectTo, {
+        connectFailed: 1,
+        connectError,
+      }),
+    );
+  }
 
   revalidateSyncViews();
-  redirect(redirectTo);
+  redirect(
+    buildRedirectWithParams(redirectTo, {
+      connected: 1,
+    }),
+  );
 };
 
 export const activateSyncAccount = async (formData: FormData) => {

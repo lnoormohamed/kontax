@@ -453,6 +453,7 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
 
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
   const created = getSearchValue(resolvedSearchParams, "created") === "1";
+  const connected = getSearchValue(resolvedSearchParams, "connected") === "1";
   const activated = getSearchValue(resolvedSearchParams, "activated") === "1";
   const paused = getSearchValue(resolvedSearchParams, "paused") === "1";
   const queued = getSearchValue(resolvedSearchParams, "queued") === "1";
@@ -464,6 +465,8 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
   const credentialsRevoked = getSearchValue(resolvedSearchParams, "credentialsRevoked") === "1";
   const relinkPrepared = getSearchValue(resolvedSearchParams, "relinkPrepared") === "1";
   const runnerProcessed = getSearchValue(resolvedSearchParams, "runnerProcessed") === "1";
+  const connectFailed = getSearchValue(resolvedSearchParams, "connectFailed") === "1";
+  const connectError = getSearchValue(resolvedSearchParams, "connectError");
   const encryptionStatus = getSyncCredentialEncryptionStatus();
 
   const [planSummary, syncAccounts, recentJobs, recentConflicts, queuedJobsCount, openConflictsCount] =
@@ -618,6 +621,19 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
         {created ? (
           <div className="rounded-[1.75rem] border border-emerald-300/25 bg-emerald-300/10 p-4 text-sm text-emerald-100 shadow-[0_20px_60px_rgba(16,185,129,0.12)]">
             Sync account saved successfully.
+          </div>
+        ) : null}
+        {connected ? (
+          <div className="rounded-[1.75rem] border border-emerald-300/25 bg-emerald-300/10 p-4 text-sm text-emerald-100 shadow-[0_20px_60px_rgba(16,185,129,0.12)]">
+            CardDAV connection validated successfully. Kontax saved the encrypted credentials and
+            discovered the remote principal and address book details, so this account is ready for
+            its first sync run.
+          </div>
+        ) : null}
+        {connectFailed ? (
+          <div className="rounded-[1.75rem] border border-rose-300/25 bg-rose-300/10 p-4 text-sm text-rose-100 shadow-[0_20px_60px_rgba(244,63,94,0.12)]">
+            {connectError ??
+              "CardDAV connection setup failed before Kontax could save the account. Review the endpoint, credentials, and provider-specific app password requirements, then try again."}
           </div>
         ) : null}
         {activated ? (
@@ -816,15 +832,15 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                 <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Sync accounts</p>
                 <h2 className="text-2xl font-semibold text-white">Connect your contact home</h2>
                 <p className="text-sm text-slate-400">
-                  Start by storing the remote CardDAV topology and lifecycle state. Encrypted
-                  credential capture, rotation, and revoke now live here too, while job queueing,
-                  retries, and conflict logging stay visible in the same operational surface.
+                  Start by validating a real CardDAV connection end to end. Kontax will encrypt the
+                  credentials, discover the principal and address book URLs, and only then save a
+                  live sync account that is ready for the first import run.
                 </p>
               </div>
 
               {canUseCardDavSync ? (
                 <form action={createSyncAccount} className="mt-6 grid gap-4">
-                  <input name="redirectTo" type="hidden" value="/sync?created=1" />
+                  <input name="redirectTo" type="hidden" value="/sync" />
 
                   <label className="grid gap-2 text-sm text-slate-200">
                     <span>Connection label</span>
@@ -850,7 +866,43 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
 
                   <div className="grid gap-4 lg:grid-cols-2">
                     <label className="grid gap-2 text-sm text-slate-200">
-                      <span>Principal URL</span>
+                      <span>Username or account email</span>
+                      <input
+                        autoComplete="username"
+                        className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
+                        name="username"
+                        placeholder="you@example.com"
+                        required
+                        type="text"
+                      />
+                    </label>
+
+                    <label className="grid gap-2 text-sm text-slate-200">
+                      <span>Password or app password</span>
+                      <input
+                        autoComplete="current-password"
+                        className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
+                        name="password"
+                        placeholder="Provider app password"
+                        required
+                        type="password"
+                      />
+                    </label>
+                  </div>
+
+                  <label className="grid gap-2 text-sm text-slate-200">
+                    <span>Credential note</span>
+                    <input
+                      className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
+                      name="note"
+                      placeholder="Optional note for this credential set"
+                      type="text"
+                    />
+                  </label>
+
+                  <div className="grid gap-4 lg:grid-cols-2">
+                    <label className="grid gap-2 text-sm text-slate-200">
+                      <span>Principal URL hint</span>
                       <input
                         className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
                         name="principalUrl"
@@ -860,7 +912,7 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                     </label>
 
                     <label className="grid gap-2 text-sm text-slate-200">
-                      <span>Address book URL</span>
+                      <span>Address book URL hint</span>
                       <input
                         className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
                         name="addressBookUrl"
@@ -891,12 +943,12 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
 
                   <div className="rounded-2xl border border-white/10 bg-[#08101c] p-4 text-sm text-slate-300">
                     <p>
-                      Scope model: one sync account maps to one remote address book and covers all
-                      active Kontax contacts by default.
+                      Kontax validates the endpoint before saving anything. If discovery or
+                      authentication fails, the connection is not created.
                     </p>
                     <p className="mt-1 text-slate-500">
-                      Two-way sync is the roadmap target. Import-only remains the safer fallback
-                      when provider behavior, client behavior, or recovery state calls for it.
+                      Principal and address book URLs are optional hints. Leave them blank unless
+                      your provider documentation requires a specific path.
                     </p>
                   </div>
 
@@ -913,7 +965,7 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                     className="rounded-full bg-cyan-300 px-5 py-3 font-semibold text-slate-950 transition hover:bg-cyan-200"
                     type="submit"
                   >
-                    Save sync account
+                    Connect CardDAV account
                   </button>
                 </form>
               ) : (
