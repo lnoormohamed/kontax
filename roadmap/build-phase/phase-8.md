@@ -57,7 +57,7 @@ Turn the contacts homepage into the base product surface for Kontax by making it
   - Favorited contacts can be recognized and reached quickly from the main list, not only through a separate filter.
   - Favorites persist cleanly across list view, detail view, import/export expectations, and future sync planning.
 - Risks / Open Questions:
-  - We should still decide whether favorites belong only to local user preference state or should be treated as portable contact metadata in exports and sync.
+  - Decision made for v1: favorites are `Kontax-local` user preference state. They should influence workspace organization and quick access, but should not be treated as portable export metadata or first-wave CardDAV sync semantics.
 
 ## P8-01a — Header, tabs, and settings architecture reset
 - Status: `Done`
@@ -111,6 +111,7 @@ Turn the contacts homepage into the base product surface for Kontax by making it
 - Implementation Notes:
   - Ensure richer field support is visible and usable in product flows rather than living only in schema and background logic.
   - Extend the creation flow and field-coverage visibility so structured data feels first-class.
+  - The current next slice should prioritize create-flow visibility: richer identity fields, labeled contact methods, structured address components, and lightweight guidance explaining why those fields matter for imports, merges, and sync readiness.
 - Acceptance Criteria:
   - Users can create and maintain richer contact records without needing hidden or purely technical flows.
   - Structured field depth is visible enough to influence how users trust imports, exports, and sync readiness.

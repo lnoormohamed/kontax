@@ -65,12 +65,12 @@ Make Kontax genuinely portable by supporting the most common contact formats, a 
   - Export jobs are recorded with counts and archived-scope metadata.
   - The export UI now supports full export, filtered export by search query, and an include-archived CSV option.
   - Next pass should deepen format-specific options and document downgrade behavior more explicitly.
-  - Favorites/starred state now exists as a real product behavior, so export planning must explicitly decide whether favorite state is exported as portable contact metadata, exported only in richer formats, or kept as Kontax-local user preference state.
+  - Favorites/starred state now exists as a real product behavior, and the v1 product decision is to keep it as Kontax-local user preference state rather than portable export metadata.
 - Acceptance Criteria:
   - Export modes and field mapping rules are documented.
   - Export behavior after merges remains consistent with canonical records.
 - Risks / Open Questions:
-  - Need clear expectations for what metadata is omitted from consumer exports, including whether favorites are portable or intentionally local-only.
+  - Need clear expectations for what metadata is omitted from consumer exports, including the intentionally local-only favorites model.
 
 ## P3-04 — Define import and export job records
 - Status: `Done`
