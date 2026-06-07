@@ -90,6 +90,173 @@ const getJobFailureClass = (errorCode: string | null) => {
   return "protocol-or-data";
 };
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+const getSnapshotStringArray = (value: unknown) =>
+  Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === "string" && item.trim().length > 0)
+    : [];
+
+const getSnapshotAddressArray = (value: unknown) =>
+  Array.isArray(value)
+    ? value
+        .flatMap((item) => {
+          if (!isRecord(item)) {
+            return [];
+          }
+
+          const formatted = item.formatted;
+          return typeof formatted === "string" && formatted.trim().length > 0 ? [formatted] : [];
+        })
+        .filter(Boolean)
+    : [];
+
+const normalizeSnapshotText = (value: string | null) => {
+  const trimmed = value?.trim();
+  return trimmed && trimmed.length > 0 ? trimmed : "—";
+};
+
+const getConflictSnapshotView = (snapshot: unknown) => {
+  if (!isRecord(snapshot)) {
+    return null;
+  }
+
+  const emailValues = getSnapshotStringArray(snapshot.emailAddresses);
+  const phoneValues = getSnapshotStringArray(snapshot.phoneNumbers);
+  const addressValues = getSnapshotAddressArray(snapshot.postalAddresses);
+  const deleted = snapshot.deleted === true;
+
+  return {
+    fullName:
+      typeof snapshot.fullName === "string" && snapshot.fullName.trim().length > 0
+        ? snapshot.fullName
+        : "—",
+    emails:
+      emailValues.length > 0
+        ? emailValues.join(" | ")
+        : typeof snapshot.email === "string" && snapshot.email.trim().length > 0
+          ? snapshot.email
+          : "—",
+    phones:
+      phoneValues.length > 0
+        ? phoneValues.join(" | ")
+        : typeof snapshot.phone === "string" && snapshot.phone.trim().length > 0
+          ? snapshot.phone
+          : "—",
+    company:
+      typeof snapshot.company === "string" && snapshot.company.trim().length > 0
+        ? snapshot.company
+        : "—",
+    jobTitle:
+      typeof snapshot.jobTitle === "string" && snapshot.jobTitle.trim().length > 0
+        ? snapshot.jobTitle
+        : "—",
+    website:
+      typeof snapshot.website === "string" && snapshot.website.trim().length > 0
+        ? snapshot.website
+        : "—",
+    birthday:
+      typeof snapshot.birthday === "string" && snapshot.birthday.trim().length > 0
+        ? snapshot.birthday
+        : "—",
+    address:
+      addressValues.length > 0
+        ? addressValues.join(" | ")
+        : typeof snapshot.address === "string" && snapshot.address.trim().length > 0
+          ? snapshot.address
+          : "—",
+    notes:
+      typeof snapshot.notes === "string" && snapshot.notes.trim().length > 0
+        ? snapshot.notes
+        : "—",
+    deleted,
+  };
+};
+
+const getConflictComparisonRows = (localSnapshot: unknown, remoteSnapshot: unknown) => {
+  const local = getConflictSnapshotView(localSnapshot);
+  const remote = getConflictSnapshotView(remoteSnapshot);
+
+  if (!local && !remote) {
+    return [];
+  }
+
+  const rows = [
+    {
+      label: "Full name",
+      local: normalizeSnapshotText(local?.fullName ?? null),
+      remote: normalizeSnapshotText(remote?.fullName ?? null),
+    },
+    {
+      label: "Emails",
+      local: normalizeSnapshotText(local?.emails ?? null),
+      remote: normalizeSnapshotText(remote?.emails ?? null),
+    },
+    {
+      label: "Phones",
+      local: normalizeSnapshotText(local?.phones ?? null),
+      remote: normalizeSnapshotText(remote?.phones ?? null),
+    },
+    {
+      label: "Company",
+      local: normalizeSnapshotText(local?.company ?? null),
+      remote: normalizeSnapshotText(remote?.company ?? null),
+    },
+    {
+      label: "Job title",
+      local: normalizeSnapshotText(local?.jobTitle ?? null),
+      remote: normalizeSnapshotText(remote?.jobTitle ?? null),
+    },
+    {
+      label: "Website",
+      local: normalizeSnapshotText(local?.website ?? null),
+      remote: normalizeSnapshotText(remote?.website ?? null),
+    },
+    {
+      label: "Birthday",
+      local: normalizeSnapshotText(local?.birthday ?? null),
+      remote: normalizeSnapshotText(remote?.birthday ?? null),
+    },
+    {
+      label: "Address",
+      local: normalizeSnapshotText(local?.address ?? null),
+      remote: normalizeSnapshotText(remote?.address ?? null),
+    },
+    {
+      label: "Notes",
+      local: normalizeSnapshotText(local?.notes ?? null),
+      remote: normalizeSnapshotText(remote?.notes ?? null),
+    },
+    {
+      label: "Remote delete intent",
+      local: local?.deleted ? "Local tombstone" : "Local still active",
+      remote: remote?.deleted ? "Remote missing / deleted" : "Remote still active",
+    },
+  ];
+
+  return rows.filter(
+    (row) => row.local !== "—" || row.remote !== "—" || row.label === "Remote delete intent",
+  );
+};
+
+const getResolutionGuidance = (strategy: string) => {
+  switch (strategy) {
+    case "KEEP_LOCAL":
+      return "Push the current Kontax version back to CardDAV and treat local as the trusted winner.";
+    case "KEEP_REMOTE":
+      return "Replace the local record with the remote CardDAV version and preserve sync linkage.";
+    case "DUPLICATE_LOCAL":
+      return "Keep a duplicate of the current local record, then let the linked record take the remote version.";
+    case "ARCHIVE_LOCAL":
+      return "Archive the local record and treat the remote deletion or cleanup as intentional.";
+    case "MANUAL_MERGE":
+      return "Use this when neither side should win cleanly and a human-reviewed merge is still needed.";
+    default:
+      return null;
+  }
+};
+
 const conflictPolicyItems = [
   {
     title: "Edit vs edit",
@@ -1055,6 +1222,14 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                       className="rounded-2xl border border-white/10 bg-[#08101c]/70 p-4"
                       key={conflict.id}
                     >
+                      {(() => {
+                        const comparisonRows = getConflictComparisonRows(
+                          conflict.localSnapshot,
+                          conflict.remoteSnapshot,
+                        );
+
+                        return (
+                          <>
                       <p className="font-semibold text-white">{conflict.syncAccount.label}</p>
                       <p className="mt-1 text-slate-400">
                         {conflict.conflictType} · {conflict.status}
@@ -1070,6 +1245,37 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                       </p>
                       {conflict.resolutionNotes ? (
                         <p className="mt-2 text-slate-400">{conflict.resolutionNotes}</p>
+                      ) : null}
+                      {comparisonRows.length > 0 ? (
+                        <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-[#020617]/80">
+                          <div className="grid grid-cols-[140px_minmax(0,1fr)_minmax(0,1fr)] border-b border-white/10 bg-white/5 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
+                            <p>Field</p>
+                            <p>Local</p>
+                            <p>Remote</p>
+                          </div>
+                          <div className="divide-y divide-white/10">
+                            {comparisonRows.map((row) => {
+                              const changed = row.local !== row.remote;
+
+                              return (
+                                <div
+                                  className={`grid grid-cols-[140px_minmax(0,1fr)_minmax(0,1fr)] gap-3 px-4 py-3 text-sm ${
+                                    changed ? "bg-amber-300/5" : ""
+                                  }`}
+                                  key={`${conflict.id}-${row.label}`}
+                                >
+                                  <p className="font-medium text-slate-300">{row.label}</p>
+                                  <p className={changed ? "text-white" : "text-slate-400"}>
+                                    {row.local}
+                                  </p>
+                                  <p className={changed ? "text-amber-100" : "text-slate-400"}>
+                                    {row.remote}
+                                  </p>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </div>
                       ) : null}
                       {conflict.status === "OPEN" ? (
                         <form action={resolveSyncConflict} className="mt-3 grid gap-3">
@@ -1100,6 +1306,23 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                               Manual merge
                             </option>
                           </select>
+                          <div className="rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-3 text-sm text-cyan-100">
+                            <p className="font-semibold text-white">Resolution guide</p>
+                            <div className="mt-2 space-y-2">
+                              {[
+                                "KEEP_LOCAL",
+                                "KEEP_REMOTE",
+                                "DUPLICATE_LOCAL",
+                                "ARCHIVE_LOCAL",
+                                "MANUAL_MERGE",
+                              ].map((strategy) => (
+                                <p key={`${conflict.id}-${strategy}`}>
+                                  <span className="font-semibold">{strategy}:</span>{" "}
+                                  {getResolutionGuidance(strategy)}
+                                </p>
+                              ))}
+                            </div>
+                          </div>
                           <input
                             className="rounded-full border border-white/10 bg-[#020617] px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
                             name="resolutionNotes"
@@ -1118,6 +1341,9 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                           Resolution: {conflict.resolutionStrategy ?? "Saved"}
                         </p>
                       )}
+                          </>
+                        );
+                      })()}
                     </div>
                   ))
                 )}
