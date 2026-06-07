@@ -244,7 +244,7 @@ export function ContactsWorkspaceTable({
         <span>Email</span>
         <span>Phone</span>
         <span>Company</span>
-        <span>Updated</span>
+        <span>Birthday</span>
         <span className="text-right">Actions</span>
       </div>
 
@@ -361,7 +361,7 @@ export function ContactsWorkspaceTable({
                 </div>
 
                 <div className="hidden text-sm text-slate-500 lg:block">
-                  {formatTimestamp(contact.updatedAt)}
+                  {contact.birthday ?? "No birthday saved"}
                 </div>
 
                 <div className="hidden items-center justify-end gap-2 lg:flex">
