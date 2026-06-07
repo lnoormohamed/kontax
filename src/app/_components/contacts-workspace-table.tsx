@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import {
   archiveContact,
   archiveContactsBulk,
+  permanentlyDeleteContact,
   restoreContact,
   restoreContactsBulk,
   toggleFavoriteContact,
@@ -134,6 +135,35 @@ export function ContactsWorkspaceTable({
 
   const toggleSelectAll = () => {
     setSelectedIds(allSelected ? [] : contacts.map((contact) => contact.id));
+  };
+
+  const openPrintContact = (contactId: string) => {
+    const printWindow = window.open(`/contacts/${contactId}?print=1`, "_blank", "noopener,noreferrer");
+
+    if (!printWindow) {
+      window.location.assign(`/contacts/${contactId}?print=1`);
+      return;
+    }
+
+    printWindow.addEventListener("load", () => {
+      printWindow.print();
+    });
+  };
+
+  const getSingleContactExportUrl = (contact: WorkspaceContact) => {
+    const query = [
+      contact.fullName,
+      contact.email,
+      contact.phone,
+      contact.company,
+      contact.jobTitle,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .trim();
+
+    const params = query.length > 0 ? `?q=${encodeURIComponent(query)}` : "";
+    return `/api/exports/contacts/csv${params}`;
   };
 
   if (contacts.length === 0) {
@@ -288,8 +318,12 @@ export function ContactsWorkspaceTable({
                           {displayName}
                         </Link>
                         {contact.isFavorite ? (
-                          <span className="rounded-full border border-cyan-200 bg-cyan-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan-700">
-                            Favorite
+                          <span
+                            aria-label="Favorite contact"
+                            className="rounded-full border border-yellow-300 bg-amber-50 px-2 py-0.5 text-[13px] text-amber-500"
+                            title="Favorite contact"
+                          >
+                            ★
                           </span>
                         ) : null}
                         {contact.archivedAt ? (
@@ -309,9 +343,6 @@ export function ContactsWorkspaceTable({
                 <div className="hidden text-sm text-slate-700 lg:block">
                   <p className="truncate font-medium text-[#3341c7]">
                     {contact.email ?? "No email saved"}
-                  </p>
-                  <p className="mt-0.5 truncate text-[13px] text-slate-500">
-                    {contact.website ?? "No website saved"}
                   </p>
                 </div>
 
@@ -392,6 +423,21 @@ export function ContactsWorkspaceTable({
                         showDesktopActions ? "opacity-100" : "pointer-events-none opacity-0"
                       }`}
                     >
+                      <button
+                        className="w-full px-3 py-2 text-left text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+                        onClick={() => openPrintContact(contact.id)}
+                        type="button"
+                      >
+                        中 Print C
+                      </button>
+                      <a
+                        className="block px-3 py-2 text-left text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+                        href={getSingleContactExportUrl(contact)}
+                        rel="noopener noreferrer"
+                        target="_blank"
+                      >
+                        I Export
+                      </a>
                       {contact.archivedAt ? (
                         <form action={restoreContact}>
                           <input name="contactId" type="hidden" value={contact.id} />
@@ -411,10 +457,26 @@ export function ContactsWorkspaceTable({
                             className="w-full px-3 py-2 text-left text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
                             type="submit"
                           >
-                            Archive
+                            Hide from contacts
                           </button>
                         </form>
                       )}
+                      <form action={permanentlyDeleteContact}>
+                        <input name="contactId" type="hidden" value={contact.id} />
+                        <input name="redirectTo" type="hidden" value="/?tab=people" />
+                        <button
+                          className="w-full px-3 py-2 text-left text-xs font-semibold text-rose-600 transition hover:bg-rose-50"
+                          type="submit"
+                        >
+                          回 Delete
+                        </button>
+                      </form>
+                      <Link
+                        className="block px-3 py-2 text-left text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
+                        href={`/contacts/${contact.id}`}
+                      >
+                        Change labels
+                      </Link>
                     </div>
                   </details>
                 </div>
