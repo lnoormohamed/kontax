@@ -63,7 +63,7 @@ const getSelectedSort = async (
     return "name";
   }
 
-  return "updated";
+  return "name";
 };
 
 const getSelectedView = async (
@@ -232,9 +232,7 @@ export default async function Home({ searchParams }: HomePageProps) {
         : {};
   const activeOrderBy =
     selectedSort === "name"
-      ? {
-          fullName: "asc" as const,
-        }
+      ? [{ lastName: "asc" as const }, { firstName: "asc" as const }, { fullName: "asc" as const }]
       : {
           updatedAt: "desc" as const,
         };
@@ -275,9 +273,7 @@ export default async function Home({ searchParams }: HomePageProps) {
       },
       orderBy:
         selectedSort === "name"
-          ? {
-              fullName: "asc",
-            }
+          ? [{ lastName: "asc" as const }, { firstName: "asc" as const }, { fullName: "asc" as const }]
           : {
               archivedAt: "desc",
             },
