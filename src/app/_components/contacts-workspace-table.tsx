@@ -85,6 +85,10 @@ const parseBirthdayDate = (value: string): Date | null => {
 
   if (separatorParts.length === 3) {
     const [first, second, third] = separatorParts;
+    if (!first || !second || !third) {
+      return null;
+    }
+
     const rawFirst = Number(first);
     const rawSecond = Number(second);
     const rawThird = Number(third);
