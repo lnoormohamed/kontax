@@ -27,9 +27,9 @@ Turn the CardDAV roadmap into a real product slice by connecting live CardDAV ac
 | --- | --- | --- | --- |
 | P7-01 | Done | P0 | P5-01, P5-03 |
 | P7-02 | Done | P0 | P7-01, P6-04 |
-| P7-03 | Not Started | P0 | P7-02, P5-04 |
-| P7-04 | Not Started | P1 | P7-03, P6-05 |
-| P7-05 | Not Started | P1 | P7-03, P5-06 |
+| P7-03 | Done | P0 | P7-02, P5-04 |
+| P7-04 | Done | P1 | P7-03, P6-05 |
+| P7-05 | Done | P1 | P7-03, P5-06 |
 | P7-06 | Not Started | P2 | P7-02, P7-05 |
 
 ## P7-01 — Build the live CardDAV account connection flow
@@ -68,7 +68,7 @@ Turn the CardDAV roadmap into a real product slice by connecting live CardDAV ac
   - Local development and production secret handling must stay aligned or debugging sync failures will be confusing.
 
 ## P7-03 — Ship the first safe one-way CardDAV import sync
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P0`
 - Dependencies: `P7-02`, `P5-04`
 - Implementation Notes:
@@ -78,6 +78,7 @@ Turn the CardDAV roadmap into a real product slice by connecting live CardDAV ac
   - Use stable remote UID and href mapping so later incremental sync work can build on the same linkage.
   - Define an explicit field mapping contract for the Phase 7 sync-safe set and preserve non-portable metadata in Kontax without claiming remote round-trip fidelity.
   - Persist unmapped or partially supported remote data in a dedicated snapshot or metadata path so recovery, debugging, and future mapping upgrades do not depend on lossy transforms alone.
+  - The live runner now executes a bootstrap import-first slice: remote cards are imported and linked, linked remote updates can refresh local records, local-only edits are deferred instead of being pushed, and remote writes remain intentionally disabled.
 - Acceptance Criteria:
   - A sync job can import real remote contacts into Kontax.
   - Imported contacts create stable sync links and job history entries.
@@ -88,7 +89,7 @@ Turn the CardDAV roadmap into a real product slice by connecting live CardDAV ac
   - Providers may interpret even standard vCard fields differently, especially labels, address structure, and secondary values.
 
 ## P7-04 — Add sync status, retry, and recovery UX
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P7-03`, `P6-05`
 - Implementation Notes:
@@ -97,6 +98,7 @@ Turn the CardDAV roadmap into a real product slice by connecting live CardDAV ac
   - Surface a simple contact-level view of sync-linked records so users understand what came from CardDAV.
   - Keep the first UX operational and confidence-building rather than overly advanced.
   - Show field-support guidance in the UI so users can tell which details are sync-safe, which may flatten during portability, and which remain Kontax-local.
+  - The sync center now shows per-account recovery guidance, dedicated revalidate controls, recent linked-contact visibility, and contact detail sync-origin cards so beta users can recover without database access.
 - Acceptance Criteria:
   - Users can see whether sync is healthy, failing, or needs reauthentication.
   - A failed sync can be retried from the UI with clear feedback.
@@ -106,7 +108,7 @@ Turn the CardDAV roadmap into a real product slice by connecting live CardDAV ac
   - Too little error detail will frustrate users, but too much raw protocol output may overwhelm them.
 
 ## P7-05 — Add failure handling, support telemetry, and recovery exports
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P7-03`, `P5-06`
 - Implementation Notes:
@@ -114,6 +116,7 @@ Turn the CardDAV roadmap into a real product slice by connecting live CardDAV ac
   - Add support-oriented diagnostics such as job summaries, conflict snapshots, and recovery export helpers for affected contacts.
   - Make sure sync failures create enough auditability to support beta operations without direct database inspection.
   - Define a lightweight health model so repeated failing accounts can be paused automatically instead of looping forever.
+  - Kontax now groups sync errors into support buckets, exposes per-account failure streaks and health badges in the sync center, auto-pauses repeated failing accounts after a bounded streak, and deepens the recovery export with link summaries, job telemetry, and sanitized support diagnostics.
 - Acceptance Criteria:
   - Sync failures produce structured logs and visible job summaries.
   - Support and recovery flows can export enough context to debug real user issues.
@@ -122,7 +125,7 @@ Turn the CardDAV roadmap into a real product slice by connecting live CardDAV ac
   - Diagnostic exports must avoid leaking secrets while still being useful for debugging.
 
 ## P7-06 — Prepare private beta validation and rollout rules
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P2`
 - Dependencies: `P7-02`, `P7-05`
 - Implementation Notes:
@@ -131,6 +134,7 @@ Turn the CardDAV roadmap into a real product slice by connecting live CardDAV ac
   - Document what must be true before enabling wider user access, especially around observability, support tooling, and non-destructive behavior.
   - Treat two-way sync as out of scope for this phase so rollout pressure does not compromise first-sync safety.
   - Publish a field-support matrix for beta users that separates sync-safe fields, partial-support fields, and Kontax-local-only metadata.
+  - The first private-beta baseline is now concrete: Fastmail has been validated end to end, support exports are live, account auto-pause is in place, and the remaining rollout gate is operational discipline rather than schema ambiguity.
 - Acceptance Criteria:
   - Phase 7 includes a concrete beta-readiness checklist.
   - Real-world validation scenarios are documented clearly enough to guide testing and support.
@@ -138,3 +142,72 @@ Turn the CardDAV roadmap into a real product slice by connecting live CardDAV ac
   - Beta documentation states clearly which fields are expected to round-trip and which are intentionally out of scope for Phase 7.
 - Risks / Open Questions:
   - Provider-specific differences may force the beta list to stay narrow longer than expected.
+
+### Beta Readiness Checklist
+- `Product scope`
+  - [x] CardDAV remains bootstrap import-first in production behavior.
+  - [x] Two-way sync messaging stays framed as a roadmap target, not a live promise.
+  - [x] Sync-origin visibility exists at both account and contact level.
+- `Connection and credential safety`
+  - [x] Sync credentials are encrypted before persistence.
+  - [x] Connection discovery is validated before a new account is treated as active.
+  - [x] Credential rotation, revoke, and revalidate paths are visible in the app.
+- `Execution and recovery`
+  - [x] Manual queue and manual runner paths are usable by support or founder operators.
+  - [x] Recovery exports omit raw credentials while preserving operational diagnostics.
+  - [x] Repeated failures can pause an account automatically instead of retrying forever.
+- `Observability`
+  - [x] Sync jobs show counts, conflict totals, worker state, and support buckets.
+  - [x] Linked contacts surface remote UID, href, ETag, and conflict count.
+  - [x] Open conflicts remain visible from the sync center before beta expansion.
+- `Beta guardrails`
+  - [x] Supported-provider list is explicit and intentionally narrow.
+  - [x] Rollback and relink expectations are documented before inviting external testers.
+  - [x] Known field limitations are visible enough that testers are not misled about parity.
+
+### Supported Providers for First Private Beta
+| Provider | Status | Entry Rule | Notes |
+| --- | --- | --- | --- |
+| Fastmail CardDAV | Validated | Allowed | End-to-end connect and bootstrap import verified in Kontax on 7 June 2026. |
+| iCloud CardDAV | Planned | Founder-only after manual verification | Expect app-password and provider-specific troubleshooting. |
+| Nextcloud CardDAV | Planned | Founder-only after manual verification | Allow only once address-book discovery and support exports are confirmed in a real account. |
+| Generic CardDAV servers | Experimental | Blocked from invite flow by default | Manual founder testing only until provider behavior is better characterized. |
+
+### Known Limitations for Private Beta
+- Kontax currently imports and links remote contacts safely, but outbound CardDAV writes remain intentionally disabled.
+- Existing local contacts are not auto-merged into remote links unless the sync model can do so safely.
+- Host mismatches in local development can affect auth redirects for the runner route, so smoke tests should stay on one origin consistently.
+- Provider-specific field behavior for labels, multiple structured values, and niche vCard extensions is still expected to vary.
+- Shared books, shared address books, and team-style tenancy are out of scope for this beta.
+
+### Rollback and Recovery Expectations
+- If sync health degrades, the first action is to pause the account before queueing more work.
+- Export the support package before any relink or reset step.
+- Use relink preparation to clear stale links and open conflicts when a bootstrap import needs a fresh start.
+- Do not attempt destructive remote cleanup from Kontax during this phase.
+- If a provider behaves unexpectedly, remove that provider from the allowed beta list before widening access.
+
+### Validation Scenarios for Beta Operators
+| Scenario | Expected Result | Required Tools |
+| --- | --- | --- |
+| First connection on a supported provider | Account validates, credentials encrypt, discovery metadata persists, support status is healthy | Sync center, support package export |
+| First bootstrap import | Remote contacts import, links persist, no remote writes occur | Queue sync run, runner, linked contacts panel |
+| Repeat sync with no remote changes | Job succeeds with low or zero contact deltas and no conflict creation | Recent jobs, activity timeline |
+| Expired or revoked credentials | Account shifts toward reauth guidance and sync work stops cleanly | Revoke credentials, revalidate path, support bucket |
+| Malformed or unsupported remote data | Job records failure or partial result without corrupting existing contacts | Recent jobs, support package, conflict list |
+| Duplicate-heavy address book | Contacts import, conflicts remain visible, no silent destructive merges occur | Linked contacts, conflicts, merge tooling |
+| Repeated non-auth failures | Account can auto-pause after the configured failure streak | Recent jobs, health badge, support export |
+
+### Field Support Matrix for Beta Users
+| Field band | Fields | Beta expectation |
+| --- | --- | --- |
+| `Sync-safe baseline` | Full name, name parts from `N`, nickname, primary and secondary emails, primary and secondary phone numbers, company, job title, notes, websites, birthday, postal addresses, remote UID linkage | Expected to import and remain visible reliably in Kontax. |
+| `Partial / client-dependent` | Labels, structured multi-value fidelity, archive state, merge lineage, address formatting variations, provider-specific display names | Preserved in Kontax where possible, but device/client round-trip behavior may vary. |
+| `Kontax-local only in Phase 7` | Billing entitlements, import/export history, merge decisions, sync conflicts, support diagnostics, recovery metadata | Visible in Kontax only and not expected to round-trip through CardDAV. |
+| `Out of scope for beta parity` | Photos, social profiles, messaging handles, attachments, groups/lists, custom provider `X-` fields, advanced significant dates beyond birthday | Do not promise clean sync behavior during this beta. |
+
+### Real-World Validation Notes Captured So Far
+- Fastmail CardDAV connection validated successfully with encrypted credentials and explicit address-book discovery.
+- A real Fastmail bootstrap import created 411 linked contacts with no conflicts in Kontax.
+- Contact detail sync-origin surfaces show remote UID, ETag, href, and account association clearly enough for support review.
+- The remaining expansion risk is provider variance, not the current Fastmail happy path.

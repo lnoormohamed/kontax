@@ -1,5 +1,11 @@
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
+import {
+  AUTO_PAUSE_FAILURE_STREAK,
+  getConsecutiveFailureStreak,
+  getSyncAccountOperationalHealth,
+  getSyncErrorSupportBucket,
+} from "~/server/sync-health";
 
 const slugify = (value: string) =>
   value
@@ -38,7 +44,7 @@ export async function GET(request: Request) {
       },
       syncJobs: {
         orderBy: [{ createdAt: "desc" }],
-        take: 10,
+        take: 20,
         select: {
           id: true,
           status: true,
@@ -47,6 +53,10 @@ export async function GET(request: Request) {
           attemptCount: true,
           maxAttempts: true,
           nextRetryAt: true,
+          leaseExpiresAt: true,
+          workerId: true,
+          cursorBefore: true,
+          cursorAfter: true,
           createdCount: true,
           updatedCount: true,
           deletedCount: true,
@@ -61,7 +71,7 @@ export async function GET(request: Request) {
       },
       syncConflicts: {
         orderBy: [{ detectedAt: "desc" }],
-        take: 10,
+        take: 20,
         select: {
           id: true,
           conflictType: true,
@@ -125,12 +135,64 @@ export async function GET(request: Request) {
       updatedAt: true,
     },
   });
+  const recoveryLinks = await db.syncContactLink.findMany({
+    where: {
+      syncAccountId: syncAccount.id,
+    },
+    orderBy: [{ updatedAt: "desc" }],
+    take: 50,
+    select: {
+      id: true,
+      remoteUid: true,
+      remoteHref: true,
+      remoteETag: true,
+      lastSyncedAt: true,
+      tombstonedAt: true,
+      remoteDeletedAt: true,
+      lastErrorCode: true,
+      lastErrorMessage: true,
+      contact: {
+        select: {
+          id: true,
+          fullName: true,
+          archivedAt: true,
+          syncUid: true,
+          syncVersion: true,
+        },
+      },
+      _count: {
+        select: {
+          syncConflicts: true,
+        },
+      },
+    },
+  });
+  const failureStreak = getConsecutiveFailureStreak(
+    syncAccount.syncJobs.map((job) => ({
+      status: job.status,
+      errorCode: job.errorCode,
+    })),
+  );
+  const operationalHealth = getSyncAccountOperationalHealth({
+    status: syncAccount.status,
+    lastErrorCode: syncAccount.lastErrorCode,
+    recentJobs: syncAccount.syncJobs.map((job) => ({
+      status: job.status,
+      errorCode: job.errorCode,
+    })),
+  });
 
   const body = JSON.stringify(
     {
       exportedAt: new Date().toISOString(),
       product: "Kontax",
       type: "sync-recovery-package",
+      support: {
+        autoPauseFailureStreak: AUTO_PAUSE_FAILURE_STREAK,
+        failureStreak,
+        operationalHealth,
+        latestSupportBucket: getSyncErrorSupportBucket(syncAccount.lastErrorCode),
+      },
       syncAccount: {
         id: syncAccount.id,
         label: syncAccount.label,
@@ -154,13 +216,21 @@ export async function GET(request: Request) {
         lastErrorMessage: syncAccount.lastErrorMessage,
         counts: syncAccount._count,
       },
-      recentJobs: syncAccount.syncJobs,
+      recentJobs: syncAccount.syncJobs.map((job) => ({
+        ...job,
+        supportBucket: getSyncErrorSupportBucket(job.errorCode),
+      })),
       recentConflicts: syncAccount.syncConflicts,
+      syncLinks: recoveryLinks.map((link) => ({
+        ...link,
+        supportBucket: getSyncErrorSupportBucket(link.lastErrorCode),
+      })),
       relatedContacts: recoveryContacts,
       notes: [
         "This package intentionally excludes raw credentials.",
         "Use this export before reset or relink operations.",
         "Sync links may be reset locally without changing your canonical Kontax contacts.",
+        "Support buckets group failures by operator-facing cause so repeated issues are easier to triage.",
       ],
     },
     null,

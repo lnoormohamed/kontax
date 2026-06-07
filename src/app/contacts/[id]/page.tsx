@@ -26,6 +26,8 @@ const formatTimestamp = (value: Date) =>
     year: "numeric",
   }).format(value);
 
+const formatNullableTimestamp = (value: Date | null) => (value ? formatTimestamp(value) : "Not yet");
+
 const getFormattedAddressArray = (value: unknown) =>
   parseContactPostalAddresses(value).map((item) => item.formatted);
 
@@ -35,6 +37,31 @@ const getPrimaryStructuredEntry = <T,>(value: unknown) => {
   }
 
   return value[0] as T;
+};
+
+const getSyncLinkStatusLabel = (link: {
+  lastSyncedAt: Date | null;
+  tombstonedAt: Date | null;
+  remoteDeletedAt: Date | null;
+  lastErrorCode: string | null;
+}) => {
+  if (link.tombstonedAt) {
+    return "Local tombstone";
+  }
+
+  if (link.remoteDeletedAt) {
+    return "Remote delete detected";
+  }
+
+  if (link.lastErrorCode) {
+    return "Needs review";
+  }
+
+  if (link.lastSyncedAt) {
+    return "Linked and healthy";
+  }
+
+  return "Linked, waiting for first sync";
 };
 
 export default async function ContactDetailPage({ params, searchParams }: ContactDetailPageProps) {
@@ -104,6 +131,41 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
   if (!contact) {
     notFound();
   }
+
+  const syncLinks = await db.syncContactLink.findMany({
+    where: {
+      contactId: contact.id,
+      syncAccount: {
+        userId: session.user.id,
+      },
+    },
+    orderBy: [{ lastSyncedAt: "desc" }, { updatedAt: "desc" }],
+    select: {
+      id: true,
+      remoteUid: true,
+      remoteHref: true,
+      remoteETag: true,
+      lastSyncedAt: true,
+      tombstonedAt: true,
+      remoteDeletedAt: true,
+      lastErrorCode: true,
+      lastErrorMessage: true,
+      syncAccount: {
+        select: {
+          id: true,
+          label: true,
+          addressBookDisplayName: true,
+          status: true,
+          lastSyncedAt: true,
+        },
+      },
+      _count: {
+        select: {
+          syncConflicts: true,
+        },
+      },
+    },
+  });
 
   const additionalEmails = parseContactStringArray(contact.emailAddresses)
     .filter((item) => item !== contact.email)
@@ -252,6 +314,77 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
             Merge undo completed. The archived secondary contact has been restored and the primary contact has been rolled back to its pre-merge state.
           </div>
         ) : null}
+
+        <section className="rounded-[2rem] border border-white/10 bg-[#08101c]/88 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.35)]">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Sync origin</p>
+              <h2 className="mt-3 text-2xl font-semibold text-white">
+                See whether this contact is local-only or already linked to CardDAV
+              </h2>
+              <p className="mt-3 max-w-3xl text-sm text-slate-400">
+                Ticket `P7-04` adds contact-level sync visibility so imported records are not a
+                black box. You can see which CardDAV account owns the link, the remote identity
+                Kontax is tracking, and whether recovery work is still open.
+              </p>
+            </div>
+            <Link
+              className="text-sm font-semibold text-cyan-200 hover:text-cyan-100"
+              href="/sync"
+            >
+              Open sync center →
+            </Link>
+          </div>
+
+          {syncLinks.length === 0 ? (
+            <div className="mt-5 rounded-[1.5rem] border border-dashed border-white/15 bg-white/5 p-5 text-sm text-slate-400">
+              This contact is local-only right now. It has not been linked to a CardDAV record yet,
+              so edits here stay inside Kontax until a future sync or relink attaches a remote
+              source.
+            </div>
+          ) : (
+            <div className="mt-5 grid gap-4 lg:grid-cols-2">
+              {syncLinks.map((link) => (
+                <article
+                  className="rounded-[1.5rem] border border-white/10 bg-white/5 p-5"
+                  key={link.id}
+                >
+                  <div className="flex flex-wrap items-center gap-3">
+                    <p className="text-sm font-semibold uppercase tracking-[0.2em] text-cyan-200">
+                      {link.syncAccount.label}
+                    </p>
+                    <span className="rounded-full border border-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">
+                      {getSyncLinkStatusLabel(link)}
+                    </span>
+                  </div>
+                  <p className="mt-2 text-sm text-slate-400">
+                    {link.syncAccount.addressBookDisplayName ?? "CardDAV address book"} · account{" "}
+                    {link.syncAccount.status.toLowerCase()}
+                  </p>
+                  <div className="mt-4 grid gap-2 text-sm text-slate-400">
+                    <p>Last link sync: {formatNullableTimestamp(link.lastSyncedAt)}</p>
+                    <p>Account last sync: {formatNullableTimestamp(link.syncAccount.lastSyncedAt)}</p>
+                    <p>Remote UID: {link.remoteUid ?? "Not stored yet"}</p>
+                    <p>Remote ETag: {link.remoteETag ?? "Not stored yet"}</p>
+                    <p>Remote href: {link.remoteHref ?? "Not stored yet"}</p>
+                    <p>Open conflicts: {link._count.syncConflicts}</p>
+                  </div>
+                  {link.lastErrorMessage ? (
+                    <p className="mt-4 rounded-2xl border border-amber-300/20 bg-amber-300/10 p-3 text-sm text-amber-100">
+                      {link.lastErrorCode ? `${link.lastErrorCode}: ` : ""}
+                      {link.lastErrorMessage}
+                    </p>
+                  ) : (
+                    <p className="mt-4 rounded-2xl border border-emerald-300/20 bg-emerald-300/10 p-3 text-sm text-emerald-100">
+                      This link is visible to the sync layer, so future CardDAV recovery and
+                      conflict actions can target this contact directly.
+                    </p>
+                  )}
+                </article>
+              ))}
+            </div>
+          )}
+        </section>
 
         <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_300px]">
           <div className="rounded-[2rem] border border-white/10 bg-[#08101c]/88 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.35)]">

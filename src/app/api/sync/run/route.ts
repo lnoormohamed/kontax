@@ -41,7 +41,12 @@ export async function POST(request: Request) {
   revalidatePath("/sync");
 
   if (typeof redirectTo === "string" && redirectTo.startsWith("/")) {
-    return NextResponse.redirect(new URL(redirectTo, request.url), { status: 303 });
+    return new NextResponse(null, {
+      status: 303,
+      headers: {
+        Location: redirectTo,
+      },
+    });
   }
 
   return NextResponse.json(result);

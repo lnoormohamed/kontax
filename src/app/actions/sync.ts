@@ -845,6 +845,166 @@ export const pauseSyncAccount = async (formData: FormData) => {
   redirect(redirectTo);
 };
 
+export const revalidateSyncAccount = async (formData: FormData) => {
+  const userId = await getRequiredUserId();
+  const syncAccountId = parseSyncAccountId(formData);
+  const redirectTo = getRedirectTarget(formData);
+
+  await assertCanUseCardDavSync(userId);
+
+  const account = await db.syncAccount.findFirst({
+    where: {
+      id: syncAccountId,
+      userId,
+    },
+    select: {
+      id: true,
+      status: true,
+      syncDirection: true,
+      baseUrl: true,
+      principalUrl: true,
+      addressBookUrl: true,
+      remoteAccountId: true,
+      remoteCTag: true,
+      credentialReference: true,
+      credentialUpdatedAt: true,
+      credentialLastValidatedAt: true,
+      credentialRevokedAt: true,
+      connectionValidatedAt: true,
+    },
+  });
+
+  if (!account) {
+    throw new Error("Sync account not found.");
+  }
+
+  const now = new Date();
+
+  if (!account.credentialReference || account.credentialRevokedAt) {
+    const errorSummary = account.credentialRevokedAt
+      ? "Stored CardDAV credentials were revoked. Add fresh encrypted credentials before revalidating this connection."
+      : "Encrypted CardDAV credentials are not attached to this sync account yet.";
+
+    await recordFailedPreflight({
+      accountId: account.id,
+      syncDirection: account.syncDirection,
+      accountStatus: account.status,
+      errorCode: "CREDENTIALS_MISSING",
+      errorSummary,
+    });
+
+    revalidateSyncViews();
+    redirect(
+      buildRedirectWithParams(redirectTo, {
+        preflightFailed: 1,
+      }),
+    );
+  }
+
+  let decryptedCredentials: ReturnType<typeof decryptSyncCredentialPayload>;
+
+  try {
+    decryptedCredentials = decryptSyncCredentialPayload(account.credentialReference);
+  } catch (error) {
+    const errorSummary =
+      error instanceof Error
+        ? error.message
+        : "Stored CardDAV credentials could not be decrypted.";
+
+    await recordFailedPreflight({
+      accountId: account.id,
+      syncDirection: account.syncDirection,
+      accountStatus: account.status,
+      errorCode: "CREDENTIALS_UNREADABLE",
+      errorSummary,
+    });
+
+    revalidateSyncViews();
+    redirect(
+      buildRedirectWithParams(redirectTo, {
+        preflightFailed: 1,
+      }),
+    );
+  }
+
+  try {
+    const discovery = await discoverCardDavAccount({
+      baseUrl: account.baseUrl,
+      principalUrl: account.principalUrl,
+      addressBookUrl: account.addressBookUrl,
+      credentials: {
+        username: decryptedCredentials.username,
+        password: decryptedCredentials.password,
+      },
+    });
+
+    await db.$transaction([
+      db.syncJob.create({
+        data: {
+          syncAccountId: account.id,
+          status: "SUCCEEDED",
+          trigger: "MANUAL",
+          syncDirection: account.syncDirection,
+          attemptCount: 1,
+          maxAttempts: 5,
+          cursorAfter: discovery.remoteCTag,
+          startedAt: now,
+          completedAt: now,
+          idempotencyKey: createIdempotencyKey([account.id, "manual", "revalidate"]),
+          errorSummary: `Connection revalidated against ${discovery.addressBookDisplayName ?? "the CardDAV address book"}.`,
+        },
+      }),
+      db.syncAccount.update({
+        where: { id: account.id },
+        data: {
+          status: account.status === "PAUSED" ? "PAUSED" : "ACTIVE",
+          principalUrl: discovery.principalUrl,
+          addressBookUrl: discovery.addressBookUrl,
+          addressBookDisplayName: discovery.addressBookDisplayName,
+          remoteAccountId: discovery.remoteAccountId,
+          remoteCTag: discovery.remoteCTag,
+          lastSyncCursor: discovery.remoteCTag,
+          credentialLastValidatedAt: now,
+          connectionValidatedAt: now,
+          lastSucceededAt: now,
+          lastErrorAt: null,
+          lastErrorCode: null,
+          lastErrorMessage: null,
+        },
+      }),
+    ]);
+  } catch (error) {
+    const errorCode =
+      error instanceof CardDavPreflightError ? error.code : "CARDDAV_PREFLIGHT_FAILED";
+    const errorSummary =
+      error instanceof Error
+        ? error.message
+        : "CardDAV revalidation failed before Kontax could refresh the connection state.";
+
+    await recordFailedPreflight({
+      accountId: account.id,
+      syncDirection: account.syncDirection,
+      accountStatus: account.status,
+      errorCode,
+      errorSummary,
+    });
+
+    revalidateSyncViews();
+    redirect(
+      buildRedirectWithParams(redirectTo, {
+        preflightFailed: 1,
+      }),
+    );
+  }
+
+  revalidateSyncViews();
+  redirect(
+    buildRedirectWithParams(redirectTo, {
+      preflightCompleted: 1,
+    }),
+  );
+};
+
 export const queueSyncJob = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const syncAccountId = parseSyncAccountId(formData);

@@ -8,6 +8,7 @@ import {
   pauseSyncAccount,
   prepareSyncRelink,
   queueSyncJob,
+  revalidateSyncAccount,
   revokeSyncCredentials,
   resolveSyncConflict,
   retrySyncJob,
@@ -15,6 +16,12 @@ import {
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
 import { db } from "~/server/db";
+import {
+  AUTO_PAUSE_FAILURE_STREAK,
+  getConsecutiveFailureStreak,
+  getSyncAccountOperationalHealth,
+  getSyncErrorSupportBucket,
+} from "~/server/sync-health";
 import { getSyncCredentialEncryptionStatus } from "~/server/sync-credentials";
 
 type SyncPageProps = {
@@ -95,28 +102,140 @@ const getConnectionValidationLabel = (account: {
   return "Validated";
 };
 
-const getJobFailureClass = (errorCode: string | null) => {
-  if (!errorCode) {
-    return "none";
+const getSyncAccountGuidance = (account: {
+  status: "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR";
+  credentialReference: string | null;
+  credentialRevokedAt: Date | null;
+  credentialUpdatedAt: Date | null;
+  credentialLastValidatedAt: Date | null;
+  connectionValidatedAt: Date | null;
+  lastErrorCode: string | null;
+  lastErrorMessage: string | null;
+}) => {
+  if (!account.credentialReference) {
+    return {
+      tone: "border-amber-300/20 bg-amber-300/10 text-amber-100",
+      title: "Add encrypted credentials",
+      body: "This account exists, but it cannot connect again until you attach CardDAV credentials.",
+    };
   }
 
-  if (errorCode.includes("CREDENTIAL")) {
-    return "authentication";
+  if (account.credentialRevokedAt || account.status === "NEEDS_REAUTH") {
+    return {
+      tone: "border-rose-300/20 bg-rose-300/10 text-rose-100",
+      title: "Credentials need attention",
+      body:
+        "The stored login is revoked or expired. Save fresh credentials, then run revalidate before queueing another sync.",
+    };
   }
 
-  if (errorCode.includes("RATE")) {
-    return "rate-limit";
+  if (
+    !account.credentialLastValidatedAt ||
+    !account.connectionValidatedAt ||
+    (account.credentialUpdatedAt &&
+      account.credentialLastValidatedAt.getTime() < account.credentialUpdatedAt.getTime())
+  ) {
+    return {
+      tone: "border-cyan-300/20 bg-cyan-300/10 text-cyan-100",
+      title: "Revalidate before the next run",
+      body:
+        "Kontax has credentials, but the live CardDAV connection has not been freshly validated against the current secret and address book metadata.",
+    };
   }
 
-  if (errorCode.includes("CONFLICT")) {
-    return "conflict";
+  if (account.lastErrorCode || account.lastErrorMessage) {
+    return {
+      tone: "border-amber-300/20 bg-amber-300/10 text-amber-100",
+      title: "Recover from the latest sync issue",
+      body:
+        account.lastErrorMessage ??
+        "The last sync attempt needs attention. Revalidate if the provider changed, then retry a queued recovery run.",
+    };
   }
 
-  if (errorCode.includes("NETWORK") || errorCode.includes("TIMEOUT")) {
-    return "connectivity";
+  if (account.status === "PAUSED") {
+    return {
+      tone: "border-slate-200/10 bg-white/5 text-slate-200",
+      title: "Paused by choice",
+      body:
+        "This connection is healthy enough to keep, but it will stay idle until you mark it active or queue another run.",
+    };
   }
 
-  return "protocol-or-data";
+  return {
+    tone: "border-emerald-300/20 bg-emerald-300/10 text-emerald-100",
+    title: "Ready for the next sync run",
+    body:
+      "Credentials and CardDAV discovery are both validated. You can queue the next import-first run with confidence.",
+  };
+};
+
+const getSyncLinkStatus = (link: {
+  lastSyncedAt: Date | null;
+  tombstonedAt: Date | null;
+  remoteDeletedAt: Date | null;
+  lastErrorCode: string | null;
+}) => {
+  if (link.tombstonedAt) {
+    return "Local tombstone";
+  }
+
+  if (link.remoteDeletedAt) {
+    return "Remote delete detected";
+  }
+
+  if (link.lastErrorCode) {
+    return "Needs review";
+  }
+
+  if (link.lastSyncedAt) {
+    return "Linked and healthy";
+  }
+
+  return "Linked, waiting for first sync";
+};
+
+const getHealthPresentation = (account: {
+  status: "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR";
+  lastErrorCode: string | null;
+  syncJobs: Array<{
+    status: "QUEUED" | "RUNNING" | "SUCCEEDED" | "PARTIAL" | "FAILED";
+    errorCode: string | null;
+  }>;
+}) => {
+  const health = getSyncAccountOperationalHealth({
+    status: account.status,
+    lastErrorCode: account.lastErrorCode,
+    recentJobs: account.syncJobs,
+  });
+
+  switch (health) {
+    case "needs_reauth":
+      return {
+        label: "Needs reauthentication",
+        tone: "border-rose-300/20 bg-rose-300/10 text-rose-100",
+      };
+    case "paused_for_safety":
+      return {
+        label: "Paused for safety",
+        tone: "border-amber-300/20 bg-amber-300/10 text-amber-100",
+      };
+    case "needs_attention":
+      return {
+        label: "Needs attention",
+        tone: "border-amber-300/20 bg-amber-300/10 text-amber-100",
+      };
+    case "watch":
+      return {
+        label: "Watch closely",
+        tone: "border-cyan-300/20 bg-cyan-300/10 text-cyan-100",
+      };
+    default:
+      return {
+        label: "Healthy",
+        tone: "border-emerald-300/20 bg-emerald-300/10 text-emerald-100",
+      };
+  }
 };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -498,7 +617,15 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
   const connectError = getSearchValue(resolvedSearchParams, "connectError");
   const encryptionStatus = getSyncCredentialEncryptionStatus();
 
-  const [planSummary, syncAccounts, recentJobs, recentConflicts, queuedJobsCount, openConflictsCount] =
+  const [
+    planSummary,
+    syncAccounts,
+    recentLinkedContacts,
+    recentJobs,
+    recentConflicts,
+    queuedJobsCount,
+    openConflictsCount,
+  ] =
     await Promise.all([
     getUserPlanSummary(session.user.id),
     db.syncAccount.findMany({
@@ -514,7 +641,59 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
         },
         syncJobs: {
           orderBy: [{ createdAt: "desc" }],
-          take: 1,
+          take: 5,
+          select: {
+            id: true,
+            status: true,
+            trigger: true,
+            errorCode: true,
+            errorSummary: true,
+            createdAt: true,
+            completedAt: true,
+          },
+        },
+      },
+    }),
+    db.syncContactLink.findMany({
+      where: {
+        syncAccount: {
+          userId: session.user.id,
+        },
+      },
+      orderBy: [{ lastSyncedAt: "desc" }, { updatedAt: "desc" }],
+      take: 8,
+      select: {
+        id: true,
+        remoteUid: true,
+        remoteHref: true,
+        remoteETag: true,
+        lastSyncedAt: true,
+        tombstonedAt: true,
+        remoteDeletedAt: true,
+        lastErrorCode: true,
+        lastErrorMessage: true,
+        contact: {
+          select: {
+            id: true,
+            fullName: true,
+            email: true,
+            phone: true,
+            company: true,
+            archivedAt: true,
+          },
+        },
+        syncAccount: {
+          select: {
+            id: true,
+            label: true,
+            addressBookDisplayName: true,
+            status: true,
+          },
+        },
+        _count: {
+          select: {
+            syncConflicts: true,
+          },
         },
       },
     }),
@@ -764,6 +943,11 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                   <p key={item}>{item}</p>
                 ))}
               </div>
+              <p className="mt-4 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-3 text-cyan-100">
+                Live execution note: the current production sync slice is bootstrap import-first.
+                Kontax imports and links remote contacts, but outbound CardDAV writes are still
+                intentionally deferred.
+              </p>
             </div>
           </div>
         </section>
@@ -1020,6 +1204,13 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                       className="rounded-[1.75rem] border border-white/10 bg-white/5 p-5"
                       key={account.id}
                     >
+                      {(() => {
+                        const healthPresentation = getHealthPresentation(account);
+                        const latestSupportBucket = getSyncErrorSupportBucket(account.lastErrorCode);
+                        const failureStreak = getConsecutiveFailureStreak(account.syncJobs);
+
+                        return (
+                          <>
                       <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                         <div>
                           <div className="flex flex-wrap items-center gap-3">
@@ -1029,6 +1220,11 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                             </span>
                             <span className="rounded-full border border-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">
                               {account.syncDirection.replaceAll("_", " ").toLowerCase()}
+                            </span>
+                            <span
+                              className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${healthPresentation.tone}`}
+                            >
+                              {healthPresentation.label}
                             </span>
                           </div>
                           <p className="mt-2 break-all text-sm text-slate-400">{account.baseUrl}</p>
@@ -1064,6 +1260,10 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                             </p>
                             <p>Last success: {formatTimestamp(account.lastSucceededAt)}</p>
                             <p>Last sync: {formatTimestamp(account.lastSyncedAt)}</p>
+                            <p>Support bucket: {latestSupportBucket}</p>
+                            <p>
+                              Failure streak: {failureStreak} / {AUTO_PAUSE_FAILURE_STREAK}
+                            </p>
                           </div>
                           {account.lastErrorMessage ? (
                             <p className="mt-3 rounded-2xl border border-rose-300/20 bg-rose-300/10 p-3 text-sm text-rose-100">
@@ -1071,6 +1271,14 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                               {account.lastErrorMessage}
                             </p>
                           ) : null}
+                          <div
+                            className={`mt-3 rounded-2xl border p-3 text-sm ${getSyncAccountGuidance(account).tone}`}
+                          >
+                            <p className="font-semibold text-white">
+                              {getSyncAccountGuidance(account).title}
+                            </p>
+                            <p className="mt-2">{getSyncAccountGuidance(account).body}</p>
+                          </div>
                         </div>
 
                         <div className="grid gap-3 text-sm text-slate-300 sm:min-w-44">
@@ -1078,6 +1286,9 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                             <p>Jobs tracked: {account._count.syncJobs}</p>
                             <p className="mt-1">Open conflicts: {account._count.syncConflicts}</p>
                             <p className="mt-1">Linked contacts: {account._count.syncLinks}</p>
+                            <p className="mt-1">
+                              Auto-pause threshold: {AUTO_PAUSE_FAILURE_STREAK} failed runs
+                            </p>
                           </div>
                           {account.status === "ACTIVE" ? (
                             <form action={pauseSyncAccount}>
@@ -1102,6 +1313,22 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                               </button>
                             </form>
                           )}
+                          {account.credentialReference && !account.credentialRevokedAt ? (
+                            <form action={revalidateSyncAccount}>
+                              <input
+                                name="redirectTo"
+                                type="hidden"
+                                value="/sync?preflightCompleted=1"
+                              />
+                              <input name="syncAccountId" type="hidden" value={account.id} />
+                              <button
+                                className="w-full rounded-full border border-cyan-300/30 px-4 py-3 font-semibold text-cyan-100 transition hover:border-cyan-200 hover:text-white"
+                                type="submit"
+                              >
+                                Revalidate connection
+                              </button>
+                            </form>
+                          ) : null}
                           <form action={queueSyncJob}>
                             <input
                               name="redirectTo"
@@ -1139,11 +1366,14 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                                 account.credentialLastValidatedAt.getTime() >=
                                   account.credentialUpdatedAt.getTime())
                                 ? "Queue sync run"
-                                : "Validate connection"}
+                                : "Preflight and queue sync"}
                             </button>
                           </form>
                         </div>
                       </div>
+                          </>
+                        );
+                      })()}
 
                       <div className="mt-4 rounded-[1.5rem] border border-white/10 bg-[#08101c]/80 p-4">
                         <p className="text-sm font-semibold text-white">Encrypted credentials</p>
@@ -1261,16 +1491,17 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                       <div className="mt-4 rounded-[1.5rem] border border-white/10 bg-[#08101c]/80 p-4">
                         <p className="text-sm font-semibold text-white">Recovery toolkit</p>
                         <p className="mt-2 text-sm text-slate-400">
-                          Ticket `P5-06`: when sync health gets messy, the safest path is pause,
+                          Ticket `P7-05`: when sync health gets messy, the safest path is pause,
                           export, inspect, then relink. Recovery actions here avoid touching your
-                          underlying Kontax contacts.
+                          underlying Kontax contacts while still giving support enough telemetry to
+                          diagnose repeated failures.
                         </p>
                         <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
                           <a
                             className="inline-flex items-center justify-center rounded-full border border-white/10 px-4 py-3 text-sm font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-100"
                             href={`/api/exports/sync-recovery?syncAccountId=${account.id}`}
                           >
-                            Export recovery package
+                            Download support package
                           </a>
                           <form action={prepareSyncRelink}>
                             <input
@@ -1383,6 +1614,82 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
             </div>
 
             <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">
+                    Linked contacts
+                  </p>
+                  <p className="mt-2 text-sm text-slate-400">
+                    This is the plain-language contact-level view for `P7-04`: which people are
+                    linked to CardDAV already, which source they came from, and which records still
+                    need review.
+                  </p>
+                </div>
+                <Link
+                  className="text-sm font-semibold text-cyan-200 hover:text-cyan-100"
+                  href="/import-export"
+                >
+                  Compare with import/export →
+                </Link>
+              </div>
+              <div className="mt-4 grid gap-3">
+                {recentLinkedContacts.length === 0 ? (
+                  <div className="rounded-2xl border border-dashed border-white/15 bg-white/5 p-4 text-slate-400">
+                    No CardDAV-linked contacts yet. After the first successful run, linked contacts
+                    will show up here with source visibility and recovery context.
+                  </div>
+                ) : (
+                  recentLinkedContacts.map((link) => (
+                    <div className="rounded-2xl border border-white/10 bg-[#08101c]/70 p-4" key={link.id}>
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                          <Link
+                            className="font-semibold text-white hover:text-cyan-100"
+                            href={`/contacts/${link.contact.id}`}
+                          >
+                            {link.contact.fullName}
+                          </Link>
+                          <p className="mt-1 text-slate-400">
+                            {link.syncAccount.label}
+                            {link.syncAccount.addressBookDisplayName
+                              ? ` · ${link.syncAccount.addressBookDisplayName}`
+                              : ""}
+                          </p>
+                          <p className="mt-1 text-slate-500">
+                            {link.contact.company ?? "No company"} · {link.contact.email ?? "No email"} ·{" "}
+                            {link.contact.phone ?? "No phone"}
+                          </p>
+                        </div>
+                        <div className="text-left sm:text-right">
+                          <p className="text-xs uppercase tracking-[0.2em] text-cyan-200">
+                            {getSyncLinkStatus(link)}
+                          </p>
+                          <p className="mt-1 text-xs text-slate-500">
+                            Last sync {formatTimestamp(link.lastSyncedAt)}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="mt-3 grid gap-2 text-sm text-slate-400 sm:grid-cols-2">
+                        <p>Remote UID: {link.remoteUid ?? "Not stored yet"}</p>
+                        <p>Remote ETag: {link.remoteETag ?? "Not stored yet"}</p>
+                        <p>Remote href: {link.remoteHref ?? "Not stored yet"}</p>
+                        <p>Open link conflicts: {link._count.syncConflicts}</p>
+                        <p>Account state: {link.syncAccount.status.toLowerCase()}</p>
+                        <p>Contact state: {link.contact.archivedAt ? "Archived locally" : "Active locally"}</p>
+                      </div>
+                      {link.lastErrorMessage ? (
+                        <p className="mt-3 rounded-2xl border border-amber-300/20 bg-amber-300/10 p-3 text-sm text-amber-100">
+                          {link.lastErrorCode ? `${link.lastErrorCode}: ` : ""}
+                          {link.lastErrorMessage}
+                        </p>
+                      ) : null}
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+
+            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
               <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Recent jobs</p>
               <div className="mt-4 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-4 text-sm text-cyan-100">
                 <p className="font-semibold text-white">P7-02 background runner</p>
@@ -1422,15 +1729,15 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                         Next retry {formatTimestamp(job.nextRetryAt)} · conflicts {job.conflictCount}
                       </p>
                       <p className="mt-1 text-slate-500">
-                        Failure class {getJobFailureClass(job.errorCode)} · cursor{" "}
+                        Support bucket {getSyncErrorSupportBucket(job.errorCode)} · cursor{" "}
                         {job.cursorAfter ?? job.cursorBefore ?? "not recorded"}
                       </p>
                       <p className="mt-1 text-slate-500">
                         Lease {formatTimestamp(job.leaseExpiresAt)} · worker {job.workerId ?? "unassigned"}
                       </p>
                       <p className="mt-1 text-slate-500">
-                        Result counts imported {job.createdCount} · matched {job.updatedCount} · exported{" "}
-                        {job.deletedCount} · skipped {job.skippedCount}
+                        Result counts imported {job.createdCount} · matched {job.updatedCount} · remote
+                        writes {job.deletedCount} · deferred local-only changes {job.skippedCount}
                       </p>
                       {job.errorSummary ? (
                         <p className="mt-2 text-sm text-amber-100">
@@ -1440,16 +1747,24 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
                       ) : null}
                       {(job.status === "FAILED" || job.status === "PARTIAL") &&
                       job.attemptCount < job.maxAttempts ? (
-                        <form action={retrySyncJob} className="mt-3">
-                          <input name="redirectTo" type="hidden" value="/sync?retryQueued=1" />
-                          <input name="syncJobId" type="hidden" value={job.id} />
-                          <button
-                            className="rounded-full border border-cyan-300/30 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200 hover:text-white"
-                            type="submit"
+                        <div className="mt-3 flex flex-col gap-3 sm:flex-row">
+                          <form action={retrySyncJob}>
+                            <input name="redirectTo" type="hidden" value="/sync?retryQueued=1" />
+                            <input name="syncJobId" type="hidden" value={job.id} />
+                            <button
+                              className="rounded-full border border-cyan-300/30 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200 hover:text-white"
+                              type="submit"
+                            >
+                              Queue recovery retry
+                            </button>
+                          </form>
+                          <a
+                            className="rounded-full border border-white/10 px-4 py-2 text-center text-sm font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-100"
+                            href={`/api/exports/sync-recovery?syncAccountId=${job.syncAccount.id}`}
                           >
-                            Queue recovery retry
-                          </button>
-                        </form>
+                            Download support package
+                          </a>
+                        </div>
                       ) : null}
                     </div>
                   ))

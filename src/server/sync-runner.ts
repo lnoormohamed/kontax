@@ -3,10 +3,14 @@ import {
   CardDavPreflightError,
   fetchCardDavAddressBookCards,
   fetchCardDavAddressBookIndex,
-  pushCardDavContact,
 } from "~/server/carddav";
 import { parseContactPostalAddresses, parseContactStringArray } from "~/server/contact-portability";
 import { db } from "~/server/db";
+import {
+  AUTO_PAUSE_FAILURE_STREAK,
+  getConsecutiveFailureStreak,
+  getSyncErrorSupportBucket,
+} from "~/server/sync-health";
 import { decryptSyncCredentialPayload } from "~/server/sync-credentials";
 
 const createRetrySchedule = (attemptNumber: number) => {
@@ -17,36 +21,6 @@ const createRetrySchedule = (attemptNumber: number) => {
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
-
-const toPortableSyncContact = (contact: {
-  fullName: string;
-  nickname: string | null;
-  email: string | null;
-  emailAddresses: unknown;
-  phone: string | null;
-  phoneNumbers: unknown;
-  company: string | null;
-  jobTitle: string | null;
-  website: string | null;
-  birthday: string | null;
-  address: string | null;
-  postalAddresses: unknown;
-  notes: string | null;
-}) => ({
-  fullName: contact.fullName,
-  nickname: contact.nickname,
-  email: contact.email,
-  emailAddresses: parseContactStringArray(contact.emailAddresses),
-  phone: contact.phone,
-  phoneNumbers: parseContactStringArray(contact.phoneNumbers),
-  company: contact.company,
-  jobTitle: contact.jobTitle,
-  website: contact.website,
-  birthday: contact.birthday,
-  address: contact.address,
-  postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
-  notes: contact.notes,
-});
 
 const buildLocalConflictSnapshot = (contact: {
   id: string;
@@ -173,6 +147,40 @@ const markJobFailed = async ({
   errorSummary: string;
 }) => {
   const now = new Date();
+  const baseFailureStatus = getFailureStatus(accountStatus, errorCode);
+  const recentJobs = await db.syncJob.findMany({
+    where: {
+      syncAccountId,
+      id: {
+        not: jobId,
+      },
+    },
+    orderBy: [{ createdAt: "desc" }],
+    take: AUTO_PAUSE_FAILURE_STREAK - 1,
+    select: {
+      status: true,
+      errorCode: true,
+    },
+  });
+  const failureStreak = getConsecutiveFailureStreak([
+    {
+      status: "FAILED",
+      errorCode,
+    },
+    ...recentJobs.map((job) => ({
+      status: job.status,
+      errorCode: job.errorCode,
+    })),
+  ]);
+  const supportBucket = getSyncErrorSupportBucket(errorCode);
+  const shouldAutoPause =
+    baseFailureStatus === "ERROR" &&
+    failureStreak >= AUTO_PAUSE_FAILURE_STREAK &&
+    supportBucket !== "authentication";
+  const finalStatus = shouldAutoPause ? "PAUSED" : baseFailureStatus;
+  const finalErrorSummary = shouldAutoPause
+    ? `${errorSummary} Kontax paused this sync account after ${failureStreak} consecutive ${supportBucket} failures so it does not keep retrying unattended.`
+    : errorSummary;
 
   await db.$transaction([
     db.syncJob.update({
@@ -181,18 +189,21 @@ const markJobFailed = async ({
         status: "FAILED",
         completedAt: now,
         leaseExpiresAt: null,
-        nextRetryAt: attemptCount < maxAttempts ? createRetrySchedule(attemptCount + 1) : null,
+        nextRetryAt:
+          attemptCount < maxAttempts && !shouldAutoPause
+            ? createRetrySchedule(attemptCount + 1)
+            : null,
         errorCode,
-        errorSummary,
+        errorSummary: finalErrorSummary,
       },
     }),
     db.syncAccount.update({
       where: { id: syncAccountId },
       data: {
-        status: getFailureStatus(accountStatus, errorCode),
+        status: finalStatus,
         lastErrorAt: now,
         lastErrorCode: errorCode,
-        lastErrorMessage: errorSummary,
+        lastErrorMessage: finalErrorSummary,
       },
     }),
   ]);
@@ -266,6 +277,22 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
         accountStatus: job.syncAccount.status,
         errorCode: "SYNC_ACCOUNT_PAUSED",
         errorSummary: "The queued sync job was skipped because the sync account is paused.",
+      });
+      summary.failed += 1;
+      continue;
+    }
+
+    if (job.syncDirection === "EXPORT_ONLY") {
+      await markJobFailed({
+        jobId: job.id,
+        syncAccountId: job.syncAccountId,
+        syncDirection: job.syncDirection,
+        attemptCount: job.attemptCount,
+        maxAttempts: job.maxAttempts,
+        accountStatus: job.syncAccount.status,
+        errorCode: "SYNC_DIRECTION_UNSUPPORTED",
+        errorSummary:
+          "EXPORT_ONLY is not available in the first live CardDAV sync slice yet. Use IMPORT_ONLY or TWO_WAY while Kontax runs bootstrap import sync.",
       });
       summary.failed += 1;
       continue;
@@ -389,38 +416,6 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
           },
         },
       });
-      const exportCandidates =
-        job.syncDirection !== "IMPORT_ONLY"
-          ? await db.contact.findMany({
-              where: {
-                userId: job.syncAccount.userId,
-                archivedAt: null,
-                syncTombstoneAt: null,
-                syncLinks: {
-                  none: {
-                    syncAccountId: job.syncAccountId,
-                  },
-                },
-              },
-              select: {
-                id: true,
-                syncUid: true,
-                fullName: true,
-                nickname: true,
-                email: true,
-                emailAddresses: true,
-                phone: true,
-                phoneNumbers: true,
-                company: true,
-                jobTitle: true,
-                website: true,
-                birthday: true,
-                address: true,
-                postalAddresses: true,
-                notes: true,
-              },
-            })
-          : [];
       const contactByUid = new Map(existingContacts.map((contact) => [contact.syncUid, contact]));
       const remoteEntryByUid = new Map(remoteEntries.map((entry) => [entry.uid, entry]));
       const remoteCardByUid = new Map(remoteCards.map((card) => [card.uid, card]));
@@ -450,12 +445,7 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
         remoteETag: string | null;
         remoteSnapshot: unknown;
       }> = [];
-      const linkedPushCandidates: Array<{
-        linkId: string;
-        contactId: string;
-        remoteUid: string;
-        contact: ReturnType<typeof toPortableSyncContact>;
-      }> = [];
+      let deferredLocalChangesCount = 0;
 
       for (const link of existingLinks) {
         const remoteUid = link.remoteUid ?? link.contact.syncUid;
@@ -487,7 +477,7 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
           continue;
         }
 
-        if (localChanged && remoteChanged && job.syncDirection === "TWO_WAY" && remoteCard) {
+        if (localChanged && remoteChanged && remoteCard) {
           conflictEntries.push({
             type: "LOCAL_REMOTE_MUTATION",
             linkId: link.id,
@@ -502,17 +492,12 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
           continue;
         }
 
-        if (localChanged && job.syncDirection !== "IMPORT_ONLY") {
-          linkedPushCandidates.push({
-            linkId: link.id,
-            contactId: link.contact.id,
-            remoteUid,
-            contact: toPortableSyncContact(link.contact),
-          });
+        if (localChanged) {
+          deferredLocalChangesCount += 1;
           continue;
         }
 
-        if (remoteChanged && remoteCard && job.syncDirection !== "EXPORT_ONLY") {
+        if (remoteChanged && remoteCard) {
           remoteApplyCandidates.push({
             linkId: link.id,
             contactId: link.contact.id,
@@ -521,68 +506,6 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
           });
         }
       }
-
-      const pushedContacts =
-        exportCandidates.length > 0
-          ? await Promise.all(
-              exportCandidates.map(async (contact) => {
-                const remote = await pushCardDavContact({
-                  addressBookUrl: job.syncAccount.addressBookUrl!,
-                  credentials: {
-                    username: decryptedCredentials.username,
-                    password: decryptedCredentials.password,
-                  },
-                  remoteUid: contact.syncUid,
-                  contact: {
-                    fullName: contact.fullName,
-                    nickname: contact.nickname,
-                    email: contact.email,
-                    emailAddresses: parseContactStringArray(contact.emailAddresses),
-                    phone: contact.phone,
-                    phoneNumbers: parseContactStringArray(contact.phoneNumbers),
-                    company: contact.company,
-                    jobTitle: contact.jobTitle,
-                    website: contact.website,
-                    birthday: contact.birthday,
-                    address: contact.address,
-                    postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
-                    notes: contact.notes,
-                  },
-                });
-
-                return {
-                  contactId: contact.id,
-                  syncUid: contact.syncUid,
-                  remoteHref: remote.href,
-                  remoteETag: remote.etag,
-                };
-              }),
-            )
-          : [];
-      const pushedLinkedContacts =
-        linkedPushCandidates.length > 0
-          ? await Promise.all(
-              linkedPushCandidates.map(async (candidate) => {
-                const remote = await pushCardDavContact({
-                  addressBookUrl: job.syncAccount.addressBookUrl!,
-                  credentials: {
-                    username: decryptedCredentials.username,
-                    password: decryptedCredentials.password,
-                  },
-                  remoteUid: candidate.remoteUid,
-                  contact: candidate.contact,
-                });
-
-                return {
-                  linkId: candidate.linkId,
-                  contactId: candidate.contactId,
-                  remoteUid: candidate.remoteUid,
-                  remoteHref: remote.href,
-                  remoteETag: remote.etag,
-                };
-              }),
-            )
-          : [];
 
       await db.$transaction(async (tx) => {
         for (const entry of matchedEntries) {
@@ -664,53 +587,6 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
           });
         }
 
-        for (const pushedContact of pushedContacts) {
-          await tx.syncContactLink.upsert({
-            where: {
-              syncAccountId_contactId: {
-                syncAccountId: job.syncAccountId,
-                contactId: pushedContact.contactId,
-              },
-            },
-            create: {
-              syncAccountId: job.syncAccountId,
-              contactId: pushedContact.contactId,
-              remoteHref: pushedContact.remoteHref,
-              remoteUid: pushedContact.syncUid,
-              remoteETag: pushedContact.remoteETag,
-              lastSyncedAt: now,
-            },
-            update: {
-              remoteHref: pushedContact.remoteHref,
-              remoteUid: pushedContact.syncUid,
-              remoteETag: pushedContact.remoteETag,
-              remoteDeletedAt: null,
-              tombstonedAt: null,
-              lastErrorCode: null,
-              lastErrorMessage: null,
-              lastSyncedAt: now,
-            },
-          });
-        }
-
-        for (const pushedLinkedContact of pushedLinkedContacts) {
-          await tx.syncContactLink.update({
-            where: {
-              id: pushedLinkedContact.linkId,
-            },
-            data: {
-              remoteHref: pushedLinkedContact.remoteHref,
-              remoteUid: pushedLinkedContact.remoteUid,
-              remoteETag: pushedLinkedContact.remoteETag,
-              remoteDeletedAt: null,
-              tombstonedAt: null,
-              lastErrorCode: null,
-              lastErrorMessage: null,
-              lastSyncedAt: now,
-            },
-          });
-        }
-
         for (const remoteApply of remoteApplyCandidates) {
           await tx.contact.update({
             where: {
@@ -765,24 +641,23 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
             nextRetryAt: null,
             createdCount: unmatchedCards.length,
             updatedCount: matchedEntries.length + remoteApplyCandidates.length,
-            deletedCount: pushedContacts.length + pushedLinkedContacts.length,
+            deletedCount: 0,
             conflictCount: conflictEntries.length,
-            skippedCount: 0,
+            skippedCount: deferredLocalChangesCount,
             cursorBefore: job.syncAccount.remoteCTag ?? job.cursorBefore ?? job.syncAccount.addressBookUrl,
             cursorAfter: String(remoteEntries.length),
             errorCode: conflictEntries.length > 0 ? "SYNC_CONFLICTS_OPEN" : null,
             errorSummary:
               unmatchedCards.length > 0 ||
-              pushedContacts.length > 0 ||
-              pushedLinkedContacts.length > 0 ||
               remoteApplyCandidates.length > 0 ||
+              deferredLocalChangesCount > 0 ||
               conflictEntries.length > 0
-                ? `Imported ${unmatchedCards.length} remote contacts, refreshed ${
+                ? `Bootstrap import synced ${unmatchedCards.length} new remote contacts, refreshed ${
                     matchedEntries.length + remoteApplyCandidates.length
-                  } linked contacts, exported ${
-                    pushedContacts.length + pushedLinkedContacts.length
-                  } local contacts, and opened ${conflictEntries.length} sync conflicts.`
-                : `Indexed ${matchedEntries.length} remote contacts and refreshed local sync links.`,
+                  } linked contacts, deferred ${deferredLocalChangesCount} local-only changes, and opened ${
+                    conflictEntries.length
+                  } sync conflicts. Remote writes remain disabled in this first live sync slice.`
+                : `Bootstrap import indexed ${matchedEntries.length} remote contacts and refreshed local sync links without remote writes.`,
           },
         });
 
