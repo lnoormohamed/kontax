@@ -168,6 +168,129 @@ const createRetrySchedule = (attemptNumber: number) => {
 
 const createIdempotencyKey = (parts: string[]) => `${parts.join(":")}:${Date.now()}`;
 
+const isRecord = (value: unknown): value is Record<string, unknown> =>
+  typeof value === "object" && value !== null;
+
+const toPortableSyncContact = (contact: {
+  fullName: string;
+  nickname: string | null;
+  email: string | null;
+  emailAddresses: unknown;
+  phone: string | null;
+  phoneNumbers: unknown;
+  company: string | null;
+  jobTitle: string | null;
+  website: string | null;
+  birthday: string | null;
+  address: string | null;
+  postalAddresses: unknown;
+  notes: string | null;
+}) => ({
+  fullName: contact.fullName,
+  nickname: contact.nickname,
+  email: contact.email,
+  emailAddresses: parseContactStringArray(contact.emailAddresses),
+  phone: contact.phone,
+  phoneNumbers: parseContactStringArray(contact.phoneNumbers),
+  company: contact.company,
+  jobTitle: contact.jobTitle,
+  website: contact.website,
+  birthday: contact.birthday,
+  address: contact.address,
+  postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
+  notes: contact.notes,
+});
+
+const buildLocalConflictSnapshot = (contact: {
+  id: string;
+  syncUid: string;
+  syncVersion: number;
+  fullName: string;
+  firstName: string | null;
+  middleName: string | null;
+  lastName: string | null;
+  namePrefix: string | null;
+  nameSuffix: string | null;
+  nickname: string | null;
+  email: string | null;
+  emailAddresses: unknown;
+  phone: string | null;
+  phoneNumbers: unknown;
+  company: string | null;
+  jobTitle: string | null;
+  website: string | null;
+  birthday: string | null;
+  address: string | null;
+  postalAddresses: unknown;
+  notes: string | null;
+}) => ({
+  id: contact.id,
+  syncUid: contact.syncUid,
+  syncVersion: contact.syncVersion,
+  fullName: contact.fullName,
+  firstName: contact.firstName,
+  middleName: contact.middleName,
+  lastName: contact.lastName,
+  namePrefix: contact.namePrefix,
+  nameSuffix: contact.nameSuffix,
+  nickname: contact.nickname,
+  email: contact.email,
+  emailAddresses: parseContactStringArray(contact.emailAddresses),
+  phone: contact.phone,
+  phoneNumbers: parseContactStringArray(contact.phoneNumbers),
+  company: contact.company,
+  jobTitle: contact.jobTitle,
+  website: contact.website,
+  birthday: contact.birthday,
+  address: contact.address,
+  postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
+  notes: contact.notes,
+});
+
+const buildContactWriteDataFromRemoteSnapshot = (snapshot: unknown) => {
+  if (!isRecord(snapshot)) {
+    throw new Error("Remote sync snapshot is missing or invalid.");
+  }
+
+  const fullName = typeof snapshot.fullName === "string" ? snapshot.fullName.trim() : "";
+
+  if (!fullName) {
+    throw new Error("Remote sync snapshot does not contain a valid contact name.");
+  }
+
+  const emailAddresses = Array.isArray(snapshot.emailAddresses)
+    ? snapshot.emailAddresses.filter((value): value is string => typeof value === "string")
+    : [];
+  const phoneNumbers = Array.isArray(snapshot.phoneNumbers)
+    ? snapshot.phoneNumbers.filter((value): value is string => typeof value === "string")
+    : [];
+
+  return {
+    fullName,
+    firstName: typeof snapshot.firstName === "string" ? snapshot.firstName : null,
+    middleName: typeof snapshot.middleName === "string" ? snapshot.middleName : null,
+    lastName: typeof snapshot.lastName === "string" ? snapshot.lastName : null,
+    namePrefix: typeof snapshot.namePrefix === "string" ? snapshot.namePrefix : null,
+    nameSuffix: typeof snapshot.nameSuffix === "string" ? snapshot.nameSuffix : null,
+    nickname: typeof snapshot.nickname === "string" ? snapshot.nickname : null,
+    email: emailAddresses[0] ?? (typeof snapshot.email === "string" ? snapshot.email : null),
+    emailAddresses: emailAddresses.length > 0 ? emailAddresses : undefined,
+    emailEntries: Array.isArray(snapshot.emailEntries) ? snapshot.emailEntries : undefined,
+    phone: phoneNumbers[0] ?? (typeof snapshot.phone === "string" ? snapshot.phone : null),
+    phoneNumbers: phoneNumbers.length > 0 ? phoneNumbers : undefined,
+    phoneEntries: Array.isArray(snapshot.phoneEntries) ? snapshot.phoneEntries : undefined,
+    company: typeof snapshot.company === "string" ? snapshot.company : null,
+    jobTitle: typeof snapshot.jobTitle === "string" ? snapshot.jobTitle : null,
+    website: typeof snapshot.website === "string" ? snapshot.website : null,
+    websiteEntries: Array.isArray(snapshot.websiteEntries) ? snapshot.websiteEntries : undefined,
+    birthday: typeof snapshot.birthday === "string" ? snapshot.birthday : null,
+    address: typeof snapshot.address === "string" ? snapshot.address : null,
+    postalAddresses: Array.isArray(snapshot.postalAddresses) ? snapshot.postalAddresses : undefined,
+    addressEntries: Array.isArray(snapshot.addressEntries) ? snapshot.addressEntries : undefined,
+    notes: typeof snapshot.notes === "string" ? snapshot.notes : null,
+  };
+};
+
 const recordFailedPreflight = async ({
   accountId,
   syncDirection,
@@ -631,6 +754,46 @@ export const queueSyncJob = async (formData: FormData) => {
             },
           })
         : [];
+    const existingLinks = await db.syncContactLink.findMany({
+      where: {
+        syncAccountId: account.id,
+      },
+      select: {
+        id: true,
+        remoteUid: true,
+        remoteHref: true,
+        remoteETag: true,
+        lastSyncedAt: true,
+        contactId: true,
+        contact: {
+          select: {
+            id: true,
+            syncUid: true,
+            syncVersion: true,
+            updatedAt: true,
+            archivedAt: true,
+            fullName: true,
+            firstName: true,
+            middleName: true,
+            lastName: true,
+            namePrefix: true,
+            nameSuffix: true,
+            nickname: true,
+            email: true,
+            emailAddresses: true,
+            phone: true,
+            phoneNumbers: true,
+            company: true,
+            jobTitle: true,
+            website: true,
+            birthday: true,
+            address: true,
+            postalAddresses: true,
+            notes: true,
+          },
+        },
+      },
+    });
     const exportCandidates =
       account.syncDirection !== "IMPORT_ONLY"
         ? await db.contact.findMany({
@@ -665,11 +828,109 @@ export const queueSyncJob = async (formData: FormData) => {
         : [];
     const contactByUid = new Map(existingContacts.map((contact) => [contact.syncUid, contact]));
     const remoteEntryByUid = new Map(remoteEntries.map((entry) => [entry.uid, entry]));
-    const matchedEntries = remoteEntries.filter((entry) => contactByUid.has(entry.uid));
+    const remoteCardByUid = new Map(remoteCards.map((card) => [card.uid, card]));
+    const linkedRemoteUids = new Set(
+      existingLinks.map((link) => link.remoteUid ?? link.contact.syncUid),
+    );
+    const matchedEntries = remoteEntries.filter(
+      (entry) => contactByUid.has(entry.uid) && !linkedRemoteUids.has(entry.uid),
+    );
     const unmatchedCards =
       account.syncDirection === "EXPORT_ONLY"
         ? []
         : remoteCards.filter((card) => !contactByUid.has(card.uid));
+    const conflictEntries: Array<{
+      type: "LOCAL_REMOTE_MUTATION" | "DELETE_CONFLICT";
+      linkId: string;
+      contactId: string;
+      localSyncVersion: number;
+      remoteETag: string | null;
+      localSnapshot: ReturnType<typeof buildLocalConflictSnapshot>;
+      remoteSnapshot: unknown;
+      resolutionNotes: string;
+    }> = [];
+    const remoteApplyCandidates: Array<{
+      linkId: string;
+      contactId: string;
+      remoteETag: string | null;
+      remoteSnapshot: unknown;
+    }> = [];
+    const linkedPushCandidates: Array<{
+      linkId: string;
+      contactId: string;
+      remoteUid: string;
+      contact: ReturnType<typeof toPortableSyncContact>;
+    }> = [];
+
+    for (const link of existingLinks) {
+      const remoteUid = link.remoteUid ?? link.contact.syncUid;
+      const remoteEntry = remoteEntryByUid.get(remoteUid);
+      const remoteCard = remoteCardByUid.get(remoteUid);
+      const localChanged =
+        link.lastSyncedAt == null || link.contact.updatedAt.getTime() > link.lastSyncedAt.getTime();
+      const remoteChanged = remoteEntry != null && remoteEntry.etag !== link.remoteETag;
+
+      if (!remoteEntry) {
+        if (account.syncDirection !== "EXPORT_ONLY" && !link.contact.archivedAt) {
+          conflictEntries.push({
+            type: "DELETE_CONFLICT",
+            linkId: link.id,
+            contactId: link.contact.id,
+            localSyncVersion: link.contact.syncVersion,
+            remoteETag: link.remoteETag ?? null,
+            localSnapshot: buildLocalConflictSnapshot(link.contact),
+            remoteSnapshot: {
+              deleted: true,
+              remoteUid,
+              remoteHref: link.remoteHref,
+            },
+            resolutionNotes:
+              "Remote contact appears missing while the local contact is still active.",
+          });
+        }
+
+        continue;
+      }
+
+      if (
+        localChanged &&
+        remoteChanged &&
+        account.syncDirection === "TWO_WAY" &&
+        remoteCard
+      ) {
+        conflictEntries.push({
+          type: "LOCAL_REMOTE_MUTATION",
+          linkId: link.id,
+          contactId: link.contact.id,
+          localSyncVersion: link.contact.syncVersion,
+          remoteETag: remoteEntry.etag ?? null,
+          localSnapshot: buildLocalConflictSnapshot(link.contact),
+          remoteSnapshot: remoteCard,
+          resolutionNotes:
+            "Local and remote contact data both changed since the last healthy sync point.",
+        });
+        continue;
+      }
+
+      if (localChanged && account.syncDirection !== "IMPORT_ONLY") {
+        linkedPushCandidates.push({
+          linkId: link.id,
+          contactId: link.contact.id,
+          remoteUid,
+          contact: toPortableSyncContact(link.contact),
+        });
+        continue;
+      }
+
+      if (remoteChanged && remoteCard && account.syncDirection !== "EXPORT_ONLY") {
+        remoteApplyCandidates.push({
+          linkId: link.id,
+          contactId: link.contact.id,
+          remoteETag: remoteEntry.etag ?? null,
+          remoteSnapshot: remoteCard,
+        });
+      }
+    }
     const pushedContacts =
       exportCandidates.length > 0
         ? await Promise.all(
@@ -701,6 +962,30 @@ export const queueSyncJob = async (formData: FormData) => {
               return {
                 contactId: contact.id,
                 syncUid: contact.syncUid,
+                remoteHref: remote.href,
+                remoteETag: remote.etag,
+              };
+            }),
+          )
+        : [];
+    const pushedLinkedContacts =
+      linkedPushCandidates.length > 0
+        ? await Promise.all(
+            linkedPushCandidates.map(async (candidate) => {
+              const remote = await pushCardDavContact({
+                addressBookUrl: account.addressBookUrl!,
+                credentials: {
+                  username: decryptedCredentials.username,
+                  password: decryptedCredentials.password,
+                },
+                remoteUid: candidate.remoteUid,
+                contact: candidate.contact,
+              });
+
+              return {
+                linkId: candidate.linkId,
+                contactId: candidate.contactId,
+                remoteUid: candidate.remoteUid,
                 remoteHref: remote.href,
                 remoteETag: remote.etag,
               };
@@ -817,10 +1102,73 @@ export const queueSyncJob = async (formData: FormData) => {
         });
       }
 
+      for (const pushedLinkedContact of pushedLinkedContacts) {
+        await tx.syncContactLink.update({
+          where: {
+            id: pushedLinkedContact.linkId,
+          },
+          data: {
+            remoteHref: pushedLinkedContact.remoteHref,
+            remoteUid: pushedLinkedContact.remoteUid,
+            remoteETag: pushedLinkedContact.remoteETag,
+            remoteDeletedAt: null,
+            tombstonedAt: null,
+            lastErrorCode: null,
+            lastErrorMessage: null,
+            lastSyncedAt: now,
+          },
+        });
+      }
+
+      for (const remoteApply of remoteApplyCandidates) {
+        await tx.contact.update({
+          where: {
+            id: remoteApply.contactId,
+          },
+          data: {
+            ...buildContactWriteDataFromRemoteSnapshot(remoteApply.remoteSnapshot),
+            syncVersion: {
+              increment: 1,
+            },
+          },
+        });
+
+        await tx.syncContactLink.update({
+          where: {
+            id: remoteApply.linkId,
+          },
+          data: {
+            remoteETag: remoteApply.remoteETag,
+            remoteDeletedAt: null,
+            tombstonedAt: null,
+            lastErrorCode: null,
+            lastErrorMessage: null,
+            lastSyncedAt: now,
+          },
+        });
+      }
+
+      for (const conflictEntry of conflictEntries) {
+        await tx.syncConflict.create({
+          data: {
+            syncAccountId: account.id,
+            syncContactLinkId: conflictEntry.linkId,
+            contactId: conflictEntry.contactId,
+            conflictType: conflictEntry.type,
+            status: "OPEN",
+            localSyncVersion: conflictEntry.localSyncVersion,
+            remoteETag: conflictEntry.remoteETag,
+            localSnapshot: conflictEntry.localSnapshot,
+            remoteSnapshot: conflictEntry.remoteSnapshot,
+            resolutionNotes: conflictEntry.resolutionNotes,
+          },
+        });
+      }
+
       await tx.syncJob.create({
         data: {
           syncAccountId: account.id,
-          status: "SUCCEEDED",
+          status: conflictEntries.length > 0 ? "PARTIAL" : "SUCCEEDED",
           trigger: "MANUAL",
           syncDirection: account.syncDirection,
           attemptCount: 1,
@@ -829,15 +1177,25 @@ export const queueSyncJob = async (formData: FormData) => {
           startedAt: now,
           completedAt: new Date(),
           createdCount: unmatchedCards.length,
-          updatedCount: matchedEntries.length,
-          deletedCount: pushedContacts.length,
+          updatedCount: matchedEntries.length + remoteApplyCandidates.length,
+          deletedCount: pushedContacts.length + pushedLinkedContacts.length,
+          conflictCount: conflictEntries.length,
           skippedCount: 0,
           cursorBefore: account.remoteAccountId ?? account.addressBookUrl,
           cursorAfter: String(remoteEntries.length),
           idempotencyKey: createIdempotencyKey([account.id, "manual", "index"]),
+          errorCode: conflictEntries.length > 0 ? "SYNC_CONFLICTS_OPEN" : null,
           errorSummary:
-            unmatchedCards.length > 0 || pushedContacts.length > 0
-              ? `Imported ${unmatchedCards.length} remote contacts, refreshed ${matchedEntries.length} existing sync links, and exported ${pushedContacts.length} local contacts.`
+            unmatchedCards.length > 0 ||
+            pushedContacts.length > 0 ||
+            pushedLinkedContacts.length > 0 ||
+            remoteApplyCandidates.length > 0 ||
+            conflictEntries.length > 0
+              ? `Imported ${unmatchedCards.length} remote contacts, refreshed ${
+                  matchedEntries.length + remoteApplyCandidates.length
+                } linked contacts, exported ${
+                  pushedContacts.length + pushedLinkedContacts.length
+                } local contacts, and opened ${conflictEntries.length} sync conflicts.`
               : `Indexed ${matchedEntries.length} remote contacts and refreshed local sync links.`,
         },
       });
@@ -848,9 +1206,12 @@ export const queueSyncJob = async (formData: FormData) => {
           status: account.status === "PAUSED" ? "PAUSED" : "ACTIVE",
           lastSyncedAt: now,
           lastSucceededAt: now,
-          lastErrorAt: null,
-          lastErrorCode: null,
-          lastErrorMessage: null,
+          lastErrorAt: conflictEntries.length > 0 ? now : null,
+          lastErrorCode: conflictEntries.length > 0 ? "SYNC_CONFLICTS_OPEN" : null,
+          lastErrorMessage:
+            conflictEntries.length > 0
+              ? `${conflictEntries.length} sync conflicts need review before the account is fully healthy again.`
+              : null,
         },
       });
 
@@ -952,11 +1313,215 @@ export const resolveSyncConflict = async (formData: FormData) => {
     },
     select: {
       id: true,
+      syncAccountId: true,
+      syncContactLinkId: true,
+      contactId: true,
+      remoteETag: true,
+      localSnapshot: true,
+      remoteSnapshot: true,
+      syncAccount: {
+        select: {
+          id: true,
+          addressBookUrl: true,
+          credentialReference: true,
+        },
+      },
+      syncContactLink: {
+        select: {
+          id: true,
+          remoteUid: true,
+        },
+      },
+      contact: {
+        select: {
+          id: true,
+          syncUid: true,
+          syncVersion: true,
+          fullName: true,
+          firstName: true,
+          middleName: true,
+          lastName: true,
+          namePrefix: true,
+          nameSuffix: true,
+          nickname: true,
+          email: true,
+          emailAddresses: true,
+          phone: true,
+          phoneNumbers: true,
+          company: true,
+          jobTitle: true,
+          website: true,
+          birthday: true,
+          address: true,
+          postalAddresses: true,
+          notes: true,
+        },
+      },
     },
   });
 
   if (!conflict) {
     throw new Error("Sync conflict not found.");
+  }
+
+  const resolvedAt = new Date();
+
+  if (input.resolutionStrategy === "KEEP_LOCAL") {
+    if (
+      !conflict.contact ||
+      !conflict.syncAccount.addressBookUrl ||
+      !conflict.syncAccount.credentialReference
+    ) {
+      throw new Error(
+        "This conflict cannot keep the local version because the sync account or contact is incomplete.",
+      );
+    }
+
+    const credentials = decryptSyncCredentialPayload(conflict.syncAccount.credentialReference);
+    const pushed = await pushCardDavContact({
+      addressBookUrl: conflict.syncAccount.addressBookUrl,
+      credentials: {
+        username: credentials.username,
+        password: credentials.password,
+      },
+      remoteUid: conflict.syncContactLink?.remoteUid ?? conflict.contact.syncUid,
+      contact: toPortableSyncContact(conflict.contact),
+    });
+
+    if (conflict.syncContactLinkId) {
+      await db.syncContactLink.update({
+        where: { id: conflict.syncContactLinkId },
+        data: {
+          remoteHref: pushed.href,
+          remoteUid: conflict.syncContactLink?.remoteUid ?? conflict.contact.syncUid,
+          remoteETag: pushed.etag,
+          remoteDeletedAt: null,
+          tombstonedAt: null,
+          lastErrorCode: null,
+          lastErrorMessage: null,
+          lastSyncedAt: resolvedAt,
+        },
+      });
+    }
+  }
+
+  if (input.resolutionStrategy === "KEEP_REMOTE") {
+    if (!conflict.contactId) {
+      throw new Error(
+        "This conflict cannot keep the remote version because the local contact is missing.",
+      );
+    }
+
+    await db.contact.update({
+      where: { id: conflict.contactId },
+      data: {
+        ...buildContactWriteDataFromRemoteSnapshot(conflict.remoteSnapshot),
+        syncVersion: {
+          increment: 1,
+        },
+      },
+    });
+
+    if (conflict.syncContactLinkId) {
+      await db.syncContactLink.update({
+        where: { id: conflict.syncContactLinkId },
+        data: {
+          remoteETag: conflict.remoteETag,
+          remoteDeletedAt: null,
+          tombstonedAt: null,
+          lastErrorCode: null,
+          lastErrorMessage: null,
+          lastSyncedAt: resolvedAt,
+        },
+      });
+    }
+  }
+
+  if (input.resolutionStrategy === "DUPLICATE_LOCAL") {
+    if (!conflict.contact) {
+      throw new Error(
+        "This conflict cannot duplicate the local contact because the current record is missing.",
+      );
+    }
+
+    await db.contact.create({
+      data: {
+        userId,
+        fullName: conflict.contact.fullName,
+        firstName: conflict.contact.firstName,
+        middleName: conflict.contact.middleName,
+        lastName: conflict.contact.lastName,
+        namePrefix: conflict.contact.namePrefix,
+        nameSuffix: conflict.contact.nameSuffix,
+        nickname: conflict.contact.nickname,
+        email: conflict.contact.email,
+        emailAddresses: parseContactStringArray(conflict.contact.emailAddresses),
+        phone: conflict.contact.phone,
+        phoneNumbers: parseContactStringArray(conflict.contact.phoneNumbers),
+        company: conflict.contact.company,
+        jobTitle: conflict.contact.jobTitle,
+        website: conflict.contact.website,
+        birthday: conflict.contact.birthday,
+        address: conflict.contact.address,
+        postalAddresses: parseContactPostalAddresses(conflict.contact.postalAddresses),
+        notes: conflict.contact.notes,
+      },
+    });
+
+    if (conflict.contactId) {
+      await db.contact.update({
+        where: { id: conflict.contactId },
+        data: {
+          ...buildContactWriteDataFromRemoteSnapshot(conflict.remoteSnapshot),
+          syncVersion: {
+            increment: 1,
+          },
+        },
+      });
+    }
+
+    if (conflict.syncContactLinkId) {
+      await db.syncContactLink.update({
+        where: { id: conflict.syncContactLinkId },
+        data: {
+          remoteETag: conflict.remoteETag,
+          remoteDeletedAt: null,
+          tombstonedAt: null,
+          lastErrorCode: null,
+          lastErrorMessage: null,
+          lastSyncedAt: resolvedAt,
+        },
+      });
+    }
+  }
+
+  if (input.resolutionStrategy === "ARCHIVE_LOCAL") {
+    if (!conflict.contactId) {
+      throw new Error(
+        "This conflict cannot archive the local contact because it is missing.",
+      );
+    }
+
+    await db.contact.update({
+      where: { id: conflict.contactId },
+      data: {
+        archivedAt: resolvedAt,
+        syncTombstoneAt: resolvedAt,
+        syncVersion: {
+          increment: 1,
+        },
+      },
+    });
+
+    if (conflict.syncContactLinkId) {
+      await db.syncContactLink.update({
+        where: { id: conflict.syncContactLinkId },
+        data: {
+          tombstonedAt: resolvedAt,
+          lastSyncedAt: resolvedAt,
+        },
+      });
+    }
   }
 
   await db.syncConflict.update({
@@ -965,9 +1530,27 @@ export const resolveSyncConflict = async (formData: FormData) => {
       status: "RESOLVED",
       resolutionStrategy: input.resolutionStrategy,
       resolutionNotes: input.resolutionNotes,
-      resolvedAt: new Date(),
+      resolvedAt,
     },
   });
+
+  const remainingOpenConflicts = await db.syncConflict.count({
+    where: {
+      syncAccountId: conflict.syncAccountId,
+      status: "OPEN",
+    },
+  });
+
+  if (remainingOpenConflicts === 0) {
+    await db.syncAccount.update({
+      where: { id: conflict.syncAccountId },
+      data: {
+        lastErrorAt: null,
+        lastErrorCode: null,
+        lastErrorMessage: null,
+      },
+    });
+  }
 
   revalidateSyncViews();
   redirect(redirectTo);
