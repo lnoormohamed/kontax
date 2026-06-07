@@ -236,6 +236,7 @@ export default async function Home({ searchParams }: HomePageProps) {
           { isFavorite: "desc" as const },
           { lastName: "asc" as const },
           { firstName: "asc" as const },
+          { company: "asc" as const },
           { fullName: "asc" as const },
         ]
       : {
@@ -282,6 +283,7 @@ export default async function Home({ searchParams }: HomePageProps) {
               { isFavorite: "desc" as const },
               { lastName: "asc" as const },
               { firstName: "asc" as const },
+              { company: "asc" as const },
               { fullName: "asc" as const },
             ]
           : {
