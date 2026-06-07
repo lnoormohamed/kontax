@@ -345,7 +345,7 @@ export function ContactsWorkspaceTable({
         </div>
       </div>
 
-      <div className="hidden grid-cols-[44px_minmax(280px,1.6fr)_minmax(210px,1fr)_minmax(170px,0.9fr)_minmax(180px,0.95fr)_110px_170px] items-center gap-4 border-b border-[#e8ede6] bg-[#fbfcf9] px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 lg:grid">
+      <div className="hidden grid-cols-[34px_minmax(230px,1.35fr)_minmax(182px,0.9fr)_minmax(136px,0.8fr)_minmax(148px,0.8fr)_86px_112px] items-center gap-2 border-b border-[#e8ede6] bg-[#fbfcf9] px-5 py-2 text-[10px] font-semibold uppercase tracking-[0.16em] text-slate-500 lg:grid">
         <span />
         <span>Summary</span>
         <span>Email</span>
@@ -358,8 +358,8 @@ export function ContactsWorkspaceTable({
       {contacts.map((contact, index) => {
         const isSelected = selectedIds.includes(contact.id);
         const showDesktopActions = hoveredId === contact.id || isSelected;
-        const rowPaddingClass = viewMode === "cozy" ? "py-4" : "py-2.5";
-        const rowGapClass = viewMode === "cozy" ? "gap-5" : "gap-4";
+        const rowPaddingClass = viewMode === "cozy" ? "py-3.5" : "py-2";
+        const rowGapClass = viewMode === "cozy" ? "gap-4" : "gap-3";
         const previousContact = index > 0 ? contacts[index - 1] : undefined;
         const showFavoritesStart = mode === "active" && index === 0 && contact.isFavorite;
                 const showFavoritesEnd =
@@ -394,7 +394,7 @@ export function ContactsWorkspaceTable({
               }
             >
               <div
-                className={`grid ${rowGapClass} lg:grid-cols-[44px_minmax(280px,1.6fr)_minmax(210px,1fr)_minmax(170px,0.9fr)_minmax(180px,0.95fr)_110px_170px] lg:items-center`}
+                className={`grid ${rowGapClass} lg:grid-cols-[34px_minmax(230px,1.35fr)_minmax(182px,0.9fr)_minmax(136px,0.8fr)_minmax(148px,0.8fr)_86px_112px] lg:items-center`}
               >
                 <label className="hidden items-center justify-center pt-1 lg:flex lg:pt-0">
                   <input
@@ -406,8 +406,8 @@ export function ContactsWorkspaceTable({
                 </label>
 
                 <div className="min-w-0">
-                  <div className="flex items-start gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#e8ecff] text-xs font-semibold text-[#4158f4]">
+                  <div className="flex items-center gap-2">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-[#e8ecff] text-xs font-semibold text-[#4158f4]">
                       {hasName ? (
                         getInitials(contact.fullName)
                       ) : hasCompany ? (
@@ -417,9 +417,9 @@ export function ContactsWorkspaceTable({
                       )}
                     </div>
                     <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-2">
+                      <div className="flex flex-wrap items-center gap-1.5">
                         <Link
-                          className="truncate text-[15px] font-semibold text-slate-900 hover:text-[#3248db]"
+                          className="truncate text-[14px] font-semibold text-slate-900 hover:text-[#3248db]"
                           href={`/contacts/${contact.id}`}
                         >
                           {displayName}
@@ -427,7 +427,7 @@ export function ContactsWorkspaceTable({
                         {contact.isFavorite ? (
                           <span
                             aria-label="Favorite contact"
-                            className="text-[13px] text-amber-500"
+                            className="text-[12px] leading-none text-amber-500"
                             title="Favorite contact"
                           >
                             ★
@@ -443,28 +443,28 @@ export function ContactsWorkspaceTable({
                   </div>
                 </div>
 
-                <div className="hidden text-sm text-slate-700 lg:block">
+                <div className="hidden text-[13px] text-slate-700 lg:block">
                   <p className="truncate font-medium text-[#3341c7]">
                     {contact.email ?? ""}
                   </p>
                 </div>
 
-                <div className="hidden text-sm text-slate-700 lg:block">
+                <div className="hidden text-[13px] text-slate-700 lg:block">
                   <p className="font-medium">{contact.phone ?? ""}</p>
                 </div>
 
-                <div className="hidden text-sm text-slate-700 lg:block">
+                <div className="hidden text-[13px] text-slate-700 lg:block">
                   <p className="truncate font-medium">{contact.company?.trim() ?? ""}</p>
-                  <p className="mt-0.5 truncate text-[13px] text-slate-500">
+                  <p className="mt-0.5 truncate text-[12px] text-slate-500">
                     {contact.jobTitle?.trim() ?? ""}
                   </p>
                 </div>
 
-                <div className="hidden text-sm text-slate-500 lg:block">
+                <div className="hidden text-[13px] text-slate-500 lg:block">
                   {formatBirthday(contact.birthday)}
                 </div>
 
-                <div className="hidden items-center justify-end gap-2 lg:flex">
+                <div className="hidden items-center justify-end gap-1.5 lg:flex">
                   <form action={toggleFavoriteContact}>
                     <input name="contactId" type="hidden" value={contact.id} />
                     <input
@@ -473,7 +473,7 @@ export function ContactsWorkspaceTable({
                       value={mode === "active" ? "/?tab=people" : "/?tab=archived"}
                     />
                     <button
-                      className={`rounded-full w-9 h-9 p-0 flex items-center justify-center border text-xs font-semibold transition ${
+                      className={`rounded-full w-8 h-8 p-0 flex items-center justify-center border text-xs font-semibold transition ${
                         showDesktopActions
                           ? contact.isFavorite
                             ? "border-cyan-300 text-cyan-700 opacity-100 hover:border-cyan-400 hover:bg-cyan-50"
@@ -489,7 +489,7 @@ export function ContactsWorkspaceTable({
                     </button>
                   </form>
                   <Link
-                    className={`rounded-full w-9 h-9 p-0 flex items-center justify-center border text-xs font-semibold transition ${
+                    className={`rounded-full w-8 h-8 p-0 flex items-center justify-center border text-xs font-semibold transition ${
                       showDesktopActions
                         ? "border-[#d8ddd6] text-slate-700 opacity-100 hover:border-[#c9d0c9] hover:bg-slate-50"
                         : "pointer-events-none border-transparent text-transparent opacity-0"
@@ -506,7 +506,7 @@ export function ContactsWorkspaceTable({
                     suppressHydrationWarning
                   >
                     <summary
-                      className={`list-none cursor-pointer rounded-full w-9 h-9 p-0 flex items-center justify-center border text-xs font-semibold transition ${
+                      className={`list-none cursor-pointer rounded-full w-8 h-8 p-0 flex items-center justify-center border text-xs font-semibold transition ${
                         showDesktopActions
                           ? "border-[#d8ddd6] text-slate-700 opacity-100 hover:border-[#c9d0c9] hover:bg-slate-50"
                           : "pointer-events-none border-transparent text-transparent opacity-0"
