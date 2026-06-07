@@ -425,10 +425,7 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
       const matchedEntries = remoteEntries.filter(
         (entry) => contactByUid.has(entry.uid) && !linkedRemoteUids.has(entry.uid),
       );
-      const unmatchedCards =
-        job.syncDirection === "EXPORT_ONLY"
-          ? []
-          : remoteCards.filter((card) => !contactByUid.has(card.uid));
+      const unmatchedCards = remoteCards.filter((card) => !contactByUid.has(card.uid));
       const conflictEntries: Array<{
         type: "LOCAL_REMOTE_MUTATION" | "DELETE_CONFLICT";
         linkId: string;
@@ -456,7 +453,7 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
         const remoteChanged = remoteEntry != null && remoteEntry.etag !== link.remoteETag;
 
         if (!remoteEntry) {
-          if (job.syncDirection !== "EXPORT_ONLY" && !link.contact.archivedAt) {
+          if (!link.contact.archivedAt) {
             conflictEntries.push({
               type: "DELETE_CONFLICT",
               linkId: link.id,
