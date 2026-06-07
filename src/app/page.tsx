@@ -232,7 +232,12 @@ export default async function Home({ searchParams }: HomePageProps) {
         : {};
   const activeOrderBy =
     selectedSort === "name"
-      ? [{ lastName: "asc" as const }, { firstName: "asc" as const }, { fullName: "asc" as const }]
+      ? [
+          { isFavorite: "desc" as const },
+          { lastName: "asc" as const },
+          { firstName: "asc" as const },
+          { fullName: "asc" as const },
+        ]
       : {
           updatedAt: "desc" as const,
         };
@@ -273,7 +278,12 @@ export default async function Home({ searchParams }: HomePageProps) {
       },
       orderBy:
         selectedSort === "name"
-          ? [{ lastName: "asc" as const }, { firstName: "asc" as const }, { fullName: "asc" as const }]
+          ? [
+              { isFavorite: "desc" as const },
+              { lastName: "asc" as const },
+              { firstName: "asc" as const },
+              { fullName: "asc" as const },
+            ]
           : {
               archivedAt: "desc",
             },
