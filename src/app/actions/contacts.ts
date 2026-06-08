@@ -13,7 +13,6 @@ import { applyAutoFilledPhoneticFields } from "~/server/phonetics";
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const contactSchema = z.object({
-  fullName: z.string().trim().max(120).optional(),
   firstName: z.string().trim().max(80).optional(),
   middleName: z.string().trim().max(80).optional(),
   lastName: z.string().trim().max(80).optional(),
@@ -208,7 +207,6 @@ const revalidateContactViews = (contactId?: string) => {
 
 const parseContactInput = (formData: FormData) => {
   const parsed = contactSchema.safeParse({
-    fullName: getOptionalString(formData, "fullName"),
     firstName: getOptionalString(formData, "firstName"),
     middleName: getOptionalString(formData, "middleName"),
     lastName: getOptionalString(formData, "lastName"),
@@ -311,7 +309,7 @@ const parseContactInput = (formData: FormData) => {
   ]
     .filter((value): value is string => Boolean(value))
     .join(" ");
-  const canonicalFullName = [fullNameFromParts, parsed.data.fullName, parsed.data.company].find(
+  const canonicalFullName = [fullNameFromParts, parsed.data.company].find(
     (value): value is string => Boolean(value?.trim()),
   );
 

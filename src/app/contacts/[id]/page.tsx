@@ -505,15 +505,6 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                   </div>
 
                   <div className="grid gap-4 lg:grid-cols-2">
-                    <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
-                      <span>Full name</span>
-                      <input
-                        className={inputClassName}
-                        defaultValue={contact.fullName}
-                        name="fullName"
-                        type="text"
-                      />
-                    </label>
                     <label className="grid gap-2 text-sm text-slate-700">
                       <span>Prefix</span>
                       <input className={inputClassName} defaultValue={contact.namePrefix ?? ""} name="namePrefix" type="text" />
@@ -597,6 +588,9 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                       />
                       <span>Favorite contact</span>
                     </label>
+                    <div className="rounded-[1.2rem] border border-[#dfe7e1] bg-[#f7fbf9] px-4 py-3 text-sm text-slate-600 lg:col-span-2">
+                      Kontax builds the display name from the person fields when present, and falls back to company for organization-only contacts.
+                    </div>
                     <div className="rounded-[1.2rem] border border-[#dfe7e1] bg-[#f7fbf9] px-4 py-3 text-sm text-slate-600 lg:col-span-2">
                       If phonetic auto-fill is enabled in settings, Kontax only fills these values when they
                       are blank. Chinese names use real phonetic generation, fallback phonetic values support
