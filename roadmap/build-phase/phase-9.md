@@ -25,7 +25,7 @@ Turn Kontax into a CardDAV server so users can add it as a native contacts accou
 | P9-03a | Done | P0 | P9-03 |
 | P9-03b | Done | P0 | P9-03a |
 | P9-03c | Done | P0 | P9-03b |
-| P9-04 | In Review | P0 | P9-02, P9-03 |
+| P9-04 | Done | P0 | P9-02, P9-03 |
 | P9-05 | Not Started | P1 | P9-04 |
 | P9-06 | Not Started | P1 | P9-04 |
 | P9-07 | Not Started | P1 | P9-05, P9-06 |
@@ -166,9 +166,10 @@ Turn Kontax into a CardDAV server so users can add it as a native contacts accou
 ---
 
 ## P9-04 — Implement contact resource endpoints (REPORT, GET, PUT, DELETE)
-- Status: `In Review`
+- Status: `Done`
 - Priority: `P0`
 - Dependencies: `P9-02`, `P9-03`
+- Smoke test (local `server.mjs` on :3100 against the dev DB, isolated test user, 2026-06-08): **45/45 checks passed.** Covered: well-known 401/301, principal + collection PROPFIND (Depth 0/1), Depth:infinity → 403, REPORT with XML-escaped `address-data` and emoji preservation, GET + ETag + `If-None-Match` 304, missing → 404, OPTIONS Allow headers, PUT create (201) / update with `If-Match` (204) / stale `If-Match` (412 + precondition-failed body) / UID mismatch (422) / `If-None-Match:*` on existing (412) / `KIND:group` (415), DELETE (204) + tombstone exclusion from REPORT + re-DELETE 404, PUT revival of a tombstoned contact, CRLF line endings, multi-value email round-trip, wrong password (401), cross-user access (403). Test user and data torn down after the run.
 - Implementation Notes:
   - **Architecture:** Implemented in `server.mjs` alongside the P9-03 discovery handlers (Next.js App Router cannot export REPORT/PROPFIND). Two new path matchers and handlers were added:
     - `getCollectionUserId` + `handleAddressBookCollection` — matches `/dav/addressbooks/{userId}/default/`. Handles `OPTIONS`, `PROPFIND` (Depth 0 = collection props with CTag; Depth 1 = collection + per-contact `getetag`), and `REPORT` (returns every active contact with `getetag` + `address-data`).
@@ -188,8 +189,9 @@ Turn Kontax into a CardDAV server so users can add it as a native contacts accou
   - DELETE archives the contact rather than destroying it. ✓
   - ETag and If-Match conditional updates work correctly (412 on stale). ✓
   - vCards include `UID:` matching `syncUid`, use CRLF, and are XML-escaped in REPORT responses. ✓
-  - A full iOS initial sync populates the phone — **pending P9-07 device test.**
-  - Changes made on the phone appear in Kontax — **pending P9-07 device test.**
+  - Protocol-level behaviour verified via smoke test (45/45). ✓
+  - A full iOS initial sync populates the phone — **pending P9-07 real-device test.**
+  - Changes made on the phone appear in Kontax — **pending P9-07 real-device test.**
 - Risks / Open Questions:
   - **Streaming deferred:** REPORT builds the full response in memory. For users with 2000+ contacts (>4 MB) this may need `ReadableStream` chunking. Acceptable for current scale; flag for P9-07 load check.
   - **Multi-value websites/addresses:** serializer emits one `URL`/`ADR` from the scalar field plus extras from JSON arrays, but parser collapses multiples into the scalar + a simple array. Round-trip preserves the primary value; secondary labels may simplify. Acceptable for v1.

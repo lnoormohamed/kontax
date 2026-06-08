@@ -99,7 +99,7 @@ This roadmap is the implementation source of truth for phases 1–14. Each phase
 | P9-03a | 9 | Done | P0 | P9-03 | Unassigned | DAV auth, XML helpers, CTag, well-known, principal and address-book PROPFIND routes implemented |
 | P9-03b | 9 | Done | P0 | P9-03a | Unassigned | 404 propstat, Depth:infinity → 403, smoke test passed |
 | P9-03c | 9 | Done | P0 | P9-03b | Unassigned | x-forwarded-proto/host respected; well-known redirect returns HTTPS URL |
-| P9-04 | 9 | In Review | P0 | P9-02, P9-03 | Unassigned | REPORT/GET/PUT/DELETE + ETag/If-Match implemented in server.mjs; pending P9-07 device test |
+| P9-04 | 9 | Done | P0 | P9-02, P9-03 | Unassigned | REPORT/GET/PUT/DELETE + ETag/If-Match in server.mjs; 45/45 smoke test passed (real-device test in P9-07) |
 | P9-05 | 9 | Not Started | P1 | P9-04 | Unassigned | User can connect iPhone following in-app guide without prior knowledge |
 | P9-06 | 9 | Not Started | P1 | P9-04 | Unassigned | Design brief covers all device connection and app password states |
 | P9-07 | 9 | Not Started | P1 | P9-05, P9-06 | Unassigned | Bidirectional sync verified on iOS, macOS Contacts, and DAVx⁵ |
