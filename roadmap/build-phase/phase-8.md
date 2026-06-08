@@ -12,6 +12,7 @@ Turn the contacts homepage into the base product surface for Kontax by making it
 - Kontax has a stable list-first contact workspace shell.
 - Header, tabs, and create-contact flow are coherent enough to extend into later phases.
 - Account and plan controls no longer compete visually with contact management on the homepage.
+- Phase 8 closeout note: this phase is now effectively complete at the phase-document level, with homepage, create/edit/detail flows, richer-field productization, and settings-shell cleanup all landed as the base consumer workspace for later phases.
 
 ## Phase Tracker
 | Ticket | Status | Priority | Depends On |
@@ -28,6 +29,8 @@ Turn the contacts homepage into the base product surface for Kontax by making it
 | P8-03d | Done | P1 | P8-03c |
 | P8-03e | Done | P1 | P8-03d |
 | P8-03f | Done | P1 | P8-03e |
+| P8-04 | Done | P1 | P8-03 |
+| P8-05 | Done | P1 | P8-01a, P8-03c |
 
 ## P8-01 — Rebuild the contacts homepage as the primary workspace
 - Status: `Done`
@@ -202,3 +205,35 @@ Turn the contacts homepage into the base product surface for Kontax by making it
   - vCard export preserves Pinyin/name-reading data with stable custom fields.
 - Risks / Open Questions:
   - External clients may ignore custom vCard fields even when Kontax preserves them correctly.
+
+## P8-04 — Polish the contact detail experience around the new workspace
+- Status: `Done`
+- Priority: `P1`
+- Dependencies: `P8-03`
+- Implementation Notes:
+  - Rework the contact detail page so it is useful as a read-first surface before the edit form opens up.
+  - Add a clearer snapshot layer, gentler empty states, and stronger section grouping so the detail page feels like part of the same system as the redesigned homepage and richer editor.
+  - Add quick-jump anchors and a more structured action rail so mobile and long-form contact pages are easier to move through.
+  - The delivered slice now includes a read-only contact snapshot, grouped identity/contact-method/personal-context cards, clearer missing-data presentation, quick jumps, and a cleaner record-action layout.
+- Acceptance Criteria:
+  - Contact detail feels like a polished read view, not only an edit form.
+  - Users can move between overview, editing, and sync linkage more easily on both desktop and mobile.
+  - Action controls remain visible without overwhelming the primary contact information.
+- Risks / Open Questions:
+  - A later design pass may still tighten responsive spacing and long-record ergonomics once device-facing CardDAV flows become more prominent.
+
+## P8-05 — Clean up settings and account structure around the workspace
+- Status: `Done`
+- Priority: `P1`
+- Dependencies: `P8-01a`, `P8-03c`
+- Implementation Notes:
+  - Treat settings as the quieter product shell for account details, preferences, plan visibility, and session actions, keeping those concerns out of the main contacts workspace.
+  - Give account, preferences, plan, and session areas clearer separation and improve settings-page copy so the page feels productized rather than administrative leftovers.
+  - Clarify phonetic-name preference behavior and strengthen quick links to import/export, sync, and merge cleanup surfaces.
+  - The delivered slice now includes a clearer settings information architecture, anchor-style section navigation, dedicated account and preference framing, stronger phonetic preference language, and more product-shaped quick links.
+- Acceptance Criteria:
+  - Account and plan controls no longer feel scattered across the contact workspace.
+  - The phonetic auto-fill preference is easy to find and easy to understand.
+  - Settings feels aligned with the calmer, denser design language introduced in the Phase 8 workspace redesign.
+- Risks / Open Questions:
+  - Later phases may still need a deeper settings taxonomy once sync recovery, sharing, and plan-specific management surfaces expand.

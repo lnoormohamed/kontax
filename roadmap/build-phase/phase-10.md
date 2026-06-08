@@ -1,0 +1,187 @@
+# Phase 10 — Enhanced Merge, Activity Changelog, and Source Tracking
+
+## Objective
+Deepen the quality of duplicate handling, give users a full auditable history of changes to their contacts, and make it clear where every contact came from and what last touched it. These three capabilities reinforce each other: better merge tooling generates better history, and source tracking makes history more meaningful.
+
+## Success Criteria
+- Users can resolve merge suggestions at a field level, not just "keep left or keep right."
+- Every meaningful change to a contact — edit, import, sync, merge, share — is recorded as a structured event.
+- Each contact carries visible attribution: where it came from and which platform or action last changed it.
+- Activity log is a Pro feature. Source badges and basic per-contact history are available on all plans.
+
+## Exit Criteria
+- `ActivityEvent` schema is stable and written to from all contact mutation paths.
+- Source tracking is present on all contacts without requiring a backfill migration.
+- Enhanced merge UI ships alongside the new history and source surfaces.
+
+## Phase Tracker
+| Ticket | Status | Priority | Depends On |
+| --- | --- | --- | --- |
+| P10-01 | Not Started | P0 | P1-01, P4-01 |
+| P10-02 | Not Started | P0 | P10-01 |
+| P10-03 | Not Started | P0 | P10-01 |
+| P10-04 | Not Started | P1 | P10-02, P10-03 |
+| P10-05 | Not Started | P1 | P10-01 |
+| P10-06 | Not Started | P1 | P10-04, P10-05 |
+| P10-07 | Not Started | P2 | P10-06 |
+| P10-08 | Not Started | P2 | P10-06 |
+
+---
+
+## P10-01 — Define ActivityEvent schema
+- Status: `Not Started`
+- Priority: `P0`
+- Dependencies: `P1-01`, `P4-01`
+- Implementation Notes:
+  - Add an `ActivityEvent` model to the schema with the following fields: `id`, `userId`, `contactId` (nullable — some events are account-level), `eventType` (enum), `actor` (enum: `USER`, `SYNC`, `IMPORT`, `SHARE`, `SYSTEM`), `actorDetail` (nullable string — e.g. sync account label, import file name, share token), `payload` (JSON — field-level diff or summary), `createdAt`.
+  - Event type enum covers: `CONTACT_CREATED`, `CONTACT_UPDATED`, `CONTACT_ARCHIVED`, `CONTACT_RESTORED`, `CONTACT_DELETED`, `CONTACT_MERGED`, `CONTACT_MERGE_UNDONE`, `CONTACT_IMPORTED`, `CONTACT_SHARED`, `CONTACT_SHARE_RECEIVED`, `SYNC_PULLED`, `SYNC_PUSHED`, `SYNC_CONFLICT_DETECTED`, `SYNC_CONFLICT_RESOLVED`.
+  - The `payload` JSON for `CONTACT_UPDATED` events should store a field-level diff: `{ field: string, before: unknown, after: unknown }[]`. This enables the activity log UI to show "phone changed from X to Y" without storing full snapshots.
+  - Index on `(userId, createdAt DESC)` for the global feed, and `(contactId, createdAt DESC)` for per-contact history.
+  - Events are append-only — never update or delete them. Retention policy is plan-gated (see Phase 11).
+- Acceptance Criteria:
+  - Schema is migrated and stable.
+  - All event types are enumerated and their payloads are documented.
+  - Indexes support both global feed and per-contact history queries efficiently.
+- Risks / Open Questions:
+  - Payload JSON size should be bounded — avoid storing full vCard snapshots in every event. Diffs only.
+  - Decide retention window per plan tier before wiring cleanup jobs.
+
+---
+
+## P10-02 — Instrument all contact mutation paths to emit ActivityEvents
+- Status: `Not Started`
+- Priority: `P0`
+- Dependencies: `P10-01`
+- Implementation Notes:
+  - Wire `ActivityEvent` creation into every path that mutates a contact: manual create/edit/archive/restore/delete, import commit, import rollback, merge accept, merge undo, sync pull (remote change applied), sync push (local change propagated), conflict resolution, and share-triggered create.
+  - For `CONTACT_UPDATED` events, compute the diff against the previous state before writing. If no fields changed, do not emit an event.
+  - Emit events inside the same database transaction as the mutation so events and data are always consistent. Do not fire-and-forget to a queue where the mutation could succeed without the event being recorded.
+  - For sync and import paths, populate `actorDetail` with the sync account label or import file name so the history reads as "updated via iCloud sync" rather than just "updated via sync."
+- Acceptance Criteria:
+  - Every contact mutation path emits the correct event type with a correctly populated payload.
+  - No mutations occur silently — every change is traceable through the event log.
+  - Events emitted by sync and import paths carry meaningful `actorDetail` values.
+- Risks / Open Questions:
+  - Import commits can affect hundreds of contacts in a single transaction — batch event insertion to avoid per-row overhead.
+  - Merge undo must emit both the undo event and restore events for fields that changed, not just a single "undo" marker.
+
+---
+
+## P10-03 — Add source tracking to contacts
+- Status: `Not Started`
+- Priority: `P0`
+- Dependencies: `P10-01`
+- Implementation Notes:
+  - Add two fields to `Contact`: `sourceType` (enum: `MANUAL`, `IMPORT_CSV`, `SYNC_CARDDAV`, `SHARED_STATIC`, `SHARED_LIVE`, `API`) and `sourceDetail` (nullable string — import file name, sync account label, or share sender).
+  - Add `lastMutatedBy` (same enum) and `lastMutatedByDetail` (nullable string) to track the most recent actor — this is separate from `sourceType` which records origin.
+  - Set `sourceType` and `sourceDetail` at creation time only; they do not change when a contact is later edited through a different path.
+  - Update `lastMutatedBy` and `lastMutatedByDetail` on every mutation alongside the `ActivityEvent` emission.
+  - For existing contacts: backfill `sourceType` from `importJobId` (if set → `IMPORT_CSV`) or default to `MANUAL`. `lastMutatedBy` can default to `MANUAL` for pre-existing records.
+- Acceptance Criteria:
+  - Every contact has a `sourceType` set on creation.
+  - `lastMutatedBy` reflects the most recent actor at all times.
+  - Backfill migration runs cleanly on existing data without errors.
+- Risks / Open Questions:
+  - Future sharing (Phase 12) introduces `SHARED_STATIC` and `SHARED_LIVE` — ensure the enum can be extended without migration pain.
+
+---
+
+## P10-04 — Surface source badges and per-contact history in the UI
+- Status: `Not Started`
+- Priority: `P1`
+- Dependencies: `P10-02`, `P10-03`
+- Implementation Notes:
+  - On the contact detail page, show a source badge: "Added manually", "Imported from Google CSV", "Synced from iCloud", "Shared by [name]". Use `sourceType` and `sourceDetail`.
+  - Show a "Last updated by" line below the source badge using `lastMutatedBy` and `lastMutatedByDetail` with a relative timestamp.
+  - Add a History tab to the contact detail page showing the per-contact `ActivityEvent` feed in reverse chronological order. Each event renders as a compact row: relative timestamp, actor icon, and a human-readable summary (e.g. "Phone number changed · iCloud sync", "Merged with John Smith · you").
+  - For `CONTACT_UPDATED` events, expand the row to show the field diff on tap/click.
+  - Per-contact history is available on all plans. The diff expansion is also available on all plans.
+- Acceptance Criteria:
+  - Source badge and last-updated line are visible on every contact detail page.
+  - History tab shows all events for the contact in readable form.
+  - Field-level diffs are accessible from the history tab without leaving the page.
+- Risks / Open Questions:
+  - History tab will be empty for contacts created before this phase ships. Show a clear "History starts from [date]" empty state rather than a broken-looking blank tab.
+
+---
+
+## P10-05 — Enhance merge: field-level selection and bulk accept
+- Status: `Not Started`
+- Priority: `P1`
+- Dependencies: `P10-01`
+- Implementation Notes:
+  - The current merge UI presents two contact cards and lets the user pick one to keep. Replace this with a field-level merge UI: for each field where the two contacts differ, show both values side by side and let the user pick which value to keep (or keep both for multi-value fields like phone and email).
+  - Fields that are identical on both contacts are auto-merged without prompting.
+  - Add a "Bulk accept" action to the merge suggestions list that accepts all `HIGH` confidence suggestions in one step. Show a confirmation summary before executing: "This will merge 12 contact pairs. High-confidence matches only."
+  - Bulk accept emits individual `CONTACT_MERGED` events per pair, not a single bulk event, so each merge remains individually undoable.
+  - Add a "Merged contacts" section to the duplicates tab showing recently merged pairs with an undo button. Undo should be available for 30 days.
+- Acceptance Criteria:
+  - Field-level merge UI allows per-field selection for all structured fields.
+  - Bulk accept works for high-confidence suggestions and emits correct events.
+  - Undo is available from the merged contacts section and restores both contacts cleanly.
+- Risks / Open Questions:
+  - Field-level merge for multi-value fields (phoneNumbers, emailAddresses) needs a clear UI — "keep A's phone list, keep B's email list, merge both address lists" is three separate decisions.
+
+---
+
+## P10-06 — Activity log global feed (Pro)
+- Status: `Not Started`
+- Priority: `P1`
+- Dependencies: `P10-04`, `P10-05`
+- Implementation Notes:
+  - Add an Activity tab to the main workspace (alongside People, Archived, Duplicates).
+  - The global feed shows all `ActivityEvent` rows for the user in reverse chronological order, paginated. Each row: relative timestamp, contact name (linked to detail), event summary, actor icon.
+  - Filter controls: by event type category (Edits, Sync, Imports, Merges, Shares), by actor (You, Sync, Import, Shared), and by date range.
+  - Activity tab is Pro-gated. Free users see a locked state with an upgrade prompt.
+  - Retention: Pro retains 90 days of activity. Future higher tiers can extend this.
+- Acceptance Criteria:
+  - Activity tab is visible in the workspace navigation.
+  - Feed loads and paginates correctly for large event volumes.
+  - Filters narrow the feed accurately.
+  - Free users see a gated state, not an empty feed.
+- Risks / Open Questions:
+  - Large event volumes (heavy sync users) may need cursor-based pagination rather than offset — design for this from the start.
+
+---
+
+## P10-07 — Design brief: activity log and source UI
+- Status: `Not Started`
+- Priority: `P2`
+- Dependencies: `P10-06`
+- Implementation Notes:
+  - Produce a design brief covering:
+    - Source badge component: styles for each `sourceType`, icon set, placement on contact detail.
+    - "Last updated by" line: format, icon, timestamp style.
+    - History tab on contact detail: empty state (no events yet), event row layout, diff expansion, actor icons.
+    - Global activity feed: tab placement in workspace, filter bar, event row layout, empty state per filter combination.
+    - Bulk merge confirmation dialog: summary list of pairs, confirm/cancel.
+    - Merged contacts section in duplicates tab: pair rows, undo action, undo confirmation.
+  - Brief should specify all interactive states: hover, expanded diff, empty, loading, error.
+- Acceptance Criteria:
+  - Designer has everything needed without follow-up.
+  - All states covered including empty and error.
+- Risks / Open Questions:
+  - Source badge icon set needs to cover: manual (person), CSV import, CardDAV sync (cloud), share received (arrow-in), share sent (arrow-out), API, system.
+
+---
+
+## P10-08 — Improve duplicate detection signals
+- Status: `Not Started`
+- Priority: `P2`
+- Dependencies: `P10-06`
+- Implementation Notes:
+  - Extend the duplicate scoring engine to include additional signals:
+    - Normalized phone number matching (strip country codes, spaces, formatting before comparing).
+    - Company + name proximity: "J. Smith at Acme" and "John Smith, Acme Corp" should score higher than name alone.
+    - Shared email domain with similar name: a weaker signal but worth surfacing as LOW confidence.
+    - Phonetic name similarity using the existing phonetics module: "Jon" and "John", "Katherine" and "Catherine".
+  - Add a "why was this suggested?" detail panel to each merge suggestion showing the individual signal scores that contributed to the match.
+  - Add a `STALE` auto-dismissal: if either contact in a suggestion has been updated since the suggestion was generated, mark the suggestion as `STALE` and regenerate rather than showing potentially outdated signal reasons.
+- Acceptance Criteria:
+  - Phone normalization correctly collapses equivalent numbers across formats.
+  - Phonetic matching catches common name variant pairs.
+  - Signal detail panel is accessible from each suggestion.
+  - Stale suggestions are regenerated rather than shown with outdated reasons.
+- Risks / Open Questions:
+  - Phone normalization across international formats is complex — start with E.164 normalization and expand.
+  - Phonetic matching should not inflate the `HIGH` confidence bucket — keep it as a supporting signal, not a primary one.

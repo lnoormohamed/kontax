@@ -24,6 +24,7 @@ Turn Kontax into a CardDAV server so users can add it as a native contacts accou
 | P9-03 | Done | P0 | P9-01 |
 | P9-03a | Done | P0 | P9-03 |
 | P9-03b | Done | P0 | P9-03a |
+| P9-03c | Done | P0 | P9-03b |
 | P9-04 | Not Started | P0 | P9-02, P9-03 |
 | P9-05 | Not Started | P1 | P9-04 |
 | P9-06 | Not Started | P1 | P9-04 |
@@ -142,6 +143,25 @@ Turn Kontax into a CardDAV server so users can add it as a native contacts accou
 - Risks / Open Questions:
   - The XML request parser is intentionally small and discovery-focused; P9-04 may need richer XML parsing for REPORT bodies.
   - DAV namespace prefixes are normalized by local property name for now, which is acceptable for the small discovery property set but should be revisited before broader DAV extensions.
+
+---
+
+## P9-03c — Fix forwarded-proto/host handling for CardDAV redirects
+- Status: `Done`
+- Priority: `P0`
+- Dependencies: `P9-03b`
+- Implementation Notes:
+  - **Problem:** `handleDavRequest` in server.mjs built `requestUrl` using a hardcoded `http://` base, so the `Location` header on the well-known 301 redirect always read `http://kontax.vexon.co/...` even in production. The server sits behind Cloudflare → Coolify, both of which terminate TLS and forward requests to the Node process over plain HTTP. iOS may reject or silently downgrade a CardDAV account setup that redirects to an `http://` URL.
+  - **Fix:** Read `x-forwarded-proto` (set by Cloudflare/Coolify with the client-facing protocol) and `x-forwarded-host` (set when the public hostname differs from the internal `Host` header) before constructing `requestUrl`.
+    - `proto` = `req.headers["x-forwarded-proto"]?.split(",")[0]?.trim() ?? "http"` — splits on comma to handle multi-hop proxy chains (e.g. `https, http`), takes the leftmost (client-facing) value.
+    - `host` = `req.headers["x-forwarded-host"] ?? req.headers.host ?? "localhost:{port}"` — uses the public hostname if the proxy sets it, falls back to the `Host` header.
+  - Result: `requestUrl` now reflects the public-facing URL (`https://kontax.vexon.co/...`), so all absolute URLs generated from it (currently only the well-known redirect Location) are correct.
+  - **Discovered via:** P9-03b smoke test on the deployed Coolify instance.
+- Acceptance Criteria:
+  - Authenticated `GET /.well-known/carddav` returns `Location: https://kontax.vexon.co/dav/principals/{userId}/` (HTTPS, not HTTP).
+  - Behaviour is unchanged in local development (`x-forwarded-proto` absent → falls back to `http://localhost`).
+- Risks / Open Questions:
+  - If Coolify or a future proxy sets `x-forwarded-proto` to a comma-separated list in a different order, the split-and-trim logic uses the first value. Verify the proxy chain sets the header in leftmost-client-facing order (standard behaviour for Cloudflare).
 
 ---
 
