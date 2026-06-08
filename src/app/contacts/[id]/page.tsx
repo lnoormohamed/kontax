@@ -105,7 +105,9 @@ const sectionCardClassName =
 const helperCardClassName =
   "rounded-[1.5rem] border border-[#dfe7e1] bg-[#f8faf8] p-4 text-sm text-slate-600";
 const progressiveDetailsClassName =
-  "group rounded-[1.6rem] border border-[#d8ddd6] bg-[#fcfcfa] px-5 py-4 shadow-sm";
+  "group rounded-[1.6rem] border border-[#dbe5df] bg-[#f6faf8] px-4 py-3 shadow-sm";
+const progressiveSummaryClassName =
+  "flex cursor-pointer list-none items-center justify-between gap-4 rounded-[1.25rem] px-2 py-1 text-left transition hover:bg-white/70";
 
 export default async function ContactDetailPage({ params, searchParams }: ContactDetailPageProps) {
   const session = await auth();
@@ -484,8 +486,8 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                   Grouped for faster everyday editing
                 </h2>
                 <p className="max-w-3xl text-sm leading-6 text-slate-500">
-                  The core profile stays up front, then communication, address, and richer personal
-                  context each get their own space instead of hiding behind stacked advanced panels.
+                  Keep the everyday fields visible, then add richer details only when this contact
+                  needs them.
                 </p>
               </div>
 
@@ -550,28 +552,21 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                       <textarea className="min-h-40 rounded-[1.2rem] border border-slate-200 bg-[#fbfaf7] px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#67b59f] focus:bg-white" defaultValue={contact.notes ?? ""} name="notes" />
                     </label>
                     <div className="rounded-[1.2rem] border border-[#dfe7e1] bg-[#f7fbf9] px-4 py-3 text-sm text-slate-600 lg:col-span-2">
-                      Kontax builds the display name from the person fields when present, and falls back to company for organization-only contacts.
-                    </div>
-                    <div className="rounded-[1.2rem] border border-[#dfe7e1] bg-[#f7fbf9] px-4 py-3 text-sm text-slate-600 lg:col-span-2">
-                      If phonetic auto-fill is enabled in settings, Kontax only fills these values when they
-                      are blank. Chinese names use real phonetic generation, fallback phonetic values support
-                      other non-Latin scripts, and manual edits always win.
+                      Kontax uses the person name when present and falls back to company for organization-only contacts.
                     </div>
                   </div>
                 </section>
 
                 <details className={progressiveDetailsClassName}>
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left">
+                  <summary className={progressiveSummaryClassName}>
                     <div>
-                      <p className="text-base font-semibold text-slate-900">More names and profile fields</p>
-                      <p className="mt-1 text-sm text-slate-500">
-                        Prefixes, phonetics, labels, avatar, and other identity details.
-                      </p>
+                      <p className="text-base font-semibold text-slate-900">Add more name fields</p>
+                      <p className="mt-1 text-sm text-slate-500">Middle name, prefix, suffix, nickname, labels, avatar.</p>
                     </div>
-                    <span className="text-sm font-semibold text-[#1f7a67]">Add more</span>
+                    <span className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-[#1f7a67] shadow-sm">+ Add</span>
                   </summary>
 
-                  <div className="mt-5 grid gap-4 border-t border-[#e7ebe5] pt-5 lg:grid-cols-2">
+                  <div className="mt-4 grid gap-4 border-t border-[#dce8e2] pt-4 lg:grid-cols-2">
                     <label className="grid gap-2 text-sm text-slate-700">
                       <span>Phonetic first name</span>
                       <input
@@ -615,6 +610,9 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                         type="text"
                       />
                     </label>
+                    <div className="rounded-[1.2rem] border border-[#dfe7e1] bg-white px-4 py-3 text-sm text-slate-600 lg:col-span-2">
+                      If phonetic auto-fill is enabled in settings, blank phonetic fields can still be generated automatically, while manual edits always win.
+                    </div>
                     <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
                       <span>Avatar URL</span>
                       <input className={inputClassName} defaultValue={contact.avatarUrl ?? ""} name="avatarUrl" type="url" />
@@ -633,17 +631,15 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 </details>
 
                 <details className={progressiveDetailsClassName}>
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left">
+                  <summary className={progressiveSummaryClassName}>
                     <div>
-                      <p className="text-base font-semibold text-slate-900">Add email and phone details</p>
-                      <p className="mt-1 text-sm text-slate-500">
-                        Labels and secondary values for richer reachability.
-                      </p>
+                      <p className="text-base font-semibold text-slate-900">Add more email and phone fields</p>
+                      <p className="mt-1 text-sm text-slate-500">Labels, secondary values, and overflow contact methods.</p>
                     </div>
-                    <span className="text-sm font-semibold text-[#1f7a67]">Add more</span>
+                    <span className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-[#1f7a67] shadow-sm">+ Add</span>
                   </summary>
 
-                  <div className="mt-5 grid gap-4 border-t border-[#e7ebe5] pt-5 lg:grid-cols-2">
+                  <div className="mt-4 grid gap-4 border-t border-[#dce8e2] pt-4 lg:grid-cols-2">
                     <label className="grid gap-2 text-sm text-slate-700">
                       <span>Email label</span>
                       <input className={inputClassName} defaultValue={primaryEmailEntry?.label ?? ""} name="emailLabel" type="text" />
@@ -668,17 +664,15 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 </details>
 
                 <details className={progressiveDetailsClassName}>
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left">
+                  <summary className={progressiveSummaryClassName}>
                     <div>
-                      <p className="text-base font-semibold text-slate-900">Add address and web fields</p>
-                      <p className="mt-1 text-sm text-slate-500">
-                        Keep online identity and location nearby when this record needs them.
-                      </p>
+                      <p className="text-base font-semibold text-slate-900">Add address and website</p>
+                      <p className="mt-1 text-sm text-slate-500">Location, websites, and structured address details.</p>
                     </div>
-                    <span className="text-sm font-semibold text-[#1f7a67]">Add more</span>
+                    <span className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-[#1f7a67] shadow-sm">+ Add</span>
                   </summary>
 
-                  <div className="mt-5 grid gap-4 border-t border-[#e7ebe5] pt-5 lg:grid-cols-2">
+                  <div className="mt-4 grid gap-4 border-t border-[#dce8e2] pt-4 lg:grid-cols-2">
                     <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
                       <span>Address</span>
                       <textarea className={textareaClassName} defaultValue={contact.address ?? ""} name="address" />
@@ -731,17 +725,15 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 </details>
 
                 <details className={progressiveDetailsClassName}>
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left">
+                  <summary className={progressiveSummaryClassName}>
                     <div>
                       <p className="text-base font-semibold text-slate-900">Add dates and relationships</p>
-                      <p className="mt-1 text-sm text-slate-500">
-                        Useful context for families, anniversaries, assistants, and other personal links.
-                      </p>
+                      <p className="mt-1 text-sm text-slate-500">Significant dates, related people, and custom fields.</p>
                     </div>
-                    <span className="text-sm font-semibold text-[#1f7a67]">Add more</span>
+                    <span className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-[#1f7a67] shadow-sm">+ Add</span>
                   </summary>
 
-                  <div className="mt-5 grid gap-4 border-t border-[#e7ebe5] pt-5 lg:grid-cols-2">
+                  <div className="mt-4 grid gap-4 border-t border-[#dce8e2] pt-4 lg:grid-cols-2">
                     <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
                       <span>Significant dates</span>
                       <textarea
