@@ -3,6 +3,11 @@
 ## Purpose
 Before a native contacts client can sync with Kontax, it must discover the server's capabilities and locate the user's address book collection. This discovery protocol is defined by RFC 6352 (CardDAV) and RFC 5785 (well-known URIs). Getting this phase right is the single most important prerequisite for iOS account setup to succeed — if discovery fails, the user sees a generic "cannot connect" error with no actionable guidance. This ticket implements every endpoint a CardDAV client touches before it starts reading or writing contact data.
 
+## Current Build Status
+Next.js App Router rejects non-standard route exports such as `PROPFIND` during `next build`, so the first production-safe slice keeps the shared DAV auth, response, XML, and CTag helpers plus the `/.well-known/carddav` redirect endpoint, but the `/dav/principals/{userId}/` and `/dav/addressbooks/{userId}/` route files currently expose only `OPTIONS`.
+
+The next implementation slice must introduce a DAV verb adapter outside normal App Router method exports before `PROPFIND` can be enabled in production. Options include a custom server, a reverse-proxy rewrite to a small Node handler, or a dedicated DAV service mounted beside the Next app.
+
 ## Background
 P9-01 defined the URL hierarchy, HTTP method matrix, ETag/CTag derivation, and route handler placement. P9-02 defined the `AppPassword` model and the `verifyCardDavCredentials` function. This ticket consumes both: every request to a discovery endpoint is authenticated via the function from P9-02, and every URL is defined by the hierarchy from P9-01.
 
