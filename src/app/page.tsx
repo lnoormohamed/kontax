@@ -89,6 +89,18 @@ const getSearchConditions = (query: string) =>
             },
           },
           {
+            phoneticFirstName: {
+              contains: query,
+              mode: "insensitive" as const,
+            },
+          },
+          {
+            phoneticLastName: {
+              contains: query,
+              mode: "insensitive" as const,
+            },
+          },
+          {
             nickname: {
               contains: query,
               mode: "insensitive" as const,
@@ -108,6 +120,12 @@ const getSearchConditions = (query: string) =>
           },
           {
             company: {
+              contains: query,
+              mode: "insensitive" as const,
+            },
+          },
+          {
+            phoneticCompany: {
               contains: query,
               mode: "insensitive" as const,
             },
@@ -334,10 +352,13 @@ export default async function Home({ searchParams }: HomePageProps) {
         fullName: true,
         firstName: true,
         lastName: true,
+        phoneticFirstName: true,
+        phoneticLastName: true,
         nickname: true,
         email: true,
         phone: true,
         company: true,
+        phoneticCompany: true,
         jobTitle: true,
         website: true,
         birthday: true,
@@ -375,10 +396,13 @@ export default async function Home({ searchParams }: HomePageProps) {
         fullName: true,
         firstName: true,
         lastName: true,
+        phoneticFirstName: true,
+        phoneticLastName: true,
         nickname: true,
         email: true,
         phone: true,
         company: true,
+        phoneticCompany: true,
         jobTitle: true,
         website: true,
         birthday: true,
@@ -430,7 +454,7 @@ export default async function Home({ searchParams }: HomePageProps) {
                 className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
                 defaultValue={query}
                 name="q"
-                placeholder="Search contacts by name, email, phone, company, website, or address"
+                placeholder="Search contacts by name, Pinyin, email, phone, company, website, or address"
                 type="search"
               />
             </div>

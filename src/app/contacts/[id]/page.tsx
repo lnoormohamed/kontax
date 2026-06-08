@@ -76,6 +76,23 @@ const getInitials = (value: string) =>
     .join("")
     .toUpperCase();
 
+const getPinyinSummary = (contact: {
+  phoneticFirstName: string | null;
+  phoneticLastName: string | null;
+  phoneticCompany: string | null;
+}) => {
+  const nameReading = [contact.phoneticFirstName, contact.phoneticLastName]
+    .filter((value): value is string => Boolean(value?.trim()))
+    .join(" ")
+    .trim();
+  const companyReading = contact.phoneticCompany?.trim() ?? "";
+
+  return {
+    nameReading: nameReading || null,
+    companyReading: companyReading || null,
+  };
+};
+
 const inputClassName =
   "rounded-[1.2rem] border border-slate-200 bg-[#fbfaf7] px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#67b59f] focus:bg-white";
 
@@ -294,6 +311,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     { label: "Custom fields", count: getStructuredEntryCount(contact.customFields) },
   ];
   const enrichedFieldCount = structuredCoverage.filter((item) => item.count > 0).length;
+  const pinyinSummary = getPinyinSummary(contact);
 
   const detailStats = [
     {
@@ -307,6 +325,10 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     {
       label: "Company",
       value: contact.company ?? "Independent",
+    },
+    {
+      label: "Pinyin",
+      value: pinyinSummary.nameReading ?? pinyinSummary.companyReading ?? "Not set",
     },
   ];
 
@@ -343,6 +365,21 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                       </span>
                     ) : null}
                   </div>
+
+                  {pinyinSummary.nameReading || pinyinSummary.companyReading ? (
+                    <div className="mt-3 flex flex-wrap gap-2 text-sm text-[#d6e6df]">
+                      {pinyinSummary.nameReading ? (
+                        <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
+                          Pinyin name: {pinyinSummary.nameReading}
+                        </span>
+                      ) : null}
+                      {pinyinSummary.companyReading ? (
+                        <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
+                          Pinyin company: {pinyinSummary.companyReading}
+                        </span>
+                      ) : null}
+                    </div>
+                  ) : null}
 
                   <p className="mt-3 max-w-3xl text-sm leading-6 text-[#d6e6df]">
                     Edit this contact in grouped sections so everyday updates stay light, while the
