@@ -65,7 +65,15 @@ export default async function NewContactPage() {
               <div className="grid gap-4 lg:grid-cols-2">
                 <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
                   <span>Full name</span>
-                  <input className={inputClassName} name="fullName" required type="text" />
+                  <input
+                    className={inputClassName}
+                    name="fullName"
+                    placeholder="Ada Lovelace or leave blank for an organization-only record"
+                    type="text"
+                  />
+                  <span className="text-xs text-slate-500">
+                    Kontax can place this record using either a person name or a company name.
+                  </span>
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Prefix</span>
@@ -93,7 +101,12 @@ export default async function NewContactPage() {
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Company</span>
-                  <input className={inputClassName} name="company" type="text" />
+                  <input
+                    className={inputClassName}
+                    name="company"
+                    placeholder="Kontax Labs"
+                    type="text"
+                  />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Job title</span>
@@ -133,6 +146,12 @@ export default async function NewContactPage() {
                 </p>
               </div>
 
+              <div className="mb-5 rounded-[1.4rem] border border-[#dfe7e1] bg-[#f8faf8] px-4 py-3 text-sm text-slate-600">
+                Add the main contact methods first, then use labeled secondary entries when a person
+                has both work and personal details. That structure improves import quality, merge
+                confidence, and later sync behavior.
+              </div>
+
               <div className="grid gap-4 lg:grid-cols-2">
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Primary email</span>
@@ -143,6 +162,19 @@ export default async function NewContactPage() {
                   <input className={inputClassName} name="emailLabel" placeholder="work" type="text" />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
+                  <span>Secondary email</span>
+                  <input className={inputClassName} name="secondaryEmail" type="email" />
+                </label>
+                <label className="grid gap-2 text-sm text-slate-700">
+                  <span>Secondary email label</span>
+                  <input
+                    className={inputClassName}
+                    name="secondaryEmailLabel"
+                    placeholder="personal"
+                    type="text"
+                  />
+                </label>
+                <label className="grid gap-2 text-sm text-slate-700">
                   <span>Primary phone</span>
                   <input className={inputClassName} name="phone" type="text" />
                 </label>
@@ -151,12 +183,38 @@ export default async function NewContactPage() {
                   <input className={inputClassName} name="phoneLabel" placeholder="mobile" type="text" />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
+                  <span>Secondary phone</span>
+                  <input className={inputClassName} name="secondaryPhone" type="text" />
+                </label>
+                <label className="grid gap-2 text-sm text-slate-700">
+                  <span>Secondary phone label</span>
+                  <input
+                    className={inputClassName}
+                    name="secondaryPhoneLabel"
+                    placeholder="work"
+                    type="text"
+                  />
+                </label>
+                <label className="grid gap-2 text-sm text-slate-700">
                   <span>Website</span>
                   <input className={inputClassName} name="website" type="url" />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Website label</span>
                   <input className={inputClassName} name="websiteLabel" placeholder="personal" type="text" />
+                </label>
+                <label className="grid gap-2 text-sm text-slate-700">
+                  <span>Secondary website</span>
+                  <input className={inputClassName} name="secondaryWebsite" type="url" />
+                </label>
+                <label className="grid gap-2 text-sm text-slate-700">
+                  <span>Secondary website label</span>
+                  <input
+                    className={inputClassName}
+                    name="secondaryWebsiteLabel"
+                    placeholder="portfolio"
+                    type="text"
+                  />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Birthday</span>
@@ -199,7 +257,7 @@ export default async function NewContactPage() {
                   <textarea
                     className={textareaClassName}
                     name="additionalEmails"
-                    placeholder={"One per line\nwork@example.com"}
+                    placeholder={"One per line for anything beyond the labeled primary and secondary emails\nteam@example.com"}
                   />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
@@ -207,7 +265,7 @@ export default async function NewContactPage() {
                   <textarea
                     className={textareaClassName}
                     name="additionalPhones"
-                    placeholder={"One per line\n+44 20 7946 0958"}
+                    placeholder={"One per line for anything beyond the labeled primary and secondary phones\n+44 20 7946 0958"}
                   />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
@@ -215,7 +273,7 @@ export default async function NewContactPage() {
                   <textarea
                     className={textareaClassName}
                     name="additionalWebsites"
-                    placeholder={"One per line\nhttps://example.com"}
+                    placeholder={"One per line for anything beyond the labeled primary and secondary websites\nhttps://example.com"}
                   />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">

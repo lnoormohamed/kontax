@@ -12,7 +12,7 @@ import { db } from "~/server/db";
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const contactSchema = z.object({
-  fullName: z.string().trim().min(1, "Full name is required.").max(120),
+  fullName: z.string().trim().max(120).optional(),
   firstName: z.string().trim().max(80).optional(),
   middleName: z.string().trim().max(80).optional(),
   lastName: z.string().trim().max(80).optional(),
@@ -21,14 +21,20 @@ const contactSchema = z.object({
   nickname: z.string().trim().max(80).optional(),
   email: z.string().trim().email("Enter a valid email address.").max(320).optional(),
   emailLabel: z.string().trim().max(40).optional(),
+  secondaryEmail: z.string().trim().email("Enter a valid secondary email address.").max(320).optional(),
+  secondaryEmailLabel: z.string().trim().max(40).optional(),
   additionalEmails: z.string().trim().max(4000).optional(),
   phone: z.string().trim().max(40).optional(),
   phoneLabel: z.string().trim().max(40).optional(),
+  secondaryPhone: z.string().trim().max(40).optional(),
+  secondaryPhoneLabel: z.string().trim().max(40).optional(),
   additionalPhones: z.string().trim().max(4000).optional(),
   company: z.string().trim().max(120).optional(),
   jobTitle: z.string().trim().max(120).optional(),
   website: z.string().trim().url("Enter a valid website URL.").max(500).optional(),
   websiteLabel: z.string().trim().max(40).optional(),
+  secondaryWebsite: z.string().trim().url("Enter a valid secondary website URL.").max(500).optional(),
+  secondaryWebsiteLabel: z.string().trim().max(40).optional(),
   additionalWebsites: z.string().trim().max(4000).optional(),
   birthday: z
     .string()
@@ -206,14 +212,20 @@ const parseContactInput = (formData: FormData) => {
     nickname: getOptionalString(formData, "nickname"),
     email: getOptionalString(formData, "email")?.toLowerCase(),
     emailLabel: getOptionalString(formData, "emailLabel"),
+    secondaryEmail: getOptionalString(formData, "secondaryEmail")?.toLowerCase(),
+    secondaryEmailLabel: getOptionalString(formData, "secondaryEmailLabel"),
     additionalEmails: getOptionalString(formData, "additionalEmails"),
     phone: getOptionalString(formData, "phone"),
     phoneLabel: getOptionalString(formData, "phoneLabel"),
+    secondaryPhone: getOptionalString(formData, "secondaryPhone"),
+    secondaryPhoneLabel: getOptionalString(formData, "secondaryPhoneLabel"),
     additionalPhones: getOptionalString(formData, "additionalPhones"),
     company: getOptionalString(formData, "company"),
     jobTitle: getOptionalString(formData, "jobTitle"),
     website: getOptionalString(formData, "website"),
     websiteLabel: getOptionalString(formData, "websiteLabel"),
+    secondaryWebsite: getOptionalString(formData, "secondaryWebsite"),
+    secondaryWebsiteLabel: getOptionalString(formData, "secondaryWebsiteLabel"),
     additionalWebsites: getOptionalString(formData, "additionalWebsites"),
     birthday: getOptionalString(formData, "birthday"),
     address: getOptionalString(formData, "address"),
@@ -236,6 +248,10 @@ const parseContactInput = (formData: FormData) => {
 
   if (!parsed.success) {
     throw new Error(parsed.error.issues[0]?.message ?? "Invalid contact details.");
+  }
+
+  if (!parsed.data.fullName && !parsed.data.company) {
+    throw new Error("Add a full name or company name so Kontax can place this contact in the list.");
   }
 
   const additionalEmails = getLineSeparatedValues(parsed.data.additionalEmails).map((email) =>
@@ -291,7 +307,7 @@ const parseContactInput = (formData: FormData) => {
   ]
     .filter((value): value is string => Boolean(value))
     .join(" ");
-  const canonicalFullName = fullNameFromParts || parsed.data.fullName;
+  const canonicalFullName = fullNameFromParts || parsed.data.fullName || parsed.data.company;
   const primaryAddress =
     parsed.data.address ??
     dedupeValues([
@@ -317,7 +333,7 @@ const parseContactInput = (formData: FormData) => {
   const websiteEntries = buildStructuredEntries(
     parsed.data.website,
     parsed.data.websiteLabel,
-    additionalWebsites,
+    dedupeValues([parsed.data.secondaryWebsite, ...additionalWebsites]),
     "primary",
   );
   const significantDates = [
@@ -347,19 +363,19 @@ const parseContactInput = (formData: FormData) => {
     nameSuffix: parsed.data.nameSuffix,
     nickname: parsed.data.nickname,
     email: parsed.data.email,
-    emailAddresses: dedupeValues([parsed.data.email, ...additionalEmails]),
+    emailAddresses: dedupeValues([parsed.data.email, parsed.data.secondaryEmail, ...additionalEmails]),
     emailEntries: buildStructuredEntries(
       parsed.data.email,
       parsed.data.emailLabel,
-      additionalEmails,
+      dedupeValues([parsed.data.secondaryEmail, ...additionalEmails]),
       "primary",
     ),
     phone: parsed.data.phone,
-    phoneNumbers: dedupeValues([parsed.data.phone, ...additionalPhones]),
+    phoneNumbers: dedupeValues([parsed.data.phone, parsed.data.secondaryPhone, ...additionalPhones]),
     phoneEntries: buildStructuredEntries(
       parsed.data.phone,
       parsed.data.phoneLabel,
-      additionalPhones,
+      dedupeValues([parsed.data.secondaryPhone, ...additionalPhones]),
       "mobile",
     ),
     company: parsed.data.company,
