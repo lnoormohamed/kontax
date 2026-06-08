@@ -71,8 +71,8 @@ export default async function SettingsPage() {
                 Account, preferences, and plan
               </h1>
               <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
-                This is now the home for account details, phonetic behavior, plan visibility, and
-                session controls so the contacts workspace can stay focused on contacts.
+                This is the quieter side of Kontax: account details, phonetic behavior, plan
+                visibility, and session controls, all kept out of the main contact workspace.
               </p>
             </div>
           </div>
@@ -112,8 +112,8 @@ export default async function SettingsPage() {
                 <div>
                   <p className="text-lg font-semibold text-slate-900">Account</p>
                   <p className="mt-1 text-sm text-slate-500">
-                    Identity and account basics now live in one quiet place instead of appearing
-                    around the contact workspace.
+                    Identity and sign-in basics now live in one place instead of being scattered
+                    across the workspace.
                   </p>
                 </div>
                 <span className="rounded-full border border-[#d8ddd6] bg-[#f8faf8] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
@@ -143,7 +143,7 @@ export default async function SettingsPage() {
               <div>
                 <p className="text-lg font-semibold text-slate-900">Preferences</p>
                 <p className="mt-1 text-sm text-slate-500">
-                  Personal behavior settings that change how Kontax helps you, without changing the
+                  Personal behavior settings that shape how Kontax helps you, without changing the
                   structure of your contacts.
                 </p>
               </div>
@@ -152,7 +152,7 @@ export default async function SettingsPage() {
                 <p className="text-sm font-semibold text-slate-900">Phonetic names</p>
                 <p className="mt-2 text-sm leading-6 text-slate-500">
                   Kontax can suggest phonetic readings for first name, last name, and company when
-                  those phonetic fields are still blank. Manual values always win.
+                  those phonetic fields are still blank. Any value you enter manually always wins.
                 </p>
               </div>
 
@@ -172,8 +172,7 @@ export default async function SettingsPage() {
                 </label>
                 <p className="mt-3 text-sm leading-6 text-slate-500">
                   Chinese names use dedicated phonetic generation. Other non-Latin scripts use a
-                  best-effort transliterated reading so the contact can still sort and search more
-                  naturally.
+                  best-effort transliterated reading so contacts can still sort and search more naturally.
                 </p>
                 <button
                   className="mt-4 rounded-[1.2rem] bg-[#17352e] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#20443b]"
@@ -246,24 +245,28 @@ export default async function SettingsPage() {
           <aside className="grid gap-6 self-start">
             <div className="rounded-[2rem] border border-[#d8ddd6] bg-white p-5 shadow-sm">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Quick links</p>
+              <p className="mt-3 text-sm leading-6 text-slate-500">
+                Jump to the parts of Kontax that sit next to settings most often: portability,
+                sync, and data cleanup.
+              </p>
               <div className="mt-3 grid gap-2 text-sm">
                 <Link
                   className="rounded-[1.3rem] px-4 py-3 text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50"
                   href="/import-export"
                 >
-                  Import and export
+                  Import and export center
                 </Link>
                 <Link
                   className="rounded-[1.3rem] px-4 py-3 text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50"
                   href="/sync"
                 >
-                  Sync center
+                  Device and sync center
                 </Link>
                 <Link
                   className="rounded-[1.3rem] px-4 py-3 text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50"
                   href="/merge/manual"
                 >
-                  Manual merge
+                  Manual merge review
                 </Link>
               </div>
             </div>
@@ -294,8 +297,8 @@ export default async function SettingsPage() {
               </p>
               <div className="mt-4 space-y-3 text-sm leading-6 text-slate-600">
                 <p>Account and plan controls now stay off the main contacts page.</p>
-                <p>Preferences are grouped separately from billing so they are easier to reason about.</p>
-                <p>This gives us a calmer shell for future settings growth in later phases.</p>
+                <p>Preferences are separated from billing so they are easier to understand at a glance.</p>
+                <p>This gives us a calmer shell for later settings growth without cluttering the workspace.</p>
               </div>
             </div>
           </aside>
