@@ -33,6 +33,33 @@ const formatNullableTimestamp = (value: Date | null) => (value ? formatTimestamp
 const getFormattedAddressArray = (value: unknown) =>
   parseContactPostalAddresses(value).map((item) => item.formatted);
 
+const formatDisplayValue = (value: string | null | undefined, fallback = "Not added yet") => {
+  const trimmed = value?.trim();
+  return trimmed ? trimmed : fallback;
+};
+
+const formatStoredDateValue = (value: string | null | undefined) => {
+  if (!value) {
+    return "Not added yet";
+  }
+
+  const exactDateMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+
+  if (!exactDateMatch) {
+    return value;
+  }
+
+  const [, year, month, day] = exactDateMatch;
+  const parsed = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
+
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(parsed);
+};
+
 const getStructuredEntryAt = <T,>(value: unknown, index: number) => {
   if (!Array.isArray(value) || value.length <= index) {
     return undefined;
@@ -354,20 +381,20 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
 
   const detailStats = [
     {
-      label: "Primary email",
-      value: contact.email ?? "Missing",
+      label: "Email",
+      value: formatDisplayValue(contact.email),
     },
     {
-      label: "Primary phone",
-      value: contact.phone ?? "Missing",
+      label: "Phone",
+      value: formatDisplayValue(contact.phone),
     },
     {
       label: "Company",
-      value: contact.company ?? "Independent",
+      value: formatDisplayValue(contact.company, "Independent"),
     },
     {
-      label: "Phonetic",
-      value: phoneticSummary.nameReading ?? phoneticSummary.companyReading ?? "Not set",
+      label: "Birthday",
+      value: formatStoredDateValue(contact.birthday),
     },
   ];
 
@@ -503,6 +530,175 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
 
         <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
           <div className="grid gap-6">
+            <section className={sectionCardClassName}>
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#1f7a67]">
+                    Contact snapshot
+                  </p>
+                  <h2 className="mt-2 text-2xl font-semibold text-slate-900">
+                    Everything important at a glance
+                  </h2>
+                  <p className="mt-2 max-w-3xl text-sm leading-6 text-slate-500">
+                    This view keeps the contact readable before you edit, with clearer grouped details,
+                    gentler empty states, and the richer fields Kontax is already preserving.
+                  </p>
+                </div>
+                <div className="rounded-[1.4rem] border border-[#dfe7e1] bg-[#f8faf8] px-4 py-3 text-sm text-slate-600">
+                  {contact.archivedAt ? "Archived record" : "Active record"} ·{" "}
+                  {contact.isFavorite ? "Favorite" : "Standard"} · {syncLinks.length > 0 ? "Synced" : "Local only"}
+                </div>
+              </div>
+
+              <div className="mt-6 grid gap-4 lg:grid-cols-2">
+                <article className="rounded-[1.6rem] border border-[#d8ddd6] bg-[#fcfcfa] p-5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#1f7a67]">
+                    Identity
+                  </p>
+                  <div className="mt-4 grid gap-3 text-sm text-slate-600">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Display name</p>
+                      <p className="mt-1 font-medium text-slate-900">{contact.fullName}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Company</p>
+                      <p className="mt-1 font-medium text-slate-900">
+                        {formatDisplayValue(contact.company)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Role</p>
+                      <p className="mt-1 font-medium text-slate-900">
+                        {formatDisplayValue(contact.jobTitle)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Nickname</p>
+                      <p className="mt-1 font-medium text-slate-900">
+                        {formatDisplayValue(contact.nickname)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Phonetic</p>
+                      <p className="mt-1 font-medium text-slate-900">
+                        {phoneticSummary.nameReading ??
+                          phoneticSummary.companyReading ??
+                          "Not added yet"}
+                      </p>
+                    </div>
+                  </div>
+                </article>
+
+                <article className="rounded-[1.6rem] border border-[#d8ddd6] bg-[#fcfcfa] p-5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#1f7a67]">
+                    Contact methods
+                  </p>
+                  <div className="mt-4 grid gap-3 text-sm text-slate-600">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Email</p>
+                      <p className="mt-1 font-medium text-slate-900">{formatDisplayValue(contact.email)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Phone</p>
+                      <p className="mt-1 font-medium text-slate-900">{formatDisplayValue(contact.phone)}</p>
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Website</p>
+                      <p className="mt-1 break-words font-medium text-slate-900">
+                        {formatDisplayValue(contact.website)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Address</p>
+                      <p className="mt-1 whitespace-pre-line font-medium text-slate-900">
+                        {formatDisplayValue(contact.address)}
+                      </p>
+                    </div>
+                  </div>
+                </article>
+
+                <article className="rounded-[1.6rem] border border-[#d8ddd6] bg-[#fcfcfa] p-5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#1f7a67]">
+                    Personal context
+                  </p>
+                  <div className="mt-4 grid gap-3 text-sm text-slate-600">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Birthday</p>
+                      <p className="mt-1 font-medium text-slate-900">
+                        {formatStoredDateValue(contact.birthday)}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.18em] text-slate-400">
+                        Related people
+                      </p>
+                      <p className="mt-1 font-medium text-slate-900">
+                        {getStructuredEntryCount(contact.relatedPeople) > 0
+                          ? `${getStructuredEntryCount(contact.relatedPeople)} saved`
+                          : "Not added yet"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.18em] text-slate-400">
+                        Significant dates
+                      </p>
+                      <p className="mt-1 font-medium text-slate-900">
+                        {getStructuredEntryCount(contact.significantDates) > 0
+                          ? `${getStructuredEntryCount(contact.significantDates)} saved`
+                          : "Not added yet"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Notes</p>
+                      <p className="mt-1 whitespace-pre-line font-medium text-slate-900">
+                        {formatDisplayValue(contact.notes)}
+                      </p>
+                    </div>
+                  </div>
+                </article>
+
+                <article className="rounded-[1.6rem] border border-[#d8ddd6] bg-[#fcfcfa] p-5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#1f7a67]">
+                    Organization and portability
+                  </p>
+                  <div className="mt-4 grid gap-3 text-sm text-slate-600">
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.18em] text-slate-400">Labels</p>
+                      <p className="mt-1 font-medium text-slate-900">
+                        {labelsValue || "Not added yet"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.18em] text-slate-400">
+                        Custom fields
+                      </p>
+                      <p className="mt-1 font-medium text-slate-900">
+                        {getStructuredEntryCount(contact.customFields) > 0
+                          ? `${getStructuredEntryCount(contact.customFields)} saved`
+                          : "Not added yet"}
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.18em] text-slate-400">
+                        Structured coverage
+                      </p>
+                      <p className="mt-1 font-medium text-slate-900">
+                        {enrichedFieldCount} of {structuredCoverage.length} richer areas populated
+                      </p>
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase tracking-[0.18em] text-slate-400">
+                        Sync linkage
+                      </p>
+                      <p className="mt-1 font-medium text-slate-900">
+                        {syncLinks.length > 0 ? `${syncLinks.length} linked source(s)` : "Local-only record"}
+                      </p>
+                    </div>
+                  </div>
+                </article>
+              </div>
+            </section>
+
             <div className={sectionCardClassName}>
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#1f7a67]">
