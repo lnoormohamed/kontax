@@ -29,12 +29,17 @@ export const parseContactPostalAddresses = (value: unknown): ContactPostalAddres
 
 export type PortableContactInput = {
   fullName: string;
+  firstName?: string | null;
+  lastName?: string | null;
+  phoneticFirstName?: string | null;
+  phoneticLastName?: string | null;
   nickname?: string | null;
   email?: string | null;
   emailAddresses?: string[] | null;
   phone?: string | null;
   phoneNumbers?: string[] | null;
   company?: string | null;
+  phoneticCompany?: string | null;
   jobTitle?: string | null;
   website?: string | null;
   birthday?: string | null;
@@ -81,10 +86,13 @@ const HEADER_ALIASES: Record<
     fullName: string[];
     firstName: string[];
     lastName: string[];
+    phoneticFirstName: string[];
+    phoneticLastName: string[];
     nickname: string[];
     email: string[];
     phone: string[];
     company: string[];
+    phoneticCompany: string[];
     jobTitle: string[];
     website: string[];
     birthday: string[];
@@ -119,6 +127,20 @@ const HEADER_ALIASES: Record<
       "surname",
       "last",
       "second name",
+    ],
+    phoneticFirstName: [
+      "pinyin first name",
+      "phonetic first name",
+      "yomi first name",
+      "reading first name",
+      "first name reading",
+    ],
+    phoneticLastName: [
+      "pinyin last name",
+      "phonetic last name",
+      "yomi last name",
+      "reading last name",
+      "last name reading",
     ],
     nickname: ["nickname", "nick name", "short name", "preferred name", "alias"],
     email: [
@@ -173,6 +195,13 @@ const HEADER_ALIASES: Record<
       "employer",
       "business",
     ],
+    phoneticCompany: [
+      "pinyin company",
+      "phonetic company",
+      "yomi company",
+      "company reading",
+      "organization yomi",
+    ],
     jobTitle: ["job title", "title", "role", "position", "profession"],
     website: ["website", "web site", "url", "homepage", "home page"],
     birthday: ["birthday", "birth date", "date of birth", "dob"],
@@ -200,6 +229,8 @@ const HEADER_ALIASES: Record<
     fullName: ["name", "full name", "file as", "nickname"],
     firstName: ["given name", "first name", "additional name", "name prefix", "givenname"],
     lastName: ["family name", "last name", "name suffix", "familyname"],
+    phoneticFirstName: ["given name yomi", "first name yomi", "pinyin first name"],
+    phoneticLastName: ["family name yomi", "last name yomi", "pinyin last name"],
     nickname: ["nickname", "name"],
     email: [
       "e-mail 1 - value",
@@ -224,6 +255,7 @@ const HEADER_ALIASES: Record<
       "organization",
       "organization 1 - title",
     ],
+    phoneticCompany: ["organization 1 yomi name", "organization 2 yomi name", "pinyin company"],
     jobTitle: ["organization 1 - title", "organization 2 - title", "job title", "title"],
     website: ["website 1 - value", "website 2 - value", "website", "homepage"],
     birthday: ["birthday", "event 1 - value", "date of birth"],
@@ -234,6 +266,8 @@ const HEADER_ALIASES: Record<
     fullName: ["name", "full name", "display name", "card", "nickname"],
     firstName: ["first name", "given name", "first", "middle name"],
     lastName: ["last name", "family name", "last", "maiden name"],
+    phoneticFirstName: ["phonetic first name", "first name phonetic", "pinyin first name"],
+    phoneticLastName: ["phonetic last name", "last name phonetic", "pinyin last name"],
     nickname: ["nickname", "maiden name"],
     email: [
       "email",
@@ -253,6 +287,7 @@ const HEADER_ALIASES: Record<
       "other phone",
     ],
     company: ["company", "organization", "department", "job title", "organization name"],
+    phoneticCompany: ["phonetic company", "organization phonetic", "pinyin company"],
     jobTitle: ["job title", "title", "department"],
     website: ["url", "website", "homepage"],
     birthday: ["birthday", "date of birth"],
@@ -263,6 +298,8 @@ const HEADER_ALIASES: Record<
     fullName: ["name", "full name", "file as", "display name"],
     firstName: ["first name", "given name", "forename", "middle name"],
     lastName: ["last name", "surname", "family name", "last"],
+    phoneticFirstName: ["yomi first name", "phonetic first name", "pinyin first name"],
+    phoneticLastName: ["yomi last name", "phonetic last name", "pinyin last name"],
     nickname: ["nickname", "yomi first name"],
     email: [
       "e-mail address",
@@ -285,6 +322,7 @@ const HEADER_ALIASES: Record<
       "radio phone",
     ],
     company: ["company", "organization", "department", "office location", "profession"],
+    phoneticCompany: ["company yomi", "phonetic company", "pinyin company"],
     jobTitle: ["job title", "title", "profession", "department"],
     website: ["web page", "website", "homepage", "personal web page"],
     birthday: ["birthday", "anniversary", "date of birth"],
@@ -441,10 +479,13 @@ export const parseCsvContacts = (
   const fullNameIndexes = getIndexes(headers, getAliasesForField(profile, "fullName"));
   const firstNameIndexes = getIndexes(headers, getAliasesForField(profile, "firstName"));
   const lastNameIndexes = getIndexes(headers, getAliasesForField(profile, "lastName"));
+  const phoneticFirstNameIndexes = getIndexes(headers, getAliasesForField(profile, "phoneticFirstName"));
+  const phoneticLastNameIndexes = getIndexes(headers, getAliasesForField(profile, "phoneticLastName"));
   const nicknameIndexes = getIndexes(headers, getAliasesForField(profile, "nickname"));
   const emailIndexes = getIndexes(headers, getAliasesForField(profile, "email"));
   const phoneIndexes = getIndexes(headers, getAliasesForField(profile, "phone"));
   const companyIndexes = getIndexes(headers, getAliasesForField(profile, "company"));
+  const phoneticCompanyIndexes = getIndexes(headers, getAliasesForField(profile, "phoneticCompany"));
   const jobTitleIndexes = getIndexes(headers, getAliasesForField(profile, "jobTitle"));
   const websiteIndexes = getIndexes(headers, getAliasesForField(profile, "website"));
   const birthdayIndexes = getIndexes(headers, getAliasesForField(profile, "birthday"));
@@ -454,10 +495,13 @@ export const parseCsvContacts = (
     ...fullNameIndexes,
     ...firstNameIndexes,
     ...lastNameIndexes,
+    ...phoneticFirstNameIndexes,
+    ...phoneticLastNameIndexes,
     ...nicknameIndexes,
     ...emailIndexes,
     ...phoneIndexes,
     ...companyIndexes,
+    ...phoneticCompanyIndexes,
     ...jobTitleIndexes,
     ...websiteIndexes,
     ...birthdayIndexes,
@@ -514,12 +558,15 @@ export const parseCsvContacts = (
     const explicitFullName = getFirstValue(row, fullNameIndexes);
     const firstName = getFirstValue(row, firstNameIndexes);
     const lastName = getFirstValue(row, lastNameIndexes);
+    const phoneticFirstName = getFirstValue(row, phoneticFirstNameIndexes);
+    const phoneticLastName = getFirstValue(row, phoneticLastNameIndexes);
     const nickname = getFirstValue(row, nicknameIndexes);
     const email = getFirstValue(row, emailIndexes)?.toLowerCase();
     const emailAddresses = getAllValues(row, emailIndexes).map((value) => value.toLowerCase());
     const phone = getFirstValue(row, phoneIndexes);
     const phoneNumbers = getAllValues(row, phoneIndexes);
     const company = getFirstValue(row, companyIndexes);
+    const phoneticCompany = getFirstValue(row, phoneticCompanyIndexes);
     const jobTitle = getFirstValue(row, jobTitleIndexes);
     const website = getFirstValue(row, websiteIndexes);
     const birthday = getFirstValue(row, birthdayIndexes);
@@ -635,12 +682,17 @@ export const parseCsvContacts = (
     contacts.push({
       rowNumber,
       fullName,
+      firstName,
+      lastName,
+      phoneticFirstName,
+      phoneticLastName,
       nickname,
       email,
       emailAddresses,
       phone,
       phoneNumbers,
       company,
+      phoneticCompany,
       jobTitle,
       website,
       birthday,
@@ -713,12 +765,17 @@ export const parseCsvContacts = (
 export const contactsToCsv = (contacts: PortableContactInput[]) => {
   const header = [
     "Full Name",
+    "First Name",
+    "Last Name",
+    "Pinyin First Name",
+    "Pinyin Last Name",
     "Nickname",
     "Email",
     "Additional Emails",
     "Phone",
     "Additional Phones",
     "Company",
+    "Pinyin Company",
     "Job Title",
     "Website",
     "Birthday",
@@ -728,6 +785,10 @@ export const contactsToCsv = (contacts: PortableContactInput[]) => {
   ];
   const rows = contacts.map((contact) => [
     escapeCsv(contact.fullName),
+    escapeCsv(contact.firstName ?? ""),
+    escapeCsv(contact.lastName ?? ""),
+    escapeCsv(contact.phoneticFirstName ?? ""),
+    escapeCsv(contact.phoneticLastName ?? ""),
     escapeCsv(contact.nickname ?? ""),
     escapeCsv(contact.email ?? ""),
     escapeCsv(
@@ -742,6 +803,7 @@ export const contactsToCsv = (contacts: PortableContactInput[]) => {
         .join(" | "),
     ),
     escapeCsv(contact.company ?? ""),
+    escapeCsv(contact.phoneticCompany ?? ""),
     escapeCsv(contact.jobTitle ?? ""),
     escapeCsv(contact.website ?? ""),
     escapeCsv(contact.birthday ?? ""),
@@ -766,6 +828,29 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
         "VERSION:4.0",
         `FN:${escapeVCard(contact.fullName)}`,
       ];
+
+      if (contact.lastName || contact.firstName) {
+        lines.push(
+          `N:${escapeVCard(contact.lastName ?? "")};${escapeVCard(contact.firstName ?? "")};;;`,
+        );
+      }
+
+      const pinyinName = [contact.phoneticFirstName, contact.phoneticLastName]
+        .filter((value): value is string => Boolean(value?.trim()))
+        .join(" ")
+        .trim();
+      if (pinyinName) {
+        lines.push(`SORT-STRING:${escapeVCard(pinyinName)}`);
+        lines.push(`X-KONTAX-PINYIN-NAME:${escapeVCard(pinyinName)}`);
+      }
+
+      if (contact.phoneticFirstName) {
+        lines.push(`X-KONTAX-PINYIN-FIRST-NAME:${escapeVCard(contact.phoneticFirstName)}`);
+      }
+
+      if (contact.phoneticLastName) {
+        lines.push(`X-KONTAX-PINYIN-LAST-NAME:${escapeVCard(contact.phoneticLastName)}`);
+      }
 
       if (contact.email) {
         lines.push(`EMAIL:${escapeVCard(contact.email)}`);
@@ -793,6 +878,10 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
 
       if (contact.company) {
         lines.push(`ORG:${escapeVCard(contact.company)}`);
+      }
+
+      if (contact.phoneticCompany) {
+        lines.push(`X-KONTAX-PINYIN-COMPANY:${escapeVCard(contact.phoneticCompany)}`);
       }
 
       if (contact.jobTitle) {
