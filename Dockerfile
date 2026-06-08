@@ -2,6 +2,8 @@ FROM node:22-alpine AS builder
 
 WORKDIR /app
 
+RUN npm install -g npm@11.6.2
+
 COPY package*.json ./
 COPY prisma ./prisma
 RUN npm ci
@@ -17,6 +19,8 @@ WORKDIR /app
 
 ENV NODE_ENV=production
 ENV PORT=3000
+
+RUN npm install -g npm@11.6.2
 
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
