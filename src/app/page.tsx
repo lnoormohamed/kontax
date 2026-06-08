@@ -166,33 +166,46 @@ const normalizeSortText = (value: string | null | undefined) => value?.trim().to
 const getNameAwareSortKeys = ({
   firstName,
   lastName,
+  phoneticFirstName,
+  phoneticLastName,
   company,
+  phoneticCompany,
   fullName,
 }: {
   firstName: string | null;
   lastName: string | null;
+  phoneticFirstName: string | null;
+  phoneticLastName: string | null;
   company: string | null;
+  phoneticCompany: string | null;
   fullName: string | null;
 }) => {
   const first = normalizeSortText(firstName);
   const last = normalizeSortText(lastName);
+  const phoneticFirst = normalizeSortText(phoneticFirstName);
+  const phoneticLast = normalizeSortText(phoneticLastName);
   const companyValue = normalizeSortText(company);
+  const phoneticCompanyValue = normalizeSortText(phoneticCompany);
   const full = normalizeSortText(fullName);
 
-  if (!first || !last) {
-    const fallback = companyValue || full;
+  const firstOrReading = phoneticFirst || first;
+  const lastOrReading = phoneticLast || last;
+  const companyOrReading = phoneticCompanyValue || companyValue;
+
+  if (!firstOrReading || !lastOrReading) {
+    const fallback = companyOrReading || companyValue || full;
     return {
       primary: fallback,
       secondary: fallback,
-      company: companyValue,
-      full: full || companyValue,
+      company: companyOrReading || companyValue,
+      full: full || companyValue || companyOrReading,
     };
   }
 
   return {
-    primary: last,
-    secondary: first,
-    company: companyValue,
+    primary: lastOrReading,
+    secondary: firstOrReading,
+    company: companyOrReading || companyValue,
     full: full,
   };
 };
@@ -202,14 +215,20 @@ const compareWorkspaceContacts = (
     isFavorite: boolean;
     firstName: string | null;
     lastName: string | null;
+    phoneticFirstName: string | null;
+    phoneticLastName: string | null;
     company: string | null;
+    phoneticCompany: string | null;
     fullName: string | null;
   },
   right: {
     isFavorite: boolean;
     firstName: string | null;
     lastName: string | null;
+    phoneticFirstName: string | null;
+    phoneticLastName: string | null;
     company: string | null;
+    phoneticCompany: string | null;
     fullName: string | null;
   },
 ) => {
