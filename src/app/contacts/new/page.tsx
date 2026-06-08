@@ -79,14 +79,6 @@ export default async function NewContactPage() {
 
               <div className="grid gap-4 lg:grid-cols-2">
                 <label className="grid gap-2 text-sm text-slate-700">
-                  <span>Prefix</span>
-                  <input className={inputClassName} name="namePrefix" type="text" />
-                </label>
-                <label className="grid gap-2 text-sm text-slate-700">
-                  <span>Nickname</span>
-                  <input className={inputClassName} name="nickname" type="text" />
-                </label>
-                <label className="grid gap-2 text-sm text-slate-700">
                   <span>First name</span>
                   <input className={inputClassName} name="firstName" type="text" />
                 </label>
@@ -117,8 +109,16 @@ export default async function NewContactPage() {
                   />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
+                  <span>Prefix</span>
+                  <input className={inputClassName} name="namePrefix" type="text" />
+                </label>
+                <label className="grid gap-2 text-sm text-slate-700">
                   <span>Suffix</span>
                   <input className={inputClassName} name="nameSuffix" type="text" />
+                </label>
+                <label className="grid gap-2 text-sm text-slate-700">
+                  <span>Nickname</span>
+                  <input className={inputClassName} name="nickname" type="text" />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Company</span>
@@ -130,10 +130,6 @@ export default async function NewContactPage() {
                   />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
-                  <span>Job title</span>
-                  <input className={inputClassName} name="jobTitle" type="text" />
-                </label>
-                <label className="grid gap-2 text-sm text-slate-700">
                   <span>Phonetic company</span>
                   <input
                     className={inputClassName}
@@ -141,6 +137,10 @@ export default async function NewContactPage() {
                     placeholder="Auto-filled when enabled in settings"
                     type="text"
                   />
+                </label>
+                <label className="grid gap-2 text-sm text-slate-700">
+                  <span>Job title</span>
+                  <input className={inputClassName} name="jobTitle" type="text" />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Labels</span>
@@ -177,17 +177,16 @@ export default async function NewContactPage() {
 
             <section className="rounded-[2rem] border border-[#d8ddd6] bg-white p-6 shadow-sm">
               <div className="mb-5">
-                <p className="text-lg font-semibold text-slate-900">Structured contact methods</p>
+                <p className="text-lg font-semibold text-slate-900">Communication</p>
                 <p className="mt-1 text-sm text-slate-500">
-                  These fields make portability and future sync safer without forcing you to fill in
-                  everything on day one.
+                  Start with the direct ways to reach this person, then layer in secondary entries
+                  when they matter.
                 </p>
               </div>
 
               <div className="mb-5 rounded-[1.4rem] border border-[#dfe7e1] bg-[#f8faf8] px-4 py-3 text-sm text-slate-600">
-                Add the main contact methods first, then use labeled secondary entries when a person
-                has both work and personal details. That structure improves import quality, merge
-                confidence, and later sync behavior.
+                Keep primary email and phone clear, then add secondary or overflow values only when
+                they help with portability, merge quality, or later sync.
               </div>
 
               <div className="grid gap-4 lg:grid-cols-2">
@@ -212,6 +211,14 @@ export default async function NewContactPage() {
                     type="text"
                   />
                 </label>
+                <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
+                  <span>Additional emails</span>
+                  <textarea
+                    className={textareaClassName}
+                    name="additionalEmails"
+                    placeholder={"One per line for anything beyond the labeled primary and secondary emails\nteam@example.com"}
+                  />
+                </label>
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Primary phone</span>
                   <input className={inputClassName} name="phone" type="text" />
@@ -233,6 +240,31 @@ export default async function NewContactPage() {
                     type="text"
                   />
                 </label>
+                <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
+                  <span>Additional phones</span>
+                  <textarea
+                    className={textareaClassName}
+                    name="additionalPhones"
+                    placeholder={"One per line for anything beyond the labeled primary and secondary phones\n+44 20 7946 0958"}
+                  />
+                </label>
+              </div>
+            </section>
+
+            <section className="rounded-[2rem] border border-[#d8ddd6] bg-white p-6 shadow-sm">
+              <div className="mb-5">
+                <p className="text-lg font-semibold text-slate-900">Address and web presence</p>
+                <p className="mt-1 text-sm text-slate-500">
+                  Keep location and online identity together so the record stays easier to scan.
+                </p>
+              </div>
+
+              <div className="mb-5 rounded-[1.4rem] border border-[#dfe7e1] bg-[#f8faf8] px-4 py-3 text-sm text-slate-600">
+                This section keeps human-readable address details close to the structured fields that
+                help exports stay cleaner and future sync stay more reliable.
+              </div>
+
+              <div className="grid gap-4 lg:grid-cols-2">
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Website</span>
                   <input className={inputClassName} name="website" type="url" />
@@ -254,21 +286,25 @@ export default async function NewContactPage() {
                     type="text"
                   />
                 </label>
-                <label className="grid gap-2 text-sm text-slate-700">
-                  <span>Birthday</span>
-                  <input className={inputClassName} name="birthday" type="date" />
+                <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
+                  <span>Additional websites</span>
+                  <textarea
+                    className={textareaClassName}
+                    name="additionalWebsites"
+                    placeholder={"One per line for anything beyond the labeled primary and secondary websites\nhttps://example.com"}
+                  />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Address label</span>
                   <input className={inputClassName} name="addressLabel" placeholder="home" type="text" />
                 </label>
-                <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
-                  <span>Address</span>
-                  <textarea className={textareaClassName} name="address" />
-                </label>
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Country or region</span>
                   <input className={inputClassName} name="countryOrRegion" type="text" />
+                </label>
+                <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
+                  <span>Address</span>
+                  <textarea className={textareaClassName} name="address" />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Street line 1</span>
@@ -291,30 +327,6 @@ export default async function NewContactPage() {
                   <input className={inputClassName} name="poBox" type="text" />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
-                  <span>Additional emails</span>
-                  <textarea
-                    className={textareaClassName}
-                    name="additionalEmails"
-                    placeholder={"One per line for anything beyond the labeled primary and secondary emails\nteam@example.com"}
-                  />
-                </label>
-                <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
-                  <span>Additional phones</span>
-                  <textarea
-                    className={textareaClassName}
-                    name="additionalPhones"
-                    placeholder={"One per line for anything beyond the labeled primary and secondary phones\n+44 20 7946 0958"}
-                  />
-                </label>
-                <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
-                  <span>Additional websites</span>
-                  <textarea
-                    className={textareaClassName}
-                    name="additionalWebsites"
-                    placeholder={"One per line for anything beyond the labeled primary and secondary websites\nhttps://example.com"}
-                  />
-                </label>
-                <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
                   <span>Additional addresses</span>
                   <textarea
                     className={textareaClassName}
@@ -334,6 +346,14 @@ export default async function NewContactPage() {
               </div>
 
               <div className="grid gap-4 lg:grid-cols-2">
+                <label className="grid gap-2 text-sm text-slate-700">
+                  <span>Birthday</span>
+                  <input className={inputClassName} name="birthday" type="date" />
+                </label>
+                <div className="rounded-[1.2rem] border border-[#dfe7e1] bg-[#f7fbf9] p-4 text-sm text-slate-600">
+                  Use the primary birthday field for the most portable date. Extra dates can be
+                  added below in <span className="font-medium text-slate-800">Label | YYYY-MM-DD</span> format.
+                </div>
                 <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
                   <span>Significant dates</span>
                   <textarea
@@ -407,7 +427,7 @@ export default async function NewContactPage() {
             <div className={helperCardClassName}>
               <p className="text-sm font-semibold text-slate-900">Recommended first-save minimum</p>
               <div className="mt-3 grid gap-2 text-sm text-slate-600">
-                <p>1. Full name</p>
+                <p>1. First and last name or company</p>
                 <p>2. One email or phone</p>
                 <p>3. Company or notes if this contact needs context</p>
               </div>

@@ -506,14 +506,6 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
 
                   <div className="grid gap-4 lg:grid-cols-2">
                     <label className="grid gap-2 text-sm text-slate-700">
-                      <span>Prefix</span>
-                      <input className={inputClassName} defaultValue={contact.namePrefix ?? ""} name="namePrefix" type="text" />
-                    </label>
-                    <label className="grid gap-2 text-sm text-slate-700">
-                      <span>Nickname</span>
-                      <input className={inputClassName} defaultValue={contact.nickname ?? ""} name="nickname" type="text" />
-                    </label>
-                    <label className="grid gap-2 text-sm text-slate-700">
                       <span>First name</span>
                       <input className={inputClassName} defaultValue={contact.firstName ?? ""} name="firstName" type="text" />
                     </label>
@@ -544,16 +536,20 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                       />
                     </label>
                     <label className="grid gap-2 text-sm text-slate-700">
+                      <span>Prefix</span>
+                      <input className={inputClassName} defaultValue={contact.namePrefix ?? ""} name="namePrefix" type="text" />
+                    </label>
+                    <label className="grid gap-2 text-sm text-slate-700">
                       <span>Suffix</span>
                       <input className={inputClassName} defaultValue={contact.nameSuffix ?? ""} name="nameSuffix" type="text" />
                     </label>
                     <label className="grid gap-2 text-sm text-slate-700">
-                      <span>Company</span>
-                      <input className={inputClassName} defaultValue={contact.company ?? ""} name="company" type="text" />
+                      <span>Nickname</span>
+                      <input className={inputClassName} defaultValue={contact.nickname ?? ""} name="nickname" type="text" />
                     </label>
                     <label className="grid gap-2 text-sm text-slate-700">
-                      <span>Job title</span>
-                      <input className={inputClassName} defaultValue={contact.jobTitle ?? ""} name="jobTitle" type="text" />
+                      <span>Company</span>
+                      <input className={inputClassName} defaultValue={contact.company ?? ""} name="company" type="text" />
                     </label>
                     <label className="grid gap-2 text-sm text-slate-700">
                       <span>Phonetic company</span>
@@ -563,6 +559,10 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                         name="phoneticCompany"
                         type="text"
                       />
+                    </label>
+                    <label className="grid gap-2 text-sm text-slate-700">
+                      <span>Job title</span>
+                      <input className={inputClassName} defaultValue={contact.jobTitle ?? ""} name="jobTitle" type="text" />
                     </label>
                     <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
                       <span>Avatar URL</span>
