@@ -1,8 +1,10 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { ContactPhoneticAssistant } from "~/app/_components/contact-phonetic-assistant";
 import { createContact } from "~/app/actions/contacts";
 import { auth } from "~/server/auth";
+import { db } from "~/server/db";
 
 const inputClassName =
   "rounded-[1.2rem] border border-slate-200 bg-[#fbfaf7] px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#667eea] focus:bg-white";
@@ -18,6 +20,15 @@ export default async function NewContactPage() {
   if (!session?.user?.id) {
     redirect("/login");
   }
+
+  const userSettings = await db.user.findUnique({
+    where: {
+      id: session.user.id,
+    },
+    select: {
+      autoFillPhoneticNames: true,
+    },
+  });
 
   return (
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(201,214,170,0.45),_transparent_26%),linear-gradient(180deg,#eff3ea_0%,#f8fafc_38%,#f6f5f0_100%)] px-4 py-6 text-slate-900 lg:px-6 lg:py-8">
@@ -51,7 +62,11 @@ export default async function NewContactPage() {
         </section>
 
         <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_320px]">
-          <form action={createContact} className="grid gap-6">
+          <form action={createContact} className="grid gap-6" id="new-contact-form">
+            <ContactPhoneticAssistant
+              enabled={userSettings?.autoFillPhoneticNames ?? false}
+              formId="new-contact-form"
+            />
             <input name="redirectTo" type="hidden" value="/contacts/:id?saved=1" />
 
             <section className="rounded-[2rem] border border-[#d8ddd6] bg-white p-6 shadow-sm">
@@ -163,7 +178,7 @@ export default async function NewContactPage() {
                 </label>
                 <div className="rounded-[1.2rem] border border-[#dfe7e1] bg-[#f7fbf9] px-4 py-3 text-sm text-slate-600 lg:col-span-2">
                   If phonetic auto-fill is enabled in settings, Kontax generates real phonetic
-                  Chinese names when these fields are blank, with fallback name readings for other
+                  Chinese names when these fields are blank, with fallback phonetic values for other
                   non-Latin scripts.
                 </div>
               </div>

@@ -136,9 +136,9 @@ export default async function SettingsPage() {
 
             <div className="rounded-[2rem] border border-[#d8ddd6] bg-white p-6 shadow-sm">
               <div>
-                <p className="text-lg font-semibold text-slate-900">Phonetic and name readings</p>
+                <p className="text-lg font-semibold text-slate-900">Phonetic names</p>
                 <p className="mt-1 text-sm text-slate-500">
-                  Auto-fill phonetic values for Chinese names, with fallback name readings for other
+                  Auto-fill phonetic values for Chinese names, with fallback phonetic values for other
                   non-Latin scripts, only when those fields are still blank.
                 </p>
               </div>
@@ -153,7 +153,7 @@ export default async function SettingsPage() {
                     value="true"
                   />
                   <span>
-                    Enable automatic phonetic and name-reading fill for first name, last name, and company
+                    Enable automatic phonetic fill for first name, last name, and company
                     when those fields are empty.
                   </span>
                 </label>

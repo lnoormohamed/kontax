@@ -208,7 +208,7 @@ const revalidateContactViews = (contactId?: string) => {
 
 const parseContactInput = (formData: FormData) => {
   const parsed = contactSchema.safeParse({
-    fullName: formData.get("fullName"),
+    fullName: getOptionalString(formData, "fullName"),
     firstName: getOptionalString(formData, "firstName"),
     middleName: getOptionalString(formData, "middleName"),
     lastName: getOptionalString(formData, "lastName"),
@@ -311,10 +311,9 @@ const parseContactInput = (formData: FormData) => {
   ]
     .filter((value): value is string => Boolean(value))
     .join(" ");
-  const canonicalFullName =
-    (fullNameFromParts.length > 0 ? fullNameFromParts : null) ??
-    parsed.data.fullName ??
-    parsed.data.company;
+  const canonicalFullName = [fullNameFromParts, parsed.data.fullName, parsed.data.company].find(
+    (value): value is string => Boolean(value?.trim()),
+  );
 
   if (!canonicalFullName) {
     throw new Error("Add a full name, name parts, or company name so Kontax can place this contact in the list.");

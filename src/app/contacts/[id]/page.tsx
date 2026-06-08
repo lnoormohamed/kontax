@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
+import { ContactPhoneticAssistant } from "~/app/_components/contact-phonetic-assistant";
 import {
   archiveContact,
   undoMergeContacts,
@@ -126,6 +127,14 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
   const wasMergeUndone = mergeUndoneState === "1";
   const decisionParam = resolvedSearchParams?.decisionId;
   const decisionId = Array.isArray(decisionParam) ? decisionParam[0] : decisionParam;
+  const userSettings = await db.user.findUnique({
+    where: {
+      id: session.user.id,
+    },
+    select: {
+      autoFillPhoneticNames: true,
+    },
+  });
 
   const contact = await db.contact.findFirst({
     where: {
@@ -478,7 +487,11 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 </p>
               </div>
 
-              <form action={updateContact} className="mt-6 grid gap-6">
+              <form action={updateContact} className="mt-6 grid gap-6" id="edit-contact-form">
+                <ContactPhoneticAssistant
+                  enabled={userSettings?.autoFillPhoneticNames ?? false}
+                  formId="edit-contact-form"
+                />
                 <input name="contactId" type="hidden" value={contact.id} />
                 <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}?saved=1`} />
 
@@ -586,7 +599,8 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                     </label>
                     <div className="rounded-[1.2rem] border border-[#dfe7e1] bg-[#f7fbf9] px-4 py-3 text-sm text-slate-600 lg:col-span-2">
                       If phonetic auto-fill is enabled in settings, Kontax only fills these values when they
-                      are blank. Chinese names use real phonetic generation, and manual edits always win.
+                      are blank. Chinese names use real phonetic generation, fallback phonetic values support
+                      other non-Latin scripts, and manual edits always win.
                     </div>
                   </div>
                 </section>
