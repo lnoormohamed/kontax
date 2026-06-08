@@ -241,8 +241,6 @@ const computeAddressBookCTag = async (userId) => {
   const mostRecent = await prisma.contact.findFirst({
     where: {
       userId,
-      archivedAt: null,
-      syncTombstoneAt: null,
     },
     orderBy: {
       updatedAt: "desc",
