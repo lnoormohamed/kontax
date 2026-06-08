@@ -104,7 +104,9 @@ export const createUserAppPassword = async (userId: string, label: string) => {
   const trimmedLabel = label.trim();
 
   const rows = await db.$queryRawUnsafe<Array<{ id: string }>>(
-    'INSERT INTO "AppPassword" ("id", "userId", "label", "hashedPassword", "createdAt", "updatedAt") VALUES (gen_random_uuid()::text, $1, $2, $3, NOW(), NOW()) RETURNING "id"',
+    'INSERT INTO "AppPassword" ("id", "userId", "label", "hashedPassword", "createdAt", "updatedAt") VALUES ($1, $2, $3, $4, NOW(), NOW()) RETURNING "id"',
+    userId,
+    crypto.randomUUID(),
     userId,
     trimmedLabel,
     hashedPassword,

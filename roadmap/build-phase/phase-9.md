@@ -21,7 +21,8 @@ Turn Kontax into a CardDAV server so users can add it as a native contacts accou
 | --- | --- | --- | --- |
 | P9-01 | Done | P0 | P1-01 |
 | P9-02 | Done | P0 | P9-01 |
-| P9-03 | In Progress | P0 | P9-01 |
+| P9-03 | Done | P0 | P9-01 |
+| P9-03a | Done | P0 | P9-03 |
 | P9-04 | Not Started | P0 | P9-02, P9-03 |
 | P9-05 | Not Started | P1 | P9-04 |
 | P9-06 | Not Started | P1 | P9-04 |
@@ -84,7 +85,7 @@ Turn Kontax into a CardDAV server so users can add it as a native contacts accou
 ---
 
 ## P9-03 — Implement CardDAV server authentication and discovery endpoints
-- Status: `In Progress`
+- Status: `Done`
 - Priority: `P0`
 - Dependencies: `P9-01`
 - Implementation Notes:
