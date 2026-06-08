@@ -199,6 +199,7 @@ const revalidateContactViews = (contactId?: string) => {
   revalidatePath("/");
   revalidatePath("/import-export");
   revalidatePath("/merge/manual");
+  revalidatePath("/contacts/[id]");
 
   if (contactId) {
     revalidatePath(`/contacts/${contactId}`);
@@ -493,9 +494,10 @@ export const createContact = async (formData: FormData) => {
 
   revalidateContactViews();
 
-  if (redirectTo) {
-    redirect(redirectTo.replace(":id", createdContact.id));
-  }
+  const destination = redirectTo
+    ? redirectTo.replace(":id", createdContact.id)
+    : `/contacts/${createdContact.id}?saved=1`;
+  redirect(destination);
 };
 
 export const updateContact = async (formData: FormData) => {
@@ -513,7 +515,7 @@ export const updateContact = async (formData: FormData) => {
   });
   const phoneticFields = applyAutoFilledPhoneticFields(input, userSettings?.autoFillPhoneticNames ?? false);
 
-  await db.contact.updateMany({
+  const updateResult = await db.contact.updateMany({
     where: {
       id: contactId,
       userId,
@@ -527,11 +529,13 @@ export const updateContact = async (formData: FormData) => {
     },
   });
 
+  if (updateResult.count === 0) {
+    throw new Error("Unable to update this contact. It may have been removed or you may not have permission to edit it.");
+  }
+
   revalidateContactViews(contactId);
 
-  if (redirectTo) {
-    redirect(redirectTo);
-  }
+  redirect(redirectTo ?? `/contacts/${contactId}?saved=1`);
 };
 
 export const toggleFavoriteContact = async (formData: FormData) => {
