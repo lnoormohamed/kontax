@@ -19,6 +19,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
 /**
+ * Model AppPassword
+ * 
+ */
+export type AppPassword = $Result.DefaultSelection<Prisma.$AppPasswordPayload>
+/**
  * Model Contact
  * 
  */
@@ -474,6 +479,16 @@ export class PrismaClient<
     * ```
     */
   get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.appPassword`: Exposes CRUD operations for the **AppPassword** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AppPasswords
+    * const appPasswords = await prisma.appPassword.findMany()
+    * ```
+    */
+  get appPassword(): Prisma.AppPasswordDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.contact`: Exposes CRUD operations for the **Contact** model.
@@ -1026,6 +1041,7 @@ export namespace Prisma {
 
   export const ModelName: {
     User: 'User',
+    AppPassword: 'AppPassword',
     Contact: 'Contact',
     SubscriptionCustomer: 'SubscriptionCustomer',
     Subscription: 'Subscription',
@@ -1055,7 +1071,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncContactLink" | "syncJob" | "syncConflict"
+      modelProps: "user" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncContactLink" | "syncJob" | "syncConflict"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1130,6 +1146,80 @@ export namespace Prisma {
           count: {
             args: Prisma.UserCountArgs<ExtArgs>
             result: $Utils.Optional<UserCountAggregateOutputType> | number
+          }
+        }
+      }
+      AppPassword: {
+        payload: Prisma.$AppPasswordPayload<ExtArgs>
+        fields: Prisma.AppPasswordFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AppPasswordFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AppPasswordPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AppPasswordFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AppPasswordPayload>
+          }
+          findFirst: {
+            args: Prisma.AppPasswordFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AppPasswordPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AppPasswordFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AppPasswordPayload>
+          }
+          findMany: {
+            args: Prisma.AppPasswordFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AppPasswordPayload>[]
+          }
+          create: {
+            args: Prisma.AppPasswordCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AppPasswordPayload>
+          }
+          createMany: {
+            args: Prisma.AppPasswordCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AppPasswordCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AppPasswordPayload>[]
+          }
+          delete: {
+            args: Prisma.AppPasswordDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AppPasswordPayload>
+          }
+          update: {
+            args: Prisma.AppPasswordUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AppPasswordPayload>
+          }
+          deleteMany: {
+            args: Prisma.AppPasswordDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AppPasswordUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.AppPasswordUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AppPasswordPayload>[]
+          }
+          upsert: {
+            args: Prisma.AppPasswordUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AppPasswordPayload>
+          }
+          aggregate: {
+            args: Prisma.AppPasswordAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAppPassword>
+          }
+          groupBy: {
+            args: Prisma.AppPasswordGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AppPasswordGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AppPasswordCountArgs<ExtArgs>
+            result: $Utils.Optional<AppPasswordCountAggregateOutputType> | number
           }
         }
       }
@@ -2044,6 +2134,7 @@ export namespace Prisma {
   }
   export type GlobalOmitConfig = {
     user?: UserOmit
+    appPassword?: AppPasswordOmit
     contact?: ContactOmit
     subscriptionCustomer?: SubscriptionCustomerOmit
     subscription?: SubscriptionOmit
@@ -2135,6 +2226,7 @@ export namespace Prisma {
    */
 
   export type UserCountOutputType = {
+    appPasswords: number
     contacts: number
     importJobs: number
     exportJobs: number
@@ -2145,6 +2237,7 @@ export namespace Prisma {
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    appPasswords?: boolean | UserCountOutputTypeCountAppPasswordsArgs
     contacts?: boolean | UserCountOutputTypeCountContactsArgs
     importJobs?: boolean | UserCountOutputTypeCountImportJobsArgs
     exportJobs?: boolean | UserCountOutputTypeCountExportJobsArgs
@@ -2163,6 +2256,13 @@ export namespace Prisma {
      * Select specific fields to fetch from the UserCountOutputType
      */
     select?: UserCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountAppPasswordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AppPasswordWhereInput
   }
 
   /**
@@ -2647,6 +2747,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: boolean
     createdAt?: boolean
     updatedAt?: boolean
+    appPasswords?: boolean | User$appPasswordsArgs<ExtArgs>
     contacts?: boolean | User$contactsArgs<ExtArgs>
     importJobs?: boolean | User$importJobsArgs<ExtArgs>
     exportJobs?: boolean | User$exportJobsArgs<ExtArgs>
@@ -2693,6 +2794,7 @@ export namespace Prisma {
 
   export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "password" | "lifecycleState" | "autoFillPhoneticNames" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    appPasswords?: boolean | User$appPasswordsArgs<ExtArgs>
     contacts?: boolean | User$contactsArgs<ExtArgs>
     importJobs?: boolean | User$importJobsArgs<ExtArgs>
     exportJobs?: boolean | User$exportJobsArgs<ExtArgs>
@@ -2709,6 +2811,7 @@ export namespace Prisma {
   export type $UserPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "User"
     objects: {
+      appPasswords: Prisma.$AppPasswordPayload<ExtArgs>[]
       contacts: Prisma.$ContactPayload<ExtArgs>[]
       importJobs: Prisma.$ImportJobPayload<ExtArgs>[]
       exportJobs: Prisma.$ExportJobPayload<ExtArgs>[]
@@ -3121,6 +3224,7 @@ export namespace Prisma {
    */
   export interface Prisma__UserClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
+    appPasswords<T extends User$appPasswordsArgs<ExtArgs> = {}>(args?: Subset<T, User$appPasswordsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AppPasswordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     contacts<T extends User$contactsArgs<ExtArgs> = {}>(args?: Subset<T, User$contactsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     importJobs<T extends User$importJobsArgs<ExtArgs> = {}>(args?: Subset<T, User$importJobsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ImportJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     exportJobs<T extends User$exportJobsArgs<ExtArgs> = {}>(args?: Subset<T, User$exportJobsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExportJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -3554,6 +3658,30 @@ export namespace Prisma {
   }
 
   /**
+   * User.appPasswords
+   */
+  export type User$appPasswordsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AppPassword
+     */
+    select?: AppPasswordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AppPassword
+     */
+    omit?: AppPasswordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppPasswordInclude<ExtArgs> | null
+    where?: AppPasswordWhereInput
+    orderBy?: AppPasswordOrderByWithRelationInput | AppPasswordOrderByWithRelationInput[]
+    cursor?: AppPasswordWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AppPasswordScalarFieldEnum | AppPasswordScalarFieldEnum[]
+  }
+
+  /**
    * User.contacts
    */
   export type User$contactsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3756,6 +3884,1103 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: UserInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model AppPassword
+   */
+
+  export type AggregateAppPassword = {
+    _count: AppPasswordCountAggregateOutputType | null
+    _min: AppPasswordMinAggregateOutputType | null
+    _max: AppPasswordMaxAggregateOutputType | null
+  }
+
+  export type AppPasswordMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    label: string | null
+    hashedPassword: string | null
+    lastUsedAt: Date | null
+    revokedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AppPasswordMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    label: string | null
+    hashedPassword: string | null
+    lastUsedAt: Date | null
+    revokedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AppPasswordCountAggregateOutputType = {
+    id: number
+    userId: number
+    label: number
+    hashedPassword: number
+    lastUsedAt: number
+    revokedAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type AppPasswordMinAggregateInputType = {
+    id?: true
+    userId?: true
+    label?: true
+    hashedPassword?: true
+    lastUsedAt?: true
+    revokedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AppPasswordMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    label?: true
+    hashedPassword?: true
+    lastUsedAt?: true
+    revokedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AppPasswordCountAggregateInputType = {
+    id?: true
+    userId?: true
+    label?: true
+    hashedPassword?: true
+    lastUsedAt?: true
+    revokedAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type AppPasswordAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AppPassword to aggregate.
+     */
+    where?: AppPasswordWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AppPasswords to fetch.
+     */
+    orderBy?: AppPasswordOrderByWithRelationInput | AppPasswordOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AppPasswordWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AppPasswords from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AppPasswords.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AppPasswords
+    **/
+    _count?: true | AppPasswordCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AppPasswordMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AppPasswordMaxAggregateInputType
+  }
+
+  export type GetAppPasswordAggregateType<T extends AppPasswordAggregateArgs> = {
+        [P in keyof T & keyof AggregateAppPassword]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAppPassword[P]>
+      : GetScalarType<T[P], AggregateAppPassword[P]>
+  }
+
+
+
+
+  export type AppPasswordGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AppPasswordWhereInput
+    orderBy?: AppPasswordOrderByWithAggregationInput | AppPasswordOrderByWithAggregationInput[]
+    by: AppPasswordScalarFieldEnum[] | AppPasswordScalarFieldEnum
+    having?: AppPasswordScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AppPasswordCountAggregateInputType | true
+    _min?: AppPasswordMinAggregateInputType
+    _max?: AppPasswordMaxAggregateInputType
+  }
+
+  export type AppPasswordGroupByOutputType = {
+    id: string
+    userId: string
+    label: string
+    hashedPassword: string
+    lastUsedAt: Date | null
+    revokedAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: AppPasswordCountAggregateOutputType | null
+    _min: AppPasswordMinAggregateOutputType | null
+    _max: AppPasswordMaxAggregateOutputType | null
+  }
+
+  type GetAppPasswordGroupByPayload<T extends AppPasswordGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AppPasswordGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AppPasswordGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AppPasswordGroupByOutputType[P]>
+            : GetScalarType<T[P], AppPasswordGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AppPasswordSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    label?: boolean
+    hashedPassword?: boolean
+    lastUsedAt?: boolean
+    revokedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["appPassword"]>
+
+  export type AppPasswordSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    label?: boolean
+    hashedPassword?: boolean
+    lastUsedAt?: boolean
+    revokedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["appPassword"]>
+
+  export type AppPasswordSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    label?: boolean
+    hashedPassword?: boolean
+    lastUsedAt?: boolean
+    revokedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["appPassword"]>
+
+  export type AppPasswordSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    label?: boolean
+    hashedPassword?: boolean
+    lastUsedAt?: boolean
+    revokedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type AppPasswordOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "label" | "hashedPassword" | "lastUsedAt" | "revokedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["appPassword"]>
+  export type AppPasswordInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type AppPasswordIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type AppPasswordIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $AppPasswordPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AppPassword"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      label: string
+      hashedPassword: string
+      lastUsedAt: Date | null
+      revokedAt: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["appPassword"]>
+    composites: {}
+  }
+
+  type AppPasswordGetPayload<S extends boolean | null | undefined | AppPasswordDefaultArgs> = $Result.GetResult<Prisma.$AppPasswordPayload, S>
+
+  type AppPasswordCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<AppPasswordFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: AppPasswordCountAggregateInputType | true
+    }
+
+  export interface AppPasswordDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AppPassword'], meta: { name: 'AppPassword' } }
+    /**
+     * Find zero or one AppPassword that matches the filter.
+     * @param {AppPasswordFindUniqueArgs} args - Arguments to find a AppPassword
+     * @example
+     * // Get one AppPassword
+     * const appPassword = await prisma.appPassword.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AppPasswordFindUniqueArgs>(args: SelectSubset<T, AppPasswordFindUniqueArgs<ExtArgs>>): Prisma__AppPasswordClient<$Result.GetResult<Prisma.$AppPasswordPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one AppPassword that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {AppPasswordFindUniqueOrThrowArgs} args - Arguments to find a AppPassword
+     * @example
+     * // Get one AppPassword
+     * const appPassword = await prisma.appPassword.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AppPasswordFindUniqueOrThrowArgs>(args: SelectSubset<T, AppPasswordFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AppPasswordClient<$Result.GetResult<Prisma.$AppPasswordPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AppPassword that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AppPasswordFindFirstArgs} args - Arguments to find a AppPassword
+     * @example
+     * // Get one AppPassword
+     * const appPassword = await prisma.appPassword.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AppPasswordFindFirstArgs>(args?: SelectSubset<T, AppPasswordFindFirstArgs<ExtArgs>>): Prisma__AppPasswordClient<$Result.GetResult<Prisma.$AppPasswordPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AppPassword that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AppPasswordFindFirstOrThrowArgs} args - Arguments to find a AppPassword
+     * @example
+     * // Get one AppPassword
+     * const appPassword = await prisma.appPassword.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AppPasswordFindFirstOrThrowArgs>(args?: SelectSubset<T, AppPasswordFindFirstOrThrowArgs<ExtArgs>>): Prisma__AppPasswordClient<$Result.GetResult<Prisma.$AppPasswordPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more AppPasswords that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AppPasswordFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AppPasswords
+     * const appPasswords = await prisma.appPassword.findMany()
+     * 
+     * // Get first 10 AppPasswords
+     * const appPasswords = await prisma.appPassword.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const appPasswordWithIdOnly = await prisma.appPassword.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AppPasswordFindManyArgs>(args?: SelectSubset<T, AppPasswordFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AppPasswordPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a AppPassword.
+     * @param {AppPasswordCreateArgs} args - Arguments to create a AppPassword.
+     * @example
+     * // Create one AppPassword
+     * const AppPassword = await prisma.appPassword.create({
+     *   data: {
+     *     // ... data to create a AppPassword
+     *   }
+     * })
+     * 
+     */
+    create<T extends AppPasswordCreateArgs>(args: SelectSubset<T, AppPasswordCreateArgs<ExtArgs>>): Prisma__AppPasswordClient<$Result.GetResult<Prisma.$AppPasswordPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many AppPasswords.
+     * @param {AppPasswordCreateManyArgs} args - Arguments to create many AppPasswords.
+     * @example
+     * // Create many AppPasswords
+     * const appPassword = await prisma.appPassword.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AppPasswordCreateManyArgs>(args?: SelectSubset<T, AppPasswordCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AppPasswords and returns the data saved in the database.
+     * @param {AppPasswordCreateManyAndReturnArgs} args - Arguments to create many AppPasswords.
+     * @example
+     * // Create many AppPasswords
+     * const appPassword = await prisma.appPassword.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AppPasswords and only return the `id`
+     * const appPasswordWithIdOnly = await prisma.appPassword.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AppPasswordCreateManyAndReturnArgs>(args?: SelectSubset<T, AppPasswordCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AppPasswordPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a AppPassword.
+     * @param {AppPasswordDeleteArgs} args - Arguments to delete one AppPassword.
+     * @example
+     * // Delete one AppPassword
+     * const AppPassword = await prisma.appPassword.delete({
+     *   where: {
+     *     // ... filter to delete one AppPassword
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AppPasswordDeleteArgs>(args: SelectSubset<T, AppPasswordDeleteArgs<ExtArgs>>): Prisma__AppPasswordClient<$Result.GetResult<Prisma.$AppPasswordPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one AppPassword.
+     * @param {AppPasswordUpdateArgs} args - Arguments to update one AppPassword.
+     * @example
+     * // Update one AppPassword
+     * const appPassword = await prisma.appPassword.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AppPasswordUpdateArgs>(args: SelectSubset<T, AppPasswordUpdateArgs<ExtArgs>>): Prisma__AppPasswordClient<$Result.GetResult<Prisma.$AppPasswordPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more AppPasswords.
+     * @param {AppPasswordDeleteManyArgs} args - Arguments to filter AppPasswords to delete.
+     * @example
+     * // Delete a few AppPasswords
+     * const { count } = await prisma.appPassword.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AppPasswordDeleteManyArgs>(args?: SelectSubset<T, AppPasswordDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AppPasswords.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AppPasswordUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AppPasswords
+     * const appPassword = await prisma.appPassword.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AppPasswordUpdateManyArgs>(args: SelectSubset<T, AppPasswordUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AppPasswords and returns the data updated in the database.
+     * @param {AppPasswordUpdateManyAndReturnArgs} args - Arguments to update many AppPasswords.
+     * @example
+     * // Update many AppPasswords
+     * const appPassword = await prisma.appPassword.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more AppPasswords and only return the `id`
+     * const appPasswordWithIdOnly = await prisma.appPassword.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends AppPasswordUpdateManyAndReturnArgs>(args: SelectSubset<T, AppPasswordUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AppPasswordPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one AppPassword.
+     * @param {AppPasswordUpsertArgs} args - Arguments to update or create a AppPassword.
+     * @example
+     * // Update or create a AppPassword
+     * const appPassword = await prisma.appPassword.upsert({
+     *   create: {
+     *     // ... data to create a AppPassword
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AppPassword we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AppPasswordUpsertArgs>(args: SelectSubset<T, AppPasswordUpsertArgs<ExtArgs>>): Prisma__AppPasswordClient<$Result.GetResult<Prisma.$AppPasswordPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of AppPasswords.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AppPasswordCountArgs} args - Arguments to filter AppPasswords to count.
+     * @example
+     * // Count the number of AppPasswords
+     * const count = await prisma.appPassword.count({
+     *   where: {
+     *     // ... the filter for the AppPasswords we want to count
+     *   }
+     * })
+    **/
+    count<T extends AppPasswordCountArgs>(
+      args?: Subset<T, AppPasswordCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AppPasswordCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AppPassword.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AppPasswordAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AppPasswordAggregateArgs>(args: Subset<T, AppPasswordAggregateArgs>): Prisma.PrismaPromise<GetAppPasswordAggregateType<T>>
+
+    /**
+     * Group by AppPassword.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AppPasswordGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AppPasswordGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AppPasswordGroupByArgs['orderBy'] }
+        : { orderBy?: AppPasswordGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AppPasswordGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAppPasswordGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AppPassword model
+   */
+  readonly fields: AppPasswordFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AppPassword.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AppPasswordClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AppPassword model
+   */
+  interface AppPasswordFieldRefs {
+    readonly id: FieldRef<"AppPassword", 'String'>
+    readonly userId: FieldRef<"AppPassword", 'String'>
+    readonly label: FieldRef<"AppPassword", 'String'>
+    readonly hashedPassword: FieldRef<"AppPassword", 'String'>
+    readonly lastUsedAt: FieldRef<"AppPassword", 'DateTime'>
+    readonly revokedAt: FieldRef<"AppPassword", 'DateTime'>
+    readonly createdAt: FieldRef<"AppPassword", 'DateTime'>
+    readonly updatedAt: FieldRef<"AppPassword", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AppPassword findUnique
+   */
+  export type AppPasswordFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AppPassword
+     */
+    select?: AppPasswordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AppPassword
+     */
+    omit?: AppPasswordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppPasswordInclude<ExtArgs> | null
+    /**
+     * Filter, which AppPassword to fetch.
+     */
+    where: AppPasswordWhereUniqueInput
+  }
+
+  /**
+   * AppPassword findUniqueOrThrow
+   */
+  export type AppPasswordFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AppPassword
+     */
+    select?: AppPasswordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AppPassword
+     */
+    omit?: AppPasswordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppPasswordInclude<ExtArgs> | null
+    /**
+     * Filter, which AppPassword to fetch.
+     */
+    where: AppPasswordWhereUniqueInput
+  }
+
+  /**
+   * AppPassword findFirst
+   */
+  export type AppPasswordFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AppPassword
+     */
+    select?: AppPasswordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AppPassword
+     */
+    omit?: AppPasswordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppPasswordInclude<ExtArgs> | null
+    /**
+     * Filter, which AppPassword to fetch.
+     */
+    where?: AppPasswordWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AppPasswords to fetch.
+     */
+    orderBy?: AppPasswordOrderByWithRelationInput | AppPasswordOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AppPasswords.
+     */
+    cursor?: AppPasswordWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AppPasswords from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AppPasswords.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AppPasswords.
+     */
+    distinct?: AppPasswordScalarFieldEnum | AppPasswordScalarFieldEnum[]
+  }
+
+  /**
+   * AppPassword findFirstOrThrow
+   */
+  export type AppPasswordFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AppPassword
+     */
+    select?: AppPasswordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AppPassword
+     */
+    omit?: AppPasswordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppPasswordInclude<ExtArgs> | null
+    /**
+     * Filter, which AppPassword to fetch.
+     */
+    where?: AppPasswordWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AppPasswords to fetch.
+     */
+    orderBy?: AppPasswordOrderByWithRelationInput | AppPasswordOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AppPasswords.
+     */
+    cursor?: AppPasswordWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AppPasswords from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AppPasswords.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AppPasswords.
+     */
+    distinct?: AppPasswordScalarFieldEnum | AppPasswordScalarFieldEnum[]
+  }
+
+  /**
+   * AppPassword findMany
+   */
+  export type AppPasswordFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AppPassword
+     */
+    select?: AppPasswordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AppPassword
+     */
+    omit?: AppPasswordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppPasswordInclude<ExtArgs> | null
+    /**
+     * Filter, which AppPasswords to fetch.
+     */
+    where?: AppPasswordWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AppPasswords to fetch.
+     */
+    orderBy?: AppPasswordOrderByWithRelationInput | AppPasswordOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AppPasswords.
+     */
+    cursor?: AppPasswordWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AppPasswords from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AppPasswords.
+     */
+    skip?: number
+    distinct?: AppPasswordScalarFieldEnum | AppPasswordScalarFieldEnum[]
+  }
+
+  /**
+   * AppPassword create
+   */
+  export type AppPasswordCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AppPassword
+     */
+    select?: AppPasswordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AppPassword
+     */
+    omit?: AppPasswordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppPasswordInclude<ExtArgs> | null
+    /**
+     * The data needed to create a AppPassword.
+     */
+    data: XOR<AppPasswordCreateInput, AppPasswordUncheckedCreateInput>
+  }
+
+  /**
+   * AppPassword createMany
+   */
+  export type AppPasswordCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AppPasswords.
+     */
+    data: AppPasswordCreateManyInput | AppPasswordCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AppPassword createManyAndReturn
+   */
+  export type AppPasswordCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AppPassword
+     */
+    select?: AppPasswordSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AppPassword
+     */
+    omit?: AppPasswordOmit<ExtArgs> | null
+    /**
+     * The data used to create many AppPasswords.
+     */
+    data: AppPasswordCreateManyInput | AppPasswordCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppPasswordIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AppPassword update
+   */
+  export type AppPasswordUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AppPassword
+     */
+    select?: AppPasswordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AppPassword
+     */
+    omit?: AppPasswordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppPasswordInclude<ExtArgs> | null
+    /**
+     * The data needed to update a AppPassword.
+     */
+    data: XOR<AppPasswordUpdateInput, AppPasswordUncheckedUpdateInput>
+    /**
+     * Choose, which AppPassword to update.
+     */
+    where: AppPasswordWhereUniqueInput
+  }
+
+  /**
+   * AppPassword updateMany
+   */
+  export type AppPasswordUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AppPasswords.
+     */
+    data: XOR<AppPasswordUpdateManyMutationInput, AppPasswordUncheckedUpdateManyInput>
+    /**
+     * Filter which AppPasswords to update
+     */
+    where?: AppPasswordWhereInput
+    /**
+     * Limit how many AppPasswords to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * AppPassword updateManyAndReturn
+   */
+  export type AppPasswordUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AppPassword
+     */
+    select?: AppPasswordSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AppPassword
+     */
+    omit?: AppPasswordOmit<ExtArgs> | null
+    /**
+     * The data used to update AppPasswords.
+     */
+    data: XOR<AppPasswordUpdateManyMutationInput, AppPasswordUncheckedUpdateManyInput>
+    /**
+     * Filter which AppPasswords to update
+     */
+    where?: AppPasswordWhereInput
+    /**
+     * Limit how many AppPasswords to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppPasswordIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AppPassword upsert
+   */
+  export type AppPasswordUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AppPassword
+     */
+    select?: AppPasswordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AppPassword
+     */
+    omit?: AppPasswordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppPasswordInclude<ExtArgs> | null
+    /**
+     * The filter to search for the AppPassword to update in case it exists.
+     */
+    where: AppPasswordWhereUniqueInput
+    /**
+     * In case the AppPassword found by the `where` argument doesn't exist, create a new AppPassword with this data.
+     */
+    create: XOR<AppPasswordCreateInput, AppPasswordUncheckedCreateInput>
+    /**
+     * In case the AppPassword was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AppPasswordUpdateInput, AppPasswordUncheckedUpdateInput>
+  }
+
+  /**
+   * AppPassword delete
+   */
+  export type AppPasswordDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AppPassword
+     */
+    select?: AppPasswordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AppPassword
+     */
+    omit?: AppPasswordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppPasswordInclude<ExtArgs> | null
+    /**
+     * Filter which AppPassword to delete.
+     */
+    where: AppPasswordWhereUniqueInput
+  }
+
+  /**
+   * AppPassword deleteMany
+   */
+  export type AppPasswordDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AppPasswords to delete
+     */
+    where?: AppPasswordWhereInput
+    /**
+     * Limit how many AppPasswords to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * AppPassword without action
+   */
+  export type AppPasswordDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AppPassword
+     */
+    select?: AppPasswordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AppPassword
+     */
+    omit?: AppPasswordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppPasswordInclude<ExtArgs> | null
   }
 
 
@@ -18269,6 +19494,20 @@ export namespace Prisma {
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+  export const AppPasswordScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    label: 'label',
+    hashedPassword: 'hashedPassword',
+    lastUsedAt: 'lastUsedAt',
+    revokedAt: 'revokedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type AppPasswordScalarFieldEnum = (typeof AppPasswordScalarFieldEnum)[keyof typeof AppPasswordScalarFieldEnum]
+
+
   export const ContactScalarFieldEnum: {
     id: 'id',
     userId: 'userId',
@@ -18975,6 +20214,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: BoolFilter<"User"> | boolean
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    appPasswords?: AppPasswordListRelationFilter
     contacts?: ContactListRelationFilter
     importJobs?: ImportJobListRelationFilter
     exportJobs?: ExportJobListRelationFilter
@@ -18994,6 +20234,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    appPasswords?: AppPasswordOrderByRelationAggregateInput
     contacts?: ContactOrderByRelationAggregateInput
     importJobs?: ImportJobOrderByRelationAggregateInput
     exportJobs?: ExportJobOrderByRelationAggregateInput
@@ -19016,6 +20257,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: BoolFilter<"User"> | boolean
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
+    appPasswords?: AppPasswordListRelationFilter
     contacts?: ContactListRelationFilter
     importJobs?: ImportJobListRelationFilter
     exportJobs?: ExportJobListRelationFilter
@@ -19052,6 +20294,76 @@ export namespace Prisma {
     autoFillPhoneticNames?: BoolWithAggregatesFilter<"User"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
+  }
+
+  export type AppPasswordWhereInput = {
+    AND?: AppPasswordWhereInput | AppPasswordWhereInput[]
+    OR?: AppPasswordWhereInput[]
+    NOT?: AppPasswordWhereInput | AppPasswordWhereInput[]
+    id?: StringFilter<"AppPassword"> | string
+    userId?: StringFilter<"AppPassword"> | string
+    label?: StringFilter<"AppPassword"> | string
+    hashedPassword?: StringFilter<"AppPassword"> | string
+    lastUsedAt?: DateTimeNullableFilter<"AppPassword"> | Date | string | null
+    revokedAt?: DateTimeNullableFilter<"AppPassword"> | Date | string | null
+    createdAt?: DateTimeFilter<"AppPassword"> | Date | string
+    updatedAt?: DateTimeFilter<"AppPassword"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type AppPasswordOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    label?: SortOrder
+    hashedPassword?: SortOrder
+    lastUsedAt?: SortOrderInput | SortOrder
+    revokedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type AppPasswordWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: AppPasswordWhereInput | AppPasswordWhereInput[]
+    OR?: AppPasswordWhereInput[]
+    NOT?: AppPasswordWhereInput | AppPasswordWhereInput[]
+    userId?: StringFilter<"AppPassword"> | string
+    label?: StringFilter<"AppPassword"> | string
+    hashedPassword?: StringFilter<"AppPassword"> | string
+    lastUsedAt?: DateTimeNullableFilter<"AppPassword"> | Date | string | null
+    revokedAt?: DateTimeNullableFilter<"AppPassword"> | Date | string | null
+    createdAt?: DateTimeFilter<"AppPassword"> | Date | string
+    updatedAt?: DateTimeFilter<"AppPassword"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type AppPasswordOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    label?: SortOrder
+    hashedPassword?: SortOrder
+    lastUsedAt?: SortOrderInput | SortOrder
+    revokedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: AppPasswordCountOrderByAggregateInput
+    _max?: AppPasswordMaxOrderByAggregateInput
+    _min?: AppPasswordMinOrderByAggregateInput
+  }
+
+  export type AppPasswordScalarWhereWithAggregatesInput = {
+    AND?: AppPasswordScalarWhereWithAggregatesInput | AppPasswordScalarWhereWithAggregatesInput[]
+    OR?: AppPasswordScalarWhereWithAggregatesInput[]
+    NOT?: AppPasswordScalarWhereWithAggregatesInput | AppPasswordScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"AppPassword"> | string
+    userId?: StringWithAggregatesFilter<"AppPassword"> | string
+    label?: StringWithAggregatesFilter<"AppPassword"> | string
+    hashedPassword?: StringWithAggregatesFilter<"AppPassword"> | string
+    lastUsedAt?: DateTimeNullableWithAggregatesFilter<"AppPassword"> | Date | string | null
+    revokedAt?: DateTimeNullableWithAggregatesFilter<"AppPassword"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"AppPassword"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"AppPassword"> | Date | string
   }
 
   export type ContactWhereInput = {
@@ -20555,6 +21867,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
@@ -20574,6 +21887,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
@@ -20593,6 +21907,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
@@ -20612,6 +21927,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
@@ -20651,6 +21967,82 @@ export namespace Prisma {
     password?: StringFieldUpdateOperationsInput | string
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AppPasswordCreateInput = {
+    id?: string
+    label: string
+    hashedPassword: string
+    lastUsedAt?: Date | string | null
+    revokedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutAppPasswordsInput
+  }
+
+  export type AppPasswordUncheckedCreateInput = {
+    id?: string
+    userId: string
+    label: string
+    hashedPassword: string
+    lastUsedAt?: Date | string | null
+    revokedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AppPasswordUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    label?: StringFieldUpdateOperationsInput | string
+    hashedPassword?: StringFieldUpdateOperationsInput | string
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutAppPasswordsNestedInput
+  }
+
+  export type AppPasswordUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    label?: StringFieldUpdateOperationsInput | string
+    hashedPassword?: StringFieldUpdateOperationsInput | string
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AppPasswordCreateManyInput = {
+    id?: string
+    userId: string
+    label: string
+    hashedPassword: string
+    lastUsedAt?: Date | string | null
+    revokedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AppPasswordUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    label?: StringFieldUpdateOperationsInput | string
+    hashedPassword?: StringFieldUpdateOperationsInput | string
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AppPasswordUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    label?: StringFieldUpdateOperationsInput | string
+    hashedPassword?: StringFieldUpdateOperationsInput | string
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -22472,6 +23864,12 @@ export namespace Prisma {
     not?: NestedDateTimeFilter<$PrismaModel> | Date | string
   }
 
+  export type AppPasswordListRelationFilter = {
+    every?: AppPasswordWhereInput
+    some?: AppPasswordWhereInput
+    none?: AppPasswordWhereInput
+  }
+
   export type ContactListRelationFilter = {
     every?: ContactWhereInput
     some?: ContactWhereInput
@@ -22522,6 +23920,10 @@ export namespace Prisma {
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
+  }
+
+  export type AppPasswordOrderByRelationAggregateInput = {
+    _count?: SortOrder
   }
 
   export type ContactOrderByRelationAggregateInput = {
@@ -22653,17 +24055,6 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
-  export type IntFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel>
-    in?: number[] | ListIntFieldRefInput<$PrismaModel>
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntFilter<$PrismaModel> | number
-  }
-
   export type DateTimeNullableFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
@@ -22673,6 +24064,69 @@ export namespace Prisma {
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
+  }
+
+  export type UserScalarRelationFilter = {
+    is?: UserWhereInput
+    isNot?: UserWhereInput
+  }
+
+  export type AppPasswordCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    label?: SortOrder
+    hashedPassword?: SortOrder
+    lastUsedAt?: SortOrder
+    revokedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AppPasswordMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    label?: SortOrder
+    hashedPassword?: SortOrder
+    lastUsedAt?: SortOrder
+    revokedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AppPasswordMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    label?: SortOrder
+    hashedPassword?: SortOrder
+    lastUsedAt?: SortOrder
+    revokedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
   }
   export type JsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -22696,11 +24150,6 @@ export namespace Prisma {
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-  }
-
-  export type UserScalarRelationFilter = {
-    is?: UserWhereInput
-    isNot?: UserWhereInput
   }
 
   export type ImportJobNullableScalarRelationFilter = {
@@ -22865,20 +24314,6 @@ export namespace Prisma {
     _sum?: NestedIntFilter<$PrismaModel>
     _min?: NestedIntFilter<$PrismaModel>
     _max?: NestedIntFilter<$PrismaModel>
-  }
-
-  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
   export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -24070,6 +25505,13 @@ export namespace Prisma {
     _max?: NestedEnumSyncResolutionStrategyNullableFilter<$PrismaModel>
   }
 
+  export type AppPasswordCreateNestedManyWithoutUserInput = {
+    create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
+    createMany?: AppPasswordCreateManyUserInputEnvelope
+    connect?: AppPasswordWhereUniqueInput | AppPasswordWhereUniqueInput[]
+  }
+
   export type ContactCreateNestedManyWithoutUserInput = {
     create?: XOR<ContactCreateWithoutUserInput, ContactUncheckedCreateWithoutUserInput> | ContactCreateWithoutUserInput[] | ContactUncheckedCreateWithoutUserInput[]
     connectOrCreate?: ContactCreateOrConnectWithoutUserInput | ContactCreateOrConnectWithoutUserInput[]
@@ -24123,6 +25565,13 @@ export namespace Prisma {
     connectOrCreate?: SubscriptionCreateOrConnectWithoutUserInput | SubscriptionCreateOrConnectWithoutUserInput[]
     createMany?: SubscriptionCreateManyUserInputEnvelope
     connect?: SubscriptionWhereUniqueInput | SubscriptionWhereUniqueInput[]
+  }
+
+  export type AppPasswordUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
+    createMany?: AppPasswordCreateManyUserInputEnvelope
+    connect?: AppPasswordWhereUniqueInput | AppPasswordWhereUniqueInput[]
   }
 
   export type ContactUncheckedCreateNestedManyWithoutUserInput = {
@@ -24198,6 +25647,20 @@ export namespace Prisma {
 
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
+  }
+
+  export type AppPasswordUpdateManyWithoutUserNestedInput = {
+    create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
+    upsert?: AppPasswordUpsertWithWhereUniqueWithoutUserInput | AppPasswordUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: AppPasswordCreateManyUserInputEnvelope
+    set?: AppPasswordWhereUniqueInput | AppPasswordWhereUniqueInput[]
+    disconnect?: AppPasswordWhereUniqueInput | AppPasswordWhereUniqueInput[]
+    delete?: AppPasswordWhereUniqueInput | AppPasswordWhereUniqueInput[]
+    connect?: AppPasswordWhereUniqueInput | AppPasswordWhereUniqueInput[]
+    update?: AppPasswordUpdateWithWhereUniqueWithoutUserInput | AppPasswordUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: AppPasswordUpdateManyWithWhereWithoutUserInput | AppPasswordUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: AppPasswordScalarWhereInput | AppPasswordScalarWhereInput[]
   }
 
   export type ContactUpdateManyWithoutUserNestedInput = {
@@ -24308,6 +25771,20 @@ export namespace Prisma {
     deleteMany?: SubscriptionScalarWhereInput | SubscriptionScalarWhereInput[]
   }
 
+  export type AppPasswordUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
+    upsert?: AppPasswordUpsertWithWhereUniqueWithoutUserInput | AppPasswordUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: AppPasswordCreateManyUserInputEnvelope
+    set?: AppPasswordWhereUniqueInput | AppPasswordWhereUniqueInput[]
+    disconnect?: AppPasswordWhereUniqueInput | AppPasswordWhereUniqueInput[]
+    delete?: AppPasswordWhereUniqueInput | AppPasswordWhereUniqueInput[]
+    connect?: AppPasswordWhereUniqueInput | AppPasswordWhereUniqueInput[]
+    update?: AppPasswordUpdateWithWhereUniqueWithoutUserInput | AppPasswordUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: AppPasswordUpdateManyWithWhereWithoutUserInput | AppPasswordUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: AppPasswordScalarWhereInput | AppPasswordScalarWhereInput[]
+  }
+
   export type ContactUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<ContactCreateWithoutUserInput, ContactUncheckedCreateWithoutUserInput> | ContactCreateWithoutUserInput[] | ContactUncheckedCreateWithoutUserInput[]
     connectOrCreate?: ContactCreateOrConnectWithoutUserInput | ContactCreateOrConnectWithoutUserInput[]
@@ -24416,6 +25893,24 @@ export namespace Prisma {
     deleteMany?: SubscriptionScalarWhereInput | SubscriptionScalarWhereInput[]
   }
 
+  export type UserCreateNestedOneWithoutAppPasswordsInput = {
+    create?: XOR<UserCreateWithoutAppPasswordsInput, UserUncheckedCreateWithoutAppPasswordsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutAppPasswordsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type NullableDateTimeFieldUpdateOperationsInput = {
+    set?: Date | string | null
+  }
+
+  export type UserUpdateOneRequiredWithoutAppPasswordsNestedInput = {
+    create?: XOR<UserCreateWithoutAppPasswordsInput, UserUncheckedCreateWithoutAppPasswordsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutAppPasswordsInput
+    upsert?: UserUpsertWithoutAppPasswordsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutAppPasswordsInput, UserUpdateWithoutAppPasswordsInput>, UserUncheckedUpdateWithoutAppPasswordsInput>
+  }
+
   export type UserCreateNestedOneWithoutContactsInput = {
     create?: XOR<UserCreateWithoutContactsInput, UserUncheckedCreateWithoutContactsInput>
     connectOrCreate?: UserCreateOrConnectWithoutContactsInput
@@ -24510,10 +26005,6 @@ export namespace Prisma {
     decrement?: number
     multiply?: number
     divide?: number
-  }
-
-  export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null
   }
 
   export type UserUpdateOneRequiredWithoutContactsNestedInput = {
@@ -25454,6 +26945,20 @@ export namespace Prisma {
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
+  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
+    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
+    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
+    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedDateTimeNullableFilter<$PrismaModel>
+    _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -25479,20 +26984,6 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
-  }
-
-  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
   export type NestedJsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -25889,6 +27380,36 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedEnumSyncResolutionStrategyNullableFilter<$PrismaModel>
     _max?: NestedEnumSyncResolutionStrategyNullableFilter<$PrismaModel>
+  }
+
+  export type AppPasswordCreateWithoutUserInput = {
+    id?: string
+    label: string
+    hashedPassword: string
+    lastUsedAt?: Date | string | null
+    revokedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AppPasswordUncheckedCreateWithoutUserInput = {
+    id?: string
+    label: string
+    hashedPassword: string
+    lastUsedAt?: Date | string | null
+    revokedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AppPasswordCreateOrConnectWithoutUserInput = {
+    where: AppPasswordWhereUniqueInput
+    create: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput>
+  }
+
+  export type AppPasswordCreateManyUserInputEnvelope = {
+    data: AppPasswordCreateManyUserInput | AppPasswordCreateManyUserInput[]
+    skipDuplicates?: boolean
   }
 
   export type ContactCreateWithoutUserInput = {
@@ -26344,6 +27865,36 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type AppPasswordUpsertWithWhereUniqueWithoutUserInput = {
+    where: AppPasswordWhereUniqueInput
+    update: XOR<AppPasswordUpdateWithoutUserInput, AppPasswordUncheckedUpdateWithoutUserInput>
+    create: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput>
+  }
+
+  export type AppPasswordUpdateWithWhereUniqueWithoutUserInput = {
+    where: AppPasswordWhereUniqueInput
+    data: XOR<AppPasswordUpdateWithoutUserInput, AppPasswordUncheckedUpdateWithoutUserInput>
+  }
+
+  export type AppPasswordUpdateManyWithWhereWithoutUserInput = {
+    where: AppPasswordScalarWhereInput
+    data: XOR<AppPasswordUpdateManyMutationInput, AppPasswordUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type AppPasswordScalarWhereInput = {
+    AND?: AppPasswordScalarWhereInput | AppPasswordScalarWhereInput[]
+    OR?: AppPasswordScalarWhereInput[]
+    NOT?: AppPasswordScalarWhereInput | AppPasswordScalarWhereInput[]
+    id?: StringFilter<"AppPassword"> | string
+    userId?: StringFilter<"AppPassword"> | string
+    label?: StringFilter<"AppPassword"> | string
+    hashedPassword?: StringFilter<"AppPassword"> | string
+    lastUsedAt?: DateTimeNullableFilter<"AppPassword"> | Date | string | null
+    revokedAt?: DateTimeNullableFilter<"AppPassword"> | Date | string | null
+    createdAt?: DateTimeFilter<"AppPassword"> | Date | string
+    updatedAt?: DateTimeFilter<"AppPassword"> | Date | string
+  }
+
   export type ContactUpsertWithWhereUniqueWithoutUserInput = {
     where: ContactWhereUniqueInput
     update: XOR<ContactUpdateWithoutUserInput, ContactUncheckedUpdateWithoutUserInput>
@@ -26684,6 +28235,98 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Subscription"> | Date | string
   }
 
+  export type UserCreateWithoutAppPasswordsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutAppPasswordsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutAppPasswordsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutAppPasswordsInput, UserUncheckedCreateWithoutAppPasswordsInput>
+  }
+
+  export type UserUpsertWithoutAppPasswordsInput = {
+    update: XOR<UserUpdateWithoutAppPasswordsInput, UserUncheckedUpdateWithoutAppPasswordsInput>
+    create: XOR<UserCreateWithoutAppPasswordsInput, UserUncheckedCreateWithoutAppPasswordsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutAppPasswordsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutAppPasswordsInput, UserUncheckedUpdateWithoutAppPasswordsInput>
+  }
+
+  export type UserUpdateWithoutAppPasswordsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutAppPasswordsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  }
+
   export type UserCreateWithoutContactsInput = {
     id?: string
     name?: string | null
@@ -26693,6 +28336,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
@@ -26711,6 +28355,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
@@ -27191,6 +28836,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
@@ -27209,6 +28855,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
@@ -27516,6 +29163,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
@@ -27534,6 +29182,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
@@ -27630,6 +29279,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
@@ -27648,6 +29298,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
@@ -27682,6 +29333,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
@@ -27700,6 +29352,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
@@ -27759,6 +29412,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
@@ -27777,6 +29431,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
@@ -27826,6 +29481,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
@@ -27844,6 +29500,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
@@ -27984,6 +29641,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
@@ -28002,6 +29660,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
@@ -28036,6 +29695,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
@@ -28054,6 +29714,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
@@ -28088,6 +29749,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
@@ -28106,6 +29768,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
@@ -28124,6 +29787,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
@@ -28142,6 +29806,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
@@ -28416,6 +30081,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
@@ -28434,6 +30100,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
@@ -28725,6 +30392,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
@@ -28743,6 +30411,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
@@ -28826,6 +30495,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
@@ -28844,6 +30514,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
@@ -28862,6 +30533,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
     contacts?: ContactCreateNestedManyWithoutUserInput
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
@@ -28880,6 +30552,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
@@ -29064,6 +30737,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
     contacts?: ContactUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
@@ -29082,6 +30756,7 @@ export namespace Prisma {
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
@@ -30159,6 +31834,16 @@ export namespace Prisma {
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
+  export type AppPasswordCreateManyUserInput = {
+    id?: string
+    label: string
+    hashedPassword: string
+    lastUsedAt?: Date | string | null
+    revokedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type ContactCreateManyUserInput = {
     id?: string
     importJobId?: string | null
@@ -30326,6 +32011,36 @@ export namespace Prisma {
     endedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+  }
+
+  export type AppPasswordUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    label?: StringFieldUpdateOperationsInput | string
+    hashedPassword?: StringFieldUpdateOperationsInput | string
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AppPasswordUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    label?: StringFieldUpdateOperationsInput | string
+    hashedPassword?: StringFieldUpdateOperationsInput | string
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AppPasswordUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    label?: StringFieldUpdateOperationsInput | string
+    hashedPassword?: StringFieldUpdateOperationsInput | string
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type ContactUpdateWithoutUserInput = {

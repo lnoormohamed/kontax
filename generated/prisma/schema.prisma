@@ -143,6 +143,7 @@ model User {
   password              String
   lifecycleState        AccountLifecycleState @default(ACTIVE)
   autoFillPhoneticNames Boolean               @default(false)
+  appPasswords          AppPassword[]
   contacts              Contact[]
   importJobs            ImportJob[]
   exportJobs            ExportJob[]
@@ -153,6 +154,21 @@ model User {
   subscriptions         Subscription[]
   createdAt             DateTime              @default(now())
   updatedAt             DateTime              @updatedAt
+}
+
+model AppPassword {
+  id             String    @id @default(cuid())
+  userId         String
+  label          String
+  hashedPassword String
+  lastUsedAt     DateTime?
+  revokedAt      DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt, createdAt])
+  @@index([userId, revokedAt])
 }
 
 model Contact {

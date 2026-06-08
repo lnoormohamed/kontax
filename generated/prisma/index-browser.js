@@ -132,6 +132,17 @@ exports.Prisma.UserScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.AppPasswordScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  label: 'label',
+  hashedPassword: 'hashedPassword',
+  lastUsedAt: 'lastUsedAt',
+  revokedAt: 'revokedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.ContactScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -539,6 +550,7 @@ exports.SyncResolutionStrategy = exports.$Enums.SyncResolutionStrategy = {
 
 exports.Prisma.ModelName = {
   User: 'User',
+  AppPassword: 'AppPassword',
   Contact: 'Contact',
   SubscriptionCustomer: 'SubscriptionCustomer',
   Subscription: 'Subscription',

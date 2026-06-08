@@ -1,7 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { AppPasswordManager } from "~/app/_components/app-password-manager";
 import { updatePhoneticSettings } from "~/app/actions/settings";
+import { canCreateAppPassword, listUserAppPasswords } from "~/server/app-passwords";
 import { signOut } from "~/server/auth";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
@@ -36,6 +38,10 @@ export default async function SettingsPage() {
   }
 
   const planSummary = await getUserPlanSummary(session.user.id);
+  const [appPasswords, appPasswordAllowance] = await Promise.all([
+    listUserAppPasswords(session.user.id),
+    canCreateAppPassword(session.user.id),
+  ]);
   const userSettings = await db.user.findUnique({
     where: {
       id: session.user.id,
@@ -239,6 +245,32 @@ export default async function SettingsPage() {
               <p className="mt-5 text-sm leading-6 text-slate-500">
                 {planSummary.lifecyclePolicy.description}
               </p>
+            </div>
+
+            <div className="rounded-[2rem] border border-[#d8ddd6] bg-white p-6 shadow-sm">
+              <div>
+                <p className="text-lg font-semibold text-slate-900">Device app passwords</p>
+                <p className="mt-1 text-sm text-slate-500">
+                  Create revocable device-specific passwords for CardDAV clients so your main
+                  Kontax login password never has to live inside a phone or sync app.
+                </p>
+              </div>
+
+              <div className="mt-5 rounded-[1.4rem] border border-[#d8ddd6] bg-[#fbfcf8] p-4">
+                <p className="text-sm font-semibold text-slate-900">Current allowance</p>
+                <p className="mt-2 text-sm leading-6 text-slate-500">
+                  {appPasswordAllowance.limit == null
+                    ? `Your ${planSummary.planLabel} plan can create unlimited active app passwords.`
+                    : `Your ${planSummary.planLabel} plan allows ${appPasswordAllowance.limit} active app password${appPasswordAllowance.limit === 1 ? "" : "s"}. You currently have ${appPasswordAllowance.current}.`}
+                </p>
+              </div>
+
+              <div className="mt-5">
+                <AppPasswordManager
+                  allowance={appPasswordAllowance}
+                  appPasswords={appPasswords}
+                />
+              </div>
             </div>
           </div>
 
