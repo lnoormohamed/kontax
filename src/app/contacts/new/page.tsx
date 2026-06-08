@@ -17,6 +17,10 @@ const progressiveDetailsClassName =
   "group rounded-[1.6rem] border border-[#e3e8f2] bg-[#f7f9fe] px-4 py-3 shadow-sm";
 const progressiveSummaryClassName =
   "flex cursor-pointer list-none items-center justify-between gap-4 rounded-[1.25rem] px-2 py-1 text-left transition hover:bg-white/70";
+const progressiveInnerCardClassName =
+  "rounded-[1.4rem] border border-[#d9e2f1] bg-white/80 p-4";
+const progressiveSectionTitleClassName =
+  "text-xs font-semibold uppercase tracking-[0.2em] text-slate-400";
 
 export default async function NewContactPage() {
   const session = await auth();
@@ -85,26 +89,8 @@ export default async function NewContactPage() {
                   <input className={inputClassName} name="firstName" type="text" />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
-                  <span>Phonetic first name</span>
-                  <input
-                    className={inputClassName}
-                    name="phoneticFirstName"
-                    placeholder="Optional"
-                    type="text"
-                  />
-                </label>
-                <label className="grid gap-2 text-sm text-slate-700">
                   <span>Last name</span>
                   <input className={inputClassName} name="lastName" type="text" />
-                </label>
-                <label className="grid gap-2 text-sm text-slate-700">
-                  <span>Phonetic last name</span>
-                  <input
-                    className={inputClassName}
-                    name="phoneticLastName"
-                    placeholder="Optional"
-                    type="text"
-                  />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Company</span>
@@ -112,15 +98,6 @@ export default async function NewContactPage() {
                     className={inputClassName}
                     name="company"
                     placeholder="Kontax Labs"
-                    type="text"
-                  />
-                </label>
-                <label className="grid gap-2 text-sm text-slate-700">
-                  <span>Phonetic company</span>
-                  <input
-                    className={inputClassName}
-                    name="phoneticCompany"
-                    placeholder="Optional"
                     type="text"
                   />
                 </label>
@@ -167,12 +144,47 @@ export default async function NewContactPage() {
               <summary className={progressiveSummaryClassName}>
                 <div>
                   <p className="text-base font-semibold text-slate-900">Add more name fields</p>
-                  <p className="mt-1 text-sm text-slate-500">Middle name, prefix, suffix, nickname, labels, avatar.</p>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Phonetic readings, middle name, prefix, suffix, nickname, labels, avatar.
+                  </p>
                 </div>
                 <span className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-[#4158f4] shadow-sm">+ Add</span>
               </summary>
 
               <div className="mt-4 grid gap-4 border-t border-[#d9e2f1] pt-4 lg:grid-cols-2">
+                <div className={`${progressiveInnerCardClassName} lg:col-span-2`}>
+                  <p className={progressiveSectionTitleClassName}>Phonetic and sorting</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-500">
+                    Leave these blank if you want Kontax to suggest phonetic readings from the name or company.
+                  </p>
+                </div>
+                <label className="grid gap-2 text-sm text-slate-700">
+                  <span>Phonetic first name</span>
+                  <input
+                    className={inputClassName}
+                    name="phoneticFirstName"
+                    placeholder="Optional"
+                    type="text"
+                  />
+                </label>
+                <label className="grid gap-2 text-sm text-slate-700">
+                  <span>Phonetic last name</span>
+                  <input
+                    className={inputClassName}
+                    name="phoneticLastName"
+                    placeholder="Optional"
+                    type="text"
+                  />
+                </label>
+                <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
+                  <span>Phonetic company</span>
+                  <input
+                    className={inputClassName}
+                    name="phoneticCompany"
+                    placeholder="Optional"
+                    type="text"
+                  />
+                </label>
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Middle name</span>
                   <input className={inputClassName} name="middleName" type="text" />
@@ -189,6 +201,12 @@ export default async function NewContactPage() {
                   <span>Nickname</span>
                   <input className={inputClassName} name="nickname" type="text" />
                 </label>
+                <div className={`${progressiveInnerCardClassName} lg:col-span-2`}>
+                  <p className={progressiveSectionTitleClassName}>Profile extras</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-500">
+                    Labels help search and filtering. Avatar links are optional and can stay Kontax-local.
+                  </p>
+                </div>
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Labels</span>
                   <input
@@ -215,6 +233,12 @@ export default async function NewContactPage() {
               </summary>
 
               <div className="mt-4 grid gap-4 border-t border-[#d9e2f1] pt-4 lg:grid-cols-2">
+                <div className={`${progressiveInnerCardClassName} lg:col-span-2`}>
+                  <p className={progressiveSectionTitleClassName}>Email</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-500">
+                    Clear labels like personal, work, or school help import and export mapping stay readable.
+                  </p>
+                </div>
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Email label</span>
                   <input className={inputClassName} name="emailLabel" placeholder="work" type="text" />
@@ -240,6 +264,12 @@ export default async function NewContactPage() {
                     placeholder={"One per line for anything beyond the labeled primary and secondary emails\nteam@example.com"}
                   />
                 </label>
+                <div className={`${progressiveInnerCardClassName} lg:col-span-2`}>
+                  <p className={progressiveSectionTitleClassName}>Phone</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-500">
+                    Keep the main number up top and use this section for structured overflow and labels.
+                  </p>
+                </div>
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Phone label</span>
                   <input className={inputClassName} name="phoneLabel" placeholder="mobile" type="text" />
@@ -278,6 +308,12 @@ export default async function NewContactPage() {
               </summary>
 
               <div className="mt-4 grid gap-4 border-t border-[#d9e2f1] pt-4 lg:grid-cols-2">
+                <div className={`${progressiveInnerCardClassName} lg:col-span-2`}>
+                  <p className={progressiveSectionTitleClassName}>Website</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-500">
+                    Personal site, company home page, portfolio, or any destination you want to preserve.
+                  </p>
+                </div>
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Website</span>
                   <input className={inputClassName} name="website" type="url" />
@@ -307,6 +343,12 @@ export default async function NewContactPage() {
                     placeholder={"One per line for anything beyond the labeled primary and secondary websites\nhttps://example.com"}
                   />
                 </label>
+                <div className={`${progressiveInnerCardClassName} lg:col-span-2`}>
+                  <p className={progressiveSectionTitleClassName}>Address</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-500">
+                    A full address works, but structured lines make export and future sync more reliable.
+                  </p>
+                </div>
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Address label</span>
                   <input className={inputClassName} name="addressLabel" placeholder="home" type="text" />
@@ -360,6 +402,12 @@ export default async function NewContactPage() {
               </summary>
 
               <div className="mt-4 grid gap-4 border-t border-[#d9e2f1] pt-4 lg:grid-cols-2">
+                <div className={`${progressiveInnerCardClassName} lg:col-span-2`}>
+                  <p className={progressiveSectionTitleClassName}>Dates</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-500">
+                    Keep birthday up top and use this space for anniversaries, milestones, and other remembered dates.
+                  </p>
+                </div>
                 <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
                   <span>Significant dates</span>
                   <textarea
@@ -368,6 +416,12 @@ export default async function NewContactPage() {
                     placeholder={"Label | YYYY-MM-DD\nAnniversary | 2018-06-09"}
                   />
                 </label>
+                <div className={`${progressiveInnerCardClassName} lg:col-span-2`}>
+                  <p className={progressiveSectionTitleClassName}>Relationships and custom data</p>
+                  <p className="mt-2 text-sm leading-6 text-slate-500">
+                    These stay useful for merge context and personal memory, even if some export targets ignore them.
+                  </p>
+                </div>
                 <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
                   <span>Related people</span>
                   <textarea

@@ -33,12 +33,12 @@ const formatNullableTimestamp = (value: Date | null) => (value ? formatTimestamp
 const getFormattedAddressArray = (value: unknown) =>
   parseContactPostalAddresses(value).map((item) => item.formatted);
 
-const getPrimaryStructuredEntry = <T,>(value: unknown) => {
-  if (!Array.isArray(value) || value.length === 0) {
+const getStructuredEntryAt = <T,>(value: unknown, index: number) => {
+  if (!Array.isArray(value) || value.length <= index) {
     return undefined;
   }
 
-  return value[0] as T;
+  return value[index] as T;
 };
 
 const getStructuredEntryCount = (value: unknown) => (Array.isArray(value) ? value.length : 0);
@@ -108,6 +108,10 @@ const progressiveDetailsClassName =
   "group rounded-[1.6rem] border border-[#dbe5df] bg-[#f6faf8] px-4 py-3 shadow-sm";
 const progressiveSummaryClassName =
   "flex cursor-pointer list-none items-center justify-between gap-4 rounded-[1.25rem] px-2 py-1 text-left transition hover:bg-white/70";
+const progressiveInnerCardClassName =
+  "rounded-[1.4rem] border border-[#dce8e2] bg-white p-4";
+const progressiveSectionTitleClassName =
+  "text-xs font-semibold uppercase tracking-[0.2em] text-slate-400";
 
 export default async function ContactDetailPage({ params, searchParams }: ContactDetailPageProps) {
   const session = await auth();
@@ -223,18 +227,17 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     },
   });
 
-  const additionalEmails = parseContactStringArray(contact.emailAddresses)
-    .filter((item) => item !== contact.email)
-    .join("\n");
-  const additionalPhones = parseContactStringArray(contact.phoneNumbers)
-    .filter((item) => item !== contact.phone)
-    .join("\n");
-  const additionalAddresses = getFormattedAddressArray(contact.postalAddresses)
-    .filter((item) => item !== contact.address)
-    .join("\n");
-  const primaryEmailEntry = getPrimaryStructuredEntry<{ label?: string }>(contact.emailEntries);
-  const primaryPhoneEntry = getPrimaryStructuredEntry<{ label?: string }>(contact.phoneEntries);
-  const primaryAddressEntry = getPrimaryStructuredEntry<{
+  const primaryEmailEntry = getStructuredEntryAt<{ label?: string }>(contact.emailEntries, 0);
+  const secondaryEmailEntry = getStructuredEntryAt<{ label?: string; value?: string }>(
+    contact.emailEntries,
+    1,
+  );
+  const primaryPhoneEntry = getStructuredEntryAt<{ label?: string }>(contact.phoneEntries, 0);
+  const secondaryPhoneEntry = getStructuredEntryAt<{ label?: string; value?: string }>(
+    contact.phoneEntries,
+    1,
+  );
+  const primaryAddressEntry = getStructuredEntryAt<{
     label?: string;
     countryOrRegion?: string;
     streetLine1?: string;
@@ -242,8 +245,27 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     cityOrTown?: string;
     postcode?: string;
     poBox?: string;
-  }>(contact.addressEntries);
-  const primaryWebsiteEntry = getPrimaryStructuredEntry<{ label?: string }>(contact.websiteEntries);
+  }>(contact.addressEntries, 0);
+  const primaryWebsiteEntry = getStructuredEntryAt<{ label?: string }>(contact.websiteEntries, 0);
+  const secondaryWebsiteEntry = getStructuredEntryAt<{ label?: string; value?: string }>(
+    contact.websiteEntries,
+    1,
+  );
+  const secondaryEmailValue =
+    typeof secondaryEmailEntry?.value === "string" ? secondaryEmailEntry.value : "";
+  const secondaryPhoneValue =
+    typeof secondaryPhoneEntry?.value === "string" ? secondaryPhoneEntry.value : "";
+  const secondaryWebsiteValue =
+    typeof secondaryWebsiteEntry?.value === "string" ? secondaryWebsiteEntry.value : "";
+  const additionalEmails = parseContactStringArray(contact.emailAddresses)
+    .filter((item) => item !== contact.email && item !== secondaryEmailValue)
+    .join("\n");
+  const additionalPhones = parseContactStringArray(contact.phoneNumbers)
+    .filter((item) => item !== contact.phone && item !== secondaryPhoneValue)
+    .join("\n");
+  const additionalAddresses = getFormattedAddressArray(contact.postalAddresses)
+    .filter((item) => item !== contact.address)
+    .join("\n");
   const labelsValue = Array.isArray(contact.labels) ? contact.labels.join(", ") : "";
   const additionalWebsites =
     Array.isArray(contact.websiteEntries)
@@ -254,7 +276,11 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
             }
 
             const value = (entry as { value?: string }).value;
-            return typeof value === "string" && value !== contact.website ? value : undefined;
+            return typeof value === "string" &&
+              value !== contact.website &&
+              value !== secondaryWebsiteValue
+              ? value
+              : undefined;
           })
           .filter((item): item is string => Boolean(item))
           .join("\n")
@@ -561,12 +587,20 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                   <summary className={progressiveSummaryClassName}>
                     <div>
                       <p className="text-base font-semibold text-slate-900">Add more name fields</p>
-                      <p className="mt-1 text-sm text-slate-500">Middle name, prefix, suffix, nickname, labels, avatar.</p>
+                      <p className="mt-1 text-sm text-slate-500">
+                        Phonetic readings, middle name, prefix, suffix, nickname, labels, avatar.
+                      </p>
                     </div>
                     <span className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-[#1f7a67] shadow-sm">+ Add</span>
                   </summary>
 
                   <div className="mt-4 grid gap-4 border-t border-[#dce8e2] pt-4 lg:grid-cols-2">
+                    <div className={`${progressiveInnerCardClassName} lg:col-span-2`}>
+                      <p className={progressiveSectionTitleClassName}>Phonetic and sorting</p>
+                      <p className="mt-2 text-sm leading-6 text-slate-500">
+                        These readings help search, sorting, and cross-script handling. Manual edits always win over auto-fill.
+                      </p>
+                    </div>
                     <label className="grid gap-2 text-sm text-slate-700">
                       <span>Phonetic first name</span>
                       <input
@@ -610,8 +644,11 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                         type="text"
                       />
                     </label>
-                    <div className="rounded-[1.2rem] border border-[#dfe7e1] bg-white px-4 py-3 text-sm text-slate-600 lg:col-span-2">
-                      If phonetic auto-fill is enabled in settings, blank phonetic fields can still be generated automatically, while manual edits always win.
+                    <div className={`${progressiveInnerCardClassName} lg:col-span-2`}>
+                      <p className={progressiveSectionTitleClassName}>Profile extras</p>
+                      <p className="mt-2 text-sm leading-6 text-slate-500">
+                        Labels help the list and filters. Avatars and nicknames add context without making the homepage heavier.
+                      </p>
                     </div>
                     <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
                       <span>Avatar URL</span>
@@ -634,27 +671,73 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                   <summary className={progressiveSummaryClassName}>
                     <div>
                       <p className="text-base font-semibold text-slate-900">Add more email and phone fields</p>
-                      <p className="mt-1 text-sm text-slate-500">Labels, secondary values, and overflow contact methods.</p>
+                      <p className="mt-1 text-sm text-slate-500">
+                        Labels, secondary values, and overflow contact methods.
+                      </p>
                     </div>
                     <span className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-[#1f7a67] shadow-sm">+ Add</span>
                   </summary>
 
                   <div className="mt-4 grid gap-4 border-t border-[#dce8e2] pt-4 lg:grid-cols-2">
+                    <div className={`${progressiveInnerCardClassName} lg:col-span-2`}>
+                      <p className={progressiveSectionTitleClassName}>Email</p>
+                      <p className="mt-2 text-sm leading-6 text-slate-500">
+                        Labeled secondary methods stay easier to understand in exports than a single generic overflow list.
+                      </p>
+                    </div>
                     <label className="grid gap-2 text-sm text-slate-700">
                       <span>Email label</span>
                       <input className={inputClassName} defaultValue={primaryEmailEntry?.label ?? ""} name="emailLabel" type="text" />
+                    </label>
+                    <label className="grid gap-2 text-sm text-slate-700">
+                      <span>Secondary email</span>
+                      <input
+                        className={inputClassName}
+                        defaultValue={secondaryEmailValue}
+                        name="secondaryEmail"
+                        type="email"
+                      />
+                    </label>
+                    <label className="grid gap-2 text-sm text-slate-700">
+                      <span>Secondary email label</span>
+                      <input
+                        className={inputClassName}
+                        defaultValue={secondaryEmailEntry?.label ?? ""}
+                        name="secondaryEmailLabel"
+                        type="text"
+                      />
                     </label>
                     <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
                       <span>Additional emails</span>
                       <textarea className={textareaClassName} defaultValue={additionalEmails} name="additionalEmails" />
                     </label>
-                    <label className="grid gap-2 text-sm text-slate-700">
-                      <span>Primary phone</span>
-                      <input className={inputClassName} defaultValue={contact.phone ?? ""} name="phone" type="text" />
-                    </label>
+                    <div className={`${progressiveInnerCardClassName} lg:col-span-2`}>
+                      <p className={progressiveSectionTitleClassName}>Phone</p>
+                      <p className="mt-2 text-sm leading-6 text-slate-500">
+                        Use labels like mobile, work, or home so the meaning survives imports and sync.
+                      </p>
+                    </div>
                     <label className="grid gap-2 text-sm text-slate-700">
                       <span>Phone label</span>
                       <input className={inputClassName} defaultValue={primaryPhoneEntry?.label ?? ""} name="phoneLabel" type="text" />
+                    </label>
+                    <label className="grid gap-2 text-sm text-slate-700">
+                      <span>Secondary phone</span>
+                      <input
+                        className={inputClassName}
+                        defaultValue={secondaryPhoneValue}
+                        name="secondaryPhone"
+                        type="text"
+                      />
+                    </label>
+                    <label className="grid gap-2 text-sm text-slate-700">
+                      <span>Secondary phone label</span>
+                      <input
+                        className={inputClassName}
+                        defaultValue={secondaryPhoneEntry?.label ?? ""}
+                        name="secondaryPhoneLabel"
+                        type="text"
+                      />
                     </label>
                     <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
                       <span>Additional phones</span>
@@ -667,12 +750,20 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                   <summary className={progressiveSummaryClassName}>
                     <div>
                       <p className="text-base font-semibold text-slate-900">Add address and website</p>
-                      <p className="mt-1 text-sm text-slate-500">Location, websites, and structured address details.</p>
+                      <p className="mt-1 text-sm text-slate-500">
+                        Location, websites, and structured address details.
+                      </p>
                     </div>
                     <span className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-[#1f7a67] shadow-sm">+ Add</span>
                   </summary>
 
                   <div className="mt-4 grid gap-4 border-t border-[#dce8e2] pt-4 lg:grid-cols-2">
+                    <div className={`${progressiveInnerCardClassName} lg:col-span-2`}>
+                      <p className={progressiveSectionTitleClassName}>Address</p>
+                      <p className="mt-2 text-sm leading-6 text-slate-500">
+                        Freeform text is fine, but structured lines make later export and sync safer.
+                      </p>
+                    </div>
                     <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
                       <span>Address</span>
                       <textarea className={textareaClassName} defaultValue={contact.address ?? ""} name="address" />
@@ -709,6 +800,12 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                       <span>Additional addresses</span>
                       <textarea className={textareaClassName} defaultValue={additionalAddresses} name="additionalAddresses" />
                     </label>
+                    <div className={`${progressiveInnerCardClassName} lg:col-span-2`}>
+                      <p className={progressiveSectionTitleClassName}>Website</p>
+                      <p className="mt-2 text-sm leading-6 text-slate-500">
+                        Structured website labels help preserve what each link is for.
+                      </p>
+                    </div>
                     <label className="grid gap-2 text-sm text-slate-700">
                       <span>Website</span>
                       <input className={inputClassName} defaultValue={contact.website ?? ""} name="website" type="url" />
@@ -716,6 +813,24 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                     <label className="grid gap-2 text-sm text-slate-700">
                       <span>Website label</span>
                       <input className={inputClassName} defaultValue={primaryWebsiteEntry?.label ?? ""} name="websiteLabel" type="text" />
+                    </label>
+                    <label className="grid gap-2 text-sm text-slate-700">
+                      <span>Secondary website</span>
+                      <input
+                        className={inputClassName}
+                        defaultValue={secondaryWebsiteValue}
+                        name="secondaryWebsite"
+                        type="url"
+                      />
+                    </label>
+                    <label className="grid gap-2 text-sm text-slate-700">
+                      <span>Secondary website label</span>
+                      <input
+                        className={inputClassName}
+                        defaultValue={secondaryWebsiteEntry?.label ?? ""}
+                        name="secondaryWebsiteLabel"
+                        type="text"
+                      />
                     </label>
                     <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
                       <span>Additional websites</span>
@@ -728,12 +843,20 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                   <summary className={progressiveSummaryClassName}>
                     <div>
                       <p className="text-base font-semibold text-slate-900">Add dates and relationships</p>
-                      <p className="mt-1 text-sm text-slate-500">Significant dates, related people, and custom fields.</p>
+                      <p className="mt-1 text-sm text-slate-500">
+                        Significant dates, related people, and custom fields.
+                      </p>
                     </div>
                     <span className="rounded-full bg-white px-3 py-1 text-sm font-semibold text-[#1f7a67] shadow-sm">+ Add</span>
                   </summary>
 
                   <div className="mt-4 grid gap-4 border-t border-[#dce8e2] pt-4 lg:grid-cols-2">
+                    <div className={`${progressiveInnerCardClassName} lg:col-span-2`}>
+                      <p className={progressiveSectionTitleClassName}>Dates</p>
+                      <p className="mt-2 text-sm leading-6 text-slate-500">
+                        Birthday stays near the top. Use this area for anniversaries, milestones, and personal reminders.
+                      </p>
+                    </div>
                     <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
                       <span>Significant dates</span>
                       <textarea
@@ -743,6 +866,12 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                         placeholder="Anniversary | 2018-06-09"
                       />
                     </label>
+                    <div className={`${progressiveInnerCardClassName} lg:col-span-2`}>
+                      <p className={progressiveSectionTitleClassName}>Relationships and custom data</p>
+                      <p className="mt-2 text-sm leading-6 text-slate-500">
+                        These fields stay useful for merge context and personal memory even when some external systems cannot round-trip them fully.
+                      </p>
+                    </div>
                     <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
                       <span>Related people</span>
                       <textarea
