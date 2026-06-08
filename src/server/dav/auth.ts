@@ -18,6 +18,9 @@ type RateLimitBucket = {
 const WINDOW_MS = 15 * 60 * 1000;
 const IP_FAILURE_LIMIT = 20;
 const EMAIL_FAILURE_LIMIT = 10;
+// NOTE: In-memory rate limiting. Effective in long-running Node.js (Docker) deployments.
+// In serverless environments each invocation is a fresh process so this provides no
+// protection — replace with a Redis-backed counter before exposing to high traffic.
 const buckets = new Map<string, RateLimitBucket>();
 
 const getRequestIp = (request: Request) => {

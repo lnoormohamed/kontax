@@ -467,8 +467,9 @@ const handleAddressBooks = async (req, res, requestUrl) => {
 };
 
 const handleDavRequest = async (req, res) => {
-  const host = req.headers.host ?? `localhost:${port}`;
-  const requestUrl = new URL(req.url ?? "/", `http://${host}`);
+  const host = req.headers["x-forwarded-host"] ?? req.headers.host ?? `localhost:${port}`;
+  const proto = req.headers["x-forwarded-proto"]?.split(",")[0]?.trim() ?? "http";
+  const requestUrl = new URL(req.url ?? "/", `${proto}://${host}`);
 
   if (await handleWellKnown(req, res, requestUrl)) {
     return true;
