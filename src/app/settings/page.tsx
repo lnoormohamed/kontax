@@ -68,21 +68,129 @@ export default async function SettingsPage() {
                 Settings
               </p>
               <h1 className="mt-2 text-4xl font-semibold tracking-tight text-slate-900">
-                Account and workspace settings
+                Account, preferences, and plan
               </h1>
-              <p className="mt-2 text-sm text-slate-500">{session.user.email}</p>
+              <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-500">
+                This is now the home for account details, phonetic behavior, plan visibility, and
+                session controls so the contacts workspace can stay focused on contacts.
+              </p>
             </div>
+          </div>
+
+          <div className="mt-5 flex flex-wrap gap-2">
+            <a
+              className="rounded-full border border-[#d8ddd6] bg-[#f8faf8] px-3 py-1.5 text-sm text-slate-600 transition hover:bg-white"
+              href="#settings-account"
+            >
+              Account
+            </a>
+            <a
+              className="rounded-full border border-[#d8ddd6] bg-[#f8faf8] px-3 py-1.5 text-sm text-slate-600 transition hover:bg-white"
+              href="#settings-preferences"
+            >
+              Preferences
+            </a>
+            <a
+              className="rounded-full border border-[#d8ddd6] bg-[#f8faf8] px-3 py-1.5 text-sm text-slate-600 transition hover:bg-white"
+              href="#settings-plan"
+            >
+              Plan
+            </a>
+            <a
+              className="rounded-full border border-[#d8ddd6] bg-[#f8faf8] px-3 py-1.5 text-sm text-slate-600 transition hover:bg-white"
+              href="#settings-session"
+            >
+              Session
+            </a>
           </div>
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
           <div className="grid gap-6">
-            <div className="rounded-[2rem] border border-[#d8ddd6] bg-white p-6 shadow-sm">
+            <div className="rounded-[2rem] border border-[#d8ddd6] bg-white p-6 shadow-sm" id="settings-account">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-lg font-semibold text-slate-900">Account</p>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Identity and account basics now live in one quiet place instead of appearing
+                    around the contact workspace.
+                  </p>
+                </div>
+                <span className="rounded-full border border-[#d8ddd6] bg-[#f8faf8] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500">
+                  Consumer account
+                </span>
+              </div>
+
+              <div className="mt-5 grid gap-3 md:grid-cols-2">
+                <div className="rounded-[1.4rem] border border-[#d8ddd6] bg-[#f8faf8] p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                    Display name
+                  </p>
+                  <p className="mt-2 text-lg font-semibold text-slate-900">{userLabel}</p>
+                </div>
+                <div className="rounded-[1.4rem] border border-[#d8ddd6] bg-[#f7f8ff] p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                    Account email
+                  </p>
+                  <p className="mt-2 break-all text-lg font-semibold text-slate-900">
+                    {session.user.email}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="rounded-[2rem] border border-[#d8ddd6] bg-white p-6 shadow-sm" id="settings-preferences">
+              <div>
+                <p className="text-lg font-semibold text-slate-900">Preferences</p>
+                <p className="mt-1 text-sm text-slate-500">
+                  Personal behavior settings that change how Kontax helps you, without changing the
+                  structure of your contacts.
+                </p>
+              </div>
+
+              <div className="mt-5 rounded-[1.4rem] border border-[#d8ddd6] bg-[#fbfcf8] p-4">
+                <p className="text-sm font-semibold text-slate-900">Phonetic names</p>
+                <p className="mt-2 text-sm leading-6 text-slate-500">
+                  Kontax can suggest phonetic readings for first name, last name, and company when
+                  those phonetic fields are still blank. Manual values always win.
+                </p>
+              </div>
+
+              <form action={updatePhoneticSettings} className="mt-5">
+                <label className="flex items-start gap-3 rounded-[1.4rem] border border-[#d8ddd6] bg-[#f8faf8] px-4 py-4 text-sm text-slate-700">
+                  <input
+                    className="mt-0.5 h-4 w-4 rounded border-slate-300 text-[#4158f4] focus:ring-[#4158f4]"
+                    defaultChecked={userSettings?.autoFillPhoneticNames ?? false}
+                    name="autoFillPhoneticNames"
+                    type="checkbox"
+                    value="true"
+                  />
+                  <span>
+                    Auto-fill phonetic first name, phonetic last name, and phonetic company when
+                    those fields are empty.
+                  </span>
+                </label>
+                <p className="mt-3 text-sm leading-6 text-slate-500">
+                  Chinese names use dedicated phonetic generation. Other non-Latin scripts use a
+                  best-effort transliterated reading so the contact can still sort and search more
+                  naturally.
+                </p>
+                <button
+                  className="mt-4 rounded-[1.2rem] bg-[#17352e] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#20443b]"
+                  type="submit"
+                >
+                  Save preferences
+                </button>
+              </form>
+            </div>
+
+            <div className="rounded-[2rem] border border-[#d8ddd6] bg-white p-6 shadow-sm" id="settings-plan">
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <p className="text-lg font-semibold text-slate-900">Plan and limits</p>
                   <p className="mt-1 text-sm text-slate-500">
-                    Workspace controls now live here instead of competing with the contacts list.
+                    Billing visibility and usage gates live here so the main product stays centered
+                    on contacts instead of account administration.
                   </p>
                 </div>
                 <span
@@ -133,49 +241,11 @@ export default async function SettingsPage() {
                 {planSummary.lifecyclePolicy.description}
               </p>
             </div>
-
-            <div className="rounded-[2rem] border border-[#d8ddd6] bg-white p-6 shadow-sm">
-              <div>
-                <p className="text-lg font-semibold text-slate-900">Phonetic names</p>
-                <p className="mt-1 text-sm text-slate-500">
-                  Auto-fill phonetic values for Chinese names, with fallback phonetic values for other
-                  non-Latin scripts, only when those fields are still blank.
-                </p>
-              </div>
-
-              <form action={updatePhoneticSettings} className="mt-5">
-                <label className="flex items-start gap-3 rounded-[1.4rem] border border-[#d8ddd6] bg-[#f8faf8] px-4 py-4 text-sm text-slate-700">
-                  <input
-                    className="mt-0.5 h-4 w-4 rounded border-slate-300 text-[#4158f4] focus:ring-[#4158f4]"
-                    defaultChecked={userSettings?.autoFillPhoneticNames ?? false}
-                    name="autoFillPhoneticNames"
-                    type="checkbox"
-                    value="true"
-                  />
-                  <span>
-                    Enable automatic phonetic fill for first name, last name, and company
-                    when those fields are empty.
-                  </span>
-                </label>
-                <p className="mt-3 text-sm leading-6 text-slate-500">
-                  Chinese names use real phonetic generation. Other non-Latin scripts still get a
-                  best-effort transliterated reading, and manual contact edits always win.
-                </p>
-              <button
-                className="mt-4 rounded-[1.2rem] bg-[#17352e] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#20443b]"
-                type="submit"
-              >
-                Save phonetic settings
-              </button>
-              </form>
-            </div>
           </div>
 
           <aside className="grid gap-6 self-start">
             <div className="rounded-[2rem] border border-[#d8ddd6] bg-white p-5 shadow-sm">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
-                Quick links
-              </p>
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Quick links</p>
               <div className="mt-3 grid gap-2 text-sm">
                 <Link
                   className="rounded-[1.3rem] px-4 py-3 text-slate-700 ring-1 ring-slate-200 transition hover:bg-slate-50"
@@ -198,21 +268,35 @@ export default async function SettingsPage() {
               </div>
             </div>
 
+            <div className="rounded-[2rem] border border-[#d8ddd6] bg-white p-5 shadow-sm" id="settings-session">
+              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Session</p>
+              <p className="mt-3 text-sm text-slate-500">
+                Use this for sign-out and account-session actions without putting account controls
+                back inside the contact workspace.
+              </p>
+              <div className="mt-4 rounded-[1.3rem] border border-[#d8ddd6] bg-[#f8faf8] p-4">
+                <p className="text-sm font-semibold text-slate-900">{session.user.email}</p>
+                <p className="mt-1 text-sm text-slate-500">Signed in to Kontax on this browser session.</p>
+                <form action={handleSignOut} className="mt-4">
+                  <button
+                    className="w-full rounded-[1.2rem] border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-[#c9d0c9] hover:bg-slate-50"
+                    type="submit"
+                  >
+                    Sign out
+                  </button>
+                </form>
+              </div>
+            </div>
+
             <div className="rounded-[2rem] border border-[#d8ddd6] bg-white p-5 shadow-sm">
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
-                Session
+                Settings posture
               </p>
-              <p className="mt-3 text-sm text-slate-500">
-                Sign out here so the contacts workspace can stay focused on the dataset itself.
-              </p>
-              <form action={handleSignOut} className="mt-4">
-                <button
-                  className="w-full rounded-[1.2rem] border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-[#c9d0c9] hover:bg-slate-50"
-                  type="submit"
-                >
-                  Sign out
-                </button>
-              </form>
+              <div className="mt-4 space-y-3 text-sm leading-6 text-slate-600">
+                <p>Account and plan controls now stay off the main contacts page.</p>
+                <p>Preferences are grouped separately from billing so they are easier to reason about.</p>
+                <p>This gives us a calmer shell for future settings growth in later phases.</p>
+              </div>
             </div>
           </aside>
         </section>
