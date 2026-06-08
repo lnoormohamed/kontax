@@ -142,6 +142,7 @@ model User {
     email                String                 @unique
     password             String
     lifecycleState       AccountLifecycleState  @default(ACTIVE)
+    autoFillPhoneticNames Boolean               @default(false)
     contacts             Contact[]
     importJobs           ImportJob[]
     exportJobs           ExportJob[]
@@ -174,12 +175,15 @@ model Contact {
     firstName   String?
     middleName  String?
     lastName    String?
+    phoneticFirstName String?
+    phoneticLastName  String?
     namePrefix  String?
     nameSuffix  String?
     nickname    String?
     email       String?
     phone       String?
     company     String?
+    phoneticCompany String?
     jobTitle    String?
     website     String?
     birthday    String?

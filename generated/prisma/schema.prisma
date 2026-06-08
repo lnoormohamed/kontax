@@ -137,21 +137,22 @@ enum SyncResolutionStrategy {
 }
 
 model User {
-  id                   String                @id @default(cuid())
-  name                 String?
-  email                String                @unique
-  password             String
-  lifecycleState       AccountLifecycleState @default(ACTIVE)
-  contacts             Contact[]
-  importJobs           ImportJob[]
-  exportJobs           ExportJob[]
-  mergeSuggestions     MergeSuggestion[]
-  mergeDecisions       MergeDecision[]
-  syncAccounts         SyncAccount[]
-  subscriptionCustomer SubscriptionCustomer?
-  subscriptions        Subscription[]
-  createdAt            DateTime              @default(now())
-  updatedAt            DateTime              @updatedAt
+  id                    String                @id @default(cuid())
+  name                  String?
+  email                 String                @unique
+  password              String
+  lifecycleState        AccountLifecycleState @default(ACTIVE)
+  autoFillPhoneticNames Boolean               @default(false)
+  contacts              Contact[]
+  importJobs            ImportJob[]
+  exportJobs            ExportJob[]
+  mergeSuggestions      MergeSuggestion[]
+  mergeDecisions        MergeDecision[]
+  syncAccounts          SyncAccount[]
+  subscriptionCustomer  SubscriptionCustomer?
+  subscriptions         Subscription[]
+  createdAt             DateTime              @default(now())
+  updatedAt             DateTime              @updatedAt
 }
 
 model Contact {
@@ -174,12 +175,15 @@ model Contact {
   firstName             String?
   middleName            String?
   lastName              String?
+  phoneticFirstName     String?
+  phoneticLastName      String?
   namePrefix            String?
   nameSuffix            String?
   nickname              String?
   email                 String?
   phone                 String?
   company               String?
+  phoneticCompany       String?
   jobTitle              String?
   website               String?
   birthday              String?

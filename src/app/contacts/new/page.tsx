@@ -88,12 +88,30 @@ export default async function NewContactPage() {
                   <input className={inputClassName} name="firstName" type="text" />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
+                  <span>Pinyin first name</span>
+                  <input
+                    className={inputClassName}
+                    name="phoneticFirstName"
+                    placeholder="Auto-filled when enabled in settings"
+                    type="text"
+                  />
+                </label>
+                <label className="grid gap-2 text-sm text-slate-700">
                   <span>Middle name</span>
                   <input className={inputClassName} name="middleName" type="text" />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Last name</span>
                   <input className={inputClassName} name="lastName" type="text" />
+                </label>
+                <label className="grid gap-2 text-sm text-slate-700">
+                  <span>Pinyin last name</span>
+                  <input
+                    className={inputClassName}
+                    name="phoneticLastName"
+                    placeholder="Auto-filled when enabled in settings"
+                    type="text"
+                  />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Suffix</span>
@@ -111,6 +129,15 @@ export default async function NewContactPage() {
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Job title</span>
                   <input className={inputClassName} name="jobTitle" type="text" />
+                </label>
+                <label className="grid gap-2 text-sm text-slate-700">
+                  <span>Pinyin company</span>
+                  <input
+                    className={inputClassName}
+                    name="phoneticCompany"
+                    placeholder="Auto-filled when enabled in settings"
+                    type="text"
+                  />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Labels</span>
@@ -134,6 +161,11 @@ export default async function NewContactPage() {
                   />
                   <span>Start this contact as a favorite</span>
                 </label>
+                <div className="rounded-[1.2rem] border border-[#dfe7e1] bg-[#f7fbf9] px-4 py-3 text-sm text-slate-600 lg:col-span-2">
+                  If pinyin auto-fill is enabled in settings, Kontax generates real pinyin for
+                  Chinese names when these fields are blank, with fallback name readings for other
+                  non-Latin scripts.
+                </div>
               </div>
             </section>
 

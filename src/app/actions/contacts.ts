@@ -8,6 +8,7 @@ import { auth } from "~/server/auth";
 import { assertCanCreateContacts } from "~/server/billing";
 import { mergeContactsForUser, undoMergedContactsForUser } from "~/server/contact-merge";
 import { db } from "~/server/db";
+import { applyAutoFilledPhoneticFields } from "~/server/phonetics";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -16,6 +17,8 @@ const contactSchema = z.object({
   firstName: z.string().trim().max(80).optional(),
   middleName: z.string().trim().max(80).optional(),
   lastName: z.string().trim().max(80).optional(),
+  phoneticFirstName: z.string().trim().max(120).optional(),
+  phoneticLastName: z.string().trim().max(120).optional(),
   namePrefix: z.string().trim().max(40).optional(),
   nameSuffix: z.string().trim().max(40).optional(),
   nickname: z.string().trim().max(80).optional(),
@@ -30,6 +33,7 @@ const contactSchema = z.object({
   secondaryPhoneLabel: z.string().trim().max(40).optional(),
   additionalPhones: z.string().trim().max(4000).optional(),
   company: z.string().trim().max(120).optional(),
+  phoneticCompany: z.string().trim().max(120).optional(),
   jobTitle: z.string().trim().max(120).optional(),
   website: z.string().trim().url("Enter a valid website URL.").max(500).optional(),
   websiteLabel: z.string().trim().max(40).optional(),
@@ -207,6 +211,8 @@ const parseContactInput = (formData: FormData) => {
     firstName: getOptionalString(formData, "firstName"),
     middleName: getOptionalString(formData, "middleName"),
     lastName: getOptionalString(formData, "lastName"),
+    phoneticFirstName: getOptionalString(formData, "phoneticFirstName"),
+    phoneticLastName: getOptionalString(formData, "phoneticLastName"),
     namePrefix: getOptionalString(formData, "namePrefix"),
     nameSuffix: getOptionalString(formData, "nameSuffix"),
     nickname: getOptionalString(formData, "nickname"),
@@ -221,6 +227,7 @@ const parseContactInput = (formData: FormData) => {
     secondaryPhoneLabel: getOptionalString(formData, "secondaryPhoneLabel"),
     additionalPhones: getOptionalString(formData, "additionalPhones"),
     company: getOptionalString(formData, "company"),
+    phoneticCompany: getOptionalString(formData, "phoneticCompany"),
     jobTitle: getOptionalString(formData, "jobTitle"),
     website: getOptionalString(formData, "website"),
     websiteLabel: getOptionalString(formData, "websiteLabel"),
@@ -248,10 +255,6 @@ const parseContactInput = (formData: FormData) => {
 
   if (!parsed.success) {
     throw new Error(parsed.error.issues[0]?.message ?? "Invalid contact details.");
-  }
-
-  if (!parsed.data.fullName && !parsed.data.company) {
-    throw new Error("Add a full name or company name so Kontax can place this contact in the list.");
   }
 
   const additionalEmails = getLineSeparatedValues(parsed.data.additionalEmails).map((email) =>
@@ -308,6 +311,10 @@ const parseContactInput = (formData: FormData) => {
     .filter((value): value is string => Boolean(value))
     .join(" ");
   const canonicalFullName = fullNameFromParts || parsed.data.fullName || parsed.data.company;
+
+  if (!canonicalFullName) {
+    throw new Error("Add a full name, name parts, or company name so Kontax can place this contact in the list.");
+  }
   const primaryAddress =
     parsed.data.address ??
     dedupeValues([
@@ -359,6 +366,8 @@ const parseContactInput = (formData: FormData) => {
     firstName: parsed.data.firstName,
     middleName: parsed.data.middleName,
     lastName: parsed.data.lastName,
+    phoneticFirstName: parsed.data.phoneticFirstName,
+    phoneticLastName: parsed.data.phoneticLastName,
     namePrefix: parsed.data.namePrefix,
     nameSuffix: parsed.data.nameSuffix,
     nickname: parsed.data.nickname,
@@ -379,6 +388,7 @@ const parseContactInput = (formData: FormData) => {
       "mobile",
     ),
     company: parsed.data.company,
+    phoneticCompany: parsed.data.phoneticCompany,
     jobTitle: parsed.data.jobTitle,
     website: parsed.data.website,
     websiteEntries,
@@ -458,6 +468,15 @@ export const createContact = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const input = parseContactInput(formData);
   const redirectTo = getRedirectTarget(formData);
+  const userSettings = await db.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      autoFillPhoneticNames: true,
+    },
+  });
+  const phoneticFields = applyAutoFilledPhoneticFields(input, userSettings?.autoFillPhoneticNames ?? false);
 
   await assertCanCreateContacts(userId);
 
@@ -465,6 +484,7 @@ export const createContact = async (formData: FormData) => {
     data: {
       userId,
       ...input,
+      ...phoneticFields,
     },
   });
 
@@ -480,6 +500,15 @@ export const updateContact = async (formData: FormData) => {
   const contactId = parseContactId(formData);
   const input = parseContactInput(formData);
   const redirectTo = getRedirectTarget(formData);
+  const userSettings = await db.user.findUnique({
+    where: {
+      id: userId,
+    },
+    select: {
+      autoFillPhoneticNames: true,
+    },
+  });
+  const phoneticFields = applyAutoFilledPhoneticFields(input, userSettings?.autoFillPhoneticNames ?? false);
 
   await db.contact.updateMany({
     where: {
@@ -488,6 +517,7 @@ export const updateContact = async (formData: FormData) => {
     },
     data: {
       ...input,
+      ...phoneticFields,
       syncVersion: {
         increment: 1,
       },

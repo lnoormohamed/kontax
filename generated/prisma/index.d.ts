@@ -2475,6 +2475,7 @@ export namespace Prisma {
     email: string | null
     password: string | null
     lifecycleState: $Enums.AccountLifecycleState | null
+    autoFillPhoneticNames: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -2485,6 +2486,7 @@ export namespace Prisma {
     email: string | null
     password: string | null
     lifecycleState: $Enums.AccountLifecycleState | null
+    autoFillPhoneticNames: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -2495,6 +2497,7 @@ export namespace Prisma {
     email: number
     password: number
     lifecycleState: number
+    autoFillPhoneticNames: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -2507,6 +2510,7 @@ export namespace Prisma {
     email?: true
     password?: true
     lifecycleState?: true
+    autoFillPhoneticNames?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2517,6 +2521,7 @@ export namespace Prisma {
     email?: true
     password?: true
     lifecycleState?: true
+    autoFillPhoneticNames?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2527,6 +2532,7 @@ export namespace Prisma {
     email?: true
     password?: true
     lifecycleState?: true
+    autoFillPhoneticNames?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -2610,6 +2616,7 @@ export namespace Prisma {
     email: string
     password: string
     lifecycleState: $Enums.AccountLifecycleState
+    autoFillPhoneticNames: boolean
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
@@ -2637,6 +2644,7 @@ export namespace Prisma {
     email?: boolean
     password?: boolean
     lifecycleState?: boolean
+    autoFillPhoneticNames?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     contacts?: boolean | User$contactsArgs<ExtArgs>
@@ -2656,6 +2664,7 @@ export namespace Prisma {
     email?: boolean
     password?: boolean
     lifecycleState?: boolean
+    autoFillPhoneticNames?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -2666,6 +2675,7 @@ export namespace Prisma {
     email?: boolean
     password?: boolean
     lifecycleState?: boolean
+    autoFillPhoneticNames?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -2676,11 +2686,12 @@ export namespace Prisma {
     email?: boolean
     password?: boolean
     lifecycleState?: boolean
+    autoFillPhoneticNames?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "password" | "lifecycleState" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "password" | "lifecycleState" | "autoFillPhoneticNames" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     contacts?: boolean | User$contactsArgs<ExtArgs>
     importJobs?: boolean | User$importJobsArgs<ExtArgs>
@@ -2713,6 +2724,7 @@ export namespace Prisma {
       email: string
       password: string
       lifecycleState: $Enums.AccountLifecycleState
+      autoFillPhoneticNames: boolean
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -3151,6 +3163,7 @@ export namespace Prisma {
     readonly email: FieldRef<"User", 'String'>
     readonly password: FieldRef<"User", 'String'>
     readonly lifecycleState: FieldRef<"User", 'AccountLifecycleState'>
+    readonly autoFillPhoneticNames: FieldRef<"User", 'Boolean'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
   }
@@ -3778,12 +3791,15 @@ export namespace Prisma {
     firstName: string | null
     middleName: string | null
     lastName: string | null
+    phoneticFirstName: string | null
+    phoneticLastName: string | null
     namePrefix: string | null
     nameSuffix: string | null
     nickname: string | null
     email: string | null
     phone: string | null
     company: string | null
+    phoneticCompany: string | null
     jobTitle: string | null
     website: string | null
     birthday: string | null
@@ -3808,12 +3824,15 @@ export namespace Prisma {
     firstName: string | null
     middleName: string | null
     lastName: string | null
+    phoneticFirstName: string | null
+    phoneticLastName: string | null
     namePrefix: string | null
     nameSuffix: string | null
     nickname: string | null
     email: string | null
     phone: string | null
     company: string | null
+    phoneticCompany: string | null
     jobTitle: string | null
     website: string | null
     birthday: string | null
@@ -3838,12 +3857,15 @@ export namespace Prisma {
     firstName: number
     middleName: number
     lastName: number
+    phoneticFirstName: number
+    phoneticLastName: number
     namePrefix: number
     nameSuffix: number
     nickname: number
     email: number
     phone: number
     company: number
+    phoneticCompany: number
     jobTitle: number
     website: number
     birthday: number
@@ -3889,12 +3911,15 @@ export namespace Prisma {
     firstName?: true
     middleName?: true
     lastName?: true
+    phoneticFirstName?: true
+    phoneticLastName?: true
     namePrefix?: true
     nameSuffix?: true
     nickname?: true
     email?: true
     phone?: true
     company?: true
+    phoneticCompany?: true
     jobTitle?: true
     website?: true
     birthday?: true
@@ -3919,12 +3944,15 @@ export namespace Prisma {
     firstName?: true
     middleName?: true
     lastName?: true
+    phoneticFirstName?: true
+    phoneticLastName?: true
     namePrefix?: true
     nameSuffix?: true
     nickname?: true
     email?: true
     phone?: true
     company?: true
+    phoneticCompany?: true
     jobTitle?: true
     website?: true
     birthday?: true
@@ -3949,12 +3977,15 @@ export namespace Prisma {
     firstName?: true
     middleName?: true
     lastName?: true
+    phoneticFirstName?: true
+    phoneticLastName?: true
     namePrefix?: true
     nameSuffix?: true
     nickname?: true
     email?: true
     phone?: true
     company?: true
+    phoneticCompany?: true
     jobTitle?: true
     website?: true
     birthday?: true
@@ -4077,12 +4108,15 @@ export namespace Prisma {
     firstName: string | null
     middleName: string | null
     lastName: string | null
+    phoneticFirstName: string | null
+    phoneticLastName: string | null
     namePrefix: string | null
     nameSuffix: string | null
     nickname: string | null
     email: string | null
     phone: string | null
     company: string | null
+    phoneticCompany: string | null
     jobTitle: string | null
     website: string | null
     birthday: string | null
@@ -4137,12 +4171,15 @@ export namespace Prisma {
     firstName?: boolean
     middleName?: boolean
     lastName?: boolean
+    phoneticFirstName?: boolean
+    phoneticLastName?: boolean
     namePrefix?: boolean
     nameSuffix?: boolean
     nickname?: boolean
     email?: boolean
     phone?: boolean
     company?: boolean
+    phoneticCompany?: boolean
     jobTitle?: boolean
     website?: boolean
     birthday?: boolean
@@ -4187,12 +4224,15 @@ export namespace Prisma {
     firstName?: boolean
     middleName?: boolean
     lastName?: boolean
+    phoneticFirstName?: boolean
+    phoneticLastName?: boolean
     namePrefix?: boolean
     nameSuffix?: boolean
     nickname?: boolean
     email?: boolean
     phone?: boolean
     company?: boolean
+    phoneticCompany?: boolean
     jobTitle?: boolean
     website?: boolean
     birthday?: boolean
@@ -4231,12 +4271,15 @@ export namespace Prisma {
     firstName?: boolean
     middleName?: boolean
     lastName?: boolean
+    phoneticFirstName?: boolean
+    phoneticLastName?: boolean
     namePrefix?: boolean
     nameSuffix?: boolean
     nickname?: boolean
     email?: boolean
     phone?: boolean
     company?: boolean
+    phoneticCompany?: boolean
     jobTitle?: boolean
     website?: boolean
     birthday?: boolean
@@ -4275,12 +4318,15 @@ export namespace Prisma {
     firstName?: boolean
     middleName?: boolean
     lastName?: boolean
+    phoneticFirstName?: boolean
+    phoneticLastName?: boolean
     namePrefix?: boolean
     nameSuffix?: boolean
     nickname?: boolean
     email?: boolean
     phone?: boolean
     company?: boolean
+    phoneticCompany?: boolean
     jobTitle?: boolean
     website?: boolean
     birthday?: boolean
@@ -4304,7 +4350,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ContactOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "importJobId" | "mergedIntoContactId" | "syncUid" | "syncVersion" | "syncTombstoneAt" | "fullName" | "firstName" | "middleName" | "lastName" | "namePrefix" | "nameSuffix" | "nickname" | "email" | "phone" | "company" | "jobTitle" | "website" | "birthday" | "address" | "avatarUrl" | "isFavorite" | "labels" | "websiteEntries" | "emailAddresses" | "phoneNumbers" | "postalAddresses" | "emailEntries" | "phoneEntries" | "addressEntries" | "significantDates" | "relatedPeople" | "customFields" | "notes" | "archivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["contact"]>
+  export type ContactOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "importJobId" | "mergedIntoContactId" | "syncUid" | "syncVersion" | "syncTombstoneAt" | "fullName" | "firstName" | "middleName" | "lastName" | "phoneticFirstName" | "phoneticLastName" | "namePrefix" | "nameSuffix" | "nickname" | "email" | "phone" | "company" | "phoneticCompany" | "jobTitle" | "website" | "birthday" | "address" | "avatarUrl" | "isFavorite" | "labels" | "websiteEntries" | "emailAddresses" | "phoneNumbers" | "postalAddresses" | "emailEntries" | "phoneEntries" | "addressEntries" | "significantDates" | "relatedPeople" | "customFields" | "notes" | "archivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["contact"]>
   export type ContactInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     importJob?: boolean | Contact$importJobArgs<ExtArgs>
@@ -4351,12 +4397,15 @@ export namespace Prisma {
       firstName: string | null
       middleName: string | null
       lastName: string | null
+      phoneticFirstName: string | null
+      phoneticLastName: string | null
       namePrefix: string | null
       nameSuffix: string | null
       nickname: string | null
       email: string | null
       phone: string | null
       company: string | null
+      phoneticCompany: string | null
       jobTitle: string | null
       website: string | null
       birthday: string | null
@@ -4820,12 +4869,15 @@ export namespace Prisma {
     readonly firstName: FieldRef<"Contact", 'String'>
     readonly middleName: FieldRef<"Contact", 'String'>
     readonly lastName: FieldRef<"Contact", 'String'>
+    readonly phoneticFirstName: FieldRef<"Contact", 'String'>
+    readonly phoneticLastName: FieldRef<"Contact", 'String'>
     readonly namePrefix: FieldRef<"Contact", 'String'>
     readonly nameSuffix: FieldRef<"Contact", 'String'>
     readonly nickname: FieldRef<"Contact", 'String'>
     readonly email: FieldRef<"Contact", 'String'>
     readonly phone: FieldRef<"Contact", 'String'>
     readonly company: FieldRef<"Contact", 'String'>
+    readonly phoneticCompany: FieldRef<"Contact", 'String'>
     readonly jobTitle: FieldRef<"Contact", 'String'>
     readonly website: FieldRef<"Contact", 'String'>
     readonly birthday: FieldRef<"Contact", 'String'>
@@ -18209,6 +18261,7 @@ export namespace Prisma {
     email: 'email',
     password: 'password',
     lifecycleState: 'lifecycleState',
+    autoFillPhoneticNames: 'autoFillPhoneticNames',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -18228,12 +18281,15 @@ export namespace Prisma {
     firstName: 'firstName',
     middleName: 'middleName',
     lastName: 'lastName',
+    phoneticFirstName: 'phoneticFirstName',
+    phoneticLastName: 'phoneticLastName',
     namePrefix: 'namePrefix',
     nameSuffix: 'nameSuffix',
     nickname: 'nickname',
     email: 'email',
     phone: 'phone',
     company: 'company',
+    phoneticCompany: 'phoneticCompany',
     jobTitle: 'jobTitle',
     website: 'website',
     birthday: 'birthday',
@@ -18576,6 +18632,13 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Boolean'
+   */
+  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
+    
+
+
+  /**
    * Reference to a field of type 'DateTime'
    */
   export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
@@ -18600,13 +18663,6 @@ export namespace Prisma {
    * Reference to a field of type 'Int[]'
    */
   export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
-    
-
-
-  /**
-   * Reference to a field of type 'Boolean'
-   */
-  export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
     
 
 
@@ -18916,6 +18972,7 @@ export namespace Prisma {
     email?: StringFilter<"User"> | string
     password?: StringFilter<"User"> | string
     lifecycleState?: EnumAccountLifecycleStateFilter<"User"> | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFilter<"User"> | boolean
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     contacts?: ContactListRelationFilter
@@ -18934,6 +18991,7 @@ export namespace Prisma {
     email?: SortOrder
     password?: SortOrder
     lifecycleState?: SortOrder
+    autoFillPhoneticNames?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     contacts?: ContactOrderByRelationAggregateInput
@@ -18955,6 +19013,7 @@ export namespace Prisma {
     name?: StringNullableFilter<"User"> | string | null
     password?: StringFilter<"User"> | string
     lifecycleState?: EnumAccountLifecycleStateFilter<"User"> | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFilter<"User"> | boolean
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     contacts?: ContactListRelationFilter
@@ -18973,6 +19032,7 @@ export namespace Prisma {
     email?: SortOrder
     password?: SortOrder
     lifecycleState?: SortOrder
+    autoFillPhoneticNames?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -18989,6 +19049,7 @@ export namespace Prisma {
     email?: StringWithAggregatesFilter<"User"> | string
     password?: StringWithAggregatesFilter<"User"> | string
     lifecycleState?: EnumAccountLifecycleStateWithAggregatesFilter<"User"> | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolWithAggregatesFilter<"User"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
@@ -19008,12 +19069,15 @@ export namespace Prisma {
     firstName?: StringNullableFilter<"Contact"> | string | null
     middleName?: StringNullableFilter<"Contact"> | string | null
     lastName?: StringNullableFilter<"Contact"> | string | null
+    phoneticFirstName?: StringNullableFilter<"Contact"> | string | null
+    phoneticLastName?: StringNullableFilter<"Contact"> | string | null
     namePrefix?: StringNullableFilter<"Contact"> | string | null
     nameSuffix?: StringNullableFilter<"Contact"> | string | null
     nickname?: StringNullableFilter<"Contact"> | string | null
     email?: StringNullableFilter<"Contact"> | string | null
     phone?: StringNullableFilter<"Contact"> | string | null
     company?: StringNullableFilter<"Contact"> | string | null
+    phoneticCompany?: StringNullableFilter<"Contact"> | string | null
     jobTitle?: StringNullableFilter<"Contact"> | string | null
     website?: StringNullableFilter<"Contact"> | string | null
     birthday?: StringNullableFilter<"Contact"> | string | null
@@ -19057,12 +19121,15 @@ export namespace Prisma {
     firstName?: SortOrderInput | SortOrder
     middleName?: SortOrderInput | SortOrder
     lastName?: SortOrderInput | SortOrder
+    phoneticFirstName?: SortOrderInput | SortOrder
+    phoneticLastName?: SortOrderInput | SortOrder
     namePrefix?: SortOrderInput | SortOrder
     nameSuffix?: SortOrderInput | SortOrder
     nickname?: SortOrderInput | SortOrder
     email?: SortOrderInput | SortOrder
     phone?: SortOrderInput | SortOrder
     company?: SortOrderInput | SortOrder
+    phoneticCompany?: SortOrderInput | SortOrder
     jobTitle?: SortOrderInput | SortOrder
     website?: SortOrderInput | SortOrder
     birthday?: SortOrderInput | SortOrder
@@ -19109,12 +19176,15 @@ export namespace Prisma {
     firstName?: StringNullableFilter<"Contact"> | string | null
     middleName?: StringNullableFilter<"Contact"> | string | null
     lastName?: StringNullableFilter<"Contact"> | string | null
+    phoneticFirstName?: StringNullableFilter<"Contact"> | string | null
+    phoneticLastName?: StringNullableFilter<"Contact"> | string | null
     namePrefix?: StringNullableFilter<"Contact"> | string | null
     nameSuffix?: StringNullableFilter<"Contact"> | string | null
     nickname?: StringNullableFilter<"Contact"> | string | null
     email?: StringNullableFilter<"Contact"> | string | null
     phone?: StringNullableFilter<"Contact"> | string | null
     company?: StringNullableFilter<"Contact"> | string | null
+    phoneticCompany?: StringNullableFilter<"Contact"> | string | null
     jobTitle?: StringNullableFilter<"Contact"> | string | null
     website?: StringNullableFilter<"Contact"> | string | null
     birthday?: StringNullableFilter<"Contact"> | string | null
@@ -19158,12 +19228,15 @@ export namespace Prisma {
     firstName?: SortOrderInput | SortOrder
     middleName?: SortOrderInput | SortOrder
     lastName?: SortOrderInput | SortOrder
+    phoneticFirstName?: SortOrderInput | SortOrder
+    phoneticLastName?: SortOrderInput | SortOrder
     namePrefix?: SortOrderInput | SortOrder
     nameSuffix?: SortOrderInput | SortOrder
     nickname?: SortOrderInput | SortOrder
     email?: SortOrderInput | SortOrder
     phone?: SortOrderInput | SortOrder
     company?: SortOrderInput | SortOrder
+    phoneticCompany?: SortOrderInput | SortOrder
     jobTitle?: SortOrderInput | SortOrder
     website?: SortOrderInput | SortOrder
     birthday?: SortOrderInput | SortOrder
@@ -19207,12 +19280,15 @@ export namespace Prisma {
     firstName?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     middleName?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     lastName?: StringNullableWithAggregatesFilter<"Contact"> | string | null
+    phoneticFirstName?: StringNullableWithAggregatesFilter<"Contact"> | string | null
+    phoneticLastName?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     namePrefix?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     nameSuffix?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     nickname?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     email?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     phone?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     company?: StringNullableWithAggregatesFilter<"Contact"> | string | null
+    phoneticCompany?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     jobTitle?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     website?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     birthday?: StringNullableWithAggregatesFilter<"Contact"> | string | null
@@ -20476,6 +20552,7 @@ export namespace Prisma {
     email: string
     password: string
     lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -20494,6 +20571,7 @@ export namespace Prisma {
     email: string
     password: string
     lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -20512,6 +20590,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -20530,6 +20609,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -20548,6 +20628,7 @@ export namespace Prisma {
     email: string
     password: string
     lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -20558,6 +20639,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -20568,6 +20650,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -20581,12 +20664,15 @@ export namespace Prisma {
     firstName?: string | null
     middleName?: string | null
     lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
     namePrefix?: string | null
     nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
     company?: string | null
+    phoneticCompany?: string | null
     jobTitle?: string | null
     website?: string | null
     birthday?: string | null
@@ -20630,12 +20716,15 @@ export namespace Prisma {
     firstName?: string | null
     middleName?: string | null
     lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
     namePrefix?: string | null
     nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
     company?: string | null
+    phoneticCompany?: string | null
     jobTitle?: string | null
     website?: string | null
     birthday?: string | null
@@ -20673,12 +20762,15 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     middleName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
     namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
     nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
@@ -20722,12 +20814,15 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     middleName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
     namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
     nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
@@ -20768,12 +20863,15 @@ export namespace Prisma {
     firstName?: string | null
     middleName?: string | null
     lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
     namePrefix?: string | null
     nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
     company?: string | null
+    phoneticCompany?: string | null
     jobTitle?: string | null
     website?: string | null
     birthday?: string | null
@@ -20806,12 +20904,15 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     middleName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
     namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
     nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
@@ -20847,12 +20948,15 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     middleName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
     namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
     nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
@@ -22352,6 +22456,11 @@ export namespace Prisma {
     not?: NestedEnumAccountLifecycleStateFilter<$PrismaModel> | $Enums.AccountLifecycleState
   }
 
+  export type BoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type DateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -22449,6 +22558,7 @@ export namespace Prisma {
     email?: SortOrder
     password?: SortOrder
     lifecycleState?: SortOrder
+    autoFillPhoneticNames?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -22459,6 +22569,7 @@ export namespace Prisma {
     email?: SortOrder
     password?: SortOrder
     lifecycleState?: SortOrder
+    autoFillPhoneticNames?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -22469,6 +22580,7 @@ export namespace Prisma {
     email?: SortOrder
     password?: SortOrder
     lifecycleState?: SortOrder
+    autoFillPhoneticNames?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -22519,6 +22631,14 @@ export namespace Prisma {
     _max?: NestedEnumAccountLifecycleStateFilter<$PrismaModel>
   }
 
+  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -22553,11 +22673,6 @@ export namespace Prisma {
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
-  export type BoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
   export type JsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -22630,12 +22745,15 @@ export namespace Prisma {
     firstName?: SortOrder
     middleName?: SortOrder
     lastName?: SortOrder
+    phoneticFirstName?: SortOrder
+    phoneticLastName?: SortOrder
     namePrefix?: SortOrder
     nameSuffix?: SortOrder
     nickname?: SortOrder
     email?: SortOrder
     phone?: SortOrder
     company?: SortOrder
+    phoneticCompany?: SortOrder
     jobTitle?: SortOrder
     website?: SortOrder
     birthday?: SortOrder
@@ -22675,12 +22793,15 @@ export namespace Prisma {
     firstName?: SortOrder
     middleName?: SortOrder
     lastName?: SortOrder
+    phoneticFirstName?: SortOrder
+    phoneticLastName?: SortOrder
     namePrefix?: SortOrder
     nameSuffix?: SortOrder
     nickname?: SortOrder
     email?: SortOrder
     phone?: SortOrder
     company?: SortOrder
+    phoneticCompany?: SortOrder
     jobTitle?: SortOrder
     website?: SortOrder
     birthday?: SortOrder
@@ -22705,12 +22826,15 @@ export namespace Prisma {
     firstName?: SortOrder
     middleName?: SortOrder
     lastName?: SortOrder
+    phoneticFirstName?: SortOrder
+    phoneticLastName?: SortOrder
     namePrefix?: SortOrder
     nameSuffix?: SortOrder
     nickname?: SortOrder
     email?: SortOrder
     phone?: SortOrder
     company?: SortOrder
+    phoneticCompany?: SortOrder
     jobTitle?: SortOrder
     website?: SortOrder
     birthday?: SortOrder
@@ -22755,14 +22879,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
-  }
-
-  export type BoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
   export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -24076,6 +24192,10 @@ export namespace Prisma {
     set?: $Enums.AccountLifecycleState
   }
 
+  export type BoolFieldUpdateOperationsInput = {
+    set?: boolean
+  }
+
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
   }
@@ -24394,10 +24514,6 @@ export namespace Prisma {
 
   export type NullableDateTimeFieldUpdateOperationsInput = {
     set?: Date | string | null
-  }
-
-  export type BoolFieldUpdateOperationsInput = {
-    set?: boolean
   }
 
   export type UserUpdateOneRequiredWithoutContactsNestedInput = {
@@ -25223,6 +25339,11 @@ export namespace Prisma {
     not?: NestedEnumAccountLifecycleStateFilter<$PrismaModel> | $Enums.AccountLifecycleState
   }
 
+  export type NestedBoolFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolFilter<$PrismaModel> | boolean
+  }
+
   export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -25300,6 +25421,14 @@ export namespace Prisma {
     _max?: NestedEnumAccountLifecycleStateFilter<$PrismaModel>
   }
 
+  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
+    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedBoolFilter<$PrismaModel>
+    _max?: NestedBoolFilter<$PrismaModel>
+  }
+
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -25323,11 +25452,6 @@ export namespace Prisma {
     gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
-  export type NestedBoolFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolFilter<$PrismaModel> | boolean
   }
 
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
@@ -25369,14 +25493,6 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
-  }
-
-  export type NestedBoolWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: boolean | BooleanFieldRefInput<$PrismaModel>
-    not?: NestedBoolWithAggregatesFilter<$PrismaModel> | boolean
-    _count?: NestedIntFilter<$PrismaModel>
-    _min?: NestedBoolFilter<$PrismaModel>
-    _max?: NestedBoolFilter<$PrismaModel>
   }
   export type NestedJsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -25784,12 +25900,15 @@ export namespace Prisma {
     firstName?: string | null
     middleName?: string | null
     lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
     namePrefix?: string | null
     nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
     company?: string | null
+    phoneticCompany?: string | null
     jobTitle?: string | null
     website?: string | null
     birthday?: string | null
@@ -25831,12 +25950,15 @@ export namespace Prisma {
     firstName?: string | null
     middleName?: string | null
     lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
     namePrefix?: string | null
     nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
     company?: string | null
+    phoneticCompany?: string | null
     jobTitle?: string | null
     website?: string | null
     birthday?: string | null
@@ -26253,12 +26375,15 @@ export namespace Prisma {
     firstName?: StringNullableFilter<"Contact"> | string | null
     middleName?: StringNullableFilter<"Contact"> | string | null
     lastName?: StringNullableFilter<"Contact"> | string | null
+    phoneticFirstName?: StringNullableFilter<"Contact"> | string | null
+    phoneticLastName?: StringNullableFilter<"Contact"> | string | null
     namePrefix?: StringNullableFilter<"Contact"> | string | null
     nameSuffix?: StringNullableFilter<"Contact"> | string | null
     nickname?: StringNullableFilter<"Contact"> | string | null
     email?: StringNullableFilter<"Contact"> | string | null
     phone?: StringNullableFilter<"Contact"> | string | null
     company?: StringNullableFilter<"Contact"> | string | null
+    phoneticCompany?: StringNullableFilter<"Contact"> | string | null
     jobTitle?: StringNullableFilter<"Contact"> | string | null
     website?: StringNullableFilter<"Contact"> | string | null
     birthday?: StringNullableFilter<"Contact"> | string | null
@@ -26565,6 +26690,7 @@ export namespace Prisma {
     email: string
     password: string
     lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
@@ -26582,6 +26708,7 @@ export namespace Prisma {
     email: string
     password: string
     lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
@@ -26846,12 +26973,15 @@ export namespace Prisma {
     firstName?: string | null
     middleName?: string | null
     lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
     namePrefix?: string | null
     nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
     company?: string | null
+    phoneticCompany?: string | null
     jobTitle?: string | null
     website?: string | null
     birthday?: string | null
@@ -26894,12 +27024,15 @@ export namespace Prisma {
     firstName?: string | null
     middleName?: string | null
     lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
     namePrefix?: string | null
     nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
     company?: string | null
+    phoneticCompany?: string | null
     jobTitle?: string | null
     website?: string | null
     birthday?: string | null
@@ -26941,12 +27074,15 @@ export namespace Prisma {
     firstName?: string | null
     middleName?: string | null
     lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
     namePrefix?: string | null
     nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
     company?: string | null
+    phoneticCompany?: string | null
     jobTitle?: string | null
     website?: string | null
     birthday?: string | null
@@ -26988,12 +27124,15 @@ export namespace Prisma {
     firstName?: string | null
     middleName?: string | null
     lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
     namePrefix?: string | null
     nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
     company?: string | null
+    phoneticCompany?: string | null
     jobTitle?: string | null
     website?: string | null
     birthday?: string | null
@@ -27049,6 +27188,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
@@ -27066,6 +27206,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
@@ -27263,12 +27404,15 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     middleName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
     namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
     nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27311,12 +27455,15 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     middleName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
     namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
     nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27366,6 +27513,7 @@ export namespace Prisma {
     email: string
     password: string
     lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -27383,6 +27531,7 @@ export namespace Prisma {
     email: string
     password: string
     lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -27478,6 +27627,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -27495,6 +27645,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -27528,6 +27679,7 @@ export namespace Prisma {
     email: string
     password: string
     lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -27545,6 +27697,7 @@ export namespace Prisma {
     email: string
     password: string
     lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -27603,6 +27756,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -27620,6 +27774,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -27668,6 +27823,7 @@ export namespace Prisma {
     email: string
     password: string
     lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -27685,6 +27841,7 @@ export namespace Prisma {
     email: string
     password: string
     lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -27710,12 +27867,15 @@ export namespace Prisma {
     firstName?: string | null
     middleName?: string | null
     lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
     namePrefix?: string | null
     nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
     company?: string | null
+    phoneticCompany?: string | null
     jobTitle?: string | null
     website?: string | null
     birthday?: string | null
@@ -27757,12 +27917,15 @@ export namespace Prisma {
     firstName?: string | null
     middleName?: string | null
     lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
     namePrefix?: string | null
     nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
     company?: string | null
+    phoneticCompany?: string | null
     jobTitle?: string | null
     website?: string | null
     birthday?: string | null
@@ -27818,6 +27981,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -27835,6 +27999,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -27868,6 +28033,7 @@ export namespace Prisma {
     email: string
     password: string
     lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -27885,6 +28051,7 @@ export namespace Prisma {
     email: string
     password: string
     lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -27918,6 +28085,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -27935,6 +28103,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -27952,6 +28121,7 @@ export namespace Prisma {
     email: string
     password: string
     lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -27969,6 +28139,7 @@ export namespace Prisma {
     email: string
     password: string
     lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -27994,12 +28165,15 @@ export namespace Prisma {
     firstName?: string | null
     middleName?: string | null
     lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
     namePrefix?: string | null
     nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
     company?: string | null
+    phoneticCompany?: string | null
     jobTitle?: string | null
     website?: string | null
     birthday?: string | null
@@ -28042,12 +28216,15 @@ export namespace Prisma {
     firstName?: string | null
     middleName?: string | null
     lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
     namePrefix?: string | null
     nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
     company?: string | null
+    phoneticCompany?: string | null
     jobTitle?: string | null
     website?: string | null
     birthday?: string | null
@@ -28089,12 +28266,15 @@ export namespace Prisma {
     firstName?: string | null
     middleName?: string | null
     lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
     namePrefix?: string | null
     nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
     company?: string | null
+    phoneticCompany?: string | null
     jobTitle?: string | null
     website?: string | null
     birthday?: string | null
@@ -28137,12 +28317,15 @@ export namespace Prisma {
     firstName?: string | null
     middleName?: string | null
     lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
     namePrefix?: string | null
     nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
     company?: string | null
+    phoneticCompany?: string | null
     jobTitle?: string | null
     website?: string | null
     birthday?: string | null
@@ -28230,6 +28413,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -28247,6 +28431,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -28278,12 +28463,15 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     middleName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
     namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
     nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28326,12 +28514,15 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     middleName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
     namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
     nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28379,12 +28570,15 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     middleName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
     namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
     nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28427,12 +28621,15 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     middleName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
     namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
     nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28525,6 +28722,7 @@ export namespace Prisma {
     email: string
     password: string
     lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -28542,6 +28740,7 @@ export namespace Prisma {
     email: string
     password: string
     lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -28624,6 +28823,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -28641,6 +28841,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -28658,6 +28859,7 @@ export namespace Prisma {
     email: string
     password: string
     lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -28675,6 +28877,7 @@ export namespace Prisma {
     email: string
     password: string
     lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -28858,6 +29061,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -28875,6 +29079,7 @@ export namespace Prisma {
     email?: StringFieldUpdateOperationsInput | string
     password?: StringFieldUpdateOperationsInput | string
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -29042,12 +29247,15 @@ export namespace Prisma {
     firstName?: string | null
     middleName?: string | null
     lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
     namePrefix?: string | null
     nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
     company?: string | null
+    phoneticCompany?: string | null
     jobTitle?: string | null
     website?: string | null
     birthday?: string | null
@@ -29090,12 +29298,15 @@ export namespace Prisma {
     firstName?: string | null
     middleName?: string | null
     lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
     namePrefix?: string | null
     nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
     company?: string | null
+    phoneticCompany?: string | null
     jobTitle?: string | null
     website?: string | null
     birthday?: string | null
@@ -29269,12 +29480,15 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     middleName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
     namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
     nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29317,12 +29531,15 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     middleName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
     namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
     nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29625,12 +29842,15 @@ export namespace Prisma {
     firstName?: string | null
     middleName?: string | null
     lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
     namePrefix?: string | null
     nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
     company?: string | null
+    phoneticCompany?: string | null
     jobTitle?: string | null
     website?: string | null
     birthday?: string | null
@@ -29673,12 +29893,15 @@ export namespace Prisma {
     firstName?: string | null
     middleName?: string | null
     lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
     namePrefix?: string | null
     nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
     company?: string | null
+    phoneticCompany?: string | null
     jobTitle?: string | null
     website?: string | null
     birthday?: string | null
@@ -29849,12 +30072,15 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     middleName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
     namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
     nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29897,12 +30123,15 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     middleName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
     namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
     nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29941,12 +30170,15 @@ export namespace Prisma {
     firstName?: string | null
     middleName?: string | null
     lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
     namePrefix?: string | null
     nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
     company?: string | null
+    phoneticCompany?: string | null
     jobTitle?: string | null
     website?: string | null
     birthday?: string | null
@@ -30105,12 +30337,15 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     middleName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
     namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
     nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30152,12 +30387,15 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     middleName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
     namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
     nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30197,12 +30435,15 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     middleName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
     namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
     nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30694,12 +30935,15 @@ export namespace Prisma {
     firstName?: string | null
     middleName?: string | null
     lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
     namePrefix?: string | null
     nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
     company?: string | null
+    phoneticCompany?: string | null
     jobTitle?: string | null
     website?: string | null
     birthday?: string | null
@@ -30945,12 +31189,15 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     middleName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
     namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
     nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30992,12 +31239,15 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     middleName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
     namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
     nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31037,12 +31287,15 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     middleName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
     namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
     nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31181,12 +31434,15 @@ export namespace Prisma {
     firstName?: string | null
     middleName?: string | null
     lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
     namePrefix?: string | null
     nameSuffix?: string | null
     nickname?: string | null
     email?: string | null
     phone?: string | null
     company?: string | null
+    phoneticCompany?: string | null
     jobTitle?: string | null
     website?: string | null
     birthday?: string | null
@@ -31219,12 +31475,15 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     middleName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
     namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
     nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31266,12 +31525,15 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     middleName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
     namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
     nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31311,12 +31573,15 @@ export namespace Prisma {
     firstName?: NullableStringFieldUpdateOperationsInput | string | null
     middleName?: NullableStringFieldUpdateOperationsInput | string | null
     lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
     namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
     nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
     nickname?: NullableStringFieldUpdateOperationsInput | string | null
     email?: NullableStringFieldUpdateOperationsInput | string | null
     phone?: NullableStringFieldUpdateOperationsInput | string | null
     company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null

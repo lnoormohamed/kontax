@@ -1,9 +1,11 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { updatePhoneticSettings } from "~/app/actions/settings";
 import { signOut } from "~/server/auth";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
+import { db } from "~/server/db";
 
 const getInitials = (value: string) =>
   value
@@ -34,6 +36,14 @@ export default async function SettingsPage() {
   }
 
   const planSummary = await getUserPlanSummary(session.user.id);
+  const userSettings = await db.user.findUnique({
+    where: {
+      id: session.user.id,
+    },
+    select: {
+      autoFillPhoneticNames: true,
+    },
+  });
   const userLabel = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
 
   const handleSignOut = async () => {
@@ -66,61 +76,96 @@ export default async function SettingsPage() {
         </section>
 
         <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <div className="rounded-[2rem] border border-[#d8ddd6] bg-white p-6 shadow-sm">
-            <div className="flex items-start justify-between gap-3">
+          <div className="grid gap-6">
+            <div className="rounded-[2rem] border border-[#d8ddd6] bg-white p-6 shadow-sm">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-lg font-semibold text-slate-900">Plan and limits</p>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Workspace controls now live here instead of competing with the contacts list.
+                  </p>
+                </div>
+                <span
+                  className={`rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${getLifecycleTone(
+                    planSummary.lifecyclePolicy.label,
+                  )}`}
+                >
+                  {planSummary.lifecyclePolicy.label}
+                </span>
+              </div>
+
+              <div className="mt-5 grid gap-3 md:grid-cols-2">
+                <div className="rounded-[1.4rem] border border-[#d8ddd6] bg-[#f8faf8] p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                    Contacts used
+                  </p>
+                  <p className="mt-2 text-2xl font-semibold text-slate-900">
+                    {planSummary.contactsUsed} / {planSummary.entitlements.contactsLimit}
+                  </p>
+                </div>
+                <div className="rounded-[1.4rem] border border-[#d8ddd6] bg-[#f7f8ff] p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                    Monthly imports
+                  </p>
+                  <p className="mt-2 text-2xl font-semibold text-slate-900">
+                    {planSummary.importedThisMonth} / {planSummary.entitlements.monthlyImportLimit}
+                  </p>
+                </div>
+                <div className="rounded-[1.4rem] border border-[#d8ddd6] bg-[#fbfcf8] p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                    Export access
+                  </p>
+                  <p className="mt-2 text-lg font-semibold text-slate-900">
+                    {planSummary.lifecyclePolicy.canUseBasicExport ? "Available" : "Restricted"}
+                  </p>
+                </div>
+                <div className="rounded-[1.4rem] border border-[#d8ddd6] bg-[#fdf9f1] p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                    Sync accounts
+                  </p>
+                  <p className="mt-2 text-lg font-semibold text-slate-900">
+                    {planSummary.entitlements.syncAccountsLimit} available on plan
+                  </p>
+                </div>
+              </div>
+
+              <p className="mt-5 text-sm leading-6 text-slate-500">
+                {planSummary.lifecyclePolicy.description}
+              </p>
+            </div>
+
+            <div className="rounded-[2rem] border border-[#d8ddd6] bg-white p-6 shadow-sm">
               <div>
-                <p className="text-lg font-semibold text-slate-900">Plan and limits</p>
+                <p className="text-lg font-semibold text-slate-900">Pinyin and name readings</p>
                 <p className="mt-1 text-sm text-slate-500">
-                  Workspace controls now live here instead of competing with the contacts list.
+                  Auto-fill pinyin for Chinese names, with fallback name readings for other non-Latin scripts, only when those fields are still blank.
                 </p>
               </div>
-              <span
-                className={`rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${getLifecycleTone(
-                  planSummary.lifecyclePolicy.label,
-                )}`}
+
+              <form action={updatePhoneticSettings} className="mt-5">
+                <label className="flex items-start gap-3 rounded-[1.4rem] border border-[#d8ddd6] bg-[#f8faf8] px-4 py-4 text-sm text-slate-700">
+                  <input
+                    className="mt-0.5 h-4 w-4 rounded border-slate-300 text-[#4158f4] focus:ring-[#4158f4]"
+                    defaultChecked={userSettings?.autoFillPhoneticNames ?? false}
+                    name="autoFillPhoneticNames"
+                    type="checkbox"
+                    value="true"
+                  />
+                  <span>
+                    Enable automatic pinyin and name-reading fill for first name, last name, and company when those fields are empty.
+                  </span>
+                </label>
+                <p className="mt-3 text-sm leading-6 text-slate-500">
+                  Chinese names use real pinyin generation. Other non-Latin scripts still get a best-effort transliterated reading, and manual contact edits always win.
+                </p>
+              <button
+                className="mt-4 rounded-[1.2rem] bg-[#17352e] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#20443b]"
+                type="submit"
               >
-                {planSummary.lifecyclePolicy.label}
-              </span>
+                Save pinyin settings
+              </button>
+              </form>
             </div>
-
-            <div className="mt-5 grid gap-3 md:grid-cols-2">
-              <div className="rounded-[1.4rem] border border-[#d8ddd6] bg-[#f8faf8] p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                  Contacts used
-                </p>
-                <p className="mt-2 text-2xl font-semibold text-slate-900">
-                  {planSummary.contactsUsed} / {planSummary.entitlements.contactsLimit}
-                </p>
-              </div>
-              <div className="rounded-[1.4rem] border border-[#d8ddd6] bg-[#f7f8ff] p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                  Monthly imports
-                </p>
-                <p className="mt-2 text-2xl font-semibold text-slate-900">
-                  {planSummary.importedThisMonth} / {planSummary.entitlements.monthlyImportLimit}
-                </p>
-              </div>
-              <div className="rounded-[1.4rem] border border-[#d8ddd6] bg-[#fbfcf8] p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                  Export access
-                </p>
-                <p className="mt-2 text-lg font-semibold text-slate-900">
-                  {planSummary.lifecyclePolicy.canUseBasicExport ? "Available" : "Restricted"}
-                </p>
-              </div>
-              <div className="rounded-[1.4rem] border border-[#d8ddd6] bg-[#fdf9f1] p-4">
-                <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                  Sync accounts
-                </p>
-                <p className="mt-2 text-lg font-semibold text-slate-900">
-                  {planSummary.entitlements.syncAccountsLimit} available on plan
-                </p>
-              </div>
-            </div>
-
-            <p className="mt-5 text-sm leading-6 text-slate-500">
-              {planSummary.lifecyclePolicy.description}
-            </p>
           </div>
 
           <aside className="grid gap-6 self-start">

@@ -127,6 +127,7 @@ exports.Prisma.UserScalarFieldEnum = {
   email: 'email',
   password: 'password',
   lifecycleState: 'lifecycleState',
+  autoFillPhoneticNames: 'autoFillPhoneticNames',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -143,12 +144,15 @@ exports.Prisma.ContactScalarFieldEnum = {
   firstName: 'firstName',
   middleName: 'middleName',
   lastName: 'lastName',
+  phoneticFirstName: 'phoneticFirstName',
+  phoneticLastName: 'phoneticLastName',
   namePrefix: 'namePrefix',
   nameSuffix: 'nameSuffix',
   nickname: 'nickname',
   email: 'email',
   phone: 'phone',
   company: 'company',
+  phoneticCompany: 'phoneticCompany',
   jobTitle: 'jobTitle',
   website: 'website',
   birthday: 'birthday',
