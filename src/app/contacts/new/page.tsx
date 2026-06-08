@@ -13,6 +13,8 @@ const textareaClassName = `${inputClassName} min-h-28`;
 
 const helperCardClassName =
   "rounded-[1.5rem] border border-[#dfe7e1] bg-[#f8faf8] p-4 text-sm text-slate-600";
+const progressiveDetailsClassName =
+  "group rounded-[1.6rem] border border-[#d8ddd6] bg-[#fcfcfa] px-5 py-4 shadow-sm";
 
 export default async function NewContactPage() {
   const session = await auth();
@@ -73,7 +75,8 @@ export default async function NewContactPage() {
               <div className="mb-5">
                 <p className="text-lg font-semibold text-slate-900">Core details</p>
                 <p className="mt-1 text-sm text-slate-500">
-                  Use the basics first, then add the richer identity structure you already know.
+                  Start with the minimum you know now. You can add the richer structure only when
+                  this contact needs it.
                 </p>
               </div>
 
@@ -92,10 +95,6 @@ export default async function NewContactPage() {
                   />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
-                  <span>Middle name</span>
-                  <input className={inputClassName} name="middleName" type="text" />
-                </label>
-                <label className="grid gap-2 text-sm text-slate-700">
                   <span>Last name</span>
                   <input className={inputClassName} name="lastName" type="text" />
                 </label>
@@ -107,18 +106,6 @@ export default async function NewContactPage() {
                     placeholder="Auto-filled when enabled in settings"
                     type="text"
                   />
-                </label>
-                <label className="grid gap-2 text-sm text-slate-700">
-                  <span>Prefix</span>
-                  <input className={inputClassName} name="namePrefix" type="text" />
-                </label>
-                <label className="grid gap-2 text-sm text-slate-700">
-                  <span>Suffix</span>
-                  <input className={inputClassName} name="nameSuffix" type="text" />
-                </label>
-                <label className="grid gap-2 text-sm text-slate-700">
-                  <span>Nickname</span>
-                  <input className={inputClassName} name="nickname" type="text" />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Company</span>
@@ -143,19 +130,18 @@ export default async function NewContactPage() {
                   <input className={inputClassName} name="jobTitle" type="text" />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
-                  <span>Labels</span>
-                  <input
-                    className={inputClassName}
-                    name="labels"
-                    placeholder="Family, VIP, School"
-                    type="text"
-                  />
+                  <span>Primary email</span>
+                  <input className={inputClassName} name="email" type="email" />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
-                  <span>Avatar URL</span>
-                  <input className={inputClassName} name="avatarUrl" type="url" />
+                  <span>Primary phone</span>
+                  <input className={inputClassName} name="phone" type="text" />
                 </label>
-                <label className="flex items-center gap-3 rounded-[1.2rem] border border-slate-200 bg-[#fbfaf7] px-4 py-3 text-sm text-slate-700 lg:col-span-2">
+                <label className="grid gap-2 text-sm text-slate-700">
+                  <span>Birthday</span>
+                  <input className={inputClassName} name="birthday" type="date" />
+                </label>
+                <label className="flex items-center gap-3 rounded-[1.2rem] border border-slate-200 bg-[#fbfaf7] px-4 py-3 text-sm text-slate-700">
                   <input
                     className="h-4 w-4 rounded border-slate-300 text-[#1f7a67] focus:ring-[#67b59f]"
                     name="isFavorite"
@@ -163,6 +149,14 @@ export default async function NewContactPage() {
                     value="true"
                   />
                   <span>Start this contact as a favorite</span>
+                </label>
+                <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
+                  <span>Notes</span>
+                  <textarea
+                    className="min-h-32 rounded-[1.2rem] border border-slate-200 bg-[#fbfaf7] px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#667eea] focus:bg-white"
+                    name="notes"
+                    placeholder="Add context you want to remember later"
+                  />
                 </label>
                 <div className="rounded-[1.2rem] border border-[#dfe7e1] bg-[#f7fbf9] px-4 py-3 text-sm text-slate-600 lg:col-span-2">
                   Kontax builds the display name from the person fields when present, and falls back to company for organization-only contacts.
@@ -175,25 +169,62 @@ export default async function NewContactPage() {
               </div>
             </section>
 
-            <section className="rounded-[2rem] border border-[#d8ddd6] bg-white p-6 shadow-sm">
-              <div className="mb-5">
-                <p className="text-lg font-semibold text-slate-900">Communication</p>
-                <p className="mt-1 text-sm text-slate-500">
-                  Start with the direct ways to reach this person, then layer in secondary entries
-                  when they matter.
-                </p>
-              </div>
+            <details className={progressiveDetailsClassName}>
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left">
+                <div>
+                  <p className="text-base font-semibold text-slate-900">More names and profile fields</p>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Prefixes, labels, avatar, and other identity details.
+                  </p>
+                </div>
+                <span className="text-sm font-semibold text-[#4158f4]">Add more</span>
+              </summary>
 
-              <div className="mb-5 rounded-[1.4rem] border border-[#dfe7e1] bg-[#f8faf8] px-4 py-3 text-sm text-slate-600">
-                Keep primary email and phone clear, then add secondary or overflow values only when
-                they help with portability, merge quality, or later sync.
-              </div>
-
-              <div className="grid gap-4 lg:grid-cols-2">
+              <div className="mt-5 grid gap-4 border-t border-[#e7ebe5] pt-5 lg:grid-cols-2">
                 <label className="grid gap-2 text-sm text-slate-700">
-                  <span>Primary email</span>
-                  <input className={inputClassName} name="email" type="email" />
+                  <span>Middle name</span>
+                  <input className={inputClassName} name="middleName" type="text" />
                 </label>
+                <label className="grid gap-2 text-sm text-slate-700">
+                  <span>Prefix</span>
+                  <input className={inputClassName} name="namePrefix" type="text" />
+                </label>
+                <label className="grid gap-2 text-sm text-slate-700">
+                  <span>Suffix</span>
+                  <input className={inputClassName} name="nameSuffix" type="text" />
+                </label>
+                <label className="grid gap-2 text-sm text-slate-700">
+                  <span>Nickname</span>
+                  <input className={inputClassName} name="nickname" type="text" />
+                </label>
+                <label className="grid gap-2 text-sm text-slate-700">
+                  <span>Labels</span>
+                  <input
+                    className={inputClassName}
+                    name="labels"
+                    placeholder="Family, VIP, School"
+                    type="text"
+                  />
+                </label>
+                <label className="grid gap-2 text-sm text-slate-700">
+                  <span>Avatar URL</span>
+                  <input className={inputClassName} name="avatarUrl" type="url" />
+                </label>
+              </div>
+            </details>
+
+            <details className={progressiveDetailsClassName}>
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left">
+                <div>
+                  <p className="text-base font-semibold text-slate-900">Add email and phone details</p>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Labels and secondary values for richer reachability.
+                  </p>
+                </div>
+                <span className="text-sm font-semibold text-[#4158f4]">Add more</span>
+              </summary>
+
+              <div className="mt-5 grid gap-4 border-t border-[#e7ebe5] pt-5 lg:grid-cols-2">
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Email label</span>
                   <input className={inputClassName} name="emailLabel" placeholder="work" type="text" />
@@ -218,10 +249,6 @@ export default async function NewContactPage() {
                     name="additionalEmails"
                     placeholder={"One per line for anything beyond the labeled primary and secondary emails\nteam@example.com"}
                   />
-                </label>
-                <label className="grid gap-2 text-sm text-slate-700">
-                  <span>Primary phone</span>
-                  <input className={inputClassName} name="phone" type="text" />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Phone label</span>
@@ -249,22 +276,20 @@ export default async function NewContactPage() {
                   />
                 </label>
               </div>
-            </section>
+            </details>
 
-            <section className="rounded-[2rem] border border-[#d8ddd6] bg-white p-6 shadow-sm">
-              <div className="mb-5">
-                <p className="text-lg font-semibold text-slate-900">Address and web presence</p>
-                <p className="mt-1 text-sm text-slate-500">
-                  Keep location and online identity together so the record stays easier to scan.
-                </p>
-              </div>
+            <details className={progressiveDetailsClassName}>
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left">
+                <div>
+                  <p className="text-base font-semibold text-slate-900">Add address and web fields</p>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Keep online identity and location nearby when this record needs them.
+                  </p>
+                </div>
+                <span className="text-sm font-semibold text-[#4158f4]">Add more</span>
+              </summary>
 
-              <div className="mb-5 rounded-[1.4rem] border border-[#dfe7e1] bg-[#f8faf8] px-4 py-3 text-sm text-slate-600">
-                This section keeps human-readable address details close to the structured fields that
-                help exports stay cleaner and future sync stay more reliable.
-              </div>
-
-              <div className="grid gap-4 lg:grid-cols-2">
+              <div className="mt-5 grid gap-4 border-t border-[#e7ebe5] pt-5 lg:grid-cols-2">
                 <label className="grid gap-2 text-sm text-slate-700">
                   <span>Website</span>
                   <input className={inputClassName} name="website" type="url" />
@@ -335,25 +360,20 @@ export default async function NewContactPage() {
                   />
                 </label>
               </div>
-            </section>
+            </details>
 
-            <section className="rounded-[2rem] border border-[#d8ddd6] bg-white p-6 shadow-sm">
-              <div className="mb-5">
-                <p className="text-lg font-semibold text-slate-900">Personal context and notes</p>
-                <p className="mt-1 text-sm text-slate-500">
-                  Add the richer details that make imports, merge suggestions, and future sync more trustworthy.
-                </p>
-              </div>
-
-              <div className="grid gap-4 lg:grid-cols-2">
-                <label className="grid gap-2 text-sm text-slate-700">
-                  <span>Birthday</span>
-                  <input className={inputClassName} name="birthday" type="date" />
-                </label>
-                <div className="rounded-[1.2rem] border border-[#dfe7e1] bg-[#f7fbf9] p-4 text-sm text-slate-600">
-                  Use the primary birthday field for the most portable date. Extra dates can be
-                  added below in <span className="font-medium text-slate-800">Label | YYYY-MM-DD</span> format.
+            <details className={progressiveDetailsClassName}>
+              <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left">
+                <div>
+                  <p className="text-base font-semibold text-slate-900">Add dates and relationships</p>
+                  <p className="mt-1 text-sm text-slate-500">
+                    Useful context for families, anniversaries, assistants, and other personal links.
+                  </p>
                 </div>
+                <span className="text-sm font-semibold text-[#4158f4]">Add more</span>
+              </summary>
+
+              <div className="mt-5 grid gap-4 border-t border-[#e7ebe5] pt-5 lg:grid-cols-2">
                 <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
                   <span>Significant dates</span>
                   <textarea
@@ -378,15 +398,8 @@ export default async function NewContactPage() {
                     placeholder={"Label | Value\nAssistant | Jamie"}
                   />
                 </label>
-                <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
-                  <span>Notes</span>
-                  <textarea
-                    className="min-h-40 rounded-[1.2rem] border border-slate-200 bg-[#fbfaf7] px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#667eea] focus:bg-white"
-                    name="notes"
-                  />
-                </label>
               </div>
-            </section>
+            </details>
 
             <div className="flex flex-wrap gap-3">
               <button

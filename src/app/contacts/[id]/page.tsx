@@ -104,6 +104,8 @@ const sectionCardClassName =
 
 const helperCardClassName =
   "rounded-[1.5rem] border border-[#dfe7e1] bg-[#f8faf8] p-4 text-sm text-slate-600";
+const progressiveDetailsClassName =
+  "group rounded-[1.6rem] border border-[#d8ddd6] bg-[#fcfcfa] px-5 py-4 shadow-sm";
 
 export default async function ContactDetailPage({ params, searchParams }: ContactDetailPageProps) {
   const session = await auth();
@@ -510,6 +512,67 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                       <input className={inputClassName} defaultValue={contact.firstName ?? ""} name="firstName" type="text" />
                     </label>
                     <label className="grid gap-2 text-sm text-slate-700">
+                      <span>Last name</span>
+                      <input className={inputClassName} defaultValue={contact.lastName ?? ""} name="lastName" type="text" />
+                    </label>
+                    <label className="grid gap-2 text-sm text-slate-700">
+                      <span>Company</span>
+                      <input className={inputClassName} defaultValue={contact.company ?? ""} name="company" type="text" />
+                    </label>
+                    <label className="grid gap-2 text-sm text-slate-700">
+                      <span>Job title</span>
+                      <input className={inputClassName} defaultValue={contact.jobTitle ?? ""} name="jobTitle" type="text" />
+                    </label>
+                    <label className="grid gap-2 text-sm text-slate-700">
+                      <span>Primary email</span>
+                      <input className={inputClassName} defaultValue={contact.email ?? ""} name="email" type="email" />
+                    </label>
+                    <label className="grid gap-2 text-sm text-slate-700">
+                      <span>Primary phone</span>
+                      <input className={inputClassName} defaultValue={contact.phone ?? ""} name="phone" type="text" />
+                    </label>
+                    <label className="grid gap-2 text-sm text-slate-700">
+                      <span>Birthday</span>
+                      <input className={inputClassName} defaultValue={contact.birthday ?? ""} name="birthday" type="date" />
+                    </label>
+                    <label className="flex items-center gap-3 rounded-[1.2rem] border border-slate-200 bg-[#fbfaf7] px-4 py-3 text-sm text-slate-700">
+                      <input
+                        className="h-4 w-4 rounded border-slate-300 text-[#1f7a67] focus:ring-[#67b59f]"
+                        defaultChecked={contact.isFavorite}
+                        name="isFavorite"
+                        type="checkbox"
+                        value="true"
+                      />
+                      <span>Favorite contact</span>
+                    </label>
+                    <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
+                      <span>Notes</span>
+                      <textarea className="min-h-40 rounded-[1.2rem] border border-slate-200 bg-[#fbfaf7] px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#67b59f] focus:bg-white" defaultValue={contact.notes ?? ""} name="notes" />
+                    </label>
+                    <div className="rounded-[1.2rem] border border-[#dfe7e1] bg-[#f7fbf9] px-4 py-3 text-sm text-slate-600 lg:col-span-2">
+                      Kontax builds the display name from the person fields when present, and falls back to company for organization-only contacts.
+                    </div>
+                    <div className="rounded-[1.2rem] border border-[#dfe7e1] bg-[#f7fbf9] px-4 py-3 text-sm text-slate-600 lg:col-span-2">
+                      If phonetic auto-fill is enabled in settings, Kontax only fills these values when they
+                      are blank. Chinese names use real phonetic generation, fallback phonetic values support
+                      other non-Latin scripts, and manual edits always win.
+                    </div>
+                  </div>
+                </section>
+
+                <details className={progressiveDetailsClassName}>
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left">
+                    <div>
+                      <p className="text-base font-semibold text-slate-900">More names and profile fields</p>
+                      <p className="mt-1 text-sm text-slate-500">
+                        Prefixes, phonetics, labels, avatar, and other identity details.
+                      </p>
+                    </div>
+                    <span className="text-sm font-semibold text-[#1f7a67]">Add more</span>
+                  </summary>
+
+                  <div className="mt-5 grid gap-4 border-t border-[#e7ebe5] pt-5 lg:grid-cols-2">
+                    <label className="grid gap-2 text-sm text-slate-700">
                       <span>Phonetic first name</span>
                       <input
                         className={inputClassName}
@@ -519,14 +582,6 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                       />
                     </label>
                     <label className="grid gap-2 text-sm text-slate-700">
-                      <span>Middle name</span>
-                      <input className={inputClassName} defaultValue={contact.middleName ?? ""} name="middleName" type="text" />
-                    </label>
-                    <label className="grid gap-2 text-sm text-slate-700">
-                      <span>Last name</span>
-                      <input className={inputClassName} defaultValue={contact.lastName ?? ""} name="lastName" type="text" />
-                    </label>
-                    <label className="grid gap-2 text-sm text-slate-700">
                       <span>Phonetic last name</span>
                       <input
                         className={inputClassName}
@@ -534,6 +589,10 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                         name="phoneticLastName"
                         type="text"
                       />
+                    </label>
+                    <label className="grid gap-2 text-sm text-slate-700">
+                      <span>Middle name</span>
+                      <input className={inputClassName} defaultValue={contact.middleName ?? ""} name="middleName" type="text" />
                     </label>
                     <label className="grid gap-2 text-sm text-slate-700">
                       <span>Prefix</span>
@@ -548,10 +607,6 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                       <input className={inputClassName} defaultValue={contact.nickname ?? ""} name="nickname" type="text" />
                     </label>
                     <label className="grid gap-2 text-sm text-slate-700">
-                      <span>Company</span>
-                      <input className={inputClassName} defaultValue={contact.company ?? ""} name="company" type="text" />
-                    </label>
-                    <label className="grid gap-2 text-sm text-slate-700">
                       <span>Phonetic company</span>
                       <input
                         className={inputClassName}
@@ -559,10 +614,6 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                         name="phoneticCompany"
                         type="text"
                       />
-                    </label>
-                    <label className="grid gap-2 text-sm text-slate-700">
-                      <span>Job title</span>
-                      <input className={inputClassName} defaultValue={contact.jobTitle ?? ""} name="jobTitle" type="text" />
                     </label>
                     <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
                       <span>Avatar URL</span>
@@ -578,41 +629,21 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                         type="text"
                       />
                     </label>
-                    <label className="flex items-center gap-3 rounded-[1.2rem] border border-slate-200 bg-[#fbfaf7] px-4 py-3 text-sm text-slate-700">
-                      <input
-                        className="h-4 w-4 rounded border-slate-300 text-[#1f7a67] focus:ring-[#67b59f]"
-                        defaultChecked={contact.isFavorite}
-                        name="isFavorite"
-                        type="checkbox"
-                        value="true"
-                      />
-                      <span>Favorite contact</span>
-                    </label>
-                    <div className="rounded-[1.2rem] border border-[#dfe7e1] bg-[#f7fbf9] px-4 py-3 text-sm text-slate-600 lg:col-span-2">
-                      Kontax builds the display name from the person fields when present, and falls back to company for organization-only contacts.
-                    </div>
-                    <div className="rounded-[1.2rem] border border-[#dfe7e1] bg-[#f7fbf9] px-4 py-3 text-sm text-slate-600 lg:col-span-2">
-                      If phonetic auto-fill is enabled in settings, Kontax only fills these values when they
-                      are blank. Chinese names use real phonetic generation, fallback phonetic values support
-                      other non-Latin scripts, and manual edits always win.
-                    </div>
                   </div>
-                </section>
+                </details>
 
-                <section className="rounded-[1.8rem] border border-[#d8ddd6] bg-[#fdfdfb] p-5">
-                  <div className="mb-5">
-                    <p className="text-lg font-semibold text-slate-900">Communication</p>
-                    <p className="mt-1 text-sm text-slate-500">
-                      Keep primary email and phone clear, then layer in labeled secondary contact
-                      methods where portability and merge quality benefit from the extra structure.
-                    </p>
-                  </div>
+                <details className={progressiveDetailsClassName}>
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left">
+                    <div>
+                      <p className="text-base font-semibold text-slate-900">Add email and phone details</p>
+                      <p className="mt-1 text-sm text-slate-500">
+                        Labels and secondary values for richer reachability.
+                      </p>
+                    </div>
+                    <span className="text-sm font-semibold text-[#1f7a67]">Add more</span>
+                  </summary>
 
-                  <div className="grid gap-4 lg:grid-cols-2">
-                    <label className="grid gap-2 text-sm text-slate-700">
-                      <span>Primary email</span>
-                      <input className={inputClassName} defaultValue={contact.email ?? ""} name="email" type="email" />
-                    </label>
+                  <div className="mt-5 grid gap-4 border-t border-[#e7ebe5] pt-5 lg:grid-cols-2">
                     <label className="grid gap-2 text-sm text-slate-700">
                       <span>Email label</span>
                       <input className={inputClassName} defaultValue={primaryEmailEntry?.label ?? ""} name="emailLabel" type="text" />
@@ -634,23 +665,20 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                       <textarea className={textareaClassName} defaultValue={additionalPhones} name="additionalPhones" />
                     </label>
                   </div>
+                </details>
 
-                  <div className="mt-4 rounded-[1.4rem] border border-[#dfe7e1] bg-[#f7fbf9] p-4 text-sm text-slate-600">
-                    One entry per line works well for secondary values. Primary email and phone stay
-                    your strongest export and sync anchors.
-                  </div>
-                </section>
+                <details className={progressiveDetailsClassName}>
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left">
+                    <div>
+                      <p className="text-base font-semibold text-slate-900">Add address and web fields</p>
+                      <p className="mt-1 text-sm text-slate-500">
+                        Keep online identity and location nearby when this record needs them.
+                      </p>
+                    </div>
+                    <span className="text-sm font-semibold text-[#1f7a67]">Add more</span>
+                  </summary>
 
-                <section className="rounded-[1.8rem] border border-[#d8ddd6] bg-[#fdfdfb] p-5">
-                  <div className="mb-5">
-                    <p className="text-lg font-semibold text-slate-900">Address and web presence</p>
-                    <p className="mt-1 text-sm text-slate-500">
-                      This section keeps a human-readable address close to the structured parts that
-                      matter for vCard fidelity and cleaner future sync behavior.
-                    </p>
-                  </div>
-
-                  <div className="grid gap-4 lg:grid-cols-2">
+                  <div className="mt-5 grid gap-4 border-t border-[#e7ebe5] pt-5 lg:grid-cols-2">
                     <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
                       <span>Address</span>
                       <textarea className={textareaClassName} defaultValue={contact.address ?? ""} name="address" />
@@ -700,26 +728,20 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                       <textarea className={textareaClassName} defaultValue={additionalWebsites} name="additionalWebsites" />
                     </label>
                   </div>
-                </section>
+                </details>
 
-                <section className="rounded-[1.8rem] border border-[#d8ddd6] bg-[#fdfdfb] p-5">
-                  <div className="mb-5">
-                    <p className="text-lg font-semibold text-slate-900">Personal context</p>
-                    <p className="mt-1 text-sm text-slate-500">
-                      Keep birthdays, important relationships, custom notes, and Kontax-specific
-                      context in one place so the record feels personal rather than purely transactional.
-                    </p>
-                  </div>
-
-                  <div className="grid gap-4 lg:grid-cols-2">
-                    <label className="grid gap-2 text-sm text-slate-700">
-                      <span>Birthday</span>
-                      <input className={inputClassName} defaultValue={contact.birthday ?? ""} name="birthday" type="date" />
-                    </label>
-                    <div className="rounded-[1.2rem] border border-[#dfe7e1] bg-[#f7fbf9] p-4 text-sm text-slate-600">
-                      Use the primary birthday field for the most portable date. Extra dates can be
-                      added below in <span className="font-medium text-slate-800">Label | YYYY-MM-DD</span> format.
+                <details className={progressiveDetailsClassName}>
+                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-left">
+                    <div>
+                      <p className="text-base font-semibold text-slate-900">Add dates and relationships</p>
+                      <p className="mt-1 text-sm text-slate-500">
+                        Useful context for families, anniversaries, assistants, and other personal links.
+                      </p>
                     </div>
+                    <span className="text-sm font-semibold text-[#1f7a67]">Add more</span>
+                  </summary>
+
+                  <div className="mt-5 grid gap-4 border-t border-[#e7ebe5] pt-5 lg:grid-cols-2">
                     <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
                       <span>Significant dates</span>
                       <textarea
@@ -747,12 +769,8 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                         placeholder="Assistant | Jamie"
                       />
                     </label>
-                    <label className="grid gap-2 text-sm text-slate-700 lg:col-span-2">
-                      <span>Notes</span>
-                      <textarea className="min-h-40 rounded-[1.2rem] border border-slate-200 bg-[#fbfaf7] px-4 py-3 text-sm text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-[#67b59f] focus:bg-white" defaultValue={contact.notes ?? ""} name="notes" />
-                    </label>
                   </div>
-                </section>
+                </details>
 
                 <div className={helperCardClassName}>
                   <p className="font-semibold text-slate-900">Portability guidance</p>
