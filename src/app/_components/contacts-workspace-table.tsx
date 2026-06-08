@@ -15,10 +15,13 @@ import {
 type WorkspaceContact = {
   id: string;
   fullName: string;
+  phoneticFirstName: string | null;
+  phoneticLastName: string | null;
   nickname: string | null;
   email: string | null;
   phone: string | null;
   company: string | null;
+  phoneticCompany: string | null;
   jobTitle: string | null;
   website: string | null;
   birthday: string | null;
@@ -215,6 +218,16 @@ const getDisplayName = (contact: WorkspaceContact) => {
   return fullName || company || "Unnamed contact";
 };
 
+const getRichFieldSignalCount = (contact: WorkspaceContact) =>
+  [
+    contact.website,
+    contact.birthday,
+    contact.address,
+    contact.notes,
+    contact.jobTitle,
+    contact.company,
+  ].filter((value) => Boolean(value?.trim())).length;
+
 export function ContactsWorkspaceTable({
   contacts,
   emptyState,
@@ -367,6 +380,12 @@ export function ContactsWorkspaceTable({
         const hasName = (contact.fullName?.trim().length ?? 0) > 0;
         const hasCompany = (contact.company?.trim().length ?? 0) > 0;
         const displayName = getDisplayName(contact);
+        const hasPinyin =
+          (contact.phoneticFirstName?.trim().length ?? 0) > 0 ||
+          (contact.phoneticLastName?.trim().length ?? 0) > 0 ||
+          (contact.phoneticCompany?.trim().length ?? 0) > 0;
+        const richFieldSignalCount = getRichFieldSignalCount(contact);
+        const hasRichFieldSignal = richFieldSignalCount >= 2;
 
         return (
           <div key={contact.id}>
@@ -436,6 +455,16 @@ export function ContactsWorkspaceTable({
                         {contact.archivedAt ? (
                           <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-700">
                             Archived
+                          </span>
+                        ) : null}
+                        {hasPinyin ? (
+                          <span className="rounded-full border border-cyan-200 bg-cyan-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-cyan-700">
+                            Pinyin
+                          </span>
+                        ) : null}
+                        {hasRichFieldSignal ? (
+                          <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-700">
+                            Rich {richFieldSignalCount}
                           </span>
                         ) : null}
                       </div>

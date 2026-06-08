@@ -9,10 +9,13 @@ import type { PersistedMergeSuggestion } from "~/server/contact-merge";
 type DashboardContact = {
   id: string;
   fullName: string;
+  phoneticFirstName: string | null;
+  phoneticLastName: string | null;
   nickname: string | null;
   email: string | null;
   phone: string | null;
   company: string | null;
+  phoneticCompany: string | null;
   jobTitle: string | null;
   website: string | null;
   birthday: string | null;
