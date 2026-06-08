@@ -28,7 +28,7 @@ Next.js App Router rejects non-standard route exports such as `PROPFIND` during 
   - `DAV: 1, addressbook`
   - `WWW-Authenticate: Basic realm="Kontax CardDAV"`
   - `Allow: OPTIONS, PROPFIND`
-- Compute address-book CTag from the newest active contact `updatedAt` value.
+- Compute address-book CTag from the newest contact `updatedAt` value across active, archived, and tombstoned contacts so deletes trigger client refreshes.
 - Update `npm start` and the Docker runtime image to use the custom server entrypoint.
 
 ## Acceptance Criteria

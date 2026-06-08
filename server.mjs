@@ -226,11 +226,66 @@ const renderProp = (prop) => {
   }
 };
 
+const renderNotFoundProp = (name) => `<d:${escapeXml(name)}/>`;
+
+const readRequestBody = async (req) => {
+  const chunks = [];
+
+  for await (const chunk of req) {
+    chunks.push(Buffer.isBuffer(chunk) ? chunk : Buffer.from(chunk));
+  }
+
+  return Buffer.concat(chunks).toString("utf8");
+};
+
+const extractRequestedPropNames = (body) => {
+  if (!body.trim()) {
+    return null;
+  }
+
+  const propMatch = body.match(/<[^>]*:?prop\b[^>]*>([\s\S]*?)<\/[^>]*:?prop>/i);
+  const propBody = propMatch?.[1];
+
+  if (!propBody) {
+    return null;
+  }
+
+  const names = [...propBody.matchAll(/<\s*(?:[A-Za-z0-9_-]+:)?([A-Za-z0-9_-]+)\b[^>]*\/?>/g)]
+    .map((match) => match[1])
+    .filter(Boolean);
+
+  return names.length > 0 ? [...new Set(names)] : null;
+};
+
+const splitDavProps = (props, requestedNames) => {
+  if (!requestedNames) {
+    return {
+      props,
+      notFoundProps: [],
+    };
+  }
+
+  const supported = new Set(props.map((prop) => prop.name));
+
+  return {
+    props: props.filter((prop) => requestedNames.includes(prop.name)),
+    notFoundProps: requestedNames.filter((name) => !supported.has(name)),
+  };
+};
+
 const buildPropfindResponse = (responses) => {
   const body = responses
     .map((response) => {
       const okProps = response.props.map(renderProp).join("");
-      return `<d:response><d:href>${escapeXml(response.href)}</d:href><d:propstat><d:prop>${okProps}</d:prop><d:status>HTTP/1.1 200 OK</d:status></d:propstat></d:response>`;
+      const notFoundProps = response.notFoundProps?.map(renderNotFoundProp).join("") ?? "";
+      const okPropstat = okProps
+        ? `<d:propstat><d:prop>${okProps}</d:prop><d:status>HTTP/1.1 200 OK</d:status></d:propstat>`
+        : "";
+      const notFoundPropstat = notFoundProps
+        ? `<d:propstat><d:prop>${notFoundProps}</d:prop><d:status>HTTP/1.1 404 Not Found</d:status></d:propstat>`
+        : "";
+
+      return `<d:response><d:href>${escapeXml(response.href)}</d:href>${okPropstat}${notFoundPropstat}</d:response>`;
     })
     .join("");
 
@@ -303,7 +358,11 @@ const handlePrincipal = async (req, res, requestUrl) => {
 
   const depth = req.headers.depth ?? "0";
 
-  if (depth !== "0" && depth !== "infinity") {
+  if (depth === "infinity") {
+    return forbidden(res);
+  }
+
+  if (depth !== "0") {
     return send(res, 400, "Unsupported Depth", { "Content-Type": "text/plain; charset=utf-8" });
   }
 
@@ -316,16 +375,19 @@ const handlePrincipal = async (req, res, requestUrl) => {
     return send(res, 404, "Not found", { "Content-Type": "text/plain; charset=utf-8" });
   }
 
+  const requestedNames = extractRequestedPropNames(await readRequestBody(req));
+  const props = [
+    { name: "current-user-principal", href: `/dav/principals/${user.id}/` },
+    { name: "addressbook-home-set", href: `/dav/addressbooks/${user.id}/` },
+    { name: "displayname", value: user.name ?? user.email },
+  ];
+
   return xmlResponse(
     res,
     buildPropfindResponse([
       {
         href: `/dav/principals/${user.id}/`,
-        props: [
-          { name: "current-user-principal", href: `/dav/principals/${user.id}/` },
-          { name: "addressbook-home-set", href: `/dav/addressbooks/${user.id}/` },
-          { name: "displayname", value: user.name ?? user.email },
-        ],
+        ...splitDavProps(props, requestedNames),
       },
     ]),
   );
@@ -356,6 +418,10 @@ const handleAddressBooks = async (req, res, requestUrl) => {
 
   const depth = req.headers.depth ?? "0";
 
+  if (depth === "infinity") {
+    return forbidden(res);
+  }
+
   if (depth !== "0" && depth !== "1") {
     return send(res, 400, "Unsupported Depth", { "Content-Type": "text/plain; charset=utf-8" });
   }
@@ -369,27 +435,31 @@ const handleAddressBooks = async (req, res, requestUrl) => {
     return send(res, 404, "Not found", { "Content-Type": "text/plain; charset=utf-8" });
   }
 
+  const requestedNames = extractRequestedPropNames(await readRequestBody(req));
   const homeHref = `/dav/addressbooks/${user.id}/`;
+  const homeProps = [
+    { name: "displayname", value: "Address Books" },
+    { name: "resourcetype", types: ["collection"] },
+    { name: "current-user-principal", href: `/dav/principals/${user.id}/` },
+  ];
   const responses = [
     {
       href: homeHref,
-      props: [
-        { name: "displayname", value: "Address Books" },
-        { name: "resourcetype", types: ["collection"] },
-        { name: "current-user-principal", href: `/dav/principals/${user.id}/` },
-      ],
+      ...splitDavProps(homeProps, requestedNames),
     },
   ];
 
   if (depth === "1") {
+    const defaultProps = [
+      { name: "displayname", value: "Kontax" },
+      { name: "resourcetype", types: ["collection", "addressbook"] },
+      { name: "getctag", value: await computeAddressBookCTag(user.id) },
+      { name: "supported-address-data" },
+    ];
+
     responses.push({
       href: `${homeHref}default/`,
-      props: [
-        { name: "displayname", value: "Kontax" },
-        { name: "resourcetype", types: ["collection", "addressbook"] },
-        { name: "getctag", value: await computeAddressBookCTag(user.id) },
-        { name: "supported-address-data" },
-      ],
+      ...splitDavProps(defaultProps, requestedNames),
     });
   }
 

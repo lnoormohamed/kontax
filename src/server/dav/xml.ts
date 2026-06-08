@@ -49,11 +49,14 @@ export const buildPropfindResponse = (responses: DavResponseItem[]) => {
     .map((response) => {
       const okProps = response.props.map(renderProp).join("");
       const notFoundProps = response.notFoundProps?.map(renderNotFoundProp).join("") ?? "";
+      const okPropstat = okProps
+        ? `<d:propstat><d:prop>${okProps}</d:prop><d:status>HTTP/1.1 200 OK</d:status></d:propstat>`
+        : "";
       const notFoundPropstat = notFoundProps
         ? `<d:propstat><d:prop>${notFoundProps}</d:prop><d:status>HTTP/1.1 404 Not Found</d:status></d:propstat>`
         : "";
 
-      return `<d:response><d:href>${escapeXml(response.href)}</d:href><d:propstat><d:prop>${okProps}</d:prop><d:status>HTTP/1.1 200 OK</d:status></d:propstat>${notFoundPropstat}</d:response>`;
+      return `<d:response><d:href>${escapeXml(response.href)}</d:href>${okPropstat}${notFoundPropstat}</d:response>`;
     })
     .join("");
 

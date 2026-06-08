@@ -23,6 +23,7 @@ Turn Kontax into a CardDAV server so users can add it as a native contacts accou
 | P9-02 | Done | P0 | P9-01 |
 | P9-03 | Done | P0 | P9-01 |
 | P9-03a | Done | P0 | P9-03 |
+| P9-03b | Done | P0 | P9-03a |
 | P9-04 | Not Started | P0 | P9-02, P9-03 |
 | P9-05 | Not Started | P1 | P9-04 |
 | P9-06 | Not Started | P1 | P9-04 |
@@ -89,21 +90,58 @@ Turn Kontax into a CardDAV server so users can add it as a native contacts accou
 - Priority: `P0`
 - Dependencies: `P9-01`
 - Implementation Notes:
-  - All CardDAV server requests are authenticated via Basic Auth using email + app password. Return HTTP 401 with a `WWW-Authenticate: Basic realm="Kontax"` header for unauthenticated requests — this is required for iOS to prompt the user for credentials.
-  - Implement `/.well-known/carddav`: return HTTP 301 redirect to `/dav/principals/{userId}/`. iOS hits this first during account setup.
-  - Implement `PROPFIND /dav/principals/{userId}/` (Depth: 0): return `current-user-principal` and `addressbook-home-set` pointing to `/dav/addressbooks/{userId}/`.
-  - Implement `PROPFIND /dav/addressbooks/{userId}/` (Depth: 1): return the default address book collection with `displayname`, `resourcetype`, and `getctag`.
-  - CTag is a collection-level change token. Derive it from the most recent `contact.updatedAt` timestamp in the collection — clients use it to detect whether anything has changed before fetching full contact data.
-  - Return correct `DAV:` capability headers on all responses.
-  - Current implementation slice adds reusable DAV Basic Auth, DAV response helpers, XML multistatus generation, CTag computation, `/.well-known/carddav`, principal PROPFIND, and address-book home-set PROPFIND routes.
+  - **Architecture:** DAV verbs (PROPFIND, REPORT, etc.) are handled in `server.mjs` — a custom Node.js HTTP server that wraps Next.js. The server intercepts all DAV traffic before Next.js processes it. Next.js App Router does not support non-standard HTTP method exports in production builds. Next.js route files under `src/app/dav/` and `src/app/.well-known/carddav/` are stubs that handle OPTIONS and return 405 for standard methods. All real DAV logic lives in server.mjs.
+  - `handleWellKnown` in server.mjs handles `/.well-known/carddav`: issues a 401 auth challenge first (required for iOS to prompt for credentials), then on authenticated requests returns a 301 redirect to `/dav/principals/{userId}/`.
+  - `handlePrincipal` in server.mjs handles `PROPFIND /dav/principals/{userId}/` (Depth:0 and Depth:infinity treated as 0): returns `current-user-principal`, `addressbook-home-set`, and `displayname`.
+  - `handleAddressBooks` in server.mjs handles `PROPFIND /dav/addressbooks/{userId}/` (Depth:0 and Depth:1): Depth:1 includes the default address book collection with `displayname`, `resourcetype`, `getctag`, and `supported-address-data`.
+  - CTag is computed from `MAX(updatedAt)` across all contacts for the user with no archived/tombstone filter — this ensures deletions and archives trigger a CTag change and clients detect them.
+  - `verifyCardDavCredentials` in server.mjs uses Prisma ORM directly. The equivalent in `src/server/app-passwords.ts` uses raw SQL — these are separate code paths; server.mjs is the live auth path for CardDAV.
+  - TypeScript helper modules (`src/server/dav/`) mirror server.mjs logic for use by future Next.js-native endpoints. These two implementations must be kept in sync manually when either changes.
 - Acceptance Criteria:
   - iOS account setup wizard completes discovery without error when pointed at the Kontax server URL.
-  - `/.well-known/carddav` redirects correctly.
-  - Principal and address book PROPFIND responses are well-formed XML.
-  - CTag changes whenever any contact in the collection changes.
+  - `/.well-known/carddav` redirects correctly after issuing a 401 challenge.
+  - Principal and address book PROPFIND responses are well-formed XML with correct namespace declarations.
+  - CTag changes whenever any contact in the collection is created, updated, archived, or tombstoned.
 - Risks / Open Questions:
-  - iOS is strict about XML namespace correctness — use a well-tested XML builder rather than string templates.
-  - The `getctag` namespace is `http://calendarserver.org/ns/` — must match exactly.
+  - P9-03b hardens `buildPropfindResponse` in server.mjs with 404 propstat handling for unsupported requested properties and rejects `Depth: infinity` with 403 before P9-07 compatibility testing.
+  - Duplicate implementations between server.mjs and `src/server/dav/*` must stay in sync manually. Consider importing from compiled TypeScript output in a future hardening pass.
+
+---
+
+## P9-03a — DAV auth, XML helpers, CTag, well-known, principal and address-book PROPFIND
+- Status: `Done`
+- Priority: `P0`
+- Dependencies: `P9-03`
+- Implementation Notes:
+  - Delivered as part of P9-03. All logic lives in `server.mjs` (the custom Node.js HTTP adapter).
+  - `src/server/dav/auth.ts` — `requireDavAuth` middleware for Next.js-native routes (future use). In-memory rate limiter (IP + email buckets, 15-min window). Acceptable for Docker/Coolify long-running deployment.
+  - `src/server/dav/xml.ts` — `buildPropfindResponse` TypeScript helper. Includes 404 propstat block for unsupported properties. Mirrors server.mjs XML builder.
+  - `src/server/dav/ctag.ts` — `computeAddressBookCTag` TypeScript helper. Queries all contacts (no archived/tombstone filter) so CTag reflects deletions. Mirrors server.mjs implementation.
+  - `src/server/dav/responses.ts` — typed response helpers (`unauthorizedDavResponse`, `xmlDavResponse`, etc.) for Next.js routes.
+  - `src/app/.well-known/carddav/route.ts` — Next.js stub. Handles GET/HEAD via `requireDavAuth` + 301 redirect. Real well-known handling is in server.mjs `handleWellKnown`.
+  - `src/app/dav/principals/[userId]/route.ts` — Next.js stub. OPTIONS + 405 for standard methods. PROPFIND handled by server.mjs `handlePrincipal`.
+  - `src/app/dav/addressbooks/[userId]/route.ts` — Next.js stub. OPTIONS + 405 for standard methods. PROPFIND handled by server.mjs `handleAddressBooks`.
+
+---
+
+## P9-03b — Harden DAV discovery XML and depth handling
+- Status: `Done`
+- Priority: `P0`
+- Dependencies: `P9-03a`
+- Implementation Notes:
+  - Extend the live `server.mjs` XML builder to produce separate `HTTP/1.1 404 Not Found` propstat blocks for unsupported properties requested by DAV clients.
+  - Parse requested property names from the `PROPFIND` body for discovery endpoints and return supported properties in a 200 propstat plus unsupported requested properties in a 404 propstat.
+  - Mirror the safer propstat rendering behavior in `src/server/dav/xml.ts` so future TypeScript route/helper usage does not drift from the live adapter.
+  - Reject `Depth: infinity` on principal and address-book discovery PROPFIND requests with 403 instead of silently treating it as supported.
+  - Keep App Router DAV files as standard-method stubs only; all non-standard DAV verbs remain owned by `server.mjs`.
+- Acceptance Criteria:
+  - `npm run build` passes.
+  - `PROPFIND` with a requested unsupported property returns a `207 Multi-Status` response containing a `404 Not Found` propstat.
+  - `PROPFIND` with `Depth: infinity` returns `403`.
+  - Existing well-known redirect, principal discovery, and address-book discovery smoke tests still pass.
+- Risks / Open Questions:
+  - The XML request parser is intentionally small and discovery-focused; P9-04 may need richer XML parsing for REPORT bodies.
+  - DAV namespace prefixes are normalized by local property name for now, which is acceptable for the small discovery property set but should be revisited before broader DAV extensions.
 
 ---
 
