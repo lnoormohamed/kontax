@@ -35,7 +35,7 @@ const getFormattedAddressArray = (value: unknown) =>
 
 const formatDisplayValue = (value: string | null | undefined, fallback = "Not added yet") => {
   const trimmed = value?.trim();
-  return trimmed ? trimmed : fallback;
+  return trimmed ?? fallback;
 };
 
 const formatStoredDateValue = (value: string | null | undefined) => {
@@ -43,7 +43,7 @@ const formatStoredDateValue = (value: string | null | undefined) => {
     return "Not added yet";
   }
 
-  const exactDateMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  const exactDateMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
 
   if (!exactDateMatch) {
     return value;
@@ -480,6 +480,24 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                         {contact.isFavorite ? "Unstar favorite" : "Star favorite"}
                       </button>
                     </form>
+                    <a
+                      className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+                      href="#contact-snapshot"
+                    >
+                      View snapshot
+                    </a>
+                    <a
+                      className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+                      href="#contact-editor"
+                    >
+                      Edit details
+                    </a>
+                    <a
+                      className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+                      href="#contact-sync-origin"
+                    >
+                      Sync links
+                    </a>
                   </div>
                 </div>
               </div>
@@ -530,7 +548,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
 
         <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
           <div className="grid gap-6">
-            <section className={sectionCardClassName}>
+            <section className={sectionCardClassName} id="contact-snapshot">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#1f7a67]">
@@ -699,7 +717,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               </div>
             </section>
 
-            <div className={sectionCardClassName}>
+            <div className={sectionCardClassName} id="contact-editor">
               <div className="space-y-2">
                 <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#1f7a67]">
                   Edit contact
@@ -1129,7 +1147,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               </form>
             </div>
 
-            <section className={sectionCardClassName}>
+            <section className={sectionCardClassName} id="contact-sync-origin">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                   <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#1f7a67]">
@@ -1203,51 +1221,84 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#1f7a67]">
                 Action rail
               </p>
-              <div className="mt-4 grid gap-3">
-                {contact.archivedAt ? (
-                  <form action={restoreContact}>
-                    <input name="contactId" type="hidden" value={contact.id} />
-                    <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}`} />
-                    <button className="w-full rounded-full bg-[#1f7a67] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#176454]" type="submit">
-                      Restore contact
-                    </button>
-                  </form>
-                ) : (
-                  <form action={archiveContact}>
-                    <input name="contactId" type="hidden" value={contact.id} />
-                    <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}`} />
-                    <button className="w-full rounded-full border border-amber-300 px-4 py-3 text-sm font-semibold text-amber-700 transition hover:border-amber-400 hover:bg-amber-50" type="submit">
-                      Archive contact
-                    </button>
-                  </form>
-                )}
+              <div className="mt-4 grid gap-4">
+                <div className="rounded-[1.4rem] border border-[#dfe7e1] bg-[#f8faf8] p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                    Quick jumps
+                  </p>
+                  <div className="mt-3 grid gap-2">
+                    <a
+                      className="rounded-full border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-[#2c8c74] hover:text-[#145c4f]"
+                      href="#contact-snapshot"
+                    >
+                      Contact snapshot
+                    </a>
+                    <a
+                      className="rounded-full border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-[#2c8c74] hover:text-[#145c4f]"
+                      href="#contact-editor"
+                    >
+                      Edit details
+                    </a>
+                    <a
+                      className="rounded-full border border-slate-200 bg-white px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-[#2c8c74] hover:text-[#145c4f]"
+                      href="#contact-sync-origin"
+                    >
+                      View sync links
+                    </a>
+                  </div>
+                </div>
 
-                {decisionId ? (
-                  <form action={undoMergeContacts}>
-                    <input name="decisionId" type="hidden" value={decisionId} />
-                    <button className="w-full rounded-full border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-[#2c8c74] hover:text-[#145c4f]" type="submit">
-                      Undo latest merge
-                    </button>
-                  </form>
-                ) : null}
+                <div className="rounded-[1.4rem] border border-[#dfe7e1] bg-[#fcfcfa] p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                    Record actions
+                  </p>
+                  <div className="mt-3 grid gap-3">
+                    {contact.archivedAt ? (
+                      <form action={restoreContact}>
+                        <input name="contactId" type="hidden" value={contact.id} />
+                        <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}`} />
+                        <button className="w-full rounded-full bg-[#1f7a67] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#176454]" type="submit">
+                          Restore contact
+                        </button>
+                      </form>
+                    ) : (
+                      <form action={archiveContact}>
+                        <input name="contactId" type="hidden" value={contact.id} />
+                        <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}`} />
+                        <button className="w-full rounded-full border border-amber-300 px-4 py-3 text-sm font-semibold text-amber-700 transition hover:border-amber-400 hover:bg-amber-50" type="submit">
+                          Archive contact
+                        </button>
+                      </form>
+                    )}
 
-                <form action={permanentlyDeleteContact}>
-                  <input name="contactId" type="hidden" value={contact.id} />
-                  <button className="w-full rounded-full border border-rose-300 px-4 py-3 text-sm font-semibold text-rose-700 transition hover:border-rose-400 hover:bg-rose-50" type="submit">
-                    Permanently delete
-                  </button>
-                </form>
+                    {decisionId ? (
+                      <form action={undoMergeContacts}>
+                        <input name="decisionId" type="hidden" value={decisionId} />
+                        <button className="w-full rounded-full border border-slate-300 px-4 py-3 text-sm font-semibold text-slate-700 transition hover:border-[#2c8c74] hover:text-[#145c4f]" type="submit">
+                          Undo latest merge
+                        </button>
+                      </form>
+                    ) : null}
+
+                    <form action={permanentlyDeleteContact}>
+                      <input name="contactId" type="hidden" value={contact.id} />
+                      <button className="w-full rounded-full border border-rose-300 px-4 py-3 text-sm font-semibold text-rose-700 transition hover:border-rose-400 hover:bg-rose-50" type="submit">
+                        Permanently delete
+                      </button>
+                    </form>
+                  </div>
+                </div>
               </div>
             </div>
 
             <div className={sectionCardClassName}>
               <p className="text-xs font-semibold uppercase tracking-[0.24em] text-[#1f7a67]">
-                Editing posture
+                Detail page posture
               </p>
               <div className="mt-4 space-y-3 text-sm leading-6 text-slate-600">
-                <p>Identity and communication fields stay up front so normal edits remain quick.</p>
-                <p>Structured address, websites, and personal context are easier to find because they now live in dedicated cards instead of nested disclosure panels.</p>
-                <p>This page is now better aligned with the denser homepage introduced in `P8-01`.</p>
+                <p>Read-first cards now make this page useful on mobile before you open the editor.</p>
+                <p>Quick jumps reduce scrolling friction between overview, editing, and sync linkage.</p>
+                <p>The detail surface is now closer to the calmer, denser workspace direction from `P8-01`.</p>
               </div>
             </div>
 
