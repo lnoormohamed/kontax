@@ -271,7 +271,7 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
       await markJobFailed({
         jobId: job.id,
         syncAccountId: job.syncAccountId,
-        syncDirection: job.syncDirection,
+        _syncDirection: job.syncDirection,
         attemptCount: job.attemptCount,
         maxAttempts: job.maxAttempts,
         accountStatus: job.syncAccount.status,
@@ -286,7 +286,7 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
       await markJobFailed({
         jobId: job.id,
         syncAccountId: job.syncAccountId,
-        syncDirection: job.syncDirection,
+        _syncDirection: job.syncDirection,
         attemptCount: job.attemptCount,
         maxAttempts: job.maxAttempts,
         accountStatus: job.syncAccount.status,
@@ -306,7 +306,7 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
       await markJobFailed({
         jobId: job.id,
         syncAccountId: job.syncAccountId,
-        syncDirection: job.syncDirection,
+        _syncDirection: job.syncDirection,
         attemptCount: job.attemptCount,
         maxAttempts: job.maxAttempts,
         accountStatus: job.syncAccount.status,
@@ -331,7 +331,7 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
       await markJobFailed({
         jobId: job.id,
         syncAccountId: job.syncAccountId,
-        syncDirection: job.syncDirection,
+        _syncDirection: job.syncDirection,
         attemptCount: job.attemptCount,
         maxAttempts: job.maxAttempts,
         accountStatus: job.syncAccount.status,
@@ -692,7 +692,7 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
       await markJobFailed({
         jobId: job.id,
         syncAccountId: job.syncAccountId,
-        syncDirection: job.syncDirection,
+        _syncDirection: job.syncDirection,
         attemptCount: job.attemptCount,
         maxAttempts: job.maxAttempts,
         accountStatus: job.syncAccount.status,
