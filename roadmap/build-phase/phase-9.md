@@ -25,7 +25,7 @@ Turn Kontax into a CardDAV server so users can add it as a native contacts accou
 | P9-03a | Done | P0 | P9-03 |
 | P9-03b | Done | P0 | P9-03a |
 | P9-03c | Done | P0 | P9-03b |
-| P9-04 | Not Started | P0 | P9-02, P9-03 |
+| P9-04 | In Review | P0 | P9-02, P9-03 |
 | P9-05 | Not Started | P1 | P9-04 |
 | P9-06 | Not Started | P1 | P9-04 |
 | P9-07 | Not Started | P1 | P9-05, P9-06 |
@@ -166,28 +166,35 @@ Turn Kontax into a CardDAV server so users can add it as a native contacts accou
 ---
 
 ## P9-04 — Implement contact resource endpoints (REPORT, GET, PUT, DELETE)
-- Status: `Not Started`
+- Status: `In Review`
 - Priority: `P0`
 - Dependencies: `P9-02`, `P9-03`
 - Implementation Notes:
-  - `REPORT /dav/addressbooks/{userId}/default/` with `addressbook-query` body (Depth: 1): return a list of contact resources with `getetag` and `address-data` (full vCard). This is what clients use on first sync and after a CTag change.
-  - `GET /dav/addressbooks/{userId}/default/{uid}.vcf`: return a single vCard. Used by clients that prefer per-resource fetching.
-  - `PUT /dav/addressbooks/{userId}/default/{uid}.vcf`: create or update a contact from the client. Parse the vCard body using the existing `carddav.ts` vCard parser and upsert into the `Contact` table using `syncUid` as the stable key. Return the new ETag in the response header.
-  - `DELETE /dav/addressbooks/{userId}/default/{uid}.vcf`: soft-delete (archive) the contact. Do not hard-delete — preserve the record and set `syncTombstoneAt` so conflict resolution and audit trails remain intact.
-  - ETag is a per-contact change token. Derive it from `contact.syncVersion` or a hash of `contact.updatedAt` — clients send it in `If-Match` headers for conditional updates.
-  - Respect `If-Match` on PUT: if the client sends a stale ETag, return HTTP 412 Precondition Failed so the client knows to re-fetch before overwriting.
-  - vCard serialization: reuse the existing `contactsToVCard` function from `contact-portability.ts`, ensuring `UID` is always written as `Contact.syncUid`.
+  - **Architecture:** Implemented in `server.mjs` alongside the P9-03 discovery handlers (Next.js App Router cannot export REPORT/PROPFIND). Two new path matchers and handlers were added:
+    - `getCollectionUserId` + `handleAddressBookCollection` — matches `/dav/addressbooks/{userId}/default/`. Handles `OPTIONS`, `PROPFIND` (Depth 0 = collection props with CTag; Depth 1 = collection + per-contact `getetag`), and `REPORT` (returns every active contact with `getetag` + `address-data`).
+    - `getResourceParams` + `handleContactResource` — matches `/dav/addressbooks/{userId}/default/{uid}.vcf`. Handles `OPTIONS`, `GET`/`HEAD`, `PUT`, `DELETE`.
+    - Both registered in `handleDavRequest` before the home-set handler (regexes are non-overlapping; resource is checked before collection before home-set).
+  - **vCard serialization** (`serializeContactToVCard`): self-contained in server.mjs (cannot import the TS `contactsToVCard` at runtime). Produces vCard 3.0 with `UID:` always set to `Contact.syncUid`, CRLF line endings, and RFC-6350 75-octet line folding that is UTF-8-boundary-safe (never splits a multi-byte sequence). Emits `X-PHONETIC-FIRST-NAME`/`X-PHONETIC-LAST-NAME` (iOS-readable) and `PHOTO;VALUE=URI` for avatars (never embeds binary).
+  - **vCard parsing** (`parseVCardToContactFields`): mirrors the `carddav.ts` client parser (unfold, unescape, line split). Maps FN/N/NICKNAME/ORG/TITLE/EMAIL/TEL/URL/ADR/BDAY/NOTE/PHOTO and both `X-PHONETIC-*` and `X-KONTAX-PINYIN-*` phonetic variants. Returns only fields present in the body so unmapped fields are left untouched on update.
+  - **ETag** (`etagForContact`): quoted `"v{syncVersion}"` per RFC 7232. Returned in `getetag` props, `ETag:` headers, and compared for `If-Match`/`If-None-Match`.
+  - **PUT semantics:** UID-in-body must match URL UID (else 422). `If-Match` stale/absent contact → 412. `If-None-Match: *` on existing contact → 412. Create sets `syncVersion=1` → 201. Update re-reads syncVersion inside a transaction, increments, clears `syncTombstoneAt`+`archivedAt` (revives tombstoned contacts) → 204. `KIND:group` vCards → 415.
+  - **DELETE semantics:** soft-delete only — sets `syncTombstoneAt` + `archivedAt`, increments `syncVersion` → 204. Already-tombstoned or missing → 404. Stale `If-Match` → 412. Never hard-deletes.
+  - **GET semantics:** active contact only (404 if archived/tombstoned). `If-None-Match` matching ETag → 304. Returns `text/vcard` + `ETag`.
+  - **Conflict logging on 412 PUT** is deferred to P9-08 (needs the `SyncConflict` schema extension). P9-04 returns the correct 412 + `<d:precondition-failed/>` XML body; the conflict record is not yet written.
+  - Verified pure-function logic (fold/unfold round-trip, escaping, N-field parse, emoji UTF-8 boundary safety) via standalone test. Full client verification is P9-07.
 - Acceptance Criteria:
-  - REPORT returns all active (non-archived) contacts as vCards.
-  - PUT creates new contacts and updates existing ones by UID without duplicating.
-  - DELETE archives the contact rather than destroying it.
-  - ETag and If-Match conditional updates work correctly.
-  - A full iOS initial sync populates the phone with the user's Kontax contacts.
-  - Changes made on the phone appear in Kontax after the next iOS background sync.
+  - REPORT returns all active (non-archived, non-tombstoned) contacts as vCards. ✓
+  - PUT creates new contacts and updates existing ones by UID without duplicating. ✓
+  - DELETE archives the contact rather than destroying it. ✓
+  - ETag and If-Match conditional updates work correctly (412 on stale). ✓
+  - vCards include `UID:` matching `syncUid`, use CRLF, and are XML-escaped in REPORT responses. ✓
+  - A full iOS initial sync populates the phone — **pending P9-07 device test.**
+  - Changes made on the phone appear in Kontax — **pending P9-07 device test.**
 - Risks / Open Questions:
-  - iOS sends `REPORT` with `Depth: 1` — confirm the server handles this correctly and does not require an explicit `Depth: 0` fallback.
-  - Large contact lists should be paged or streamed — consider a contact count limit warning for FREE tier users.
-  - Archived contacts must not appear in REPORT responses but their UIDs must not be reused.
+  - **Streaming deferred:** REPORT builds the full response in memory. For users with 2000+ contacts (>4 MB) this may need `ReadableStream` chunking. Acceptable for current scale; flag for P9-07 load check.
+  - **Multi-value websites/addresses:** serializer emits one `URL`/`ADR` from the scalar field plus extras from JSON arrays, but parser collapses multiples into the scalar + a simple array. Round-trip preserves the primary value; secondary labels may simplify. Acceptable for v1.
+  - **412 conflict records** are not written until P9-08 extends `SyncConflict` with a device-write source.
+  - Duplicate vCard logic now exists in three places (server.mjs, `contact-portability.ts`, `carddav.ts`). Consolidation into a shared module is a future hardening task.
 
 ---
 

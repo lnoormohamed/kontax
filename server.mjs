@@ -96,6 +96,36 @@ const xmlResponse = (res, body) =>
     "Content-Type": "application/xml; charset=utf-8",
   });
 
+const notFound = (res) =>
+  send(res, 404, "Not found", { "Content-Type": "text/plain; charset=utf-8" });
+
+const notModified = (res, etag) =>
+  send(res, 304, null, etag ? { ETag: etag } : {});
+
+const preconditionFailed = (res) =>
+  send(
+    res,
+    412,
+    '<?xml version="1.0" encoding="utf-8"?><d:error xmlns:d="DAV:"><d:precondition-failed/></d:error>',
+    { "Content-Type": "application/xml; charset=utf-8" },
+  );
+
+const unprocessable = (res, message) =>
+  send(res, 422, message ?? "Unprocessable content", {
+    "Content-Type": "text/plain; charset=utf-8",
+  });
+
+const unsupportedMediaType = (res) =>
+  send(res, 415, "Unsupported media type", {
+    "Content-Type": "text/plain; charset=utf-8",
+  });
+
+const vcardResponse = (res, body, etag) =>
+  send(res, 200, body, {
+    "Content-Type": "text/vcard; charset=utf-8",
+    ETag: etag,
+  });
+
 const decodeBasicAuth = (header) => {
   if (!header?.startsWith("Basic ")) {
     return null;
@@ -221,6 +251,8 @@ const renderProp = (prop) => {
       return `<cs:getctag>${escapeXml(prop.value)}</cs:getctag>`;
     case "getetag":
       return `<d:getetag>${escapeXml(prop.value)}</d:getetag>`;
+    case "address-data":
+      return `<card:address-data>${escapeXml(prop.value)}</card:address-data>`;
     default:
       return "";
   }
@@ -310,6 +342,325 @@ const computeAddressBookCTag = async (userId) => {
 
 const getPrincipalUserId = (pathname) => pathname.match(/^\/dav\/principals\/([^/]+)\/?$/)?.[1];
 const getAddressBookUserId = (pathname) => pathname.match(/^\/dav\/addressbooks\/([^/]+)\/?$/)?.[1];
+const getCollectionUserId = (pathname) =>
+  pathname.match(/^\/dav\/addressbooks\/([^/]+)\/default\/?$/)?.[1];
+const getResourceParams = (pathname) => {
+  const match = pathname.match(/^\/dav\/addressbooks\/([^/]+)\/default\/([^/]+)$/);
+
+  if (!match) {
+    return null;
+  }
+
+  const rawUid = match[2];
+  const uid = rawUid.endsWith(".vcf") ? rawUid.slice(0, -4) : rawUid;
+
+  return { userId: match[1], uid: decodeURIComponent(uid) };
+};
+
+// --- vCard serialization / parsing (self-contained for the Node DAV adapter) ---
+
+const etagForContact = (contact) => `"v${contact.syncVersion}"`;
+
+const contactResourceHref = (userId, syncUid) =>
+  `/dav/addressbooks/${userId}/default/${encodeURIComponent(syncUid)}.vcf`;
+
+const escapeVCardValue = (value) =>
+  String(value ?? "")
+    .replaceAll("\\", "\\\\")
+    .replaceAll("\n", "\\n")
+    .replaceAll(",", "\\,")
+    .replaceAll(";", "\\;");
+
+// Fold lines at 75 octets per RFC 6350 §3.2, continuation lines start with a space.
+const foldVCardLine = (line) => {
+  const bytes = Buffer.from(line, "utf8");
+
+  if (bytes.length <= 75) {
+    return line;
+  }
+
+  const segments = [];
+  let index = 0;
+  let limit = 75;
+
+  while (index < bytes.length) {
+    // Avoid splitting a multi-byte UTF-8 sequence across a fold boundary.
+    let end = Math.min(index + limit, bytes.length);
+    while (end < bytes.length && (bytes[end] & 0xc0) === 0x80) {
+      end -= 1;
+    }
+    segments.push(bytes.subarray(index, end).toString("utf8"));
+    index = end;
+    limit = 74; // continuation lines lose one octet to the leading space
+  }
+
+  return segments.join("\r\n ");
+};
+
+const toStringArray = (value) => {
+  if (Array.isArray(value)) {
+    return value.filter((entry) => typeof entry === "string" && entry.trim().length > 0);
+  }
+
+  return [];
+};
+
+const serializeContactToVCard = (contact) => {
+  const lines = ["BEGIN:VCARD", "VERSION:3.0", `UID:${escapeVCardValue(contact.syncUid)}`];
+
+  lines.push(`FN:${escapeVCardValue(contact.fullName)}`);
+
+  if (contact.lastName || contact.firstName || contact.middleName || contact.namePrefix || contact.nameSuffix) {
+    lines.push(
+      `N:${escapeVCardValue(contact.lastName ?? "")};${escapeVCardValue(
+        contact.firstName ?? "",
+      )};${escapeVCardValue(contact.middleName ?? "")};${escapeVCardValue(
+        contact.namePrefix ?? "",
+      )};${escapeVCardValue(contact.nameSuffix ?? "")}`,
+    );
+  }
+
+  if (contact.nickname) {
+    lines.push(`NICKNAME:${escapeVCardValue(contact.nickname)}`);
+  }
+
+  if (contact.phoneticFirstName) {
+    lines.push(`X-PHONETIC-FIRST-NAME:${escapeVCardValue(contact.phoneticFirstName)}`);
+  }
+
+  if (contact.phoneticLastName) {
+    lines.push(`X-PHONETIC-LAST-NAME:${escapeVCardValue(contact.phoneticLastName)}`);
+  }
+
+  const emails = [];
+  if (contact.email) {
+    emails.push(contact.email);
+  }
+  for (const value of toStringArray(contact.emailAddresses)) {
+    if (!emails.includes(value)) {
+      emails.push(value);
+    }
+  }
+  for (const value of emails) {
+    lines.push(`EMAIL:${escapeVCardValue(value)}`);
+  }
+
+  const phones = [];
+  if (contact.phone) {
+    phones.push(contact.phone);
+  }
+  for (const value of toStringArray(contact.phoneNumbers)) {
+    if (!phones.includes(value)) {
+      phones.push(value);
+    }
+  }
+  for (const value of phones) {
+    lines.push(`TEL:${escapeVCardValue(value)}`);
+  }
+
+  if (contact.company) {
+    lines.push(`ORG:${escapeVCardValue(contact.company)}`);
+  }
+
+  if (contact.jobTitle) {
+    lines.push(`TITLE:${escapeVCardValue(contact.jobTitle)}`);
+  }
+
+  if (contact.website) {
+    lines.push(`URL:${escapeVCardValue(contact.website)}`);
+  }
+
+  if (contact.birthday) {
+    lines.push(`BDAY:${escapeVCardValue(contact.birthday)}`);
+  }
+
+  if (contact.address) {
+    lines.push(`ADR:;;${escapeVCardValue(contact.address)};;;;`);
+  }
+
+  if (contact.notes) {
+    lines.push(`NOTE:${escapeVCardValue(contact.notes)}`);
+  }
+
+  if (contact.avatarUrl) {
+    lines.push(`PHOTO;VALUE=URI:${escapeVCardValue(contact.avatarUrl)}`);
+  }
+
+  lines.push("END:VCARD");
+
+  return lines.map(foldVCardLine).join("\r\n");
+};
+
+const unfoldVCard = (value) => value.replace(/\r?\n[ \t]/g, "");
+
+const unescapeVCardValue = (value) =>
+  value
+    .replaceAll("\\n", "\n")
+    .replaceAll("\\N", "\n")
+    .replaceAll("\\,", ",")
+    .replaceAll("\\;", ";")
+    .replaceAll("\\\\", "\\")
+    .trim();
+
+const parseVCardLines = (value) =>
+  unfoldVCard(value)
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(
+      (line) =>
+        line.length > 0 &&
+        !line.toUpperCase().startsWith("BEGIN:") &&
+        !line.toUpperCase().startsWith("END:"),
+    )
+    .map((line) => {
+      const separatorIndex = line.indexOf(":");
+
+      if (separatorIndex < 0) {
+        return null;
+      }
+
+      const left = line.slice(0, separatorIndex);
+      const rawValue = line.slice(separatorIndex + 1);
+      const [rawName, ...paramParts] = left.split(";");
+      const name = rawName?.trim().toUpperCase();
+
+      if (!name) {
+        return null;
+      }
+
+      return { name, params: paramParts, value: unescapeVCardValue(rawValue) };
+    })
+    .filter(Boolean);
+
+const getVCardUid = (text) => {
+  const match = unfoldVCard(text).match(/^UID(?:;[^:]*)?:(.+)$/im);
+  return match?.[1]?.trim() ?? null;
+};
+
+const isGroupVCard = (text) => /\bKIND:group\b/i.test(unfoldVCard(text));
+
+// Parse a vCard body into a partial Contact field map. Only fields present in
+// the vCard are returned, so callers can leave unmapped fields untouched on update.
+const parseVCardToContactFields = (text) => {
+  const lines = parseVCardLines(text);
+  const fields = {};
+
+  const fnLine = lines.find((line) => line.name === "FN");
+  if (fnLine) {
+    fields.fullName = fnLine.value;
+  }
+
+  const nLine = lines.find((line) => line.name === "N");
+  if (nLine) {
+    const [lastName, firstName, middleName, namePrefix, nameSuffix] = nLine.value
+      .split(";")
+      .map((part) => unescapeVCardValue(part));
+    fields.lastName = lastName || null;
+    fields.firstName = firstName || null;
+    fields.middleName = middleName || null;
+    fields.namePrefix = namePrefix || null;
+    fields.nameSuffix = nameSuffix || null;
+  }
+
+  const nicknameLine = lines.find((line) => line.name === "NICKNAME");
+  if (nicknameLine) {
+    fields.nickname = nicknameLine.value || null;
+  }
+
+  const phoneticFirst = lines.find(
+    (line) => line.name === "X-PHONETIC-FIRST-NAME" || line.name === "X-KONTAX-PINYIN-FIRST-NAME",
+  );
+  if (phoneticFirst) {
+    fields.phoneticFirstName = phoneticFirst.value || null;
+  }
+
+  const phoneticLast = lines.find(
+    (line) => line.name === "X-PHONETIC-LAST-NAME" || line.name === "X-KONTAX-PINYIN-LAST-NAME",
+  );
+  if (phoneticLast) {
+    fields.phoneticLastName = phoneticLast.value || null;
+  }
+
+  const orgLine = lines.find((line) => line.name === "ORG");
+  if (orgLine) {
+    fields.company = orgLine.value.split(";")[0]?.trim() || null;
+  }
+
+  const titleLine = lines.find((line) => line.name === "TITLE");
+  if (titleLine) {
+    fields.jobTitle = titleLine.value || null;
+  }
+
+  const emails = [];
+  for (const line of lines.filter((entry) => entry.name === "EMAIL")) {
+    const value = line.value.trim();
+    if (value && !emails.includes(value)) {
+      emails.push(value);
+    }
+  }
+  if (lines.some((line) => line.name === "EMAIL")) {
+    fields.email = emails[0] ?? null;
+    fields.emailAddresses = emails;
+  }
+
+  const phones = [];
+  for (const line of lines.filter((entry) => entry.name === "TEL")) {
+    const value = line.value.trim();
+    if (value && !phones.includes(value)) {
+      phones.push(value);
+    }
+  }
+  if (lines.some((line) => line.name === "TEL")) {
+    fields.phone = phones[0] ?? null;
+    fields.phoneNumbers = phones;
+  }
+
+  const urlLine = lines.find((line) => line.name === "URL");
+  if (urlLine) {
+    fields.website = urlLine.value || null;
+  }
+
+  const bdayLine = lines.find((line) => line.name === "BDAY");
+  if (bdayLine) {
+    fields.birthday = bdayLine.value || null;
+  }
+
+  const adrLines = lines.filter((line) => line.name === "ADR");
+  if (adrLines.length > 0) {
+    const formatted = adrLines
+      .map((line) => {
+        const [, , street, city, region, postcode, country] = line.value
+          .split(";")
+          .map((part) => unescapeVCardValue(part));
+        return [street, city, region, postcode, country].filter(Boolean).join(", ");
+      })
+      .filter(Boolean);
+    fields.address = formatted[0] ?? null;
+    fields.postalAddresses = formatted.map((value) => ({ label: "home", formatted: value }));
+  }
+
+  const noteLines = lines.filter((line) => line.name === "NOTE");
+  if (noteLines.length > 0) {
+    fields.notes = noteLines.map((line) => line.value).filter(Boolean).join("\n\n") || null;
+  }
+
+  const photoLine = lines.find((line) => line.name === "PHOTO");
+  if (photoLine && photoLine.params.some((param) => /VALUE=URI/i.test(param))) {
+    fields.avatarUrl = photoLine.value || null;
+  }
+
+  return fields;
+};
+
+const fetchActiveContacts = (userId) =>
+  prisma.contact.findMany({
+    where: {
+      userId,
+      archivedAt: null,
+      syncTombstoneAt: null,
+    },
+    orderBy: { syncUid: "asc" },
+  });
 
 const handleWellKnown = async (req, res, requestUrl) => {
   if (requestUrl.pathname !== "/.well-known/carddav") {
@@ -466,6 +817,237 @@ const handleAddressBooks = async (req, res, requestUrl) => {
   return xmlResponse(res, buildPropfindResponse(responses));
 };
 
+const handleAddressBookCollection = async (req, res, requestUrl) => {
+  const userId = getCollectionUserId(requestUrl.pathname);
+
+  if (!userId) {
+    return false;
+  }
+
+  const allow = "OPTIONS, PROPFIND, REPORT";
+
+  if (req.method === "OPTIONS") {
+    return options(res, allow);
+  }
+
+  if (req.method !== "PROPFIND" && req.method !== "REPORT") {
+    return methodNotAllowed(res, allow);
+  }
+
+  const authResult = await requireDavAuth(req, res, userId);
+
+  if (!authResult) {
+    return true;
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true },
+  });
+
+  if (!user) {
+    return notFound(res);
+  }
+
+  const collectionHref = `/dav/addressbooks/${userId}/default/`;
+
+  if (req.method === "PROPFIND") {
+    const depth = req.headers.depth ?? "0";
+
+    if (depth === "infinity") {
+      return forbidden(res);
+    }
+
+    if (depth !== "0" && depth !== "1") {
+      return send(res, 400, "Unsupported Depth", { "Content-Type": "text/plain; charset=utf-8" });
+    }
+
+    const requestedNames = extractRequestedPropNames(await readRequestBody(req));
+    const collectionProps = [
+      { name: "displayname", value: "Kontax" },
+      { name: "resourcetype", types: ["collection", "addressbook"] },
+      { name: "getctag", value: await computeAddressBookCTag(userId) },
+      { name: "supported-address-data" },
+    ];
+    const responses = [
+      {
+        href: collectionHref,
+        ...splitDavProps(collectionProps, requestedNames),
+      },
+    ];
+
+    if (depth === "1") {
+      const contacts = await fetchActiveContacts(userId);
+
+      for (const contact of contacts) {
+        const props = [{ name: "getetag", value: etagForContact(contact) }];
+        responses.push({
+          href: contactResourceHref(userId, contact.syncUid),
+          ...splitDavProps(props, requestedNames),
+        });
+      }
+    }
+
+    return xmlResponse(res, buildPropfindResponse(responses));
+  }
+
+  // REPORT (addressbook-query): return every active contact with getetag + address-data.
+  // The request-body filter is treated as a hint and ignored in v1.
+  await readRequestBody(req);
+  const contacts = await fetchActiveContacts(userId);
+  const responses = contacts.map((contact) => ({
+    href: contactResourceHref(userId, contact.syncUid),
+    props: [
+      { name: "getetag", value: etagForContact(contact) },
+      { name: "address-data", value: serializeContactToVCard(contact) },
+    ],
+    notFoundProps: [],
+  }));
+
+  return xmlResponse(res, buildPropfindResponse(responses));
+};
+
+const handleContactResource = async (req, res, requestUrl) => {
+  const params = getResourceParams(requestUrl.pathname);
+
+  if (!params) {
+    return false;
+  }
+
+  const { userId, uid } = params;
+  const allow = "OPTIONS, GET, PUT, DELETE";
+
+  if (req.method === "OPTIONS") {
+    return options(res, allow);
+  }
+
+  if (!["GET", "HEAD", "PUT", "DELETE"].includes(req.method)) {
+    return methodNotAllowed(res, allow);
+  }
+
+  const authResult = await requireDavAuth(req, res, userId);
+
+  if (!authResult) {
+    return true;
+  }
+
+  const existing = await prisma.contact.findFirst({
+    where: { userId, syncUid: uid },
+  });
+
+  if (req.method === "GET" || req.method === "HEAD") {
+    if (!existing || existing.archivedAt || existing.syncTombstoneAt) {
+      return notFound(res);
+    }
+
+    const etag = etagForContact(existing);
+    const ifNoneMatch = req.headers["if-none-match"];
+
+    if (ifNoneMatch && ifNoneMatch.split(",").map((value) => value.trim()).includes(etag)) {
+      return notModified(res, etag);
+    }
+
+    return vcardResponse(res, req.method === "HEAD" ? null : serializeContactToVCard(existing), etag);
+  }
+
+  if (req.method === "PUT") {
+    const body = await readRequestBody(req);
+
+    if (isGroupVCard(body)) {
+      return unsupportedMediaType(res);
+    }
+
+    const bodyUid = getVCardUid(body);
+
+    if (bodyUid && bodyUid !== uid) {
+      return unprocessable(res, "UID in vCard body does not match the resource URL.");
+    }
+
+    const ifMatch = req.headers["if-match"];
+    const ifNoneMatch = req.headers["if-none-match"];
+
+    if (ifMatch) {
+      if (!existing || existing.syncTombstoneAt) {
+        return preconditionFailed(res);
+      }
+      if (!ifMatch.split(",").map((value) => value.trim()).includes(etagForContact(existing))) {
+        // Stale ETag — P9-08 will record a SyncConflict here.
+        return preconditionFailed(res);
+      }
+    }
+
+    if (ifNoneMatch === "*" && existing && !existing.syncTombstoneAt) {
+      return preconditionFailed(res);
+    }
+
+    const fields = parseVCardToContactFields(body);
+
+    if (!fields.fullName || !fields.fullName.trim()) {
+      // Derive a display name so the record always has a usable label.
+      const derived = [fields.firstName, fields.lastName].filter(Boolean).join(" ").trim();
+      fields.fullName = derived || fields.company || fields.email || "Unnamed contact";
+    }
+
+    if (!existing) {
+      const created = await prisma.contact.create({
+        data: {
+          userId,
+          syncUid: uid,
+          syncVersion: 1,
+          ...fields,
+        },
+      });
+
+      return send(res, 201, null, { ETag: etagForContact(created) });
+    }
+
+    const updated = await prisma.$transaction(async (tx) => {
+      const current = await tx.contact.findFirst({
+        where: { userId, syncUid: uid },
+        select: { id: true, syncVersion: true },
+      });
+
+      return tx.contact.update({
+        where: { id: current.id },
+        data: {
+          ...fields,
+          syncVersion: (current.syncVersion ?? 0) + 1,
+          syncTombstoneAt: null,
+          archivedAt: null,
+        },
+      });
+    });
+
+    return send(res, 204, null, { ETag: etagForContact(updated) });
+  }
+
+  // DELETE
+  if (!existing || existing.syncTombstoneAt) {
+    return notFound(res);
+  }
+
+  const ifMatch = req.headers["if-match"];
+
+  if (
+    ifMatch &&
+    !ifMatch.split(",").map((value) => value.trim()).includes(etagForContact(existing))
+  ) {
+    return preconditionFailed(res);
+  }
+
+  const now = new Date();
+  await prisma.contact.update({
+    where: { id: existing.id },
+    data: {
+      syncTombstoneAt: now,
+      archivedAt: existing.archivedAt ?? now,
+      syncVersion: existing.syncVersion + 1,
+    },
+  });
+
+  return send(res, 204, null);
+};
+
 const handleDavRequest = async (req, res) => {
   const host = req.headers["x-forwarded-host"] ?? req.headers.host ?? `localhost:${port}`;
   const proto = req.headers["x-forwarded-proto"]?.split(",")[0]?.trim() ?? "http";
@@ -476,6 +1058,14 @@ const handleDavRequest = async (req, res) => {
   }
 
   if (await handlePrincipal(req, res, requestUrl)) {
+    return true;
+  }
+
+  if (await handleContactResource(req, res, requestUrl)) {
+    return true;
+  }
+
+  if (await handleAddressBookCollection(req, res, requestUrl)) {
     return true;
   }
 
