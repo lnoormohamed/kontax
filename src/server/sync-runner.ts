@@ -130,7 +130,7 @@ const getFailureStatus = (
 const markJobFailed = async ({
   jobId,
   syncAccountId,
-  syncDirection,
+  _syncDirection,
   attemptCount,
   maxAttempts,
   accountStatus,
@@ -139,7 +139,7 @@ const markJobFailed = async ({
 }: {
   jobId: string;
   syncAccountId: string;
-  syncDirection: "TWO_WAY" | "IMPORT_ONLY" | "EXPORT_ONLY";
+  _syncDirection: "TWO_WAY" | "IMPORT_ONLY" | "EXPORT_ONLY";
   attemptCount: number;
   maxAttempts: number;
   accountStatus: "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR";

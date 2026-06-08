@@ -310,7 +310,10 @@ const parseContactInput = (formData: FormData) => {
   ]
     .filter((value): value is string => Boolean(value))
     .join(" ");
-  const canonicalFullName = fullNameFromParts || parsed.data.fullName || parsed.data.company;
+  const canonicalFullName =
+    (fullNameFromParts.length > 0 ? fullNameFromParts : null) ??
+    parsed.data.fullName ??
+    parsed.data.company;
 
   if (!canonicalFullName) {
     throw new Error("Add a full name, name parts, or company name so Kontax can place this contact in the list.");
