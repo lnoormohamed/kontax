@@ -3,7 +3,7 @@
 ## Summary
 Kontax is being built as a consumer-first SaaS contacts platform with single-user ownership in v1, practical strong security defaults, import/export before CardDAV, and billing foundations introduced early without blocking the core contact experience.
 
-This roadmap is the implementation source of truth for phases 1-7. Each phase file contains detailed tickets, dependencies, implementation notes, acceptance criteria, and progress tracking.
+This roadmap is the implementation source of truth for phases 1-8. Each phase file contains detailed tickets, dependencies, implementation notes, acceptance criteria, and progress tracking.
 
 ## Goals
 - Ship a trustworthy personal contacts product with strong foundations for future SaaS growth.
@@ -68,6 +68,18 @@ This roadmap is the implementation source of truth for phases 1-7. Each phase fi
 | P7-04 | 7 | Done | P1 | P7-03, P6-05 | Unassigned | Sync status, retry, recovery UX, and contact-level sync visibility are usable from the app |
 | P7-05 | 7 | Done | P1 | P7-03, P5-06 | Unassigned | Failure handling, health telemetry, auto-pause rules, and support exports are in place |
 | P7-06 | 7 | Done | P2 | P7-02, P7-05 | Unassigned | Private beta checklist, provider scope, rollback rules, and validation scenarios are documented |
+| P8-01 | 8 | Done | P0 | P1-06, P3-06, P4-06 | Unassigned | Contacts homepage is rebuilt as the primary list-first workspace |
+| P8-01a | 8 | Done | P0 | P8-01 | Unassigned | Header, tabs, and settings architecture are reset cleanly |
+| P8-01b | 8 | Done | P0 | P8-01a | Unassigned | Quick-add is removed and create-contact flow is route-based |
+| P8-01c | 8 | Done | P1 | P8-01 | Unassigned | Favorites are real workspace behavior, not placeholder UI |
+| P8-02 | 8 | Done | P1 | P8-01 | Unassigned | Contact detail page matches the denser homepage direction |
+| P8-03 | 8 | Done | P1 | P8-02 | Unassigned | Richer contact fields are visible, editable, sortable, searchable, and portable in product flows |
+| P8-03a | 8 | Done | P1 | P8-03 | Unassigned | Create flow supports richer identity and structured methods |
+| P8-03b | 8 | Done | P1 | P8-03a | Unassigned | Edit/detail flow reaches parity for richer identity fields |
+| P8-03c | 8 | Done | P1 | P8-03b | Unassigned | Pinyin auto-fill settings and visibility work cleanly |
+| P8-03d | 8 | Done | P1 | P8-03c | Unassigned | Contact list sorting respects stored Pinyin readings |
+| P8-03e | 8 | Done | P1 | P8-03d | Unassigned | Main list signals richer field coverage without added noise |
+| P8-03f | 8 | Done | P1 | P8-03e | Unassigned | Import/export preserves richer identity and Pinyin fields |
 
 ## Dependency Map
 - Phase 1 defines the contact model, security baseline, and consumer scope.
@@ -77,6 +89,7 @@ This roadmap is the implementation source of truth for phases 1-7. Each phase fi
 - Phase 5 depends on Phases 1, 3, and 4 because sync requires stable identifiers, import-compatible mappings, and deterministic conflict/merge behavior.
 - Phase 6 depends on Phases 1, 3, 4, and 5 because richer contact detail needs a stable schema base, portability rules, deterministic merge behavior, and clear sync compatibility expectations.
 - Phase 7 depends on Phases 5 and 6 because real CardDAV implementation needs stable sync models, secure credential handling, compatibility guidance, and rich-field portability expectations already defined.
+- Phase 8 depends on Phases 1, 3, 4, 6, and 7 because the workspace redesign and richer-field productization build on the stable contact model, portability rules, merge behavior, rich-field schema treatment, and real sync-facing identity expectations.
 
 ## Cross-Phase Validation Scenarios
 - A new account can sign up, authenticate, and save contacts without schema redesign between phases.

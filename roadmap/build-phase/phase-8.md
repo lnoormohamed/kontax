@@ -21,7 +21,13 @@ Turn the contacts homepage into the base product surface for Kontax by making it
 | P8-01b | Done | P0 | P8-01a |
 | P8-01c | Done | P1 | P8-01 |
 | P8-02 | Done | P1 | P8-01 |
-| P8-03 | In Progress | P1 | P8-02 |
+| P8-03 | Done | P1 | P8-02 |
+| P8-03a | Done | P1 | P8-03 |
+| P8-03b | Done | P1 | P8-03a |
+| P8-03c | Done | P1 | P8-03b |
+| P8-03d | Done | P1 | P8-03c |
+| P8-03e | Done | P1 | P8-03d |
+| P8-03f | Done | P1 | P8-03e |
 
 ## P8-01 — Rebuild the contacts homepage as the primary workspace
 - Status: `Done`
@@ -105,15 +111,94 @@ Turn the contacts homepage into the base product surface for Kontax by making it
   - The edit page may still need a second pass once the new homepage interaction model settles.
 
 ## P8-03 — Bring richer field support into the product surface
-- Status: `In Progress`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P8-02`
 - Implementation Notes:
   - Ensure richer field support is visible and usable in product flows rather than living only in schema and background logic.
   - Extend the creation flow and field-coverage visibility so structured data feels first-class.
-  - The current next slice should prioritize create-flow visibility: richer identity fields, labeled contact methods, structured address components, and lightweight guidance explaining why those fields matter for imports, merges, and sync readiness.
+  - The delivered slice now includes richer create-flow identity coverage, visible Pinyin/name-reading fields, settings-driven Pinyin auto-fill, Pinyin-aware search and sorting, main-list rich-field signals, and import/export preservation for name-part and Pinyin fields.
 - Acceptance Criteria:
   - Users can create and maintain richer contact records without needing hidden or purely technical flows.
   - Structured field depth is visible enough to influence how users trust imports, exports, and sync readiness.
 - Risks / Open Questions:
-  - We still need a follow-on pass for deeper import/export and merge parity on the richer fields.
+  - We still need a follow-on pass for richer merge heuristics, richer mobile presentation, and deeper sync parity on these identity fields.
+
+## P8-03a — Expand the create flow for richer identity and structured methods
+- Status: `Done`
+- Priority: `P1`
+- Dependencies: `P8-03`
+- Implementation Notes:
+  - Make richer contact capture feel intentional instead of hidden behind generic “additional” text areas.
+  - Allow organization-only records, add visible secondary labeled methods, and guide users toward structured data that helps import quality and future sync.
+- Acceptance Criteria:
+  - Users can create person-first or organization-first contacts cleanly.
+  - Secondary email, phone, and website fields feel first-class in the create flow.
+- Risks / Open Questions:
+  - Edit-flow parity needed to stay aligned as field depth grows.
+
+## P8-03b — Bring richer edit and detail parity into the product surface
+- Status: `Done`
+- Priority: `P1`
+- Dependencies: `P8-03a`
+- Implementation Notes:
+  - Extend the contact detail editing flow so richer fields remain visible and editable after creation.
+  - Add Pinyin/name-reading fields to the editable contact identity model.
+- Acceptance Criteria:
+  - Rich identity fields are editable from the contact detail page, not just during creation.
+  - Manual overrides remain available for generated name-reading values.
+- Risks / Open Questions:
+  - Header and summary presentation may still need a future visual refinement pass.
+
+## P8-03c — Add Pinyin auto-fill controls and visibility
+- Status: `Done`
+- Priority: `P1`
+- Dependencies: `P8-03b`
+- Implementation Notes:
+  - Add a settings toggle for auto-filling Pinyin and name readings only when those fields are blank.
+  - Use Chinese-specific Pinyin generation with fallback transliteration for other non-Latin scripts.
+- Acceptance Criteria:
+  - Users can enable or disable automatic Pinyin filling in settings.
+  - Generated readings never overwrite manually-entered values.
+- Risks / Open Questions:
+  - Cross-language behavior outside Han-script names remains best-effort rather than locale-perfect.
+
+## P8-03d — Use Pinyin-aware list sorting and placement
+- Status: `Done`
+- Priority: `P1`
+- Dependencies: `P8-03c`
+- Implementation Notes:
+  - Let stored Pinyin/name-reading fields participate in list ordering when present.
+  - Preserve favorites-first ordering and company fallback behavior.
+- Acceptance Criteria:
+  - Contacts with Han-script names sort naturally when Pinyin is available.
+  - Contacts without Pinyin continue to sort sensibly under the existing fallback rules.
+- Risks / Open Questions:
+  - Future locale-aware sorting may still need a broader abstraction beyond Pinyin-specific handling.
+
+## P8-03e — Surface richer-field signals in the main list
+- Status: `Done`
+- Priority: `P1`
+- Dependencies: `P8-03d`
+- Implementation Notes:
+  - Add compact inline indicators in the list for Pinyin presence and richer structured completeness.
+  - Keep the list single-row and dense while still signaling depth.
+- Acceptance Criteria:
+  - Users can recognize richer contacts without leaving the main list.
+  - Signals remain lightweight enough that the list does not become noisy.
+- Risks / Open Questions:
+  - The threshold for “rich” completeness may need tuning after more real-world datasets.
+
+## P8-03f — Preserve richer identity fields across import and export
+- Status: `Done`
+- Priority: `P1`
+- Dependencies: `P8-03e`
+- Implementation Notes:
+  - Preserve first/last name and Pinyin fields in CSV import, CSV export, and vCard export.
+  - Keep the data portable enough that richer identity work is not trapped inside Kontax-only UI.
+- Acceptance Criteria:
+  - CSV import can recognize Pinyin columns.
+  - CSV export includes Pinyin columns.
+  - vCard export preserves Pinyin/name-reading data with stable custom fields.
+- Risks / Open Questions:
+  - External clients may ignore custom vCard fields even when Kontax preserves them correctly.
