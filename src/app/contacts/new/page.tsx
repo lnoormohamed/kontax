@@ -88,7 +88,7 @@ export default async function NewContactPage() {
                   <input className={inputClassName} name="firstName" type="text" />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
-                  <span>Pinyin first name</span>
+                  <span>Phonetic first name</span>
                   <input
                     className={inputClassName}
                     name="phoneticFirstName"
@@ -105,7 +105,7 @@ export default async function NewContactPage() {
                   <input className={inputClassName} name="lastName" type="text" />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
-                  <span>Pinyin last name</span>
+                  <span>Phonetic last name</span>
                   <input
                     className={inputClassName}
                     name="phoneticLastName"
@@ -131,7 +131,7 @@ export default async function NewContactPage() {
                   <input className={inputClassName} name="jobTitle" type="text" />
                 </label>
                 <label className="grid gap-2 text-sm text-slate-700">
-                  <span>Pinyin company</span>
+                  <span>Phonetic company</span>
                   <input
                     className={inputClassName}
                     name="phoneticCompany"
@@ -162,7 +162,7 @@ export default async function NewContactPage() {
                   <span>Start this contact as a favorite</span>
                 </label>
                 <div className="rounded-[1.2rem] border border-[#dfe7e1] bg-[#f7fbf9] px-4 py-3 text-sm text-slate-600 lg:col-span-2">
-                  If pinyin auto-fill is enabled in settings, Kontax generates real pinyin for
+                  If phonetic auto-fill is enabled in settings, Kontax generates real phonetic
                   Chinese names when these fields are blank, with fallback name readings for other
                   non-Latin scripts.
                 </div>

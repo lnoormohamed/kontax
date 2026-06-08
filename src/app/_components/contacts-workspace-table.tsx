@@ -380,7 +380,7 @@ export function ContactsWorkspaceTable({
         const hasName = (contact.fullName?.trim().length ?? 0) > 0;
         const hasCompany = (contact.company?.trim().length ?? 0) > 0;
         const displayName = getDisplayName(contact);
-        const hasPinyin =
+        const hasPhonetic =
           (contact.phoneticFirstName?.trim().length ?? 0) > 0 ||
           (contact.phoneticLastName?.trim().length ?? 0) > 0 ||
           (contact.phoneticCompany?.trim().length ?? 0) > 0;
@@ -457,9 +457,9 @@ export function ContactsWorkspaceTable({
                             Archived
                           </span>
                         ) : null}
-                        {hasPinyin ? (
+                        {hasPhonetic ? (
                           <span className="rounded-full border border-cyan-200 bg-cyan-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-cyan-700">
-                            Pinyin
+                            Phonetic
                           </span>
                         ) : null}
                         {hasRichFieldSignal ? (

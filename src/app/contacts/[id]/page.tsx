@@ -76,7 +76,7 @@ const getInitials = (value: string) =>
     .join("")
     .toUpperCase();
 
-const getPinyinSummary = (contact: {
+const getPhoneticSummary = (contact: {
   phoneticFirstName: string | null;
   phoneticLastName: string | null;
   phoneticCompany: string | null;
@@ -311,7 +311,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     { label: "Custom fields", count: getStructuredEntryCount(contact.customFields) },
   ];
   const enrichedFieldCount = structuredCoverage.filter((item) => item.count > 0).length;
-  const pinyinSummary = getPinyinSummary(contact);
+  const phoneticSummary = getPhoneticSummary(contact);
 
   const detailStats = [
     {
@@ -327,8 +327,8 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
       value: contact.company ?? "Independent",
     },
     {
-      label: "Pinyin",
-      value: pinyinSummary.nameReading ?? pinyinSummary.companyReading ?? "Not set",
+      label: "Phonetic",
+      value: phoneticSummary.nameReading ?? phoneticSummary.companyReading ?? "Not set",
     },
   ];
 
@@ -366,16 +366,16 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                     ) : null}
                   </div>
 
-                  {pinyinSummary.nameReading || pinyinSummary.companyReading ? (
+                  {phoneticSummary.nameReading || phoneticSummary.companyReading ? (
                     <div className="mt-3 flex flex-wrap gap-2 text-sm text-[#d6e6df]">
-                      {pinyinSummary.nameReading ? (
+                      {phoneticSummary.nameReading ? (
                         <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
-                          Pinyin name: {pinyinSummary.nameReading}
+                          Phonetic name: {phoneticSummary.nameReading}
                         </span>
                       ) : null}
-                      {pinyinSummary.companyReading ? (
+                      {phoneticSummary.companyReading ? (
                         <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
-                          Pinyin company: {pinyinSummary.companyReading}
+                          Phonetic company: {phoneticSummary.companyReading}
                         </span>
                       ) : null}
                     </div>
@@ -514,7 +514,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                       <input className={inputClassName} defaultValue={contact.firstName ?? ""} name="firstName" type="text" />
                     </label>
                     <label className="grid gap-2 text-sm text-slate-700">
-                      <span>Pinyin first name</span>
+                      <span>Phonetic first name</span>
                       <input
                         className={inputClassName}
                         defaultValue={contact.phoneticFirstName ?? ""}
@@ -531,7 +531,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                       <input className={inputClassName} defaultValue={contact.lastName ?? ""} name="lastName" type="text" />
                     </label>
                     <label className="grid gap-2 text-sm text-slate-700">
-                      <span>Pinyin last name</span>
+                      <span>Phonetic last name</span>
                       <input
                         className={inputClassName}
                         defaultValue={contact.phoneticLastName ?? ""}
@@ -552,7 +552,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                       <input className={inputClassName} defaultValue={contact.jobTitle ?? ""} name="jobTitle" type="text" />
                     </label>
                     <label className="grid gap-2 text-sm text-slate-700">
-                      <span>Pinyin company</span>
+                      <span>Phonetic company</span>
                       <input
                         className={inputClassName}
                         defaultValue={contact.phoneticCompany ?? ""}
@@ -585,7 +585,8 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                       <span>Favorite contact</span>
                     </label>
                     <div className="rounded-[1.2rem] border border-[#dfe7e1] bg-[#f7fbf9] px-4 py-3 text-sm text-slate-600 lg:col-span-2">
-                      If pinyin auto-fill is enabled in settings, Kontax only fills these values when they are blank. Chinese names use real pinyin generation, and manual edits always win.
+                      If phonetic auto-fill is enabled in settings, Kontax only fills these values when they
+                      are blank. Chinese names use real phonetic generation, and manual edits always win.
                     </div>
                   </div>
                 </section>

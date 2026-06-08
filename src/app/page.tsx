@@ -473,7 +473,7 @@ export default async function Home({ searchParams }: HomePageProps) {
                 className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
                 defaultValue={query}
                 name="q"
-                placeholder="Search contacts by name, Pinyin, email, phone, company, website, or address"
+                placeholder="Search contacts by name, phonetic, email, phone, company, website, or address"
                 type="search"
               />
             </div>

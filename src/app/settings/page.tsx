@@ -136,9 +136,10 @@ export default async function SettingsPage() {
 
             <div className="rounded-[2rem] border border-[#d8ddd6] bg-white p-6 shadow-sm">
               <div>
-                <p className="text-lg font-semibold text-slate-900">Pinyin and name readings</p>
+                <p className="text-lg font-semibold text-slate-900">Phonetic and name readings</p>
                 <p className="mt-1 text-sm text-slate-500">
-                  Auto-fill pinyin for Chinese names, with fallback name readings for other non-Latin scripts, only when those fields are still blank.
+                  Auto-fill phonetic values for Chinese names, with fallback name readings for other
+                  non-Latin scripts, only when those fields are still blank.
                 </p>
               </div>
 
@@ -152,17 +153,19 @@ export default async function SettingsPage() {
                     value="true"
                   />
                   <span>
-                    Enable automatic pinyin and name-reading fill for first name, last name, and company when those fields are empty.
+                    Enable automatic phonetic and name-reading fill for first name, last name, and company
+                    when those fields are empty.
                   </span>
                 </label>
                 <p className="mt-3 text-sm leading-6 text-slate-500">
-                  Chinese names use real pinyin generation. Other non-Latin scripts still get a best-effort transliterated reading, and manual contact edits always win.
+                  Chinese names use real phonetic generation. Other non-Latin scripts still get a
+                  best-effort transliterated reading, and manual contact edits always win.
                 </p>
               <button
                 className="mt-4 rounded-[1.2rem] bg-[#17352e] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#20443b]"
                 type="submit"
               >
-                Save pinyin settings
+                Save phonetic settings
               </button>
               </form>
             </div>
