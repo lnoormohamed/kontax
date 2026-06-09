@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ContactsWorkspaceTable } from "~/app/_components/contacts-workspace-table";
 import { MergeSuggestionDismissButton } from "~/app/_components/merge-suggestion-dismiss-button";
 import { MergeSuggestionRefreshButton } from "~/app/_components/merge-suggestion-refresh-button";
+import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import type { BillingLifecycleState } from "~/server/billing";
 import type { PersistedMergeSuggestion } from "~/server/contact-merge";
 
@@ -129,9 +130,7 @@ export function ContactDashboard({
       }`}
       href={href}
     >
-      <span aria-hidden className="w-5 text-center text-[15px]">
-        {icon}
-      </span>
+      <WorkspaceIcon name={icon} size={18} />
       <span className="flex-1">{label}</span>
       {count != null ? (
         badge && count > 0 ? (
@@ -164,9 +163,7 @@ export function ContactDashboard({
       className="flex h-8 items-center gap-2.5 rounded-md px-2.5 text-[12.5px] font-medium text-[#8b938c] transition hover:bg-[#f2f4f0] hover:text-[#5c655e]"
       href={href}
     >
-      <span aria-hidden className="w-4 text-center">
-        {icon}
-      </span>
+      <WorkspaceIcon name={icon} size={15} />
       <span className="flex-1">{label}</span>
       {dot ? (
         <span
@@ -218,7 +215,7 @@ export function ContactDashboard({
           </span>
         </Link>
 
-        {navItem(peopleActive, buildHref("people", { filter: "all" }), "📋", "People", counts.people)}
+        {navItem(peopleActive, buildHref("people", { filter: "all" }), "people", "People", counts.people)}
         {peopleActive ? (
           <div className="grid gap-0.5">
             {subFilter("all", "All contacts")}
@@ -226,21 +223,21 @@ export function ContactDashboard({
             {subFilter("incomplete", "Missing details")}
           </div>
         ) : null}
-        {navItem(isFavoritesView, buildHref("people", { filter: "favorites" }), "⭐", "Favorites", counts.favorites)}
-        {navItem(currentTab === "archived", buildHref("archived", { filter: "all" }), "🗂", "Archived", counts.archived)}
+        {navItem(isFavoritesView, buildHref("people", { filter: "favorites" }), "star", "Favorites", counts.favorites)}
+        {navItem(currentTab === "archived", buildHref("archived", { filter: "all" }), "archive", "Archived", counts.archived)}
         {navItem(
           currentTab === "duplicates",
           buildHref("duplicates", { filter: "all" }),
-          "👥",
+          "people",
           "Duplicates",
           counts.duplicates,
           true,
         )}
 
         <div className="mt-auto border-t border-[#e9ece7] pt-2">
-          {sideLink("/import-export", "↑", "Import")}
-          {sideLink("/import-export", "↓", "Export")}
-          {sideLink("/sync", "⟳", "Sync", true)}
+          {sideLink("/import-export", "upload", "Import")}
+          {sideLink("/import-export", "download", "Export")}
+          {sideLink("/sync", "sync", "Sync", true)}
         </div>
       </aside>
 
@@ -392,32 +389,28 @@ export function ContactDashboard({
       <nav className="fixed inset-x-0 bottom-0 z-30 flex items-stretch border-t border-[#d8ddd6] bg-white/95 backdrop-blur lg:hidden">
         {(
           [
-            ["📋", "People", peopleActive, buildHref("people", { filter: "all" })],
-            ["⭐", "Favorites", isFavoritesView, buildHref("people", { filter: "favorites" })],
-            ["🗂", "Archived", currentTab === "archived", buildHref("archived", { filter: "all" })],
-            ["👥", "Duplicates", currentTab === "duplicates", buildHref("duplicates", { filter: "all" })],
+            ["people", "People", peopleActive, buildHref("people", { filter: "all" })],
+            ["star", "Favorites", isFavoritesView, buildHref("people", { filter: "favorites" })],
+            ["archive", "Archived", currentTab === "archived", buildHref("archived", { filter: "all" })],
+            ["people", "Duplicates", currentTab === "duplicates", buildHref("duplicates", { filter: "all" })],
           ] as const
         ).map(([icon, label, active, href]) => (
           <Link
-            className={`flex flex-1 flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium ${
+            className={`flex flex-1 flex-col items-center justify-center gap-1 py-2 text-[10px] font-medium ${
               active ? "text-[#17352e]" : "text-[#8b938c]"
             }`}
             href={href}
             key={label}
           >
-            <span aria-hidden className="text-[16px]">
-              {icon}
-            </span>
+            <WorkspaceIcon name={icon} size={19} />
             {label}
           </Link>
         ))}
         <Link
-          className="flex flex-1 flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium text-[#8b938c]"
+          className="flex flex-1 flex-col items-center justify-center gap-1 py-2 text-[10px] font-medium text-[#8b938c]"
           href="/settings"
         >
-          <span aria-hidden className="text-[16px]">
-            ⋯
-          </span>
+          <WorkspaceIcon name="more" size={19} />
           More
         </Link>
       </nav>

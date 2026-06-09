@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { ContactDashboard } from "~/app/_components/contact-dashboard";
+import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
 import { getOpenMergeSuggestionsForUser } from "~/server/contact-merge";
@@ -59,8 +60,8 @@ const getSelectedSort = async (
 ): Promise<ContactsWorkspaceSort> => {
   const sort = await getSingleParam(searchParams, "sort");
 
-  if (sort === "name") {
-    return "name";
+  if (sort === "updated") {
+    return "updated";
   }
 
   return "name";
@@ -455,71 +456,62 @@ export default async function Home({ searchParams }: HomePageProps) {
   const userInitials = getInitials(userLabel);
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#f4f6f1_0%,#f8faf7_24%,#fbfcfa_100%)] text-slate-900">
-      <header className="sticky top-0 z-30 border-b border-[#d9ddd8] bg-[rgba(249,250,246,0.96)] backdrop-blur-xl">
-        <div className="mx-auto flex w-full max-w-[1800px] items-center gap-3 px-4 py-3 lg:px-6">
-          <Link className="flex shrink-0 items-center gap-3" href="/">
-            <div className="flex h-11 w-11 items-center justify-center rounded-[1.2rem] bg-[#17352e] text-sm font-semibold text-white shadow-[0_10px_24px_rgba(23,53,46,0.18)]">
+    <main className="min-h-screen bg-[#f6f7f4] text-[#1d2823]">
+      <header className="sticky top-0 z-30 border-b border-[#d8ddd6] bg-white">
+        <div className="mx-auto flex w-full max-w-[1800px] items-center gap-4 px-4 py-2.5 lg:px-3">
+          {/* wordmark — aligned over the sidebar width */}
+          <Link className="flex shrink-0 items-center gap-2.5 lg:w-[232px]" href="/">
+            <span className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-[#17352e] text-[17px] font-bold text-[#dff0e7]">
               K
-            </div>
-            <div className="hidden min-w-0 sm:block">
-              <p className="text-sm font-semibold tracking-tight text-slate-900">Kontax</p>
-              <p className="text-xs text-slate-500">Contacts</p>
-            </div>
+            </span>
+            <span className="text-[19px] font-bold tracking-[-0.01em] text-[#1d2823]">Kontax</span>
           </Link>
 
-          <form className="flex min-w-0 flex-1 items-center gap-3" method="get">
+          {/* search */}
+          <form className="flex min-w-0 flex-1 justify-center" method="get">
             <input name="tab" type="hidden" value={selectedTab} />
             <input name="filter" type="hidden" value={selectedFilter} />
             <input name="sort" type="hidden" value={selectedSort} />
             <input name="view" type="hidden" value={selectedView} />
-            <div className="flex min-w-0 flex-1 items-center gap-3 rounded-[1.2rem] border border-[#d8ddd6] bg-white px-4 py-2.5 shadow-sm">
-              <span className="text-sm text-slate-400">Search</span>
+            <div className="flex min-w-0 flex-1 items-center gap-2.5 rounded-[10px] border border-[#d8ddd6] bg-white px-3 lg:max-w-[560px]">
+              <WorkspaceIcon className="shrink-0 text-[#8b938c]" name="search" size={18} />
               <input
-                className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
+                className="h-10 w-full bg-transparent text-sm text-[#1d2823] outline-none placeholder:text-[#8b938c]"
                 defaultValue={query}
                 name="q"
-                placeholder="Search contacts by name, phonetic, email, phone, company, website, or address"
+                placeholder="Search by name, email, phone, company…"
                 type="search"
               />
             </div>
-            <button
-              className="hidden rounded-[1.1rem] border border-[#d8ddd6] bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-[#c9d0c9] hover:bg-slate-50 md:inline-flex"
-              type="submit"
-            >
-              Search
-            </button>
           </form>
 
-          <div className="flex shrink-0 items-center gap-2">
+          {/* actions */}
+          <div className="flex shrink-0 items-center gap-2.5">
             <Link
-              className={`rounded-[1.1rem] px-4 py-2.5 text-sm font-semibold transition ${
+              className={`inline-flex h-10 items-center gap-1.5 rounded-full px-4 text-sm font-semibold transition ${
                 planSummary.lifecyclePolicy.canWrite
                   ? "bg-[#4158f4] text-white hover:bg-[#3248db]"
                   : "cursor-not-allowed bg-slate-200 text-slate-500"
               }`}
               href={planSummary.lifecyclePolicy.canWrite ? "/contacts/new" : "/settings"}
             >
-              Create contact
+              <WorkspaceIcon name="plus" size={18} strokeWidth={2} />
+              <span className="hidden sm:inline">Create contact</span>
             </Link>
             <button
               aria-label="Notifications"
-              className="hidden h-10 w-10 items-center justify-center rounded-full border border-[#d8ddd6] bg-white text-base text-slate-500 transition hover:border-[#c9d0c9] hover:bg-slate-50 sm:inline-flex"
+              className="hidden h-10 w-10 items-center justify-center rounded-full border border-[#d8ddd6] bg-white text-[#5c655e] transition hover:bg-[#f2f4f0] sm:inline-flex"
               type="button"
             >
-              🔔
+              <WorkspaceIcon name="bell" size={18} />
             </button>
             <Link
-              className="flex items-center gap-3 rounded-[1.1rem] border border-[#d8ddd6] bg-white px-3 py-2 transition hover:border-[#c9d0c9] hover:bg-slate-50"
+              aria-label="Account settings"
+              className="flex h-10 w-10 items-center justify-center rounded-full bg-[#17352e] text-xs font-semibold text-[#dff0e7] transition hover:opacity-90"
               href="/settings"
+              title={`${userLabel} · ${session.user.email ?? ""}`}
             >
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#dfe3ff] text-xs font-semibold text-[#4158f4]">
-                {userInitials}
-              </div>
-              <div className="hidden text-left xl:block">
-                <p className="text-sm font-semibold text-slate-900">{userLabel}</p>
-                <p className="text-xs text-slate-500">{session.user.email}</p>
-              </div>
+              {userInitials}
             </Link>
           </div>
         </div>
