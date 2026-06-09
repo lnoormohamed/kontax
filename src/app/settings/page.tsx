@@ -1,13 +1,25 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { AppPasswordManager } from "~/app/_components/app-password-manager";
+import { ConnectionGuides } from "~/app/_components/connection-guides";
+import { CopyField } from "~/app/_components/copy-field";
 import { updatePhoneticSettings } from "~/app/actions/settings";
 import { canCreateAppPassword, listUserAppPasswords } from "~/server/app-passwords";
 import { signOut } from "~/server/auth";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
 import { db } from "~/server/db";
+
+const getPublicOrigin = async () => {
+  const headerList = await headers();
+  const forwardedHost = headerList.get("x-forwarded-host") ?? headerList.get("host");
+  const forwardedProto = headerList.get("x-forwarded-proto")?.split(",")[0]?.trim();
+  const host = forwardedHost ?? "localhost:3000";
+  const proto = forwardedProto ?? (host.startsWith("localhost") ? "http" : "https");
+  return `${proto}://${host}`;
+};
 
 const getInitials = (value: string) =>
   value
@@ -38,10 +50,12 @@ export default async function SettingsPage() {
   }
 
   const planSummary = await getUserPlanSummary(session.user.id);
-  const [appPasswords, appPasswordAllowance] = await Promise.all([
+  const [appPasswords, appPasswordAllowance, publicOrigin] = await Promise.all([
     listUserAppPasswords(session.user.id),
     canCreateAppPassword(session.user.id),
+    getPublicOrigin(),
   ]);
+  const carddavServerUrl = publicOrigin;
   const userSettings = await db.user.findUnique({
     where: {
       id: session.user.id,
@@ -101,6 +115,12 @@ export default async function SettingsPage() {
               href="#settings-plan"
             >
               Plan
+            </a>
+            <a
+              className="rounded-full border border-[#d8ddd6] bg-[#f8faf8] px-3 py-1.5 text-sm text-slate-600 transition hover:bg-white"
+              href="#settings-devices"
+            >
+              Devices
             </a>
             <a
               className="rounded-full border border-[#d8ddd6] bg-[#f8faf8] px-3 py-1.5 text-sm text-slate-600 transition hover:bg-white"
@@ -247,29 +267,53 @@ export default async function SettingsPage() {
               </p>
             </div>
 
-            <div className="rounded-[2rem] border border-[#d8ddd6] bg-white p-6 shadow-sm">
+            <div
+              className="rounded-[2rem] border border-[#d8ddd6] bg-white p-6 shadow-sm"
+              id="settings-devices"
+            >
               <div>
-                <p className="text-lg font-semibold text-slate-900">Device app passwords</p>
+                <p className="text-lg font-semibold text-slate-900">Connect a device</p>
                 <p className="mt-1 text-sm text-slate-500">
-                  Create revocable device-specific passwords for CardDAV clients so your main
-                  Kontax login password never has to live inside a phone or sync app.
+                  Add Kontax to your iPhone, Mac, or Android phone as a contacts account. Your
+                  contacts then stay in sync automatically in the background — no app required.
                 </p>
               </div>
 
-              <div className="mt-5 rounded-[1.4rem] border border-[#d8ddd6] bg-[#fbfcf8] p-4">
-                <p className="text-sm font-semibold text-slate-900">Current allowance</p>
-                <p className="mt-2 text-sm leading-6 text-slate-500">
-                  {appPasswordAllowance.limit == null
-                    ? `Your ${planSummary.planLabel} plan can create unlimited active app passwords.`
-                    : `Your ${planSummary.planLabel} plan allows ${appPasswordAllowance.limit} active app password${appPasswordAllowance.limit === 1 ? "" : "s"}. You currently have ${appPasswordAllowance.current}.`}
-                </p>
-              </div>
-
-              <div className="mt-5">
-                <AppPasswordManager
-                  allowance={appPasswordAllowance}
-                  appPasswords={appPasswords}
+              <div className="mt-5 grid gap-3">
+                <CopyField
+                  helper="Enter this as the server address during CardDAV setup on your device."
+                  label="Server URL"
+                  value={carddavServerUrl}
                 />
+                <CopyField label="Username" value={session.user.email ?? ""} />
+              </div>
+
+              <div className="mt-6">
+                <p className="text-sm font-semibold text-slate-900">App passwords</p>
+                <p className="mt-1 text-sm leading-6 text-slate-500">
+                  Each device uses its own app password instead of your Kontax login, so you can
+                  revoke a single device without affecting the others.
+                </p>
+                <div className="mt-4">
+                  <AppPasswordManager
+                    allowance={appPasswordAllowance}
+                    appPasswords={appPasswords}
+                  />
+                </div>
+              </div>
+
+              <div className="mt-6 rounded-[1.5rem] border border-[#d8ddd6] bg-[#fbfcf8] p-5">
+                <p className="text-sm font-semibold text-slate-900">Step-by-step setup</p>
+                <p className="mt-1 text-sm leading-6 text-slate-500">
+                  Pick your device and follow the steps. The server URL and username are already
+                  filled in for you.
+                </p>
+                <div className="mt-4">
+                  <ConnectionGuides
+                    email={session.user.email ?? ""}
+                    serverUrl={carddavServerUrl}
+                  />
+                </div>
               </div>
             </div>
           </div>

@@ -26,7 +26,7 @@ Turn Kontax into a CardDAV server so users can add it as a native contacts accou
 | P9-03b | Done | P0 | P9-03a |
 | P9-03c | Done | P0 | P9-03b |
 | P9-04 | Done | P0 | P9-02, P9-03 |
-| P9-05 | Not Started | P1 | P9-04 |
+| P9-05 | Done | P1 | P9-04 |
 | P9-06 | Not Started | P1 | P9-04 |
 | P9-07 | Not Started | P1 | P9-05, P9-06 |
 | P9-08 | Not Started | P2 | P9-07 |
@@ -201,26 +201,25 @@ Turn Kontax into a CardDAV server so users can add it as a native contacts accou
 ---
 
 ## P9-05 — Add CardDAV server settings and connect instructions to the UI
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P9-04`
 - Implementation Notes:
-  - Add a "Connect a device" section to the settings page (or a new `/settings/devices` route).
-  - Surface the user's CardDAV server URL, their username (email), and a prompt to create an app password.
-  - App password creation: label input (e.g. "iPhone", "macOS"), generate on submit, show plaintext once with a copy button, then display only the label and last-used date.
-  - App password list: show label, created date, last used date, and a revoke button per password.
-  - Include a step-by-step connection guide for:
-    - iPhone/iPad: Settings > Contacts > Accounts > Add Account > Other > Add CardDAV Account
-    - macOS: System Settings > Internet Accounts > Add Other Account > CardDAV
-    - Android (DAVx⁵): link to setup instructions
-  - Plan limits: show how many app passwords the user's plan allows and prompt upgrade if at the limit.
+  - Delivered as an expanded "Connect a device" section on the existing `/settings` page (kept on the page rather than a separate `/settings/devices` route to reduce navigation; a `#settings-devices` nav chip jumps to it).
+  - **Server connection details:** new `CopyField` client component (`src/app/_components/copy-field.tsx`) renders the Server URL and Username (email) each with a one-click copy button + "Copied" flash. The server URL is derived from request headers (`x-forwarded-host`/`x-forwarded-proto` with localhost fallback) via `getPublicOrigin()` in the settings server component — no new env var required. The origin is the value users enter; iOS/macOS/DAVx⁵ discover the rest via `/.well-known/carddav`.
+  - **App password manager** (`src/app/_components/app-password-manager.tsx`, rewritten): full three-state show-once flow. Create → token revealed once in an amber `role="status"` box with a "Copy password" button (copies the un-hyphenated token) and an explicit "I've copied this password" acknowledgment that permanently hides it. Empty state with platform glyphs and onboarding copy. List rows show an inferred platform glyph (iPhone/Mac/Android/generic from the label), relative created/last-used dates (absolute past 30 days), and a Revoke button. Revoke opens an ARIA modal confirmation naming the device; confirm runs the action via `useTransition` with inline error handling. Plan-limit indicator ("Using X of Y" / "Unlimited") plus an amber at-limit callout.
+  - **Connection guides** (`src/app/_components/connection-guides.tsx`): tabbed iPhone / macOS / Android (DAVx⁵) step lists with the real Server URL and Username pre-filled in copyable value chips so users never context-switch.
+  - **Security:** plaintext token lives only in React state from the `createAppPassword` response; never written to DOM attributes, localStorage, or server-rendered HTML. Copy uses `navigator.clipboard.writeText`.
+  - Verified via `tsc --noEmit`, `next lint` (clean), and a full `next build` (settings + DAV routes compile). Visual walkthrough on a real device is folded into P9-07.
 - Acceptance Criteria:
-  - A user with no technical knowledge can follow the in-app guide and successfully connect their iPhone.
-  - App passwords can be created and revoked from the UI.
-  - The server URL and username are clearly displayed and copyable.
-  - Plan limits are surfaced before the user hits them.
+  - App passwords can be created (show-once) and revoked (with confirmation) from the UI. ✓
+  - Server URL and username are displayed and copyable. ✓
+  - Plan limits are surfaced before the user hits them (indicator + at-limit callout + disabled create). ✓
+  - Step-by-step guides for iPhone, macOS, and Android with pre-filled values. ✓
+  - A non-technical user can follow the in-app guide to connect their iPhone — **end-to-end device walkthrough verified in P9-07.**
 - Risks / Open Questions:
-  - The "show once" plaintext pattern must be implemented carefully — no caching, no server logs, no clipboard persistence beyond the session.
+  - Server URL is presented as the bare origin (relies on `/.well-known/carddav` discovery). If P9-07 finds a client that needs the explicit principal/collection path, it is a guide-text-only change.
+  - "Show once" relies on the user clicking the acknowledgment; closing the tab first loses the token (intentional — they revoke and recreate). Copy tone communicates this.
 
 ---
 
