@@ -1,5 +1,7 @@
 # P11-01 Plan Feature Matrix
 
+> **Status: FROZEN (2026-06-10).** Tiers, entitlement values, cross-tier sharing rules, and downgrade paths are agreed. Product decisions resolved: member counts (Family 6 / Teams 25), PRO app-password limit (5), PLUS removal (no subscribers), merge-undo mechanism (existing `MergeDecision`, P10-05). Three non-blocking items remain flagged in the "Still open" subsection (vCard bulk import, Teams expansion, Teams shared-book CardDAV) — none gate P11-02/P11-03. P11-02 schema work may proceed.
+
 ## Purpose
 This ticket defines the authoritative, frozen feature set for every subscription tier in Kontax: Free, Pro, Family, and Teams. Every other Phase 11 ticket — schema migration, entitlement enforcement, design brief, activity log retention, and settings UI — derives from this document. No feature boundary in any later ticket should contradict what is written here. If a downstream ticket uncovers a conflict with this matrix, a revision to this document must be filed and agreed before the downstream ticket can close.
 
@@ -103,7 +105,7 @@ The current `billing.ts` PLAN_DEFAULTS map (`FREE`, `PLUS`, `PRO`) and the Prism
 - Advanced merge: enabled. `advancedMergeEnabled` is `true`.
 - Field-level selection: when two contacts are being merged, the user can choose which version of each field wins (not winner-takes-all).
 - Bulk accept: the user can accept all HIGH confidence merge suggestions in a single action.
-- 30-day undo window: merged contacts are kept as soft-deleted (`syncTombstoneAt` set, contact hidden from UI) for 30 days. A separate `MergeUndo` or reversible path exists for this window. After 30 days the tombstoned contacts are eligible for hard deletion by a cleanup job.
+- 30-day undo window: implemented in Phase 10 (P10-05) via the `MergeDecision` model. An accepted merge writes a `MergeDecision` row (`status: ACCEPTED`, `decidedAt`, before/after snapshot); the absorbed contact is archived (`archivedAt` set), not hard-deleted. `undoMergedContactsForUser` reverses a decision within 30 days of `decidedAt` (restores the absorbed contact, reverts the survivor, re-opens the suggestion, sets `MergeDecision.reversedAt`). Beyond 30 days the decision shows as "Expired" and undo is unavailable. **No `syncTombstoneAt` or new `MergeUndo` model is involved** — that earlier assumption is superseded by the shipped P10-05 mechanism.
 
 #### Sharing
 - vCard share link: download-only, no expiry, revocable (user can deactivate the link from their share management page). Receiving end requires no Kontax account.
@@ -242,6 +244,7 @@ New fields added in P11-02:
 | `staticShareEnabled` | false | true | true | true |
 
 Notes on null semantics:
+- `appPasswordsLimit` is currently **hardcoded** in `getActiveAppPasswordLimit` (`src/server/app-passwords.ts`) as FREE=1, PLUS=3, PRO=null. P11-02 adds the field to `Subscription`; **P11-03 must read the field and set PRO=5** (matching this matrix), replacing the hardcoded values.
 - `contactsLimit: null` = no ceiling. Enforcement code must check `if (limit !== null && used >= limit)`.
 - `monthlyImportLimit: null` = no ceiling. Same null check.
 - `activityLogRetentionDays: null` = keep forever. Retention job skips users where this is null.
@@ -278,21 +281,23 @@ Notes on null semantics:
 
 ---
 
-### Uncertain Boundaries Requiring Product Decision Before P11-02 Closes
+### Uncertain Boundaries — Resolutions (updated 2026-06-10)
 
-1. **PLUS subscriber migration**: Confirm with billing that zero active subscribers are on PLUS before renaming the enum. If any exist, a one-time communication and migration plan is required before the schema migration runs in production.
+1. **PLUS subscriber migration** — ✅ **RESOLVED.** A direct DB check found **zero** subscriptions on PLUS (only FREE/PRO in use). The enum value can be removed safely in P11-02 with no data backfill. *Action:* re-run the same check against production immediately before the P11-02 `db push` to confirm prod matches.
 
-2. **Family member count (6) and Teams member count (25)**: These are working numbers. Confirm with pricing and commercial team before freezing. Schema stores `memberSlotsLimit` as an Int on both the `Subscription` and `Group` models, so the number can be overridden per-group without a migration.
+2. **Family member count (6) and Teams member count (25)** — ✅ **RESOLVED.** Confirmed: **Family = 6, Teams = 25.** Stored as `memberSlotsLimit` on both `Subscription` and `Group`, so a single group can be overridden later without a schema change.
 
-3. **App passwords entitlement field**: `appPasswordsLimit` is not currently in the `Subscription` model. It must be added in P11-02. The enforcement code in P11-03 must gate app password creation against this limit. Confirm where app passwords are currently stored (likely a separate model not yet in the schema) before P11-03 begins.
+3. **App passwords entitlement field** — ✅ **RESOLVED (with a code discrepancy to fix in P11-03).** The `AppPassword` model **already exists** in the schema; the per-plan limit is currently *hardcoded* in `getActiveAppPasswordLimit` (`src/server/app-passwords.ts`) as FREE=1, PLUS=3, PRO=`null` (unlimited). The frozen matrix is **PRO = 5** (not unlimited). P11-02 adds the `appPasswordsLimit` field to `Subscription`; **P11-03 must replace the hardcoded function with reads of that field and set PRO=5** (the file already carries a `TODO(Phase 11)` to this effect). Family/Teams = 5 per member.
 
-4. **vCard bulk import for Pro**: Confirm whether this requires a new `ImportFormat` enum value or whether it reuses `VCARD_4` (which exists as an export format but not an import format). This is a schema and parser question for the import pipeline, not just an entitlement question.
+5. **Merge 30-day undo** — ✅ **RESOLVED.** Already shipped in P10-05 via the `MergeDecision` model (`reversedAt`, archived absorbed contact). No `syncTombstoneAt` use and no new `MergeUndo` model — see the Pro › Merge section above. No further schema work needed for the undo window.
 
-5. **Merge 30-day undo**: Confirm that the existing `syncTombstoneAt` field on `Contact` is the intended mechanism for the undo window, or whether a separate `MergeUndo` model is needed. This affects P11-03 and the merge pipeline.
+#### Still open (do not block P11-02 schema; resolve before the relevant downstream work)
 
-6. **Teams expansion beyond 25**: Define the commercial process for expanding the member slot limit. The `memberSlotsLimit` field on `Group` allows a custom value to be set without a schema change, but the upgrade flow and admin tooling for this are out of scope for Phase 11.
+4. **vCard bulk import for Pro** — **OPEN / DEFERRED.** There is currently **no `ImportFormat` enum** in the schema (import source profiles are GENERIC/GOOGLE/APPLE/OUTLOOK). vCard bulk import is net-new parser work, not an entitlement toggle. Defer to whichever phase next touches the import pipeline; it does not gate P11-02/03.
 
-7. **Shared book CardDAV endpoint for Teams**: Confirm whether team-level CardDAV sync accounts are in scope for Phase 11 schema work (P11-02) or deferred to Phase 14. The `GroupAddressBook` model scaffold includes this concept but the sync infrastructure wiring is not Phase 11 work.
+6. **Teams expansion beyond 25** — **OPEN / COMMERCIAL.** `memberSlotsLimit` on `Group` already allows a custom value without a schema change. The upgrade flow + admin tooling for expansion are out of scope for Phase 11.
+
+7. **Shared-book CardDAV endpoint for Teams** — **DEFERRED to Phase 14.** The `GroupAddressBook` scaffold may include the concept, but no sync-infrastructure wiring is Phase 11 work.
 
 ---
 
@@ -307,7 +312,7 @@ Notes on null semantics:
 - The document is agreed by at least the engineering lead and product owner before P11-02 begins.
 
 ## Risks and Open Questions
-- PLUS to PRO migration: if any PLUS subscribers exist, silent migration without communication is unacceptable. Must be coordinated.
+- PLUS to PRO migration: resolved for the current dataset (0 PLUS subscribers in dev). The only residual risk is prod drift — re-check prod immediately before the P11-02 enum change. If any PLUS subscribers appear, silent migration without communication is unacceptable and must be coordinated.
 - The Family member reversion-to-Free on group dissolution is potentially surprising to members who joined expecting ongoing access. The product must communicate this clearly in the invite acceptance flow (Phase 13).
 - Null-as-unlimited semantics in enforcement code are easy to get wrong. Every place in the codebase that reads `contactsLimit` or `monthlyImportLimit` must be audited for `=== null` guards, not `=== 0` or `=== undefined`.
 - The relationship between personal Pro entitlements and group membership entitlements for Family and Teams members needs careful handling in `getUserBillingContext`. The function currently reads from `user.subscriptions` directly; for group members it must also resolve group membership and derive entitlements from the group owner's subscription.

@@ -18,7 +18,7 @@ Restructure the subscription model around four tiers that reflect how people act
 ## Phase Tracker
 | Ticket | Status | Priority | Depends On |
 | --- | --- | --- | --- |
-| P11-01 | Not Started | P0 | P2-02 |
+| P11-01 | Done | P0 | P2-02 |
 | P11-02 | Not Started | P0 | P11-01 |
 | P11-03 | Not Started | P0 | P11-01 |
 | P11-04 | Not Started | P1 | P11-02, P11-03 |
@@ -28,9 +28,14 @@ Restructure the subscription model around four tiers that reflect how people act
 ---
 
 ## P11-01 — Define plan feature matrix
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P0`
 - Dependencies: `P2-02`
+- Delivered:
+  - Froze `roadmap/build-phase/p11-01-plan-feature-matrix.md`: complete feature set for Free/Pro/Family/Teams, full entitlement-field mapping (existing + new) with null semantics, cross-tier sharing rules, one-group-per-user + subscription-ownership rules, and Family→Pro / Teams→Pro downgrade paths.
+  - Product decisions resolved: **Family 6 / Teams 25** member slots; **PRO app-password limit = 5** (matrix wins over the current hardcoded "unlimited" — fix lands in P11-03); **PLUS removal safe** (0 PLUS subscribers in dev — re-check prod before P11-02 `db push`); **merge 30-day undo** uses the shipped `MergeDecision` mechanism (P10-05), not `syncTombstoneAt`/`MergeUndo`.
+  - Corrected two stale assumptions in the doc: the `AppPassword` model already exists (limit hardcoded, not a DB field yet), and there is no `ImportFormat` enum (vCard bulk import is net-new parser work).
+  - Three non-blocking items remain flagged (vCard bulk import, Teams expansion >25, Teams shared-book CardDAV) — none gate P11-02/03.
 - Implementation Notes:
   - Document the feature set for each tier. The working baseline is:
 
