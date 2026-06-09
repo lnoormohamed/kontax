@@ -395,6 +395,17 @@ exports.Prisma.SyncConflictScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ActivityEventScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  contactId: 'contactId',
+  eventType: 'eventType',
+  actor: 'actor',
+  actorDetail: 'actorDetail',
+  payload: 'payload',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -557,6 +568,33 @@ exports.SyncResolutionStrategy = exports.$Enums.SyncResolutionStrategy = {
   MANUAL_MERGE: 'MANUAL_MERGE'
 };
 
+exports.EventType = exports.$Enums.EventType = {
+  CONTACT_CREATED: 'CONTACT_CREATED',
+  CONTACT_UPDATED: 'CONTACT_UPDATED',
+  CONTACT_ARCHIVED: 'CONTACT_ARCHIVED',
+  CONTACT_RESTORED: 'CONTACT_RESTORED',
+  CONTACT_DELETED: 'CONTACT_DELETED',
+  CONTACT_MERGED: 'CONTACT_MERGED',
+  CONTACT_MERGE_UNDONE: 'CONTACT_MERGE_UNDONE',
+  CONTACT_IMPORTED: 'CONTACT_IMPORTED',
+  CONTACT_SHARED: 'CONTACT_SHARED',
+  CONTACT_SHARE_RECEIVED: 'CONTACT_SHARE_RECEIVED',
+  SYNC_PULLED: 'SYNC_PULLED',
+  SYNC_PUSHED: 'SYNC_PUSHED',
+  SYNC_CONFLICT_DETECTED: 'SYNC_CONFLICT_DETECTED',
+  SYNC_CONFLICT_RESOLVED: 'SYNC_CONFLICT_RESOLVED'
+};
+
+exports.Actor = exports.$Enums.Actor = {
+  USER: 'USER',
+  SYNC: 'SYNC',
+  IMPORT: 'IMPORT',
+  SHARE: 'SHARE',
+  FAMILY_MEMBER: 'FAMILY_MEMBER',
+  TEAM_MEMBER: 'TEAM_MEMBER',
+  SYSTEM: 'SYSTEM'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   AppPassword: 'AppPassword',
@@ -570,7 +608,8 @@ exports.Prisma.ModelName = {
   SyncAccount: 'SyncAccount',
   SyncContactLink: 'SyncContactLink',
   SyncJob: 'SyncJob',
-  SyncConflict: 'SyncConflict'
+  SyncConflict: 'SyncConflict',
+  ActivityEvent: 'ActivityEvent'
 };
 
 /**

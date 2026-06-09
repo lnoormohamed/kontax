@@ -111,7 +111,7 @@ This roadmap is the implementation source of truth for phases 1–16. Each phase
 
 | Ticket | Phase | Status | Priority | Depends On | Owner | Acceptance |
 | --- | --- | --- | --- | --- | --- | --- |
-| P10-01 | 10 | Not Started | P0 | P1-01, P4-01 | Unassigned | ActivityEvent schema migrated; all event types and payload shapes documented |
+| P10-01 | 10 | Done | P0 | P1-01, P4-01 | Unassigned | ActivityEvent model + EventType/Actor enums + indexes pushed; Zod payload schemas + append-only emitEvent helper |
 | P10-02 | 10 | Not Started | P0 | P10-01 | Unassigned | Every contact mutation path emits the correct event with populated payload |
 | P10-03 | 10 | Not Started | P0 | P10-01 | Unassigned | Every contact has sourceType set at creation; lastMutatedBy updates on every write |
 | P10-04 | 10 | Not Started | P1 | P10-02, P10-03 | Unassigned | Source badges and History tab are visible and accurate on every contact detail page |

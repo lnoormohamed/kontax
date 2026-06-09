@@ -78,6 +78,11 @@ export type SyncJob = $Result.DefaultSelection<Prisma.$SyncJobPayload>
  * 
  */
 export type SyncConflict = $Result.DefaultSelection<Prisma.$SyncConflictPayload>
+/**
+ * Model ActivityEvent
+ * 
+ */
+export type ActivityEvent = $Result.DefaultSelection<Prisma.$ActivityEventPayload>
 
 /**
  * Enums
@@ -278,6 +283,39 @@ export const SyncResolutionStrategy: {
 
 export type SyncResolutionStrategy = (typeof SyncResolutionStrategy)[keyof typeof SyncResolutionStrategy]
 
+
+export const EventType: {
+  CONTACT_CREATED: 'CONTACT_CREATED',
+  CONTACT_UPDATED: 'CONTACT_UPDATED',
+  CONTACT_ARCHIVED: 'CONTACT_ARCHIVED',
+  CONTACT_RESTORED: 'CONTACT_RESTORED',
+  CONTACT_DELETED: 'CONTACT_DELETED',
+  CONTACT_MERGED: 'CONTACT_MERGED',
+  CONTACT_MERGE_UNDONE: 'CONTACT_MERGE_UNDONE',
+  CONTACT_IMPORTED: 'CONTACT_IMPORTED',
+  CONTACT_SHARED: 'CONTACT_SHARED',
+  CONTACT_SHARE_RECEIVED: 'CONTACT_SHARE_RECEIVED',
+  SYNC_PULLED: 'SYNC_PULLED',
+  SYNC_PUSHED: 'SYNC_PUSHED',
+  SYNC_CONFLICT_DETECTED: 'SYNC_CONFLICT_DETECTED',
+  SYNC_CONFLICT_RESOLVED: 'SYNC_CONFLICT_RESOLVED'
+};
+
+export type EventType = (typeof EventType)[keyof typeof EventType]
+
+
+export const Actor: {
+  USER: 'USER',
+  SYNC: 'SYNC',
+  IMPORT: 'IMPORT',
+  SHARE: 'SHARE',
+  FAMILY_MEMBER: 'FAMILY_MEMBER',
+  TEAM_MEMBER: 'TEAM_MEMBER',
+  SYSTEM: 'SYSTEM'
+};
+
+export type Actor = (typeof Actor)[keyof typeof Actor]
+
 }
 
 export type AccountLifecycleState = $Enums.AccountLifecycleState
@@ -363,6 +401,14 @@ export const SyncConflictSource: typeof $Enums.SyncConflictSource
 export type SyncResolutionStrategy = $Enums.SyncResolutionStrategy
 
 export const SyncResolutionStrategy: typeof $Enums.SyncResolutionStrategy
+
+export type EventType = $Enums.EventType
+
+export const EventType: typeof $Enums.EventType
+
+export type Actor = $Enums.Actor
+
+export const Actor: typeof $Enums.Actor
 
 /**
  * ##  Prisma Client ʲˢ
@@ -611,6 +657,16 @@ export class PrismaClient<
     * ```
     */
   get syncConflict(): Prisma.SyncConflictDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.activityEvent`: Exposes CRUD operations for the **ActivityEvent** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ActivityEvents
+    * const activityEvents = await prisma.activityEvent.findMany()
+    * ```
+    */
+  get activityEvent(): Prisma.ActivityEventDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1064,7 +1120,8 @@ export namespace Prisma {
     SyncAccount: 'SyncAccount',
     SyncContactLink: 'SyncContactLink',
     SyncJob: 'SyncJob',
-    SyncConflict: 'SyncConflict'
+    SyncConflict: 'SyncConflict',
+    ActivityEvent: 'ActivityEvent'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1083,7 +1140,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncContactLink" | "syncJob" | "syncConflict"
+      modelProps: "user" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncContactLink" | "syncJob" | "syncConflict" | "activityEvent"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2049,6 +2106,80 @@ export namespace Prisma {
           }
         }
       }
+      ActivityEvent: {
+        payload: Prisma.$ActivityEventPayload<ExtArgs>
+        fields: Prisma.ActivityEventFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ActivityEventFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityEventPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ActivityEventFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityEventPayload>
+          }
+          findFirst: {
+            args: Prisma.ActivityEventFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityEventPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ActivityEventFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityEventPayload>
+          }
+          findMany: {
+            args: Prisma.ActivityEventFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityEventPayload>[]
+          }
+          create: {
+            args: Prisma.ActivityEventCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityEventPayload>
+          }
+          createMany: {
+            args: Prisma.ActivityEventCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ActivityEventCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityEventPayload>[]
+          }
+          delete: {
+            args: Prisma.ActivityEventDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityEventPayload>
+          }
+          update: {
+            args: Prisma.ActivityEventUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityEventPayload>
+          }
+          deleteMany: {
+            args: Prisma.ActivityEventDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ActivityEventUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ActivityEventUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityEventPayload>[]
+          }
+          upsert: {
+            args: Prisma.ActivityEventUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ActivityEventPayload>
+          }
+          aggregate: {
+            args: Prisma.ActivityEventAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateActivityEvent>
+          }
+          groupBy: {
+            args: Prisma.ActivityEventGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ActivityEventGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ActivityEventCountArgs<ExtArgs>
+            result: $Utils.Optional<ActivityEventCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2158,6 +2289,7 @@ export namespace Prisma {
     syncContactLink?: SyncContactLinkOmit
     syncJob?: SyncJobOmit
     syncConflict?: SyncConflictOmit
+    activityEvent?: ActivityEventOmit
   }
 
   /* Types for Logging */
@@ -2246,6 +2378,7 @@ export namespace Prisma {
     mergeDecisions: number
     syncAccounts: number
     subscriptions: number
+    activityEvents: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2257,6 +2390,7 @@ export namespace Prisma {
     mergeDecisions?: boolean | UserCountOutputTypeCountMergeDecisionsArgs
     syncAccounts?: boolean | UserCountOutputTypeCountSyncAccountsArgs
     subscriptions?: boolean | UserCountOutputTypeCountSubscriptionsArgs
+    activityEvents?: boolean | UserCountOutputTypeCountActivityEventsArgs
   }
 
   // Custom InputTypes
@@ -2326,6 +2460,13 @@ export namespace Prisma {
     where?: SubscriptionWhereInput
   }
 
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountActivityEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ActivityEventWhereInput
+  }
+
 
   /**
    * Count Type AppPasswordCountOutputType
@@ -2367,6 +2508,7 @@ export namespace Prisma {
     rightMergeSuggestions: number
     syncLinks: number
     syncConflicts: number
+    activityEvents: number
     mergedChildren: number
   }
 
@@ -2375,6 +2517,7 @@ export namespace Prisma {
     rightMergeSuggestions?: boolean | ContactCountOutputTypeCountRightMergeSuggestionsArgs
     syncLinks?: boolean | ContactCountOutputTypeCountSyncLinksArgs
     syncConflicts?: boolean | ContactCountOutputTypeCountSyncConflictsArgs
+    activityEvents?: boolean | ContactCountOutputTypeCountActivityEventsArgs
     mergedChildren?: boolean | ContactCountOutputTypeCountMergedChildrenArgs
   }
 
@@ -2415,6 +2558,13 @@ export namespace Prisma {
    */
   export type ContactCountOutputTypeCountSyncConflictsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: SyncConflictWhereInput
+  }
+
+  /**
+   * ContactCountOutputType without action
+   */
+  export type ContactCountOutputTypeCountActivityEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ActivityEventWhereInput
   }
 
   /**
@@ -2799,6 +2949,7 @@ export namespace Prisma {
     syncAccounts?: boolean | User$syncAccountsArgs<ExtArgs>
     subscriptionCustomer?: boolean | User$subscriptionCustomerArgs<ExtArgs>
     subscriptions?: boolean | User$subscriptionsArgs<ExtArgs>
+    activityEvents?: boolean | User$activityEventsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -2846,6 +2997,7 @@ export namespace Prisma {
     syncAccounts?: boolean | User$syncAccountsArgs<ExtArgs>
     subscriptionCustomer?: boolean | User$subscriptionCustomerArgs<ExtArgs>
     subscriptions?: boolean | User$subscriptionsArgs<ExtArgs>
+    activityEvents?: boolean | User$activityEventsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -2863,6 +3015,7 @@ export namespace Prisma {
       syncAccounts: Prisma.$SyncAccountPayload<ExtArgs>[]
       subscriptionCustomer: Prisma.$SubscriptionCustomerPayload<ExtArgs> | null
       subscriptions: Prisma.$SubscriptionPayload<ExtArgs>[]
+      activityEvents: Prisma.$ActivityEventPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -3276,6 +3429,7 @@ export namespace Prisma {
     syncAccounts<T extends User$syncAccountsArgs<ExtArgs> = {}>(args?: Subset<T, User$syncAccountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     subscriptionCustomer<T extends User$subscriptionCustomerArgs<ExtArgs> = {}>(args?: Subset<T, User$subscriptionCustomerArgs<ExtArgs>>): Prisma__SubscriptionCustomerClient<$Result.GetResult<Prisma.$SubscriptionCustomerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     subscriptions<T extends User$subscriptionsArgs<ExtArgs> = {}>(args?: Subset<T, User$subscriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    activityEvents<T extends User$activityEventsArgs<ExtArgs> = {}>(args?: Subset<T, User$activityEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActivityEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -3909,6 +4063,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: SubscriptionScalarFieldEnum | SubscriptionScalarFieldEnum[]
+  }
+
+  /**
+   * User.activityEvents
+   */
+  export type User$activityEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityEvent
+     */
+    select?: ActivityEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityEvent
+     */
+    omit?: ActivityEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityEventInclude<ExtArgs> | null
+    where?: ActivityEventWhereInput
+    orderBy?: ActivityEventOrderByWithRelationInput | ActivityEventOrderByWithRelationInput[]
+    cursor?: ActivityEventWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ActivityEventScalarFieldEnum | ActivityEventScalarFieldEnum[]
   }
 
   /**
@@ -5505,6 +5683,7 @@ export namespace Prisma {
     rightMergeSuggestions?: boolean | Contact$rightMergeSuggestionsArgs<ExtArgs>
     syncLinks?: boolean | Contact$syncLinksArgs<ExtArgs>
     syncConflicts?: boolean | Contact$syncConflictsArgs<ExtArgs>
+    activityEvents?: boolean | Contact$activityEventsArgs<ExtArgs>
     mergedIntoContact?: boolean | Contact$mergedIntoContactArgs<ExtArgs>
     mergedChildren?: boolean | Contact$mergedChildrenArgs<ExtArgs>
     _count?: boolean | ContactCountOutputTypeDefaultArgs<ExtArgs>
@@ -5656,6 +5835,7 @@ export namespace Prisma {
     rightMergeSuggestions?: boolean | Contact$rightMergeSuggestionsArgs<ExtArgs>
     syncLinks?: boolean | Contact$syncLinksArgs<ExtArgs>
     syncConflicts?: boolean | Contact$syncConflictsArgs<ExtArgs>
+    activityEvents?: boolean | Contact$activityEventsArgs<ExtArgs>
     mergedIntoContact?: boolean | Contact$mergedIntoContactArgs<ExtArgs>
     mergedChildren?: boolean | Contact$mergedChildrenArgs<ExtArgs>
     _count?: boolean | ContactCountOutputTypeDefaultArgs<ExtArgs>
@@ -5680,6 +5860,7 @@ export namespace Prisma {
       rightMergeSuggestions: Prisma.$MergeSuggestionPayload<ExtArgs>[]
       syncLinks: Prisma.$SyncContactLinkPayload<ExtArgs>[]
       syncConflicts: Prisma.$SyncConflictPayload<ExtArgs>[]
+      activityEvents: Prisma.$ActivityEventPayload<ExtArgs>[]
       mergedIntoContact: Prisma.$ContactPayload<ExtArgs> | null
       mergedChildren: Prisma.$ContactPayload<ExtArgs>[]
     }
@@ -6125,6 +6306,7 @@ export namespace Prisma {
     rightMergeSuggestions<T extends Contact$rightMergeSuggestionsArgs<ExtArgs> = {}>(args?: Subset<T, Contact$rightMergeSuggestionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeSuggestionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     syncLinks<T extends Contact$syncLinksArgs<ExtArgs> = {}>(args?: Subset<T, Contact$syncLinksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncContactLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     syncConflicts<T extends Contact$syncConflictsArgs<ExtArgs> = {}>(args?: Subset<T, Contact$syncConflictsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncConflictPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    activityEvents<T extends Contact$activityEventsArgs<ExtArgs> = {}>(args?: Subset<T, Contact$activityEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActivityEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     mergedIntoContact<T extends Contact$mergedIntoContactArgs<ExtArgs> = {}>(args?: Subset<T, Contact$mergedIntoContactArgs<ExtArgs>>): Prisma__ContactClient<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     mergedChildren<T extends Contact$mergedChildrenArgs<ExtArgs> = {}>(args?: Subset<T, Contact$mergedChildrenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -6705,6 +6887,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: SyncConflictScalarFieldEnum | SyncConflictScalarFieldEnum[]
+  }
+
+  /**
+   * Contact.activityEvents
+   */
+  export type Contact$activityEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityEvent
+     */
+    select?: ActivityEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityEvent
+     */
+    omit?: ActivityEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityEventInclude<ExtArgs> | null
+    where?: ActivityEventWhereInput
+    orderBy?: ActivityEventOrderByWithRelationInput | ActivityEventOrderByWithRelationInput[]
+    cursor?: ActivityEventWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ActivityEventScalarFieldEnum | ActivityEventScalarFieldEnum[]
   }
 
   /**
@@ -19638,6 +19844,1126 @@ export namespace Prisma {
 
 
   /**
+   * Model ActivityEvent
+   */
+
+  export type AggregateActivityEvent = {
+    _count: ActivityEventCountAggregateOutputType | null
+    _min: ActivityEventMinAggregateOutputType | null
+    _max: ActivityEventMaxAggregateOutputType | null
+  }
+
+  export type ActivityEventMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    contactId: string | null
+    eventType: $Enums.EventType | null
+    actor: $Enums.Actor | null
+    actorDetail: string | null
+    createdAt: Date | null
+  }
+
+  export type ActivityEventMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    contactId: string | null
+    eventType: $Enums.EventType | null
+    actor: $Enums.Actor | null
+    actorDetail: string | null
+    createdAt: Date | null
+  }
+
+  export type ActivityEventCountAggregateOutputType = {
+    id: number
+    userId: number
+    contactId: number
+    eventType: number
+    actor: number
+    actorDetail: number
+    payload: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type ActivityEventMinAggregateInputType = {
+    id?: true
+    userId?: true
+    contactId?: true
+    eventType?: true
+    actor?: true
+    actorDetail?: true
+    createdAt?: true
+  }
+
+  export type ActivityEventMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    contactId?: true
+    eventType?: true
+    actor?: true
+    actorDetail?: true
+    createdAt?: true
+  }
+
+  export type ActivityEventCountAggregateInputType = {
+    id?: true
+    userId?: true
+    contactId?: true
+    eventType?: true
+    actor?: true
+    actorDetail?: true
+    payload?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type ActivityEventAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ActivityEvent to aggregate.
+     */
+    where?: ActivityEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ActivityEvents to fetch.
+     */
+    orderBy?: ActivityEventOrderByWithRelationInput | ActivityEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ActivityEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ActivityEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ActivityEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ActivityEvents
+    **/
+    _count?: true | ActivityEventCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ActivityEventMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ActivityEventMaxAggregateInputType
+  }
+
+  export type GetActivityEventAggregateType<T extends ActivityEventAggregateArgs> = {
+        [P in keyof T & keyof AggregateActivityEvent]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateActivityEvent[P]>
+      : GetScalarType<T[P], AggregateActivityEvent[P]>
+  }
+
+
+
+
+  export type ActivityEventGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ActivityEventWhereInput
+    orderBy?: ActivityEventOrderByWithAggregationInput | ActivityEventOrderByWithAggregationInput[]
+    by: ActivityEventScalarFieldEnum[] | ActivityEventScalarFieldEnum
+    having?: ActivityEventScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ActivityEventCountAggregateInputType | true
+    _min?: ActivityEventMinAggregateInputType
+    _max?: ActivityEventMaxAggregateInputType
+  }
+
+  export type ActivityEventGroupByOutputType = {
+    id: string
+    userId: string
+    contactId: string | null
+    eventType: $Enums.EventType
+    actor: $Enums.Actor
+    actorDetail: string | null
+    payload: JsonValue
+    createdAt: Date
+    _count: ActivityEventCountAggregateOutputType | null
+    _min: ActivityEventMinAggregateOutputType | null
+    _max: ActivityEventMaxAggregateOutputType | null
+  }
+
+  type GetActivityEventGroupByPayload<T extends ActivityEventGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ActivityEventGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ActivityEventGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ActivityEventGroupByOutputType[P]>
+            : GetScalarType<T[P], ActivityEventGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ActivityEventSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    contactId?: boolean
+    eventType?: boolean
+    actor?: boolean
+    actorDetail?: boolean
+    payload?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    contact?: boolean | ActivityEvent$contactArgs<ExtArgs>
+  }, ExtArgs["result"]["activityEvent"]>
+
+  export type ActivityEventSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    contactId?: boolean
+    eventType?: boolean
+    actor?: boolean
+    actorDetail?: boolean
+    payload?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    contact?: boolean | ActivityEvent$contactArgs<ExtArgs>
+  }, ExtArgs["result"]["activityEvent"]>
+
+  export type ActivityEventSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    contactId?: boolean
+    eventType?: boolean
+    actor?: boolean
+    actorDetail?: boolean
+    payload?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    contact?: boolean | ActivityEvent$contactArgs<ExtArgs>
+  }, ExtArgs["result"]["activityEvent"]>
+
+  export type ActivityEventSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    contactId?: boolean
+    eventType?: boolean
+    actor?: boolean
+    actorDetail?: boolean
+    payload?: boolean
+    createdAt?: boolean
+  }
+
+  export type ActivityEventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "contactId" | "eventType" | "actor" | "actorDetail" | "payload" | "createdAt", ExtArgs["result"]["activityEvent"]>
+  export type ActivityEventInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    contact?: boolean | ActivityEvent$contactArgs<ExtArgs>
+  }
+  export type ActivityEventIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    contact?: boolean | ActivityEvent$contactArgs<ExtArgs>
+  }
+  export type ActivityEventIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    contact?: boolean | ActivityEvent$contactArgs<ExtArgs>
+  }
+
+  export type $ActivityEventPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ActivityEvent"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+      contact: Prisma.$ContactPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      contactId: string | null
+      eventType: $Enums.EventType
+      actor: $Enums.Actor
+      actorDetail: string | null
+      payload: Prisma.JsonValue
+      createdAt: Date
+    }, ExtArgs["result"]["activityEvent"]>
+    composites: {}
+  }
+
+  type ActivityEventGetPayload<S extends boolean | null | undefined | ActivityEventDefaultArgs> = $Result.GetResult<Prisma.$ActivityEventPayload, S>
+
+  type ActivityEventCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ActivityEventFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ActivityEventCountAggregateInputType | true
+    }
+
+  export interface ActivityEventDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ActivityEvent'], meta: { name: 'ActivityEvent' } }
+    /**
+     * Find zero or one ActivityEvent that matches the filter.
+     * @param {ActivityEventFindUniqueArgs} args - Arguments to find a ActivityEvent
+     * @example
+     * // Get one ActivityEvent
+     * const activityEvent = await prisma.activityEvent.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ActivityEventFindUniqueArgs>(args: SelectSubset<T, ActivityEventFindUniqueArgs<ExtArgs>>): Prisma__ActivityEventClient<$Result.GetResult<Prisma.$ActivityEventPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ActivityEvent that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ActivityEventFindUniqueOrThrowArgs} args - Arguments to find a ActivityEvent
+     * @example
+     * // Get one ActivityEvent
+     * const activityEvent = await prisma.activityEvent.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ActivityEventFindUniqueOrThrowArgs>(args: SelectSubset<T, ActivityEventFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ActivityEventClient<$Result.GetResult<Prisma.$ActivityEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ActivityEvent that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActivityEventFindFirstArgs} args - Arguments to find a ActivityEvent
+     * @example
+     * // Get one ActivityEvent
+     * const activityEvent = await prisma.activityEvent.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ActivityEventFindFirstArgs>(args?: SelectSubset<T, ActivityEventFindFirstArgs<ExtArgs>>): Prisma__ActivityEventClient<$Result.GetResult<Prisma.$ActivityEventPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ActivityEvent that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActivityEventFindFirstOrThrowArgs} args - Arguments to find a ActivityEvent
+     * @example
+     * // Get one ActivityEvent
+     * const activityEvent = await prisma.activityEvent.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ActivityEventFindFirstOrThrowArgs>(args?: SelectSubset<T, ActivityEventFindFirstOrThrowArgs<ExtArgs>>): Prisma__ActivityEventClient<$Result.GetResult<Prisma.$ActivityEventPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ActivityEvents that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActivityEventFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ActivityEvents
+     * const activityEvents = await prisma.activityEvent.findMany()
+     * 
+     * // Get first 10 ActivityEvents
+     * const activityEvents = await prisma.activityEvent.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const activityEventWithIdOnly = await prisma.activityEvent.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ActivityEventFindManyArgs>(args?: SelectSubset<T, ActivityEventFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActivityEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ActivityEvent.
+     * @param {ActivityEventCreateArgs} args - Arguments to create a ActivityEvent.
+     * @example
+     * // Create one ActivityEvent
+     * const ActivityEvent = await prisma.activityEvent.create({
+     *   data: {
+     *     // ... data to create a ActivityEvent
+     *   }
+     * })
+     * 
+     */
+    create<T extends ActivityEventCreateArgs>(args: SelectSubset<T, ActivityEventCreateArgs<ExtArgs>>): Prisma__ActivityEventClient<$Result.GetResult<Prisma.$ActivityEventPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ActivityEvents.
+     * @param {ActivityEventCreateManyArgs} args - Arguments to create many ActivityEvents.
+     * @example
+     * // Create many ActivityEvents
+     * const activityEvent = await prisma.activityEvent.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ActivityEventCreateManyArgs>(args?: SelectSubset<T, ActivityEventCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ActivityEvents and returns the data saved in the database.
+     * @param {ActivityEventCreateManyAndReturnArgs} args - Arguments to create many ActivityEvents.
+     * @example
+     * // Create many ActivityEvents
+     * const activityEvent = await prisma.activityEvent.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ActivityEvents and only return the `id`
+     * const activityEventWithIdOnly = await prisma.activityEvent.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ActivityEventCreateManyAndReturnArgs>(args?: SelectSubset<T, ActivityEventCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActivityEventPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ActivityEvent.
+     * @param {ActivityEventDeleteArgs} args - Arguments to delete one ActivityEvent.
+     * @example
+     * // Delete one ActivityEvent
+     * const ActivityEvent = await prisma.activityEvent.delete({
+     *   where: {
+     *     // ... filter to delete one ActivityEvent
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ActivityEventDeleteArgs>(args: SelectSubset<T, ActivityEventDeleteArgs<ExtArgs>>): Prisma__ActivityEventClient<$Result.GetResult<Prisma.$ActivityEventPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ActivityEvent.
+     * @param {ActivityEventUpdateArgs} args - Arguments to update one ActivityEvent.
+     * @example
+     * // Update one ActivityEvent
+     * const activityEvent = await prisma.activityEvent.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ActivityEventUpdateArgs>(args: SelectSubset<T, ActivityEventUpdateArgs<ExtArgs>>): Prisma__ActivityEventClient<$Result.GetResult<Prisma.$ActivityEventPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ActivityEvents.
+     * @param {ActivityEventDeleteManyArgs} args - Arguments to filter ActivityEvents to delete.
+     * @example
+     * // Delete a few ActivityEvents
+     * const { count } = await prisma.activityEvent.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ActivityEventDeleteManyArgs>(args?: SelectSubset<T, ActivityEventDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ActivityEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActivityEventUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ActivityEvents
+     * const activityEvent = await prisma.activityEvent.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ActivityEventUpdateManyArgs>(args: SelectSubset<T, ActivityEventUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ActivityEvents and returns the data updated in the database.
+     * @param {ActivityEventUpdateManyAndReturnArgs} args - Arguments to update many ActivityEvents.
+     * @example
+     * // Update many ActivityEvents
+     * const activityEvent = await prisma.activityEvent.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ActivityEvents and only return the `id`
+     * const activityEventWithIdOnly = await prisma.activityEvent.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ActivityEventUpdateManyAndReturnArgs>(args: SelectSubset<T, ActivityEventUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActivityEventPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ActivityEvent.
+     * @param {ActivityEventUpsertArgs} args - Arguments to update or create a ActivityEvent.
+     * @example
+     * // Update or create a ActivityEvent
+     * const activityEvent = await prisma.activityEvent.upsert({
+     *   create: {
+     *     // ... data to create a ActivityEvent
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ActivityEvent we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ActivityEventUpsertArgs>(args: SelectSubset<T, ActivityEventUpsertArgs<ExtArgs>>): Prisma__ActivityEventClient<$Result.GetResult<Prisma.$ActivityEventPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ActivityEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActivityEventCountArgs} args - Arguments to filter ActivityEvents to count.
+     * @example
+     * // Count the number of ActivityEvents
+     * const count = await prisma.activityEvent.count({
+     *   where: {
+     *     // ... the filter for the ActivityEvents we want to count
+     *   }
+     * })
+    **/
+    count<T extends ActivityEventCountArgs>(
+      args?: Subset<T, ActivityEventCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ActivityEventCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ActivityEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActivityEventAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ActivityEventAggregateArgs>(args: Subset<T, ActivityEventAggregateArgs>): Prisma.PrismaPromise<GetActivityEventAggregateType<T>>
+
+    /**
+     * Group by ActivityEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ActivityEventGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ActivityEventGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ActivityEventGroupByArgs['orderBy'] }
+        : { orderBy?: ActivityEventGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ActivityEventGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetActivityEventGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ActivityEvent model
+   */
+  readonly fields: ActivityEventFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ActivityEvent.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ActivityEventClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    contact<T extends ActivityEvent$contactArgs<ExtArgs> = {}>(args?: Subset<T, ActivityEvent$contactArgs<ExtArgs>>): Prisma__ContactClient<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ActivityEvent model
+   */
+  interface ActivityEventFieldRefs {
+    readonly id: FieldRef<"ActivityEvent", 'String'>
+    readonly userId: FieldRef<"ActivityEvent", 'String'>
+    readonly contactId: FieldRef<"ActivityEvent", 'String'>
+    readonly eventType: FieldRef<"ActivityEvent", 'EventType'>
+    readonly actor: FieldRef<"ActivityEvent", 'Actor'>
+    readonly actorDetail: FieldRef<"ActivityEvent", 'String'>
+    readonly payload: FieldRef<"ActivityEvent", 'Json'>
+    readonly createdAt: FieldRef<"ActivityEvent", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ActivityEvent findUnique
+   */
+  export type ActivityEventFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityEvent
+     */
+    select?: ActivityEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityEvent
+     */
+    omit?: ActivityEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityEventInclude<ExtArgs> | null
+    /**
+     * Filter, which ActivityEvent to fetch.
+     */
+    where: ActivityEventWhereUniqueInput
+  }
+
+  /**
+   * ActivityEvent findUniqueOrThrow
+   */
+  export type ActivityEventFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityEvent
+     */
+    select?: ActivityEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityEvent
+     */
+    omit?: ActivityEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityEventInclude<ExtArgs> | null
+    /**
+     * Filter, which ActivityEvent to fetch.
+     */
+    where: ActivityEventWhereUniqueInput
+  }
+
+  /**
+   * ActivityEvent findFirst
+   */
+  export type ActivityEventFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityEvent
+     */
+    select?: ActivityEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityEvent
+     */
+    omit?: ActivityEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityEventInclude<ExtArgs> | null
+    /**
+     * Filter, which ActivityEvent to fetch.
+     */
+    where?: ActivityEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ActivityEvents to fetch.
+     */
+    orderBy?: ActivityEventOrderByWithRelationInput | ActivityEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ActivityEvents.
+     */
+    cursor?: ActivityEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ActivityEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ActivityEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ActivityEvents.
+     */
+    distinct?: ActivityEventScalarFieldEnum | ActivityEventScalarFieldEnum[]
+  }
+
+  /**
+   * ActivityEvent findFirstOrThrow
+   */
+  export type ActivityEventFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityEvent
+     */
+    select?: ActivityEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityEvent
+     */
+    omit?: ActivityEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityEventInclude<ExtArgs> | null
+    /**
+     * Filter, which ActivityEvent to fetch.
+     */
+    where?: ActivityEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ActivityEvents to fetch.
+     */
+    orderBy?: ActivityEventOrderByWithRelationInput | ActivityEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ActivityEvents.
+     */
+    cursor?: ActivityEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ActivityEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ActivityEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ActivityEvents.
+     */
+    distinct?: ActivityEventScalarFieldEnum | ActivityEventScalarFieldEnum[]
+  }
+
+  /**
+   * ActivityEvent findMany
+   */
+  export type ActivityEventFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityEvent
+     */
+    select?: ActivityEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityEvent
+     */
+    omit?: ActivityEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityEventInclude<ExtArgs> | null
+    /**
+     * Filter, which ActivityEvents to fetch.
+     */
+    where?: ActivityEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ActivityEvents to fetch.
+     */
+    orderBy?: ActivityEventOrderByWithRelationInput | ActivityEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ActivityEvents.
+     */
+    cursor?: ActivityEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ActivityEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ActivityEvents.
+     */
+    skip?: number
+    distinct?: ActivityEventScalarFieldEnum | ActivityEventScalarFieldEnum[]
+  }
+
+  /**
+   * ActivityEvent create
+   */
+  export type ActivityEventCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityEvent
+     */
+    select?: ActivityEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityEvent
+     */
+    omit?: ActivityEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityEventInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ActivityEvent.
+     */
+    data: XOR<ActivityEventCreateInput, ActivityEventUncheckedCreateInput>
+  }
+
+  /**
+   * ActivityEvent createMany
+   */
+  export type ActivityEventCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ActivityEvents.
+     */
+    data: ActivityEventCreateManyInput | ActivityEventCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ActivityEvent createManyAndReturn
+   */
+  export type ActivityEventCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityEvent
+     */
+    select?: ActivityEventSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityEvent
+     */
+    omit?: ActivityEventOmit<ExtArgs> | null
+    /**
+     * The data used to create many ActivityEvents.
+     */
+    data: ActivityEventCreateManyInput | ActivityEventCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityEventIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ActivityEvent update
+   */
+  export type ActivityEventUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityEvent
+     */
+    select?: ActivityEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityEvent
+     */
+    omit?: ActivityEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityEventInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ActivityEvent.
+     */
+    data: XOR<ActivityEventUpdateInput, ActivityEventUncheckedUpdateInput>
+    /**
+     * Choose, which ActivityEvent to update.
+     */
+    where: ActivityEventWhereUniqueInput
+  }
+
+  /**
+   * ActivityEvent updateMany
+   */
+  export type ActivityEventUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ActivityEvents.
+     */
+    data: XOR<ActivityEventUpdateManyMutationInput, ActivityEventUncheckedUpdateManyInput>
+    /**
+     * Filter which ActivityEvents to update
+     */
+    where?: ActivityEventWhereInput
+    /**
+     * Limit how many ActivityEvents to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ActivityEvent updateManyAndReturn
+   */
+  export type ActivityEventUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityEvent
+     */
+    select?: ActivityEventSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityEvent
+     */
+    omit?: ActivityEventOmit<ExtArgs> | null
+    /**
+     * The data used to update ActivityEvents.
+     */
+    data: XOR<ActivityEventUpdateManyMutationInput, ActivityEventUncheckedUpdateManyInput>
+    /**
+     * Filter which ActivityEvents to update
+     */
+    where?: ActivityEventWhereInput
+    /**
+     * Limit how many ActivityEvents to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityEventIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ActivityEvent upsert
+   */
+  export type ActivityEventUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityEvent
+     */
+    select?: ActivityEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityEvent
+     */
+    omit?: ActivityEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityEventInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ActivityEvent to update in case it exists.
+     */
+    where: ActivityEventWhereUniqueInput
+    /**
+     * In case the ActivityEvent found by the `where` argument doesn't exist, create a new ActivityEvent with this data.
+     */
+    create: XOR<ActivityEventCreateInput, ActivityEventUncheckedCreateInput>
+    /**
+     * In case the ActivityEvent was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ActivityEventUpdateInput, ActivityEventUncheckedUpdateInput>
+  }
+
+  /**
+   * ActivityEvent delete
+   */
+  export type ActivityEventDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityEvent
+     */
+    select?: ActivityEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityEvent
+     */
+    omit?: ActivityEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityEventInclude<ExtArgs> | null
+    /**
+     * Filter which ActivityEvent to delete.
+     */
+    where: ActivityEventWhereUniqueInput
+  }
+
+  /**
+   * ActivityEvent deleteMany
+   */
+  export type ActivityEventDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ActivityEvents to delete
+     */
+    where?: ActivityEventWhereInput
+    /**
+     * Limit how many ActivityEvents to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ActivityEvent.contact
+   */
+  export type ActivityEvent$contactArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Contact
+     */
+    select?: ContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Contact
+     */
+    omit?: ContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactInclude<ExtArgs> | null
+    where?: ContactWhereInput
+  }
+
+  /**
+   * ActivityEvent without action
+   */
+  export type ActivityEventDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ActivityEvent
+     */
+    select?: ActivityEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ActivityEvent
+     */
+    omit?: ActivityEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ActivityEventInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -19962,6 +21288,20 @@ export namespace Prisma {
   };
 
   export type SyncConflictScalarFieldEnum = (typeof SyncConflictScalarFieldEnum)[keyof typeof SyncConflictScalarFieldEnum]
+
+
+  export const ActivityEventScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    contactId: 'contactId',
+    eventType: 'eventType',
+    actor: 'actor',
+    actorDetail: 'actorDetail',
+    payload: 'payload',
+    createdAt: 'createdAt'
+  };
+
+  export type ActivityEventScalarFieldEnum = (typeof ActivityEventScalarFieldEnum)[keyof typeof ActivityEventScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -20375,6 +21715,34 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'EventType'
+   */
+  export type EnumEventTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EventType'>
+    
+
+
+  /**
+   * Reference to a field of type 'EventType[]'
+   */
+  export type ListEnumEventTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EventType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Actor'
+   */
+  export type EnumActorFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Actor'>
+    
+
+
+  /**
+   * Reference to a field of type 'Actor[]'
+   */
+  export type ListEnumActorFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Actor[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -20412,6 +21780,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountListRelationFilter
     subscriptionCustomer?: XOR<SubscriptionCustomerNullableScalarRelationFilter, SubscriptionCustomerWhereInput> | null
     subscriptions?: SubscriptionListRelationFilter
+    activityEvents?: ActivityEventListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -20432,6 +21801,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountOrderByRelationAggregateInput
     subscriptionCustomer?: SubscriptionCustomerOrderByWithRelationInput
     subscriptions?: SubscriptionOrderByRelationAggregateInput
+    activityEvents?: ActivityEventOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -20455,6 +21825,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountListRelationFilter
     subscriptionCustomer?: XOR<SubscriptionCustomerNullableScalarRelationFilter, SubscriptionCustomerWhereInput> | null
     subscriptions?: SubscriptionListRelationFilter
+    activityEvents?: ActivityEventListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -20609,6 +21980,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionListRelationFilter
     syncLinks?: SyncContactLinkListRelationFilter
     syncConflicts?: SyncConflictListRelationFilter
+    activityEvents?: ActivityEventListRelationFilter
     mergedIntoContact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
     mergedChildren?: ContactListRelationFilter
   }
@@ -20661,6 +22033,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionOrderByRelationAggregateInput
     syncLinks?: SyncContactLinkOrderByRelationAggregateInput
     syncConflicts?: SyncConflictOrderByRelationAggregateInput
+    activityEvents?: ActivityEventOrderByRelationAggregateInput
     mergedIntoContact?: ContactOrderByWithRelationInput
     mergedChildren?: ContactOrderByRelationAggregateInput
   }
@@ -20716,6 +22089,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionListRelationFilter
     syncLinks?: SyncContactLinkListRelationFilter
     syncConflicts?: SyncConflictListRelationFilter
+    activityEvents?: ActivityEventListRelationFilter
     mergedIntoContact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
     mergedChildren?: ContactListRelationFilter
   }, "id" | "syncUid">
@@ -22073,6 +23447,79 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"SyncConflict"> | Date | string
   }
 
+  export type ActivityEventWhereInput = {
+    AND?: ActivityEventWhereInput | ActivityEventWhereInput[]
+    OR?: ActivityEventWhereInput[]
+    NOT?: ActivityEventWhereInput | ActivityEventWhereInput[]
+    id?: StringFilter<"ActivityEvent"> | string
+    userId?: StringFilter<"ActivityEvent"> | string
+    contactId?: StringNullableFilter<"ActivityEvent"> | string | null
+    eventType?: EnumEventTypeFilter<"ActivityEvent"> | $Enums.EventType
+    actor?: EnumActorFilter<"ActivityEvent"> | $Enums.Actor
+    actorDetail?: StringNullableFilter<"ActivityEvent"> | string | null
+    payload?: JsonFilter<"ActivityEvent">
+    createdAt?: DateTimeFilter<"ActivityEvent"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    contact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
+  }
+
+  export type ActivityEventOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    contactId?: SortOrderInput | SortOrder
+    eventType?: SortOrder
+    actor?: SortOrder
+    actorDetail?: SortOrderInput | SortOrder
+    payload?: SortOrder
+    createdAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+    contact?: ContactOrderByWithRelationInput
+  }
+
+  export type ActivityEventWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: ActivityEventWhereInput | ActivityEventWhereInput[]
+    OR?: ActivityEventWhereInput[]
+    NOT?: ActivityEventWhereInput | ActivityEventWhereInput[]
+    userId?: StringFilter<"ActivityEvent"> | string
+    contactId?: StringNullableFilter<"ActivityEvent"> | string | null
+    eventType?: EnumEventTypeFilter<"ActivityEvent"> | $Enums.EventType
+    actor?: EnumActorFilter<"ActivityEvent"> | $Enums.Actor
+    actorDetail?: StringNullableFilter<"ActivityEvent"> | string | null
+    payload?: JsonFilter<"ActivityEvent">
+    createdAt?: DateTimeFilter<"ActivityEvent"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    contact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
+  }, "id">
+
+  export type ActivityEventOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    contactId?: SortOrderInput | SortOrder
+    eventType?: SortOrder
+    actor?: SortOrder
+    actorDetail?: SortOrderInput | SortOrder
+    payload?: SortOrder
+    createdAt?: SortOrder
+    _count?: ActivityEventCountOrderByAggregateInput
+    _max?: ActivityEventMaxOrderByAggregateInput
+    _min?: ActivityEventMinOrderByAggregateInput
+  }
+
+  export type ActivityEventScalarWhereWithAggregatesInput = {
+    AND?: ActivityEventScalarWhereWithAggregatesInput | ActivityEventScalarWhereWithAggregatesInput[]
+    OR?: ActivityEventScalarWhereWithAggregatesInput[]
+    NOT?: ActivityEventScalarWhereWithAggregatesInput | ActivityEventScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ActivityEvent"> | string
+    userId?: StringWithAggregatesFilter<"ActivityEvent"> | string
+    contactId?: StringNullableWithAggregatesFilter<"ActivityEvent"> | string | null
+    eventType?: EnumEventTypeWithAggregatesFilter<"ActivityEvent"> | $Enums.EventType
+    actor?: EnumActorWithAggregatesFilter<"ActivityEvent"> | $Enums.Actor
+    actorDetail?: StringNullableWithAggregatesFilter<"ActivityEvent"> | string | null
+    payload?: JsonWithAggregatesFilter<"ActivityEvent">
+    createdAt?: DateTimeWithAggregatesFilter<"ActivityEvent"> | Date | string
+  }
+
   export type UserCreateInput = {
     id?: string
     name?: string | null
@@ -22091,6 +23538,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -22111,6 +23559,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -22131,6 +23580,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -22151,6 +23601,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -22311,6 +23762,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -22361,6 +23813,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -22409,6 +23862,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -22459,6 +23913,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -24057,6 +25512,81 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ActivityEventCreateInput = {
+    id?: string
+    eventType: $Enums.EventType
+    actor: $Enums.Actor
+    actorDetail?: string | null
+    payload?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutActivityEventsInput
+    contact?: ContactCreateNestedOneWithoutActivityEventsInput
+  }
+
+  export type ActivityEventUncheckedCreateInput = {
+    id?: string
+    userId: string
+    contactId?: string | null
+    eventType: $Enums.EventType
+    actor: $Enums.Actor
+    actorDetail?: string | null
+    payload?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type ActivityEventUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    eventType?: EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType
+    actor?: EnumActorFieldUpdateOperationsInput | $Enums.Actor
+    actorDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    payload?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutActivityEventsNestedInput
+    contact?: ContactUpdateOneWithoutActivityEventsNestedInput
+  }
+
+  export type ActivityEventUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    eventType?: EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType
+    actor?: EnumActorFieldUpdateOperationsInput | $Enums.Actor
+    actorDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    payload?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ActivityEventCreateManyInput = {
+    id?: string
+    userId: string
+    contactId?: string | null
+    eventType: $Enums.EventType
+    actor: $Enums.Actor
+    actorDetail?: string | null
+    payload?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type ActivityEventUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    eventType?: EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType
+    actor?: EnumActorFieldUpdateOperationsInput | $Enums.Actor
+    actorDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    payload?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ActivityEventUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    eventType?: EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType
+    actor?: EnumActorFieldUpdateOperationsInput | $Enums.Actor
+    actorDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    payload?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -24163,6 +25693,12 @@ export namespace Prisma {
     none?: SubscriptionWhereInput
   }
 
+  export type ActivityEventListRelationFilter = {
+    every?: ActivityEventWhereInput
+    some?: ActivityEventWhereInput
+    none?: ActivityEventWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -24197,6 +25733,10 @@ export namespace Prisma {
   }
 
   export type SubscriptionOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ActivityEventOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -25790,6 +27330,71 @@ export namespace Prisma {
     _max?: NestedEnumSyncResolutionStrategyNullableFilter<$PrismaModel>
   }
 
+  export type EnumEventTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.EventType | EnumEventTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.EventType[] | ListEnumEventTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EventType[] | ListEnumEventTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumEventTypeFilter<$PrismaModel> | $Enums.EventType
+  }
+
+  export type EnumActorFilter<$PrismaModel = never> = {
+    equals?: $Enums.Actor | EnumActorFieldRefInput<$PrismaModel>
+    in?: $Enums.Actor[] | ListEnumActorFieldRefInput<$PrismaModel>
+    notIn?: $Enums.Actor[] | ListEnumActorFieldRefInput<$PrismaModel>
+    not?: NestedEnumActorFilter<$PrismaModel> | $Enums.Actor
+  }
+
+  export type ActivityEventCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    contactId?: SortOrder
+    eventType?: SortOrder
+    actor?: SortOrder
+    actorDetail?: SortOrder
+    payload?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ActivityEventMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    contactId?: SortOrder
+    eventType?: SortOrder
+    actor?: SortOrder
+    actorDetail?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ActivityEventMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    contactId?: SortOrder
+    eventType?: SortOrder
+    actor?: SortOrder
+    actorDetail?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type EnumEventTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EventType | EnumEventTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.EventType[] | ListEnumEventTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EventType[] | ListEnumEventTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumEventTypeWithAggregatesFilter<$PrismaModel> | $Enums.EventType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumEventTypeFilter<$PrismaModel>
+    _max?: NestedEnumEventTypeFilter<$PrismaModel>
+  }
+
+  export type EnumActorWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.Actor | EnumActorFieldRefInput<$PrismaModel>
+    in?: $Enums.Actor[] | ListEnumActorFieldRefInput<$PrismaModel>
+    notIn?: $Enums.Actor[] | ListEnumActorFieldRefInput<$PrismaModel>
+    not?: NestedEnumActorWithAggregatesFilter<$PrismaModel> | $Enums.Actor
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumActorFilter<$PrismaModel>
+    _max?: NestedEnumActorFilter<$PrismaModel>
+  }
+
   export type AppPasswordCreateNestedManyWithoutUserInput = {
     create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
@@ -25852,6 +27457,13 @@ export namespace Prisma {
     connect?: SubscriptionWhereUniqueInput | SubscriptionWhereUniqueInput[]
   }
 
+  export type ActivityEventCreateNestedManyWithoutUserInput = {
+    create?: XOR<ActivityEventCreateWithoutUserInput, ActivityEventUncheckedCreateWithoutUserInput> | ActivityEventCreateWithoutUserInput[] | ActivityEventUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ActivityEventCreateOrConnectWithoutUserInput | ActivityEventCreateOrConnectWithoutUserInput[]
+    createMany?: ActivityEventCreateManyUserInputEnvelope
+    connect?: ActivityEventWhereUniqueInput | ActivityEventWhereUniqueInput[]
+  }
+
   export type AppPasswordUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
@@ -25912,6 +27524,13 @@ export namespace Prisma {
     connectOrCreate?: SubscriptionCreateOrConnectWithoutUserInput | SubscriptionCreateOrConnectWithoutUserInput[]
     createMany?: SubscriptionCreateManyUserInputEnvelope
     connect?: SubscriptionWhereUniqueInput | SubscriptionWhereUniqueInput[]
+  }
+
+  export type ActivityEventUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<ActivityEventCreateWithoutUserInput, ActivityEventUncheckedCreateWithoutUserInput> | ActivityEventCreateWithoutUserInput[] | ActivityEventUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ActivityEventCreateOrConnectWithoutUserInput | ActivityEventCreateOrConnectWithoutUserInput[]
+    createMany?: ActivityEventCreateManyUserInputEnvelope
+    connect?: ActivityEventWhereUniqueInput | ActivityEventWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -26056,6 +27675,20 @@ export namespace Prisma {
     deleteMany?: SubscriptionScalarWhereInput | SubscriptionScalarWhereInput[]
   }
 
+  export type ActivityEventUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ActivityEventCreateWithoutUserInput, ActivityEventUncheckedCreateWithoutUserInput> | ActivityEventCreateWithoutUserInput[] | ActivityEventUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ActivityEventCreateOrConnectWithoutUserInput | ActivityEventCreateOrConnectWithoutUserInput[]
+    upsert?: ActivityEventUpsertWithWhereUniqueWithoutUserInput | ActivityEventUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ActivityEventCreateManyUserInputEnvelope
+    set?: ActivityEventWhereUniqueInput | ActivityEventWhereUniqueInput[]
+    disconnect?: ActivityEventWhereUniqueInput | ActivityEventWhereUniqueInput[]
+    delete?: ActivityEventWhereUniqueInput | ActivityEventWhereUniqueInput[]
+    connect?: ActivityEventWhereUniqueInput | ActivityEventWhereUniqueInput[]
+    update?: ActivityEventUpdateWithWhereUniqueWithoutUserInput | ActivityEventUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ActivityEventUpdateManyWithWhereWithoutUserInput | ActivityEventUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ActivityEventScalarWhereInput | ActivityEventScalarWhereInput[]
+  }
+
   export type AppPasswordUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
@@ -26178,6 +27811,20 @@ export namespace Prisma {
     deleteMany?: SubscriptionScalarWhereInput | SubscriptionScalarWhereInput[]
   }
 
+  export type ActivityEventUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ActivityEventCreateWithoutUserInput, ActivityEventUncheckedCreateWithoutUserInput> | ActivityEventCreateWithoutUserInput[] | ActivityEventUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ActivityEventCreateOrConnectWithoutUserInput | ActivityEventCreateOrConnectWithoutUserInput[]
+    upsert?: ActivityEventUpsertWithWhereUniqueWithoutUserInput | ActivityEventUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ActivityEventCreateManyUserInputEnvelope
+    set?: ActivityEventWhereUniqueInput | ActivityEventWhereUniqueInput[]
+    disconnect?: ActivityEventWhereUniqueInput | ActivityEventWhereUniqueInput[]
+    delete?: ActivityEventWhereUniqueInput | ActivityEventWhereUniqueInput[]
+    connect?: ActivityEventWhereUniqueInput | ActivityEventWhereUniqueInput[]
+    update?: ActivityEventUpdateWithWhereUniqueWithoutUserInput | ActivityEventUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ActivityEventUpdateManyWithWhereWithoutUserInput | ActivityEventUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ActivityEventScalarWhereInput | ActivityEventScalarWhereInput[]
+  }
+
   export type UserCreateNestedOneWithoutAppPasswordsInput = {
     create?: XOR<UserCreateWithoutAppPasswordsInput, UserUncheckedCreateWithoutAppPasswordsInput>
     connectOrCreate?: UserCreateOrConnectWithoutAppPasswordsInput
@@ -26278,6 +27925,13 @@ export namespace Prisma {
     connect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
   }
 
+  export type ActivityEventCreateNestedManyWithoutContactInput = {
+    create?: XOR<ActivityEventCreateWithoutContactInput, ActivityEventUncheckedCreateWithoutContactInput> | ActivityEventCreateWithoutContactInput[] | ActivityEventUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: ActivityEventCreateOrConnectWithoutContactInput | ActivityEventCreateOrConnectWithoutContactInput[]
+    createMany?: ActivityEventCreateManyContactInputEnvelope
+    connect?: ActivityEventWhereUniqueInput | ActivityEventWhereUniqueInput[]
+  }
+
   export type ContactCreateNestedOneWithoutMergedChildrenInput = {
     create?: XOR<ContactCreateWithoutMergedChildrenInput, ContactUncheckedCreateWithoutMergedChildrenInput>
     connectOrCreate?: ContactCreateOrConnectWithoutMergedChildrenInput
@@ -26317,6 +27971,13 @@ export namespace Prisma {
     connectOrCreate?: SyncConflictCreateOrConnectWithoutContactInput | SyncConflictCreateOrConnectWithoutContactInput[]
     createMany?: SyncConflictCreateManyContactInputEnvelope
     connect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+  }
+
+  export type ActivityEventUncheckedCreateNestedManyWithoutContactInput = {
+    create?: XOR<ActivityEventCreateWithoutContactInput, ActivityEventUncheckedCreateWithoutContactInput> | ActivityEventCreateWithoutContactInput[] | ActivityEventUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: ActivityEventCreateOrConnectWithoutContactInput | ActivityEventCreateOrConnectWithoutContactInput[]
+    createMany?: ActivityEventCreateManyContactInputEnvelope
+    connect?: ActivityEventWhereUniqueInput | ActivityEventWhereUniqueInput[]
   }
 
   export type ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput = {
@@ -26408,6 +28069,20 @@ export namespace Prisma {
     deleteMany?: SyncConflictScalarWhereInput | SyncConflictScalarWhereInput[]
   }
 
+  export type ActivityEventUpdateManyWithoutContactNestedInput = {
+    create?: XOR<ActivityEventCreateWithoutContactInput, ActivityEventUncheckedCreateWithoutContactInput> | ActivityEventCreateWithoutContactInput[] | ActivityEventUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: ActivityEventCreateOrConnectWithoutContactInput | ActivityEventCreateOrConnectWithoutContactInput[]
+    upsert?: ActivityEventUpsertWithWhereUniqueWithoutContactInput | ActivityEventUpsertWithWhereUniqueWithoutContactInput[]
+    createMany?: ActivityEventCreateManyContactInputEnvelope
+    set?: ActivityEventWhereUniqueInput | ActivityEventWhereUniqueInput[]
+    disconnect?: ActivityEventWhereUniqueInput | ActivityEventWhereUniqueInput[]
+    delete?: ActivityEventWhereUniqueInput | ActivityEventWhereUniqueInput[]
+    connect?: ActivityEventWhereUniqueInput | ActivityEventWhereUniqueInput[]
+    update?: ActivityEventUpdateWithWhereUniqueWithoutContactInput | ActivityEventUpdateWithWhereUniqueWithoutContactInput[]
+    updateMany?: ActivityEventUpdateManyWithWhereWithoutContactInput | ActivityEventUpdateManyWithWhereWithoutContactInput[]
+    deleteMany?: ActivityEventScalarWhereInput | ActivityEventScalarWhereInput[]
+  }
+
   export type ContactUpdateOneWithoutMergedChildrenNestedInput = {
     create?: XOR<ContactCreateWithoutMergedChildrenInput, ContactUncheckedCreateWithoutMergedChildrenInput>
     connectOrCreate?: ContactCreateOrConnectWithoutMergedChildrenInput
@@ -26486,6 +28161,20 @@ export namespace Prisma {
     update?: SyncConflictUpdateWithWhereUniqueWithoutContactInput | SyncConflictUpdateWithWhereUniqueWithoutContactInput[]
     updateMany?: SyncConflictUpdateManyWithWhereWithoutContactInput | SyncConflictUpdateManyWithWhereWithoutContactInput[]
     deleteMany?: SyncConflictScalarWhereInput | SyncConflictScalarWhereInput[]
+  }
+
+  export type ActivityEventUncheckedUpdateManyWithoutContactNestedInput = {
+    create?: XOR<ActivityEventCreateWithoutContactInput, ActivityEventUncheckedCreateWithoutContactInput> | ActivityEventCreateWithoutContactInput[] | ActivityEventUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: ActivityEventCreateOrConnectWithoutContactInput | ActivityEventCreateOrConnectWithoutContactInput[]
+    upsert?: ActivityEventUpsertWithWhereUniqueWithoutContactInput | ActivityEventUpsertWithWhereUniqueWithoutContactInput[]
+    createMany?: ActivityEventCreateManyContactInputEnvelope
+    set?: ActivityEventWhereUniqueInput | ActivityEventWhereUniqueInput[]
+    disconnect?: ActivityEventWhereUniqueInput | ActivityEventWhereUniqueInput[]
+    delete?: ActivityEventWhereUniqueInput | ActivityEventWhereUniqueInput[]
+    connect?: ActivityEventWhereUniqueInput | ActivityEventWhereUniqueInput[]
+    update?: ActivityEventUpdateWithWhereUniqueWithoutContactInput | ActivityEventUpdateWithWhereUniqueWithoutContactInput[]
+    updateMany?: ActivityEventUpdateManyWithWhereWithoutContactInput | ActivityEventUpdateManyWithWhereWithoutContactInput[]
+    deleteMany?: ActivityEventScalarWhereInput | ActivityEventScalarWhereInput[]
   }
 
   export type ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput = {
@@ -27144,6 +28833,44 @@ export namespace Prisma {
     update?: XOR<XOR<AppPasswordUpdateToOneWithWhereWithoutSyncConflictsInput, AppPasswordUpdateWithoutSyncConflictsInput>, AppPasswordUncheckedUpdateWithoutSyncConflictsInput>
   }
 
+  export type UserCreateNestedOneWithoutActivityEventsInput = {
+    create?: XOR<UserCreateWithoutActivityEventsInput, UserUncheckedCreateWithoutActivityEventsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutActivityEventsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type ContactCreateNestedOneWithoutActivityEventsInput = {
+    create?: XOR<ContactCreateWithoutActivityEventsInput, ContactUncheckedCreateWithoutActivityEventsInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutActivityEventsInput
+    connect?: ContactWhereUniqueInput
+  }
+
+  export type EnumEventTypeFieldUpdateOperationsInput = {
+    set?: $Enums.EventType
+  }
+
+  export type EnumActorFieldUpdateOperationsInput = {
+    set?: $Enums.Actor
+  }
+
+  export type UserUpdateOneRequiredWithoutActivityEventsNestedInput = {
+    create?: XOR<UserCreateWithoutActivityEventsInput, UserUncheckedCreateWithoutActivityEventsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutActivityEventsInput
+    upsert?: UserUpsertWithoutActivityEventsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutActivityEventsInput, UserUpdateWithoutActivityEventsInput>, UserUncheckedUpdateWithoutActivityEventsInput>
+  }
+
+  export type ContactUpdateOneWithoutActivityEventsNestedInput = {
+    create?: XOR<ContactCreateWithoutActivityEventsInput, ContactUncheckedCreateWithoutActivityEventsInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutActivityEventsInput
+    upsert?: ContactUpsertWithoutActivityEventsInput
+    disconnect?: ContactWhereInput | boolean
+    delete?: ContactWhereInput | boolean
+    connect?: ContactWhereUniqueInput
+    update?: XOR<XOR<ContactUpdateToOneWithWhereWithoutActivityEventsInput, ContactUpdateWithoutActivityEventsInput>, ContactUncheckedUpdateWithoutActivityEventsInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -27748,6 +29475,40 @@ export namespace Prisma {
     _max?: NestedEnumSyncResolutionStrategyNullableFilter<$PrismaModel>
   }
 
+  export type NestedEnumEventTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.EventType | EnumEventTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.EventType[] | ListEnumEventTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EventType[] | ListEnumEventTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumEventTypeFilter<$PrismaModel> | $Enums.EventType
+  }
+
+  export type NestedEnumActorFilter<$PrismaModel = never> = {
+    equals?: $Enums.Actor | EnumActorFieldRefInput<$PrismaModel>
+    in?: $Enums.Actor[] | ListEnumActorFieldRefInput<$PrismaModel>
+    notIn?: $Enums.Actor[] | ListEnumActorFieldRefInput<$PrismaModel>
+    not?: NestedEnumActorFilter<$PrismaModel> | $Enums.Actor
+  }
+
+  export type NestedEnumEventTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EventType | EnumEventTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.EventType[] | ListEnumEventTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EventType[] | ListEnumEventTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumEventTypeWithAggregatesFilter<$PrismaModel> | $Enums.EventType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumEventTypeFilter<$PrismaModel>
+    _max?: NestedEnumEventTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumActorWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.Actor | EnumActorFieldRefInput<$PrismaModel>
+    in?: $Enums.Actor[] | ListEnumActorFieldRefInput<$PrismaModel>
+    notIn?: $Enums.Actor[] | ListEnumActorFieldRefInput<$PrismaModel>
+    not?: NestedEnumActorWithAggregatesFilter<$PrismaModel> | $Enums.Actor
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumActorFilter<$PrismaModel>
+    _max?: NestedEnumActorFilter<$PrismaModel>
+  }
+
   export type AppPasswordCreateWithoutUserInput = {
     id?: string
     label: string
@@ -27824,6 +29585,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -27873,6 +29635,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -28230,6 +29993,36 @@ export namespace Prisma {
 
   export type SubscriptionCreateManyUserInputEnvelope = {
     data: SubscriptionCreateManyUserInput | SubscriptionCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ActivityEventCreateWithoutUserInput = {
+    id?: string
+    eventType: $Enums.EventType
+    actor: $Enums.Actor
+    actorDetail?: string | null
+    payload?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    contact?: ContactCreateNestedOneWithoutActivityEventsInput
+  }
+
+  export type ActivityEventUncheckedCreateWithoutUserInput = {
+    id?: string
+    contactId?: string | null
+    eventType: $Enums.EventType
+    actor: $Enums.Actor
+    actorDetail?: string | null
+    payload?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type ActivityEventCreateOrConnectWithoutUserInput = {
+    where: ActivityEventWhereUniqueInput
+    create: XOR<ActivityEventCreateWithoutUserInput, ActivityEventUncheckedCreateWithoutUserInput>
+  }
+
+  export type ActivityEventCreateManyUserInputEnvelope = {
+    data: ActivityEventCreateManyUserInput | ActivityEventCreateManyUserInput[]
     skipDuplicates?: boolean
   }
 
@@ -28603,6 +30396,36 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"Subscription"> | Date | string
   }
 
+  export type ActivityEventUpsertWithWhereUniqueWithoutUserInput = {
+    where: ActivityEventWhereUniqueInput
+    update: XOR<ActivityEventUpdateWithoutUserInput, ActivityEventUncheckedUpdateWithoutUserInput>
+    create: XOR<ActivityEventCreateWithoutUserInput, ActivityEventUncheckedCreateWithoutUserInput>
+  }
+
+  export type ActivityEventUpdateWithWhereUniqueWithoutUserInput = {
+    where: ActivityEventWhereUniqueInput
+    data: XOR<ActivityEventUpdateWithoutUserInput, ActivityEventUncheckedUpdateWithoutUserInput>
+  }
+
+  export type ActivityEventUpdateManyWithWhereWithoutUserInput = {
+    where: ActivityEventScalarWhereInput
+    data: XOR<ActivityEventUpdateManyMutationInput, ActivityEventUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type ActivityEventScalarWhereInput = {
+    AND?: ActivityEventScalarWhereInput | ActivityEventScalarWhereInput[]
+    OR?: ActivityEventScalarWhereInput[]
+    NOT?: ActivityEventScalarWhereInput | ActivityEventScalarWhereInput[]
+    id?: StringFilter<"ActivityEvent"> | string
+    userId?: StringFilter<"ActivityEvent"> | string
+    contactId?: StringNullableFilter<"ActivityEvent"> | string | null
+    eventType?: EnumEventTypeFilter<"ActivityEvent"> | $Enums.EventType
+    actor?: EnumActorFilter<"ActivityEvent"> | $Enums.Actor
+    actorDetail?: StringNullableFilter<"ActivityEvent"> | string | null
+    payload?: JsonFilter<"ActivityEvent">
+    createdAt?: DateTimeFilter<"ActivityEvent"> | Date | string
+  }
+
   export type UserCreateWithoutAppPasswordsInput = {
     id?: string
     name?: string | null
@@ -28620,6 +30443,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAppPasswordsInput = {
@@ -28639,6 +30463,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAppPasswordsInput = {
@@ -28728,6 +30553,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAppPasswordsInput = {
@@ -28747,6 +30573,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SyncConflictUpsertWithWhereUniqueWithoutAppPasswordInput = {
@@ -28808,6 +30635,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutContactsInput = {
@@ -28827,6 +30655,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutContactsInput = {
@@ -29081,6 +30910,36 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ActivityEventCreateWithoutContactInput = {
+    id?: string
+    eventType: $Enums.EventType
+    actor: $Enums.Actor
+    actorDetail?: string | null
+    payload?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutActivityEventsInput
+  }
+
+  export type ActivityEventUncheckedCreateWithoutContactInput = {
+    id?: string
+    userId: string
+    eventType: $Enums.EventType
+    actor: $Enums.Actor
+    actorDetail?: string | null
+    payload?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
+  export type ActivityEventCreateOrConnectWithoutContactInput = {
+    where: ActivityEventWhereUniqueInput
+    create: XOR<ActivityEventCreateWithoutContactInput, ActivityEventUncheckedCreateWithoutContactInput>
+  }
+
+  export type ActivityEventCreateManyContactInputEnvelope = {
+    data: ActivityEventCreateManyContactInput | ActivityEventCreateManyContactInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ContactCreateWithoutMergedChildrenInput = {
     id?: string
     syncUid?: string
@@ -29126,6 +30985,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
   }
 
@@ -29175,6 +31035,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
   }
 
   export type ContactCreateOrConnectWithoutMergedChildrenInput = {
@@ -29227,6 +31088,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -29275,6 +31137,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -29316,6 +31179,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutContactsInput = {
@@ -29335,6 +31199,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ImportJobUpsertWithoutContactsInput = {
@@ -29481,6 +31346,22 @@ export namespace Prisma {
     data: XOR<SyncConflictUpdateManyMutationInput, SyncConflictUncheckedUpdateManyWithoutContactInput>
   }
 
+  export type ActivityEventUpsertWithWhereUniqueWithoutContactInput = {
+    where: ActivityEventWhereUniqueInput
+    update: XOR<ActivityEventUpdateWithoutContactInput, ActivityEventUncheckedUpdateWithoutContactInput>
+    create: XOR<ActivityEventCreateWithoutContactInput, ActivityEventUncheckedCreateWithoutContactInput>
+  }
+
+  export type ActivityEventUpdateWithWhereUniqueWithoutContactInput = {
+    where: ActivityEventWhereUniqueInput
+    data: XOR<ActivityEventUpdateWithoutContactInput, ActivityEventUncheckedUpdateWithoutContactInput>
+  }
+
+  export type ActivityEventUpdateManyWithWhereWithoutContactInput = {
+    where: ActivityEventScalarWhereInput
+    data: XOR<ActivityEventUpdateManyMutationInput, ActivityEventUncheckedUpdateManyWithoutContactInput>
+  }
+
   export type ContactUpsertWithoutMergedChildrenInput = {
     update: XOR<ContactUpdateWithoutMergedChildrenInput, ContactUncheckedUpdateWithoutMergedChildrenInput>
     create: XOR<ContactCreateWithoutMergedChildrenInput, ContactUncheckedCreateWithoutMergedChildrenInput>
@@ -29537,6 +31418,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
   }
 
@@ -29586,6 +31468,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
   }
 
   export type ContactUpsertWithWhereUniqueWithoutMergedIntoContactInput = {
@@ -29621,6 +31504,7 @@ export namespace Prisma {
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSubscriptionCustomerInput = {
@@ -29640,6 +31524,7 @@ export namespace Prisma {
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSubscriptionCustomerInput = {
@@ -29737,6 +31622,7 @@ export namespace Prisma {
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSubscriptionCustomerInput = {
@@ -29756,6 +31642,7 @@ export namespace Prisma {
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SubscriptionUpsertWithWhereUniqueWithoutSubscriptionCustomerInput = {
@@ -29791,6 +31678,7 @@ export namespace Prisma {
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSubscriptionsInput = {
@@ -29810,6 +31698,7 @@ export namespace Prisma {
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSubscriptionsInput = {
@@ -29870,6 +31759,7 @@ export namespace Prisma {
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSubscriptionsInput = {
@@ -29889,6 +31779,7 @@ export namespace Prisma {
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SubscriptionCustomerUpsertWithoutSubscriptionsInput = {
@@ -29939,6 +31830,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutImportJobsInput = {
@@ -29958,6 +31850,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutImportJobsInput = {
@@ -30009,6 +31902,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -30058,6 +31952,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -30099,6 +31994,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutImportJobsInput = {
@@ -30118,6 +32014,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ContactUpsertWithWhereUniqueWithoutImportJobInput = {
@@ -30153,6 +32050,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutExportJobsInput = {
@@ -30172,6 +32070,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutExportJobsInput = {
@@ -30207,6 +32106,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutExportJobsInput = {
@@ -30226,6 +32126,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutMergeSuggestionsInput = {
@@ -30245,6 +32146,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutMergeSuggestionsInput = {
@@ -30264,6 +32166,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutMergeSuggestionsInput = {
@@ -30315,6 +32218,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -30364,6 +32268,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -30416,6 +32321,7 @@ export namespace Prisma {
     leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -30465,6 +32371,7 @@ export namespace Prisma {
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -30539,6 +32446,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMergeSuggestionsInput = {
@@ -30558,6 +32466,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ContactUpsertWithoutLeftMergeSuggestionsInput = {
@@ -30615,6 +32524,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -30664,6 +32574,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -30722,6 +32633,7 @@ export namespace Prisma {
     leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -30771,6 +32683,7 @@ export namespace Prisma {
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -30850,6 +32763,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutMergeDecisionsInput = {
@@ -30869,6 +32783,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutMergeDecisionsInput = {
@@ -30953,6 +32868,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMergeDecisionsInput = {
@@ -30972,6 +32888,7 @@ export namespace Prisma {
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutSyncAccountsInput = {
@@ -30991,6 +32908,7 @@ export namespace Prisma {
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSyncAccountsInput = {
@@ -31010,6 +32928,7 @@ export namespace Prisma {
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSyncAccountsInput = {
@@ -31203,6 +33122,7 @@ export namespace Prisma {
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSyncAccountsInput = {
@@ -31222,6 +33142,7 @@ export namespace Prisma {
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SyncContactLinkUpsertWithWhereUniqueWithoutSyncAccountInput = {
@@ -31415,6 +33336,7 @@ export namespace Prisma {
     leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -31464,6 +33386,7 @@ export namespace Prisma {
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -31656,6 +33579,7 @@ export namespace Prisma {
     leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -31705,6 +33629,7 @@ export namespace Prisma {
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -32018,6 +33943,7 @@ export namespace Prisma {
     leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -32067,6 +33993,7 @@ export namespace Prisma {
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -32275,6 +34202,7 @@ export namespace Prisma {
     leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -32324,6 +34252,7 @@ export namespace Prisma {
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -32358,6 +34287,314 @@ export namespace Prisma {
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserCreateWithoutActivityEventsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutActivityEventsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutActivityEventsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutActivityEventsInput, UserUncheckedCreateWithoutActivityEventsInput>
+  }
+
+  export type ContactCreateWithoutActivityEventsInput = {
+    id?: string
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
+    nickname?: string | null
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    phoneticCompany?: string | null
+    jobTitle?: string | null
+    website?: string | null
+    birthday?: string | null
+    address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutContactsInput
+    importJob?: ImportJobCreateNestedOneWithoutContactsInput
+    leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
+    mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactUncheckedCreateWithoutActivityEventsInput = {
+    id?: string
+    userId: string
+    importJobId?: string | null
+    mergedIntoContactId?: string | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
+    nickname?: string | null
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    phoneticCompany?: string | null
+    jobTitle?: string | null
+    website?: string | null
+    birthday?: string | null
+    address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactCreateOrConnectWithoutActivityEventsInput = {
+    where: ContactWhereUniqueInput
+    create: XOR<ContactCreateWithoutActivityEventsInput, ContactUncheckedCreateWithoutActivityEventsInput>
+  }
+
+  export type UserUpsertWithoutActivityEventsInput = {
+    update: XOR<UserUpdateWithoutActivityEventsInput, UserUncheckedUpdateWithoutActivityEventsInput>
+    create: XOR<UserCreateWithoutActivityEventsInput, UserUncheckedCreateWithoutActivityEventsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutActivityEventsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutActivityEventsInput, UserUncheckedUpdateWithoutActivityEventsInput>
+  }
+
+  export type UserUpdateWithoutActivityEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutActivityEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type ContactUpsertWithoutActivityEventsInput = {
+    update: XOR<ContactUpdateWithoutActivityEventsInput, ContactUncheckedUpdateWithoutActivityEventsInput>
+    create: XOR<ContactCreateWithoutActivityEventsInput, ContactUncheckedCreateWithoutActivityEventsInput>
+    where?: ContactWhereInput
+  }
+
+  export type ContactUpdateToOneWithWhereWithoutActivityEventsInput = {
+    where?: ContactWhereInput
+    data: XOR<ContactUpdateWithoutActivityEventsInput, ContactUncheckedUpdateWithoutActivityEventsInput>
+  }
+
+  export type ContactUpdateWithoutActivityEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
+    nickname?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    birthday?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutContactsNestedInput
+    importJob?: ImportJobUpdateOneWithoutContactsNestedInput
+    leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
+    mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+  }
+
+  export type ContactUncheckedUpdateWithoutActivityEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
+    nickname?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    birthday?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
   export type AppPasswordCreateManyUserInput = {
@@ -32539,6 +34776,16 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type ActivityEventCreateManyUserInput = {
+    id?: string
+    contactId?: string | null
+    eventType: $Enums.EventType
+    actor: $Enums.Actor
+    actorDetail?: string | null
+    payload?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+  }
+
   export type AppPasswordUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     label?: StringFieldUpdateOperationsInput | string
@@ -32615,6 +34862,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -32664,6 +34912,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -33098,6 +35347,36 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ActivityEventUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    eventType?: EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType
+    actor?: EnumActorFieldUpdateOperationsInput | $Enums.Actor
+    actorDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    payload?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contact?: ContactUpdateOneWithoutActivityEventsNestedInput
+  }
+
+  export type ActivityEventUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    eventType?: EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType
+    actor?: EnumActorFieldUpdateOperationsInput | $Enums.Actor
+    actorDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    payload?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ActivityEventUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    eventType?: EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType
+    actor?: EnumActorFieldUpdateOperationsInput | $Enums.Actor
+    actorDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    payload?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type SyncConflictCreateManyAppPasswordInput = {
     id?: string
     syncAccountId?: string | null
@@ -33257,6 +35536,16 @@ export namespace Prisma {
     resolvedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+  }
+
+  export type ActivityEventCreateManyContactInput = {
+    id?: string
+    userId: string
+    eventType: $Enums.EventType
+    actor: $Enums.Actor
+    actorDetail?: string | null
+    payload?: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
   }
 
   export type ContactCreateManyMergedIntoContactInput = {
@@ -33527,6 +35816,36 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ActivityEventUpdateWithoutContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    eventType?: EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType
+    actor?: EnumActorFieldUpdateOperationsInput | $Enums.Actor
+    actorDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    payload?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutActivityEventsNestedInput
+  }
+
+  export type ActivityEventUncheckedUpdateWithoutContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    eventType?: EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType
+    actor?: EnumActorFieldUpdateOperationsInput | $Enums.Actor
+    actorDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    payload?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ActivityEventUncheckedUpdateManyWithoutContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    eventType?: EnumEventTypeFieldUpdateOperationsInput | $Enums.EventType
+    actor?: EnumActorFieldUpdateOperationsInput | $Enums.Actor
+    actorDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    payload?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type ContactUpdateWithoutMergedIntoContactInput = {
     id?: StringFieldUpdateOperationsInput | string
     syncUid?: StringFieldUpdateOperationsInput | string
@@ -33572,6 +35891,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -33620,6 +35940,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -33857,6 +36178,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -33906,6 +36228,7 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 

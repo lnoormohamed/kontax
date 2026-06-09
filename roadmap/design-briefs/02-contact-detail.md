@@ -2,7 +2,19 @@
 
 **Route:** `/contacts/[id]`
 **Phase:** P0 core surface
-**Last updated:** 2026-06-08
+**Last updated:** 2026-06-09
+
+---
+
+## Design language (aligned with the rebuilt contacts list)
+
+This brief was first drafted before the contacts-list redesign shipped. The detail page must match that locked design language — read `01-contacts-list.md` first. Where this document names older values, the list's palette/type win:
+
+- **Palette (from the production kit):** ink `#1d2823`, secondary `#5c655e`, muted `#8b938c`, lines `#d8ddd6` / `#e9ece7`, paper `#ffffff`, brand green `#17352e`, CTA blue `#4158f4`, amber `#bf8526`, red `#b5472f`. Background is white/near-white — **not** the older `#f9faf6`. Font: Geist / system sans. Straight, consistent corners.
+- **Header chrome matches the list:** same back/wordmark treatment, white header on a `#d8ddd6` border (not a tinted translucent bar).
+- **Avatar tints** use the same name-hash colour set as the list rows, so a person looks identical in both places.
+- **Row-context icons are one governed system (Phase 15).** This page shows the *expanded* form of the same cluster used on list rows — favourite, plus status badges (family / team / live-shared / emergency). Do not invent separate one-off badges; every badge here is the detail-page expansion of a list badge, with the same glyph and meaning. The "live share" and "family book" items called out under Future Additions are members of that one system.
+- Section cards (`rounded` + `border`) are appropriate here — a detail page is allowed more structure than the full-bleed list — but use the palette above, not the old hexes.
 
 ---
 
@@ -54,11 +66,11 @@ The contact detail page is the single source of truth for everything Kontax know
 └──────────────────────┴──────────────────────────────────────────────────────┘
 ```
 
-**Left pane** is sticky — it remains visible while the user scrolls the right pane. Width: 320px. Background: same off-white as the page (`#f9faf6`). No card border — it reads as part of the page structure, not a floating widget.
+**Left pane** is sticky — it remains visible while the user scrolls the right pane. Width: 320px. Background: same near-white as the page. No card border — it reads as part of the page structure, not a floating widget.
 
-**Right pane** is scrollable. Max-width ~800px, centered within remaining space. Padding: 32px top, 40px horizontal. Section cards use the standard `rounded-[2rem] border border-[#d8ddd6] bg-white` pattern from the rest of the app.
+**Right pane** is scrollable. Max-width ~800px, centered within remaining space. Padding: 32px top, 40px horizontal. Section cards use a `rounded` card with a `#d8ddd6` border on white — consistent with the app, in the palette above.
 
-**Sticky header** is minimal: back chevron + breadcrumb label on the left, contact display name (truncated) in the centre, destructive/utility actions (Archive, Delete, ⋯) on the right. Uses `rgba(249,250,246,0.96)` backdrop with border `#d8ddd6`.
+**Sticky header** is minimal: back chevron + breadcrumb label on the left, contact display name (truncated) in the centre, destructive/utility actions (Archive, Delete, ⋯) on the right. Solid **white** header with a `#d8ddd6` bottom border — matching the contacts-list header chrome (not a tinted translucent bar).
 
 ---
 
@@ -205,7 +217,7 @@ On mobile, the two-pane layout collapses to a single column.
 The design must structurally accommodate the following without a full redesign:
 
 ### Source Badges (Phase 10)
-Below the name/title block in the left pane, a small "Synced from iCloud" or "Imported via Google CSV" badge. Design a badge row here now — even if it renders empty in v1. Badge: icon + label, `bg-slate-100 rounded-full px-3 py-1 text-xs text-slate-500`.
+Below the name/title block in the left pane, a small "Synced from iCloud" or "Imported via Google CSV" badge driven by the contact's `sourceType` / `sourceDetail`. Design a badge row here now — even if it renders empty in v1. Badge: icon + label, quiet `rounded-full` chip in the muted palette. Use the same source glyphs the activity log uses (Phase 10) so source reads consistently across surfaces.
 
 ### Last-Updated-By Attribution (Phase 10)
 In the metadata block at the bottom of the left pane, a "Last edited by: You / [Family member name]" line. Reserve space in the metadata section.

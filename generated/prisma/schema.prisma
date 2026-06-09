@@ -157,6 +157,7 @@ model User {
   syncAccounts          SyncAccount[]
   subscriptionCustomer  SubscriptionCustomer?
   subscriptions         Subscription[]
+  activityEvents        ActivityEvent[]
   createdAt             DateTime              @default(now())
   updatedAt             DateTime              @updatedAt
 }
@@ -187,6 +188,7 @@ model Contact {
   rightMergeSuggestions MergeSuggestion[] @relation("MergeSuggestionRightContact")
   syncLinks             SyncContactLink[]
   syncConflicts         SyncConflict[]
+  activityEvents        ActivityEvent[]
   mergedIntoContactId   String?
   mergedIntoContact     Contact?          @relation("ContactMergeLineage", fields: [mergedIntoContactId], references: [id], onDelete: SetNull)
   mergedChildren        Contact[]         @relation("ContactMergeLineage")
@@ -503,4 +505,48 @@ model SyncConflict {
   @@index([syncContactLinkId, status])
   @@index([appPasswordId, status])
   @@index([conflictSource, status, detectedAt])
+}
+
+enum EventType {
+  CONTACT_CREATED
+  CONTACT_UPDATED
+  CONTACT_ARCHIVED
+  CONTACT_RESTORED
+  CONTACT_DELETED
+  CONTACT_MERGED
+  CONTACT_MERGE_UNDONE
+  CONTACT_IMPORTED
+  CONTACT_SHARED
+  CONTACT_SHARE_RECEIVED
+  SYNC_PULLED
+  SYNC_PUSHED
+  SYNC_CONFLICT_DETECTED
+  SYNC_CONFLICT_RESOLVED
+}
+
+enum Actor {
+  USER
+  SYNC
+  IMPORT
+  SHARE
+  FAMILY_MEMBER
+  TEAM_MEMBER
+  SYSTEM
+}
+
+model ActivityEvent {
+  id          String    @id @default(cuid())
+  userId      String
+  contactId   String?
+  eventType   EventType
+  actor       Actor
+  actorDetail String?
+  payload     Json      @default("{}")
+  createdAt   DateTime  @default(now())
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  contact Contact? @relation(fields: [contactId], references: [id], onDelete: SetNull)
+
+  @@index([userId, createdAt(sort: Desc)])
+  @@index([contactId, createdAt(sort: Desc)])
 }

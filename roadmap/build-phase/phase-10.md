@@ -17,7 +17,7 @@ Deepen the quality of duplicate handling, give users a full auditable history of
 ## Phase Tracker
 | Ticket | Status | Priority | Depends On |
 | --- | --- | --- | --- |
-| P10-01 | Not Started | P0 | P1-01, P4-01 |
+| P10-01 | Done | P0 | P1-01, P4-01 |
 | P10-02 | Not Started | P0 | P10-01 |
 | P10-03 | Not Started | P0 | P10-01 |
 | P10-04 | Not Started | P1 | P10-02, P10-03 |
@@ -29,9 +29,15 @@ Deepen the quality of duplicate handling, give users a full auditable history of
 ---
 
 ## P10-01 — Define ActivityEvent schema
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P0`
 - Dependencies: `P1-01`, `P4-01`
+- Delivered:
+  - `ActivityEvent` model (id, userId, contactId?, eventType, actor, actorDetail?, payload Json default `{}`, createdAt) with `userId` Cascade and `contactId` SetNull; reverse relations on `User` and `Contact`. `EventType` (14 values) and `Actor` (7: USER/SYNC/IMPORT/SHARE/FAMILY_MEMBER/TEAM_MEMBER/SYSTEM) enums. Composite indexes `(userId, createdAt desc)` and `(contactId, createdAt desc)`. Applied via `prisma db push`; both indexes confirmed in Postgres.
+  - Zod payload schema per event type in `src/lib/activity/payload-schemas.ts` (`EVENT_PAYLOAD_SCHEMAS`, `FieldDiff`, `EventPayloadMap`). CONTACT_UPDATED requires non-empty `diffs`; CONTACT_DELETED carries a name/email/phone snapshot (the only snapshot exception, since contactId becomes null).
+  - Append-only writer `emitEvent(client, args)` in `src/lib/activity/index.ts` — validates payload against the event-type schema, caps `actorDetail` at 255, accepts a `PrismaClient` or transaction client so callers write the event atomically with the mutation. No update/delete path exists (pruning is Phase 11).
+  - Verified: event create with a diff payload round-trips; hard-deleting the contact leaves the event with `contactId = null` (SetNull); tsc + lint + build green.
+  - Actor count note: the ticket text says "6 actor values" but the enum block lists 7 — shipped the 7-value enum (the block is authoritative; FAMILY_MEMBER/TEAM_MEMBER are needed by Phases 13/14).
 - Implementation Notes:
   - Add an `ActivityEvent` model to the schema with the following fields: `id`, `userId`, `contactId` (nullable — some events are account-level), `eventType` (enum), `actor` (enum: `USER`, `SYNC`, `IMPORT`, `SHARE`, `SYSTEM`), `actorDetail` (nullable string — e.g. sync account label, import file name, share token), `payload` (JSON — field-level diff or summary), `createdAt`.
   - Event type enum covers: `CONTACT_CREATED`, `CONTACT_UPDATED`, `CONTACT_ARCHIVED`, `CONTACT_RESTORED`, `CONTACT_DELETED`, `CONTACT_MERGED`, `CONTACT_MERGE_UNDONE`, `CONTACT_IMPORTED`, `CONTACT_SHARED`, `CONTACT_SHARE_RECEIVED`, `SYNC_PULLED`, `SYNC_PUSHED`, `SYNC_CONFLICT_DETECTED`, `SYNC_CONFLICT_RESOLVED`.
