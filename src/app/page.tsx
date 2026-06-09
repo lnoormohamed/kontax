@@ -13,7 +13,7 @@ type HomePageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
-type ContactsWorkspaceTab = "people" | "archived" | "duplicates";
+type ContactsWorkspaceTab = "people" | "archived" | "duplicates" | "activity";
 type ContactsWorkspaceFilter = "all" | "recent" | "incomplete" | "favorites";
 type ContactsWorkspaceSort = "updated" | "name";
 type ContactsWorkspaceView = "compact" | "cozy";
@@ -38,7 +38,7 @@ const getSelectedTab = async (
 ): Promise<ContactsWorkspaceTab> => {
   const tab = await getSingleParam(searchParams, "tab");
 
-  if (tab === "archived" || tab === "duplicates") {
+  if (tab === "archived" || tab === "duplicates" || tab === "activity") {
     return tab;
   }
 
@@ -530,6 +530,7 @@ export default async function Home({ searchParams }: HomePageProps) {
           importedThisMonth: planSummary.importedThisMonth,
           monthlyImportLimit: planSummary.entitlements.monthlyImportLimit,
           premiumExportEnabled: planSummary.entitlements.premiumExportEnabled,
+          activityEnabled: planSummary.plan !== "FREE",
         }}
         query={query}
         viewMode={selectedView}

@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ActivityFeed, ActivityLocked } from "~/app/_components/activity-feed";
 import { ContactsWorkspaceTable } from "~/app/_components/contacts-workspace-table";
 import { BulkMergeButton, UndoMergeButton } from "~/app/_components/merge-actions";
 import { MergeSuggestionDismissButton } from "~/app/_components/merge-suggestion-dismiss-button";
@@ -42,9 +43,10 @@ type PlanSummary = {
   importedThisMonth: number;
   monthlyImportLimit: number;
   premiumExportEnabled: boolean;
+  activityEnabled: boolean;
 };
 
-type WorkspaceTab = "people" | "archived" | "duplicates";
+type WorkspaceTab = "people" | "archived" | "duplicates" | "activity";
 type WorkspaceFilter = "all" | "recent" | "incomplete" | "favorites";
 type WorkspaceSort = "updated" | "name";
 type WorkspaceView = "compact" | "cozy";
@@ -244,6 +246,7 @@ export function ContactDashboard({
           counts.duplicates,
           true,
         )}
+        {navItem(currentTab === "activity", buildHref("activity"), "clock", "Activity", null)}
 
         {/* Labels (placeholder until the labels feature ships) */}
         <div className="mt-3">
@@ -319,6 +322,7 @@ export function ContactDashboard({
         ) : null}
 
         {/* toolbar */}
+        {currentTab === "activity" ? null : (
         <div className="flex shrink-0 items-center gap-3 border-b border-[#e9ece7] px-4 py-2.5">
           {currentTab !== "duplicates" ? (
             <>
@@ -340,6 +344,7 @@ export function ContactDashboard({
           )}
           <span className="ml-auto text-[12.5px] text-[#8b938c]">{countLabel}</span>
         </div>
+        )}
 
         <div className="flex-1 overflow-y-auto pb-24 lg:pb-0">
           {currentTab === "people" ? (
@@ -459,6 +464,14 @@ export function ContactDashboard({
                 </div>
               ) : null}
             </div>
+          ) : null}
+
+          {currentTab === "activity" ? (
+            planSummary.activityEnabled ? (
+              <ActivityFeed />
+            ) : (
+              <ActivityLocked planLabel={planSummary.planLabel} />
+            )
           ) : null}
         </div>
       </section>

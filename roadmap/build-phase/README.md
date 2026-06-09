@@ -116,7 +116,7 @@ This roadmap is the implementation source of truth for phases 1–16. Each phase
 | P10-03 | 10 | Done | P0 | P10-01 | Unassigned | SourceType enum + source/lastMutatedBy fields; set on create + every mutation; formatSourceBadge; backfill run |
 | P10-04 | 10 | Done | P1 | P10-02, P10-03 | Unassigned | Source badge + last-updated line + History feed (load-more, expandable diffs) on contact detail; /api/contacts/[id]/history |
 | P10-05 | 10 | Done | P1 | P10-01 | Unassigned | Field-level merge review (survivor pick, auto-collapse identical, per-field winner, multi-value keep-both union, gated submit) + bulk accept + Merged-contacts section + 30-day undo |
-| P10-06 | 10 | Not Started | P1 | P10-04, P10-05 | Unassigned | Activity feed loads, paginates, and filters correctly; Free users see gated state |
+| P10-06 | 10 | Done | P1 | P10-04, P10-05 | Unassigned | Activity tab + global feed (/api/activity), cursor pagination, category/actor filters, 90-day retention, Pro gate (route 403 + ActivityLocked) |
 | P10-07 | 10 | Not Started | P2 | P10-06 | Unassigned | Design brief covers all activity log and source badge surfaces and states |
 | P10-08 | 10 | Not Started | P2 | P10-06 | Unassigned | Phone normalisation, phonetic matching, and stale-suggestion regeneration work correctly |
 

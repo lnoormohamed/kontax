@@ -22,7 +22,7 @@ Deepen the quality of duplicate handling, give users a full auditable history of
 | P10-03 | Done | P0 | P10-01 |
 | P10-04 | Done | P1 | P10-02, P10-03 |
 | P10-05 | Done | P1 | P10-01 |
-| P10-06 | Not Started | P1 | P10-04, P10-05 |
+| P10-06 | Done | P1 | P10-04, P10-05 |
 | P10-07 | Not Started | P2 | P10-06 |
 | P10-08 | Not Started | P2 | P10-06 |
 
@@ -168,9 +168,17 @@ Deepen the quality of duplicate handling, give users a full auditable history of
 ---
 
 ## P10-06 — Activity log global feed (Pro)
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P10-04`, `P10-05`
+- Delivered:
+  - **Activity tab** in the workspace sidebar (after Duplicates), `?tab=activity`, with a clock icon (new `clock` glyph added to `workspace-icons`).
+  - **Global feed** (`/api/activity` GET + `ActivityFeed` client component): all of the user's `ActivityEvent`s in reverse-chronological order. Each row links the contact name to its detail (falls back to "Deleted contact" when `contactId` is null), shows the event summary, actor label + icon, relative time, and expandable field diffs (reusing the P10-04 formatters).
+  - **Cursor pagination** from the start — `createdAt`-based cursor, `take: limit + 1` look-ahead, "Load more". Handles large event volumes without offset scans.
+  - **Filters** — event-type category (All · Edits · Sync · Imports · Merges · Shares) and actor (Anyone · You · Sync · Import · Shared) as chip rows; changing a filter resets the feed.
+  - **Pro gate** — gated server-side in the route (HTTP 403 + `gated:true` for `FREE`) *and* in the dashboard (`ActivityLocked` upgrade prompt). Paid plans (PLUS/PRO) get the feed; FREE sees the locked state, not an empty feed. (Note: gate is currently "any paid plan"; tighten to PRO-only if desired.)
+  - **Retention** — 90-day window enforced in the query (`createdAt >= now - 90d`); the feed footer states "Showing the last 90 days".
+  - Verified: tsc + lint + build green; feed query + billing gate checked against the DB.
 - Implementation Notes:
   - Add an Activity tab to the main workspace (alongside People, Archived, Duplicates).
   - The global feed shows all `ActivityEvent` rows for the user in reverse chronological order, paginated. Each row: relative timestamp, contact name (linked to detail), event summary, actor icon.
