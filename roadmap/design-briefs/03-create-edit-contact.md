@@ -1,14 +1,18 @@
-# Design Brief: Create / Edit Contact Form
+# Design Brief: Create Contact Form
 
-**Routes:** `/contacts/new` · edit mode on `/contacts/[id]`
+**Route:** `/contacts/new`
 **Phase:** P0 core surface
-**Last updated:** 2026-06-08
+**Last updated:** 2026-06-10
+
+> **Scope: CREATE only.** This brief covers the net-new contact form at `/contacts/new`. **Editing an existing contact is *not* a separate form** — it happens inline on the contact detail page (see brief **02 — Contact Detail**, which is LOCKED on an inline-edit, auto-save-on-blur model with no separate edit route). There is intentionally no `/contacts/[id]/edit`. Anything in earlier drafts about "edit mode", a pre-populated form, or a delete action on this form is superseded by brief 02 — deletion/archiving lives on the detail page, not here.
+
+> **Design language:** follow the locked Kontax system used in briefs 01/02 — ink `#1d2823`, secondary `#5c655e`, muted `#8b938c`, hairline `#d8ddd6`, brand green `#17352e`, blue CTA `#4158f4`, red `#b5472f`, Geist. Where this brief still shows generic Tailwind tokens (`slate-*`, `border-red-400`, `bg-slate-100`), treat them as placeholders and map to the locked palette (e.g. error border → `#b5472f`, label-pill surface → `#f2f4f0`).
 
 ---
 
 ## Purpose
 
-This is the primary data-entry surface in Kontax. It serves two closely related use cases: creating a net-new contact from scratch, and editing an existing one. Both routes render the same form shell — the only differences are the page title ("New contact" vs. the contact's display name), whether an existing record is pre-populated, and whether a Delete action is available. The audience is anyone who needs to capture or update contact information: adding a new colleague, fixing a phone number, filling in a birthday. Speed matters — users who are entering a contact from a business card or during a call need to get through the form quickly. The design must make the happy path (name + one contact method) frictionless while not hiding the depth of fields available for power users.
+This is the primary data-*entry* surface in Kontax: creating a net-new contact from scratch. The audience is anyone capturing a new person — adding a colleague, saving someone from a business card, jotting a number during a call. Speed matters: the happy path (a name + one contact method) must be frictionless, while the depth of fields stays available for power users one tap away. On save, the user lands on the new contact's detail page, where any further changes happen inline.
 
 ---
 
@@ -92,12 +96,10 @@ This matches exactly how Google Contacts handles it. The result is a form that l
 │                                                                             │
 │  − Show less    (collapses back)                                            │
 │                                                                             │
-│  ── FOOTER ──────────────────────────────────────────────────────────────  │
-│                                                                             │
-│  [Delete contact] (edit mode only, red text link, very bottom)             │
-│                                                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
 ```
+
+(No delete action on this form — deleting/archiving a contact happens on the detail page, per brief 02.)
 
 ### Layout notes
 - The form is **not split into section cards**. It is a single flat scrollable form, matching Google Contacts' clean borderless style. Section groupings are indicated by the left-column icon changing — not by card borders or section header labels.
@@ -113,7 +115,7 @@ This matches exactly how Google Contacts handles it. The result is a form that l
 Sits at the very top of the viewport. Height: 56px. Background: `rgba(249,250,246,0.96)`, `backdrop-filter: blur(8px)`, border-bottom `#d8ddd6`.
 
 - **Left:** "Cancel" — a text link in `text-slate-500`. Clicking triggers the unsaved-changes check (see States), then navigates back.
-- **Centre:** Page title — "New contact" on `/contacts/new`; the contact's current display name (updated live as the user types) on edit mode.
+- **Centre:** Page title — "New contact". (Optional nicety: once the user has typed a name, the title can echo the composing display name.)
 - **Right:** "Save contact" — primary CTA button. `bg-[#4158f4] text-white rounded-xl px-5 py-2 text-sm font-semibold`. Disabled state when: form is pristine (no changes), full name is empty and organisation name is empty. Loading state during save.
 
 The action bar must remain visible at all scroll positions. On mobile it collapses slightly (48px) but retains all three zones.
@@ -201,21 +203,17 @@ Related people, significant dates, and custom fields are in the extended section
 - Placeholder: "Add any notes about this contact…"
 - Character counter appears in the bottom-right corner of the textarea when within 200 characters of the 4000 character limit: shown as `3812 / 4000` in `text-slate-400 text-xs`.
 
-### Delete Contact (Edit Mode Only)
+### (No delete on this form)
 
-At the very bottom of the form, below all section cards, a text-only action link: "Delete contact permanently" in `text-red-500 text-sm`. No icon needed. Clicking opens a confirmation modal (see States). This is intentionally low-profile — it should not be accidentally triggered.
+There is no delete/archive action on the create form. Those actions live on the contact detail page (brief 02): Archive in the header, "Delete permanently" in the ⋯ menu. Nothing to design here.
 
 ---
 
 ## States
 
-### Empty / Initial (Create Mode)
+### Empty / Initial
 
-The form loads with: one empty email row, one empty phone row, all other fields blank. Placeholders visible. The avatar circle shows a "+" prompt. "Save contact" is disabled.
-
-### Pre-populated (Edit Mode)
-
-All existing field values are pre-filled. The avatar shows the existing initials/photo. "Save contact" is disabled until the user makes a change (dirty state detection). The page title shows the contact's display name.
+The form loads with: one empty email row, one empty phone row, all other fields blank. Placeholders visible. The avatar circle shows a "+" prompt. "Save contact" is disabled until at least a name (or, in Organisation mode, a company) is entered.
 
 ### Field Validation Errors
 
@@ -232,34 +230,13 @@ When "Save contact" is clicked, the button transitions to a loading state: spinn
 
 ### Unsaved Changes Warning
 
-If the user clicks Cancel (or navigates away via browser back) with unsaved changes:
-- A modal appears: "Discard changes? Your unsaved changes will be lost." with buttons "Keep editing" (dismisses modal) and "Discard" (proceeds with navigation).
-- This applies only if the form is dirty (any field changed from its original value).
-- In create mode, any input at all counts as a change.
+If the user clicks Cancel (or navigates away via browser back) after entering anything:
+- A modal appears: "Discard new contact? Your unsaved changes will be lost." with buttons "Keep editing" (dismisses modal) and "Discard" (proceeds with navigation).
+- Applies only if the form is dirty — any input at all counts.
 
-### Delete Confirmation Modal
+### Save Error
 
-Triggered by "Delete contact permanently" in edit mode.
-
-```
-┌────────────────────────────────────────────┐
-│                                            │
-│  Delete [Contact Name]?                    │
-│                                            │
-│  This will permanently remove the contact │
-│  from Kontax and all sync accounts.        │
-│  This action cannot be undone.             │
-│                                            │
-│  [Cancel]         [Delete permanently]     │
-│                   (red button)             │
-└────────────────────────────────────────────┘
-```
-
-"Delete permanently" is a red-filled button. Modal is centred on the page, with a semi-transparent scrim behind it.
-
-### Network Error
-
-If the form fails to load existing data (edit mode), show a centred error state within the form area: "Couldn't load this contact. Check your connection and try again." with a "Retry" button.
+If the save request fails, keep the form intact (no data loss), re-enable the "Save contact" button, and show an error toast: "Couldn't save this contact. Check your connection and try again." The user can retry the save directly. (There is no "load existing data" state — this form never pre-loads a record; that's the detail page's job.)
 
 ---
 
@@ -283,7 +260,7 @@ In Organisation mode:
 
 ### Tab Order
 
-Tab order follows visual reading order: Avatar → Full name → First → Middle → Last → (advanced if expanded) → Email rows → Phone rows → Website rows → Company → Job title → (advanced work if expanded) → Birthday → Addresses → (advanced personal if expanded) → Notes → Save button. The Cancel link and delete link are not in the standard tab order (they require deliberate interaction).
+Tab order follows visual reading order: Avatar → Full name → First → Middle → Last → (advanced if expanded) → Email rows → Phone rows → Website rows → Company → Job title → (advanced work if expanded) → Birthday → Addresses → (advanced personal if expanded) → Notes → Save button. The Cancel link is not in the standard tab order (it requires deliberate interaction).
 
 ---
 
@@ -304,7 +281,6 @@ On mobile, the layout is identical in structure — single column always — but
 │  [Personal card]             │
 │  [Notes card]                │
 │                              │
-│  [Delete] (edit only)        │
 ├──────────────────────────────┤
 │  [Save contact]  ← full-width sticky bottom bar                │
 └──────────────────────────────┘
