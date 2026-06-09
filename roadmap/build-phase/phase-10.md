@@ -18,7 +18,7 @@ Deepen the quality of duplicate handling, give users a full auditable history of
 | Ticket | Status | Priority | Depends On |
 | --- | --- | --- | --- |
 | P10-01 | Done | P0 | P1-01, P4-01 |
-| P10-02 | Not Started | P0 | P10-01 |
+| P10-02 | Done | P0 | P10-01 |
 | P10-03 | Not Started | P0 | P10-01 |
 | P10-04 | Not Started | P1 | P10-02, P10-03 |
 | P10-05 | Not Started | P1 | P10-01 |
@@ -55,9 +55,21 @@ Deepen the quality of duplicate handling, give users a full auditable history of
 ---
 
 ## P10-02 — Instrument all contact mutation paths to emit ActivityEvents
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P0`
 - Dependencies: `P10-01`
+- Delivered:
+  - `src/lib/activity/diff.ts` — `computeContactDiff` + structural `deepEqual` (handles Json/arrays, ignores system + source-tracking fields). Empty diff ⇒ no `CONTACT_UPDATED` event.
+  - Manual CRUD (`contacts.ts`): create/update/archive/restore/delete + bulk archive/restore now run inside a transaction that emits the matching event atomically — `CONTACT_CREATED`, diff-gated `CONTACT_UPDATED` (before/after read in-tx), `CONTACT_ARCHIVED`/`CONTACT_RESTORED` (only when a row actually changed), `CONTACT_DELETED` (name/email/phone snapshot, `contactId: null`). Bulk paths resolve affected ids then `createMany` events.
+  - Merge (`contact-merge.ts`): accept emits `CONTACT_MERGED` (survivor) + `CONTACT_ARCHIVED` (absorbed, actor SYSTEM); undo emits `CONTACT_MERGE_UNDONE` (survivor) + `CONTACT_RESTORED` (restored) — in the merge transaction.
+  - Import (`commit`/`rollback` routes): `CONTACT_IMPORTED` per created contact via `createMany` (actorDetail = filename); rollback soft-archives, so `CONTACT_ARCHIVED` (actor IMPORT) per contact.
+  - Sync (`sync-runner.ts`): `SYNC_PULLED` on remote-created and remote-applied contacts, `SYNC_CONFLICT_DETECTED` per detected conflict (in the sync tx); `SYNC_CONFLICT_RESOLVED` on resolution (`sync.ts`). actorDetail = sync account label.
+  - Verified: `computeContactDiff` algorithm (identical/ignored-only → [], scalar + json-array changes correct); tsc + lint + build green.
+- Known gaps (accurate, not omissions):
+  - `SYNC_PUSHED` has no emission point yet — EXPORT_ONLY/push isn't in the current sync slice (sync-runner rejects EXPORT_ONLY). Wire when push lands.
+  - Device-write conflicts (P9-08) are recorded as `SyncConflict` rows in `server.mjs` (plain JS, can't import the TS `emitEvent`); emitting a matching `SYNC_CONFLICT_DETECTED` from there is a follow-up.
+  - `CONTACT_SHARED` / `CONTACT_SHARE_RECEIVED` are Phase 12 — not wired (stubs only).
+  - `toggleFavoriteContact` is intentionally not logged (favourites are local preference state, would be activity-log noise).
 - Implementation Notes:
   - Wire `ActivityEvent` creation into every path that mutates a contact: manual create/edit/archive/restore/delete, import commit, import rollback, merge accept, merge undo, sync pull (remote change applied), sync push (local change propagated), conflict resolution, and share-triggered create.
   - For `CONTACT_UPDATED` events, compute the diff against the previous state before writing. If no fields changed, do not emit an event.
