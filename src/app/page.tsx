@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { ContactDashboard } from "~/app/_components/contact-dashboard";
+import { SearchInput } from "~/app/_components/search-input";
 import { UserMenu } from "~/app/_components/user-menu";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
@@ -468,23 +469,14 @@ export default async function Home({ searchParams }: HomePageProps) {
             <span className="text-[19px] font-bold tracking-[-0.01em] text-[#1d2823]">Kontax</span>
           </Link>
 
-          {/* search */}
-          <form className="flex min-w-0 flex-1 justify-center" method="get">
-            <input name="tab" type="hidden" value={selectedTab} />
-            <input name="filter" type="hidden" value={selectedFilter} />
-            <input name="sort" type="hidden" value={selectedSort} />
-            <input name="view" type="hidden" value={selectedView} />
-            <div className="flex min-w-0 flex-1 items-center gap-2.5 rounded-[10px] border border-[#d8ddd6] bg-white px-3 lg:max-w-[560px]">
-              <WorkspaceIcon className="shrink-0 text-[#8b938c]" name="search" size={18} />
-              <input
-                className="h-10 w-full bg-transparent text-sm text-[#1d2823] outline-none placeholder:text-[#8b938c]"
-                defaultValue={query}
-                name="q"
-                placeholder="Search by name, email, phone, company…"
-                type="search"
-              />
-            </div>
-          </form>
+          {/* search (live, debounced) */}
+          <SearchInput
+            filter={selectedFilter}
+            initialQuery={query}
+            sort={selectedSort}
+            tab={selectedTab}
+            view={selectedView}
+          />
 
           {/* actions */}
           <div className="flex shrink-0 items-center gap-2.5">
