@@ -291,16 +291,64 @@ On mobile (< 768px):
 
 ---
 
+## Chosen direction & default state
+
+After exploring three directions (A sidebar, B top-tab table, C icon rail), the build is **Direction A's shell with Direction B's columnar rows**. Direction C is dropped.
+
+**Default landing state (lock this in):**
+- **People → "All contacts"** is the active nav/filter on login.
+- Sidebar expanded (240px) on desktop; search empty and ready; Create always visible.
+- **Sort = Name A–Z**, favorites pinned above the alphabetical groups.
+- **Row style = columns** (Direction B: Name · Company · Email · Phone · ★ with sticky header) — NOT the two-line cozy rows. Cozy stays available via the density toggle.
+- **Default density = Compact.** A phone book must stay calm at 500+, so Compact columns (more names per screen, Google-Contacts feel) is the landing. Cozy is the friendlier option for sparse books and remains a toggle.
+- **Bell dot is conditional** — no notification dot unless there are actually pending shares. The wireframe's dot is demo data.
+
+**Carry from the brief, not the wireframe aesthetic:** build in the real app style (clean Geist/system sans, straight consistent corners, real palette — `#17352e` green, `#4158f4` blue, `#d8ddd6` lines). The hand-drawn Caveat font and wonky borders are wireframe conventions, not the production target. We adopt the *structure*, not the sketch look.
+
+**Preserve bulk selection** (missing from Direction B): a checkbox appears in the avatar slot on row hover, and a contextual action bar shows only when something is selected. No permanent select-all bar.
+
+**Grouping rules:** alphabetical group dividers only when Sort = Name; flat list for Sort = Recently updated; flat + highlighted during active search (favorites un-pinned while searching).
+
+**Mobile (<768px):** columns collapse to the two-line cozy rows + bottom nav. Direction B's columns cannot survive narrow widths — spec the cozy fallback.
+
+---
+
+## Row context icons (governed system — built per phase)
+
+Contacts can belong to shared books and carry designations. Surface these as a **single, consistent trailing icon cluster** on the row — never a grab-bag, or rows become icon soup and the calm phone-book goal dies. Two concepts, kept visually distinct:
+
+**1. Membership / sync source — "where this contact lives"**
+- **Family** — in a shared family book (Phase 13)
+- **Org / team directory** — from a shared team address book (Phase 14)
+- **Live-shared** — live-linked from another user, "Live from [name]" (Phase 12)
+- **Synced** — pushed to a connected device/CardDAV account (optional; may be noise — evaluate before shipping)
+
+**2. Designations — "what this contact is to you"**
+- **Favorite** ★ — built (Phase 8)
+- **Emergency contact** — a first-class per-contact flag, like favorite (new — see P15-02)
+- **Labels** — Family/Work/VIP user tags
+
+**Design rules (hold the line):**
+- **Cap at 2–3 icons per row.** If more apply, show the highest-priority + a "+N" affordance. Scannability wins.
+- **One glyph per meaning, everywhere** — same icon on the row, the sidebar, and the contact detail. No reuse across meanings; the three sharing badges (family / team / live) must read distinctly.
+- **Quiet by default** — monochrome/tinted line icons, not full color, so they read as metadata. Reserve color for genuinely urgent states (emergency = subtle red).
+- **Tooltips on hover** — icons alone are ambiguous ("Shared with Smith Family").
+- **Row is the summary; the contact detail page is the full story** — detail spells each one out (shared status + "last updated by [member]", emergency designation, team/book membership).
+- **Accessibility:** every icon needs an `aria-label`; never icon-only meaning.
+
+**Scope:** design the icon system + reserve the row slot now; build each icon as its phase ships. Do not wire any into the first contacts-list build.
+
+---
+
 ## Future additions (to design now as placeholder, build later)
 
 These surfaces will appear in this page as new phases ship. Design should account for them structurally even if they are not yet built:
 
 - **Shared book section in sidebar** (Family/Teams plan) — already described above.
-- **Family badge on rows** — small pill badge ("Family") on contacts that belong to the family shared book.
-- **Team/book badge** — small pill badge ("Clients") on contacts from a team address book.
+- **Row context icons** — the governed icon system above (family / team / live-shared / emergency). Reserve the trailing cluster slot now.
+- **Family-shared indicator** — beyond the row badge, the contact detail page gets a "Shared with your family" section: who can edit, member access list, and "Last updated by [member] · [time]" so users understand an edit propagates to everyone. Make shared status visible *before* edit. States: synced/healthy, recently changed by another member, this member's edit pending, view-only. (Phase 13)
 - **Activity log tab** — a fourth tab alongside People/Archived/Duplicates for Pro users. Activity feed, not a contact list.
 - **Incoming share notification** — a badge count on a notification bell in the header. Tapping opens a pending shares sheet.
-- **"Live from [Name]" indicator** — a subtle badge on contacts that are live-linked from another user's account.
 
 ---
 

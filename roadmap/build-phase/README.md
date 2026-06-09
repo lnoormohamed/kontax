@@ -3,7 +3,7 @@
 ## Summary
 Kontax is a consumer-first SaaS contacts hub. Users store contacts in one canonical place, sync them to any device or platform, share individual contacts with anyone, and collaborate on shared address books with family or their team — all with a full audit trail and fine-grained control over what goes where.
 
-This roadmap is the implementation source of truth for phases 1–14. Each phase file contains detailed tickets, dependencies, implementation notes, acceptance criteria, and progress tracking. Individual ticket files provide additional implementation depth for each ticket.
+This roadmap is the implementation source of truth for phases 1–15. Each phase file contains detailed tickets, dependencies, implementation notes, acceptance criteria, and progress tracking. Individual ticket files provide additional implementation depth for each ticket.
 
 ## Goals
 - Ship a trustworthy personal contacts product with strong foundations for future SaaS growth.
@@ -169,6 +169,15 @@ This roadmap is the implementation source of truth for phases 1–14. Each phase
 | P14-08 | 14 | Not Started | P2 | P14-07 | Unassigned | Design brief covers all Teams surfaces with admin and member perspectives |
 | P14-09 | 14 | Not Started | P2 | P14-07, P9-04 | Unassigned | Team books appear as named CardDAV collections; device writes attributed correctly |
 
+### Phase 15 — Row Context Icons and Contact Designations
+
+| Ticket | Phase | Status | Priority | Depends On | Owner | Acceptance |
+| --- | --- | --- | --- | --- | --- | --- |
+| P15-01 | 15 | Not Started | P1 | P8-01c | Unassigned | Shared ContactBadgeCluster renders all row icons; capped at 2–3 + overflow; one registry; a11y + tooltips |
+| P15-02 | 15 | Not Started | P1 | P15-01 | Unassigned | isEmergency flag; toggle in create/edit + detail; emergency badge + filter |
+| P15-03 | 15 | Not Started | P2 | P15-01, P10-01 | Unassigned | Family-shared status section on contact detail with member access + last-edited-by |
+| P15-04 | 15 | Not Started | P2 | P15-01 | Unassigned | Designation filters + membership groupings wired to the badge registry |
+
 ## Dependency Map
 
 **Phases 1–8 (foundation)**
@@ -188,6 +197,9 @@ This roadmap is the implementation source of truth for phases 1–14. Each phase
 - Phase 12 depends on Phase 11 (entitlement gates) and Phase 10 (ActivityEvent for share attribution). vCard links are free; account sharing is Pro+.
 - Phase 13 depends on Phase 11 (Group scaffolding schema and Family plan entitlements) and Phase 10 (activity attribution for family book changes).
 - Phase 14 depends on Phase 13 (reuses Group/GroupContact schema and change propagation infrastructure) and Phase 5/7 (team-level CardDAV sync accounts).
+
+**Phase 15 (row context icons & designations)**
+- Phase 15 depends on Phase 8 (favorites, the first designation, and the workspace shell). It provides the shared `ContactBadgeCluster` that the Family (Phase 13), Team (Phase 14), and Live-share (Phase 12) badges render through, plus the net-new emergency-contact designation. P15-03 (family-shared detail status) additionally depends on Phase 13 (shared book) and Phase 10 (activity attribution). Sequence the cross-phase badges to adopt the shared component as each of those phases lands.
 
 ## Cross-Phase Validation Scenarios
 - A new account can sign up, authenticate, and save contacts without schema redesign between phases.
