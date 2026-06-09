@@ -199,7 +199,7 @@ export function ContactDashboard({
   return (
     <div className="flex min-h-0 flex-1">
       {/* sidebar */}
-      <aside className="hidden w-[244px] shrink-0 flex-col gap-1 overflow-y-auto border-r border-[#d8ddd6] bg-white px-3 py-4 lg:flex">
+      <aside className="hidden w-[248px] shrink-0 flex-col gap-1 overflow-y-auto border-r border-[#d8ddd6] bg-white px-3 py-3.5 lg:flex">
         <Link
           className="mb-2 flex items-center gap-3 rounded-xl border border-[#e9ece7] bg-[#f6f7f4] p-2.5 transition hover:bg-[#f2f4f0]"
           href="/settings"

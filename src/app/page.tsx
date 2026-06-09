@@ -460,9 +460,9 @@ export default async function Home({ searchParams }: HomePageProps) {
   return (
     <main className="flex h-screen flex-col overflow-hidden bg-white text-[#1d2823]">
       <header className="shrink-0 border-b border-[#d8ddd6] bg-white">
-        <div className="flex w-full items-center gap-4 px-4 py-2.5 lg:px-3">
-          {/* wordmark — aligned over the sidebar width */}
-          <Link className="flex shrink-0 items-center gap-2.5 lg:w-[232px]" href="/">
+        <div className="flex h-[60px] w-full items-center gap-4 px-4 lg:px-[18px]">
+          {/* wordmark — left pad (18) + this width (230) = sidebar width (248) so search aligns with the list */}
+          <Link className="flex shrink-0 items-center gap-2.5 lg:w-[230px]" href="/">
             <span className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-[#17352e] text-[17px] font-bold text-[#dff0e7]">
               K
             </span>
