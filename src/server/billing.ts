@@ -8,9 +8,17 @@ type PlanEntitlements = {
   contactsLimit: number;
   monthlyImportLimit: number;
   syncAccountsLimit: number;
+  appPasswordsLimit: number;
   advancedMergeEnabled: boolean;
   premiumExportEnabled: boolean;
   cardDavSyncEnabled: boolean;
+  familyGroupEnabled: boolean;
+  teamsEnabled: boolean;
+  sharedAddressBooksLimit: number | null;
+  memberSlotsLimit: number | null;
+  activityLogRetentionDays: number | null;
+  liveShareEnabled: boolean;
+  staticShareEnabled: boolean;
 };
 
 type BillingContext = {
@@ -102,37 +110,71 @@ const LIFECYCLE_ACCESS_POLICIES: Record<BillingLifecycleState, LifecycleAccessPo
   },
 };
 
+// Per-plan default entitlements (P11-01 matrix). NOTE: contactsLimit /
+// monthlyImportLimit / syncAccountsLimit remain numeric ceilings here; the
+// matrix's "null = unlimited" semantics for paid tiers are applied in
+// enforcement during P11-03. Family/Teams mirror Pro's personal-library limits
+// (their group/sharing entitlements are the net-new flags below).
+const PRO_PERSONAL = {
+  contactsLimit: 25000,
+  monthlyImportLimit: 25000,
+  syncAccountsLimit: 5,
+  appPasswordsLimit: 5,
+  advancedMergeEnabled: true,
+  premiumExportEnabled: true,
+  cardDavSyncEnabled: true,
+  liveShareEnabled: true,
+  staticShareEnabled: true,
+} as const;
+
 const PLAN_DEFAULTS: Record<SubscriptionPlan, PlanEntitlements> = {
   FREE: {
     contactsLimit: 500,
-    monthlyImportLimit: 250,
-    syncAccountsLimit: 0,
+    monthlyImportLimit: 3,
+    syncAccountsLimit: 1,
+    appPasswordsLimit: 1,
     advancedMergeEnabled: false,
     premiumExportEnabled: false,
     cardDavSyncEnabled: false,
-  },
-  PLUS: {
-    contactsLimit: 5000,
-    monthlyImportLimit: 5000,
-    syncAccountsLimit: 1,
-    advancedMergeEnabled: true,
-    premiumExportEnabled: true,
-    cardDavSyncEnabled: false,
+    familyGroupEnabled: false,
+    teamsEnabled: false,
+    sharedAddressBooksLimit: 0,
+    memberSlotsLimit: null,
+    activityLogRetentionDays: 0,
+    liveShareEnabled: false,
+    staticShareEnabled: false,
   },
   PRO: {
-    contactsLimit: 25000,
-    monthlyImportLimit: 25000,
-    syncAccountsLimit: 5,
-    advancedMergeEnabled: true,
-    premiumExportEnabled: true,
-    cardDavSyncEnabled: true,
+    ...PRO_PERSONAL,
+    familyGroupEnabled: false,
+    teamsEnabled: false,
+    sharedAddressBooksLimit: 0,
+    memberSlotsLimit: null,
+    activityLogRetentionDays: 90,
+  },
+  FAMILY: {
+    ...PRO_PERSONAL,
+    familyGroupEnabled: true,
+    teamsEnabled: false,
+    sharedAddressBooksLimit: 1,
+    memberSlotsLimit: 6,
+    activityLogRetentionDays: 365,
+  },
+  TEAMS: {
+    ...PRO_PERSONAL,
+    familyGroupEnabled: false,
+    teamsEnabled: true,
+    sharedAddressBooksLimit: null,
+    memberSlotsLimit: 25,
+    activityLogRetentionDays: null,
   },
 };
 
 const PLAN_LABELS: Record<SubscriptionPlan, string> = {
   FREE: "Free",
-  PLUS: "Plus",
   PRO: "Pro",
+  FAMILY: "Family",
+  TEAMS: "Teams",
 };
 
 export const getLifecycleAccessPolicy = (state: BillingLifecycleState) =>
@@ -161,9 +203,17 @@ export const getUserBillingContext = async (userId: string): Promise<BillingCont
           contactsLimit: true,
           monthlyImportLimit: true,
           syncAccountsLimit: true,
+          appPasswordsLimit: true,
           advancedMergeEnabled: true,
           premiumExportEnabled: true,
           cardDavSyncEnabled: true,
+          familyGroupEnabled: true,
+          teamsEnabled: true,
+          sharedAddressBooksLimit: true,
+          memberSlotsLimit: true,
+          activityLogRetentionDays: true,
+          liveShareEnabled: true,
+          staticShareEnabled: true,
         },
       },
     },
@@ -185,10 +235,20 @@ export const getUserBillingContext = async (userId: string): Promise<BillingCont
       contactsLimit: subscription?.contactsLimit ?? defaults.contactsLimit,
       monthlyImportLimit: subscription?.monthlyImportLimit ?? defaults.monthlyImportLimit,
       syncAccountsLimit: subscription?.syncAccountsLimit ?? defaults.syncAccountsLimit,
+      appPasswordsLimit: subscription?.appPasswordsLimit ?? defaults.appPasswordsLimit,
       advancedMergeEnabled: subscription?.advancedMergeEnabled ?? defaults.advancedMergeEnabled,
       premiumExportEnabled:
         subscription?.premiumExportEnabled ?? defaults.premiumExportEnabled,
       cardDavSyncEnabled: subscription?.cardDavSyncEnabled ?? defaults.cardDavSyncEnabled,
+      familyGroupEnabled: subscription?.familyGroupEnabled ?? defaults.familyGroupEnabled,
+      teamsEnabled: subscription?.teamsEnabled ?? defaults.teamsEnabled,
+      sharedAddressBooksLimit:
+        subscription?.sharedAddressBooksLimit ?? defaults.sharedAddressBooksLimit,
+      memberSlotsLimit: subscription?.memberSlotsLimit ?? defaults.memberSlotsLimit,
+      activityLogRetentionDays:
+        subscription?.activityLogRetentionDays ?? defaults.activityLogRetentionDays,
+      liveShareEnabled: subscription?.liveShareEnabled ?? defaults.liveShareEnabled,
+      staticShareEnabled: subscription?.staticShareEnabled ?? defaults.staticShareEnabled,
     },
   };
 };
@@ -274,7 +334,7 @@ export const assertCanUsePremiumExport = async (userId: string) => {
   assertExportableAccount(summary);
 
   if (!summary.entitlements.premiumExportEnabled) {
-    throw new Error("vCard export is available on Plus and Pro plans.");
+    throw new Error("vCard export is available on the Pro plan.");
   }
 
   return summary;

@@ -125,7 +125,7 @@ This roadmap is the implementation source of truth for phases 1–16. Each phase
 | Ticket | Phase | Status | Priority | Depends On | Owner | Acceptance |
 | --- | --- | --- | --- | --- | --- | --- |
 | P11-01 | 11 | Done | P0 | P2-02 | Unassigned | Feature matrix frozen: 4 tiers, entitlement mapping, sharing/downgrade rules; decisions resolved (6/25 members, PRO=5 app pwds, PLUS removal, MergeDecision undo) |
-| P11-02 | 11 | Not Started | P0 | P11-01 | Unassigned | SubscriptionPlan enum updated; entitlement fields and group scaffolding migrated |
+| P11-02 | 11 | Done | P0 | P11-01 | Unassigned | Enum → FREE/PRO/FAMILY/TEAMS, 8 new entitlement fields, Group/GroupMember/GroupAddressBook scaffolding; billing.ts + app-passwords.ts updated; db pushed |
 | P11-03 | 11 | Not Started | P0 | P11-01 | Unassigned | All entitlement gates use new field names; downgrade behaviour is handled gracefully |
 | P11-04 | 11 | Not Started | P1 | P11-02, P11-03 | Unassigned | Design brief covers pricing page, upgrade prompts, and downgrade warning |
 | P11-05 | 11 | Not Started | P1 | P11-01, P10-01 | Unassigned | Retention pruning job runs correctly for all plan tiers |

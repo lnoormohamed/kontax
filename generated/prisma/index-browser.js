@@ -213,9 +213,17 @@ exports.Prisma.SubscriptionScalarFieldEnum = {
   contactsLimit: 'contactsLimit',
   monthlyImportLimit: 'monthlyImportLimit',
   syncAccountsLimit: 'syncAccountsLimit',
+  appPasswordsLimit: 'appPasswordsLimit',
   advancedMergeEnabled: 'advancedMergeEnabled',
   premiumExportEnabled: 'premiumExportEnabled',
   cardDavSyncEnabled: 'cardDavSyncEnabled',
+  familyGroupEnabled: 'familyGroupEnabled',
+  teamsEnabled: 'teamsEnabled',
+  sharedAddressBooksLimit: 'sharedAddressBooksLimit',
+  memberSlotsLimit: 'memberSlotsLimit',
+  activityLogRetentionDays: 'activityLogRetentionDays',
+  liveShareEnabled: 'liveShareEnabled',
+  staticShareEnabled: 'staticShareEnabled',
   startedAt: 'startedAt',
   currentPeriodStart: 'currentPeriodStart',
   currentPeriodEnd: 'currentPeriodEnd',
@@ -410,6 +418,35 @@ exports.Prisma.ActivityEventScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.GroupScalarFieldEnum = {
+  id: 'id',
+  ownerId: 'ownerId',
+  type: 'type',
+  name: 'name',
+  subscriptionId: 'subscriptionId',
+  memberSlotsLimit: 'memberSlotsLimit',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.GroupMemberScalarFieldEnum = {
+  id: 'id',
+  groupId: 'groupId',
+  userId: 'userId',
+  role: 'role',
+  inviteStatus: 'inviteStatus',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.GroupAddressBookScalarFieldEnum = {
+  id: 'id',
+  groupId: 'groupId',
+  name: 'name',
+  description: 'description',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -462,8 +499,9 @@ exports.BillingProvider = exports.$Enums.BillingProvider = {
 
 exports.SubscriptionPlan = exports.$Enums.SubscriptionPlan = {
   FREE: 'FREE',
-  PLUS: 'PLUS',
-  PRO: 'PRO'
+  PRO: 'PRO',
+  FAMILY: 'FAMILY',
+  TEAMS: 'TEAMS'
 };
 
 exports.SubscriptionStatus = exports.$Enums.SubscriptionStatus = {
@@ -608,6 +646,24 @@ exports.Actor = exports.$Enums.Actor = {
   SYSTEM: 'SYSTEM'
 };
 
+exports.GroupType = exports.$Enums.GroupType = {
+  FAMILY: 'FAMILY',
+  TEAM: 'TEAM'
+};
+
+exports.GroupRole = exports.$Enums.GroupRole = {
+  OWNER: 'OWNER',
+  ADMIN: 'ADMIN',
+  MEMBER: 'MEMBER'
+};
+
+exports.GroupInviteStatus = exports.$Enums.GroupInviteStatus = {
+  PENDING: 'PENDING',
+  ACCEPTED: 'ACCEPTED',
+  DECLINED: 'DECLINED',
+  REVOKED: 'REVOKED'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   AppPassword: 'AppPassword',
@@ -622,7 +678,10 @@ exports.Prisma.ModelName = {
   SyncContactLink: 'SyncContactLink',
   SyncJob: 'SyncJob',
   SyncConflict: 'SyncConflict',
-  ActivityEvent: 'ActivityEvent'
+  ActivityEvent: 'ActivityEvent',
+  Group: 'Group',
+  GroupMember: 'GroupMember',
+  GroupAddressBook: 'GroupAddressBook'
 };
 
 /**

@@ -338,7 +338,7 @@ export default async function ImportExportPage({ searchParams }: ImportExportPag
                 </form>
               ) : (
                 <div className="mt-4 rounded-2xl border border-amber-300/20 bg-amber-300/10 p-4 text-sm text-amber-100">
-                  vCard export unlocks on Plus and Pro plans.
+                  vCard export unlocks on the Pro plan.
                 </div>
               )}
             </div>

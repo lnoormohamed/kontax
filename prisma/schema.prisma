@@ -22,8 +22,27 @@ enum BillingProvider {
 
 enum SubscriptionPlan {
     FREE
-    PLUS
     PRO
+    FAMILY
+    TEAMS
+}
+
+enum GroupType {
+    FAMILY
+    TEAM
+}
+
+enum GroupRole {
+    OWNER
+    ADMIN
+    MEMBER
+}
+
+enum GroupInviteStatus {
+    PENDING
+    ACCEPTED
+    DECLINED
+    REVOKED
 }
 
 enum SubscriptionStatus {
@@ -167,6 +186,8 @@ model User {
     subscriptionCustomer SubscriptionCustomer?
     subscriptions        Subscription[]
     activityEvents       ActivityEvent[]
+    ownedGroups          Group[]                @relation("GroupOwner")
+    groupMemberships     GroupMember[]
     createdAt            DateTime               @default(now())
     updatedAt            DateTime               @updatedAt
 }
@@ -278,9 +299,17 @@ model Subscription {
     contactsLimit          Int?
     monthlyImportLimit     Int?
     syncAccountsLimit      Int?
+    appPasswordsLimit        Int?
     advancedMergeEnabled   Boolean              @default(false)
     premiumExportEnabled   Boolean              @default(false)
     cardDavSyncEnabled     Boolean              @default(false)
+    familyGroupEnabled       Boolean              @default(false)
+    teamsEnabled             Boolean              @default(false)
+    sharedAddressBooksLimit  Int?
+    memberSlotsLimit         Int?
+    activityLogRetentionDays Int?
+    liveShareEnabled         Boolean              @default(false)
+    staticShareEnabled       Boolean              @default(false)
     startedAt              DateTime             @default(now())
     currentPeriodStart     DateTime?
     currentPeriodEnd       DateTime?
@@ -293,6 +322,7 @@ model Subscription {
     updatedAt              DateTime             @updatedAt
     user                   User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
     subscriptionCustomer   SubscriptionCustomer @relation(fields: [subscriptionCustomerId], references: [id], onDelete: Cascade)
+    groups                 Group[]
 
     @@unique([provider, providerSubscriptionId])
     @@index([userId, status])
@@ -562,4 +592,52 @@ model ActivityEvent {
 
     @@index([userId, createdAt(sort: Desc)])
     @@index([contactId, createdAt(sort: Desc)])
+}
+
+// --- Group scaffolding (P11-02) ------------------------------------------------
+// Empty structural models for Family/Teams shared books. No product logic yet —
+// Phases 13 (Family) and 14 (Teams) build the behaviour on top of these.
+
+model Group {
+    id             String             @id @default(cuid())
+    ownerId        String
+    type           GroupType
+    name           String
+    subscriptionId String?
+    memberSlotsLimit Int?
+    createdAt      DateTime           @default(now())
+    updatedAt      DateTime           @updatedAt
+    owner          User               @relation("GroupOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+    subscription   Subscription?      @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+    members        GroupMember[]
+    addressBooks   GroupAddressBook[]
+
+    @@index([ownerId])
+    @@index([subscriptionId])
+}
+
+model GroupMember {
+    id           String            @id @default(cuid())
+    groupId      String
+    userId       String
+    role         GroupRole         @default(MEMBER)
+    inviteStatus GroupInviteStatus @default(PENDING)
+    createdAt    DateTime          @default(now())
+    group        Group             @relation(fields: [groupId], references: [id], onDelete: Cascade)
+    user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([groupId, userId])
+    @@index([userId, inviteStatus])
+}
+
+model GroupAddressBook {
+    id          String   @id @default(cuid())
+    groupId     String
+    name        String
+    description String?
+    createdAt   DateTime @default(now())
+    updatedAt   DateTime @updatedAt
+    group       Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+    @@index([groupId])
 }

@@ -63,15 +63,9 @@ export const verifyAppPassword = async (plaintext: string, hash: string) =>
 
 const getActiveAppPasswordLimit = async (userId: string) => {
   const context = await getUserBillingContext(userId);
-
-  switch (context.plan) {
-    case "FREE":
-      return 1;
-    case "PLUS":
-      return 3; // TODO(Phase 11): PLUS → PRO rename. Update to: PRO=5, FAMILY=5, TEAMS=null.
-    case "PRO":
-      return null;
-  }
+  // P11-02: read the entitlement (FREE=1, PRO/FAMILY/TEAMS=5 per the frozen
+  // matrix). P11-03 folds app passwords into the central entitlement layer.
+  return context.entitlements.appPasswordsLimit;
 };
 
 export const canCreateAppPassword = async (userId: string) => {

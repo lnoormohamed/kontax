@@ -19,7 +19,7 @@ Restructure the subscription model around four tiers that reflect how people act
 | Ticket | Status | Priority | Depends On |
 | --- | --- | --- | --- |
 | P11-01 | Done | P0 | P2-02 |
-| P11-02 | Not Started | P0 | P11-01 |
+| P11-02 | Done | P0 | P11-01 |
 | P11-03 | Not Started | P0 | P11-01 |
 | P11-04 | Not Started | P1 | P11-02, P11-03 |
 | P11-05 | Not Started | P1 | P11-01, P10-01 |
@@ -98,9 +98,16 @@ Restructure the subscription model around four tiers that reflect how people act
 ---
 
 ## P11-02 — Update SubscriptionPlan enum and entitlement schema
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P0`
 - Dependencies: `P11-01`
+- Delivered:
+  - `SubscriptionPlan` enum is now `FREE / PRO / FAMILY / TEAMS` (`PLUS` removed — 0 subscribers).
+  - Added 8 entitlement fields to `Subscription`: `appPasswordsLimit`, `familyGroupEnabled`, `teamsEnabled`, `sharedAddressBooksLimit`, `memberSlotsLimit`, `activityLogRetentionDays`, `liveShareEnabled`, `staticShareEnabled`.
+  - Added empty group-scaffolding: `Group`, `GroupMember`, `GroupAddressBook` models + `GroupType`, `GroupRole`, `GroupInviteStatus` enums (with back-relations on `User` and `Subscription`). No product logic — Phases 13/14 build on these.
+  - `billing.ts`: removed PLUS, added FAMILY/TEAMS to `PLAN_DEFAULTS`/`PLAN_LABELS`, extended `PlanEntitlements` + `getUserBillingContext` select/mapping with all new fields (matrix values: FREE app-pwds=1/others=5; retention 0/90/365/null; member slots 6/25; etc.). `app-passwords.ts` now reads `appPasswordsLimit` from entitlements (FREE=1, paid=5), removing the hardcoded PLUS switch. Updated two user-facing "Plus" strings.
+  - Applied via `prisma db push` after granting the `SubscriptionPlan` type to the `kontax` role (the type was owned by `postgres`, blocking enum alteration). Verified enum/columns/tables/enums all present; client regenerated; tsc + lint + build green.
+  - **Note:** `contactsLimit`/`monthlyImportLimit`/`syncAccountsLimit` remain numeric ceilings in code; the matrix's "null = unlimited" semantics for paid tiers are applied in enforcement during **P11-03**.
 - Implementation Notes:
   - Update `SubscriptionPlan` enum: `FREE`, `PRO`, `FAMILY`, `TEAMS`. Remove `PLUS` after confirming no active subscribers.
   - Add new entitlement fields to `Subscription` to cover Family and Teams capabilities:
