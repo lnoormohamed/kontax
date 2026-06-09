@@ -3,7 +3,9 @@
 ## Summary
 Kontax is a consumer-first SaaS contacts hub. Users store contacts in one canonical place, sync them to any device or platform, share individual contacts with anyone, and collaborate on shared address books with family or their team — all with a full audit trail and fine-grained control over what goes where.
 
-This roadmap is the implementation source of truth for phases 1–15. Each phase file contains detailed tickets, dependencies, implementation notes, acceptance criteria, and progress tracking. Individual ticket files provide additional implementation depth for each ticket.
+This roadmap is the implementation source of truth for phases 1–16. Each phase file contains detailed tickets, dependencies, implementation notes, acceptance criteria, and progress tracking. Individual ticket files provide additional implementation depth for each ticket.
+
+> **Build-order note:** phase numbers are not strict build order. **Phase 16 (Contacts List Rebuild) is built before Phases 10–15** because it is the shell those phases extend. See the dependency map.
 
 ## Goals
 - Ship a trustworthy personal contacts product with strong foundations for future SaaS growth.
@@ -101,7 +103,7 @@ This roadmap is the implementation source of truth for phases 1–15. Each phase
 | P9-03c | 9 | Done | P0 | P9-03b | Unassigned | x-forwarded-proto/host respected; well-known redirect returns HTTPS URL |
 | P9-04 | 9 | Done | P0 | P9-02, P9-03 | Unassigned | REPORT/GET/PUT/DELETE + ETag/If-Match in server.mjs; 45/45 smoke test passed (real-device test in P9-07) |
 | P9-05 | 9 | Done | P1 | P9-04 | Unassigned | Connect-a-device settings UI: server URL/username copy, show-once app passwords, revoke confirm, connection guides (device walkthrough in P9-07) |
-| P9-06 | 9 | Not Started | P1 | P9-04 | Unassigned | Design brief covers all device connection and app password states |
+| P9-06 | 9 | Done | P1 | P9-04 | Unassigned | Design brief exists; device-connections UI already shipped in P9-05 |
 | P9-07 | 9 | Not Started | P1 | P9-05, P9-06 | Unassigned | Bidirectional sync verified on iOS, macOS Contacts, and DAVx⁵ |
 | P9-08 | 9 | Not Started | P2 | P9-07 | Unassigned | VERSION_MISMATCH conflicts logged; last-write-wins does not corrupt data |
 
@@ -178,6 +180,18 @@ This roadmap is the implementation source of truth for phases 1–15. Each phase
 | P15-03 | 15 | Not Started | P2 | P15-01, P10-01 | Unassigned | Family-shared status section on contact detail with member access + last-edited-by |
 | P15-04 | 15 | Not Started | P2 | P15-01 | Unassigned | Designation filters + membership groupings wired to the badge registry |
 
+### Phase 16 — Contacts List Rebuild (Sidebar Shell + Column Rows) — build before 10–15
+
+| Ticket | Phase | Status | Priority | Depends On | Owner | Acceptance |
+| --- | --- | --- | --- | --- | --- | --- |
+| P16-01 | 16 | Not Started | P0 | P8-01 | Unassigned | Sidebar shell + header; nav/sub-filters drive URL params; stable counts |
+| P16-02 | 16 | Not Started | P0 | P16-01 | Unassigned | Column rows, sticky head, Compact default, grouping + favorites pin rules |
+| P16-03 | 16 | Not Started | P0 | P16-02 | Unassigned | Inline RowBadges cluster (delivers P15-01); trailing star removed |
+| P16-04 | 16 | Not Started | P1 | P16-02 | Unassigned | Bulk select via hover checkbox + contextual bar; bulk actions preserved |
+| P16-05 | 16 | Not Started | P1 | P16-02 | Unassigned | Search/empty/no-match + plan/lifecycle/sync banners in new shell |
+| P16-06 | 16 | Not Started | P1 | P16-02 | Unassigned | Duplicates pair cards + Archived restore/delete in new shell |
+| P16-07 | 16 | Not Started | P1 | P16-02 | Unassigned | Mobile cozy fallback + bottom nav; tablet drops Company column |
+
 ## Dependency Map
 
 **Phases 1–8 (foundation)**
@@ -200,6 +214,10 @@ This roadmap is the implementation source of truth for phases 1–15. Each phase
 
 **Phase 15 (row context icons & designations)**
 - Phase 15 depends on Phase 8 (favorites, the first designation, and the workspace shell). It provides the shared `ContactBadgeCluster` that the Family (Phase 13), Team (Phase 14), and Live-share (Phase 12) badges render through, plus the net-new emergency-contact designation. P15-03 (family-shared detail status) additionally depends on Phase 13 (shared book) and Phase 10 (activity attribution). Sequence the cross-phase badges to adopt the shared component as each of those phases lands.
+- **P15-01 (`ContactBadgeCluster`) is delivered by Phase 16's P16-03** — the inline `RowBadges` cluster is the same component. Phase 15's remaining tickets (P15-02 emergency flag, P15-03 family-shared detail, P15-04 filters) build on it afterwards.
+
+**Phase 16 (contacts list rebuild) — BUILD ORDER: before 10–15**
+- Phase 16 depends only on Phase 8 (the contact model + workspace it replaces) and the approved design (`01-contacts-list.md` + the production mock). It is sequenced **before Phases 10–15** because the contacts list is the surface those phases extend: Phase 10's activity tab, Phase 12's share/live badges, Phase 13's family sidebar section + badge, Phase 14's team books, and Phase 15's row icon cluster all layer onto this shell. Building them onto the old Phase-8 workspace and then replacing it would duplicate the integration work.
 
 ## Cross-Phase Validation Scenarios
 - A new account can sign up, authenticate, and save contacts without schema redesign between phases.

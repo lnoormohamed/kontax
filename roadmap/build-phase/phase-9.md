@@ -27,7 +27,7 @@ Turn Kontax into a CardDAV server so users can add it as a native contacts accou
 | P9-03c | Done | P0 | P9-03b |
 | P9-04 | Done | P0 | P9-02, P9-03 |
 | P9-05 | Done | P1 | P9-04 |
-| P9-06 | Not Started | P1 | P9-04 |
+| P9-06 | Done | P1 | P9-04 |
 | P9-07 | Not Started | P1 | P9-05, P9-06 |
 | P9-08 | Not Started | P2 | P9-07 |
 
@@ -224,9 +224,10 @@ Turn Kontax into a CardDAV server so users can add it as a native contacts accou
 ---
 
 ## P9-06 — Design brief: device connections and app passwords UI
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P9-04`
+- Closeout note: the design-brief content exists (`p9-06-design-brief-device-connections.md`) and the device-connections UI it informs already shipped in P9-05 (server URL/username copy, show-once app passwords, revoke confirmation, connection guides). No further dedicated brief work needed; marked Done.
 - Implementation Notes:
   - Produce a design brief for the designer covering the following surfaces:
     - **Empty state:** no app passwords created yet — onboarding prompt with platform icons (iPhone, Android, macOS).
