@@ -78,6 +78,10 @@ export default async function MergeSuggestionReviewPage({
     notes: suggestion.rightContact.notes,
   };
 
+  // Reasons that aren't scored signal contributions are edge-case warnings.
+  const contributionLabels = new Set(suggestion.contributions.map((c) => c.label));
+  const warnings = suggestion.reasons.filter((reason) => !contributionLabels.has(reason));
+
   return (
     <main className="min-h-screen bg-[#f4f6f2] text-[#1d2823]">
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-5 py-8 lg:py-12">
@@ -104,18 +108,38 @@ export default async function MergeSuggestionReviewPage({
           </div>
         </div>
 
-        {suggestion.reasons.length > 0 ? (
+        {suggestion.contributions.length > 0 || suggestion.reasons.length > 0 ? (
           <div className="rounded-[1.4rem] border border-[#d8ddd6] bg-white p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[#8b938c]">
-              Why this was suggested
-            </p>
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[#8b938c]">
+                Why this was suggested
+              </p>
+              <span className="text-[12px] font-semibold text-[#5c655e]">
+                Match score {suggestion.score}
+              </span>
+            </div>
             <ul className="mt-2.5 grid gap-1.5">
-              {suggestion.reasons.map((reason) => (
-                <li className="text-[13.5px] text-[#1d2823]" key={reason}>
-                  {reason}
+              {suggestion.contributions.map((contribution) => (
+                <li
+                  className="flex items-center justify-between gap-3 text-[13.5px] text-[#1d2823]"
+                  key={`${contribution.signal}-${contribution.label}`}
+                >
+                  <span>{contribution.label}</span>
+                  <span className="shrink-0 rounded-full bg-[#e7efe9] px-2 py-0.5 text-[11px] font-semibold text-[#17352e]">
+                    +{contribution.score}
+                  </span>
                 </li>
               ))}
             </ul>
+            {warnings.length > 0 ? (
+              <ul className="mt-2.5 grid gap-1.5 border-t border-[#edf0ea] pt-2.5">
+                {warnings.map((warning) => (
+                  <li className="text-[12.5px] leading-5 text-[#7a5a1a]" key={warning}>
+                    ⚠ {warning}
+                  </li>
+                ))}
+              </ul>
+            ) : null}
           </div>
         ) : null}
 

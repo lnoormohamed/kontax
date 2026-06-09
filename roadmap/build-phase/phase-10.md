@@ -24,7 +24,7 @@ Deepen the quality of duplicate handling, give users a full auditable history of
 | P10-05 | Done | P1 | P10-01 |
 | P10-06 | Done | P1 | P10-04, P10-05 |
 | P10-07 | Done | P2 | P10-06 |
-| P10-08 | Not Started | P2 | P10-06 |
+| P10-08 | Done | P2 | P10-06 |
 
 ---
 
@@ -220,9 +220,16 @@ Deepen the quality of duplicate handling, give users a full auditable history of
 ---
 
 ## P10-08 — Improve duplicate detection signals
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P2`
 - Dependencies: `P10-06`
+- Delivered:
+  - New pure, unit-testable signal helpers in `src/lib/duplicate-signals.ts`: `normalizePhoneKey` (digits-only, trailing-10 so the same number matches across country-code/spacing/trunk-zero formats), `phoneticNameKey` (Soundex variant with sound-folding *before* coding so "Jon"/"John" and "Catherine"/"Katherine" collide — first letter included), `emailDomain`, `givenInitialMatch`, name-token helpers.
+  - `getSignalDetails` extended with four new signals on top of exact email/phone: **normalized-phone** (hard, 90), **name-and-company-proximity** ("J. Smith at Acme" ≈ "John Smith, Acme Corp" — surname + initial + same company, 55), **phonetic-name** (supporting only, 30/40 — never a hard match), and **email-domain-and-name** (shared *non-public* domain + similar name, LOW, 15).
+  - New `deriveConfidence` tiering with a real **LOW** bucket: HIGH only for hard matches / score ≥ 90 (and never when edge-case warnings apply), MEDIUM ≥ 45, else LOW — so phonetic/email-domain signals don't inflate HIGH.
+  - **"Why was this suggested?" panel** on the review page: each signal listed with its individual `+score` contribution and the total match score; edge-case warnings shown separately. Scores persisted as structured `SignalContribution[]` in the suggestion's `signals` JSON (back-compat parser for old bare-string rows).
+  - **STALE auto-regeneration** (`regenerateStaleSuggestionsForUser`, run inside `getOpenMergeSuggestionsForUser`): any OPEN suggestion whose left/right contact changed since `generatedAt` is recomputed in place (fresh score/reasons/confidence) or marked `STALE` if it no longer matches or a contact was archived — so users never see outdated match reasons.
+  - Verified: tsc + lint + build green; signal scoring checked with crafted pairs (phone-format, phonetic, proximity, email-domain, public-domain exclusion) and the regeneration path checked against the DB.
 - Implementation Notes:
   - Extend the duplicate scoring engine to include additional signals:
     - Normalized phone number matching (strip country codes, spaces, formatting before comparing).

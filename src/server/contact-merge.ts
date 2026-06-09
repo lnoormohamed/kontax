@@ -1,6 +1,13 @@
 import { Prisma } from "../../generated/prisma";
 import { emitEvent } from "~/lib/activity";
 import {
+  emailDomain,
+  getFamilyName as getFamilyNameKey,
+  givenInitialMatch,
+  normalizePhoneKey,
+  phoneticNameKey,
+} from "~/lib/duplicate-signals";
+import {
   parseContactPostalAddresses,
   parseContactStringArray,
 } from "~/server/contact-portability";
@@ -42,8 +49,19 @@ type MergeCandidateContact = {
 export type MergeSuggestionSignal =
   | "exact-email"
   | "exact-phone"
+  | "normalized-phone"
   | "name-and-company"
-  | "name-and-missing-company";
+  | "name-and-company-proximity"
+  | "name-and-missing-company"
+  | "phonetic-name"
+  | "email-domain-and-name";
+
+// Per-signal score contribution, surfaced in the "why was this suggested?" panel (P10-08).
+export type SignalContribution = {
+  signal: MergeSuggestionSignal;
+  label: string;
+  score: number;
+};
 
 export type MergeSuggestionConfidence = "high" | "medium" | "low";
 
@@ -72,6 +90,7 @@ export type MergeSuggestionPreview = {
   score: number;
   reasons: string[];
   signals: MergeSuggestionSignal[];
+  contributions: SignalContribution[];
   hardMatch: boolean;
 };
 
@@ -86,6 +105,7 @@ export type PersistedMergeSuggestion = {
   reviewedAt: Date | null;
   reasons: string[];
   signals: MergeSuggestionSignal[];
+  contributions: SignalContribution[];
   leftContact: MergeCandidateContact;
   rightContact: MergeCandidateContact;
 };
@@ -686,50 +706,143 @@ const getEdgeCaseWarnings = (left: MergeableContact, right: MergeableContact) =>
 const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateContact) => {
   const leftEmail = normalizeValue(left.email);
   const rightEmail = normalizeValue(right.email);
-  const leftPhone = normalizePhone(left.phone);
-  const rightPhone = normalizePhone(right.phone);
+  const leftPhoneExact = normalizePhone(left.phone);
+  const rightPhoneExact = normalizePhone(right.phone);
+  const leftPhoneKey = normalizePhoneKey(left.phone);
+  const rightPhoneKey = normalizePhoneKey(right.phone);
   const leftName = normalizeName(left.fullName);
   const rightName = normalizeName(right.fullName);
   const leftCompany = normalizeValue(left.company);
   const rightCompany = normalizeValue(right.company);
+  const sameCompany = Boolean(leftCompany && rightCompany && leftCompany === rightCompany);
 
-  const signals: MergeSuggestionSignal[] = [];
-  const reasons: string[] = [];
-  let score = 0;
+  const contributions: SignalContribution[] = [];
   let hardMatch = false;
+  const add = (signal: MergeSuggestionSignal, label: string, points: number) => {
+    contributions.push({ signal, label, score: points });
+  };
 
+  // --- Hard identifier matches -------------------------------------------------
   if (leftEmail && rightEmail && leftEmail === rightEmail) {
-    signals.push("exact-email");
-    reasons.push(`Same email: ${left.email}`);
-    score += 100;
+    add("exact-email", `Same email: ${left.email}`, 100);
     hardMatch = true;
   }
 
-  if (leftPhone && rightPhone && leftPhone === rightPhone) {
-    signals.push("exact-phone");
-    reasons.push(`Same phone: ${left.phone}`);
-    score += 95;
+  if (leftPhoneExact && rightPhoneExact && leftPhoneExact === rightPhoneExact) {
+    add("exact-phone", `Same phone: ${left.phone}`, 95);
+    hardMatch = true;
+  } else if (leftPhoneKey && rightPhoneKey && leftPhoneKey === rightPhoneKey) {
+    // Same number written in different formats (country code / spacing / trunk 0).
+    add("normalized-phone", `Same phone in a different format: ${left.phone} ≈ ${right.phone}`, 90);
     hardMatch = true;
   }
 
-  if (leftName && rightName && leftName === rightName) {
-    if (leftCompany && rightCompany && leftCompany === rightCompany) {
-      signals.push("name-and-company");
-      reasons.push(`Same name and company: ${left.fullName} at ${left.company}`);
-      score += 70;
+  // --- Name + company ----------------------------------------------------------
+  const exactName = Boolean(leftName && rightName && leftName === rightName);
+  if (exactName) {
+    if (sameCompany) {
+      add("name-and-company", `Same name and company: ${left.fullName} at ${left.company}`, 70);
     } else if (!leftCompany || !rightCompany) {
-      signals.push("name-and-missing-company");
-      reasons.push(`Same name with missing company context: ${left.fullName}`);
-      score += 45;
+      add("name-and-missing-company", `Same name with missing company context: ${left.fullName}`, 45);
+    }
+  } else if (
+    sameCompany &&
+    getFamilyNameKey(left.fullName) &&
+    getFamilyNameKey(left.fullName) === getFamilyNameKey(right.fullName) &&
+    givenInitialMatch(left.fullName, right.fullName)
+  ) {
+    // "J. Smith at Acme" ~ "John Smith, Acme Corp": same surname + initial + company.
+    add(
+      "name-and-company-proximity",
+      `Likely same person at ${left.company}: ${left.fullName} ≈ ${right.fullName}`,
+      55,
+    );
+  }
+
+  // --- Phonetic name (supporting signal only — never a hard match) -------------
+  if (!exactName) {
+    const leftPhonetic = phoneticNameKey(left.fullName);
+    const rightPhonetic = phoneticNameKey(right.fullName);
+    if (leftPhonetic && leftPhonetic === rightPhonetic) {
+      add(
+        "phonetic-name",
+        `Names sound alike: ${left.fullName} ≈ ${right.fullName}`,
+        sameCompany ? 40 : 30,
+      );
     }
   }
+
+  // --- Shared email domain + similar name (weak / LOW) -------------------------
+  if (!(leftEmail && rightEmail && leftEmail === rightEmail)) {
+    const leftDomain = emailDomain(left.email);
+    const rightDomain = emailDomain(right.email);
+    const commonDomain = leftDomain && leftDomain === rightDomain;
+    const isPublicDomain = /^(gmail|yahoo|hotmail|outlook|icloud|aol|proton(mail)?)\./.test(
+      `${leftDomain}.`,
+    );
+    const surnameMatch =
+      getFamilyNameKey(left.fullName) &&
+      getFamilyNameKey(left.fullName) === getFamilyNameKey(right.fullName);
+    if (commonDomain && !isPublicDomain && (surnameMatch || givenInitialMatch(left.fullName, right.fullName))) {
+      add("email-domain-and-name", `Same email domain and similar name: @${leftDomain}`, 15);
+    }
+  }
+
+  const signals = contributions.map((contribution) => contribution.signal);
+  const reasons = contributions.map((contribution) => contribution.label);
+  const score = contributions.reduce((total, contribution) => total + contribution.score, 0);
 
   return {
     signals,
     reasons,
+    contributions,
     score,
     hardMatch,
   };
+};
+
+// Confidence tier from the total score. Edge-case warnings cap the result at
+// MEDIUM so review-first pairs never land in the HIGH (bulk-acceptable) bucket,
+// and weak supporting-only signals (phonetic / email-domain) stay LOW (P10-08).
+const deriveConfidence = (
+  score: number,
+  hardMatch: boolean,
+  hasEdgeWarnings: boolean,
+): MergeSuggestionConfidence => {
+  if (!hasEdgeWarnings && (hardMatch || score >= 90)) {
+    return "high";
+  }
+  if (score >= 45) {
+    return "medium";
+  }
+  return "low";
+};
+
+const toConfidenceEnum = (confidence: MergeSuggestionConfidence) =>
+  confidence.toUpperCase() as "HIGH" | "MEDIUM" | "LOW";
+
+// Parse the persisted `signals` JSON back into structured contributions. Newer
+// rows store SignalContribution objects; older rows stored bare signal strings.
+const parseContributions = (value: unknown): SignalContribution[] => {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+  return value.flatMap((item) => {
+    if (typeof item === "string") {
+      return [{ signal: item as MergeSuggestionSignal, label: item, score: 0 }];
+    }
+    if (item && typeof item === "object" && "signal" in item) {
+      const record = item as { signal?: unknown; label?: unknown; score?: unknown };
+      return [
+        {
+          signal: String(record.signal) as MergeSuggestionSignal,
+          label: typeof record.label === "string" ? record.label : String(record.signal),
+          score: typeof record.score === "number" ? record.score : 0,
+        },
+      ];
+    }
+    return [];
+  });
 };
 
 export const buildContactMergeSuggestions = (contacts: MergeCandidateContact[]) => {
@@ -747,7 +860,7 @@ export const buildContactMergeSuggestions = (contacts: MergeCandidateContact[]) 
         continue;
       }
 
-      const { signals, reasons, score, hardMatch } = getSignalDetails(left, right);
+      const { signals, reasons, contributions, score, hardMatch } = getSignalDetails(left, right);
       const edgeCaseWarnings = getEdgeCaseWarnings(
         {
           ...left,
@@ -765,8 +878,7 @@ export const buildContactMergeSuggestions = (contacts: MergeCandidateContact[]) 
         continue;
       }
 
-      const confidence: MergeSuggestionConfidence =
-        edgeCaseWarnings.length > 0 ? "medium" : hardMatch || score >= 90 ? "high" : "medium";
+      const confidence = deriveConfidence(score, hardMatch, edgeCaseWarnings.length > 0);
 
       suggestions.push({
         pairKey: buildPairKey(left.id, right.id),
@@ -776,6 +888,7 @@ export const buildContactMergeSuggestions = (contacts: MergeCandidateContact[]) 
         score,
         reasons: [...reasons, ...edgeCaseWarnings],
         signals,
+        contributions,
         hardMatch,
       });
     }
@@ -1204,10 +1317,10 @@ export const refreshMergeSuggestionsForUser = async (
         rightContactId: suggestion.rightContact.id,
         pairKey: suggestion.pairKey,
         status: "OPEN",
-        confidence: suggestion.confidence.toUpperCase() as "HIGH" | "MEDIUM",
+        confidence: toConfidenceEnum(suggestion.confidence),
         score: suggestion.score,
         hardMatch: suggestion.hardMatch,
-        signals: suggestion.signals,
+        signals: suggestion.contributions,
         reasons: suggestion.reasons,
         source,
         generatedAt: new Date(),
@@ -1216,10 +1329,10 @@ export const refreshMergeSuggestionsForUser = async (
         leftContactId: suggestion.leftContact.id,
         rightContactId: suggestion.rightContact.id,
         status: existing?.status === "DISMISSED" || existing?.status === "MERGED" ? existing.status : "OPEN",
-        confidence: suggestion.confidence.toUpperCase() as "HIGH" | "MEDIUM",
+        confidence: toConfidenceEnum(suggestion.confidence),
         score: suggestion.score,
         hardMatch: suggestion.hardMatch,
-        signals: suggestion.signals,
+        signals: suggestion.contributions,
         reasons: suggestion.reasons,
         source,
         generatedAt: new Date(),
@@ -1331,7 +1444,99 @@ export const bulkAcceptHighConfidenceForUser = async (
   return { mergedCount, failedCount };
 };
 
+// Recompute OPEN suggestions whose left/right contact was edited after the
+// suggestion was generated (P10-08). A still-valid pair is refreshed in place
+// (new score/reasons/confidence/generatedAt); a pair that no longer matches —
+// or whose contacts were archived/removed — is marked STALE so the user never
+// sees outdated match reasons.
+export const regenerateStaleSuggestionsForUser = async (userId: string) => {
+  const open = await db.mergeSuggestion.findMany({
+    where: { userId, status: "OPEN" },
+    select: {
+      id: true,
+      generatedAt: true,
+      leftContact: {
+        select: {
+          id: true,
+          fullName: true,
+          email: true,
+          phone: true,
+          company: true,
+          importJobId: true,
+          archivedAt: true,
+          updatedAt: true,
+        },
+      },
+      rightContact: {
+        select: {
+          id: true,
+          fullName: true,
+          email: true,
+          phone: true,
+          company: true,
+          importJobId: true,
+          archivedAt: true,
+          updatedAt: true,
+        },
+      },
+    },
+  });
+
+  const stale = open.filter(
+    (s) =>
+      s.leftContact.updatedAt > s.generatedAt || s.rightContact.updatedAt > s.generatedAt,
+  );
+
+  for (const suggestion of stale) {
+    const { leftContact, rightContact } = suggestion;
+
+    // Either contact archived → the pair is no longer mergeable.
+    if (leftContact.archivedAt || rightContact.archivedAt) {
+      await db.mergeSuggestion.update({
+        where: { id: suggestion.id },
+        data: { status: "STALE", reviewedAt: new Date() },
+      });
+      continue;
+    }
+
+    const details = getSignalDetails(leftContact, rightContact);
+
+    if (details.signals.length === 0) {
+      // No longer looks like a duplicate.
+      await db.mergeSuggestion.update({
+        where: { id: suggestion.id },
+        data: { status: "STALE", reviewedAt: new Date() },
+      });
+      continue;
+    }
+
+    const edgeCaseWarnings = getEdgeCaseWarnings(
+      { ...leftContact, notes: null, archivedAt: null },
+      { ...rightContact, notes: null, archivedAt: null },
+    );
+
+    await db.mergeSuggestion.update({
+      where: { id: suggestion.id },
+      data: {
+        confidence: toConfidenceEnum(
+          deriveConfidence(details.score, details.hardMatch, edgeCaseWarnings.length > 0),
+        ),
+        score: details.score,
+        hardMatch: details.hardMatch,
+        signals: details.contributions,
+        reasons: [...details.reasons, ...edgeCaseWarnings],
+        source: "stale-regenerated",
+        generatedAt: new Date(),
+      },
+    });
+  }
+};
+
 export const getOpenMergeSuggestionsForUser = async (userId: string) => {
+  // Keep the open queue fresh: any suggestion whose contacts changed since it
+  // was generated is recomputed (or retired) before we read (P10-08).
+  await regenerateStaleSuggestionsForUser(userId);
+
   const suggestions = await db.mergeSuggestion.findMany({
     where: {
       userId,
@@ -1373,22 +1578,24 @@ export const getOpenMergeSuggestionsForUser = async (userId: string) => {
     },
   });
 
-  return suggestions.map((suggestion) => ({
-    id: suggestion.id,
-    status: suggestion.status,
-    confidence: suggestion.confidence.toLowerCase() as MergeSuggestionConfidence,
-    score: suggestion.score,
-    hardMatch: suggestion.hardMatch,
-    source: suggestion.source,
-    generatedAt: suggestion.generatedAt,
-    reviewedAt: suggestion.reviewedAt,
-    reasons: Array.isArray(suggestion.reasons) ? (suggestion.reasons as string[]) : [],
-    signals: Array.isArray(suggestion.signals)
-      ? (suggestion.signals as MergeSuggestionSignal[])
-      : [],
-    leftContact: suggestion.leftContact,
-    rightContact: suggestion.rightContact,
-  })) satisfies PersistedMergeSuggestion[];
+  return suggestions.map((suggestion) => {
+    const contributions = parseContributions(suggestion.signals);
+    return {
+      id: suggestion.id,
+      status: suggestion.status,
+      confidence: suggestion.confidence.toLowerCase() as MergeSuggestionConfidence,
+      score: suggestion.score,
+      hardMatch: suggestion.hardMatch,
+      source: suggestion.source,
+      generatedAt: suggestion.generatedAt,
+      reviewedAt: suggestion.reviewedAt,
+      reasons: Array.isArray(suggestion.reasons) ? (suggestion.reasons as string[]) : [],
+      signals: contributions.map((contribution) => contribution.signal),
+      contributions,
+      leftContact: suggestion.leftContact,
+      rightContact: suggestion.rightContact,
+    };
+  }) satisfies PersistedMergeSuggestion[];
 };
 
 // Full field selection for the field-level merge review (P10-05): include the
@@ -1459,6 +1666,7 @@ export const getMergeSuggestionByIdForUser = async (userId: string, suggestionId
     return null;
   }
 
+  const contributions = parseContributions(suggestion.signals);
   return {
     id: suggestion.id,
     status: suggestion.status,
@@ -1469,9 +1677,8 @@ export const getMergeSuggestionByIdForUser = async (userId: string, suggestionId
     generatedAt: suggestion.generatedAt,
     reviewedAt: suggestion.reviewedAt,
     reasons: Array.isArray(suggestion.reasons) ? (suggestion.reasons as string[]) : [],
-    signals: Array.isArray(suggestion.signals)
-      ? (suggestion.signals as MergeSuggestionSignal[])
-      : [],
+    signals: contributions.map((contribution) => contribution.signal),
+    contributions,
     leftContact: suggestion.leftContact,
     rightContact: suggestion.rightContact,
   };
@@ -1598,15 +1805,12 @@ export const mergeContactsForUser = async ({
             rightContactId: secondaryContactId,
             pairKey,
             status: "MERGED",
-            confidence:
-              signalDetails.hardMatch || signalDetails.score >= 90
-                ? "HIGH"
-                : signalDetails.signals.length > 0
-                  ? "MEDIUM"
-                  : "LOW",
+            confidence: toConfidenceEnum(
+              deriveConfidence(signalDetails.score, signalDetails.hardMatch, false),
+            ),
             score: signalDetails.score,
             hardMatch: signalDetails.hardMatch,
-            signals: signalDetails.signals,
+            signals: signalDetails.contributions,
             reasons:
               signalDetails.reasons.length > 0
                 ? signalDetails.reasons
