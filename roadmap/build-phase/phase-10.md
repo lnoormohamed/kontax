@@ -23,7 +23,7 @@ Deepen the quality of duplicate handling, give users a full auditable history of
 | P10-04 | Done | P1 | P10-02, P10-03 |
 | P10-05 | Done | P1 | P10-01 |
 | P10-06 | Done | P1 | P10-04, P10-05 |
-| P10-07 | Not Started | P2 | P10-06 |
+| P10-07 | Done | P2 | P10-06 |
 | P10-08 | Not Started | P2 | P10-06 |
 
 ---
@@ -196,9 +196,12 @@ Deepen the quality of duplicate handling, give users a full auditable history of
 ---
 
 ## P10-07 — Design brief: activity log and source UI
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P2`
 - Dependencies: `P10-06`
+- Delivered:
+  - Wrote `roadmap/design-briefs/10-activity-log-and-source.md` (indexed in the briefs README). Covers all six surfaces against the real shipped behaviour: source badge (all 6 `sourceType`s + light-palette restyle), "Last edited by" line, per-contact History tab, global activity feed (filter bar, linked rows, Pro-locked upsell, retention), bulk-merge confirm dialog, and the merged-contacts/undo section.
+  - Documents the shared event/actor/source **icon set** including the share-in vs share-out distinction and API/system glyphs (the ticket's open question), and specifies every interactive state (hover, expanded diff, loading, empty, filtered-empty, error, locked).
 - Implementation Notes:
   - Produce a design brief covering:
     - Source badge component: styles for each `sourceType`, icon set, placement on contact detail.

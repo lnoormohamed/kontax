@@ -15,6 +15,7 @@ One brief per page or major surface. Each brief describes the purpose, layout, v
 | [07 — Sync & Connections](./07-sync-connections.md) | `/sync` | P1 |
 | [08 — Import & Export](./08-import-export.md) | `/import-export` | P1 |
 | [09 — Merge & Duplicates](./09-merge-duplicates.md) | `/merge-suggestions/[id]`, `/merge/manual` | P2 |
+| [10 — Activity Log & Source](./10-activity-log-and-source.md) | `/contacts/[id]` (source/history), `/?tab=activity`, `/?tab=duplicates` | P2 |
 
 ## Design Principles
 
