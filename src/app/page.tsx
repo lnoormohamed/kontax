@@ -456,9 +456,9 @@ export default async function Home({ searchParams }: HomePageProps) {
   const userInitials = getInitials(userLabel);
 
   return (
-    <main className="min-h-screen bg-[#f6f7f4] text-[#1d2823]">
-      <header className="sticky top-0 z-30 border-b border-[#d8ddd6] bg-white">
-        <div className="mx-auto flex w-full max-w-[1800px] items-center gap-4 px-4 py-2.5 lg:px-3">
+    <main className="flex h-screen flex-col overflow-hidden bg-white text-[#1d2823]">
+      <header className="shrink-0 border-b border-[#d8ddd6] bg-white">
+        <div className="flex w-full items-center gap-4 px-4 py-2.5 lg:px-3">
           {/* wordmark — aligned over the sidebar width */}
           <Link className="flex shrink-0 items-center gap-2.5 lg:w-[232px]" href="/">
             <span className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-[#17352e] text-[17px] font-bold text-[#dff0e7]">

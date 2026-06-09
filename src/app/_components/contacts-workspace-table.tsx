@@ -398,7 +398,7 @@ export function ContactsWorkspaceTable({
 
   if (contacts.length === 0) {
     return (
-      <div className="rounded-[1.6rem] border border-dashed border-[#d8ddd6] bg-white px-6 py-12 text-center text-sm text-slate-500">
+      <div className="m-4 rounded-[1.6rem] border border-dashed border-[#d8ddd6] bg-white px-6 py-12 text-center text-sm text-slate-500">
         {emptyState}
       </div>
     );
@@ -417,7 +417,7 @@ export function ContactsWorkspaceTable({
   );
 
   return (
-    <div className="overflow-hidden rounded-[1.6rem] border border-[#dfe4dc] bg-white">
+    <div className="bg-white">
       {hasSelection ? (
         <div className="flex flex-wrap items-center gap-3 border-b border-[#e9ece7] bg-[#edf0fe] px-4 py-2.5">
           <button

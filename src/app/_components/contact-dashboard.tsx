@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ContactsWorkspaceTable } from "~/app/_components/contacts-workspace-table";
 import { MergeSuggestionDismissButton } from "~/app/_components/merge-suggestion-dismiss-button";
 import { MergeSuggestionRefreshButton } from "~/app/_components/merge-suggestion-refresh-button";
+import { SortMenu } from "~/app/_components/sort-menu";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import type { BillingLifecycleState } from "~/server/billing";
 import type { PersistedMergeSuggestion } from "~/server/contact-merge";
@@ -196,9 +197,9 @@ export function ContactDashboard({
         : `${counts.duplicates} duplicates`;
 
   return (
-    <div className="mx-auto flex w-full max-w-[1800px]">
+    <div className="flex min-h-0 flex-1">
       {/* sidebar */}
-      <aside className="hidden w-[244px] shrink-0 flex-col gap-1 border-r border-[#d8ddd6] bg-white px-3 py-4 lg:flex">
+      <aside className="hidden w-[244px] shrink-0 flex-col gap-1 overflow-y-auto border-r border-[#d8ddd6] bg-white px-3 py-4 lg:flex">
         <Link
           className="mb-2 flex items-center gap-3 rounded-xl border border-[#e9ece7] bg-[#f6f7f4] p-2.5 transition hover:bg-[#f2f4f0]"
           href="/settings"
@@ -234,6 +235,33 @@ export function ContactDashboard({
           true,
         )}
 
+        {/* Labels (placeholder until the labels feature ships) */}
+        <div className="mt-3">
+          <div className="flex items-center gap-2 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8b938c]">
+            <span className="text-[#aeb4ac]">▾</span>
+            <span>Labels</span>
+          </div>
+          {(
+            [
+              ["Family", "#7aa37f"],
+              ["Work", "#8a93c8"],
+              ["VIP", "#c9a86a"],
+            ] as const
+          ).map(([label, color]) => (
+            <div
+              className="ml-[9px] flex h-8 items-center gap-2.5 rounded-md px-2.5 text-[12.5px] text-[#5c655e]"
+              key={label}
+            >
+              <span className="h-2 w-2 rounded-sm" style={{ background: color }} />
+              {label}
+            </div>
+          ))}
+          <div className="ml-[9px] flex h-8 items-center gap-2 rounded-md px-2.5 text-[12px] text-[#8b938c]">
+            <WorkspaceIcon name="plus" size={13} />
+            Create label
+          </div>
+        </div>
+
         <div className="mt-auto border-t border-[#e9ece7] pt-2">
           {sideLink("/import-export", "upload", "Import")}
           {sideLink("/import-export", "download", "Export")}
@@ -242,9 +270,9 @@ export function ContactDashboard({
       </aside>
 
       {/* list area */}
-      <section className="min-w-0 flex-1 bg-white">
+      <section className="flex min-w-0 flex-1 flex-col bg-white">
         {hasBanner ? (
-          <div className="grid gap-2 px-4 pt-3">
+          <div className="grid shrink-0 gap-2 px-4 pt-3">
             {showLocked ? (
               <div className="flex items-center gap-2.5 rounded-[0.9rem] bg-[#f3e1da] px-3.5 py-2.5 text-[13px] text-[#7a2f1d]">
                 <span aria-hidden>🔒</span>
@@ -281,13 +309,14 @@ export function ContactDashboard({
         ) : null}
 
         {/* toolbar */}
-        <div className="flex items-center gap-3 border-b border-[#e9ece7] px-4 py-2.5">
+        <div className="flex shrink-0 items-center gap-3 border-b border-[#e9ece7] px-4 py-2.5">
           {currentTab !== "duplicates" ? (
             <>
-              <div className="flex items-center gap-1 rounded-lg bg-[#f2f4f0] p-0.5">
-                {segment("Name", currentSort === "name", buildHref(currentTab, { sort: "name" }))}
-                {segment("Recent", currentSort === "updated", buildHref(currentTab, { sort: "updated" }))}
-              </div>
+              <SortMenu
+                current={currentSort}
+                nameHref={buildHref(currentTab, { sort: "name" })}
+                updatedHref={buildHref(currentTab, { sort: "updated" })}
+              />
               <div className="flex items-center gap-1 rounded-lg bg-[#f2f4f0] p-0.5">
                 {segment("Compact", viewMode === "compact", buildHref(currentTab, { view: "compact" }))}
                 {segment("Cozy", viewMode === "cozy", buildHref(currentTab, { view: "cozy" }))}
@@ -299,7 +328,7 @@ export function ContactDashboard({
           <span className="ml-auto text-[12.5px] text-[#8b938c]">{countLabel}</span>
         </div>
 
-        <div className="p-4 pb-24 lg:pb-4">
+        <div className="flex-1 overflow-y-auto pb-24 lg:pb-0">
           {currentTab === "people" ? (
             <ContactsWorkspaceTable
               contacts={activeContacts}
@@ -332,11 +361,11 @@ export function ContactDashboard({
 
           {currentTab === "duplicates" ? (
             mergeSuggestions.length === 0 ? (
-              <div className="rounded-[1.6rem] border border-dashed border-[#d8ddd6] bg-white px-6 py-12 text-center text-sm text-slate-500">
+              <div className="m-4 rounded-[1.6rem] border border-dashed border-[#d8ddd6] bg-white px-6 py-12 text-center text-sm text-slate-500">
                 No duplicates to review. Kontax scans as you add and import contacts — you&apos;re all clear.
               </div>
             ) : (
-              <div className="grid gap-3">
+              <div className="grid gap-3 p-4">
                 {mergeSuggestionsRefreshed ? (
                   <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#1f7a67]">Suggestions refreshed</p>
                 ) : null}
