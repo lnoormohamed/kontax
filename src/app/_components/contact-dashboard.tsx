@@ -484,6 +484,7 @@ export function ContactDashboard({
             ["star", "Favorites", isFavoritesView, buildHref("people", { filter: "favorites" })],
             ["archive", "Archived", currentTab === "archived", buildHref("archived", { filter: "all" })],
             ["people", "Duplicates", currentTab === "duplicates", buildHref("duplicates", { filter: "all" })],
+            ["clock", "Activity", currentTab === "activity", buildHref("activity")],
           ] as const
         ).map(([icon, label, active, href]) => (
           <Link

@@ -41,10 +41,10 @@ export async function GET(request: Request) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  // Pro gate: the global activity feed is a paid feature. Free users are blocked
-  // server-side (the client also renders a locked state).
+  // Pro gate: the global activity feed is a Pro-only feature. Non-Pro plans are
+  // blocked server-side (the client also renders a locked state).
   const billing = await getUserBillingContext(userId);
-  if (billing.plan === "FREE") {
+  if (billing.plan !== "PRO") {
     return Response.json({ message: "Upgrade required", gated: true }, { status: 403 });
   }
 

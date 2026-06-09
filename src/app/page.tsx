@@ -530,7 +530,7 @@ export default async function Home({ searchParams }: HomePageProps) {
           importedThisMonth: planSummary.importedThisMonth,
           monthlyImportLimit: planSummary.entitlements.monthlyImportLimit,
           premiumExportEnabled: planSummary.entitlements.premiumExportEnabled,
-          activityEnabled: planSummary.plan !== "FREE",
+          activityEnabled: planSummary.plan === "PRO",
         }}
         query={query}
         viewMode={selectedView}
