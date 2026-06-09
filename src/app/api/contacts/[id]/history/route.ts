@@ -1,9 +1,13 @@
-import { auth } from "~/server/auth";
-import { db } from "~/server/db";
 import { actorIconName, formatActorLabel, formatEventSummary } from "~/lib/activity/formatters";
+import { auth } from "~/server/auth";
+import { getUserBillingContext, isActivityLogEnabled } from "~/server/billing";
+import { db } from "~/server/db";
 
 const DEFAULT_LIMIT = 30;
 const MAX_LIMIT = 100;
+// Free plan: per-contact history shows only the most recent N events (P11-01),
+// enforced at query time — older events are kept in the DB, just not surfaced.
+const FREE_HISTORY_CAP = 10;
 
 export async function GET(
   request: Request,
@@ -36,7 +40,11 @@ export async function GET(
     ? Math.min(Math.max(rawLimit, 1), MAX_LIMIT)
     : DEFAULT_LIMIT;
 
-  const cursorDate = cursor ? new Date(cursor) : null;
+  // Free plan caps per-contact history to the last N events with no pagination.
+  const billing = await getUserBillingContext(userId);
+  const capped = !isActivityLogEnabled(billing.entitlements);
+  const effectiveLimit = capped ? Math.min(limit, FREE_HISTORY_CAP) : limit;
+  const cursorDate = capped || !cursor ? null : new Date(cursor);
 
   const rows = await db.activityEvent.findMany({
     where: {
@@ -47,11 +55,11 @@ export async function GET(
         : {}),
     },
     orderBy: { createdAt: "desc" },
-    take: limit + 1,
+    take: effectiveLimit + 1,
   });
 
-  const hasMore = rows.length > limit;
-  const page = hasMore ? rows.slice(0, limit) : rows;
+  const hasMore = !capped && rows.length > effectiveLimit;
+  const page = rows.slice(0, effectiveLimit);
 
   const events = page.map((event) => ({
     id: event.id,

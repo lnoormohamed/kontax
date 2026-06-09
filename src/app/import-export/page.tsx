@@ -143,10 +143,10 @@ export default async function ImportExportPage({ searchParams }: ImportExportPag
               <span className="text-slate-500">Plan:</span> {planSummary.planLabel}
             </p>
             <p>
-              <span className="text-slate-500">Contacts:</span> {planSummary.contactsUsed} / {planSummary.entitlements.contactsLimit}
+              <span className="text-slate-500">Contacts:</span> {planSummary.contactsUsed} / {planSummary.entitlements.contactsLimit ?? "Unlimited"}
             </p>
             <p>
-              <span className="text-slate-500">Monthly imports:</span> {planSummary.importedThisMonth} / {planSummary.entitlements.monthlyImportLimit}
+              <span className="text-slate-500">Monthly imports:</span> {planSummary.importedThisMonth} / {planSummary.entitlements.monthlyImportLimit ?? "Unlimited"}
             </p>
           </div>
         </div>

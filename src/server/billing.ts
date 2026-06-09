@@ -5,8 +5,8 @@ import { db } from "~/server/db";
 export type BillingLifecycleState = "ACTIVE" | "TRIALING" | "GRACE" | "CANCELED" | "LOCKED";
 
 type PlanEntitlements = {
-  contactsLimit: number;
-  monthlyImportLimit: number;
+  contactsLimit: number | null;
+  monthlyImportLimit: number | null;
   syncAccountsLimit: number;
   appPasswordsLimit: number;
   advancedMergeEnabled: boolean;
@@ -116,8 +116,8 @@ const LIFECYCLE_ACCESS_POLICIES: Record<BillingLifecycleState, LifecycleAccessPo
 // enforcement during P11-03. Family/Teams mirror Pro's personal-library limits
 // (their group/sharing entitlements are the net-new flags below).
 const PRO_PERSONAL = {
-  contactsLimit: 25000,
-  monthlyImportLimit: 25000,
+  contactsLimit: null,
+  monthlyImportLimit: null,
   syncAccountsLimit: 5,
   appPasswordsLimit: 5,
   advancedMergeEnabled: true,
@@ -198,23 +198,7 @@ export const getUserBillingContext = async (userId: string): Promise<BillingCont
         },
         orderBy: [{ currentPeriodEnd: "desc" }, { createdAt: "desc" }],
         take: 1,
-        select: {
-          plan: true,
-          contactsLimit: true,
-          monthlyImportLimit: true,
-          syncAccountsLimit: true,
-          appPasswordsLimit: true,
-          advancedMergeEnabled: true,
-          premiumExportEnabled: true,
-          cardDavSyncEnabled: true,
-          familyGroupEnabled: true,
-          teamsEnabled: true,
-          sharedAddressBooksLimit: true,
-          memberSlotsLimit: true,
-          activityLogRetentionDays: true,
-          liveShareEnabled: true,
-          staticShareEnabled: true,
-        },
+        select: { plan: true },
       },
     },
   });
@@ -225,31 +209,17 @@ export const getUserBillingContext = async (userId: string): Promise<BillingCont
 
   const subscription = user.subscriptions[0];
   const plan = subscription?.plan ?? "FREE";
-  const defaults = PLAN_DEFAULTS[plan];
 
+  // Entitlements are tier-driven: the frozen P11-01 matrix (PLAN_DEFAULTS) is the
+  // single source of truth. The per-subscription entitlement columns added in
+  // P11-02 remain in the schema for future custom/enterprise overrides, but are
+  // intentionally NOT merged here — non-nullable boolean columns default to false
+  // and would otherwise silently strip paid-tier features from existing rows.
   return {
     lifecycleState: user.lifecycleState,
     plan,
     planLabel: PLAN_LABELS[plan],
-    entitlements: {
-      contactsLimit: subscription?.contactsLimit ?? defaults.contactsLimit,
-      monthlyImportLimit: subscription?.monthlyImportLimit ?? defaults.monthlyImportLimit,
-      syncAccountsLimit: subscription?.syncAccountsLimit ?? defaults.syncAccountsLimit,
-      appPasswordsLimit: subscription?.appPasswordsLimit ?? defaults.appPasswordsLimit,
-      advancedMergeEnabled: subscription?.advancedMergeEnabled ?? defaults.advancedMergeEnabled,
-      premiumExportEnabled:
-        subscription?.premiumExportEnabled ?? defaults.premiumExportEnabled,
-      cardDavSyncEnabled: subscription?.cardDavSyncEnabled ?? defaults.cardDavSyncEnabled,
-      familyGroupEnabled: subscription?.familyGroupEnabled ?? defaults.familyGroupEnabled,
-      teamsEnabled: subscription?.teamsEnabled ?? defaults.teamsEnabled,
-      sharedAddressBooksLimit:
-        subscription?.sharedAddressBooksLimit ?? defaults.sharedAddressBooksLimit,
-      memberSlotsLimit: subscription?.memberSlotsLimit ?? defaults.memberSlotsLimit,
-      activityLogRetentionDays:
-        subscription?.activityLogRetentionDays ?? defaults.activityLogRetentionDays,
-      liveShareEnabled: subscription?.liveShareEnabled ?? defaults.liveShareEnabled,
-      staticShareEnabled: subscription?.staticShareEnabled ?? defaults.staticShareEnabled,
-    },
+    entitlements: PLAN_DEFAULTS[plan],
   };
 };
 
@@ -299,7 +269,11 @@ export const getUserPlanSummary = async (userId: string) => {
     ...context,
     lifecyclePolicy: getLifecycleAccessPolicy(context.lifecycleState),
     contactsUsed,
-    contactsRemaining: Math.max(context.entitlements.contactsLimit - contactsUsed, 0),
+    // null = unlimited (Pro/Family/Teams) → no finite "remaining".
+    contactsRemaining:
+      context.entitlements.contactsLimit === null
+        ? null
+        : Math.max(context.entitlements.contactsLimit - contactsUsed, 0),
     importedThisMonth: importedThisMonthAggregate._sum.importedCount ?? 0,
   };
 };
@@ -308,9 +282,10 @@ export const assertCanCreateContacts = async (userId: string, incomingCount = 1)
   const summary = await getUserPlanSummary(userId);
   assertWritableAccount(summary);
 
-  if (summary.contactsUsed + incomingCount > summary.entitlements.contactsLimit) {
+  const limit = summary.entitlements.contactsLimit;
+  if (limit !== null && summary.contactsUsed + incomingCount > limit) {
     throw new Error(
-      `${summary.planLabel} plan limit reached. You can store up to ${summary.entitlements.contactsLimit} contacts on this plan.`,
+      `${summary.planLabel} plan limit reached. You can store up to ${limit} contacts on this plan.`,
     );
   }
 
@@ -320,9 +295,10 @@ export const assertCanCreateContacts = async (userId: string, incomingCount = 1)
 export const assertCanImportContacts = async (userId: string, incomingCount: number) => {
   const summary = await assertCanCreateContacts(userId, incomingCount);
 
-  if (summary.importedThisMonth + incomingCount > summary.entitlements.monthlyImportLimit) {
+  const limit = summary.entitlements.monthlyImportLimit;
+  if (limit !== null && summary.importedThisMonth + incomingCount > limit) {
     throw new Error(
-      `${summary.planLabel} plan import limit reached. You can import up to ${summary.entitlements.monthlyImportLimit} contacts per month on this plan.`,
+      `${summary.planLabel} plan import limit reached. You can import up to ${limit} contacts per month on this plan.`,
     );
   }
 
@@ -368,4 +344,49 @@ export const assertCanCreateSyncAccount = async (userId: string) => {
     syncAccountsUsed,
     syncAccountsRemaining: Math.max(summary.entitlements.syncAccountsLimit - syncAccountsUsed, 0),
   };
+};
+
+// --- Activity log & sharing gates (P11-03) -----------------------------------
+
+// The global activity feed is gated by retention: Free has retention 0 (no feed);
+// Pro (90), Family (365), and Teams (unlimited/null) all qualify. Using the
+// retention entitlement instead of a plan-name list means new paid tiers are
+// included automatically.
+export const isActivityLogEnabled = (entitlements: PlanEntitlements) =>
+  entitlements.activityLogRetentionDays !== 0;
+
+export const assertCanUseActivityLog = async (userId: string) => {
+  const context = await getUserBillingContext(userId);
+  if (!isActivityLogEnabled(context.entitlements)) {
+    throw new Error("The activity log is available on the Pro plan and above.");
+  }
+  return context;
+};
+
+// Sharing gates — stubbed now (P11-03) so Phases 12–14 can call them directly.
+// Live/static Kontax-to-Kontax sharing requires Pro and above on the sender side.
+export const assertCanLiveShare = async (userId: string) => {
+  const context = await getUserBillingContext(userId);
+  if (!context.entitlements.liveShareEnabled) {
+    throw new Error("Live contact sharing is available on the Pro plan and above.");
+  }
+  return context;
+};
+
+export const assertCanStaticShare = async (userId: string) => {
+  const context = await getUserBillingContext(userId);
+  if (!context.entitlements.staticShareEnabled) {
+    throw new Error("Contact sharing is available on the Pro plan and above.");
+  }
+  return context;
+};
+
+// Shared address books exist only on Family (1) and Teams (unlimited).
+export const assertCanUseSharedAddressBooks = async (userId: string) => {
+  const context = await getUserBillingContext(userId);
+  const limit = context.entitlements.sharedAddressBooksLimit;
+  if (limit === 0) {
+    throw new Error("Shared address books are available on the Family and Teams plans.");
+  }
+  return context;
 };

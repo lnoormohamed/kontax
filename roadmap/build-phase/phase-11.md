@@ -20,7 +20,7 @@ Restructure the subscription model around four tiers that reflect how people act
 | --- | --- | --- | --- |
 | P11-01 | Done | P0 | P2-02 |
 | P11-02 | Done | P0 | P11-01 |
-| P11-03 | Not Started | P0 | P11-01 |
+| P11-03 | Done | P0 | P11-01 |
 | P11-04 | Not Started | P1 | P11-02, P11-03 |
 | P11-05 | Not Started | P1 | P11-01, P10-01 |
 | P11-06 | Not Started | P2 | P11-05 |
@@ -134,9 +134,17 @@ Restructure the subscription model around four tiers that reflect how people act
 ---
 
 ## P11-03 — Update entitlement enforcement across the app
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P0`
 - Dependencies: `P11-01`
+- Delivered:
+  - **Tier-driven entitlements.** `getUserBillingContext` now derives entitlements straight from `PLAN_DEFAULTS` (the frozen P11-01 matrix) rather than merging per-subscription columns. The P11-02 override columns stay in the schema for future custom/enterprise plans but are intentionally not merged — non-nullable boolean columns default to `false` and were silently stripping paid features from existing rows (caught in smoke testing: PRO was resolving `liveShare:false`, `contactsLimit:25000`).
+  - **null = unlimited** for `contactsLimit`/`monthlyImportLimit` (Pro/Family/Teams). `PlanEntitlements` types widened to `number | null`; `assertCanCreateContacts`/`assertCanImportContacts` skip the check when null; `contactsRemaining` is null when unlimited; all UI readouts (dashboard near-limit banner, settings, import-export) render "Unlimited" / null-safe.
+  - **App passwords** read `appPasswordsLimit` (FREE=1, paid=5) — done in P11-02, confirmed.
+  - **Activity feed gate broadened** from PRO-only to all paid tiers via `isActivityLogEnabled(entitlements)` (retention ≠ 0), so Family/Teams are included automatically. Retention window is now per-tier from `activityLogRetentionDays` (Pro 90 / Family 365 / Teams unlimited) in the feed route + client footer ("Showing all activity" when unlimited).
+  - **Per-contact history capped to the last 10 events for Free** (query-time, no deletion) in `/api/contacts/[id]/history`; paid tiers stay uncapped with cursor pagination.
+  - **Stub gates added for Phases 12–14**: `assertCanLiveShare`, `assertCanStaticShare`, `assertCanUseSharedAddressBooks`, `assertCanUseActivityLog` — callable now, throwing tier-appropriate errors.
+  - **Downgrade behaviour (documented + graceful).** Because entitlements are tier-driven, a downgrade takes effect immediately at the gate level with **no silent data loss**: existing contacts/sync accounts/app passwords over the new limit are retained (read-only / can't add more), the activity feed locks and per-contact history caps to 10 (events retained, just not surfaced), and old activity is only removed later by the P11-05 retention job (which runs after downgrade is confirmed). Live-share→static conversion and Family/Teams group dissolution are specified in the P11-01 matrix and implemented when those features land (Phases 12–14); the gate stubs are in place.
 - Implementation Notes:
   - Audit every entitlement check in `billing.ts` and throughout the app. Update each gate to use the new field names and plan tiers.
   - Key gates to update or add:

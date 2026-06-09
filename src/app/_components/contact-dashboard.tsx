@@ -38,10 +38,10 @@ type PlanSummary = {
   canWrite: boolean;
   canUseBasicExport: boolean;
   contactsUsed: number;
-  contactsRemaining: number;
-  contactsLimit: number;
+  contactsRemaining: number | null;
+  contactsLimit: number | null;
   importedThisMonth: number;
-  monthlyImportLimit: number;
+  monthlyImportLimit: number | null;
   premiumExportEnabled: boolean;
   activityEnabled: boolean;
 };
@@ -122,7 +122,9 @@ export function ContactDashboard({
   const showGrace = planSummary.lifecycleState === "GRACE";
   const showLocked = planSummary.lifecycleState === "LOCKED" || planSummary.lifecycleState === "CANCELED";
   const nearLimit =
+    planSummary.contactsLimit !== null &&
     planSummary.contactsLimit > 0 &&
+    planSummary.contactsRemaining !== null &&
     planSummary.contactsRemaining >= 0 &&
     planSummary.contactsRemaining <= 20;
   const hasBanner = showGrace || showLocked || nearLimit;

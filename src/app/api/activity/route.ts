@@ -1,14 +1,11 @@
 import type { Actor, EventType, Prisma } from "../../../../generated/prisma";
 import { actorIconName, formatActorLabel, formatEventSummary } from "~/lib/activity/formatters";
 import { auth } from "~/server/auth";
-import { getUserBillingContext } from "~/server/billing";
+import { getUserBillingContext, isActivityLogEnabled } from "~/server/billing";
 import { db } from "~/server/db";
 
 const DEFAULT_LIMIT = 30;
 const MAX_LIMIT = 100;
-
-// Pro retains 90 days of activity (P10-06). Higher tiers can extend later.
-const ACTIVITY_RETENTION_DAYS = 90;
 
 // Event-type categories used by the filter bar.
 const CATEGORY_EVENT_TYPES: Record<string, EventType[]> = {
@@ -41,12 +38,15 @@ export async function GET(request: Request) {
     return Response.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  // Pro gate: the global activity feed is a Pro-only feature. Non-Pro plans are
-  // blocked server-side (the client also renders a locked state).
+  // Plan gate: the global activity feed is available to Pro/Family/Teams (any
+  // plan with non-zero activity retention). Free is blocked server-side (the
+  // client also renders a locked state).
   const billing = await getUserBillingContext(userId);
-  if (billing.plan !== "PRO") {
+  if (!isActivityLogEnabled(billing.entitlements)) {
     return Response.json({ message: "Upgrade required", gated: true }, { status: 403 });
   }
+  // Retention window by tier: Pro 90d, Family 365d, Teams unlimited (null).
+  const retentionDays = billing.entitlements.activityLogRetentionDays;
 
   const url = new URL(request.url);
   const cursor = url.searchParams.get("cursor");
@@ -60,11 +60,13 @@ export async function GET(request: Request) {
   const cursorDate = cursor ? new Date(cursor) : null;
   const hasCursor = cursorDate != null && !Number.isNaN(cursorDate.getTime());
 
-  const retentionStart = new Date();
-  retentionStart.setDate(retentionStart.getDate() - ACTIVITY_RETENTION_DAYS);
-
-  // The lower bound is the more recent of (retention window) and (cursor).
-  const createdAtFilter: Prisma.DateTimeFilter = { gte: retentionStart };
+  // Retention lower bound — omitted entirely for unlimited (Teams, null).
+  const createdAtFilter: Prisma.DateTimeFilter = {};
+  if (retentionDays !== null && retentionDays > 0) {
+    const retentionStart = new Date();
+    retentionStart.setDate(retentionStart.getDate() - retentionDays);
+    createdAtFilter.gte = retentionStart;
+  }
   if (hasCursor) {
     createdAtFilter.lt = cursorDate!;
   }
@@ -113,6 +115,6 @@ export async function GET(request: Request) {
     events,
     nextCursor: hasMore ? (page[page.length - 1]?.createdAt.toISOString() ?? null) : null,
     hasMore,
-    retentionDays: ACTIVITY_RETENTION_DAYS,
+    retentionDays,
   });
 }

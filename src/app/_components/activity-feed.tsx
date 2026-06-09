@@ -187,10 +187,11 @@ function FilterChips({
   );
 }
 
-export function ActivityFeed({ retentionDays = 90 }: { retentionDays?: number }) {
+export function ActivityFeed({ retentionDays = 90 }: { retentionDays?: number | null }) {
   const [events, setEvents] = useState<ActivityEventRow[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
+  const [retention, setRetention] = useState<number | null>(retentionDays);
   const [category, setCategory] = useState("all");
   const [actor, setActor] = useState("all");
   const [status, setStatus] = useState<
@@ -219,7 +220,11 @@ export function ActivityFeed({ retentionDays = 90 }: { retentionDays?: number })
           events: ActivityEventRow[];
           nextCursor: string | null;
           hasMore: boolean;
+          retentionDays?: number | null;
         };
+        if (data.retentionDays !== undefined) {
+          setRetention(data.retentionDays);
+        }
         setEvents((current) => (nextCursor ? [...current, ...data.events] : data.events));
         setCursor(data.nextCursor);
         setHasMore(data.hasMore);
@@ -269,7 +274,9 @@ export function ActivityFeed({ retentionDays = 90 }: { retentionDays?: number })
             <p className="max-w-sm text-xs leading-5 text-[#8b938c]">
               {filtering
                 ? "Try a different category or actor."
-                : `Edits, syncs, imports, merges, and shares from the last ${retentionDays} days show up here.`}
+                : retention === null
+                  ? "Edits, syncs, imports, merges, and shares show up here."
+                  : `Edits, syncs, imports, merges, and shares from the last ${retention} days show up here.`}
             </p>
           </div>
         ) : (
@@ -291,7 +298,7 @@ export function ActivityFeed({ retentionDays = 90 }: { retentionDays?: number })
                 </button>
               ) : (
                 <span className="text-xs text-[#aeb4ac]">
-                  — Showing the last {retentionDays} days —
+                  {retention === null ? "— Showing all activity —" : `— Showing the last ${retention} days —`}
                 </span>
               )}
             </div>

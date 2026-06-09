@@ -233,7 +233,7 @@ export default async function SettingsPage() {
                     Contacts used
                   </p>
                   <p className="mt-2 text-2xl font-semibold text-slate-900">
-                    {planSummary.contactsUsed} / {planSummary.entitlements.contactsLimit}
+                    {planSummary.contactsUsed} / {planSummary.entitlements.contactsLimit ?? "Unlimited"}
                   </p>
                 </div>
                 <div className="rounded-[1.4rem] border border-[#d8ddd6] bg-[#f7f8ff] p-4">
@@ -241,7 +241,7 @@ export default async function SettingsPage() {
                     Monthly imports
                   </p>
                   <p className="mt-2 text-2xl font-semibold text-slate-900">
-                    {planSummary.importedThisMonth} / {planSummary.entitlements.monthlyImportLimit}
+                    {planSummary.importedThisMonth} / {planSummary.entitlements.monthlyImportLimit ?? "Unlimited"}
                   </p>
                 </div>
                 <div className="rounded-[1.4rem] border border-[#d8ddd6] bg-[#fbfcf8] p-4">

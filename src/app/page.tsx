@@ -5,7 +5,7 @@ import { SearchInput } from "~/app/_components/search-input";
 import { UserMenu } from "~/app/_components/user-menu";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
-import { getUserPlanSummary } from "~/server/billing";
+import { getUserPlanSummary, isActivityLogEnabled } from "~/server/billing";
 import { getOpenMergeSuggestionsForUser, getRecentMergesForUser } from "~/server/contact-merge";
 import { db } from "~/server/db";
 
@@ -530,7 +530,7 @@ export default async function Home({ searchParams }: HomePageProps) {
           importedThisMonth: planSummary.importedThisMonth,
           monthlyImportLimit: planSummary.entitlements.monthlyImportLimit,
           premiumExportEnabled: planSummary.entitlements.premiumExportEnabled,
-          activityEnabled: planSummary.plan === "PRO",
+          activityEnabled: isActivityLogEnabled(planSummary.entitlements),
         }}
         query={query}
         viewMode={selectedView}
