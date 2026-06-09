@@ -436,6 +436,12 @@ export default async function Home({ searchParams }: HomePageProps) {
     getUserPlanSummary(session.user.id),
   ]);
 
+  const [peopleCount, favoritesCount, archivedCount] = await Promise.all([
+    db.contact.count({ where: { userId: session.user.id, archivedAt: null } }),
+    db.contact.count({ where: { userId: session.user.id, archivedAt: null, isFavorite: true } }),
+    db.contact.count({ where: { userId: session.user.id, NOT: { archivedAt: null } } }),
+  ]);
+
   const sortedActiveContacts =
     selectedSort === "name"
       ? [...activeContacts].sort(compareWorkspaceContacts)
@@ -487,12 +493,6 @@ export default async function Home({ searchParams }: HomePageProps) {
 
           <div className="flex shrink-0 items-center gap-2">
             <Link
-              className="hidden rounded-[1.1rem] border border-[#d8ddd6] bg-white px-4 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-[#c9d0c9] hover:bg-slate-50 lg:inline-flex"
-              href="/import-export"
-            >
-              Import / export
-            </Link>
-            <Link
               className={`rounded-[1.1rem] px-4 py-2.5 text-sm font-semibold transition ${
                 planSummary.lifecyclePolicy.canWrite
                   ? "bg-[#4158f4] text-white hover:bg-[#3248db]"
@@ -502,6 +502,13 @@ export default async function Home({ searchParams }: HomePageProps) {
             >
               Create contact
             </Link>
+            <button
+              aria-label="Notifications"
+              className="hidden h-10 w-10 items-center justify-center rounded-full border border-[#d8ddd6] bg-white text-base text-slate-500 transition hover:border-[#c9d0c9] hover:bg-slate-50 sm:inline-flex"
+              type="button"
+            >
+              🔔
+            </button>
             <Link
               className="flex items-center gap-3 rounded-[1.1rem] border border-[#d8ddd6] bg-white px-3 py-2 transition hover:border-[#c9d0c9] hover:bg-slate-50"
               href="/settings"
@@ -542,6 +549,14 @@ export default async function Home({ searchParams }: HomePageProps) {
         }}
         query={query}
         viewMode={selectedView}
+        counts={{
+          people: peopleCount,
+          favorites: favoritesCount,
+          archived: archivedCount,
+          duplicates: mergeSuggestions.length,
+        }}
+        account={{ name: userLabel, email: session.user.email ?? "" }}
+        syncState="ok"
       />
     </main>
   );

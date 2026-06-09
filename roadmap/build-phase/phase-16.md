@@ -25,13 +25,15 @@ Rebuild the main contacts page (`/`) into the approved design: Direction A's lef
 ## Phase Tracker
 | Ticket | Status | Priority | Depends On |
 | --- | --- | --- | --- |
-| P16-01 | Not Started | P0 | P8-01 |
-| P16-02 | Not Started | P0 | P16-01 |
-| P16-03 | Not Started | P0 | P16-02 |
-| P16-04 | Not Started | P1 | P16-02 |
-| P16-05 | Not Started | P1 | P16-02 |
-| P16-06 | Not Started | P1 | P16-02 |
+| P16-01 | Done | P0 | P8-01 |
+| P16-02 | Done | P0 | P16-01 |
+| P16-03 | Done | P0 | P16-02 |
+| P16-04 | Done | P1 | P16-02 |
+| P16-05 | In Progress | P1 | P16-02 |
+| P16-06 | Done | P1 | P16-02 |
 | P16-07 | Not Started | P1 | P16-02 |
+
+> Build status: P16-01/02/03/04/06 landed (sidebar shell, column rows, inline RowBadges, bulk-select, duplicates+archived). P16-05 partial — search + empty states done; plan-limit / lifecycle / sync banners still to add. P16-07 (mobile bottom nav) not started — sidebar currently hides below `lg` with no replacement nav; list itself falls back to cozy rows. Verified via tsc + lint + production build; visual/logged-in review still pending.
 
 ---
 

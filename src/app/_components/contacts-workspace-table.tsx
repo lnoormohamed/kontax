@@ -37,583 +37,448 @@ type ContactsWorkspaceTableProps = {
   emptyState: string;
   mode: "active" | "archived";
   viewMode: "compact" | "cozy";
+  groupByLetter: boolean;
+  query: string;
 };
 
-const parseBirthdayDate = (value: string): Date | null => {
-  const trimmed = value.trim();
+const AVATAR_TINTS: Array<[string, string]> = [
+  ["#e6ece4", "#3f6b53"],
+  ["#e9e7f4", "#5a55a6"],
+  ["#f3e7df", "#9a623a"],
+  ["#e2edf2", "#3d6f8a"],
+  ["#f2e6ea", "#9a4a63"],
+  ["#e8efe0", "#5f7a3a"],
+  ["#efe9df", "#85703f"],
+  ["#e3eef0", "#3f7d7a"],
+];
 
-  if (!trimmed) {
-    return null;
+const tintForName = (value: string): [string, string] => {
+  let hash = 0;
+  for (let index = 0; index < value.length; index += 1) {
+    hash = (hash * 31 + value.charCodeAt(index)) >>> 0;
   }
-
-  const direct = new Date(trimmed);
-  if (!Number.isNaN(direct.getTime())) {
-    return direct;
-  }
-
-  const isValidDate = (year: number, month: number, day: number) => {
-    if (!Number.isFinite(year) || !Number.isFinite(month) || !Number.isFinite(day)) {
-      return null;
-    }
-
-    if (year < 1 || year > 9999 || month < 1 || month > 12 || day < 1 || day > 31) {
-      return null;
-    }
-
-    const candidate = new Date(year, month - 1, day);
-    if (
-      candidate.getFullYear() === year &&
-      candidate.getMonth() === month - 1 &&
-      candidate.getDate() === day
-    ) {
-      return candidate;
-    }
-
-    return null;
-  };
-
-  const normalizeTwoDigitYear = (year: number) => (year <= 40 ? 2000 + year : 1900 + year);
-
-  const normalized = trimmed.replace(/,/g, "");
-  const compactDigits = normalized.replace(/[-./\s]/g, "");
-
-  const separatorParts = normalized.split(/[-./]/);
-
-  if (separatorParts.length === 3) {
-    const [first, second, third] = separatorParts;
-    if (!first || !second || !third) {
-      return null;
-    }
-
-    const rawFirst = Number(first);
-    const rawSecond = Number(second);
-    const rawThird = Number(third);
-
-    if (!Number.isNaN(rawFirst) && !Number.isNaN(rawSecond) && !Number.isNaN(rawThird)) {
-      const firstPartLooksYear = first.length === 4;
-      if (firstPartLooksYear) {
-        const candidate = isValidDate(rawFirst, rawSecond, rawThird);
-        if (candidate) {
-          return candidate;
-        }
-      }
-
-      if (rawFirst > 12 && rawSecond <= 12) {
-        const year = rawThird.toString().length === 2 ? normalizeTwoDigitYear(rawThird) : rawThird;
-        return isValidDate(year, rawSecond, rawFirst);
-      }
-
-      if (rawSecond > 12 && rawFirst <= 12) {
-        const year = rawThird.toString().length === 2 ? normalizeTwoDigitYear(rawThird) : rawThird;
-        return isValidDate(year, rawFirst, rawSecond);
-      }
-
-      // ambiguous separator format; prefer dd/mm/yyyy style
-      const ambiguousYear = rawThird.toString().length === 2 ? normalizeTwoDigitYear(rawThird) : rawThird;
-      const asDmy = isValidDate(ambiguousYear, rawSecond, rawFirst);
-      if (asDmy) {
-        return asDmy;
-      }
-
-      const asMdy = isValidDate(ambiguousYear, rawFirst, rawSecond);
-      if (asMdy) {
-        return asMdy;
-      }
-    }
-  }
-
-  const compactDigitsRegex = /^\d{8}$/u;
-  const compactMatch = compactDigitsRegex.exec(compactDigits);
-  if (compactMatch) {
-    const valueOnlyDigits = compactMatch[0];
-    const first4 = Number(valueOnlyDigits.slice(0, 4));
-
-    const candidateYmd = isValidDate(first4, Number(valueOnlyDigits.slice(4, 6)), Number(valueOnlyDigits.slice(6, 8)));
-    if (candidateYmd && first4 >= 1000) {
-      return candidateYmd;
-    }
-
-    const dmyDate = isValidDate(
-      Number(valueOnlyDigits.slice(4, 8)),
-      Number(valueOnlyDigits.slice(2, 4)),
-      Number(valueOnlyDigits.slice(0, 2)),
-    );
-    if (dmyDate) {
-      return dmyDate;
-    }
-
-    const mdyDate = isValidDate(
-      Number(valueOnlyDigits.slice(4, 8)),
-      Number(valueOnlyDigits.slice(0, 2)),
-      Number(valueOnlyDigits.slice(2, 4)),
-    );
-    if (mdyDate) {
-      return mdyDate;
-    }
-  }
-
-  return null;
-};
-
-const formatBirthday = (value: string | null) => {
-  if (!value?.trim()) {
-    return "";
-  }
-
-  const birthday = parseBirthdayDate(value);
-
-  if (!birthday) {
-    return value.trim();
-  }
-
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-  }).format(birthday);
+  return AVATAR_TINTS[hash % AVATAR_TINTS.length]!;
 };
 
 const getInitials = (value: string) =>
   value
-    .split(" ")
+    .split(/\s+/)
     .map((part) => part.trim()[0])
     .filter(Boolean)
     .slice(0, 2)
     .join("")
     .toUpperCase();
 
-const IconStar = ({ filled }: { filled: boolean }) => (
-  <span aria-hidden="true" className="text-sm leading-none">
-    {filled ? "★" : "☆"}
-  </span>
-);
-
-const IconEdit = () => (
-  <span aria-hidden="true" className="text-sm leading-none">
-    ✎
-  </span>
-);
-
-const IconPerson = () => (
-  <span aria-hidden="true" className="text-sm leading-none">
-    👤
-  </span>
-);
-
-const IconBuilding = () => (
-  <span aria-hidden="true" className="text-sm leading-none">
-    🏢
-  </span>
-);
-
-const IconMore = () => (
-  <span aria-hidden="true" className="text-lg leading-none">
-    ⋯
-  </span>
-);
-
 const getDisplayName = (contact: WorkspaceContact) => {
   const fullName = contact.fullName?.trim() ?? "";
+  if (fullName.length > 0) {
+    return fullName;
+  }
   const company = contact.company?.trim() ?? "";
-  return fullName || company || "Unnamed contact";
+  return company.length > 0 ? company : "Unnamed contact";
 };
 
-const getRichFieldSignalCount = (contact: WorkspaceContact) =>
-  [
-    contact.website,
-    contact.birthday,
-    contact.address,
-    contact.notes,
-    contact.jobTitle,
-    contact.company,
-  ].filter((value) => Boolean(value?.trim())).length;
+const getGroupLetter = (contact: WorkspaceContact) => {
+  const fullName = contact.fullName?.trim() ?? "";
+  const company = contact.company?.trim() ?? "";
+  const source = fullName.length > 0 ? fullName : company;
+  const lastToken = source.split(/\s+/).filter(Boolean).pop() ?? "";
+  const first = (lastToken[0] ?? source[0] ?? "#").toUpperCase();
+  return /[A-Z]/.test(first) ? first : "#";
+};
+
+function Highlight({ text, query }: { text: string; query: string }) {
+  if (!query) {
+    return <>{text}</>;
+  }
+  const index = text.toLowerCase().indexOf(query.toLowerCase());
+  if (index < 0) {
+    return <>{text}</>;
+  }
+  return (
+    <>
+      {text.slice(0, index)}
+      <mark className="rounded-[3px] bg-[#fff0bf] px-0.5 text-inherit">
+        {text.slice(index, index + query.length)}
+      </mark>
+      {text.slice(index + query.length)}
+    </>
+  );
+}
+
+function Avatar({ name, size }: { name: string; size: number }) {
+  const [bg, fg] = tintForName(name);
+  return (
+    <span
+      className="flex shrink-0 items-center justify-center rounded-full font-semibold"
+      style={{ width: size, height: size, background: bg, color: fg, fontSize: size * 0.36 }}
+    >
+      {getInitials(name)}
+    </span>
+  );
+}
+
+// Inline cluster after the name: favorite toggle + status badges.
+// Status badges (family/team/live/emergency) read from optional contact flags
+// that land in later phases; favorite is live now.
+function RowBadges({ contact, mode }: { contact: WorkspaceContact; mode: "active" | "archived" }) {
+  return (
+    <span className="inline-flex shrink-0 items-center gap-1">
+      <form action={toggleFavoriteContact} className="inline-flex">
+        <input name="contactId" type="hidden" value={contact.id} />
+        <input name="redirectTo" type="hidden" value={mode === "active" ? "/?tab=people" : "/?tab=archived"} />
+        <button
+          aria-label={contact.isFavorite ? "Unfavorite" : "Favorite"}
+          aria-pressed={contact.isFavorite}
+          className={`grid h-[22px] w-[22px] place-items-center rounded-md text-sm leading-none transition hover:bg-[rgba(0,0,0,0.06)] ${
+            contact.isFavorite
+              ? "text-amber-500"
+              : "text-slate-300 opacity-0 group-hover:opacity-100"
+          }`}
+          title={contact.isFavorite ? "Unfavorite" : "Favorite"}
+          type="submit"
+        >
+          {contact.isFavorite ? "★" : "☆"}
+        </button>
+      </form>
+    </span>
+  );
+}
+
+function RowActions({ contact, mode }: { contact: WorkspaceContact; mode: "active" | "archived" }) {
+  const [menuOpen, setMenuOpen] = useState(false);
+  return (
+    <div className="relative flex items-center justify-end gap-0.5">
+      <Link
+        aria-label="Edit contact"
+        className="hidden h-[30px] w-[30px] place-items-center rounded-md text-slate-500 transition hover:bg-[rgba(0,0,0,0.06)] hover:text-slate-700 group-hover:grid"
+        href={`/contacts/${contact.id}`}
+        onClick={(event) => event.stopPropagation()}
+      >
+        ✎
+      </Link>
+      <button
+        aria-label="More actions"
+        className="hidden h-[30px] w-[30px] place-items-center rounded-md text-lg leading-none text-slate-500 transition hover:bg-[rgba(0,0,0,0.06)] hover:text-slate-700 group-hover:grid"
+        onClick={(event) => {
+          event.stopPropagation();
+          setMenuOpen((open) => !open);
+        }}
+        type="button"
+      >
+        ⋯
+      </button>
+      {menuOpen ? (
+        <>
+          <button
+            aria-hidden
+            className="fixed inset-0 z-10 cursor-default"
+            onClick={() => setMenuOpen(false)}
+            tabIndex={-1}
+            type="button"
+          />
+          <div className="absolute right-0 top-9 z-20 w-44 overflow-hidden rounded-[0.9rem] border border-[#d8ddd6] bg-white py-1 shadow-[0_12px_34px_rgba(20,30,25,0.16)]">
+            <Link className="block px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-50" href={`/contacts/${contact.id}`}>
+              Open
+            </Link>
+            {mode === "active" ? (
+              <form action={archiveContact}>
+                <input name="contactId" type="hidden" value={contact.id} />
+                <input name="redirectTo" type="hidden" value="/?tab=people" />
+                <button className="block w-full px-4 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50" type="submit">
+                  Archive
+                </button>
+              </form>
+            ) : (
+              <form action={restoreContact}>
+                <input name="contactId" type="hidden" value={contact.id} />
+                <input name="redirectTo" type="hidden" value="/?tab=archived" />
+                <button className="block w-full px-4 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50" type="submit">
+                  Restore
+                </button>
+              </form>
+            )}
+            <form action={permanentlyDeleteContact}>
+              <input name="contactId" type="hidden" value={contact.id} />
+              <input name="redirectTo" type="hidden" value={mode === "active" ? "/?tab=people" : "/?tab=archived"} />
+              <button className="block w-full px-4 py-2 text-left text-sm text-rose-600 transition hover:bg-rose-50" type="submit">
+                Delete permanently
+              </button>
+            </form>
+          </div>
+        </>
+      ) : null}
+    </div>
+  );
+}
+
+const GRID = "grid-cols-[44px_minmax(150px,2.3fr)_minmax(110px,1.35fr)_minmax(170px,1.95fr)_158px_92px]";
+
+function Cell({ value, query }: { value: string | null; query: string }) {
+  if (!value?.trim()) {
+    return <span className="text-slate-300">—</span>;
+  }
+  return <Highlight query={query} text={value} />;
+}
+
+function ContactRow({
+  contact,
+  mode,
+  viewMode,
+  query,
+  selected,
+  onToggleSelect,
+}: {
+  contact: WorkspaceContact;
+  mode: "active" | "archived";
+  viewMode: "compact" | "cozy";
+  query: string;
+  selected: boolean;
+  onToggleSelect: (id: string) => void;
+}) {
+  const displayName = getDisplayName(contact);
+  const avatarSize = viewMode === "compact" ? 32 : 40;
+
+  const avatarSlot = (
+    <span className="relative inline-grid place-items-center" style={{ width: 40, height: 40 }}>
+      <span className={selected ? "opacity-0" : "opacity-100 group-hover:opacity-0"}>
+        <Avatar name={displayName} size={avatarSize} />
+      </span>
+      <button
+        aria-label={selected ? "Deselect contact" : "Select contact"}
+        className={`absolute inset-0 z-10 grid place-items-center rounded-full transition ${
+          selected ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+        }`}
+        onClick={(event) => {
+          event.stopPropagation();
+          onToggleSelect(contact.id);
+        }}
+        type="button"
+      >
+        <span
+          className={`grid h-[18px] w-[18px] place-items-center rounded-[5px] border-[1.6px] text-[10px] ${
+            selected ? "border-[#4158f4] bg-[#4158f4] text-white" : "border-slate-400 bg-white text-transparent"
+          }`}
+        >
+          ✓
+        </span>
+      </button>
+    </span>
+  );
+
+  if (viewMode === "compact") {
+    return (
+      <div
+        className={`group grid ${GRID} items-center gap-4 border-b border-[#edf0ea] px-3 py-2 transition last:border-b-0 ${
+          selected ? "bg-[#edf0fe]" : "hover:bg-[#f2f4f0]"
+        }`}
+        data-selected={selected ? "1" : "0"}
+      >
+        {avatarSlot}
+        <div className="flex min-w-0 items-center gap-1.5">
+          <Link className="min-w-0 truncate" href={`/contacts/${contact.id}`}>
+            <span className="truncate text-sm font-semibold text-[#1d2823]">
+              <Highlight query={query} text={displayName} />
+            </span>
+          </Link>
+          <RowBadges contact={contact} mode={mode} />
+        </div>
+        <div className="truncate text-[13px] text-[#5c655e]">
+          <Cell query={query} value={contact.company} />
+        </div>
+        <div className="truncate text-[13px] text-[#5c655e]">
+          <Cell query={query} value={contact.email} />
+        </div>
+        <div className="truncate text-[13px] tabular-nums text-[#5c655e]">
+          <Cell query={query} value={contact.phone} />
+        </div>
+        <RowActions contact={contact} mode={mode} />
+      </div>
+    );
+  }
+
+  // cozy two-line
+  const meta = [contact.company, contact.email, contact.phone].filter((value) => value?.trim());
+  return (
+    <div
+      className={`group flex items-center gap-3 border-b border-[#edf0ea] px-3 py-2.5 transition last:border-b-0 ${
+        selected ? "bg-[#edf0fe]" : "hover:bg-[#f2f4f0]"
+      }`}
+    >
+      {avatarSlot}
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1.5">
+          <Link className="min-w-0 truncate" href={`/contacts/${contact.id}`}>
+            <span className="truncate text-[14.5px] font-semibold text-[#1d2823]">
+              <Highlight query={query} text={displayName} />
+            </span>
+          </Link>
+          <RowBadges contact={contact} mode={mode} />
+        </div>
+        <p className="truncate text-[12.5px] text-[#8b938c]">
+          {meta.length > 0 ? (
+            meta.map((value, index) => (
+              <span key={index}>
+                {index > 0 ? <span className="mx-1.5 text-[#aeb4ac]">·</span> : null}
+                <Highlight query={query} text={value!} />
+              </span>
+            ))
+          ) : (
+            "No details yet"
+          )}
+        </p>
+      </div>
+      <RowActions contact={contact} mode={mode} />
+    </div>
+  );
+}
+
+function GroupHeading({ label, favorites }: { label: string; favorites?: boolean }) {
+  return (
+    <div className="flex items-center gap-3 px-3 pb-1.5 pt-3.5">
+      {favorites ? <span className="text-sm text-amber-500">★</span> : null}
+      <span
+        className={`font-bold leading-none ${favorites ? "text-[12px] uppercase tracking-[0.06em] text-amber-600" : "text-[16px] text-[#aeb4ac]"}`}
+      >
+        {favorites ? "Favorites" : label}
+      </span>
+      <span className="h-px flex-1 bg-[#e9ece7]" />
+    </div>
+  );
+}
 
 export function ContactsWorkspaceTable({
   contacts,
   emptyState,
   mode,
   viewMode,
+  groupByLetter,
+  query,
 }: ContactsWorkspaceTableProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [hoveredId, setHoveredId] = useState<string | null>(null);
 
-  const allSelected = contacts.length > 0 && selectedIds.length === contacts.length;
+  const isSearching = query.trim().length > 0;
+  const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds]);
   const hasSelection = selectedIds.length > 0;
-  const selectedContacts = useMemo(
-    () => contacts.filter((contact) => selectedIds.includes(contact.id)),
-    [contacts, selectedIds],
-  );
-  const firstSelectedContact = selectedContacts[0];
+  const visibleIds = contacts.map((contact) => contact.id);
+  const allSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedSet.has(id));
 
-  const toggleSelection = (contactId: string) => {
+  const toggleSelect = (id: string) =>
     setSelectedIds((current) =>
-      current.includes(contactId)
-        ? current.filter((id) => id !== contactId)
-        : [...current, contactId],
+      current.includes(id) ? current.filter((value) => value !== id) : [...current, id],
     );
-  };
+  const toggleSelectAll = () =>
+    setSelectedIds(allSelected ? [] : visibleIds);
 
-  const toggleSelectAll = () => {
-    setSelectedIds(allSelected ? [] : contacts.map((contact) => contact.id));
-  };
+  const favorites = !isSearching && mode === "active" ? contacts.filter((c) => c.isFavorite) : [];
+  const rest = !isSearching && mode === "active" ? contacts.filter((c) => !c.isFavorite) : contacts;
 
-  const openPrintContact = (contactId: string) => {
-    const printWindow = window.open(`/contacts/${contactId}?print=1`, "_blank", "noopener,noreferrer");
-
-    if (!printWindow) {
-      window.location.assign(`/contacts/${contactId}?print=1`);
-      return;
+  const groups = useMemo(() => {
+    if (!groupByLetter || isSearching) {
+      return null;
     }
-
-    printWindow.addEventListener("load", () => {
-      printWindow.print();
-    });
-  };
-
-  const getSingleContactExportUrl = (contact: WorkspaceContact) => {
-    const query = [
-      contact.fullName,
-      contact.email,
-      contact.phone,
-      contact.company,
-      contact.jobTitle,
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .trim();
-
-    const params = query.length > 0 ? `?q=${encodeURIComponent(query)}` : "";
-    return `/api/exports/contacts/csv${params}`;
-  };
+    const map = new Map<string, WorkspaceContact[]>();
+    for (const contact of rest) {
+      const letter = getGroupLetter(contact);
+      const bucket = map.get(letter) ?? [];
+      bucket.push(contact);
+      map.set(letter, bucket);
+    }
+    return [...map.entries()].sort(([a], [b]) => a.localeCompare(b));
+  }, [groupByLetter, isSearching, rest]);
 
   if (contacts.length === 0) {
     return (
-      <div className="rounded-[1.8rem] border border-dashed border-[#d8ddd6] bg-white px-6 py-12 text-sm text-slate-500">
+      <div className="rounded-[1.6rem] border border-dashed border-[#d8ddd6] bg-white px-6 py-12 text-center text-sm text-slate-500">
         {emptyState}
       </div>
     );
   }
 
+  const renderRow = (contact: WorkspaceContact) => (
+    <ContactRow
+      contact={contact}
+      key={contact.id}
+      mode={mode}
+      onToggleSelect={toggleSelect}
+      query={query}
+      selected={selectedSet.has(contact.id)}
+      viewMode={viewMode}
+    />
+  );
+
   return (
     <div className="overflow-hidden rounded-[1.6rem] border border-[#dfe4dc] bg-white">
-      <div className="border-b border-[#e8ede6] bg-[#fbfcf9] px-4 py-3 lg:px-5">
-        <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-          <label className="flex items-center gap-3 text-sm text-slate-600">
-            <input
-              checked={allSelected}
-              className="h-4 w-4 rounded border-slate-300 text-[#4158f4] focus:ring-[#4158f4]"
-              onChange={toggleSelectAll}
-              type="checkbox"
-            />
-            <span>
-              {hasSelection ? `${selectedIds.length} selected` : `Select all ${contacts.length} visible`}
-            </span>
-          </label>
-
-          <div className="flex flex-wrap items-center gap-2">
-            {hasSelection ? (
-              <>
-                {firstSelectedContact ? (
-                  <Link
-                    className="rounded-full border border-[#d8ddd6] bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-[#c9d0c9] hover:bg-slate-50"
-                    href={`/contacts/${firstSelectedContact.id}`}
-                  >
-                    Open selected
-                  </Link>
-                ) : null}
-                <form action={mode === "active" ? archiveContactsBulk : restoreContactsBulk}>
-                  {selectedIds.map((contactId) => (
-                    <input key={contactId} name="contactIds" type="hidden" value={contactId} />
-                  ))}
-                  <input
-                    name="redirectTo"
-                    type="hidden"
-                    value={mode === "active" ? "/?tab=people" : "/?tab=archived"}
-                  />
-                  <button
-                    className={`rounded-full px-3 py-2 text-xs font-semibold transition ${
-                      mode === "active"
-                        ? "border border-amber-300 text-amber-700 hover:border-amber-400 hover:bg-amber-50"
-                        : "bg-[#4158f4] text-white hover:bg-[#3248db]"
-                    }`}
-                    type="submit"
-                  >
-                    {mode === "active" ? "Archive selected" : "Restore selected"}
-                  </button>
-                </form>
-                <button
-                  className="rounded-full border border-[#d8ddd6] bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition hover:border-[#c9d0c9] hover:bg-slate-50"
-                  onClick={() => setSelectedIds([])}
-                  type="button"
-                >
-                  Clear
-                </button>
-              </>
-            ) : (
-              <span className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
-                List view
-              </span>
-            )}
+      {hasSelection ? (
+        <div className="flex flex-wrap items-center gap-3 border-b border-[#e9ece7] bg-[#edf0fe] px-4 py-2.5">
+          <button
+            aria-label="Clear selection"
+            className="grid h-7 w-7 place-items-center rounded-md text-slate-600 transition hover:bg-[rgba(0,0,0,0.06)]"
+            onClick={() => setSelectedIds([])}
+            type="button"
+          >
+            ✕
+          </button>
+          <span className="text-sm font-semibold text-slate-700">{selectedIds.length} selected</span>
+          <div className="ml-2 flex flex-wrap items-center gap-2">
+            <form action={mode === "active" ? archiveContactsBulk : restoreContactsBulk}>
+              {selectedIds.map((id) => (
+                <input key={id} name="contactIds" type="hidden" value={id} />
+              ))}
+              <input name="redirectTo" type="hidden" value={mode === "active" ? "/?tab=people" : "/?tab=archived"} />
+              <button
+                className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${
+                  mode === "active"
+                    ? "border-[#d8ddd6] text-slate-700 hover:bg-white"
+                    : "border-[#4158f4] bg-[#4158f4] text-white hover:bg-[#3248db]"
+                }`}
+                type="submit"
+              >
+                {mode === "active" ? "Archive" : "Restore"}
+              </button>
+            </form>
           </div>
         </div>
-      </div>
+      ) : null}
 
-      <div className="hidden grid-cols-[44px_minmax(280px,1.6fr)_minmax(210px,1fr)_minmax(170px,0.9fr)_minmax(180px,0.95fr)_110px_170px] items-center gap-4 border-b border-[#e8ede6] bg-[#fbfcf9] px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-500 lg:grid">
-        <span />
-        <span>Summary</span>
-        <span>Email</span>
-        <span>Phone</span>
-        <span>Company</span>
-        <span>Birthday</span>
-        <span className="text-right">Actions</span>
-      </div>
+      {/* sticky column header (compact only) */}
+      {viewMode === "compact" ? (
+        <div
+          className={`sticky top-0 z-[3] hidden ${GRID} items-center gap-4 border-b border-[#e9ece7] bg-white px-3 py-2.5 text-[10.5px] font-bold uppercase tracking-[0.07em] text-[#8b938c] lg:grid`}
+        >
+          <button
+            aria-label={allSelected ? "Deselect all" : "Select all"}
+            className={`grid h-[18px] w-[18px] place-items-center rounded-[5px] border-[1.6px] text-[10px] transition ${
+              allSelected ? "border-[#4158f4] bg-[#4158f4] text-white" : "border-slate-300 bg-white text-transparent hover:border-slate-400"
+            } ${hasSelection ? "" : "opacity-0 hover:opacity-100"}`}
+            onClick={toggleSelectAll}
+            type="button"
+          >
+            ✓
+          </button>
+          <span>Name</span>
+          <span>Company</span>
+          <span>Email</span>
+          <span>Phone</span>
+          <span />
+        </div>
+      ) : null}
 
-      {contacts.map((contact, index) => {
-        const isSelected = selectedIds.includes(contact.id);
-        const showDesktopActions = hoveredId === contact.id || isSelected;
-        const rowPaddingClass = viewMode === "cozy" ? "py-3" : "py-2";
-        const rowGapClass = viewMode === "cozy" ? "gap-5" : "gap-4";
-        const previousContact = index > 0 ? contacts[index - 1] : undefined;
-        const showFavoritesStart = mode === "active" && index === 0 && contact.isFavorite;
-                const showFavoritesEnd =
-          mode === "active" && previousContact?.isFavorite === true && !contact.isFavorite;
-        const hasName = (contact.fullName?.trim().length ?? 0) > 0;
-        const hasCompany = (contact.company?.trim().length ?? 0) > 0;
-        const displayName = getDisplayName(contact);
-        const hasPhonetic =
-          (contact.phoneticFirstName?.trim().length ?? 0) > 0 ||
-          (contact.phoneticLastName?.trim().length ?? 0) > 0 ||
-          (contact.phoneticCompany?.trim().length ?? 0) > 0;
-        const richFieldSignalCount = getRichFieldSignalCount(contact);
-        const hasRichFieldSignal = richFieldSignalCount >= 2;
+      {favorites.length > 0 ? (
+        <>
+          <GroupHeading favorites label="Favorites" />
+          {favorites.map(renderRow)}
+        </>
+      ) : null}
 
-        return (
-          <div key={contact.id}>
-            {showFavoritesStart ? (
-              <div className="border-b border-[#e8ede6] bg-[#f4fbfa] px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-[#1f7a67] lg:px-5">
-                Pinned favorites
-              </div>
-            ) : null}
-            {showFavoritesEnd ? (
-              <div className="border-b border-[#e8ede6] bg-[#fbfcf9] px-4 py-2.5 text-xs font-semibold uppercase tracking-[0.18em] text-slate-500 lg:px-5">
-                All contacts
-              </div>
-            ) : null}
-            <article
-              className={`border-b border-[#edf0ea] px-4 ${rowPaddingClass} transition last:border-b-0 lg:px-5 ${
-                isSelected
-                  ? "bg-[#f4f6ff] shadow-[inset_3px_0_0_0_#4158f4]"
-                  : contact.isFavorite
-                    ? "bg-[#fcfefd] hover:bg-[#f8fcfb]"
-                    : "bg-white hover:bg-[#fafbf8]"
-              }`}
-              onMouseEnter={() => setHoveredId(contact.id)}
-              onMouseLeave={() =>
-                setHoveredId((current) => (current === contact.id ? null : current))
-              }
-            >
-              <div
-                className={`grid ${rowGapClass} lg:grid-cols-[44px_minmax(280px,1.6fr)_minmax(210px,1fr)_minmax(170px,0.9fr)_minmax(180px,0.95fr)_110px_170px] lg:items-center`}
-              >
-                <label className="hidden items-center justify-center lg:flex">
-                  <input
-                    checked={isSelected}
-                    className="h-4 w-4 rounded border-slate-300 text-[#4158f4] focus:ring-[#4158f4]"
-                    onChange={() => toggleSelection(contact.id)}
-                    type="checkbox"
-                  />
-                </label>
-
-                <div className="min-w-0">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#e8ecff] text-xs font-semibold text-[#4158f4]">
-                      {hasName ? (
-                        getInitials(contact.fullName)
-                      ) : hasCompany ? (
-                        <IconBuilding />
-                      ) : (
-                        <IconPerson />
-                      )}
-                    </div>
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-1.5">
-                        <Link
-                          className="truncate text-[14px] font-semibold text-slate-900 hover:text-[#3248db]"
-                          href={`/contacts/${contact.id}`}
-                        >
-                          {displayName}
-                        </Link>
-                        {contact.isFavorite ? (
-                          <span
-                            aria-label="Favorite contact"
-                            className="text-[13px] text-amber-500"
-                            title="Favorite contact"
-                          >
-                            ★
-                          </span>
-                        ) : null}
-                        {contact.archivedAt ? (
-                          <span className="rounded-full border border-amber-200 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-amber-700">
-                            Archived
-                          </span>
-                        ) : null}
-                        {hasPhonetic ? (
-                          <span className="rounded-full border border-cyan-200 bg-cyan-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-cyan-700">
-                            Phonetic
-                          </span>
-                        ) : null}
-                        {hasRichFieldSignal ? (
-                          <span className="rounded-full border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.16em] text-emerald-700">
-                            Rich {richFieldSignalCount}
-                          </span>
-                        ) : null}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="hidden text-[13px] text-slate-700 lg:block">
-                  <p className="truncate font-medium text-[#3341c7]">
-                    {contact.email ?? ""}
-                  </p>
-                </div>
-
-                <div className="hidden text-[13px] text-slate-700 lg:block">
-                  <p className="font-medium">{contact.phone ?? ""}</p>
-                </div>
-
-                <div className="hidden text-[13px] text-slate-700 lg:block">
-                  <p className="truncate font-medium">{contact.company?.trim() ?? ""}</p>
-                    <p className="mt-0.5 truncate text-[13px] text-slate-500">
-                    {contact.jobTitle?.trim() ?? ""}
-                  </p>
-                </div>
-
-                <div className="hidden text-[13px] text-slate-500 lg:block">
-                  {formatBirthday(contact.birthday)}
-                </div>
-
-                <div className="hidden items-center justify-end gap-2 lg:flex">
-                  <form action={toggleFavoriteContact}>
-                    <input name="contactId" type="hidden" value={contact.id} />
-                    <input
-                      name="redirectTo"
-                      type="hidden"
-                      value={mode === "active" ? "/?tab=people" : "/?tab=archived"}
-                    />
-                    <button
-                      className={`rounded-full w-9 h-9 p-0 flex items-center justify-center border text-xs font-semibold transition ${
-                        showDesktopActions
-                          ? contact.isFavorite
-                            ? "border-cyan-300 text-cyan-700 opacity-100 hover:border-cyan-400 hover:bg-cyan-50"
-                            : "border-[#d8ddd6] text-slate-700 opacity-100 hover:border-[#c9d0c9] hover:bg-slate-50"
-                          : "pointer-events-none border-transparent text-transparent opacity-0"
-                      }`}
-                      tabIndex={showDesktopActions ? 0 : -1}
-                      type="submit"
-                      aria-label={contact.isFavorite ? "Unstar contact" : "Star contact"}
-                    >
-                      <span className="sr-only">{contact.isFavorite ? "Unstar" : "Star"}</span>
-                      <IconStar filled={contact.isFavorite} />
-                    </button>
-                  </form>
-                  <Link
-                    className={`rounded-full w-9 h-9 p-0 flex items-center justify-center border text-xs font-semibold transition ${
-                      showDesktopActions
-                        ? "border-[#d8ddd6] text-slate-700 opacity-100 hover:border-[#c9d0c9] hover:bg-slate-50"
-                        : "pointer-events-none border-transparent text-transparent opacity-0"
-                    }`}
-                    href={`/contacts/${contact.id}`}
-                    tabIndex={showDesktopActions ? 0 : -1}
-                    aria-label="Edit contact"
-                  >
-                    <span className="sr-only">Edit contact</span>
-                    <IconEdit />
-                  </Link>
-                  <details
-                    className="relative"
-                    suppressHydrationWarning
-                  >
-                    <summary
-                      className={`list-none cursor-pointer rounded-full w-9 h-9 p-0 flex items-center justify-center border text-xs font-semibold transition ${
-                        showDesktopActions
-                          ? "border-[#d8ddd6] text-slate-700 opacity-100 hover:border-[#c9d0c9] hover:bg-slate-50"
-                          : "pointer-events-none border-transparent text-transparent opacity-0"
-                      }`}
-                      role="button"
-                      aria-label="More actions"
-                      tabIndex={showDesktopActions ? 0 : -1}
-                    >
-                      <span className="sr-only">More actions</span>
-                      <IconMore />
-                    </summary>
-                    <div
-                      className={`absolute right-0 top-full z-20 mt-2 min-w-[160px] overflow-hidden rounded-xl border border-[#d8ddd6] bg-white shadow-[0_16px_48px_rgba(15,23,42,0.15)] ${
-                        showDesktopActions ? "opacity-100" : "pointer-events-none opacity-0"
-                      }`}
-                    >
-                      <button
-                        className="w-full px-3 py-2 text-left text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
-                        onClick={() => openPrintContact(contact.id)}
-                        type="button"
-                      >
-                        中 Print C
-                      </button>
-                      <a
-                        className="block px-3 py-2 text-left text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
-                        href={getSingleContactExportUrl(contact)}
-                        rel="noopener noreferrer"
-                        target="_blank"
-                      >
-                        I Export
-                      </a>
-                      {contact.archivedAt ? (
-                        <form action={restoreContact}>
-                          <input name="contactId" type="hidden" value={contact.id} />
-                          <input name="redirectTo" type="hidden" value="/?tab=archived" />
-                          <button
-                            className="w-full px-3 py-2 text-left text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
-                            type="submit"
-                          >
-                            Restore
-                          </button>
-                        </form>
-                      ) : (
-                        <form action={archiveContact}>
-                          <input name="contactId" type="hidden" value={contact.id} />
-                          <input name="redirectTo" type="hidden" value="/?tab=people" />
-                          <button
-                            className="w-full px-3 py-2 text-left text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
-                            type="submit"
-                          >
-                            Hide from contacts
-                          </button>
-                        </form>
-                      )}
-                      <form action={permanentlyDeleteContact}>
-                        <input name="contactId" type="hidden" value={contact.id} />
-                        <input name="redirectTo" type="hidden" value="/?tab=people" />
-                        <button
-                          className="w-full px-3 py-2 text-left text-xs font-semibold text-rose-600 transition hover:bg-rose-50"
-                          type="submit"
-                        >
-                          回 Delete
-                        </button>
-                      </form>
-                      <Link
-                        className="block px-3 py-2 text-left text-xs font-semibold text-slate-700 transition hover:bg-slate-50"
-                        href={`/contacts/${contact.id}`}
-                      >
-                        Change labels
-                      </Link>
-                    </div>
-                  </details>
-                </div>
-              </div>
-            </article>
-          </div>
-        );
-      })}
+      {groups
+        ? groups.map(([letter, bucket]) => (
+            <div key={letter}>
+              <GroupHeading label={letter} />
+              {bucket.map(renderRow)}
+            </div>
+          ))
+        : rest.map(renderRow)}
     </div>
   );
 }

@@ -41,30 +41,35 @@ type PlanSummary = {
   premiumExportEnabled: boolean;
 };
 
+type WorkspaceTab = "people" | "archived" | "duplicates";
+type WorkspaceFilter = "all" | "recent" | "incomplete" | "favorites";
+type WorkspaceSort = "updated" | "name";
+type WorkspaceView = "compact" | "cozy";
+
 type ContactDashboardProps = {
   activeContacts: DashboardContact[];
   archivedContacts: DashboardContact[];
-  currentFilter: "all" | "recent" | "incomplete" | "favorites";
-  currentSort: "updated" | "name";
-  currentTab: "people" | "archived" | "duplicates";
+  currentFilter: WorkspaceFilter;
+  currentSort: WorkspaceSort;
+  currentTab: WorkspaceTab;
   query: string;
   planSummary: PlanSummary;
   mergeSuggestions: PersistedMergeSuggestion[];
   mergeSuggestionsRefreshed: boolean;
-  viewMode: "compact" | "cozy";
+  viewMode: WorkspaceView;
+  counts: { people: number; favorites: number; archived: number; duplicates: number };
+  account: { name: string; email: string };
+  syncState: "ok" | "warning" | "error";
 };
 
-const getLifecycleTone = (state: BillingLifecycleState) => {
-  if (state === "ACTIVE" || state === "TRIALING") {
-    return "border-emerald-200 bg-emerald-50 text-emerald-700";
-  }
-
-  if (state === "GRACE") {
-    return "border-amber-200 bg-amber-50 text-amber-700";
-  }
-
-  return "border-rose-200 bg-rose-50 text-rose-700";
-};
+const getInitials = (value: string) =>
+  value
+    .split(/\s+/)
+    .map((part) => part.trim()[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
 export function ContactDashboard({
   activeContacts,
@@ -77,17 +82,13 @@ export function ContactDashboard({
   mergeSuggestions,
   mergeSuggestionsRefreshed,
   viewMode,
+  counts,
+  account,
+  syncState,
 }: ContactDashboardProps) {
-  const visibleCount = activeContacts.length + archivedContacts.length;
-  const needsDetailsCount = activeContacts.filter((contact) => !contact.email && !contact.phone).length;
-  const totalContacts = activeContacts.length;
-  const buildWorkspaceHref = (
-    tab: "people" | "archived" | "duplicates",
-    overrides?: {
-      filter?: "all" | "recent" | "incomplete" | "favorites";
-      sort?: "updated" | "name";
-      view?: "compact" | "cozy";
-    },
+  const buildHref = (
+    tab: WorkspaceTab,
+    overrides?: { filter?: WorkspaceFilter; sort?: WorkspaceSort; view?: WorkspaceView },
   ) => {
     const params = new URLSearchParams();
     params.set("tab", tab);
@@ -99,306 +100,246 @@ export function ContactDashboard({
     }
     return `/?${params.toString()}`;
   };
-  const peopleTabHref = buildWorkspaceHref("people");
-  const archivedTabHref = buildWorkspaceHref("archived");
-  const duplicatesTabHref = buildWorkspaceHref("duplicates");
+
+  const isFavoritesView = currentTab === "people" && currentFilter === "favorites";
+  const peopleActive = currentTab === "people" && !isFavoritesView;
+  const groupByLetter = currentSort === "name" && !query;
+
+  const navItem = (
+    active: boolean,
+    href: string,
+    icon: string,
+    label: string,
+    count: number | null,
+    badge?: boolean,
+  ) => (
+    <Link
+      className={`flex h-9 items-center gap-3 rounded-lg px-2.5 text-[13.5px] transition ${
+        active
+          ? "bg-[#e7efe9] font-semibold text-[#17352e]"
+          : "font-medium text-[#5c655e] hover:bg-[#f2f4f0]"
+      }`}
+      href={href}
+    >
+      <span aria-hidden className="w-5 text-center text-[15px]">
+        {icon}
+      </span>
+      <span className="flex-1">{label}</span>
+      {count != null ? (
+        badge && count > 0 ? (
+          <span className="rounded-full bg-[#bf8526] px-1.5 text-[11px] font-semibold text-white">{count}</span>
+        ) : (
+          <span className="text-[12px] text-[#8b938c]">{count}</span>
+        )
+      ) : null}
+    </Link>
+  );
+
+  const subFilter = (filter: WorkspaceFilter, label: string) => {
+    const active = peopleActive && currentFilter === filter;
+    return (
+      <Link
+        className={`ml-[17px] flex h-[30px] items-center rounded-md border-l-2 pl-3 pr-2.5 text-[12.5px] transition ${
+          active
+            ? "border-[#17352e] bg-[#f2f4f0] font-semibold text-[#1d2823]"
+            : "border-[#e9ece7] font-medium text-[#5c655e] hover:bg-[#f2f4f0]"
+        }`}
+        href={buildHref("people", { filter })}
+      >
+        {label}
+      </Link>
+    );
+  };
+
+  const sideLink = (href: string, icon: string, label: string, dot?: boolean) => (
+    <Link
+      className="flex h-8 items-center gap-2.5 rounded-md px-2.5 text-[12.5px] font-medium text-[#8b938c] transition hover:bg-[#f2f4f0] hover:text-[#5c655e]"
+      href={href}
+    >
+      <span aria-hidden className="w-4 text-center">
+        {icon}
+      </span>
+      <span className="flex-1">{label}</span>
+      {dot ? (
+        <span
+          aria-label={`Sync: ${syncState}`}
+          className="h-2 w-2 rounded-full"
+          style={{
+            background: syncState === "error" ? "#b5472f" : syncState === "warning" ? "#bf8526" : "#3a9d6a",
+          }}
+        />
+      ) : null}
+    </Link>
+  );
+
+  const segment = (label: string, active: boolean, href: string) => (
+    <Link
+      className={`rounded-md px-2.5 py-1 text-[12px] font-semibold transition ${
+        active ? "bg-white text-[#1d2823] shadow-[0_1px_2px_rgba(0,0,0,0.08)]" : "text-[#8b938c] hover:text-[#5c655e]"
+      }`}
+      href={href}
+    >
+      {label}
+    </Link>
+  );
+
+  const countLabel =
+    currentTab === "people"
+      ? `${counts.people} contacts`
+      : currentTab === "archived"
+        ? `${counts.archived} archived`
+        : `${counts.duplicates} duplicates`;
 
   return (
-    <div className="mx-auto w-full max-w-[1800px] px-4 py-5 lg:px-6 lg:py-6">
-      <section className="overflow-hidden rounded-[2rem] border border-[#d8ddd6] bg-white shadow-[0_24px_80px_rgba(15,23,42,0.06)]">
-        <div className="border-b border-[#e7ebe5] px-4 py-4 sm:px-6">
-          <div className="flex flex-col gap-4">
-            <div className="min-w-0">
-              <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">
-                Contacts
-              </p>
-              <h1 className="mt-1 text-[1.9rem] font-semibold tracking-tight text-slate-900">
-                {query ? `Search results for "${query}"` : "People"}
-              </h1>
-              <p className="mt-1 text-sm text-slate-500">
-                Keep the list fast, the actions obvious, and the details one click away.
-              </p>
-            </div>
-          </div>
+    <div className="mx-auto flex w-full max-w-[1800px]">
+      {/* sidebar */}
+      <aside className="hidden w-[244px] shrink-0 flex-col gap-1 border-r border-[#d8ddd6] bg-white px-3 py-4 lg:flex">
+        <Link
+          className="mb-2 flex items-center gap-3 rounded-xl border border-[#e9ece7] bg-[#f6f7f4] p-2.5 transition hover:bg-[#f2f4f0]"
+          href="/settings"
+        >
+          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#17352e] text-xs font-semibold text-[#dff0e7]">
+            {getInitials(account.name)}
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block truncate text-[13px] font-semibold text-[#1d2823]">{account.name}</span>
+            <span className="block truncate text-[11px] text-[#8b938c]">{account.email}</span>
+          </span>
+          <span className="rounded-full bg-[#e7efe9] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.06em] text-[#17352e]">
+            {planSummary.planLabel}
+          </span>
+        </Link>
 
-          <div className="mt-5 flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-            <div className="flex flex-wrap gap-2">
-              <Link
-                className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                  currentTab === "people"
-                    ? "bg-[#17352e] text-white"
-                    : "border border-[#d8ddd6] bg-white text-slate-600 hover:bg-slate-50"
-                }`}
-                href={peopleTabHref}
-              >
-                People
-              </Link>
-              <Link
-                className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                  currentTab === "archived"
-                    ? "bg-[#17352e] text-white"
-                    : "border border-[#d8ddd6] bg-white text-slate-600 hover:bg-slate-50"
-                }`}
-                href={archivedTabHref}
-              >
-                Archived
-              </Link>
-              <Link
-                className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                  currentTab === "duplicates"
-                    ? "bg-[#17352e] text-white"
-                    : "border border-[#d8ddd6] bg-white text-slate-600 hover:bg-slate-50"
-                }`}
-                href={duplicatesTabHref}
-              >
-                Duplicates
-              </Link>
-            </div>
-
-            <div className="flex flex-wrap gap-2 text-sm">
-              <Link
-                className="rounded-full border border-[#d8ddd6] bg-[#fbfcf8] px-3 py-2 text-slate-600 transition hover:bg-slate-50"
-                href="/merge/manual"
-              >
-                Manual merge
-              </Link>
-              <Link
-                className="rounded-full border border-[#d8ddd6] bg-[#fbfcf8] px-3 py-2 text-slate-600 transition hover:bg-slate-50"
-                href="/sync"
-              >
-                Sync center
-              </Link>
-              <Link
-                className="rounded-full border border-[#d8ddd6] bg-[#fbfcf8] px-3 py-2 text-slate-600 transition hover:bg-slate-50"
-                href="/settings"
-              >
-                Settings
-              </Link>
-            </div>
-          </div>
-
-          <div className="mt-4 flex flex-wrap gap-2">
-            <div className="rounded-full border border-[#d8ddd6] bg-[#f8faf8] px-3 py-1.5 text-sm text-slate-600">
-              <span className="font-semibold text-slate-900">{visibleCount}</span> visible
-            </div>
-            <div className="rounded-full border border-[#d8ddd6] bg-[#fbfcf8] px-3 py-1.5 text-sm text-slate-600">
-              <span className="font-semibold text-slate-900">{needsDetailsCount}</span> need enrichment
-            </div>
-            <div className="rounded-full border border-[#d8ddd6] bg-[#f7f8ff] px-3 py-1.5 text-sm text-slate-600">
-              <span className="font-semibold text-slate-900">{planSummary.contactsRemaining}</span> plan space
-            </div>
-            <div className="rounded-full border border-[#d8ddd6] bg-[#fdf9f1] px-3 py-1.5 text-sm text-slate-600">
-              <span className="font-semibold text-slate-900">{mergeSuggestions.length}</span> duplicates
-            </div>
-          </div>
-        </div>
-
-        {mergeSuggestionsRefreshed ? (
-          <div className="mx-4 mt-4 rounded-[1.2rem] border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700 shadow-sm sm:mx-6">
-            Duplicate suggestions refreshed successfully.
+        {navItem(peopleActive, buildHref("people", { filter: "all" }), "📋", "People", counts.people)}
+        {peopleActive ? (
+          <div className="grid gap-0.5">
+            {subFilter("all", "All contacts")}
+            {subFilter("recent", "Recently updated")}
+            {subFilter("incomplete", "Missing details")}
           </div>
         ) : null}
+        {navItem(isFavoritesView, buildHref("people", { filter: "favorites" }), "⭐", "Favorites", counts.favorites)}
+        {navItem(currentTab === "archived", buildHref("archived", { filter: "all" }), "🗂", "Archived", counts.archived)}
+        {navItem(
+          currentTab === "duplicates",
+          buildHref("duplicates", { filter: "all" }),
+          "👥",
+          "Duplicates",
+          counts.duplicates,
+          true,
+        )}
 
-        <div className="px-4 py-4 sm:px-6 sm:py-5">
-          <div className="flex flex-col gap-3 border-b border-[#eef1eb] pb-4 sm:flex-row sm:items-center sm:justify-between">
-            <div>
-              <p className="text-lg font-semibold text-slate-900">
-                {currentTab === "people"
-                  ? "People"
-                  : currentTab === "archived"
-                    ? "Archived contacts"
-                    : "Duplicate review"}
-              </p>
-              <p className="mt-1 text-sm text-slate-500">
-                {currentTab === "people"
-                  ? `${totalContacts} active contacts ready for quick scanning and detail updates.`
-                  : currentTab === "archived"
-                    ? "Archived contacts stay recoverable instead of disappearing into a hidden bin."
-                    : "Review suggested duplicates without leaving the primary workspace."}
-              </p>
-            </div>
+        <div className="mt-auto border-t border-[#e9ece7] pt-2">
+          {sideLink("/import-export", "↑", "Import")}
+          {sideLink("/import-export", "↓", "Export")}
+          {sideLink("/sync", "⟳", "Sync", true)}
+        </div>
+      </aside>
 
-            <div className="flex flex-wrap items-center gap-2">
-              <span
-                className={`rounded-full border px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.18em] ${getLifecycleTone(
-                  planSummary.lifecycleState,
-                )}`}
-              >
-                {planSummary.lifecycleLabel}
-              </span>
-              {currentTab === "duplicates" ? <MergeSuggestionRefreshButton /> : null}
-            </div>
-          </div>
-
-          <div className="sticky top-[77px] z-10 -mx-4 border-b border-[#eef1eb] bg-[rgba(255,255,255,0.96)] px-4 py-3 backdrop-blur sm:-mx-6 sm:px-6">
-            <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
-              <div className="flex flex-wrap gap-2">
-                <Link
-                  className={`rounded-full border px-3 py-1.5 text-sm transition ${
-                    currentFilter === "all"
-                      ? "border-[#d8ddd6] bg-[#f8faf8] font-semibold text-slate-900"
-                      : "border-[#d8ddd6] bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
-                  href={buildWorkspaceHref(currentTab, { filter: "all" })}
-                >
-                  All contacts
-                </Link>
-                <Link
-                  className={`rounded-full border px-3 py-1.5 text-sm transition ${
-                    currentFilter === "recent"
-                      ? "border-[#d8ddd6] bg-[#f8faf8] font-semibold text-slate-900"
-                      : "border-[#d8ddd6] bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
-                  href={buildWorkspaceHref(currentTab, { filter: "recent" })}
-                >
-                  Recently updated
-                </Link>
-                <Link
-                  className={`rounded-full border px-3 py-1.5 text-sm transition ${
-                    currentFilter === "incomplete"
-                      ? "border-[#d8ddd6] bg-[#f8faf8] font-semibold text-slate-900"
-                      : "border-[#d8ddd6] bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
-                  href={buildWorkspaceHref(currentTab, { filter: "incomplete" })}
-                >
-                  Missing details
-                </Link>
-                <Link
-                  className={`rounded-full border px-3 py-1.5 text-sm transition ${
-                    currentFilter === "favorites"
-                      ? "border-[#d8ddd6] bg-[#f8faf8] font-semibold text-slate-900"
-                      : "border-[#d8ddd6] bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
-                  href={buildWorkspaceHref(currentTab, { filter: "favorites" })}
-                >
-                  Favorites
-                </Link>
+      {/* list area */}
+      <section className="min-w-0 flex-1 bg-white">
+        {/* toolbar */}
+        <div className="flex items-center gap-3 border-b border-[#e9ece7] px-4 py-2.5">
+          {currentTab !== "duplicates" ? (
+            <>
+              <div className="flex items-center gap-1 rounded-lg bg-[#f2f4f0] p-0.5">
+                {segment("Name", currentSort === "name", buildHref(currentTab, { sort: "name" }))}
+                {segment("Recent", currentSort === "updated", buildHref(currentTab, { sort: "updated" }))}
               </div>
-
-              <div className="flex flex-wrap gap-2">
-                <Link
-                  className={`rounded-full border px-3 py-1.5 text-sm transition ${
-                    currentSort === "updated"
-                      ? "border-[#d8ddd6] bg-[#f8faf8] font-semibold text-slate-900"
-                      : "border-[#d8ddd6] bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
-                  href={buildWorkspaceHref(currentTab, { sort: "updated" })}
-                >
-                  Sort: Updated
-                </Link>
-                <Link
-                  className={`rounded-full border px-3 py-1.5 text-sm transition ${
-                    currentSort === "name"
-                      ? "border-[#d8ddd6] bg-[#f8faf8] font-semibold text-slate-900"
-                      : "border-[#d8ddd6] bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
-                  href={buildWorkspaceHref(currentTab, { sort: "name" })}
-                >
-                  Sort: Name
-                </Link>
-                <Link
-                  className={`rounded-full border px-3 py-1.5 text-sm transition ${
-                    viewMode === "compact"
-                      ? "border-[#d8ddd6] bg-[#f8faf8] font-semibold text-slate-900"
-                      : "border-[#d8ddd6] bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
-                  href={buildWorkspaceHref(currentTab, { view: "compact" })}
-                >
-                  View: Compact
-                </Link>
-                <Link
-                  className={`rounded-full border px-3 py-1.5 text-sm transition ${
-                    viewMode === "cozy"
-                      ? "border-[#d8ddd6] bg-[#f8faf8] font-semibold text-slate-900"
-                      : "border-[#d8ddd6] bg-white text-slate-600 hover:bg-slate-50"
-                  }`}
-                  href={buildWorkspaceHref(currentTab, { view: "cozy" })}
-                >
-                  View: Cozy
-                </Link>
+              <div className="flex items-center gap-1 rounded-lg bg-[#f2f4f0] p-0.5">
+                {segment("Compact", viewMode === "compact", buildHref(currentTab, { view: "compact" }))}
+                {segment("Cozy", viewMode === "cozy", buildHref(currentTab, { view: "cozy" }))}
               </div>
-            </div>
-          </div>
+            </>
+          ) : (
+            <MergeSuggestionRefreshButton />
+          )}
+          <span className="ml-auto text-[12.5px] text-[#8b938c]">{countLabel}</span>
+        </div>
 
-          <div className="mt-4">
-            {currentTab === "people" ? (
-              <ContactsWorkspaceTable
-                contacts={activeContacts}
-                emptyState="No active contacts match this view yet."
-                mode="active"
-                viewMode={viewMode}
-              />
-            ) : null}
+        <div className="p-4">
+          {currentTab === "people" ? (
+            <ContactsWorkspaceTable
+              contacts={activeContacts}
+              emptyState={
+                query
+                  ? `No contacts match “${query}”.`
+                  : isFavoritesView
+                    ? "No favorites yet. Star a contact to pin it here."
+                    : currentFilter === "incomplete"
+                      ? "No contacts are missing details."
+                      : "Your contacts list is empty. Add your first contact or import from Google, Apple, or Outlook."
+              }
+              groupByLetter={groupByLetter}
+              mode="active"
+              query={query}
+              viewMode={viewMode}
+            />
+          ) : null}
 
-            {currentTab === "archived" ? (
-              <ContactsWorkspaceTable
-                contacts={archivedContacts}
-                emptyState="No archived contacts match this view yet."
-                mode="archived"
-                viewMode={viewMode}
-              />
-            ) : null}
+          {currentTab === "archived" ? (
+            <ContactsWorkspaceTable
+              contacts={archivedContacts}
+              emptyState={query ? `No archived contacts match “${query}”.` : "No archived contacts."}
+              groupByLetter={groupByLetter}
+              mode="archived"
+              query={query}
+              viewMode={viewMode}
+            />
+          ) : null}
 
-            {currentTab === "duplicates" ? (
-              mergeSuggestions.length === 0 ? (
-                <div className="rounded-[1.8rem] border border-dashed border-[#d8ddd6] bg-[#fbfcf8] px-6 py-12 text-sm text-slate-500">
-                  No duplicate suggestions are open right now.
-                </div>
-              ) : (
-                <div className="grid gap-4">
-                  {mergeSuggestions.map((suggestion) => (
-                    <article
-                      className="rounded-[1.6rem] border border-[#d8ddd6] bg-[#fcfcfa] p-5"
-                      key={suggestion.id}
-                    >
-                      <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-                        <div className="min-w-0">
-                          <div className="flex flex-wrap items-center gap-3">
-                            <p className="text-lg font-semibold text-slate-900">
-                              {suggestion.leftContact.fullName} ↔ {suggestion.rightContact.fullName}
-                            </p>
-                            <span
-                              className={`rounded-full px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] ${
-                                suggestion.confidence === "high"
-                                  ? "bg-rose-100 text-rose-700"
-                                  : "bg-amber-100 text-amber-700"
-                              }`}
-                            >
-                              {suggestion.confidence}
-                            </span>
-                          </div>
-                          <p className="mt-2 text-sm text-slate-500">
-                            Score {suggestion.score} · {suggestion.hardMatch ? "Hard match" : "Needs review"}
-                          </p>
-                          <div className="mt-3 grid gap-2 text-sm text-slate-600">
-                            {suggestion.reasons.map((reason) => (
-                              <p key={reason}>{reason}</p>
-                            ))}
-                          </div>
-                        </div>
-
-                        <div className="flex flex-wrap gap-2">
-                          <Link
-                            className="rounded-full bg-[#17352e] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#20443b]"
-                            href={`/merge-suggestions/${suggestion.id}`}
-                          >
-                            Review
-                          </Link>
-                          <Link
-                            className="rounded-full border border-[#d8ddd6] px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-                            href={`/contacts/${suggestion.leftContact.id}`}
-                          >
-                            Open contact
-                          </Link>
-                          <MergeSuggestionDismissButton suggestionId={suggestion.id} />
-                        </div>
+          {currentTab === "duplicates" ? (
+            mergeSuggestions.length === 0 ? (
+              <div className="rounded-[1.6rem] border border-dashed border-[#d8ddd6] bg-white px-6 py-12 text-center text-sm text-slate-500">
+                No duplicates to review. Kontax scans as you add and import contacts — you&apos;re all clear.
+              </div>
+            ) : (
+              <div className="grid gap-3">
+                {mergeSuggestionsRefreshed ? (
+                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#1f7a67]">Suggestions refreshed</p>
+                ) : null}
+                {mergeSuggestions.map((suggestion) => (
+                  <article
+                    className="flex flex-col gap-4 rounded-[1.2rem] border border-[#d8ddd6] bg-white p-4 lg:flex-row lg:items-center lg:justify-between"
+                    key={suggestion.id}
+                  >
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-3">
+                        <p className="text-[15px] font-semibold text-slate-900">
+                          {suggestion.leftContact.fullName} ↔ {suggestion.rightContact.fullName}
+                        </p>
+                        <span
+                          className={`rounded-full px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.04em] ${
+                            suggestion.confidence === "high"
+                              ? "bg-[#f3e1da] text-[#b5472f]"
+                              : suggestion.confidence === "medium"
+                                ? "bg-[#f6edd9] text-[#bf8526]"
+                                : "bg-[#f2f4f0] text-[#8b938c]"
+                          }`}
+                        >
+                          {suggestion.confidence} confidence
+                        </span>
                       </div>
-                    </article>
-                  ))}
-                </div>
-              )
-            ) : null}
-          </div>
+                      <div className="mt-1.5 grid gap-1 text-[12.5px] text-[#5c655e]">
+                        {suggestion.reasons.map((reason) => (
+                          <p key={reason}>{reason}</p>
+                        ))}
+                      </div>
+                    </div>
+                    <div className="flex flex-wrap gap-2">
+                      <Link
+                        className="rounded-lg border border-[#d8ddd6] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#1d2823] transition hover:bg-slate-50"
+                        href={`/merge-suggestions/${suggestion.id}`}
+                      >
+                        Review
+                      </Link>
+                      <MergeSuggestionDismissButton suggestionId={suggestion.id} />
+                    </div>
+                  </article>
+                ))}
+              </div>
+            )
+          ) : null}
         </div>
       </section>
     </div>
