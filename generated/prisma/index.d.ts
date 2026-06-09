@@ -260,6 +260,14 @@ export const SyncConflictStatus: {
 export type SyncConflictStatus = (typeof SyncConflictStatus)[keyof typeof SyncConflictStatus]
 
 
+export const SyncConflictSource: {
+  OUTBOUND_SYNC: 'OUTBOUND_SYNC',
+  INBOUND_DEVICE: 'INBOUND_DEVICE'
+};
+
+export type SyncConflictSource = (typeof SyncConflictSource)[keyof typeof SyncConflictSource]
+
+
 export const SyncResolutionStrategy: {
   KEEP_LOCAL: 'KEEP_LOCAL',
   KEEP_REMOTE: 'KEEP_REMOTE',
@@ -347,6 +355,10 @@ export const SyncConflictType: typeof $Enums.SyncConflictType
 export type SyncConflictStatus = $Enums.SyncConflictStatus
 
 export const SyncConflictStatus: typeof $Enums.SyncConflictStatus
+
+export type SyncConflictSource = $Enums.SyncConflictSource
+
+export const SyncConflictSource: typeof $Enums.SyncConflictSource
 
 export type SyncResolutionStrategy = $Enums.SyncResolutionStrategy
 
@@ -2316,6 +2328,37 @@ export namespace Prisma {
 
 
   /**
+   * Count Type AppPasswordCountOutputType
+   */
+
+  export type AppPasswordCountOutputType = {
+    syncConflicts: number
+  }
+
+  export type AppPasswordCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    syncConflicts?: boolean | AppPasswordCountOutputTypeCountSyncConflictsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * AppPasswordCountOutputType without action
+   */
+  export type AppPasswordCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AppPasswordCountOutputType
+     */
+    select?: AppPasswordCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * AppPasswordCountOutputType without action
+   */
+  export type AppPasswordCountOutputTypeCountSyncConflictsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SyncConflictWhereInput
+  }
+
+
+  /**
    * Count Type ContactCountOutputType
    */
 
@@ -4076,6 +4119,8 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+    syncConflicts?: boolean | AppPassword$syncConflictsArgs<ExtArgs>
+    _count?: boolean | AppPasswordCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["appPassword"]>
 
   export type AppPasswordSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -4116,6 +4161,8 @@ export namespace Prisma {
   export type AppPasswordOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "label" | "hashedPassword" | "lastUsedAt" | "revokedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["appPassword"]>
   export type AppPasswordInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+    syncConflicts?: boolean | AppPassword$syncConflictsArgs<ExtArgs>
+    _count?: boolean | AppPasswordCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type AppPasswordIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -4128,6 +4175,7 @@ export namespace Prisma {
     name: "AppPassword"
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
+      syncConflicts: Prisma.$SyncConflictPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4533,6 +4581,7 @@ export namespace Prisma {
   export interface Prisma__AppPasswordClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    syncConflicts<T extends AppPassword$syncConflictsArgs<ExtArgs> = {}>(args?: Subset<T, AppPassword$syncConflictsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncConflictPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4963,6 +5012,30 @@ export namespace Prisma {
      * Limit how many AppPasswords to delete.
      */
     limit?: number
+  }
+
+  /**
+   * AppPassword.syncConflicts
+   */
+  export type AppPassword$syncConflictsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncConflict
+     */
+    select?: SyncConflictSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncConflict
+     */
+    omit?: SyncConflictOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncConflictInclude<ExtArgs> | null
+    where?: SyncConflictWhereInput
+    orderBy?: SyncConflictOrderByWithRelationInput | SyncConflictOrderByWithRelationInput[]
+    cursor?: SyncConflictWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SyncConflictScalarFieldEnum | SyncConflictScalarFieldEnum[]
   }
 
   /**
@@ -18210,12 +18283,16 @@ export namespace Prisma {
     syncAccountId: string | null
     syncContactLinkId: string | null
     contactId: string | null
+    appPasswordId: string | null
     conflictType: $Enums.SyncConflictType | null
+    conflictSource: $Enums.SyncConflictSource | null
     status: $Enums.SyncConflictStatus | null
     resolutionStrategy: $Enums.SyncResolutionStrategy | null
     localSyncVersion: number | null
     remoteETag: string | null
     resolutionNotes: string | null
+    lastErrorAt: Date | null
+    lastErrorCode: string | null
     detectedAt: Date | null
     resolvedAt: Date | null
     createdAt: Date | null
@@ -18227,12 +18304,16 @@ export namespace Prisma {
     syncAccountId: string | null
     syncContactLinkId: string | null
     contactId: string | null
+    appPasswordId: string | null
     conflictType: $Enums.SyncConflictType | null
+    conflictSource: $Enums.SyncConflictSource | null
     status: $Enums.SyncConflictStatus | null
     resolutionStrategy: $Enums.SyncResolutionStrategy | null
     localSyncVersion: number | null
     remoteETag: string | null
     resolutionNotes: string | null
+    lastErrorAt: Date | null
+    lastErrorCode: string | null
     detectedAt: Date | null
     resolvedAt: Date | null
     createdAt: Date | null
@@ -18244,7 +18325,9 @@ export namespace Prisma {
     syncAccountId: number
     syncContactLinkId: number
     contactId: number
+    appPasswordId: number
     conflictType: number
+    conflictSource: number
     status: number
     resolutionStrategy: number
     localSyncVersion: number
@@ -18252,6 +18335,8 @@ export namespace Prisma {
     localSnapshot: number
     remoteSnapshot: number
     resolutionNotes: number
+    lastErrorAt: number
+    lastErrorCode: number
     detectedAt: number
     resolvedAt: number
     createdAt: number
@@ -18273,12 +18358,16 @@ export namespace Prisma {
     syncAccountId?: true
     syncContactLinkId?: true
     contactId?: true
+    appPasswordId?: true
     conflictType?: true
+    conflictSource?: true
     status?: true
     resolutionStrategy?: true
     localSyncVersion?: true
     remoteETag?: true
     resolutionNotes?: true
+    lastErrorAt?: true
+    lastErrorCode?: true
     detectedAt?: true
     resolvedAt?: true
     createdAt?: true
@@ -18290,12 +18379,16 @@ export namespace Prisma {
     syncAccountId?: true
     syncContactLinkId?: true
     contactId?: true
+    appPasswordId?: true
     conflictType?: true
+    conflictSource?: true
     status?: true
     resolutionStrategy?: true
     localSyncVersion?: true
     remoteETag?: true
     resolutionNotes?: true
+    lastErrorAt?: true
+    lastErrorCode?: true
     detectedAt?: true
     resolvedAt?: true
     createdAt?: true
@@ -18307,7 +18400,9 @@ export namespace Prisma {
     syncAccountId?: true
     syncContactLinkId?: true
     contactId?: true
+    appPasswordId?: true
     conflictType?: true
+    conflictSource?: true
     status?: true
     resolutionStrategy?: true
     localSyncVersion?: true
@@ -18315,6 +18410,8 @@ export namespace Prisma {
     localSnapshot?: true
     remoteSnapshot?: true
     resolutionNotes?: true
+    lastErrorAt?: true
+    lastErrorCode?: true
     detectedAt?: true
     resolvedAt?: true
     createdAt?: true
@@ -18410,10 +18507,12 @@ export namespace Prisma {
 
   export type SyncConflictGroupByOutputType = {
     id: string
-    syncAccountId: string
+    syncAccountId: string | null
     syncContactLinkId: string | null
     contactId: string | null
+    appPasswordId: string | null
     conflictType: $Enums.SyncConflictType
+    conflictSource: $Enums.SyncConflictSource
     status: $Enums.SyncConflictStatus
     resolutionStrategy: $Enums.SyncResolutionStrategy | null
     localSyncVersion: number | null
@@ -18421,6 +18520,8 @@ export namespace Prisma {
     localSnapshot: JsonValue | null
     remoteSnapshot: JsonValue | null
     resolutionNotes: string | null
+    lastErrorAt: Date | null
+    lastErrorCode: string | null
     detectedAt: Date
     resolvedAt: Date | null
     createdAt: Date
@@ -18451,7 +18552,9 @@ export namespace Prisma {
     syncAccountId?: boolean
     syncContactLinkId?: boolean
     contactId?: boolean
+    appPasswordId?: boolean
     conflictType?: boolean
+    conflictSource?: boolean
     status?: boolean
     resolutionStrategy?: boolean
     localSyncVersion?: boolean
@@ -18459,13 +18562,16 @@ export namespace Prisma {
     localSnapshot?: boolean
     remoteSnapshot?: boolean
     resolutionNotes?: boolean
+    lastErrorAt?: boolean
+    lastErrorCode?: boolean
     detectedAt?: boolean
     resolvedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    syncAccount?: boolean | SyncConflict$syncAccountArgs<ExtArgs>
     syncContactLink?: boolean | SyncConflict$syncContactLinkArgs<ExtArgs>
     contact?: boolean | SyncConflict$contactArgs<ExtArgs>
+    appPassword?: boolean | SyncConflict$appPasswordArgs<ExtArgs>
   }, ExtArgs["result"]["syncConflict"]>
 
   export type SyncConflictSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -18473,7 +18579,9 @@ export namespace Prisma {
     syncAccountId?: boolean
     syncContactLinkId?: boolean
     contactId?: boolean
+    appPasswordId?: boolean
     conflictType?: boolean
+    conflictSource?: boolean
     status?: boolean
     resolutionStrategy?: boolean
     localSyncVersion?: boolean
@@ -18481,13 +18589,16 @@ export namespace Prisma {
     localSnapshot?: boolean
     remoteSnapshot?: boolean
     resolutionNotes?: boolean
+    lastErrorAt?: boolean
+    lastErrorCode?: boolean
     detectedAt?: boolean
     resolvedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    syncAccount?: boolean | SyncConflict$syncAccountArgs<ExtArgs>
     syncContactLink?: boolean | SyncConflict$syncContactLinkArgs<ExtArgs>
     contact?: boolean | SyncConflict$contactArgs<ExtArgs>
+    appPassword?: boolean | SyncConflict$appPasswordArgs<ExtArgs>
   }, ExtArgs["result"]["syncConflict"]>
 
   export type SyncConflictSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -18495,7 +18606,9 @@ export namespace Prisma {
     syncAccountId?: boolean
     syncContactLinkId?: boolean
     contactId?: boolean
+    appPasswordId?: boolean
     conflictType?: boolean
+    conflictSource?: boolean
     status?: boolean
     resolutionStrategy?: boolean
     localSyncVersion?: boolean
@@ -18503,13 +18616,16 @@ export namespace Prisma {
     localSnapshot?: boolean
     remoteSnapshot?: boolean
     resolutionNotes?: boolean
+    lastErrorAt?: boolean
+    lastErrorCode?: boolean
     detectedAt?: boolean
     resolvedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    syncAccount?: boolean | SyncConflict$syncAccountArgs<ExtArgs>
     syncContactLink?: boolean | SyncConflict$syncContactLinkArgs<ExtArgs>
     contact?: boolean | SyncConflict$contactArgs<ExtArgs>
+    appPassword?: boolean | SyncConflict$appPasswordArgs<ExtArgs>
   }, ExtArgs["result"]["syncConflict"]>
 
   export type SyncConflictSelectScalar = {
@@ -18517,7 +18633,9 @@ export namespace Prisma {
     syncAccountId?: boolean
     syncContactLinkId?: boolean
     contactId?: boolean
+    appPasswordId?: boolean
     conflictType?: boolean
+    conflictSource?: boolean
     status?: boolean
     resolutionStrategy?: boolean
     localSyncVersion?: boolean
@@ -18525,42 +18643,50 @@ export namespace Prisma {
     localSnapshot?: boolean
     remoteSnapshot?: boolean
     resolutionNotes?: boolean
+    lastErrorAt?: boolean
+    lastErrorCode?: boolean
     detectedAt?: boolean
     resolvedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type SyncConflictOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "syncAccountId" | "syncContactLinkId" | "contactId" | "conflictType" | "status" | "resolutionStrategy" | "localSyncVersion" | "remoteETag" | "localSnapshot" | "remoteSnapshot" | "resolutionNotes" | "detectedAt" | "resolvedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["syncConflict"]>
+  export type SyncConflictOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "syncAccountId" | "syncContactLinkId" | "contactId" | "appPasswordId" | "conflictType" | "conflictSource" | "status" | "resolutionStrategy" | "localSyncVersion" | "remoteETag" | "localSnapshot" | "remoteSnapshot" | "resolutionNotes" | "lastErrorAt" | "lastErrorCode" | "detectedAt" | "resolvedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["syncConflict"]>
   export type SyncConflictInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    syncAccount?: boolean | SyncConflict$syncAccountArgs<ExtArgs>
     syncContactLink?: boolean | SyncConflict$syncContactLinkArgs<ExtArgs>
     contact?: boolean | SyncConflict$contactArgs<ExtArgs>
+    appPassword?: boolean | SyncConflict$appPasswordArgs<ExtArgs>
   }
   export type SyncConflictIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    syncAccount?: boolean | SyncConflict$syncAccountArgs<ExtArgs>
     syncContactLink?: boolean | SyncConflict$syncContactLinkArgs<ExtArgs>
     contact?: boolean | SyncConflict$contactArgs<ExtArgs>
+    appPassword?: boolean | SyncConflict$appPasswordArgs<ExtArgs>
   }
   export type SyncConflictIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    syncAccount?: boolean | SyncConflict$syncAccountArgs<ExtArgs>
     syncContactLink?: boolean | SyncConflict$syncContactLinkArgs<ExtArgs>
     contact?: boolean | SyncConflict$contactArgs<ExtArgs>
+    appPassword?: boolean | SyncConflict$appPasswordArgs<ExtArgs>
   }
 
   export type $SyncConflictPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "SyncConflict"
     objects: {
-      syncAccount: Prisma.$SyncAccountPayload<ExtArgs>
+      syncAccount: Prisma.$SyncAccountPayload<ExtArgs> | null
       syncContactLink: Prisma.$SyncContactLinkPayload<ExtArgs> | null
       contact: Prisma.$ContactPayload<ExtArgs> | null
+      appPassword: Prisma.$AppPasswordPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      syncAccountId: string
+      syncAccountId: string | null
       syncContactLinkId: string | null
       contactId: string | null
+      appPasswordId: string | null
       conflictType: $Enums.SyncConflictType
+      conflictSource: $Enums.SyncConflictSource
       status: $Enums.SyncConflictStatus
       resolutionStrategy: $Enums.SyncResolutionStrategy | null
       localSyncVersion: number | null
@@ -18568,6 +18694,8 @@ export namespace Prisma {
       localSnapshot: Prisma.JsonValue | null
       remoteSnapshot: Prisma.JsonValue | null
       resolutionNotes: string | null
+      lastErrorAt: Date | null
+      lastErrorCode: string | null
       detectedAt: Date
       resolvedAt: Date | null
       createdAt: Date
@@ -18966,9 +19094,10 @@ export namespace Prisma {
    */
   export interface Prisma__SyncConflictClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    syncAccount<T extends SyncAccountDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccountDefaultArgs<ExtArgs>>): Prisma__SyncAccountClient<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    syncAccount<T extends SyncConflict$syncAccountArgs<ExtArgs> = {}>(args?: Subset<T, SyncConflict$syncAccountArgs<ExtArgs>>): Prisma__SyncAccountClient<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     syncContactLink<T extends SyncConflict$syncContactLinkArgs<ExtArgs> = {}>(args?: Subset<T, SyncConflict$syncContactLinkArgs<ExtArgs>>): Prisma__SyncContactLinkClient<$Result.GetResult<Prisma.$SyncContactLinkPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     contact<T extends SyncConflict$contactArgs<ExtArgs> = {}>(args?: Subset<T, SyncConflict$contactArgs<ExtArgs>>): Prisma__ContactClient<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    appPassword<T extends SyncConflict$appPasswordArgs<ExtArgs> = {}>(args?: Subset<T, SyncConflict$appPasswordArgs<ExtArgs>>): Prisma__AppPasswordClient<$Result.GetResult<Prisma.$AppPasswordPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -19002,7 +19131,9 @@ export namespace Prisma {
     readonly syncAccountId: FieldRef<"SyncConflict", 'String'>
     readonly syncContactLinkId: FieldRef<"SyncConflict", 'String'>
     readonly contactId: FieldRef<"SyncConflict", 'String'>
+    readonly appPasswordId: FieldRef<"SyncConflict", 'String'>
     readonly conflictType: FieldRef<"SyncConflict", 'SyncConflictType'>
+    readonly conflictSource: FieldRef<"SyncConflict", 'SyncConflictSource'>
     readonly status: FieldRef<"SyncConflict", 'SyncConflictStatus'>
     readonly resolutionStrategy: FieldRef<"SyncConflict", 'SyncResolutionStrategy'>
     readonly localSyncVersion: FieldRef<"SyncConflict", 'Int'>
@@ -19010,6 +19141,8 @@ export namespace Prisma {
     readonly localSnapshot: FieldRef<"SyncConflict", 'Json'>
     readonly remoteSnapshot: FieldRef<"SyncConflict", 'Json'>
     readonly resolutionNotes: FieldRef<"SyncConflict", 'String'>
+    readonly lastErrorAt: FieldRef<"SyncConflict", 'DateTime'>
+    readonly lastErrorCode: FieldRef<"SyncConflict", 'String'>
     readonly detectedAt: FieldRef<"SyncConflict", 'DateTime'>
     readonly resolvedAt: FieldRef<"SyncConflict", 'DateTime'>
     readonly createdAt: FieldRef<"SyncConflict", 'DateTime'>
@@ -19410,6 +19543,25 @@ export namespace Prisma {
   }
 
   /**
+   * SyncConflict.syncAccount
+   */
+  export type SyncConflict$syncAccountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccount
+     */
+    select?: SyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccount
+     */
+    omit?: SyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountInclude<ExtArgs> | null
+    where?: SyncAccountWhereInput
+  }
+
+  /**
    * SyncConflict.syncContactLink
    */
   export type SyncConflict$syncContactLinkArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -19445,6 +19597,25 @@ export namespace Prisma {
      */
     include?: ContactInclude<ExtArgs> | null
     where?: ContactWhereInput
+  }
+
+  /**
+   * SyncConflict.appPassword
+   */
+  export type SyncConflict$appPasswordArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AppPassword
+     */
+    select?: AppPasswordSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AppPassword
+     */
+    omit?: AppPasswordOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AppPasswordInclude<ExtArgs> | null
+    where?: AppPasswordWhereInput
   }
 
   /**
@@ -19772,7 +19943,9 @@ export namespace Prisma {
     syncAccountId: 'syncAccountId',
     syncContactLinkId: 'syncContactLinkId',
     contactId: 'contactId',
+    appPasswordId: 'appPasswordId',
     conflictType: 'conflictType',
+    conflictSource: 'conflictSource',
     status: 'status',
     resolutionStrategy: 'resolutionStrategy',
     localSyncVersion: 'localSyncVersion',
@@ -19780,6 +19953,8 @@ export namespace Prisma {
     localSnapshot: 'localSnapshot',
     remoteSnapshot: 'remoteSnapshot',
     resolutionNotes: 'resolutionNotes',
+    lastErrorAt: 'lastErrorAt',
+    lastErrorCode: 'lastErrorCode',
     detectedAt: 'detectedAt',
     resolvedAt: 'resolvedAt',
     createdAt: 'createdAt',
@@ -20158,6 +20333,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'SyncConflictSource'
+   */
+  export type EnumSyncConflictSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SyncConflictSource'>
+    
+
+
+  /**
+   * Reference to a field of type 'SyncConflictSource[]'
+   */
+  export type ListEnumSyncConflictSourceFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SyncConflictSource[]'>
+    
+
+
+  /**
    * Reference to a field of type 'SyncConflictStatus'
    */
   export type EnumSyncConflictStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SyncConflictStatus'>
@@ -20309,6 +20498,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"AppPassword"> | Date | string
     updatedAt?: DateTimeFilter<"AppPassword"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    syncConflicts?: SyncConflictListRelationFilter
   }
 
   export type AppPasswordOrderByWithRelationInput = {
@@ -20321,6 +20511,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
+    syncConflicts?: SyncConflictOrderByRelationAggregateInput
   }
 
   export type AppPasswordWhereUniqueInput = Prisma.AtLeast<{
@@ -20336,6 +20527,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"AppPassword"> | Date | string
     updatedAt?: DateTimeFilter<"AppPassword"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    syncConflicts?: SyncConflictListRelationFilter
   }, "id">
 
   export type AppPasswordOrderByWithAggregationInput = {
@@ -21745,10 +21937,12 @@ export namespace Prisma {
     OR?: SyncConflictWhereInput[]
     NOT?: SyncConflictWhereInput | SyncConflictWhereInput[]
     id?: StringFilter<"SyncConflict"> | string
-    syncAccountId?: StringFilter<"SyncConflict"> | string
+    syncAccountId?: StringNullableFilter<"SyncConflict"> | string | null
     syncContactLinkId?: StringNullableFilter<"SyncConflict"> | string | null
     contactId?: StringNullableFilter<"SyncConflict"> | string | null
+    appPasswordId?: StringNullableFilter<"SyncConflict"> | string | null
     conflictType?: EnumSyncConflictTypeFilter<"SyncConflict"> | $Enums.SyncConflictType
+    conflictSource?: EnumSyncConflictSourceFilter<"SyncConflict"> | $Enums.SyncConflictSource
     status?: EnumSyncConflictStatusFilter<"SyncConflict"> | $Enums.SyncConflictStatus
     resolutionStrategy?: EnumSyncResolutionStrategyNullableFilter<"SyncConflict"> | $Enums.SyncResolutionStrategy | null
     localSyncVersion?: IntNullableFilter<"SyncConflict"> | number | null
@@ -21756,21 +21950,26 @@ export namespace Prisma {
     localSnapshot?: JsonNullableFilter<"SyncConflict">
     remoteSnapshot?: JsonNullableFilter<"SyncConflict">
     resolutionNotes?: StringNullableFilter<"SyncConflict"> | string | null
+    lastErrorAt?: DateTimeNullableFilter<"SyncConflict"> | Date | string | null
+    lastErrorCode?: StringNullableFilter<"SyncConflict"> | string | null
     detectedAt?: DateTimeFilter<"SyncConflict"> | Date | string
     resolvedAt?: DateTimeNullableFilter<"SyncConflict"> | Date | string | null
     createdAt?: DateTimeFilter<"SyncConflict"> | Date | string
     updatedAt?: DateTimeFilter<"SyncConflict"> | Date | string
-    syncAccount?: XOR<SyncAccountScalarRelationFilter, SyncAccountWhereInput>
+    syncAccount?: XOR<SyncAccountNullableScalarRelationFilter, SyncAccountWhereInput> | null
     syncContactLink?: XOR<SyncContactLinkNullableScalarRelationFilter, SyncContactLinkWhereInput> | null
     contact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
+    appPassword?: XOR<AppPasswordNullableScalarRelationFilter, AppPasswordWhereInput> | null
   }
 
   export type SyncConflictOrderByWithRelationInput = {
     id?: SortOrder
-    syncAccountId?: SortOrder
+    syncAccountId?: SortOrderInput | SortOrder
     syncContactLinkId?: SortOrderInput | SortOrder
     contactId?: SortOrderInput | SortOrder
+    appPasswordId?: SortOrderInput | SortOrder
     conflictType?: SortOrder
+    conflictSource?: SortOrder
     status?: SortOrder
     resolutionStrategy?: SortOrderInput | SortOrder
     localSyncVersion?: SortOrderInput | SortOrder
@@ -21778,6 +21977,8 @@ export namespace Prisma {
     localSnapshot?: SortOrderInput | SortOrder
     remoteSnapshot?: SortOrderInput | SortOrder
     resolutionNotes?: SortOrderInput | SortOrder
+    lastErrorAt?: SortOrderInput | SortOrder
+    lastErrorCode?: SortOrderInput | SortOrder
     detectedAt?: SortOrder
     resolvedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -21785,6 +21986,7 @@ export namespace Prisma {
     syncAccount?: SyncAccountOrderByWithRelationInput
     syncContactLink?: SyncContactLinkOrderByWithRelationInput
     contact?: ContactOrderByWithRelationInput
+    appPassword?: AppPasswordOrderByWithRelationInput
   }
 
   export type SyncConflictWhereUniqueInput = Prisma.AtLeast<{
@@ -21792,10 +21994,12 @@ export namespace Prisma {
     AND?: SyncConflictWhereInput | SyncConflictWhereInput[]
     OR?: SyncConflictWhereInput[]
     NOT?: SyncConflictWhereInput | SyncConflictWhereInput[]
-    syncAccountId?: StringFilter<"SyncConflict"> | string
+    syncAccountId?: StringNullableFilter<"SyncConflict"> | string | null
     syncContactLinkId?: StringNullableFilter<"SyncConflict"> | string | null
     contactId?: StringNullableFilter<"SyncConflict"> | string | null
+    appPasswordId?: StringNullableFilter<"SyncConflict"> | string | null
     conflictType?: EnumSyncConflictTypeFilter<"SyncConflict"> | $Enums.SyncConflictType
+    conflictSource?: EnumSyncConflictSourceFilter<"SyncConflict"> | $Enums.SyncConflictSource
     status?: EnumSyncConflictStatusFilter<"SyncConflict"> | $Enums.SyncConflictStatus
     resolutionStrategy?: EnumSyncResolutionStrategyNullableFilter<"SyncConflict"> | $Enums.SyncResolutionStrategy | null
     localSyncVersion?: IntNullableFilter<"SyncConflict"> | number | null
@@ -21803,21 +22007,26 @@ export namespace Prisma {
     localSnapshot?: JsonNullableFilter<"SyncConflict">
     remoteSnapshot?: JsonNullableFilter<"SyncConflict">
     resolutionNotes?: StringNullableFilter<"SyncConflict"> | string | null
+    lastErrorAt?: DateTimeNullableFilter<"SyncConflict"> | Date | string | null
+    lastErrorCode?: StringNullableFilter<"SyncConflict"> | string | null
     detectedAt?: DateTimeFilter<"SyncConflict"> | Date | string
     resolvedAt?: DateTimeNullableFilter<"SyncConflict"> | Date | string | null
     createdAt?: DateTimeFilter<"SyncConflict"> | Date | string
     updatedAt?: DateTimeFilter<"SyncConflict"> | Date | string
-    syncAccount?: XOR<SyncAccountScalarRelationFilter, SyncAccountWhereInput>
+    syncAccount?: XOR<SyncAccountNullableScalarRelationFilter, SyncAccountWhereInput> | null
     syncContactLink?: XOR<SyncContactLinkNullableScalarRelationFilter, SyncContactLinkWhereInput> | null
     contact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
+    appPassword?: XOR<AppPasswordNullableScalarRelationFilter, AppPasswordWhereInput> | null
   }, "id">
 
   export type SyncConflictOrderByWithAggregationInput = {
     id?: SortOrder
-    syncAccountId?: SortOrder
+    syncAccountId?: SortOrderInput | SortOrder
     syncContactLinkId?: SortOrderInput | SortOrder
     contactId?: SortOrderInput | SortOrder
+    appPasswordId?: SortOrderInput | SortOrder
     conflictType?: SortOrder
+    conflictSource?: SortOrder
     status?: SortOrder
     resolutionStrategy?: SortOrderInput | SortOrder
     localSyncVersion?: SortOrderInput | SortOrder
@@ -21825,6 +22034,8 @@ export namespace Prisma {
     localSnapshot?: SortOrderInput | SortOrder
     remoteSnapshot?: SortOrderInput | SortOrder
     resolutionNotes?: SortOrderInput | SortOrder
+    lastErrorAt?: SortOrderInput | SortOrder
+    lastErrorCode?: SortOrderInput | SortOrder
     detectedAt?: SortOrder
     resolvedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -21841,10 +22052,12 @@ export namespace Prisma {
     OR?: SyncConflictScalarWhereWithAggregatesInput[]
     NOT?: SyncConflictScalarWhereWithAggregatesInput | SyncConflictScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"SyncConflict"> | string
-    syncAccountId?: StringWithAggregatesFilter<"SyncConflict"> | string
+    syncAccountId?: StringNullableWithAggregatesFilter<"SyncConflict"> | string | null
     syncContactLinkId?: StringNullableWithAggregatesFilter<"SyncConflict"> | string | null
     contactId?: StringNullableWithAggregatesFilter<"SyncConflict"> | string | null
+    appPasswordId?: StringNullableWithAggregatesFilter<"SyncConflict"> | string | null
     conflictType?: EnumSyncConflictTypeWithAggregatesFilter<"SyncConflict"> | $Enums.SyncConflictType
+    conflictSource?: EnumSyncConflictSourceWithAggregatesFilter<"SyncConflict"> | $Enums.SyncConflictSource
     status?: EnumSyncConflictStatusWithAggregatesFilter<"SyncConflict"> | $Enums.SyncConflictStatus
     resolutionStrategy?: EnumSyncResolutionStrategyNullableWithAggregatesFilter<"SyncConflict"> | $Enums.SyncResolutionStrategy | null
     localSyncVersion?: IntNullableWithAggregatesFilter<"SyncConflict"> | number | null
@@ -21852,6 +22065,8 @@ export namespace Prisma {
     localSnapshot?: JsonNullableWithAggregatesFilter<"SyncConflict">
     remoteSnapshot?: JsonNullableWithAggregatesFilter<"SyncConflict">
     resolutionNotes?: StringNullableWithAggregatesFilter<"SyncConflict"> | string | null
+    lastErrorAt?: DateTimeNullableWithAggregatesFilter<"SyncConflict"> | Date | string | null
+    lastErrorCode?: StringNullableWithAggregatesFilter<"SyncConflict"> | string | null
     detectedAt?: DateTimeWithAggregatesFilter<"SyncConflict"> | Date | string
     resolvedAt?: DateTimeNullableWithAggregatesFilter<"SyncConflict"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"SyncConflict"> | Date | string
@@ -21980,6 +22195,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutAppPasswordsInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutAppPasswordInput
   }
 
   export type AppPasswordUncheckedCreateInput = {
@@ -21991,6 +22207,7 @@ export namespace Prisma {
     revokedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutAppPasswordInput
   }
 
   export type AppPasswordUpdateInput = {
@@ -22002,6 +22219,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutAppPasswordsNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutAppPasswordNestedInput
   }
 
   export type AppPasswordUncheckedUpdateInput = {
@@ -22013,6 +22231,7 @@ export namespace Prisma {
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutAppPasswordNestedInput
   }
 
   export type AppPasswordCreateManyInput = {
@@ -23684,6 +23903,7 @@ export namespace Prisma {
   export type SyncConflictCreateInput = {
     id?: string
     conflictType: $Enums.SyncConflictType
+    conflictSource?: $Enums.SyncConflictSource
     status?: $Enums.SyncConflictStatus
     resolutionStrategy?: $Enums.SyncResolutionStrategy | null
     localSyncVersion?: number | null
@@ -23691,21 +23911,26 @@ export namespace Prisma {
     localSnapshot?: NullableJsonNullValueInput | InputJsonValue
     remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
     resolutionNotes?: string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     detectedAt?: Date | string
     resolvedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    syncAccount: SyncAccountCreateNestedOneWithoutSyncConflictsInput
+    syncAccount?: SyncAccountCreateNestedOneWithoutSyncConflictsInput
     syncContactLink?: SyncContactLinkCreateNestedOneWithoutSyncConflictsInput
     contact?: ContactCreateNestedOneWithoutSyncConflictsInput
+    appPassword?: AppPasswordCreateNestedOneWithoutSyncConflictsInput
   }
 
   export type SyncConflictUncheckedCreateInput = {
     id?: string
-    syncAccountId: string
+    syncAccountId?: string | null
     syncContactLinkId?: string | null
     contactId?: string | null
+    appPasswordId?: string | null
     conflictType: $Enums.SyncConflictType
+    conflictSource?: $Enums.SyncConflictSource
     status?: $Enums.SyncConflictStatus
     resolutionStrategy?: $Enums.SyncResolutionStrategy | null
     localSyncVersion?: number | null
@@ -23713,6 +23938,8 @@ export namespace Prisma {
     localSnapshot?: NullableJsonNullValueInput | InputJsonValue
     remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
     resolutionNotes?: string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     detectedAt?: Date | string
     resolvedAt?: Date | string | null
     createdAt?: Date | string
@@ -23722,6 +23949,7 @@ export namespace Prisma {
   export type SyncConflictUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    conflictSource?: EnumSyncConflictSourceFieldUpdateOperationsInput | $Enums.SyncConflictSource
     status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
     resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
     localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
@@ -23729,21 +23957,26 @@ export namespace Prisma {
     localSnapshot?: NullableJsonNullValueInput | InputJsonValue
     remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    syncAccount?: SyncAccountUpdateOneRequiredWithoutSyncConflictsNestedInput
+    syncAccount?: SyncAccountUpdateOneWithoutSyncConflictsNestedInput
     syncContactLink?: SyncContactLinkUpdateOneWithoutSyncConflictsNestedInput
     contact?: ContactUpdateOneWithoutSyncConflictsNestedInput
+    appPassword?: AppPasswordUpdateOneWithoutSyncConflictsNestedInput
   }
 
   export type SyncConflictUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    syncAccountId?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     syncContactLinkId?: NullableStringFieldUpdateOperationsInput | string | null
     contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    appPasswordId?: NullableStringFieldUpdateOperationsInput | string | null
     conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    conflictSource?: EnumSyncConflictSourceFieldUpdateOperationsInput | $Enums.SyncConflictSource
     status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
     resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
     localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
@@ -23751,6 +23984,8 @@ export namespace Prisma {
     localSnapshot?: NullableJsonNullValueInput | InputJsonValue
     remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -23759,10 +23994,12 @@ export namespace Prisma {
 
   export type SyncConflictCreateManyInput = {
     id?: string
-    syncAccountId: string
+    syncAccountId?: string | null
     syncContactLinkId?: string | null
     contactId?: string | null
+    appPasswordId?: string | null
     conflictType: $Enums.SyncConflictType
+    conflictSource?: $Enums.SyncConflictSource
     status?: $Enums.SyncConflictStatus
     resolutionStrategy?: $Enums.SyncResolutionStrategy | null
     localSyncVersion?: number | null
@@ -23770,6 +24007,8 @@ export namespace Prisma {
     localSnapshot?: NullableJsonNullValueInput | InputJsonValue
     remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
     resolutionNotes?: string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     detectedAt?: Date | string
     resolvedAt?: Date | string | null
     createdAt?: Date | string
@@ -23779,6 +24018,7 @@ export namespace Prisma {
   export type SyncConflictUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
     conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    conflictSource?: EnumSyncConflictSourceFieldUpdateOperationsInput | $Enums.SyncConflictSource
     status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
     resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
     localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
@@ -23786,6 +24026,8 @@ export namespace Prisma {
     localSnapshot?: NullableJsonNullValueInput | InputJsonValue
     remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -23794,10 +24036,12 @@ export namespace Prisma {
 
   export type SyncConflictUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    syncAccountId?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     syncContactLinkId?: NullableStringFieldUpdateOperationsInput | string | null
     contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    appPasswordId?: NullableStringFieldUpdateOperationsInput | string | null
     conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    conflictSource?: EnumSyncConflictSourceFieldUpdateOperationsInput | $Enums.SyncConflictSource
     status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
     resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
     localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
@@ -23805,6 +24049,8 @@ export namespace Prisma {
     localSnapshot?: NullableJsonNullValueInput | InputJsonValue
     remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24071,6 +24317,16 @@ export namespace Prisma {
     isNot?: UserWhereInput
   }
 
+  export type SyncConflictListRelationFilter = {
+    every?: SyncConflictWhereInput
+    some?: SyncConflictWhereInput
+    none?: SyncConflictWhereInput
+  }
+
+  export type SyncConflictOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type AppPasswordCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
@@ -24163,22 +24419,12 @@ export namespace Prisma {
     none?: SyncContactLinkWhereInput
   }
 
-  export type SyncConflictListRelationFilter = {
-    every?: SyncConflictWhereInput
-    some?: SyncConflictWhereInput
-    none?: SyncConflictWhereInput
-  }
-
   export type ContactNullableScalarRelationFilter = {
     is?: ContactWhereInput | null
     isNot?: ContactWhereInput | null
   }
 
   export type SyncContactLinkOrderByRelationAggregateInput = {
-    _count?: SortOrder
-  }
-
-  export type SyncConflictOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -25395,6 +25641,13 @@ export namespace Prisma {
     not?: NestedEnumSyncConflictTypeFilter<$PrismaModel> | $Enums.SyncConflictType
   }
 
+  export type EnumSyncConflictSourceFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncConflictSource | EnumSyncConflictSourceFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncConflictSource[] | ListEnumSyncConflictSourceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncConflictSource[] | ListEnumSyncConflictSourceFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncConflictSourceFilter<$PrismaModel> | $Enums.SyncConflictSource
+  }
+
   export type EnumSyncConflictStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.SyncConflictStatus | EnumSyncConflictStatusFieldRefInput<$PrismaModel>
     in?: $Enums.SyncConflictStatus[] | ListEnumSyncConflictStatusFieldRefInput<$PrismaModel>
@@ -25409,9 +25662,19 @@ export namespace Prisma {
     not?: NestedEnumSyncResolutionStrategyNullableFilter<$PrismaModel> | $Enums.SyncResolutionStrategy | null
   }
 
+  export type SyncAccountNullableScalarRelationFilter = {
+    is?: SyncAccountWhereInput | null
+    isNot?: SyncAccountWhereInput | null
+  }
+
   export type SyncContactLinkNullableScalarRelationFilter = {
     is?: SyncContactLinkWhereInput | null
     isNot?: SyncContactLinkWhereInput | null
+  }
+
+  export type AppPasswordNullableScalarRelationFilter = {
+    is?: AppPasswordWhereInput | null
+    isNot?: AppPasswordWhereInput | null
   }
 
   export type SyncConflictCountOrderByAggregateInput = {
@@ -25419,7 +25682,9 @@ export namespace Prisma {
     syncAccountId?: SortOrder
     syncContactLinkId?: SortOrder
     contactId?: SortOrder
+    appPasswordId?: SortOrder
     conflictType?: SortOrder
+    conflictSource?: SortOrder
     status?: SortOrder
     resolutionStrategy?: SortOrder
     localSyncVersion?: SortOrder
@@ -25427,6 +25692,8 @@ export namespace Prisma {
     localSnapshot?: SortOrder
     remoteSnapshot?: SortOrder
     resolutionNotes?: SortOrder
+    lastErrorAt?: SortOrder
+    lastErrorCode?: SortOrder
     detectedAt?: SortOrder
     resolvedAt?: SortOrder
     createdAt?: SortOrder
@@ -25442,12 +25709,16 @@ export namespace Prisma {
     syncAccountId?: SortOrder
     syncContactLinkId?: SortOrder
     contactId?: SortOrder
+    appPasswordId?: SortOrder
     conflictType?: SortOrder
+    conflictSource?: SortOrder
     status?: SortOrder
     resolutionStrategy?: SortOrder
     localSyncVersion?: SortOrder
     remoteETag?: SortOrder
     resolutionNotes?: SortOrder
+    lastErrorAt?: SortOrder
+    lastErrorCode?: SortOrder
     detectedAt?: SortOrder
     resolvedAt?: SortOrder
     createdAt?: SortOrder
@@ -25459,12 +25730,16 @@ export namespace Prisma {
     syncAccountId?: SortOrder
     syncContactLinkId?: SortOrder
     contactId?: SortOrder
+    appPasswordId?: SortOrder
     conflictType?: SortOrder
+    conflictSource?: SortOrder
     status?: SortOrder
     resolutionStrategy?: SortOrder
     localSyncVersion?: SortOrder
     remoteETag?: SortOrder
     resolutionNotes?: SortOrder
+    lastErrorAt?: SortOrder
+    lastErrorCode?: SortOrder
     detectedAt?: SortOrder
     resolvedAt?: SortOrder
     createdAt?: SortOrder
@@ -25483,6 +25758,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumSyncConflictTypeFilter<$PrismaModel>
     _max?: NestedEnumSyncConflictTypeFilter<$PrismaModel>
+  }
+
+  export type EnumSyncConflictSourceWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncConflictSource | EnumSyncConflictSourceFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncConflictSource[] | ListEnumSyncConflictSourceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncConflictSource[] | ListEnumSyncConflictSourceFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncConflictSourceWithAggregatesFilter<$PrismaModel> | $Enums.SyncConflictSource
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSyncConflictSourceFilter<$PrismaModel>
+    _max?: NestedEnumSyncConflictSourceFilter<$PrismaModel>
   }
 
   export type EnumSyncConflictStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -25899,6 +26184,20 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type SyncConflictCreateNestedManyWithoutAppPasswordInput = {
+    create?: XOR<SyncConflictCreateWithoutAppPasswordInput, SyncConflictUncheckedCreateWithoutAppPasswordInput> | SyncConflictCreateWithoutAppPasswordInput[] | SyncConflictUncheckedCreateWithoutAppPasswordInput[]
+    connectOrCreate?: SyncConflictCreateOrConnectWithoutAppPasswordInput | SyncConflictCreateOrConnectWithoutAppPasswordInput[]
+    createMany?: SyncConflictCreateManyAppPasswordInputEnvelope
+    connect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+  }
+
+  export type SyncConflictUncheckedCreateNestedManyWithoutAppPasswordInput = {
+    create?: XOR<SyncConflictCreateWithoutAppPasswordInput, SyncConflictUncheckedCreateWithoutAppPasswordInput> | SyncConflictCreateWithoutAppPasswordInput[] | SyncConflictUncheckedCreateWithoutAppPasswordInput[]
+    connectOrCreate?: SyncConflictCreateOrConnectWithoutAppPasswordInput | SyncConflictCreateOrConnectWithoutAppPasswordInput[]
+    createMany?: SyncConflictCreateManyAppPasswordInputEnvelope
+    connect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+  }
+
   export type NullableDateTimeFieldUpdateOperationsInput = {
     set?: Date | string | null
   }
@@ -25909,6 +26208,34 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutAppPasswordsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutAppPasswordsInput, UserUpdateWithoutAppPasswordsInput>, UserUncheckedUpdateWithoutAppPasswordsInput>
+  }
+
+  export type SyncConflictUpdateManyWithoutAppPasswordNestedInput = {
+    create?: XOR<SyncConflictCreateWithoutAppPasswordInput, SyncConflictUncheckedCreateWithoutAppPasswordInput> | SyncConflictCreateWithoutAppPasswordInput[] | SyncConflictUncheckedCreateWithoutAppPasswordInput[]
+    connectOrCreate?: SyncConflictCreateOrConnectWithoutAppPasswordInput | SyncConflictCreateOrConnectWithoutAppPasswordInput[]
+    upsert?: SyncConflictUpsertWithWhereUniqueWithoutAppPasswordInput | SyncConflictUpsertWithWhereUniqueWithoutAppPasswordInput[]
+    createMany?: SyncConflictCreateManyAppPasswordInputEnvelope
+    set?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    disconnect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    delete?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    connect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    update?: SyncConflictUpdateWithWhereUniqueWithoutAppPasswordInput | SyncConflictUpdateWithWhereUniqueWithoutAppPasswordInput[]
+    updateMany?: SyncConflictUpdateManyWithWhereWithoutAppPasswordInput | SyncConflictUpdateManyWithWhereWithoutAppPasswordInput[]
+    deleteMany?: SyncConflictScalarWhereInput | SyncConflictScalarWhereInput[]
+  }
+
+  export type SyncConflictUncheckedUpdateManyWithoutAppPasswordNestedInput = {
+    create?: XOR<SyncConflictCreateWithoutAppPasswordInput, SyncConflictUncheckedCreateWithoutAppPasswordInput> | SyncConflictCreateWithoutAppPasswordInput[] | SyncConflictUncheckedCreateWithoutAppPasswordInput[]
+    connectOrCreate?: SyncConflictCreateOrConnectWithoutAppPasswordInput | SyncConflictCreateOrConnectWithoutAppPasswordInput[]
+    upsert?: SyncConflictUpsertWithWhereUniqueWithoutAppPasswordInput | SyncConflictUpsertWithWhereUniqueWithoutAppPasswordInput[]
+    createMany?: SyncConflictCreateManyAppPasswordInputEnvelope
+    set?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    disconnect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    delete?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    connect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+    update?: SyncConflictUpdateWithWhereUniqueWithoutAppPasswordInput | SyncConflictUpdateWithWhereUniqueWithoutAppPasswordInput[]
+    updateMany?: SyncConflictUpdateManyWithWhereWithoutAppPasswordInput | SyncConflictUpdateManyWithWhereWithoutAppPasswordInput[]
+    deleteMany?: SyncConflictScalarWhereInput | SyncConflictScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutContactsInput = {
@@ -26755,8 +27082,18 @@ export namespace Prisma {
     connect?: ContactWhereUniqueInput
   }
 
+  export type AppPasswordCreateNestedOneWithoutSyncConflictsInput = {
+    create?: XOR<AppPasswordCreateWithoutSyncConflictsInput, AppPasswordUncheckedCreateWithoutSyncConflictsInput>
+    connectOrCreate?: AppPasswordCreateOrConnectWithoutSyncConflictsInput
+    connect?: AppPasswordWhereUniqueInput
+  }
+
   export type EnumSyncConflictTypeFieldUpdateOperationsInput = {
     set?: $Enums.SyncConflictType
+  }
+
+  export type EnumSyncConflictSourceFieldUpdateOperationsInput = {
+    set?: $Enums.SyncConflictSource
   }
 
   export type EnumSyncConflictStatusFieldUpdateOperationsInput = {
@@ -26767,10 +27104,12 @@ export namespace Prisma {
     set?: $Enums.SyncResolutionStrategy | null
   }
 
-  export type SyncAccountUpdateOneRequiredWithoutSyncConflictsNestedInput = {
+  export type SyncAccountUpdateOneWithoutSyncConflictsNestedInput = {
     create?: XOR<SyncAccountCreateWithoutSyncConflictsInput, SyncAccountUncheckedCreateWithoutSyncConflictsInput>
     connectOrCreate?: SyncAccountCreateOrConnectWithoutSyncConflictsInput
     upsert?: SyncAccountUpsertWithoutSyncConflictsInput
+    disconnect?: SyncAccountWhereInput | boolean
+    delete?: SyncAccountWhereInput | boolean
     connect?: SyncAccountWhereUniqueInput
     update?: XOR<XOR<SyncAccountUpdateToOneWithWhereWithoutSyncConflictsInput, SyncAccountUpdateWithoutSyncConflictsInput>, SyncAccountUncheckedUpdateWithoutSyncConflictsInput>
   }
@@ -26793,6 +27132,16 @@ export namespace Prisma {
     delete?: ContactWhereInput | boolean
     connect?: ContactWhereUniqueInput
     update?: XOR<XOR<ContactUpdateToOneWithWhereWithoutSyncConflictsInput, ContactUpdateWithoutSyncConflictsInput>, ContactUncheckedUpdateWithoutSyncConflictsInput>
+  }
+
+  export type AppPasswordUpdateOneWithoutSyncConflictsNestedInput = {
+    create?: XOR<AppPasswordCreateWithoutSyncConflictsInput, AppPasswordUncheckedCreateWithoutSyncConflictsInput>
+    connectOrCreate?: AppPasswordCreateOrConnectWithoutSyncConflictsInput
+    upsert?: AppPasswordUpsertWithoutSyncConflictsInput
+    disconnect?: AppPasswordWhereInput | boolean
+    delete?: AppPasswordWhereInput | boolean
+    connect?: AppPasswordWhereUniqueInput
+    update?: XOR<XOR<AppPasswordUpdateToOneWithWhereWithoutSyncConflictsInput, AppPasswordUpdateWithoutSyncConflictsInput>, AppPasswordUncheckedUpdateWithoutSyncConflictsInput>
   }
 
   export type NestedStringFilter<$PrismaModel = never> = {
@@ -27338,6 +27687,13 @@ export namespace Prisma {
     not?: NestedEnumSyncConflictTypeFilter<$PrismaModel> | $Enums.SyncConflictType
   }
 
+  export type NestedEnumSyncConflictSourceFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncConflictSource | EnumSyncConflictSourceFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncConflictSource[] | ListEnumSyncConflictSourceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncConflictSource[] | ListEnumSyncConflictSourceFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncConflictSourceFilter<$PrismaModel> | $Enums.SyncConflictSource
+  }
+
   export type NestedEnumSyncConflictStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.SyncConflictStatus | EnumSyncConflictStatusFieldRefInput<$PrismaModel>
     in?: $Enums.SyncConflictStatus[] | ListEnumSyncConflictStatusFieldRefInput<$PrismaModel>
@@ -27360,6 +27716,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumSyncConflictTypeFilter<$PrismaModel>
     _max?: NestedEnumSyncConflictTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumSyncConflictSourceWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SyncConflictSource | EnumSyncConflictSourceFieldRefInput<$PrismaModel>
+    in?: $Enums.SyncConflictSource[] | ListEnumSyncConflictSourceFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SyncConflictSource[] | ListEnumSyncConflictSourceFieldRefInput<$PrismaModel>
+    not?: NestedEnumSyncConflictSourceWithAggregatesFilter<$PrismaModel> | $Enums.SyncConflictSource
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSyncConflictSourceFilter<$PrismaModel>
+    _max?: NestedEnumSyncConflictSourceFilter<$PrismaModel>
   }
 
   export type NestedEnumSyncConflictStatusWithAggregatesFilter<$PrismaModel = never> = {
@@ -27390,6 +27756,7 @@ export namespace Prisma {
     revokedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    syncConflicts?: SyncConflictCreateNestedManyWithoutAppPasswordInput
   }
 
   export type AppPasswordUncheckedCreateWithoutUserInput = {
@@ -27400,6 +27767,7 @@ export namespace Prisma {
     revokedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutAppPasswordInput
   }
 
   export type AppPasswordCreateOrConnectWithoutUserInput = {
@@ -28278,6 +28646,60 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutAppPasswordsInput, UserUncheckedCreateWithoutAppPasswordsInput>
   }
 
+  export type SyncConflictCreateWithoutAppPasswordInput = {
+    id?: string
+    conflictType: $Enums.SyncConflictType
+    conflictSource?: $Enums.SyncConflictSource
+    status?: $Enums.SyncConflictStatus
+    resolutionStrategy?: $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: number | null
+    remoteETag?: string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    detectedAt?: Date | string
+    resolvedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    syncAccount?: SyncAccountCreateNestedOneWithoutSyncConflictsInput
+    syncContactLink?: SyncContactLinkCreateNestedOneWithoutSyncConflictsInput
+    contact?: ContactCreateNestedOneWithoutSyncConflictsInput
+  }
+
+  export type SyncConflictUncheckedCreateWithoutAppPasswordInput = {
+    id?: string
+    syncAccountId?: string | null
+    syncContactLinkId?: string | null
+    contactId?: string | null
+    conflictType: $Enums.SyncConflictType
+    conflictSource?: $Enums.SyncConflictSource
+    status?: $Enums.SyncConflictStatus
+    resolutionStrategy?: $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: number | null
+    remoteETag?: string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    detectedAt?: Date | string
+    resolvedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SyncConflictCreateOrConnectWithoutAppPasswordInput = {
+    where: SyncConflictWhereUniqueInput
+    create: XOR<SyncConflictCreateWithoutAppPasswordInput, SyncConflictUncheckedCreateWithoutAppPasswordInput>
+  }
+
+  export type SyncConflictCreateManyAppPasswordInputEnvelope = {
+    data: SyncConflictCreateManyAppPasswordInput | SyncConflictCreateManyAppPasswordInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutAppPasswordsInput = {
     update: XOR<UserUpdateWithoutAppPasswordsInput, UserUncheckedUpdateWithoutAppPasswordsInput>
     create: XOR<UserCreateWithoutAppPasswordsInput, UserUncheckedCreateWithoutAppPasswordsInput>
@@ -28325,6 +28747,48 @@ export namespace Prisma {
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type SyncConflictUpsertWithWhereUniqueWithoutAppPasswordInput = {
+    where: SyncConflictWhereUniqueInput
+    update: XOR<SyncConflictUpdateWithoutAppPasswordInput, SyncConflictUncheckedUpdateWithoutAppPasswordInput>
+    create: XOR<SyncConflictCreateWithoutAppPasswordInput, SyncConflictUncheckedCreateWithoutAppPasswordInput>
+  }
+
+  export type SyncConflictUpdateWithWhereUniqueWithoutAppPasswordInput = {
+    where: SyncConflictWhereUniqueInput
+    data: XOR<SyncConflictUpdateWithoutAppPasswordInput, SyncConflictUncheckedUpdateWithoutAppPasswordInput>
+  }
+
+  export type SyncConflictUpdateManyWithWhereWithoutAppPasswordInput = {
+    where: SyncConflictScalarWhereInput
+    data: XOR<SyncConflictUpdateManyMutationInput, SyncConflictUncheckedUpdateManyWithoutAppPasswordInput>
+  }
+
+  export type SyncConflictScalarWhereInput = {
+    AND?: SyncConflictScalarWhereInput | SyncConflictScalarWhereInput[]
+    OR?: SyncConflictScalarWhereInput[]
+    NOT?: SyncConflictScalarWhereInput | SyncConflictScalarWhereInput[]
+    id?: StringFilter<"SyncConflict"> | string
+    syncAccountId?: StringNullableFilter<"SyncConflict"> | string | null
+    syncContactLinkId?: StringNullableFilter<"SyncConflict"> | string | null
+    contactId?: StringNullableFilter<"SyncConflict"> | string | null
+    appPasswordId?: StringNullableFilter<"SyncConflict"> | string | null
+    conflictType?: EnumSyncConflictTypeFilter<"SyncConflict"> | $Enums.SyncConflictType
+    conflictSource?: EnumSyncConflictSourceFilter<"SyncConflict"> | $Enums.SyncConflictSource
+    status?: EnumSyncConflictStatusFilter<"SyncConflict"> | $Enums.SyncConflictStatus
+    resolutionStrategy?: EnumSyncResolutionStrategyNullableFilter<"SyncConflict"> | $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: IntNullableFilter<"SyncConflict"> | number | null
+    remoteETag?: StringNullableFilter<"SyncConflict"> | string | null
+    localSnapshot?: JsonNullableFilter<"SyncConflict">
+    remoteSnapshot?: JsonNullableFilter<"SyncConflict">
+    resolutionNotes?: StringNullableFilter<"SyncConflict"> | string | null
+    lastErrorAt?: DateTimeNullableFilter<"SyncConflict"> | Date | string | null
+    lastErrorCode?: StringNullableFilter<"SyncConflict"> | string | null
+    detectedAt?: DateTimeFilter<"SyncConflict"> | Date | string
+    resolvedAt?: DateTimeNullableFilter<"SyncConflict"> | Date | string | null
+    createdAt?: DateTimeFilter<"SyncConflict"> | Date | string
+    updatedAt?: DateTimeFilter<"SyncConflict"> | Date | string
   }
 
   export type UserCreateWithoutContactsInput = {
@@ -28566,6 +29030,7 @@ export namespace Prisma {
   export type SyncConflictCreateWithoutContactInput = {
     id?: string
     conflictType: $Enums.SyncConflictType
+    conflictSource?: $Enums.SyncConflictSource
     status?: $Enums.SyncConflictStatus
     resolutionStrategy?: $Enums.SyncResolutionStrategy | null
     localSyncVersion?: number | null
@@ -28573,19 +29038,24 @@ export namespace Prisma {
     localSnapshot?: NullableJsonNullValueInput | InputJsonValue
     remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
     resolutionNotes?: string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     detectedAt?: Date | string
     resolvedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    syncAccount: SyncAccountCreateNestedOneWithoutSyncConflictsInput
+    syncAccount?: SyncAccountCreateNestedOneWithoutSyncConflictsInput
     syncContactLink?: SyncContactLinkCreateNestedOneWithoutSyncConflictsInput
+    appPassword?: AppPasswordCreateNestedOneWithoutSyncConflictsInput
   }
 
   export type SyncConflictUncheckedCreateWithoutContactInput = {
     id?: string
-    syncAccountId: string
+    syncAccountId?: string | null
     syncContactLinkId?: string | null
+    appPasswordId?: string | null
     conflictType: $Enums.SyncConflictType
+    conflictSource?: $Enums.SyncConflictSource
     status?: $Enums.SyncConflictStatus
     resolutionStrategy?: $Enums.SyncResolutionStrategy | null
     localSyncVersion?: number | null
@@ -28593,6 +29063,8 @@ export namespace Prisma {
     localSnapshot?: NullableJsonNullValueInput | InputJsonValue
     remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
     resolutionNotes?: string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     detectedAt?: Date | string
     resolvedAt?: Date | string | null
     createdAt?: Date | string
@@ -29007,28 +29479,6 @@ export namespace Prisma {
   export type SyncConflictUpdateManyWithWhereWithoutContactInput = {
     where: SyncConflictScalarWhereInput
     data: XOR<SyncConflictUpdateManyMutationInput, SyncConflictUncheckedUpdateManyWithoutContactInput>
-  }
-
-  export type SyncConflictScalarWhereInput = {
-    AND?: SyncConflictScalarWhereInput | SyncConflictScalarWhereInput[]
-    OR?: SyncConflictScalarWhereInput[]
-    NOT?: SyncConflictScalarWhereInput | SyncConflictScalarWhereInput[]
-    id?: StringFilter<"SyncConflict"> | string
-    syncAccountId?: StringFilter<"SyncConflict"> | string
-    syncContactLinkId?: StringNullableFilter<"SyncConflict"> | string | null
-    contactId?: StringNullableFilter<"SyncConflict"> | string | null
-    conflictType?: EnumSyncConflictTypeFilter<"SyncConflict"> | $Enums.SyncConflictType
-    status?: EnumSyncConflictStatusFilter<"SyncConflict"> | $Enums.SyncConflictStatus
-    resolutionStrategy?: EnumSyncResolutionStrategyNullableFilter<"SyncConflict"> | $Enums.SyncResolutionStrategy | null
-    localSyncVersion?: IntNullableFilter<"SyncConflict"> | number | null
-    remoteETag?: StringNullableFilter<"SyncConflict"> | string | null
-    localSnapshot?: JsonNullableFilter<"SyncConflict">
-    remoteSnapshot?: JsonNullableFilter<"SyncConflict">
-    resolutionNotes?: StringNullableFilter<"SyncConflict"> | string | null
-    detectedAt?: DateTimeFilter<"SyncConflict"> | Date | string
-    resolvedAt?: DateTimeNullableFilter<"SyncConflict"> | Date | string | null
-    createdAt?: DateTimeFilter<"SyncConflict"> | Date | string
-    updatedAt?: DateTimeFilter<"SyncConflict"> | Date | string
   }
 
   export type ContactUpsertWithoutMergedChildrenInput = {
@@ -30674,6 +31124,7 @@ export namespace Prisma {
   export type SyncConflictCreateWithoutSyncAccountInput = {
     id?: string
     conflictType: $Enums.SyncConflictType
+    conflictSource?: $Enums.SyncConflictSource
     status?: $Enums.SyncConflictStatus
     resolutionStrategy?: $Enums.SyncResolutionStrategy | null
     localSyncVersion?: number | null
@@ -30681,19 +31132,24 @@ export namespace Prisma {
     localSnapshot?: NullableJsonNullValueInput | InputJsonValue
     remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
     resolutionNotes?: string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     detectedAt?: Date | string
     resolvedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     syncContactLink?: SyncContactLinkCreateNestedOneWithoutSyncConflictsInput
     contact?: ContactCreateNestedOneWithoutSyncConflictsInput
+    appPassword?: AppPasswordCreateNestedOneWithoutSyncConflictsInput
   }
 
   export type SyncConflictUncheckedCreateWithoutSyncAccountInput = {
     id?: string
     syncContactLinkId?: string | null
     contactId?: string | null
+    appPasswordId?: string | null
     conflictType: $Enums.SyncConflictType
+    conflictSource?: $Enums.SyncConflictSource
     status?: $Enums.SyncConflictStatus
     resolutionStrategy?: $Enums.SyncResolutionStrategy | null
     localSyncVersion?: number | null
@@ -30701,6 +31157,8 @@ export namespace Prisma {
     localSnapshot?: NullableJsonNullValueInput | InputJsonValue
     remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
     resolutionNotes?: string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     detectedAt?: Date | string
     resolvedAt?: Date | string | null
     createdAt?: Date | string
@@ -31017,6 +31475,7 @@ export namespace Prisma {
   export type SyncConflictCreateWithoutSyncContactLinkInput = {
     id?: string
     conflictType: $Enums.SyncConflictType
+    conflictSource?: $Enums.SyncConflictSource
     status?: $Enums.SyncConflictStatus
     resolutionStrategy?: $Enums.SyncResolutionStrategy | null
     localSyncVersion?: number | null
@@ -31024,19 +31483,24 @@ export namespace Prisma {
     localSnapshot?: NullableJsonNullValueInput | InputJsonValue
     remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
     resolutionNotes?: string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     detectedAt?: Date | string
     resolvedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    syncAccount: SyncAccountCreateNestedOneWithoutSyncConflictsInput
+    syncAccount?: SyncAccountCreateNestedOneWithoutSyncConflictsInput
     contact?: ContactCreateNestedOneWithoutSyncConflictsInput
+    appPassword?: AppPasswordCreateNestedOneWithoutSyncConflictsInput
   }
 
   export type SyncConflictUncheckedCreateWithoutSyncContactLinkInput = {
     id?: string
-    syncAccountId: string
+    syncAccountId?: string | null
     contactId?: string | null
+    appPasswordId?: string | null
     conflictType: $Enums.SyncConflictType
+    conflictSource?: $Enums.SyncConflictSource
     status?: $Enums.SyncConflictStatus
     resolutionStrategy?: $Enums.SyncResolutionStrategy | null
     localSyncVersion?: number | null
@@ -31044,6 +31508,8 @@ export namespace Prisma {
     localSnapshot?: NullableJsonNullValueInput | InputJsonValue
     remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
     resolutionNotes?: string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     detectedAt?: Date | string
     resolvedAt?: Date | string | null
     createdAt?: Date | string
@@ -31609,6 +32075,33 @@ export namespace Prisma {
     create: XOR<ContactCreateWithoutSyncConflictsInput, ContactUncheckedCreateWithoutSyncConflictsInput>
   }
 
+  export type AppPasswordCreateWithoutSyncConflictsInput = {
+    id?: string
+    label: string
+    hashedPassword: string
+    lastUsedAt?: Date | string | null
+    revokedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutAppPasswordsInput
+  }
+
+  export type AppPasswordUncheckedCreateWithoutSyncConflictsInput = {
+    id?: string
+    userId: string
+    label: string
+    hashedPassword: string
+    lastUsedAt?: Date | string | null
+    revokedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AppPasswordCreateOrConnectWithoutSyncConflictsInput = {
+    where: AppPasswordWhereUniqueInput
+    create: XOR<AppPasswordCreateWithoutSyncConflictsInput, AppPasswordUncheckedCreateWithoutSyncConflictsInput>
+  }
+
   export type SyncAccountUpsertWithoutSyncConflictsInput = {
     update: XOR<SyncAccountUpdateWithoutSyncConflictsInput, SyncAccountUncheckedUpdateWithoutSyncConflictsInput>
     create: XOR<SyncAccountCreateWithoutSyncConflictsInput, SyncAccountUncheckedCreateWithoutSyncConflictsInput>
@@ -31834,6 +32327,39 @@ export namespace Prisma {
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
+  export type AppPasswordUpsertWithoutSyncConflictsInput = {
+    update: XOR<AppPasswordUpdateWithoutSyncConflictsInput, AppPasswordUncheckedUpdateWithoutSyncConflictsInput>
+    create: XOR<AppPasswordCreateWithoutSyncConflictsInput, AppPasswordUncheckedCreateWithoutSyncConflictsInput>
+    where?: AppPasswordWhereInput
+  }
+
+  export type AppPasswordUpdateToOneWithWhereWithoutSyncConflictsInput = {
+    where?: AppPasswordWhereInput
+    data: XOR<AppPasswordUpdateWithoutSyncConflictsInput, AppPasswordUncheckedUpdateWithoutSyncConflictsInput>
+  }
+
+  export type AppPasswordUpdateWithoutSyncConflictsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    label?: StringFieldUpdateOperationsInput | string
+    hashedPassword?: StringFieldUpdateOperationsInput | string
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutAppPasswordsNestedInput
+  }
+
+  export type AppPasswordUncheckedUpdateWithoutSyncConflictsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    label?: StringFieldUpdateOperationsInput | string
+    hashedPassword?: StringFieldUpdateOperationsInput | string
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type AppPasswordCreateManyUserInput = {
     id?: string
     label: string
@@ -32021,6 +32547,7 @@ export namespace Prisma {
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncConflicts?: SyncConflictUpdateManyWithoutAppPasswordNestedInput
   }
 
   export type AppPasswordUncheckedUpdateWithoutUserInput = {
@@ -32031,6 +32558,7 @@ export namespace Prisma {
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutAppPasswordNestedInput
   }
 
   export type AppPasswordUncheckedUpdateManyWithoutUserInput = {
@@ -32570,6 +33098,94 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type SyncConflictCreateManyAppPasswordInput = {
+    id?: string
+    syncAccountId?: string | null
+    syncContactLinkId?: string | null
+    contactId?: string | null
+    conflictType: $Enums.SyncConflictType
+    conflictSource?: $Enums.SyncConflictSource
+    status?: $Enums.SyncConflictStatus
+    resolutionStrategy?: $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: number | null
+    remoteETag?: string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    detectedAt?: Date | string
+    resolvedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SyncConflictUpdateWithoutAppPasswordInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    conflictSource?: EnumSyncConflictSourceFieldUpdateOperationsInput | $Enums.SyncConflictSource
+    status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
+    resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncAccount?: SyncAccountUpdateOneWithoutSyncConflictsNestedInput
+    syncContactLink?: SyncContactLinkUpdateOneWithoutSyncConflictsNestedInput
+    contact?: ContactUpdateOneWithoutSyncConflictsNestedInput
+  }
+
+  export type SyncConflictUncheckedUpdateWithoutAppPasswordInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncContactLinkId?: NullableStringFieldUpdateOperationsInput | string | null
+    contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    conflictSource?: EnumSyncConflictSourceFieldUpdateOperationsInput | $Enums.SyncConflictSource
+    status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
+    resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncConflictUncheckedUpdateManyWithoutAppPasswordInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncContactLinkId?: NullableStringFieldUpdateOperationsInput | string | null
+    contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    conflictSource?: EnumSyncConflictSourceFieldUpdateOperationsInput | $Enums.SyncConflictSource
+    status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
+    resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
+    localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
+    remoteETag?: NullableStringFieldUpdateOperationsInput | string | null
+    localSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
+    resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type MergeSuggestionCreateManyLeftContactInput = {
     id?: string
     userId: string
@@ -32623,9 +33239,11 @@ export namespace Prisma {
 
   export type SyncConflictCreateManyContactInput = {
     id?: string
-    syncAccountId: string
+    syncAccountId?: string | null
     syncContactLinkId?: string | null
+    appPasswordId?: string | null
     conflictType: $Enums.SyncConflictType
+    conflictSource?: $Enums.SyncConflictSource
     status?: $Enums.SyncConflictStatus
     resolutionStrategy?: $Enums.SyncResolutionStrategy | null
     localSyncVersion?: number | null
@@ -32633,6 +33251,8 @@ export namespace Prisma {
     localSnapshot?: NullableJsonNullValueInput | InputJsonValue
     remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
     resolutionNotes?: string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     detectedAt?: Date | string
     resolvedAt?: Date | string | null
     createdAt?: Date | string
@@ -32844,6 +33464,7 @@ export namespace Prisma {
   export type SyncConflictUpdateWithoutContactInput = {
     id?: StringFieldUpdateOperationsInput | string
     conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    conflictSource?: EnumSyncConflictSourceFieldUpdateOperationsInput | $Enums.SyncConflictSource
     status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
     resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
     localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
@@ -32851,19 +33472,24 @@ export namespace Prisma {
     localSnapshot?: NullableJsonNullValueInput | InputJsonValue
     remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    syncAccount?: SyncAccountUpdateOneRequiredWithoutSyncConflictsNestedInput
+    syncAccount?: SyncAccountUpdateOneWithoutSyncConflictsNestedInput
     syncContactLink?: SyncContactLinkUpdateOneWithoutSyncConflictsNestedInput
+    appPassword?: AppPasswordUpdateOneWithoutSyncConflictsNestedInput
   }
 
   export type SyncConflictUncheckedUpdateWithoutContactInput = {
     id?: StringFieldUpdateOperationsInput | string
-    syncAccountId?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     syncContactLinkId?: NullableStringFieldUpdateOperationsInput | string | null
+    appPasswordId?: NullableStringFieldUpdateOperationsInput | string | null
     conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    conflictSource?: EnumSyncConflictSourceFieldUpdateOperationsInput | $Enums.SyncConflictSource
     status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
     resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
     localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
@@ -32871,6 +33497,8 @@ export namespace Prisma {
     localSnapshot?: NullableJsonNullValueInput | InputJsonValue
     remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32879,9 +33507,11 @@ export namespace Prisma {
 
   export type SyncConflictUncheckedUpdateManyWithoutContactInput = {
     id?: StringFieldUpdateOperationsInput | string
-    syncAccountId?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     syncContactLinkId?: NullableStringFieldUpdateOperationsInput | string | null
+    appPasswordId?: NullableStringFieldUpdateOperationsInput | string | null
     conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    conflictSource?: EnumSyncConflictSourceFieldUpdateOperationsInput | $Enums.SyncConflictSource
     status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
     resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
     localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
@@ -32889,6 +33519,8 @@ export namespace Prisma {
     localSnapshot?: NullableJsonNullValueInput | InputJsonValue
     remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33421,7 +34053,9 @@ export namespace Prisma {
     id?: string
     syncContactLinkId?: string | null
     contactId?: string | null
+    appPasswordId?: string | null
     conflictType: $Enums.SyncConflictType
+    conflictSource?: $Enums.SyncConflictSource
     status?: $Enums.SyncConflictStatus
     resolutionStrategy?: $Enums.SyncResolutionStrategy | null
     localSyncVersion?: number | null
@@ -33429,6 +34063,8 @@ export namespace Prisma {
     localSnapshot?: NullableJsonNullValueInput | InputJsonValue
     remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
     resolutionNotes?: string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     detectedAt?: Date | string
     resolvedAt?: Date | string | null
     createdAt?: Date | string
@@ -33563,6 +34199,7 @@ export namespace Prisma {
   export type SyncConflictUpdateWithoutSyncAccountInput = {
     id?: StringFieldUpdateOperationsInput | string
     conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    conflictSource?: EnumSyncConflictSourceFieldUpdateOperationsInput | $Enums.SyncConflictSource
     status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
     resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
     localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
@@ -33570,19 +34207,24 @@ export namespace Prisma {
     localSnapshot?: NullableJsonNullValueInput | InputJsonValue
     remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     syncContactLink?: SyncContactLinkUpdateOneWithoutSyncConflictsNestedInput
     contact?: ContactUpdateOneWithoutSyncConflictsNestedInput
+    appPassword?: AppPasswordUpdateOneWithoutSyncConflictsNestedInput
   }
 
   export type SyncConflictUncheckedUpdateWithoutSyncAccountInput = {
     id?: StringFieldUpdateOperationsInput | string
     syncContactLinkId?: NullableStringFieldUpdateOperationsInput | string | null
     contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    appPasswordId?: NullableStringFieldUpdateOperationsInput | string | null
     conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    conflictSource?: EnumSyncConflictSourceFieldUpdateOperationsInput | $Enums.SyncConflictSource
     status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
     resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
     localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
@@ -33590,6 +34232,8 @@ export namespace Prisma {
     localSnapshot?: NullableJsonNullValueInput | InputJsonValue
     remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33600,7 +34244,9 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     syncContactLinkId?: NullableStringFieldUpdateOperationsInput | string | null
     contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    appPasswordId?: NullableStringFieldUpdateOperationsInput | string | null
     conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    conflictSource?: EnumSyncConflictSourceFieldUpdateOperationsInput | $Enums.SyncConflictSource
     status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
     resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
     localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
@@ -33608,6 +34254,8 @@ export namespace Prisma {
     localSnapshot?: NullableJsonNullValueInput | InputJsonValue
     remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33616,9 +34264,11 @@ export namespace Prisma {
 
   export type SyncConflictCreateManySyncContactLinkInput = {
     id?: string
-    syncAccountId: string
+    syncAccountId?: string | null
     contactId?: string | null
+    appPasswordId?: string | null
     conflictType: $Enums.SyncConflictType
+    conflictSource?: $Enums.SyncConflictSource
     status?: $Enums.SyncConflictStatus
     resolutionStrategy?: $Enums.SyncResolutionStrategy | null
     localSyncVersion?: number | null
@@ -33626,6 +34276,8 @@ export namespace Prisma {
     localSnapshot?: NullableJsonNullValueInput | InputJsonValue
     remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
     resolutionNotes?: string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     detectedAt?: Date | string
     resolvedAt?: Date | string | null
     createdAt?: Date | string
@@ -33635,6 +34287,7 @@ export namespace Prisma {
   export type SyncConflictUpdateWithoutSyncContactLinkInput = {
     id?: StringFieldUpdateOperationsInput | string
     conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    conflictSource?: EnumSyncConflictSourceFieldUpdateOperationsInput | $Enums.SyncConflictSource
     status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
     resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
     localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
@@ -33642,19 +34295,24 @@ export namespace Prisma {
     localSnapshot?: NullableJsonNullValueInput | InputJsonValue
     remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    syncAccount?: SyncAccountUpdateOneRequiredWithoutSyncConflictsNestedInput
+    syncAccount?: SyncAccountUpdateOneWithoutSyncConflictsNestedInput
     contact?: ContactUpdateOneWithoutSyncConflictsNestedInput
+    appPassword?: AppPasswordUpdateOneWithoutSyncConflictsNestedInput
   }
 
   export type SyncConflictUncheckedUpdateWithoutSyncContactLinkInput = {
     id?: StringFieldUpdateOperationsInput | string
-    syncAccountId?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    appPasswordId?: NullableStringFieldUpdateOperationsInput | string | null
     conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    conflictSource?: EnumSyncConflictSourceFieldUpdateOperationsInput | $Enums.SyncConflictSource
     status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
     resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
     localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
@@ -33662,6 +34320,8 @@ export namespace Prisma {
     localSnapshot?: NullableJsonNullValueInput | InputJsonValue
     remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33670,9 +34330,11 @@ export namespace Prisma {
 
   export type SyncConflictUncheckedUpdateManyWithoutSyncContactLinkInput = {
     id?: StringFieldUpdateOperationsInput | string
-    syncAccountId?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: NullableStringFieldUpdateOperationsInput | string | null
     contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    appPasswordId?: NullableStringFieldUpdateOperationsInput | string | null
     conflictType?: EnumSyncConflictTypeFieldUpdateOperationsInput | $Enums.SyncConflictType
+    conflictSource?: EnumSyncConflictSourceFieldUpdateOperationsInput | $Enums.SyncConflictSource
     status?: EnumSyncConflictStatusFieldUpdateOperationsInput | $Enums.SyncConflictStatus
     resolutionStrategy?: NullableEnumSyncResolutionStrategyFieldUpdateOperationsInput | $Enums.SyncResolutionStrategy | null
     localSyncVersion?: NullableIntFieldUpdateOperationsInput | number | null
@@ -33680,6 +34342,8 @@ export namespace Prisma {
     localSnapshot?: NullableJsonNullValueInput | InputJsonValue
     remoteSnapshot?: NullableJsonNullValueInput | InputJsonValue
     resolutionNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     detectedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string

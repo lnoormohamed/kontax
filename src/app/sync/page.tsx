@@ -778,7 +778,7 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
     ...recentConflicts.map((conflict) => ({
       id: `conflict-${conflict.id}`,
       occurredAt: conflict.resolvedAt ?? conflict.detectedAt,
-      title: `${conflict.syncAccount.label} conflict ${conflict.status.toLowerCase()}`,
+      title: `${conflict.syncAccount?.label ?? "Device sync"} conflict ${conflict.status.toLowerCase()}`,
       body:
         conflict.contact?.fullName
           ? `${conflict.conflictType} · ${conflict.contact.fullName}`
@@ -1820,7 +1820,7 @@ export default async function SyncPage({ searchParams }: SyncPageProps) {
 
                         return (
                           <>
-                      <p className="font-semibold text-white">{conflict.syncAccount.label}</p>
+                      <p className="font-semibold text-white">{conflict.syncAccount?.label ?? "Device sync"}</p>
                       <p className="mt-1 text-slate-400">
                         {conflict.conflictType} · {conflict.status}
                       </p>

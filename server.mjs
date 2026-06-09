@@ -662,6 +662,32 @@ const fetchActiveContacts = (userId) =>
     orderBy: { syncUid: "asc" },
   });
 
+// P9-08: record an inbound device-write conflict (stale If-Match on PUT/DELETE).
+// Default resolution is last-write-wins (server is authoritative); the record is
+// kept OPEN for the Phase 10 activity log / review UI. Never throws into the
+// request path — a failed log must not turn a 412 into a 500.
+const logDeviceWriteConflict = async ({ contact, appPasswordId, clientEtag, incomingVCard, conflictType }) => {
+  try {
+    await prisma.syncConflict.create({
+      data: {
+        conflictType: conflictType ?? "VERSION_MISMATCH",
+        conflictSource: "INBOUND_DEVICE",
+        status: "OPEN",
+        resolutionStrategy: "KEEP_LOCAL",
+        contactId: contact.id,
+        appPasswordId: appPasswordId ?? null,
+        localSyncVersion: contact.syncVersion ?? null,
+        remoteETag: clientEtag ?? null,
+        localSnapshot: JSON.parse(JSON.stringify(contact)),
+        remoteSnapshot: incomingVCard ? { rawVCard: incomingVCard } : undefined,
+        detectedAt: new Date(),
+      },
+    });
+  } catch (error) {
+    console.error("Failed to log device-write conflict", error);
+  }
+};
+
 const handleWellKnown = async (req, res, requestUrl) => {
   if (requestUrl.pathname !== "/.well-known/carddav") {
     return false;
@@ -971,7 +997,14 @@ const handleContactResource = async (req, res, requestUrl) => {
         return preconditionFailed(res);
       }
       if (!ifMatch.split(",").map((value) => value.trim()).includes(etagForContact(existing))) {
-        // Stale ETag — P9-08 will record a SyncConflict here.
+        // Stale ETag → version conflict. Record it, then 412 (last-write-wins).
+        await logDeviceWriteConflict({
+          contact: existing,
+          appPasswordId: authResult.appPasswordId,
+          clientEtag: ifMatch,
+          incomingVCard: body,
+          conflictType: "VERSION_MISMATCH",
+        });
         return preconditionFailed(res);
       }
     }
@@ -1032,6 +1065,14 @@ const handleContactResource = async (req, res, requestUrl) => {
     ifMatch &&
     !ifMatch.split(",").map((value) => value.trim()).includes(etagForContact(existing))
   ) {
+    // Device is deleting a contact that changed server-side since its last sync.
+    await logDeviceWriteConflict({
+      contact: existing,
+      appPasswordId: authResult.appPasswordId,
+      clientEtag: ifMatch,
+      incomingVCard: null,
+      conflictType: "DELETE_CONFLICT",
+    });
     return preconditionFailed(res);
   }
 

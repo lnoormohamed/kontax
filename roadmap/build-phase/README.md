@@ -105,7 +105,7 @@ This roadmap is the implementation source of truth for phases 1–16. Each phase
 | P9-05 | 9 | Done | P1 | P9-04 | Unassigned | Connect-a-device settings UI: server URL/username copy, show-once app passwords, revoke confirm, connection guides (device walkthrough in P9-07) |
 | P9-06 | 9 | Done | P1 | P9-04 | Unassigned | Design brief exists; device-connections UI already shipped in P9-05 |
 | P9-07 | 9 | Not Started | P1 | P9-05, P9-06 | Unassigned | Bidirectional sync verified on iOS, macOS Contacts, and DAVx⁵ |
-| P9-08 | 9 | Not Started | P2 | P9-07 | Unassigned | VERSION_MISMATCH conflicts logged; last-write-wins does not corrupt data |
+| P9-08 | 9 | Done | P2 | P9-04 | Unassigned | Device-write conflicts logged (VERSION_MISMATCH/DELETE_CONFLICT, INBOUND_DEVICE) on stale If-Match; last-write-wins; smoke-tested |
 
 ### Phase 10 — Enhanced Merge, Activity Changelog, Source Tracking
 

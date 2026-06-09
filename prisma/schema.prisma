@@ -128,6 +128,11 @@ enum SyncConflictStatus {
     IGNORED
 }
 
+enum SyncConflictSource {
+    OUTBOUND_SYNC
+    INBOUND_DEVICE
+}
+
 enum SyncResolutionStrategy {
     KEEP_LOCAL
     KEEP_REMOTE
@@ -166,6 +171,7 @@ model AppPassword {
     createdAt      DateTime @default(now())
     updatedAt      DateTime @updatedAt
     user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    syncConflicts  SyncConflict[]
 
     @@index([userId, revokedAt, createdAt])
     @@index([userId, revokedAt])
@@ -468,10 +474,12 @@ model SyncJob {
 
 model SyncConflict {
     id                 String                 @id @default(cuid())
-    syncAccountId      String
+    syncAccountId      String?
     syncContactLinkId  String?
     contactId          String?
+    appPasswordId      String?
     conflictType       SyncConflictType
+    conflictSource     SyncConflictSource     @default(OUTBOUND_SYNC)
     status             SyncConflictStatus     @default(OPEN)
     resolutionStrategy SyncResolutionStrategy?
     localSyncVersion   Int?
@@ -479,15 +487,20 @@ model SyncConflict {
     localSnapshot      Json?
     remoteSnapshot     Json?
     resolutionNotes    String?
+    lastErrorAt        DateTime?
+    lastErrorCode      String?
     detectedAt         DateTime               @default(now())
     resolvedAt         DateTime?
     createdAt          DateTime               @default(now())
     updatedAt          DateTime               @updatedAt
-    syncAccount        SyncAccount            @relation(fields: [syncAccountId], references: [id], onDelete: Cascade)
+    syncAccount        SyncAccount?           @relation(fields: [syncAccountId], references: [id], onDelete: Cascade)
     syncContactLink    SyncContactLink?       @relation(fields: [syncContactLinkId], references: [id], onDelete: SetNull)
     contact            Contact?               @relation(fields: [contactId], references: [id], onDelete: SetNull)
+    appPassword        AppPassword?           @relation(fields: [appPasswordId], references: [id], onDelete: SetNull)
 
     @@index([syncAccountId, status, detectedAt])
     @@index([contactId, status])
     @@index([syncContactLinkId, status])
+    @@index([appPasswordId, status])
+    @@index([conflictSource, status, detectedAt])
 }

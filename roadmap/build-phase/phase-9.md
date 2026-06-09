@@ -29,7 +29,7 @@ Turn Kontax into a CardDAV server so users can add it as a native contacts accou
 | P9-05 | Done | P1 | P9-04 |
 | P9-06 | Done | P1 | P9-04 |
 | P9-07 | Not Started | P1 | P9-05, P9-06 |
-| P9-08 | Not Started | P2 | P9-07 |
+| P9-08 | Done | P2 | P9-04 |
 
 ---
 
@@ -270,9 +270,15 @@ Turn Kontax into a CardDAV server so users can add it as a native contacts accou
 ---
 
 ## P9-08 — Sync conflict handling for server-side writes
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P2`
-- Dependencies: `P9-07`
+- Dependencies: `P9-04`
+- Delivered:
+  - Schema: `SyncConflict.syncAccountId` made nullable (inbound device writes have no sync account); added `SyncConflictSource` enum (`OUTBOUND_SYNC` / `INBOUND_DEVICE`), `conflictSource` (default `OUTBOUND_SYNC`), nullable `appPasswordId` + `AppPassword` relation, and `lastErrorAt` / `lastErrorCode`. New indexes on `(appPasswordId, status)` and `(conflictSource, status, detectedAt)`. Applied via `prisma db push`.
+  - Live path (`server.mjs`): `logDeviceWriteConflict` records a `SyncConflict` on stale-`If-Match` PUT (`VERSION_MISMATCH`) and DELETE (`DELETE_CONFLICT`) before returning 412 — `conflictSource: INBOUND_DEVICE`, `status: OPEN`, `resolutionStrategy: KEEP_LOCAL` (last-write-wins, server authoritative), capturing `localSyncVersion`, `remoteETag`, the device's `appPasswordId`, a `localSnapshot` of the server contact, and (for PUT) the incoming vCard in `remoteSnapshot`. Logging never throws into the request path.
+  - Parity helper `src/server/dav/conflicts.ts` (`logDeviceWriteConflict`) for Next-native callers/tests; existing outbound-sync resolution code updated for the now-nullable `syncAccountId`.
+  - Smoke-tested: stale PUT → 412 + one `VERSION_MISMATCH` row; stale DELETE → 412 + one `DELETE_CONFLICT` row; valid PUT (matching ETag) → 204 + no conflict. All fields verified; test data torn down.
+  - Conflict review UI is deferred to Phase 10 (the rows are `OPEN` and queryable by `conflictSource`/`appPasswordId` for the activity log).
 - Implementation Notes:
   - When a device sends a `PUT` with an outdated ETag (`If-Match` mismatch), return HTTP 412 and log a `SyncConflict` record with `conflictType: VERSION_MISMATCH`.
   - Provide a basic resolution strategy: last-write-wins by default (the server's version is authoritative), with the conflict logged for Pro users to review in the activity log (Phase 11).

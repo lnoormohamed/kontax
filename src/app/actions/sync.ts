@@ -1317,22 +1317,31 @@ export const resolveSyncConflict = async (formData: FormData) => {
     throw new Error("Sync conflict not found.");
   }
 
+  // Conflict resolution here applies to outbound CardDAV-sync conflicts, which
+  // always have a linked sync account. Inbound device-write conflicts (P9-08)
+  // have no sync account and are not resolvable through this action.
+  if (!conflict.syncAccount || !conflict.syncAccountId) {
+    throw new Error("This sync conflict is not linked to a sync account and cannot be resolved here.");
+  }
+  const syncAccount = conflict.syncAccount;
+  const conflictSyncAccountId = conflict.syncAccountId;
+
   const resolvedAt = new Date();
 
   if (input.resolutionStrategy === "KEEP_LOCAL") {
     if (
       !conflict.contact ||
-      !conflict.syncAccount.addressBookUrl ||
-      !conflict.syncAccount.credentialReference
+      !syncAccount.addressBookUrl ||
+      !syncAccount.credentialReference
     ) {
       throw new Error(
         "This conflict cannot keep the local version because the sync account or contact is incomplete.",
       );
     }
 
-    const credentials = decryptSyncCredentialPayload(conflict.syncAccount.credentialReference);
+    const credentials = decryptSyncCredentialPayload(syncAccount.credentialReference);
     const pushed = await pushCardDavContact({
-      addressBookUrl: conflict.syncAccount.addressBookUrl,
+      addressBookUrl: syncAccount.addressBookUrl,
       credentials: {
         username: credentials.username,
         password: credentials.password,
@@ -1481,8 +1490,8 @@ export const resolveSyncConflict = async (formData: FormData) => {
     if (
       !conflict.contactId ||
       !conflict.contact ||
-      !conflict.syncAccount.addressBookUrl ||
-      !conflict.syncAccount.credentialReference
+      !syncAccount.addressBookUrl ||
+      !syncAccount.credentialReference
     ) {
       throw new Error(
         "Manual merge needs an attached local contact plus active remote sync credentials.",
@@ -1525,9 +1534,9 @@ export const resolveSyncConflict = async (formData: FormData) => {
       },
     });
 
-    const credentials = decryptSyncCredentialPayload(conflict.syncAccount.credentialReference);
+    const credentials = decryptSyncCredentialPayload(syncAccount.credentialReference);
     const pushed = await pushCardDavContact({
-      addressBookUrl: conflict.syncAccount.addressBookUrl,
+      addressBookUrl: syncAccount.addressBookUrl,
       credentials: {
         username: credentials.username,
         password: credentials.password,
@@ -1579,14 +1588,14 @@ export const resolveSyncConflict = async (formData: FormData) => {
 
   const remainingOpenConflicts = await db.syncConflict.count({
     where: {
-      syncAccountId: conflict.syncAccountId,
+      syncAccountId: conflictSyncAccountId,
       status: "OPEN",
     },
   });
 
   if (remainingOpenConflicts === 0) {
     await db.syncAccount.update({
-      where: { id: conflict.syncAccountId },
+      where: { id: conflictSyncAccountId },
       data: {
         lastErrorAt: null,
         lastErrorCode: null,

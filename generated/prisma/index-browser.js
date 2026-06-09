@@ -377,7 +377,9 @@ exports.Prisma.SyncConflictScalarFieldEnum = {
   syncAccountId: 'syncAccountId',
   syncContactLinkId: 'syncContactLinkId',
   contactId: 'contactId',
+  appPasswordId: 'appPasswordId',
   conflictType: 'conflictType',
+  conflictSource: 'conflictSource',
   status: 'status',
   resolutionStrategy: 'resolutionStrategy',
   localSyncVersion: 'localSyncVersion',
@@ -385,6 +387,8 @@ exports.Prisma.SyncConflictScalarFieldEnum = {
   localSnapshot: 'localSnapshot',
   remoteSnapshot: 'remoteSnapshot',
   resolutionNotes: 'resolutionNotes',
+  lastErrorAt: 'lastErrorAt',
+  lastErrorCode: 'lastErrorCode',
   detectedAt: 'detectedAt',
   resolvedAt: 'resolvedAt',
   createdAt: 'createdAt',
@@ -532,6 +536,11 @@ exports.SyncConflictType = exports.$Enums.SyncConflictType = {
   DELETE_CONFLICT: 'DELETE_CONFLICT',
   MERGE_CONFLICT: 'MERGE_CONFLICT',
   VERSION_MISMATCH: 'VERSION_MISMATCH'
+};
+
+exports.SyncConflictSource = exports.$Enums.SyncConflictSource = {
+  OUTBOUND_SYNC: 'OUTBOUND_SYNC',
+  INBOUND_DEVICE: 'INBOUND_DEVICE'
 };
 
 exports.SyncConflictStatus = exports.$Enums.SyncConflictStatus = {
