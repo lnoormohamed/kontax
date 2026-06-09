@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { ContactDashboard } from "~/app/_components/contact-dashboard";
+import { UserMenu } from "~/app/_components/user-menu";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
@@ -505,14 +506,7 @@ export default async function Home({ searchParams }: HomePageProps) {
             >
               <WorkspaceIcon name="bell" size={18} />
             </button>
-            <Link
-              aria-label="Account settings"
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-[#17352e] text-xs font-semibold text-[#dff0e7] transition hover:opacity-90"
-              href="/settings"
-              title={`${userLabel} · ${session.user.email ?? ""}`}
-            >
-              {userInitials}
-            </Link>
+            <UserMenu email={session.user.email ?? ""} initials={userInitials} name={userLabel} />
           </div>
         </div>
       </header>
