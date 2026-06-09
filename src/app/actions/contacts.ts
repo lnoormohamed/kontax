@@ -8,6 +8,8 @@ import { auth } from "~/server/auth";
 import { assertCanCreateContacts } from "~/server/billing";
 import { mergeContactsForUser, undoMergedContactsForUser } from "~/server/contact-merge";
 import { db } from "~/server/db";
+import { emitEvent } from "~/lib/activity";
+import { computeContactDiff } from "~/lib/activity/diff";
 import { applyAutoFilledPhoneticFields } from "~/server/phonetics";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -481,12 +483,22 @@ export const createContact = async (formData: FormData) => {
 
   await assertCanCreateContacts(userId);
 
-  const createdContact = await db.contact.create({
-    data: {
+  const createdContact = await db.$transaction(async (tx) => {
+    const contact = await tx.contact.create({
+      data: {
+        userId,
+        ...input,
+        ...phoneticFields,
+      },
+    });
+    await emitEvent(tx, {
       userId,
-      ...input,
-      ...phoneticFields,
-    },
+      contactId: contact.id,
+      eventType: "CONTACT_CREATED",
+      actor: "USER",
+      payload: {},
+    });
+    return contact;
   });
 
   revalidateContactViews();
@@ -512,23 +524,39 @@ export const updateContact = async (formData: FormData) => {
   });
   const phoneticFields = applyAutoFilledPhoneticFields(input, userSettings?.autoFillPhoneticNames ?? false);
 
-  const updateResult = await db.contact.updateMany({
-    where: {
-      id: contactId,
-      userId,
-    },
-    data: {
-      ...input,
-      ...phoneticFields,
-      syncVersion: {
-        increment: 1,
-      },
-    },
-  });
+  await db.$transaction(async (tx) => {
+    const before = await tx.contact.findFirst({
+      where: { id: contactId, userId },
+    });
 
-  if (updateResult.count === 0) {
-    throw new Error("Unable to update this contact. It may have been removed or you may not have permission to edit it.");
-  }
+    if (!before) {
+      throw new Error(
+        "Unable to update this contact. It may have been removed or you may not have permission to edit it.",
+      );
+    }
+
+    const after = await tx.contact.update({
+      where: { id: before.id },
+      data: {
+        ...input,
+        ...phoneticFields,
+        syncVersion: {
+          increment: 1,
+        },
+      },
+    });
+
+    const diffs = computeContactDiff(before, after);
+    if (diffs.length > 0) {
+      await emitEvent(tx, {
+        userId,
+        contactId,
+        eventType: "CONTACT_UPDATED",
+        actor: "USER",
+        payload: { diffs },
+      });
+    }
+  });
 
   revalidateContactViews(contactId);
 
@@ -578,19 +606,24 @@ export const archiveContact = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const contactId = parseContactId(formData);
 
-  await db.contact.updateMany({
-    where: {
-      id: contactId,
-      userId,
-      archivedAt: null,
-    },
-    data: {
-      archivedAt: new Date(),
-      syncTombstoneAt: new Date(),
-      syncVersion: {
-        increment: 1,
+  await db.$transaction(async (tx) => {
+    const result = await tx.contact.updateMany({
+      where: { id: contactId, userId, archivedAt: null },
+      data: {
+        archivedAt: new Date(),
+        syncTombstoneAt: new Date(),
+        syncVersion: { increment: 1 },
       },
-    },
+    });
+    if (result.count > 0) {
+      await emitEvent(tx, {
+        userId,
+        contactId,
+        eventType: "CONTACT_ARCHIVED",
+        actor: "USER",
+        payload: {},
+      });
+    }
   });
 
   revalidateContactViews(contactId);
@@ -606,21 +639,31 @@ export const archiveContactsBulk = async (formData: FormData) => {
   const contactIds = parseContactIds(formData);
   const redirectTo = getRedirectTarget(formData);
 
-  await db.contact.updateMany({
-    where: {
-      id: {
-        in: contactIds,
+  await db.$transaction(async (tx) => {
+    const affected = await tx.contact.findMany({
+      where: { id: { in: contactIds }, userId, archivedAt: null },
+      select: { id: true },
+    });
+    if (affected.length === 0) {
+      return;
+    }
+    await tx.contact.updateMany({
+      where: { id: { in: affected.map((c) => c.id) } },
+      data: {
+        archivedAt: new Date(),
+        syncTombstoneAt: new Date(),
+        syncVersion: { increment: 1 },
       },
-      userId,
-      archivedAt: null,
-    },
-    data: {
-      archivedAt: new Date(),
-      syncTombstoneAt: new Date(),
-      syncVersion: {
-        increment: 1,
-      },
-    },
+    });
+    await tx.activityEvent.createMany({
+      data: affected.map((c) => ({
+        userId,
+        contactId: c.id,
+        eventType: "CONTACT_ARCHIVED" as const,
+        actor: "USER" as const,
+        payload: {},
+      })),
+    });
   });
 
   revalidateContactViews();
@@ -634,21 +677,24 @@ export const restoreContact = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const contactId = parseContactId(formData);
 
-  await db.contact.updateMany({
-    where: {
-      id: contactId,
-      userId,
-      NOT: {
+  await db.$transaction(async (tx) => {
+    const result = await tx.contact.updateMany({
+      where: { id: contactId, userId, NOT: { archivedAt: null } },
+      data: {
         archivedAt: null,
+        syncTombstoneAt: null,
+        syncVersion: { increment: 1 },
       },
-    },
-    data: {
-      archivedAt: null,
-      syncTombstoneAt: null,
-      syncVersion: {
-        increment: 1,
-      },
-    },
+    });
+    if (result.count > 0) {
+      await emitEvent(tx, {
+        userId,
+        contactId,
+        eventType: "CONTACT_RESTORED",
+        actor: "USER",
+        payload: {},
+      });
+    }
   });
 
   revalidateContactViews(contactId);
@@ -664,23 +710,31 @@ export const restoreContactsBulk = async (formData: FormData) => {
   const contactIds = parseContactIds(formData);
   const redirectTo = getRedirectTarget(formData);
 
-  await db.contact.updateMany({
-    where: {
-      id: {
-        in: contactIds,
-      },
-      userId,
-      NOT: {
+  await db.$transaction(async (tx) => {
+    const affected = await tx.contact.findMany({
+      where: { id: { in: contactIds }, userId, NOT: { archivedAt: null } },
+      select: { id: true },
+    });
+    if (affected.length === 0) {
+      return;
+    }
+    await tx.contact.updateMany({
+      where: { id: { in: affected.map((c) => c.id) } },
+      data: {
         archivedAt: null,
+        syncTombstoneAt: null,
+        syncVersion: { increment: 1 },
       },
-    },
-    data: {
-      archivedAt: null,
-      syncTombstoneAt: null,
-      syncVersion: {
-        increment: 1,
-      },
-    },
+    });
+    await tx.activityEvent.createMany({
+      data: affected.map((c) => ({
+        userId,
+        contactId: c.id,
+        eventType: "CONTACT_RESTORED" as const,
+        actor: "USER" as const,
+        payload: {},
+      })),
+    });
   });
 
   revalidateContactViews();
@@ -695,11 +749,30 @@ export const permanentlyDeleteContact = async (formData: FormData) => {
   const contactId = parseContactId(formData);
   const redirectTo = getRedirectTarget(formData);
 
-  await db.contact.deleteMany({
-    where: {
-      id: contactId,
-      userId,
-    },
+  await db.$transaction(async (tx) => {
+    const contact = await tx.contact.findFirst({
+      where: { id: contactId, userId },
+      select: { fullName: true, firstName: true, lastName: true, email: true, phone: true },
+    });
+    const result = await tx.contact.deleteMany({
+      where: { id: contactId, userId },
+    });
+    if (result.count > 0 && contact) {
+      await emitEvent(tx, {
+        userId,
+        contactId: null,
+        eventType: "CONTACT_DELETED",
+        actor: "USER",
+        payload: {
+          fullName:
+            contact.fullName?.trim() ||
+            `${contact.firstName ?? ""} ${contact.lastName ?? ""}`.trim() ||
+            "Unnamed contact",
+          email: contact.email ?? undefined,
+          phone: contact.phone ?? undefined,
+        },
+      });
+    }
   });
 
   revalidateContactViews(contactId);
