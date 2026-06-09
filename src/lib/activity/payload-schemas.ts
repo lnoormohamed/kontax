@@ -43,7 +43,7 @@ const contactMerged = z.object({
 
 const contactMergeUndone = z.object({
   restoredContactId: z.string(),
-  originalMergeEventId: z.string(),
+  originalMergeEventId: z.string().optional(),
 });
 
 const contactImported = z.object({
@@ -61,6 +61,7 @@ const contactShared = z.object({
 // because remote shape varies; all fields optional.
 const syncMutation = z.object({
   diffs: z.array(fieldDiffSchema).optional(),
+  syncAccountId: z.string().optional(),
   syncAccountLabel: z.string().optional(),
 });
 

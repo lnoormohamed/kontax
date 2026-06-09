@@ -54,6 +54,11 @@ export async function POST(request: Request) {
   }
 
   const rolledBackAt = new Date();
+  // Capture ids before archiving so we can log one event per contact.
+  const toArchive = await db.contact.findMany({
+    where: { userId, importJobId: job.id, archivedAt: null },
+    select: { id: true },
+  });
   const archivedContacts = await db.contact.updateMany({
     where: {
       userId,
@@ -64,6 +69,20 @@ export async function POST(request: Request) {
       archivedAt: rolledBackAt,
     },
   });
+
+  // P10-02: rollback soft-archives the imported contacts → CONTACT_ARCHIVED.
+  if (toArchive.length > 0) {
+    await db.activityEvent.createMany({
+      data: toArchive.map((contact) => ({
+        userId,
+        contactId: contact.id,
+        eventType: "CONTACT_ARCHIVED" as const,
+        actor: "IMPORT" as const,
+        actorDetail: "import rollback",
+        payload: {},
+      })),
+    });
+  }
 
   await db.importJob.update({
     where: { id: job.id },

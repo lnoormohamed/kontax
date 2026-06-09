@@ -6,6 +6,7 @@ import {
 } from "~/server/carddav";
 import { parseContactPostalAddresses, parseContactStringArray } from "~/server/contact-portability";
 import { db } from "~/server/db";
+import { emitEvent } from "~/lib/activity";
 import {
   AUTO_PAUSE_FAILURE_STREAK,
   getConsecutiveFailureStreak,
@@ -582,6 +583,15 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
               lastSyncedAt: now,
             },
           });
+
+          await emitEvent(tx, {
+            userId: job.syncAccount.userId,
+            contactId: createdContact.id,
+            eventType: "SYNC_PULLED",
+            actor: "SYNC",
+            actorDetail: job.syncAccount.label,
+            payload: { syncAccountId: job.syncAccountId, syncAccountLabel: job.syncAccount.label },
+          });
         }
 
         for (const remoteApply of remoteApplyCandidates) {
@@ -610,6 +620,15 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
               lastSyncedAt: now,
             },
           });
+
+          await emitEvent(tx, {
+            userId: job.syncAccount.userId,
+            contactId: remoteApply.contactId,
+            eventType: "SYNC_PULLED",
+            actor: "SYNC",
+            actorDetail: job.syncAccount.label,
+            payload: { syncAccountId: job.syncAccountId, syncAccountLabel: job.syncAccount.label },
+          });
         }
 
         for (const conflictEntry of conflictEntries) {
@@ -625,6 +644,18 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
               localSnapshot: conflictEntry.localSnapshot,
               remoteSnapshot: conflictEntry.remoteSnapshot as Prisma.InputJsonValue,
               resolutionNotes: conflictEntry.resolutionNotes,
+            },
+          });
+
+          await emitEvent(tx, {
+            userId: job.syncAccount.userId,
+            contactId: conflictEntry.contactId,
+            eventType: "SYNC_CONFLICT_DETECTED",
+            actor: "SYNC",
+            actorDetail: job.syncAccount.label,
+            payload: {
+              conflictType: conflictEntry.type,
+              remoteETag: conflictEntry.remoteETag ?? undefined,
             },
           });
         }

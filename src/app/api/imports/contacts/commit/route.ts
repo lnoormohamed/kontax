@@ -109,6 +109,24 @@ export async function POST(request: Request) {
       })),
     });
 
+    // P10-02: one CONTACT_IMPORTED event per created contact (batch insert).
+    const importedContacts = await db.contact.findMany({
+      where: { userId, importJobId: job.id },
+      select: { id: true },
+    });
+    if (importedContacts.length > 0) {
+      await db.activityEvent.createMany({
+        data: importedContacts.map((contact) => ({
+          userId,
+          contactId: contact.id,
+          eventType: "CONTACT_IMPORTED" as const,
+          actor: "IMPORT" as const,
+          actorDetail: sourceFileName,
+          payload: { importJobId: job.id, sourceFileName },
+        })),
+      });
+    }
+
     await db.importJob.update({
       where: { id: job.id },
       data: {

@@ -1,4 +1,5 @@
 import { Prisma } from "../../generated/prisma";
+import { emitEvent } from "~/lib/activity";
 import {
   parseContactPostalAddresses,
   parseContactStringArray,
@@ -1583,6 +1584,26 @@ export const mergeContactsForUser = async ({
       },
     });
 
+    await emitEvent(tx, {
+      userId,
+      contactId: primaryContact.id,
+      eventType: "CONTACT_MERGED",
+      actor: "USER",
+      payload: {
+        absorbedContactId: secondaryContact.id,
+        absorbedContactName: secondaryContact.fullName ?? "",
+        fieldResolutions: [],
+      },
+    });
+    await emitEvent(tx, {
+      userId,
+      contactId: secondaryContact.id,
+      eventType: "CONTACT_ARCHIVED",
+      actor: "SYSTEM",
+      actorDetail: "merged",
+      payload: {},
+    });
+
     let acceptedDecisionId: string | undefined;
 
     if (persistedSuggestionId) {
@@ -1917,6 +1938,21 @@ export const undoMergedContactsForUser = async ({
           reversedDecisionId: decision.id,
         },
       },
+    });
+
+    await emitEvent(tx, {
+      userId,
+      contactId: details.primaryBefore.id,
+      eventType: "CONTACT_MERGE_UNDONE",
+      actor: "USER",
+      payload: { restoredContactId: details.secondaryBefore.id },
+    });
+    await emitEvent(tx, {
+      userId,
+      contactId: details.secondaryBefore.id,
+      eventType: "CONTACT_RESTORED",
+      actor: "USER",
+      payload: {},
     });
 
     return details.primaryBefore.id;

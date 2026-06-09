@@ -10,6 +10,7 @@ import { assertCanCreateSyncAccount, assertCanUseCardDavSync } from "~/server/bi
 import { CardDavPreflightError, discoverCardDavAccount, pushCardDavContact } from "~/server/carddav";
 import { parseContactPostalAddresses, parseContactStringArray } from "~/server/contact-portability";
 import { db } from "~/server/db";
+import { emitEvent } from "~/lib/activity";
 import {
   decryptSyncCredentialPayload,
   encryptSyncCredentialPayload,
@@ -1584,6 +1585,14 @@ export const resolveSyncConflict = async (formData: FormData) => {
       resolutionNotes: input.resolutionNotes,
       resolvedAt,
     },
+  });
+
+  await emitEvent(db, {
+    userId,
+    contactId: conflict.contactId,
+    eventType: "SYNC_CONFLICT_RESOLVED",
+    actor: "USER",
+    payload: { conflictId: conflict.id, resolutionStrategy: input.resolutionStrategy },
   });
 
   const remainingOpenConflicts = await db.syncConflict.count({
