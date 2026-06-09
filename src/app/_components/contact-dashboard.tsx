@@ -1,12 +1,13 @@
 import Link from "next/link";
 
 import { ContactsWorkspaceTable } from "~/app/_components/contacts-workspace-table";
+import { BulkMergeButton, UndoMergeButton } from "~/app/_components/merge-actions";
 import { MergeSuggestionDismissButton } from "~/app/_components/merge-suggestion-dismiss-button";
 import { MergeSuggestionRefreshButton } from "~/app/_components/merge-suggestion-refresh-button";
 import { SortMenu } from "~/app/_components/sort-menu";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import type { BillingLifecycleState } from "~/server/billing";
-import type { PersistedMergeSuggestion } from "~/server/contact-merge";
+import type { PersistedMergeSuggestion, RecentMerge } from "~/server/contact-merge";
 
 type DashboardContact = {
   id: string;
@@ -62,6 +63,8 @@ type ContactDashboardProps = {
   counts: { people: number; favorites: number; archived: number; duplicates: number };
   account: { name: string; email: string };
   syncState: "ok" | "warning" | "error";
+  highConfidenceCount: number;
+  recentMerges: RecentMerge[];
 };
 
 const getInitials = (value: string) =>
@@ -87,7 +90,14 @@ export function ContactDashboard({
   counts,
   account,
   syncState,
+  highConfidenceCount,
+  recentMerges,
 }: ContactDashboardProps) {
+  const mergeDateFormatter = new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
   const buildHref = (
     tab: WorkspaceTab,
     overrides?: { filter?: WorkspaceFilter; sort?: WorkspaceSort; view?: WorkspaceView },
@@ -323,7 +333,10 @@ export function ContactDashboard({
               </div>
             </>
           ) : (
-            <MergeSuggestionRefreshButton />
+            <div className="flex items-center gap-2">
+              <MergeSuggestionRefreshButton />
+              <BulkMergeButton count={highConfidenceCount} />
+            </div>
           )}
           <span className="ml-auto text-[12.5px] text-[#8b938c]">{countLabel}</span>
         </div>
@@ -360,7 +373,8 @@ export function ContactDashboard({
           ) : null}
 
           {currentTab === "duplicates" ? (
-            mergeSuggestions.length === 0 ? (
+            <div className="grid gap-6">
+              {mergeSuggestions.length === 0 ? (
               <div className="m-4 rounded-[1.6rem] border border-dashed border-[#d8ddd6] bg-white px-6 py-12 text-center text-sm text-slate-500">
                 No duplicates to review. Kontax scans as you add and import contacts — you&apos;re all clear.
               </div>
@@ -409,7 +423,42 @@ export function ContactDashboard({
                   </article>
                 ))}
               </div>
-            )
+            )}
+
+              {recentMerges.length > 0 ? (
+                <div className="p-4 pt-0">
+                  <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-slate-400">
+                    Merged contacts
+                  </p>
+                  <div className="overflow-hidden rounded-[1.2rem] border border-[#d8ddd6] bg-white">
+                    {recentMerges.map((merge) => (
+                      <div
+                        className="flex items-center gap-3 border-b border-[#edf0ea] px-4 py-3 last:border-b-0"
+                        key={merge.decisionId}
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-sm font-semibold text-slate-900">
+                            <Link className="hover:underline" href={`/contacts/${merge.survivorContactId}`}>
+                              {merge.survivorName}
+                            </Link>{" "}
+                            <span className="text-[#8b938c]">←</span> {merge.absorbedName}
+                          </p>
+                          <p className="text-xs text-[#8b938c]">
+                            {mergeDateFormatter.format(merge.decidedAt)}
+                            {merge.source === "bulk-accept" ? " · bulk" : ""}
+                          </p>
+                        </div>
+                        {merge.canUndo ? (
+                          <UndoMergeButton decisionId={merge.decisionId} />
+                        ) : (
+                          <span className="text-xs font-medium text-[#aeb4ac]">Expired</span>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
+            </div>
           ) : null}
         </div>
       </section>

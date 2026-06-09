@@ -6,7 +6,7 @@ import { UserMenu } from "~/app/_components/user-menu";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
-import { getOpenMergeSuggestionsForUser } from "~/server/contact-merge";
+import { getOpenMergeSuggestionsForUser, getRecentMergesForUser } from "~/server/contact-merge";
 import { db } from "~/server/db";
 
 type HomePageProps = {
@@ -445,6 +445,12 @@ export default async function Home({ searchParams }: HomePageProps) {
     db.contact.count({ where: { userId: session.user.id, NOT: { archivedAt: null } } }),
   ]);
 
+  const highConfidenceCount = mergeSuggestions.filter(
+    (suggestion) => suggestion.confidence === "high",
+  ).length;
+  const recentMerges =
+    selectedTab === "duplicates" ? await getRecentMergesForUser(session.user.id) : [];
+
   const sortedActiveContacts =
     selectedSort === "name"
       ? [...activeContacts].sort(compareWorkspaceContacts)
@@ -535,6 +541,8 @@ export default async function Home({ searchParams }: HomePageProps) {
         }}
         account={{ name: userLabel, email: session.user.email ?? "" }}
         syncState="ok"
+        highConfidenceCount={highConfidenceCount}
+        recentMerges={recentMerges}
       />
     </main>
   );

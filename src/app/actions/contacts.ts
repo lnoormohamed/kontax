@@ -6,7 +6,11 @@ import { z } from "zod";
 
 import { auth } from "~/server/auth";
 import { assertCanCreateContacts } from "~/server/billing";
-import { mergeContactsForUser, undoMergedContactsForUser } from "~/server/contact-merge";
+import {
+  bulkAcceptHighConfidenceForUser,
+  mergeContactsForUser,
+  undoMergedContactsForUser,
+} from "~/server/contact-merge";
 import { db } from "~/server/db";
 import { emitEvent } from "~/lib/activity";
 import { computeContactDiff } from "~/lib/activity/diff";
@@ -824,6 +828,19 @@ export const mergeContacts = async (formData: FormData) => {
         : `${redirectTo}${separator}merged=1`;
     redirect(mergedRedirect);
   }
+};
+
+export const bulkAcceptHighConfidenceContacts = async (formData: FormData) => {
+  const userId = await getRequiredUserId();
+  const redirectTo = getRedirectTarget(formData);
+
+  const { mergedCount, failedCount } = await bulkAcceptHighConfidenceForUser(userId);
+
+  revalidateContactViews();
+
+  const base = redirectTo ?? "/?tab=duplicates";
+  const separator = base.includes("?") ? "&" : "?";
+  redirect(`${base}${separator}bulkMerged=${mergedCount}&bulkFailed=${failedCount}`);
 };
 
 export const undoMergeContacts = async (formData: FormData) => {

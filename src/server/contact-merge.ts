@@ -1255,6 +1255,82 @@ export const refreshMergeSuggestionsForUser = async (
   return suggestions.length;
 };
 
+export type RecentMerge = {
+  decisionId: string;
+  survivorContactId: string;
+  survivorName: string;
+  absorbedName: string;
+  decidedAt: Date;
+  source: string;
+  canUndo: boolean;
+};
+
+const MERGE_UNDO_WINDOW_DAYS = 30;
+
+// Recent, not-yet-reversed merges for the "Merged contacts" section (P10-05).
+// Undo is offered for 30 days (from decidedAt); older rows show as expired.
+export const getRecentMergesForUser = async (userId: string): Promise<RecentMerge[]> => {
+  const decisions = await db.mergeDecision.findMany({
+    where: { userId, status: "ACCEPTED", reversedAt: null },
+    orderBy: { decidedAt: "desc" },
+    take: 20,
+    select: { id: true, decidedAt: true, source: true, details: true },
+  });
+
+  const cutoff = Date.now() - MERGE_UNDO_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+
+  return decisions
+    .map((decision) => {
+      const details = decision.details as MergeDecisionSnapshot | null;
+      if (!details) {
+        return null;
+      }
+      return {
+        decisionId: decision.id,
+        survivorContactId: details.primaryBefore.id,
+        survivorName: details.primaryBefore.fullName || "Unnamed contact",
+        absorbedName: details.secondaryBefore.fullName || "Unnamed contact",
+        decidedAt: decision.decidedAt,
+        source: decision.source,
+        canUndo: decision.decidedAt.getTime() >= cutoff,
+      } satisfies RecentMerge;
+    })
+    .filter((row): row is RecentMerge => row != null);
+};
+
+// Bulk-accept every OPEN, HIGH-confidence suggestion (P10-05). Each pair merges
+// in its own transaction (reusing mergeContactsForUser → events + decision +
+// archive), so one failure doesn't abort the rest, and each stays undoable.
+export const bulkAcceptHighConfidenceForUser = async (
+  userId: string,
+): Promise<{ mergedCount: number; failedCount: number }> => {
+  const suggestions = await db.mergeSuggestion.findMany({
+    where: { userId, status: "OPEN", confidence: "HIGH" },
+    select: { id: true, leftContactId: true, rightContactId: true },
+  });
+
+  let mergedCount = 0;
+  let failedCount = 0;
+
+  for (const suggestion of suggestions) {
+    try {
+      await mergeContactsForUser({
+        userId,
+        primaryContactId: suggestion.leftContactId,
+        secondaryContactId: suggestion.rightContactId,
+        suggestionId: suggestion.id,
+        source: "bulk-accept",
+      });
+      mergedCount += 1;
+    } catch (error) {
+      console.error(`Bulk merge failed for suggestion ${suggestion.id}`, error);
+      failedCount += 1;
+    }
+  }
+
+  return { mergedCount, failedCount };
+};
+
 export const getOpenMergeSuggestionsForUser = async (userId: string) => {
   const suggestions = await db.mergeSuggestion.findMany({
     where: {
