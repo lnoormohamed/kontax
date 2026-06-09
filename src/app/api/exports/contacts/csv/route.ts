@@ -17,6 +17,12 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const includeArchived = url.searchParams.get("includeArchived") === "true";
   const query = url.searchParams.get("q")?.trim() ?? "";
+  // Explicit selection (bulk "Export" from the contacts list) takes precedence
+  // over query/archived filters — export exactly the chosen contacts.
+  const idsParam = url.searchParams.get("ids")?.trim() ?? "";
+  const selectedIds = idsParam
+    ? idsParam.split(",").map((value) => value.trim()).filter(Boolean)
+    : [];
   const resultFileName = `kontax-contacts-${new Date().toISOString().slice(0, 10)}.csv`;
 
   const job = await db.exportJob.create({
@@ -32,7 +38,9 @@ export async function GET(request: Request) {
 
   try {
     const contacts = await db.contact.findMany({
-      where: {
+      where: selectedIds.length > 0
+        ? { userId, id: { in: selectedIds } }
+        : {
         userId,
         ...(includeArchived ? {} : { archivedAt: null }),
         ...(query

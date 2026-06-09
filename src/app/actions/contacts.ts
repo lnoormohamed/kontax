@@ -760,6 +760,87 @@ export const restoreContactsBulk = async (formData: FormData) => {
   }
 };
 
+export const favoriteContactsBulk = async (formData: FormData) => {
+  const userId = await getRequiredUserId();
+  const contactIds = parseContactIds(formData);
+  const redirectTo = getRedirectTarget(formData);
+
+  await db.$transaction(async (tx) => {
+    const affected = await tx.contact.findMany({
+      where: { id: { in: contactIds }, userId, isFavorite: false },
+      select: { id: true },
+    });
+    if (affected.length === 0) {
+      return;
+    }
+    await tx.contact.updateMany({
+      where: { id: { in: affected.map((c) => c.id) } },
+      data: {
+        isFavorite: true,
+        lastMutatedBy: "MANUAL",
+        lastMutatedByDetail: null,
+        syncVersion: { increment: 1 },
+      },
+    });
+    await tx.activityEvent.createMany({
+      data: affected.map((c) => ({
+        userId,
+        contactId: c.id,
+        eventType: "CONTACT_UPDATED" as const,
+        actor: "USER" as const,
+        payload: { diffs: [{ field: "isFavorite", before: false, after: true }] },
+      })),
+    });
+  });
+
+  revalidateContactViews();
+
+  if (redirectTo) {
+    redirect(redirectTo);
+  }
+};
+
+export const deleteContactsBulk = async (formData: FormData) => {
+  const userId = await getRequiredUserId();
+  const contactIds = parseContactIds(formData);
+  const redirectTo = getRedirectTarget(formData);
+
+  await db.$transaction(async (tx) => {
+    const affected = await tx.contact.findMany({
+      where: { id: { in: contactIds }, userId },
+      select: { id: true, fullName: true, firstName: true, lastName: true, email: true, phone: true },
+    });
+    if (affected.length === 0) {
+      return;
+    }
+    await tx.contact.deleteMany({
+      where: { id: { in: affected.map((c) => c.id) }, userId },
+    });
+    await tx.activityEvent.createMany({
+      data: affected.map((c) => ({
+        userId,
+        contactId: null,
+        eventType: "CONTACT_DELETED" as const,
+        actor: "USER" as const,
+        payload: {
+          fullName:
+            c.fullName?.trim() ||
+            `${c.firstName ?? ""} ${c.lastName ?? ""}`.trim() ||
+            "Unnamed contact",
+          ...(c.email ? { email: c.email } : {}),
+          ...(c.phone ? { phone: c.phone } : {}),
+        },
+      })),
+    });
+  });
+
+  revalidateContactViews();
+
+  if (redirectTo) {
+    redirect(redirectTo);
+  }
+};
+
 export const permanentlyDeleteContact = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const contactId = parseContactId(formData);

@@ -6,6 +6,8 @@ import { useMemo, useState } from "react";
 import {
   archiveContact,
   archiveContactsBulk,
+  deleteContactsBulk,
+  favoriteContactsBulk,
   permanentlyDeleteContact,
   restoreContact,
   restoreContactsBulk,
@@ -365,6 +367,7 @@ export function ContactsWorkspaceTable({
   query,
 }: ContactsWorkspaceTableProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   const isSearching = query.trim().length > 0;
   const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds]);
@@ -429,23 +432,89 @@ export function ContactsWorkspaceTable({
             ✕
           </button>
           <span className="text-sm font-semibold text-slate-700">{selectedIds.length} selected</span>
-          <div className="ml-2 flex flex-wrap items-center gap-2">
+          <div className="mx-1 h-5 w-px bg-[#d8ddd6]" />
+          <div className="flex flex-wrap items-center gap-2">
+            {mode === "active" ? (
+              <form action={favoriteContactsBulk}>
+                {selectedIds.map((id) => (
+                  <input key={id} name="contactIds" type="hidden" value={id} />
+                ))}
+                <input name="redirectTo" type="hidden" value="/?tab=people" />
+                <button
+                  className="inline-flex items-center gap-1.5 rounded-lg border border-[#d8ddd6] bg-white px-3 py-1.5 text-xs font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+                  type="submit"
+                >
+                  <span aria-hidden>☆</span> Favorite
+                </button>
+              </form>
+            ) : null}
+
             <form action={mode === "active" ? archiveContactsBulk : restoreContactsBulk}>
               {selectedIds.map((id) => (
                 <input key={id} name="contactIds" type="hidden" value={id} />
               ))}
               <input name="redirectTo" type="hidden" value={mode === "active" ? "/?tab=people" : "/?tab=archived"} />
               <button
-                className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${
-                  mode === "active"
-                    ? "border-[#d8ddd6] text-slate-700 hover:bg-white"
-                    : "border-[#4158f4] bg-[#4158f4] text-white hover:bg-[#3248db]"
-                }`}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-[#d8ddd6] bg-white px-3 py-1.5 text-xs font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
                 type="submit"
               >
                 {mode === "active" ? "Archive" : "Restore"}
               </button>
             </form>
+
+            <a
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#d8ddd6] bg-white px-3 py-1.5 text-xs font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+              href={`/api/exports/contacts/csv?ids=${encodeURIComponent(selectedIds.join(","))}`}
+            >
+              <span aria-hidden>↓</span> Export
+            </a>
+
+            <button
+              className="inline-flex items-center gap-1.5 rounded-lg border border-[#b5472f] bg-white px-3 py-1.5 text-xs font-semibold text-[#b5472f] transition hover:bg-[#fbeae6]"
+              onClick={() => setConfirmDelete(true)}
+              type="button"
+            >
+              <span aria-hidden>🗑</span> Delete
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      {confirmDelete ? (
+        <div
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4"
+          role="dialog"
+        >
+          <div className="w-full max-w-md rounded-[1.4rem] border border-[#d8ddd6] bg-white p-6 shadow-xl">
+            <p className="text-lg font-semibold text-[#1d2823]">
+              Delete {selectedIds.length} contact{selectedIds.length === 1 ? "" : "s"} permanently?
+            </p>
+            <p className="mt-2 text-sm leading-6 text-slate-500">
+              This can&apos;t be undone. The contact{selectedIds.length === 1 ? "" : "s"} and their
+              sync links will be removed from Kontax.
+            </p>
+            <div className="mt-5 flex flex-wrap justify-end gap-2">
+              <button
+                className="rounded-[0.9rem] border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
+                onClick={() => setConfirmDelete(false)}
+                type="button"
+              >
+                Cancel
+              </button>
+              <form action={deleteContactsBulk}>
+                {selectedIds.map((id) => (
+                  <input key={id} name="contactIds" type="hidden" value={id} />
+                ))}
+                <input name="redirectTo" type="hidden" value={mode === "active" ? "/?tab=people" : "/?tab=archived"} />
+                <button
+                  className="rounded-[0.9rem] bg-[#b5472f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#9c3c28]"
+                  type="submit"
+                >
+                  Delete {selectedIds.length}
+                </button>
+              </form>
+            </div>
           </div>
         </div>
       ) : null}
