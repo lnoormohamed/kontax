@@ -29,7 +29,7 @@ The contact detail page is the single source of truth for everything Kontax know
 ```
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │  STICKY HEADER                                                              │
-│  ← Contacts          [Contact name]              [Archive] [Delete] [⋯]   │
+│  ← Contacts          [Contact name]              [Share] [Archive] [⋯]    │
 ├──────────────────────┬──────────────────────────────────────────────────────┤
 │                      │                                                      │
 │   LEFT PANE          │   RIGHT PANE (scrollable)                           │
@@ -70,7 +70,19 @@ The contact detail page is the single source of truth for everything Kontax know
 
 **Right pane** is scrollable. Max-width ~800px, centered within remaining space. Padding: 32px top, 40px horizontal. Section cards use a `rounded` card with a `#d8ddd6` border on white — consistent with the app, in the palette above.
 
-**Sticky header** is minimal: back chevron + breadcrumb label on the left, contact display name (truncated) in the centre, destructive/utility actions (Archive, Delete, ⋯) on the right. Solid **white** header with a `#d8ddd6` bottom border — matching the contacts-list header chrome (not a tinted translucent bar).
+**Sticky header** is minimal: back chevron + breadcrumb label on the left, contact display name (truncated) in the centre, utility actions on the right. Solid **white** header with a `#d8ddd6` bottom border — matching the contacts-list header chrome (not a tinted translucent bar).
+
+### App shell — detail lives **inside** the persistent shell (master–detail)
+
+> Added after the latest mock review. The standalone mock dropped the global chrome.
+
+The current mock renders the detail as a **standalone window** with only its own slim 60px header, losing the global app shell that the rebuilt contacts list owns (`contact-dashboard.tsx`): the persistent **left sidebar** (workspace logo + All contacts / Favourites / Labels / Import-Export-Sync) and the user-menu header. Opening a contact must **not** drop the user out of the app chrome.
+
+- Use a **master–detail** layout: the global sidebar **persists**, and the contact detail renders in the **main content area**.
+- The detail's own internal header (back-to-Contacts breadcrumb + name + actions) is fine, but it sits **inside** the shell — it does not replace the sidebar/user-menu.
+- So the desktop has effectively three columns at ≥1280px: **global sidebar** → detail **left rail (320px)** → detail **right pane**. The 320px rail and right pane are the detail's two panes; the global sidebar is separate chrome shared with the list.
+
+**Header destructive action — archive-first.** Drop the always-visible red **Delete** button from the header. Our model is archive-first; permanent delete is rare. Make **Archive** the primary header action; keep **"Delete permanently"** in the **⋯ More** menu only (it already lives there) so a hard delete is never one stray click away.
 
 ---
 
@@ -242,6 +254,17 @@ A **Share action** (in the header actions and/or quick-action bar) that opens a 
 - **Share with a Kontax user** → static copy (snapshot) or live link (stays in sync).
 - **vCard link / download** — anyone, no account needed. Distinct from the collaborative share.
 
+#### Share sheet must be **data-driven** — not hardcoded books
+
+> Added after the latest mock review. The mock hardcoded one family ("Castellanos Family") and one team ("Acme Corp") as if every account has exactly those — that's seed data leaking in as the model.
+
+- A user can **own/belong to multiple** family and team books. The "Add to a shared book" section lists the **user's actual books**, one row each — driven from real membership, not a fixed pair.
+- **Row label = the book's real name** with a small **Family / Team** type chip. Drop the redundant `Family book ·` / `Team book ·` prefix — "Castellanos Family" already reads as a family book.
+- **Distinguish "add to" from "already in."** A checkmark on an add-row conflates the two states:
+  - Books the contact is **not** in → **"Add to [book]"** (action row).
+  - Books the contact **is** in → render as added, with **Manage** / **Remove from book** — not a re-add row.
+- Empty state: if the user owns no shared books yet, show a "Create a family/team book" affordance instead of an empty list.
+
 ### "Sharing" card (right pane) — shown when the contact is in a shared book or shared live
 - Which book it lives in: **Family** or **Team · [book name]**.
 - **"Anyone in [group] can edit"** framing so it's clear edits affect everyone.
@@ -251,6 +274,8 @@ A **Share action** (in the header actions and/or quick-action bar) that opens a 
 
 ### Row-context badge cluster (Phase 15 — keep consistent with the list)
 The left-pane badges are the **expanded form of the list's row-badge cluster**, one governed system: **family · team · live-shared · emergency** (+ the source chip). The current mock has source / live / family — **add Team and Emergency** so the detail page matches the list. Same glyphs and meanings across both surfaces; "Family book" / "Team book" badges navigate to the relevant group management page.
+
+**Cluster order (mock review):** lead with the **sharing/status** chips (Family → Team → Live), then **Emergency** (red), and put the always-on **Source** chip **last**. The mock currently pushes Source first, which buries the chips the user actually scans for. The glyphs, colours, and order must match the list's inline icon slot (the slot immediately after the name) exactly — same contact, same badges, both surfaces.
 
 ---
 
