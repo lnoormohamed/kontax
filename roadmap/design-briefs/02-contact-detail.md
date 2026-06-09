@@ -212,24 +212,45 @@ On mobile, the two-pane layout collapses to a single column.
 
 ---
 
-## Future Additions
+## Birthday in the left summary
 
-The design must structurally accommodate the following without a full redesign:
+Add a compact, **read-only** birthday line to the left pane summary, directly under the `Job title · Company` line — shown **only when a birthday is set** (e.g. a small cake icon + `14 Mar` or `14 Mar 1989`). For a personal address book an upcoming birthday is a genuine at-a-glance fact, so it earns a place in the summary.
 
-### Source Badges (Phase 10)
-Below the name/title block in the left pane, a small "Synced from iCloud" or "Imported via Google CSV" badge driven by the contact's `sourceType` / `sourceDetail`. Design a badge row here now — even if it renders empty in v1. Badge: icon + label, quiet `rounded-full` chip in the muted palette. Use the same source glyphs the activity log uses (Phase 10) so source reads consistently across surfaces.
+- This is a **summary mirror, not editable** — the editable birthday field stays in the Personal section (single source of truth). Do not create two editable copies.
+- Keep the rest of the left pane lean — birthday earns this slot; other fields do not. Don't migrate phone/email/etc. up.
 
-### Last-Updated-By Attribution (Phase 10)
-In the metadata block at the bottom of the left pane, a "Last edited by: You / [Family member name]" line. Reserve space in the metadata section.
+## Built in Phase 10 — render as real, always-on (not placeholders)
 
-### History Tab (Phase 10)
-The right pane will gain a tab bar at the top: **Details** (current view) | **History**. The History tab shows a chronological activity log for this contact (field changes, merges, imports, sync events). Structure the right pane content inside a tabbed container now — even if v1 only shows the Details tab.
+These three were "future" in the original draft but are now **live data**. They must render on every contact, not be gated behind a demo flag:
 
-### Live Share Badge (Phase 12)
-If a contact is being shared live from another Kontax user, a "Live from [Owner Name]" pill in the left pane below the name. Green dot + "Live" in `text-green-700`. Fields from the live source are read-only and subtly marked.
+### Source badge — `sourceType` / `sourceDetail` (built, P10-03/04)
+Below the name/title block in the left pane: a quiet chip showing origin — "Added manually", "Imported from contacts.csv", "Synced from iCloud", etc. **Every contact has a source now**, so this always renders (it is not optional). Use the same source glyphs as the activity log.
 
-### Family Address Book Badge (Phase 13)
-If the contact lives in a shared family address book, a "Family book" badge in the left pane. Tapping it navigates to the family group management page.
+### "Last edited by" line — `lastMutatedBy` / `lastMutatedByDetail` (built, P10-03/04)
+In the left-pane metadata block: "Last edited by you · 2h ago", "Last edited by iCloud sync · yesterday", and (in shared books) "Last edited by [member] · 2h ago". Real data — always shown.
+
+### History tab — per-contact activity feed (built, P10-04)
+The Details / History tab bar is correct. The History panel is **not a placeholder** — mock it as the real feed: rows of *actor icon + summary + relative time*, with **expandable field diffs** for updates/syncs ("phone changed from — → +44…"). Real event vocabulary: Created · Updated (N fields) · Archived/Restored · Merged with [name] · Imported from [file] · Synced from [account] · Conflict detected/resolved. Include the empty state ("History starts from …") and a "Load more" control. Available on all plans (no Pro gate on per-contact history).
+
+## Sharing & shared books (Phases 12–14) — design now, wire later
+
+The contact detail page is where a user shares a contact and sees its shared status. The mock currently has only passive badges and a vCard-only "Share" action — the collaborative share is missing. Design the following as quiet placeholders now; the live feature lands in Phases 12 (sharing), 13 (family), 14 (teams).
+
+### Share action + share sheet
+A **Share action** (in the header actions and/or quick-action bar) that opens a share sheet with these distinct options — keep them separate, do not conflate with vCard export:
+- **Add to a shared book → Family book / Team book ([name])** — the collaborative case: *any member of that group can view and edit this contact* (update details, etc.). This is the headline feature.
+- **Share with a Kontax user** → static copy (snapshot) or live link (stays in sync).
+- **vCard link / download** — anyone, no account needed. Distinct from the collaborative share.
+
+### "Sharing" card (right pane) — shown when the contact is in a shared book or shared live
+- Which book it lives in: **Family** or **Team · [book name]**.
+- **"Anyone in [group] can edit"** framing so it's clear edits affect everyone.
+- **Member access**: avatars / list of who can see and edit; per-member edit vs view where Teams permissions apply.
+- **Live shares**: "Live from [owner] — owner edits, you view", with the source fields rendered read-only and subtly marked.
+- Pairs with the "Last edited by [member]" line, which becomes genuinely useful in a shared book.
+
+### Row-context badge cluster (Phase 15 — keep consistent with the list)
+The left-pane badges are the **expanded form of the list's row-badge cluster**, one governed system: **family · team · live-shared · emergency** (+ the source chip). The current mock has source / live / family — **add Team and Emergency** so the detail page matches the list. Same glyphs and meanings across both surfaces; "Family book" / "Team book" badges navigate to the relevant group management page.
 
 ---
 
