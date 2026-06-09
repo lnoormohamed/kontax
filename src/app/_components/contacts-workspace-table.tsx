@@ -266,14 +266,57 @@ function ContactRow({
     </span>
   );
 
-  if (viewMode === "compact") {
+  const meta = [contact.company, contact.email, contact.phone].filter((value) => value?.trim());
+
+  const stacked = (
+    <div className="flex min-w-0 flex-1 items-center gap-3">
+      {avatarSlot}
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-1.5">
+          <Link className="min-w-0 truncate" href={`/contacts/${contact.id}`}>
+            <span className="truncate text-[14.5px] font-semibold text-[#1d2823]">
+              <Highlight query={query} text={displayName} />
+            </span>
+          </Link>
+          <RowBadges contact={contact} mode={mode} />
+        </div>
+        <p className="truncate text-[12.5px] text-[#8b938c]">
+          {meta.length > 0
+            ? meta.map((value, index) => (
+                <span key={index}>
+                  {index > 0 ? <span className="mx-1.5 text-[#aeb4ac]">·</span> : null}
+                  <Highlight query={query} text={value!} />
+                </span>
+              ))
+            : "No details yet"}
+        </p>
+      </div>
+      <RowActions contact={contact} mode={mode} />
+    </div>
+  );
+
+  // Cozy: stacked two-line at every width.
+  if (viewMode === "cozy") {
     return (
       <div
-        className={`group grid ${GRID} items-center gap-4 border-b border-[#edf0ea] px-3 py-2 transition last:border-b-0 ${
+        className={`group flex items-center gap-3 border-b border-[#edf0ea] px-3 py-2.5 transition last:border-b-0 ${
           selected ? "bg-[#edf0fe]" : "hover:bg-[#f2f4f0]"
         }`}
-        data-selected={selected ? "1" : "0"}
       >
+        {stacked}
+      </div>
+    );
+  }
+
+  // Compact: column grid on desktop, stacked fallback on mobile (<lg).
+  return (
+    <div
+      className={`group border-b border-[#edf0ea] px-3 transition last:border-b-0 ${
+        selected ? "bg-[#edf0fe]" : "hover:bg-[#f2f4f0]"
+      }`}
+      data-selected={selected ? "1" : "0"}
+    >
+      <div className={`hidden ${GRID} items-center gap-4 py-2 lg:grid`}>
         {avatarSlot}
         <div className="flex min-w-0 items-center gap-1.5">
           <Link className="min-w-0 truncate" href={`/contacts/${contact.id}`}>
@@ -294,41 +337,7 @@ function ContactRow({
         </div>
         <RowActions contact={contact} mode={mode} />
       </div>
-    );
-  }
-
-  // cozy two-line
-  const meta = [contact.company, contact.email, contact.phone].filter((value) => value?.trim());
-  return (
-    <div
-      className={`group flex items-center gap-3 border-b border-[#edf0ea] px-3 py-2.5 transition last:border-b-0 ${
-        selected ? "bg-[#edf0fe]" : "hover:bg-[#f2f4f0]"
-      }`}
-    >
-      {avatarSlot}
-      <div className="min-w-0 flex-1">
-        <div className="flex items-center gap-1.5">
-          <Link className="min-w-0 truncate" href={`/contacts/${contact.id}`}>
-            <span className="truncate text-[14.5px] font-semibold text-[#1d2823]">
-              <Highlight query={query} text={displayName} />
-            </span>
-          </Link>
-          <RowBadges contact={contact} mode={mode} />
-        </div>
-        <p className="truncate text-[12.5px] text-[#8b938c]">
-          {meta.length > 0 ? (
-            meta.map((value, index) => (
-              <span key={index}>
-                {index > 0 ? <span className="mx-1.5 text-[#aeb4ac]">·</span> : null}
-                <Highlight query={query} text={value!} />
-              </span>
-            ))
-          ) : (
-            "No details yet"
-          )}
-        </p>
-      </div>
-      <RowActions contact={contact} mode={mode} />
+      <div className="flex py-2 lg:hidden">{stacked}</div>
     </div>
   );
 }

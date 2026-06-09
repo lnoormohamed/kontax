@@ -29,11 +29,11 @@ Rebuild the main contacts page (`/`) into the approved design: Direction A's lef
 | P16-02 | Done | P0 | P16-01 |
 | P16-03 | Done | P0 | P16-02 |
 | P16-04 | Done | P1 | P16-02 |
-| P16-05 | In Progress | P1 | P16-02 |
+| P16-05 | Done | P1 | P16-02 |
 | P16-06 | Done | P1 | P16-02 |
-| P16-07 | Not Started | P1 | P16-02 |
+| P16-07 | Done | P1 | P16-02 |
 
-> Build status: P16-01/02/03/04/06 landed (sidebar shell, column rows, inline RowBadges, bulk-select, duplicates+archived). P16-05 partial — search + empty states done; plan-limit / lifecycle / sync banners still to add. P16-07 (mobile bottom nav) not started — sidebar currently hides below `lg` with no replacement nav; list itself falls back to cozy rows. Verified via tsc + lint + production build; visual/logged-in review still pending.
+> Build status: all P16 tickets landed. Sidebar shell, column rows, inline RowBadges, bulk-select, duplicates+archived, banners (plan-limit / grace / locked; sync surfaced via sidebar dot), and mobile (compact rows collapse to stacked below `lg` + fixed bottom nav). Verified via tsc + lint + production build, and via an authenticated SSR pass against a seeded user (all views/states return 200 with correct structure, counts, search highlight, and empty states). Banner dismiss-persistence and a real on-device visual remain nice-to-haves.
 
 ---
 

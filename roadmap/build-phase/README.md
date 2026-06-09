@@ -188,9 +188,9 @@ This roadmap is the implementation source of truth for phases 1–16. Each phase
 | P16-02 | 16 | Done | P0 | P16-01 | Unassigned | Column rows, sticky head, Compact default, grouping + favorites pin rules |
 | P16-03 | 16 | Done | P0 | P16-02 | Unassigned | Inline RowBadges cluster (delivers P15-01); trailing star removed |
 | P16-04 | 16 | Done | P1 | P16-02 | Unassigned | Bulk select via hover checkbox + contextual bar; bulk actions preserved |
-| P16-05 | 16 | In Progress | P1 | P16-02 | Unassigned | Search/empty/no-match + plan/lifecycle/sync banners in new shell |
+| P16-05 | 16 | Done | P1 | P16-02 | Unassigned | Search/empty/no-match + plan/lifecycle/sync banners in new shell |
 | P16-06 | 16 | Done | P1 | P16-02 | Unassigned | Duplicates pair cards + Archived restore/delete in new shell |
-| P16-07 | 16 | Not Started | P1 | P16-02 | Unassigned | Mobile cozy fallback + bottom nav; tablet drops Company column |
+| P16-07 | 16 | Done | P1 | P16-02 | Unassigned | Mobile cozy fallback + bottom nav; tablet drops Company column |
 
 ## Dependency Map
 

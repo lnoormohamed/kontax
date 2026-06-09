@@ -105,6 +105,14 @@ export function ContactDashboard({
   const peopleActive = currentTab === "people" && !isFavoritesView;
   const groupByLetter = currentSort === "name" && !query;
 
+  const showGrace = planSummary.lifecycleState === "GRACE";
+  const showLocked = planSummary.lifecycleState === "LOCKED" || planSummary.lifecycleState === "CANCELED";
+  const nearLimit =
+    planSummary.contactsLimit > 0 &&
+    planSummary.contactsRemaining >= 0 &&
+    planSummary.contactsRemaining <= 20;
+  const hasBanner = showGrace || showLocked || nearLimit;
+
   const navItem = (
     active: boolean,
     href: string,
@@ -238,6 +246,43 @@ export function ContactDashboard({
 
       {/* list area */}
       <section className="min-w-0 flex-1 bg-white">
+        {hasBanner ? (
+          <div className="grid gap-2 px-4 pt-3">
+            {showLocked ? (
+              <div className="flex items-center gap-2.5 rounded-[0.9rem] bg-[#f3e1da] px-3.5 py-2.5 text-[13px] text-[#7a2f1d]">
+                <span aria-hidden>🔒</span>
+                <span className="flex-1">
+                  Your account is read-only. {planSummary.lifecycleDescription}
+                </span>
+                <Link className="shrink-0 font-semibold underline" href="/settings">
+                  Manage plan
+                </Link>
+              </div>
+            ) : null}
+            {showGrace ? (
+              <div className="flex items-center gap-2.5 rounded-[0.9rem] bg-[#f6edd9] px-3.5 py-2.5 text-[13px] text-[#7a5a1a]">
+                <span aria-hidden>⚠️</span>
+                <span className="flex-1">Your subscription needs attention.</span>
+                <Link className="shrink-0 font-semibold underline" href="/settings">
+                  Review
+                </Link>
+              </div>
+            ) : null}
+            {nearLimit ? (
+              <div className="flex items-center gap-2.5 rounded-[0.9rem] bg-[#f6edd9] px-3.5 py-2.5 text-[13px] text-[#7a5a1a]">
+                <span aria-hidden>📈</span>
+                <span className="flex-1">
+                  {planSummary.contactsRemaining} of {planSummary.contactsLimit} contacts remaining on the{" "}
+                  {planSummary.planLabel} plan. Upgrade for unlimited.
+                </span>
+                <Link className="shrink-0 font-semibold underline" href="/settings">
+                  Upgrade
+                </Link>
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+
         {/* toolbar */}
         <div className="flex items-center gap-3 border-b border-[#e9ece7] px-4 py-2.5">
           {currentTab !== "duplicates" ? (
@@ -257,7 +302,7 @@ export function ContactDashboard({
           <span className="ml-auto text-[12.5px] text-[#8b938c]">{countLabel}</span>
         </div>
 
-        <div className="p-4">
+        <div className="p-4 pb-24 lg:pb-4">
           {currentTab === "people" ? (
             <ContactsWorkspaceTable
               contacts={activeContacts}
@@ -342,6 +387,40 @@ export function ContactDashboard({
           ) : null}
         </div>
       </section>
+
+      {/* mobile bottom nav */}
+      <nav className="fixed inset-x-0 bottom-0 z-30 flex items-stretch border-t border-[#d8ddd6] bg-white/95 backdrop-blur lg:hidden">
+        {(
+          [
+            ["📋", "People", peopleActive, buildHref("people", { filter: "all" })],
+            ["⭐", "Favorites", isFavoritesView, buildHref("people", { filter: "favorites" })],
+            ["🗂", "Archived", currentTab === "archived", buildHref("archived", { filter: "all" })],
+            ["👥", "Duplicates", currentTab === "duplicates", buildHref("duplicates", { filter: "all" })],
+          ] as const
+        ).map(([icon, label, active, href]) => (
+          <Link
+            className={`flex flex-1 flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium ${
+              active ? "text-[#17352e]" : "text-[#8b938c]"
+            }`}
+            href={href}
+            key={label}
+          >
+            <span aria-hidden className="text-[16px]">
+              {icon}
+            </span>
+            {label}
+          </Link>
+        ))}
+        <Link
+          className="flex flex-1 flex-col items-center justify-center gap-0.5 py-2 text-[10px] font-medium text-[#8b938c]"
+          href="/settings"
+        >
+          <span aria-hidden className="text-[16px]">
+            ⋯
+          </span>
+          More
+        </Link>
+      </nav>
     </div>
   );
 }
