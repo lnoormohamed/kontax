@@ -1,18 +1,39 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
+import { MergeReview, type MergeReviewUnions } from "~/app/_components/merge-review";
 import { MergeSuggestionDismissButton } from "~/app/_components/merge-suggestion-dismiss-button";
-import { MergePreviewForm } from "~/app/_components/merge-preview-form";
 import { auth } from "~/server/auth";
 import {
   buildMergedContactPreview,
   getMergeSuggestionByIdForUser,
+  type MergePreview,
 } from "~/server/contact-merge";
 
 type MergeSuggestionReviewPageProps = {
   params: Promise<{
     id: string;
   }>;
+};
+
+const toUnions = (preview: MergePreview): MergeReviewUnions => {
+  const merged = preview.mergedContact;
+  return {
+    emails: merged.emailAddresses ?? [],
+    phones: merged.phoneNumbers ?? [],
+    addresses: (merged.postalAddresses ?? []).map((entry) => entry.formatted),
+    websites: (merged.websiteEntries ?? []).map((entry) => entry.value),
+    labels: merged.labels ?? [],
+    dates: (merged.significantDates ?? []).map((entry) => `${entry.label}: ${entry.date}`),
+    related: (merged.relatedPeople ?? []).map((entry) => `${entry.relationship}: ${entry.name}`),
+    custom: (merged.customFields ?? []).map((entry) => `${entry.label}: ${entry.value}`),
+  };
+};
+
+const confidenceBadge: Record<string, string> = {
+  high: "bg-[#eef5ef] text-[#17352e]",
+  medium: "bg-[#f6edd9] text-[#7a5a1a]",
+  low: "bg-[#eef0f3] text-[#5c655e]",
 };
 
 export default async function MergeSuggestionReviewPage({
@@ -40,135 +61,82 @@ export default async function MergeSuggestionReviewPage({
     suggestion.leftContact,
   );
 
+  const contactA = {
+    id: suggestion.leftContact.id,
+    fullName: suggestion.leftContact.fullName,
+    email: suggestion.leftContact.email,
+    phone: suggestion.leftContact.phone,
+    company: suggestion.leftContact.company,
+    notes: suggestion.leftContact.notes,
+  };
+  const contactB = {
+    id: suggestion.rightContact.id,
+    fullName: suggestion.rightContact.fullName,
+    email: suggestion.rightContact.email,
+    phone: suggestion.rightContact.phone,
+    company: suggestion.rightContact.company,
+    notes: suggestion.rightContact.notes,
+  };
+
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),_transparent_30%),linear-gradient(180deg,#020617_0%,#07111d_45%,#0f172a_100%)] text-white">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-8 lg:px-10 lg:py-12">
-        <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-[0_30px_120px_rgba(2,8,23,0.45)] backdrop-blur">
-          <Link className="text-sm font-semibold text-cyan-200 hover:text-cyan-100" href="/">
-            ← Back to dashboard
+    <main className="min-h-screen bg-[#f4f6f2] text-[#1d2823]">
+      <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-5 py-8 lg:py-12">
+        <div>
+          <Link className="text-[13px] font-semibold text-[#4158f4]" href="/?tab=duplicates">
+            ← Back to duplicates
           </Link>
-          <p className="mt-4 text-sm uppercase tracking-[0.35em] text-cyan-200">Suggested merge</p>
-          <h1 className="mt-3 text-4xl font-semibold tracking-tight text-white">
-            Review this duplicate suggestion
-          </h1>
-          <p className="mt-3 max-w-3xl text-sm text-slate-300">
-            Ticket `P4-03`: suggestion review keeps the user in control by showing both records,
-            the heuristic reasons, and two explicit “keep this record” merge paths.
+          <h1 className="mt-3 text-2xl font-semibold tracking-tight">Review duplicate</h1>
+          <p className="mt-2 text-[14px] text-[#5c655e]">
+            Pick which record survives, resolve any conflicting fields, then merge. Multi-value
+            fields like phones and addresses are kept from both.
           </p>
-          <div className="mt-4 flex flex-wrap gap-3 text-sm text-slate-300">
-            <span className="rounded-full border border-white/10 px-3 py-1">
-              Confidence: {suggestion.confidence}
+          <div className="mt-3 flex flex-wrap gap-2 text-[12px] font-semibold">
+            <span
+              className={`rounded-full px-2.5 py-1 ${
+                confidenceBadge[suggestion.confidence] ?? confidenceBadge.low
+              }`}
+            >
+              {suggestion.confidence} confidence
             </span>
-            <span className="rounded-full border border-white/10 px-3 py-1">
-              Score: {suggestion.score}
-            </span>
-            <span className="rounded-full border border-white/10 px-3 py-1">
-              Source: {suggestion.source}
+            <span className="rounded-full bg-white px-2.5 py-1 text-[#5c655e]">
+              Score {suggestion.score}
             </span>
           </div>
         </div>
 
-        <section className="grid gap-6 lg:grid-cols-2">
-          <article className="rounded-[2rem] border border-white/10 bg-[#08101c]/88 p-6">
-            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Contact A</p>
-            <h2 className="mt-3 text-2xl font-semibold text-white">{suggestion.leftContact.fullName}</h2>
-            <div className="mt-4 grid gap-3 text-sm text-slate-300">
-              <p>Email: {suggestion.leftContact.email ?? "Not provided"}</p>
-              <p>Phone: {suggestion.leftContact.phone ?? "Not provided"}</p>
-              <p>Company: {suggestion.leftContact.company ?? "Not provided"}</p>
-              <p className="whitespace-pre-wrap">Notes: {suggestion.leftContact.notes ?? "No notes"}</p>
-            </div>
-            <Link
-              className="mt-5 inline-flex rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-100"
-              href={`/contacts/${suggestion.leftContact.id}`}
-            >
-              Open contact A
-            </Link>
-          </article>
-
-          <article className="rounded-[2rem] border border-white/10 bg-[#08101c]/88 p-6">
-            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Contact B</p>
-            <h2 className="mt-3 text-2xl font-semibold text-white">{suggestion.rightContact.fullName}</h2>
-            <div className="mt-4 grid gap-3 text-sm text-slate-300">
-              <p>Email: {suggestion.rightContact.email ?? "Not provided"}</p>
-              <p>Phone: {suggestion.rightContact.phone ?? "Not provided"}</p>
-              <p>Company: {suggestion.rightContact.company ?? "Not provided"}</p>
-              <p className="whitespace-pre-wrap">Notes: {suggestion.rightContact.notes ?? "No notes"}</p>
-            </div>
-            <Link
-              className="mt-5 inline-flex rounded-full border border-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-100"
-              href={`/contacts/${suggestion.rightContact.id}`}
-            >
-              Open contact B
-            </Link>
-          </article>
-        </section>
-
-        <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]">
-          <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
-            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Why Kontax suggested this</p>
-            <div className="mt-4 grid gap-3 text-sm text-slate-300">
-              {suggestion.reasons.map((reason) => (
-                <p className="rounded-2xl border border-white/10 bg-[#08101c]/70 p-4" key={reason}>
-                  {reason}
-                </p>
-              ))}
-            </div>
-          </div>
-
-          <aside className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
-            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P4-01 and P4-02</p>
-            <div className="mt-4 grid gap-3 text-sm text-slate-300">
-              <p>
-                Duplicate heuristics stay user-scoped and review-first. Exact email and phone
-                matches can score highly, but Kontax still leaves the final decision to you.
-              </p>
-              <p>
-                Suggestion lifecycle is now persistent: open, dismissed, merged, and stale states
-                remain traceable instead of being recreated as one-off scans.
-              </p>
-            </div>
-          </aside>
-
-          <aside className="rounded-[2rem] border border-white/10 bg-white/5 p-6">
-            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Not a match?</p>
-            <p className="mt-4 text-sm text-slate-300">
-              Dismiss this suggestion to remove it from the open queue while preserving the review
-              history we started in `P4-02`.
+        {suggestion.reasons.length > 0 ? (
+          <div className="rounded-[1.4rem] border border-[#d8ddd6] bg-white p-5">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[#8b938c]">
+              Why this was suggested
             </p>
-            <div className="mt-4">
-              <MergeSuggestionDismissButton suggestionId={suggestion.id} />
-            </div>
-          </aside>
-        </section>
+            <ul className="mt-2.5 grid gap-1.5">
+              {suggestion.reasons.map((reason) => (
+                <li className="text-[13.5px] text-[#1d2823]" key={reason}>
+                  {reason}
+                </li>
+              ))}
+            </ul>
+          </div>
+        ) : null}
 
-        <section className="grid gap-6 lg:grid-cols-2">
-          <MergePreviewForm
-            description="Field-by-field choices default conservatively. You can override any conflicting value before merging into contact A."
-            mergeSource="suggestion-review"
-            preview={keepLeftPreview}
-            primaryContactId={suggestion.leftContact.id}
-            primaryLabel="Contact A"
-            redirectTo={`/contacts/${suggestion.leftContact.id}?saved=1`}
-            secondaryContactId={suggestion.rightContact.id}
-            secondaryLabel="Contact B"
-            suggestionId={suggestion.id}
-            title="Keep contact A"
-          />
+        <MergeReview
+          contactA={contactA}
+          contactB={contactB}
+          mergeSource="suggestion-review"
+          suggestionId={suggestion.id}
+          unionsA={toUnions(keepLeftPreview)}
+          unionsB={toUnions(keepRightPreview)}
+        />
 
-          <MergePreviewForm
-            description="Use this path when contact B should remain canonical, but still review every field before confirming."
-            mergeSource="suggestion-review"
-            preview={keepRightPreview}
-            primaryContactId={suggestion.rightContact.id}
-            primaryLabel="Contact B"
-            redirectTo={`/contacts/${suggestion.rightContact.id}?saved=1`}
-            secondaryContactId={suggestion.leftContact.id}
-            secondaryLabel="Contact A"
-            suggestionId={suggestion.id}
-            title="Keep contact B"
-          />
-        </section>
+        <div className="rounded-[1.4rem] border border-[#d8ddd6] bg-white p-5">
+          <p className="text-[13px] font-semibold text-[#1d2823]">Not a duplicate?</p>
+          <p className="mt-1 text-[13px] text-[#5c655e]">
+            Dismiss this suggestion to remove it from the open queue. The review history is kept.
+          </p>
+          <div className="mt-3">
+            <MergeSuggestionDismissButton suggestionId={suggestion.id} />
+          </div>
+        </div>
       </div>
     </main>
   );

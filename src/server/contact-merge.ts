@@ -1391,6 +1391,43 @@ export const getOpenMergeSuggestionsForUser = async (userId: string) => {
   })) satisfies PersistedMergeSuggestion[];
 };
 
+// Full field selection for the field-level merge review (P10-05): include the
+// rich JSON fields so buildMergedContactPreview can show real "keep both" unions.
+const mergeReviewContactSelect = {
+  id: true,
+  fullName: true,
+  firstName: true,
+  middleName: true,
+  lastName: true,
+  namePrefix: true,
+  nameSuffix: true,
+  nickname: true,
+  email: true,
+  emailAddresses: true,
+  emailEntries: true,
+  phone: true,
+  phoneNumbers: true,
+  phoneEntries: true,
+  company: true,
+  jobTitle: true,
+  website: true,
+  websiteEntries: true,
+  birthday: true,
+  address: true,
+  postalAddresses: true,
+  addressEntries: true,
+  avatarUrl: true,
+  isFavorite: true,
+  labels: true,
+  significantDates: true,
+  relatedPeople: true,
+  customFields: true,
+  notes: true,
+  archivedAt: true,
+  importJobId: true,
+  updatedAt: true,
+} satisfies Prisma.ContactSelect;
+
 export const getMergeSuggestionByIdForUser = async (userId: string, suggestionId: string) => {
   const suggestion = await db.mergeSuggestion.findFirst({
     where: {
@@ -1410,30 +1447,10 @@ export const getMergeSuggestionByIdForUser = async (userId: string, suggestionId
       reasons: true,
       signals: true,
       leftContact: {
-        select: {
-          id: true,
-          fullName: true,
-          email: true,
-          phone: true,
-          company: true,
-          notes: true,
-          archivedAt: true,
-          importJobId: true,
-          updatedAt: true,
-        },
+        select: mergeReviewContactSelect,
       },
       rightContact: {
-        select: {
-          id: true,
-          fullName: true,
-          email: true,
-          phone: true,
-          company: true,
-          notes: true,
-          archivedAt: true,
-          importJobId: true,
-          updatedAt: true,
-        },
+        select: mergeReviewContactSelect,
       },
     },
   });

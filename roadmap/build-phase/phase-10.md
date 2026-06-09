@@ -21,7 +21,7 @@ Deepen the quality of duplicate handling, give users a full auditable history of
 | P10-02 | Done | P0 | P10-01 |
 | P10-03 | Done | P0 | P10-01 |
 | P10-04 | Done | P1 | P10-02, P10-03 |
-| P10-05 | In Progress | P1 | P10-01 |
+| P10-05 | Done | P1 | P10-01 |
 | P10-06 | Not Started | P1 | P10-04, P10-05 |
 | P10-07 | Not Started | P2 | P10-06 |
 | P10-08 | Not Started | P2 | P10-06 |
@@ -139,15 +139,19 @@ Deepen the quality of duplicate handling, give users a full auditable history of
 ---
 
 ## P10-05 — Enhance merge: field-level selection and bulk accept
-- Status: `In Progress`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P10-01`
 - Delivered:
   - **Bulk accept**: `bulkAcceptHighConfidenceForUser` loops every OPEN HIGH-confidence suggestion through the existing tested `mergeContactsForUser` (per-pair transaction → CONTACT_MERGED + CONTACT_ARCHIVED events, MergeDecision, archive). One failure is caught and skipped, the rest proceed; each merged pair stays individually undoable. Surfaced as an "Accept all N high-confidence" button in the duplicates toolbar with a confirmation dialog (`BulkMergeButton`).
   - **Merged contacts section**: `getRecentMergesForUser` returns the last 20 un-reversed ACCEPTED decisions (survivor ← absorbed names from the decision snapshot, decided date, source). Rendered in the duplicates tab; each row offers **Undo** within 30 days (`UndoMergeButton` → existing `undoMergeContacts`, which restores the absorbed contact, reverts the survivor, re-opens the suggestion, and emits CONTACT_MERGE_UNDONE + CONTACT_RESTORED) or shows **Expired** beyond 30 days.
   - tsc + lint + build green; new queries verified against the schema.
-- Remaining (field-level merge UI enhancement):
-  - The merge-suggestion review screen already offers per-field choices for the key scalar fields (fullName/email/phone/company/notes via `merge-preview-form` + `mergeContactsForUser`). The richer UI from this ticket — auto-collapsing identical fields, a true multi-value **"keep both" union** for phones/emails/addresses with dedup, and disabling Merge until every differing field is resolved — is not yet built and remains the open part of P10-05.
+  - **Field-level merge review UI** (rebuilt `merge-suggestions/[id]` in the locked light palette, new `merge-review.tsx` client component):
+    - **Survivor selection** — choose which record stays primary; choices are stored contact-relative (A/B) and translated to primary/secondary at submit, so flipping the survivor keeps prior field picks valid.
+    - **Auto-collapse identical fields** — only genuinely *conflicting* fields (both sides non-empty and different) demand a decision. Matching fields collapse into a "Show N matching fields" summary; fields where only one side has a value are listed as "filled automatically".
+    - **Per-field winner** for the governed scalars (full name, email, phone, company) plus notes (A / B / **Keep both → combine**).
+    - **Multi-value "keep both" union** — emails, phones, addresses, websites, labels, significant dates, related people, custom fields are unioned + deduped automatically by `buildMergedContactPreview` (already in the engine); the UI now surfaces the combined result in a "Kept from both contacts" panel. Query extended (`mergeReviewContactSelect`) so the review loads the rich JSON fields needed for real union previews.
+    - **Merge gated** — the submit button is disabled until every conflicting field is resolved, with a live "resolve N more fields" hint.
 - Implementation Notes:
   - The current merge UI presents two contact cards and lets the user pick one to keep. Replace this with a field-level merge UI: for each field where the two contacts differ, show both values side by side and let the user pick which value to keep (or keep both for multi-value fields like phone and email).
   - Fields that are identical on both contacts are auto-merged without prompting.
