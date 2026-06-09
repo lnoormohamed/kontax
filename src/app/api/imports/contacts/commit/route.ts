@@ -106,6 +106,10 @@ export async function POST(request: Request) {
         address: contact.address,
         postalAddresses: getOptionalJsonArray(contact.postalAddresses),
         notes: contact.notes,
+        sourceType: "IMPORT_CSV" as const,
+        sourceDetail: sourceFileName,
+        lastMutatedBy: "IMPORT_CSV" as const,
+        lastMutatedByDetail: sourceFileName,
       })),
     });
 

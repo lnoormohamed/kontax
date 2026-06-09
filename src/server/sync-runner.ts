@@ -565,6 +565,10 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
                 card.postalAddresses.length > 0 ? card.postalAddresses : undefined,
               addressEntries: card.addressEntries.length > 0 ? card.addressEntries : undefined,
               notes: card.notes,
+              sourceType: "SYNC_CARDDAV",
+              sourceDetail: job.syncAccount.label,
+              lastMutatedBy: "SYNC_CARDDAV",
+              lastMutatedByDetail: job.syncAccount.label,
             },
             select: {
               id: true,
@@ -601,6 +605,8 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
             },
             data: {
               ...buildContactWriteDataFromRemoteSnapshot(remoteApply.remoteSnapshot),
+              lastMutatedBy: "SYNC_CARDDAV",
+              lastMutatedByDetail: job.syncAccount.label,
               syncVersion: {
                 increment: 1,
               },

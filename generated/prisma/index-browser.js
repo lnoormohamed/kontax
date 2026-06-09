@@ -182,6 +182,10 @@ exports.Prisma.ContactScalarFieldEnum = {
   relatedPeople: 'relatedPeople',
   customFields: 'customFields',
   notes: 'notes',
+  sourceType: 'sourceType',
+  sourceDetail: 'sourceDetail',
+  lastMutatedBy: 'lastMutatedBy',
+  lastMutatedByDetail: 'lastMutatedByDetail',
   archivedAt: 'archivedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -441,6 +445,15 @@ exports.AccountLifecycleState = exports.$Enums.AccountLifecycleState = {
   GRACE: 'GRACE',
   CANCELED: 'CANCELED',
   LOCKED: 'LOCKED'
+};
+
+exports.SourceType = exports.$Enums.SourceType = {
+  MANUAL: 'MANUAL',
+  IMPORT_CSV: 'IMPORT_CSV',
+  SYNC_CARDDAV: 'SYNC_CARDDAV',
+  SHARED_STATIC: 'SHARED_STATIC',
+  SHARED_LIVE: 'SHARED_LIVE',
+  API: 'API'
 };
 
 exports.BillingProvider = exports.$Enums.BillingProvider = {

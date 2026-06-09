@@ -1564,6 +1564,8 @@ export const mergeContactsForUser = async ({
         relatedPeople: toNullableJsonField(preview.mergedContact.relatedPeople),
         customFields: toNullableJsonField(preview.mergedContact.customFields),
         notes: preview.mergedContact.notes,
+        lastMutatedBy: "MANUAL",
+        lastMutatedByDetail: null,
         syncVersion: {
           increment: 1,
         },
@@ -1578,6 +1580,8 @@ export const mergeContactsForUser = async ({
         archivedAt: reviewedAt,
         syncTombstoneAt: reviewedAt,
         mergedIntoContactId: primaryContact.id,
+        lastMutatedBy: "MANUAL",
+        lastMutatedByDetail: null,
         syncVersion: {
           increment: 1,
         },

@@ -540,6 +540,8 @@ export const updateContact = async (formData: FormData) => {
       data: {
         ...input,
         ...phoneticFields,
+        lastMutatedBy: "MANUAL",
+        lastMutatedByDetail: null,
         syncVersion: {
           increment: 1,
         },
@@ -589,6 +591,8 @@ export const toggleFavoriteContact = async (formData: FormData) => {
     },
     data: {
       isFavorite: !existingContact.isFavorite,
+      lastMutatedBy: "MANUAL",
+      lastMutatedByDetail: null,
       syncVersion: {
         increment: 1,
       },
@@ -612,6 +616,8 @@ export const archiveContact = async (formData: FormData) => {
       data: {
         archivedAt: new Date(),
         syncTombstoneAt: new Date(),
+        lastMutatedBy: "MANUAL",
+        lastMutatedByDetail: null,
         syncVersion: { increment: 1 },
       },
     });
@@ -652,6 +658,8 @@ export const archiveContactsBulk = async (formData: FormData) => {
       data: {
         archivedAt: new Date(),
         syncTombstoneAt: new Date(),
+        lastMutatedBy: "MANUAL",
+        lastMutatedByDetail: null,
         syncVersion: { increment: 1 },
       },
     });
@@ -683,6 +691,8 @@ export const restoreContact = async (formData: FormData) => {
       data: {
         archivedAt: null,
         syncTombstoneAt: null,
+        lastMutatedBy: "MANUAL",
+        lastMutatedByDetail: null,
         syncVersion: { increment: 1 },
       },
     });
@@ -723,6 +733,8 @@ export const restoreContactsBulk = async (formData: FormData) => {
       data: {
         archivedAt: null,
         syncTombstoneAt: null,
+        lastMutatedBy: "MANUAL",
+        lastMutatedByDetail: null,
         syncVersion: { increment: 1 },
       },
     });

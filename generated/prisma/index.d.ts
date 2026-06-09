@@ -284,6 +284,18 @@ export const SyncResolutionStrategy: {
 export type SyncResolutionStrategy = (typeof SyncResolutionStrategy)[keyof typeof SyncResolutionStrategy]
 
 
+export const SourceType: {
+  MANUAL: 'MANUAL',
+  IMPORT_CSV: 'IMPORT_CSV',
+  SYNC_CARDDAV: 'SYNC_CARDDAV',
+  SHARED_STATIC: 'SHARED_STATIC',
+  SHARED_LIVE: 'SHARED_LIVE',
+  API: 'API'
+};
+
+export type SourceType = (typeof SourceType)[keyof typeof SourceType]
+
+
 export const EventType: {
   CONTACT_CREATED: 'CONTACT_CREATED',
   CONTACT_UPDATED: 'CONTACT_UPDATED',
@@ -401,6 +413,10 @@ export const SyncConflictSource: typeof $Enums.SyncConflictSource
 export type SyncResolutionStrategy = $Enums.SyncResolutionStrategy
 
 export const SyncResolutionStrategy: typeof $Enums.SyncResolutionStrategy
+
+export type SourceType = $Enums.SourceType
+
+export const SourceType: typeof $Enums.SourceType
 
 export type EventType = $Enums.EventType
 
@@ -5283,6 +5299,10 @@ export namespace Prisma {
     avatarUrl: string | null
     isFavorite: boolean | null
     notes: string | null
+    sourceType: $Enums.SourceType | null
+    sourceDetail: string | null
+    lastMutatedBy: $Enums.SourceType | null
+    lastMutatedByDetail: string | null
     archivedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -5316,6 +5336,10 @@ export namespace Prisma {
     avatarUrl: string | null
     isFavorite: boolean | null
     notes: string | null
+    sourceType: $Enums.SourceType | null
+    sourceDetail: string | null
+    lastMutatedBy: $Enums.SourceType | null
+    lastMutatedByDetail: string | null
     archivedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -5360,6 +5384,10 @@ export namespace Prisma {
     relatedPeople: number
     customFields: number
     notes: number
+    sourceType: number
+    sourceDetail: number
+    lastMutatedBy: number
+    lastMutatedByDetail: number
     archivedAt: number
     createdAt: number
     updatedAt: number
@@ -5403,6 +5431,10 @@ export namespace Prisma {
     avatarUrl?: true
     isFavorite?: true
     notes?: true
+    sourceType?: true
+    sourceDetail?: true
+    lastMutatedBy?: true
+    lastMutatedByDetail?: true
     archivedAt?: true
     createdAt?: true
     updatedAt?: true
@@ -5436,6 +5468,10 @@ export namespace Prisma {
     avatarUrl?: true
     isFavorite?: true
     notes?: true
+    sourceType?: true
+    sourceDetail?: true
+    lastMutatedBy?: true
+    lastMutatedByDetail?: true
     archivedAt?: true
     createdAt?: true
     updatedAt?: true
@@ -5480,6 +5516,10 @@ export namespace Prisma {
     relatedPeople?: true
     customFields?: true
     notes?: true
+    sourceType?: true
+    sourceDetail?: true
+    lastMutatedBy?: true
+    lastMutatedByDetail?: true
     archivedAt?: true
     createdAt?: true
     updatedAt?: true
@@ -5611,6 +5651,10 @@ export namespace Prisma {
     relatedPeople: JsonValue | null
     customFields: JsonValue | null
     notes: string | null
+    sourceType: $Enums.SourceType
+    sourceDetail: string | null
+    lastMutatedBy: $Enums.SourceType
+    lastMutatedByDetail: string | null
     archivedAt: Date | null
     createdAt: Date
     updatedAt: Date
@@ -5674,6 +5718,10 @@ export namespace Prisma {
     relatedPeople?: boolean
     customFields?: boolean
     notes?: boolean
+    sourceType?: boolean
+    sourceDetail?: boolean
+    lastMutatedBy?: boolean
+    lastMutatedByDetail?: boolean
     archivedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -5728,6 +5776,10 @@ export namespace Prisma {
     relatedPeople?: boolean
     customFields?: boolean
     notes?: boolean
+    sourceType?: boolean
+    sourceDetail?: boolean
+    lastMutatedBy?: boolean
+    lastMutatedByDetail?: boolean
     archivedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -5775,6 +5827,10 @@ export namespace Prisma {
     relatedPeople?: boolean
     customFields?: boolean
     notes?: boolean
+    sourceType?: boolean
+    sourceDetail?: boolean
+    lastMutatedBy?: boolean
+    lastMutatedByDetail?: boolean
     archivedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -5822,12 +5878,16 @@ export namespace Prisma {
     relatedPeople?: boolean
     customFields?: boolean
     notes?: boolean
+    sourceType?: boolean
+    sourceDetail?: boolean
+    lastMutatedBy?: boolean
+    lastMutatedByDetail?: boolean
     archivedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ContactOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "importJobId" | "mergedIntoContactId" | "syncUid" | "syncVersion" | "syncTombstoneAt" | "fullName" | "firstName" | "middleName" | "lastName" | "phoneticFirstName" | "phoneticLastName" | "namePrefix" | "nameSuffix" | "nickname" | "email" | "phone" | "company" | "phoneticCompany" | "jobTitle" | "website" | "birthday" | "address" | "avatarUrl" | "isFavorite" | "labels" | "websiteEntries" | "emailAddresses" | "phoneNumbers" | "postalAddresses" | "emailEntries" | "phoneEntries" | "addressEntries" | "significantDates" | "relatedPeople" | "customFields" | "notes" | "archivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["contact"]>
+  export type ContactOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "importJobId" | "mergedIntoContactId" | "syncUid" | "syncVersion" | "syncTombstoneAt" | "fullName" | "firstName" | "middleName" | "lastName" | "phoneticFirstName" | "phoneticLastName" | "namePrefix" | "nameSuffix" | "nickname" | "email" | "phone" | "company" | "phoneticCompany" | "jobTitle" | "website" | "birthday" | "address" | "avatarUrl" | "isFavorite" | "labels" | "websiteEntries" | "emailAddresses" | "phoneNumbers" | "postalAddresses" | "emailEntries" | "phoneEntries" | "addressEntries" | "significantDates" | "relatedPeople" | "customFields" | "notes" | "sourceType" | "sourceDetail" | "lastMutatedBy" | "lastMutatedByDetail" | "archivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["contact"]>
   export type ContactInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     importJob?: boolean | Contact$importJobArgs<ExtArgs>
@@ -5903,6 +5963,10 @@ export namespace Prisma {
       relatedPeople: Prisma.JsonValue | null
       customFields: Prisma.JsonValue | null
       notes: string | null
+      sourceType: $Enums.SourceType
+      sourceDetail: string | null
+      lastMutatedBy: $Enums.SourceType
+      lastMutatedByDetail: string | null
       archivedAt: Date | null
       createdAt: Date
       updatedAt: Date
@@ -6376,6 +6440,10 @@ export namespace Prisma {
     readonly relatedPeople: FieldRef<"Contact", 'Json'>
     readonly customFields: FieldRef<"Contact", 'Json'>
     readonly notes: FieldRef<"Contact", 'String'>
+    readonly sourceType: FieldRef<"Contact", 'SourceType'>
+    readonly sourceDetail: FieldRef<"Contact", 'String'>
+    readonly lastMutatedBy: FieldRef<"Contact", 'SourceType'>
+    readonly lastMutatedByDetail: FieldRef<"Contact", 'String'>
     readonly archivedAt: FieldRef<"Contact", 'DateTime'>
     readonly createdAt: FieldRef<"Contact", 'DateTime'>
     readonly updatedAt: FieldRef<"Contact", 'DateTime'>
@@ -21044,6 +21112,10 @@ export namespace Prisma {
     relatedPeople: 'relatedPeople',
     customFields: 'customFields',
     notes: 'notes',
+    sourceType: 'sourceType',
+    sourceDetail: 'sourceDetail',
+    lastMutatedBy: 'lastMutatedBy',
+    lastMutatedByDetail: 'lastMutatedByDetail',
     archivedAt: 'archivedAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -21431,6 +21503,20 @@ export namespace Prisma {
    * Reference to a field of type 'QueryMode'
    */
   export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+  /**
+   * Reference to a field of type 'SourceType'
+   */
+  export type EnumSourceTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SourceType'>
+    
+
+
+  /**
+   * Reference to a field of type 'SourceType[]'
+   */
+  export type ListEnumSourceTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SourceType[]'>
     
 
 
@@ -21971,6 +22057,10 @@ export namespace Prisma {
     relatedPeople?: JsonNullableFilter<"Contact">
     customFields?: JsonNullableFilter<"Contact">
     notes?: StringNullableFilter<"Contact"> | string | null
+    sourceType?: EnumSourceTypeFilter<"Contact"> | $Enums.SourceType
+    sourceDetail?: StringNullableFilter<"Contact"> | string | null
+    lastMutatedBy?: EnumSourceTypeFilter<"Contact"> | $Enums.SourceType
+    lastMutatedByDetail?: StringNullableFilter<"Contact"> | string | null
     archivedAt?: DateTimeNullableFilter<"Contact"> | Date | string | null
     createdAt?: DateTimeFilter<"Contact"> | Date | string
     updatedAt?: DateTimeFilter<"Contact"> | Date | string
@@ -22024,6 +22114,10 @@ export namespace Prisma {
     relatedPeople?: SortOrderInput | SortOrder
     customFields?: SortOrderInput | SortOrder
     notes?: SortOrderInput | SortOrder
+    sourceType?: SortOrder
+    sourceDetail?: SortOrderInput | SortOrder
+    lastMutatedBy?: SortOrder
+    lastMutatedByDetail?: SortOrderInput | SortOrder
     archivedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -22080,6 +22174,10 @@ export namespace Prisma {
     relatedPeople?: JsonNullableFilter<"Contact">
     customFields?: JsonNullableFilter<"Contact">
     notes?: StringNullableFilter<"Contact"> | string | null
+    sourceType?: EnumSourceTypeFilter<"Contact"> | $Enums.SourceType
+    sourceDetail?: StringNullableFilter<"Contact"> | string | null
+    lastMutatedBy?: EnumSourceTypeFilter<"Contact"> | $Enums.SourceType
+    lastMutatedByDetail?: StringNullableFilter<"Contact"> | string | null
     archivedAt?: DateTimeNullableFilter<"Contact"> | Date | string | null
     createdAt?: DateTimeFilter<"Contact"> | Date | string
     updatedAt?: DateTimeFilter<"Contact"> | Date | string
@@ -22133,6 +22231,10 @@ export namespace Prisma {
     relatedPeople?: SortOrderInput | SortOrder
     customFields?: SortOrderInput | SortOrder
     notes?: SortOrderInput | SortOrder
+    sourceType?: SortOrder
+    sourceDetail?: SortOrderInput | SortOrder
+    lastMutatedBy?: SortOrder
+    lastMutatedByDetail?: SortOrderInput | SortOrder
     archivedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -22185,6 +22287,10 @@ export namespace Prisma {
     relatedPeople?: JsonNullableWithAggregatesFilter<"Contact">
     customFields?: JsonNullableWithAggregatesFilter<"Contact">
     notes?: StringNullableWithAggregatesFilter<"Contact"> | string | null
+    sourceType?: EnumSourceTypeWithAggregatesFilter<"Contact"> | $Enums.SourceType
+    sourceDetail?: StringNullableWithAggregatesFilter<"Contact"> | string | null
+    lastMutatedBy?: EnumSourceTypeWithAggregatesFilter<"Contact"> | $Enums.SourceType
+    lastMutatedByDetail?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     archivedAt?: DateTimeNullableWithAggregatesFilter<"Contact"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Contact"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Contact"> | Date | string
@@ -23753,6 +23859,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -23806,6 +23916,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -23853,6 +23967,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -23906,6 +24024,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -23956,6 +24078,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -23997,6 +24123,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -24041,6 +24171,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -25948,6 +26082,13 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
+  export type EnumSourceTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.SourceType | EnumSourceTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.SourceType[] | ListEnumSourceTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SourceType[] | ListEnumSourceTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumSourceTypeFilter<$PrismaModel> | $Enums.SourceType
+  }
+
   export type ImportJobNullableScalarRelationFilter = {
     is?: ImportJobWhereInput | null
     isNot?: ImportJobWhereInput | null
@@ -26007,6 +26148,10 @@ export namespace Prisma {
     relatedPeople?: SortOrder
     customFields?: SortOrder
     notes?: SortOrder
+    sourceType?: SortOrder
+    sourceDetail?: SortOrder
+    lastMutatedBy?: SortOrder
+    lastMutatedByDetail?: SortOrder
     archivedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -26044,6 +26189,10 @@ export namespace Prisma {
     avatarUrl?: SortOrder
     isFavorite?: SortOrder
     notes?: SortOrder
+    sourceType?: SortOrder
+    sourceDetail?: SortOrder
+    lastMutatedBy?: SortOrder
+    lastMutatedByDetail?: SortOrder
     archivedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -26077,6 +26226,10 @@ export namespace Prisma {
     avatarUrl?: SortOrder
     isFavorite?: SortOrder
     notes?: SortOrder
+    sourceType?: SortOrder
+    sourceDetail?: SortOrder
+    lastMutatedBy?: SortOrder
+    lastMutatedByDetail?: SortOrder
     archivedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -26126,6 +26279,16 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedJsonNullableFilter<$PrismaModel>
     _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+
+  export type EnumSourceTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SourceType | EnumSourceTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.SourceType[] | ListEnumSourceTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SourceType[] | ListEnumSourceTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumSourceTypeWithAggregatesFilter<$PrismaModel> | $Enums.SourceType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSourceTypeFilter<$PrismaModel>
+    _max?: NestedEnumSourceTypeFilter<$PrismaModel>
   }
 
   export type EnumBillingProviderFilter<$PrismaModel = never> = {
@@ -27995,6 +28158,10 @@ export namespace Prisma {
     divide?: number
   }
 
+  export type EnumSourceTypeFieldUpdateOperationsInput = {
+    set?: $Enums.SourceType
+  }
+
   export type UserUpdateOneRequiredWithoutContactsNestedInput = {
     create?: XOR<UserCreateWithoutContactsInput, UserUncheckedCreateWithoutContactsInput>
     connectOrCreate?: UserCreateOrConnectWithoutContactsInput
@@ -29035,6 +29202,13 @@ export namespace Prisma {
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
+  export type NestedEnumSourceTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.SourceType | EnumSourceTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.SourceType[] | ListEnumSourceTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SourceType[] | ListEnumSourceTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumSourceTypeFilter<$PrismaModel> | $Enums.SourceType
+  }
+
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -29083,6 +29257,16 @@ export namespace Prisma {
     gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type NestedEnumSourceTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.SourceType | EnumSourceTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.SourceType[] | ListEnumSourceTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.SourceType[] | ListEnumSourceTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumSourceTypeWithAggregatesFilter<$PrismaModel> | $Enums.SourceType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumSourceTypeFilter<$PrismaModel>
+    _max?: NestedEnumSourceTypeFilter<$PrismaModel>
   }
 
   export type NestedEnumBillingProviderFilter<$PrismaModel = never> = {
@@ -29577,6 +29761,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -29628,6 +29816,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -30114,6 +30306,10 @@ export namespace Prisma {
     relatedPeople?: JsonNullableFilter<"Contact">
     customFields?: JsonNullableFilter<"Contact">
     notes?: StringNullableFilter<"Contact"> | string | null
+    sourceType?: EnumSourceTypeFilter<"Contact"> | $Enums.SourceType
+    sourceDetail?: StringNullableFilter<"Contact"> | string | null
+    lastMutatedBy?: EnumSourceTypeFilter<"Contact"> | $Enums.SourceType
+    lastMutatedByDetail?: StringNullableFilter<"Contact"> | string | null
     archivedAt?: DateTimeNullableFilter<"Contact"> | Date | string | null
     createdAt?: DateTimeFilter<"Contact"> | Date | string
     updatedAt?: DateTimeFilter<"Contact"> | Date | string
@@ -30976,6 +31172,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -31028,6 +31228,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -31079,6 +31283,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -31130,6 +31338,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -31409,6 +31621,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31461,6 +31677,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -31894,6 +32114,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -31945,6 +32169,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -32210,6 +32438,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -32262,6 +32494,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -32313,6 +32549,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -32365,6 +32605,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -32516,6 +32760,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32568,6 +32816,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32625,6 +32877,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32677,6 +32933,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33328,6 +33588,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -33380,6 +33644,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -33571,6 +33839,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33623,6 +33895,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33935,6 +34211,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -33987,6 +34267,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -34194,6 +34478,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -34246,6 +34534,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -34370,6 +34662,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -34422,6 +34718,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -34535,6 +34835,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -34587,6 +34891,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -34645,6 +34953,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -34854,6 +35166,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -34905,6 +35221,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -34954,6 +35274,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35586,6 +35910,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -35882,6 +36210,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35933,6 +36265,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -35982,6 +36318,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36129,6 +36469,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -36170,6 +36514,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36221,6 +36569,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -36270,6 +36622,10 @@ export namespace Prisma {
     relatedPeople?: NullableJsonNullValueInput | InputJsonValue
     customFields?: NullableJsonNullValueInput | InputJsonValue
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string

@@ -19,7 +19,7 @@ Deepen the quality of duplicate handling, give users a full auditable history of
 | --- | --- | --- | --- |
 | P10-01 | Done | P0 | P1-01, P4-01 |
 | P10-02 | Done | P0 | P10-01 |
-| P10-03 | Not Started | P0 | P10-01 |
+| P10-03 | Done | P0 | P10-01 |
 | P10-04 | Not Started | P1 | P10-02, P10-03 |
 | P10-05 | Not Started | P1 | P10-01 |
 | P10-06 | Not Started | P1 | P10-04, P10-05 |
@@ -86,9 +86,17 @@ Deepen the quality of duplicate handling, give users a full auditable history of
 ---
 
 ## P10-03 — Add source tracking to contacts
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P0`
 - Dependencies: `P10-01`
+- Delivered:
+  - Schema: `SourceType` enum (MANUAL/IMPORT_CSV/SYNC_CARDDAV/SHARED_STATIC/SHARED_LIVE/API) + `sourceType` (default MANUAL), `sourceDetail`, `lastMutatedBy` (default MANUAL), `lastMutatedByDetail` on `Contact`. Pushed via `db push` (zero-downtime defaults).
+  - Origin set at creation: manual → MANUAL (default); import commit → IMPORT_CSV + filename; sync pull create → SYNC_CARDDAV + account label. `lastMutatedBy`/`Detail` updated on every mutation path (manual update/archive/restore/favorite/bulk, merge accept/secondary, sync apply) — origin (`sourceType`) is never changed after creation.
+  - `src/lib/activity/formatters.ts`: `formatSourceBadge(sourceType, detail)` ("Added manually", "Imported from X", "Synced from X", "Shared by/Live from X", "Added via API") + `formatLastMutatedBy`.
+  - Backfill: `scripts/backfill-source-type.mjs` (idempotent) sets IMPORT_CSV + detail for import-originated contacts; everything else stays MANUAL. Ran clean.
+  - Contact detail page `select` now exposes the four source fields for the P10-04 badge.
+  - Verified field semantics: manual → MANUAL/MANUAL; sync-edit of a manual contact → sourceType stays MANUAL, lastMutatedBy → SYNC_CARDDAV; manual-edit of a synced contact → sourceType stays SYNC_CARDDAV, lastMutatedBy → MANUAL. tsc + lint + build green.
+  - Note: SHARED_STATIC/SHARED_LIVE/API enum values exist but are not wired (Phase 12 / API).
 - Implementation Notes:
   - Add two fields to `Contact`: `sourceType` (enum: `MANUAL`, `IMPORT_CSV`, `SYNC_CARDDAV`, `SHARED_STATIC`, `SHARED_LIVE`, `API`) and `sourceDetail` (nullable string — import file name, sync account label, or share sender).
   - Add `lastMutatedBy` (same enum) and `lastMutatedByDetail` (nullable string) to track the most recent actor — this is separate from `sourceType` which records origin.
