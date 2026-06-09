@@ -4,6 +4,8 @@
 **Phase:** P0 core surface
 **Last updated:** 2026-06-09
 
+> **Design status: LOCKED.** The final mock is approved and matches this brief. Resolved in the final design: master–detail app shell, archive-first header, left-rail badge order, data-driven share sheet (add vs. manage + empty state), and the **Details · Sharing · History** tab layout. Sharing remains wired in Phases 12–14; everything else is ready to build to spec.
+
 ---
 
 ## Design language (aligned with the rebuilt contacts list)
@@ -72,9 +74,9 @@ The contact detail page is the single source of truth for everything Kontax know
 
 **Sticky header** is minimal: back chevron + breadcrumb label on the left, contact display name (truncated) in the centre, utility actions on the right. Solid **white** header with a `#d8ddd6` bottom border — matching the contacts-list header chrome (not a tinted translucent bar).
 
-### App shell — detail lives **inside** the persistent shell (master–detail)
+### App shell — detail lives **inside** the persistent shell (master–detail) — ✅ resolved in final mock
 
-> Added after the latest mock review. The standalone mock dropped the global chrome.
+> Resolved. The final mock renders the detail inside the persistent global shell. Spec retained for the build.
 
 The current mock renders the detail as a **standalone window** with only its own slim 60px header, losing the global app shell that the rebuilt contacts list owns (`contact-dashboard.tsx`): the persistent **left sidebar** (workspace logo + All contacts / Favourites / Labels / Import-Export-Sync) and the user-menu header. Opening a contact must **not** drop the user out of the app chrome.
 
@@ -82,7 +84,7 @@ The current mock renders the detail as a **standalone window** with only its own
 - The detail's own internal header (back-to-Contacts breadcrumb + name + actions) is fine, but it sits **inside** the shell — it does not replace the sidebar/user-menu.
 - So the desktop has effectively three columns at ≥1280px: **global sidebar** → detail **left rail (320px)** → detail **right pane**. The 320px rail and right pane are the detail's two panes; the global sidebar is separate chrome shared with the list.
 
-**Header destructive action — archive-first.** Drop the always-visible red **Delete** button from the header. Our model is archive-first; permanent delete is rare. Make **Archive** the primary header action; keep **"Delete permanently"** in the **⋯ More** menu only (it already lives there) so a hard delete is never one stray click away.
+**Header destructive action — archive-first (✅ resolved in final mock).** The header shows **Share · Archive · ⋯**; the red **Delete** button is gone and **"Delete permanently"** lives in the **⋯ More** menu only, so a hard delete is never one stray click away.
 
 ---
 
@@ -244,9 +246,22 @@ In the left-pane metadata block: "Last edited by you · 2h ago", "Last edited by
 ### History tab — per-contact activity feed (built, P10-04)
 The Details / History tab bar is correct. The History panel is **not a placeholder** — mock it as the real feed: rows of *actor icon + summary + relative time*, with **expandable field diffs** for updates/syncs ("phone changed from — → +44…"). Real event vocabulary: Created · Updated (N fields) · Archived/Restored · Merged with [name] · Imported from [file] · Synced from [account] · Conflict detected/resolved. Include the empty state ("History starts from …") and a "Load more" control. Available on all plans (no Pro gate on per-contact history).
 
-## Sharing & shared books (Phases 12–14) — design now, wire later
+## Sharing & shared books (Phases 12–14) — design locked, wire later
 
-The contact detail page is where a user shares a contact and sees its shared status. The mock currently has only passive badges and a vCard-only "Share" action — the collaborative share is missing. Design the following as quiet placeholders now; the live feature lands in Phases 12 (sharing), 13 (family), 14 (teams).
+> **Design status: LOCKED** (final mock approved). The contact-detail sharing UX below matches the approved mock and is ready to build when the sharing phases land — Phases 12 (sharing), 13 (family), 14 (teams). No further design rounds needed for this surface unless the data model changes.
+
+The contact detail page is where a user shares a contact and sees its shared status. The design covers three surfaces: the **Sharing tab**, the **share sheet**, and the **left-rail badge** — described below.
+
+### Sharing tab (Details · Sharing · History)
+
+> Final decision: sharing lives in its own tab, not pinned inside Details.
+
+- The right-pane tab bar is **Details · Sharing · History**. Sharing is its own tab so Details stays focused on the contact's own fields.
+- **Count indicator**: when the contact is shared, the Sharing tab shows a count badge = number of members. (Refinement: for a **live** share, prefer a small "Live" dot over a numeric count, since the count of 2 — owner + you — reads oddly.)
+- **Empty state (unshared contact)**: the tab is never blank. It shows "This contact isn't shared yet" plus the share options inline (add to a family/team book · send a copy · share a live link). This pairs with the header **Share** button: button = quick entry point, tab = full current state + manage.
+- **Shared state**: shows the Sharing card (book it lives in + per-member access + Manage), followed by a "More ways to share" options block.
+- **Mobile**: mirror the tab as a dedicated **Sharing accordion section** in the same order — not a floating card.
+- **Do not duplicate** a sharing summary back into the Details tab; the left-rail badge is the at-a-glance shared signal.
 
 ### Share action + share sheet
 A **Share action** (in the header actions and/or quick-action bar) that opens a share sheet with these distinct options — keep them separate, do not conflate with vCard export:
@@ -254,9 +269,9 @@ A **Share action** (in the header actions and/or quick-action bar) that opens a 
 - **Share with a Kontax user** → static copy (snapshot) or live link (stays in sync).
 - **vCard link / download** — anyone, no account needed. Distinct from the collaborative share.
 
-#### Share sheet must be **data-driven** — not hardcoded books
+#### Share sheet must be **data-driven** — not hardcoded books — ✅ resolved in final mock
 
-> Added after the latest mock review. The mock hardcoded one family ("Castellanos Family") and one team ("Acme Corp") as if every account has exactly those — that's seed data leaking in as the model.
+> Resolved. The final mock drives the share sheet from the user's real books and distinguishes add vs. manage. Spec retained for the build.
 
 - A user can **own/belong to multiple** family and team books. The "Add to a shared book" section lists the **user's actual books**, one row each — driven from real membership, not a fixed pair.
 - **Row label = the book's real name** with a small **Family / Team** type chip. Drop the redundant `Family book ·` / `Team book ·` prefix — "Castellanos Family" already reads as a family book.
@@ -264,6 +279,7 @@ A **Share action** (in the header actions and/or quick-action bar) that opens a 
   - Books the contact is **not** in → **"Add to [book]"** (action row).
   - Books the contact **is** in → render as added, with **Manage** / **Remove from book** — not a re-add row.
 - Empty state: if the user owns no shared books yet, show a "Create a family/team book" affordance instead of an empty list.
+- The three categories — **Add to a shared book** · **Share with a Kontax user** (send copy / live link) · **Export vCard** — stay visually separate. Live-link copy reads "a read-only mirror — they see your updates".
 
 ### "Sharing" card (right pane) — shown when the contact is in a shared book or shared live
 - Which book it lives in: **Family** or **Team · [book name]**.
@@ -275,7 +291,7 @@ A **Share action** (in the header actions and/or quick-action bar) that opens a 
 ### Row-context badge cluster (Phase 15 — keep consistent with the list)
 The left-pane badges are the **expanded form of the list's row-badge cluster**, one governed system: **family · team · live-shared · emergency** (+ the source chip). The current mock has source / live / family — **add Team and Emergency** so the detail page matches the list. Same glyphs and meanings across both surfaces; "Family book" / "Team book" badges navigate to the relevant group management page.
 
-**Cluster order (mock review):** lead with the **sharing/status** chips (Family → Team → Live), then **Emergency** (red), and put the always-on **Source** chip **last**. The mock currently pushes Source first, which buries the chips the user actually scans for. The glyphs, colours, and order must match the list's inline icon slot (the slot immediately after the name) exactly — same contact, same badges, both surfaces.
+**Cluster order — ✅ resolved in final mock:** lead with the **sharing/status** chips (Family → Team → Live), then **Emergency** (red), and put the always-on **Source** chip **last**. The glyphs, colours, and order must match the list's inline icon slot (the slot immediately after the name) exactly — same contact, same badges, both surfaces.
 
 ---
 
