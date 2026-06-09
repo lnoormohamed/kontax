@@ -3,6 +3,8 @@
 **Route:** `/` (logged in)
 **Priority:** P0 — this is the product. Every other page exists to support this one.
 
+> **Status: BUILT (as-built reference, 2026-06-10).** This surface is shipped (Phase 16) in the **locked light design system** (ink `#1d2823`, green `#17352e`, blue `#4158f4`, hairline `#d8ddd6`, Geist) and matches the approved production mock — **the live app is the source of truth**, not this brief. Earlier wording predates the final mock. Hand to a designer as background/reference, not as "please design this." The bulk-select bar now offers **Favorite · Archive · Export · Delete** (Restore · Delete in the archived view).
+
 ---
 
 ## Purpose

@@ -3,6 +3,8 @@
 **Route:** `/import-export`
 **Priority:** P1 — a primary data entry path, especially for new users onboarding from Google Contacts or Apple Contacts. The export path is used less frequently but must be frictionless.
 
+> **Freshness (2026-06-10) — needs realignment.** This page is **built but on the original dark theme** (cyan / `#08101c`), inconsistent with the **locked light design system** used by the core surfaces (01/02/03/09/10). The *flow and content* (3-step import wizard, export panel, import history + rollback) are valid; the visual treatment is stale. Send as a **"bring into the locked light system"** task — keep the IA, restyle to ink `#1d2823` / green `#17352e` / blue `#4158f4` / hairline `#d8ddd6` / white surfaces / Geist. Also reflect two recent additions: **export gating is Pro-only** (vCard premium), and the contacts list now supports **bulk "Export" of a selection** (CSV of the selected contacts) — the export panel here should acknowledge that selection-based export path.
+
 ---
 
 ## Purpose

@@ -3,6 +3,8 @@
 **Route:** `/sync`
 **Priority:** P1 — the core differentiator. Users who connect a CardDAV source get compound value from Kontax. The page must inspire confidence: green health dots, clear timestamps, no jargon beyond what is necessary.
 
+> **Freshness (2026-06-10) — needs realignment.** This page is **built but on the original dark theme** (cyan / `#08101c`), inconsistent with the **locked light design system** now used by the core surfaces (01/02/03/09/10). The *structure and content* are still valid; the visual treatment is what's stale. Send as a **"bring into the locked light system"** task — keep the layout/IA, restyle to ink `#1d2823` / green `#17352e` / blue `#4158f4` / hairline `#d8ddd6` / white surfaces / Geist. Note: inbound device connections (Kontax's own CardDAV server + app passwords) shipped in Phase 9 — reconcile the "reserved at the bottom" section with what now exists.
+
 ---
 
 ## Purpose

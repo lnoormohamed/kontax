@@ -2,7 +2,9 @@
 
 **Route:** `/` (logged-out state)
 **Phase:** P0 core surface
-**Last updated:** 2026-06-08
+**Last updated:** 2026-06-10
+
+> **Freshness (2026-06-10) — DECISION NEEDED before sending.** The landing page is **built on the original dark theme** (cyan / `#020617` / `#08101c`), which **predates the locked light design system** used by the in-app surfaces. As a *marketing* surface, a distinct darker atmosphere can be a legitimate choice (unlike in-app auth) — but it should still feel like the same brand. **Decide before sending:** keep the dark marketing aesthetic (and refine it intentionally) or align it to the locked palette. Either way, the in-app mock shown on this page should reflect the **current** light contacts list (Phase 16), not the old dark dashboard.
 
 ---
 

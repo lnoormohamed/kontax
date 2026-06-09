@@ -2,7 +2,9 @@
 
 **Routes:** `/login` · `/register`
 **Phase:** P0 core surface
-**Last updated:** 2026-06-08
+**Last updated:** 2026-06-10
+
+> **Freshness (2026-06-10) — DECISION NEEDED before sending.** These pages are **built but on the original dark theme** (cyan / `#08101c` / slate-950), which **predates and conflicts with the locked light design system** now used by the core surfaces (01/02/03/09/10: ink `#1d2823`, green `#17352e`, blue `#4158f4`, off-white backgrounds, Geist). This brief still *prescribes* the dark "branded atmosphere," so it matches what shipped — but is inconsistent with the rest of the app. **Decide before sending:** (a) keep auth deliberately dark as a distinct entry experience, or (b) bring login/register into the locked light system (safer default — most products use one system throughout). If (b), the palette/atmosphere sections below need rewriting to the locked tokens.
 
 ---
 
