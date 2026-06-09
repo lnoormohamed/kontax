@@ -1,7 +1,10 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
+import { ContactHistory } from "~/app/_components/contact-history";
 import { ContactPhoneticAssistant } from "~/app/_components/contact-phonetic-assistant";
+import { LastUpdatedBy } from "~/app/_components/last-updated-by";
+import { SourceBadge } from "~/app/_components/source-badge";
 import {
   archiveContact,
   undoMergeContacts,
@@ -434,6 +437,17 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                         Favorite
                       </span>
                     ) : null}
+                  </div>
+
+                  <div className="mt-3 flex flex-wrap items-center gap-2">
+                    <SourceBadge sourceType={contact.sourceType} sourceDetail={contact.sourceDetail} />
+                  </div>
+                  <div className="mt-2">
+                    <LastUpdatedBy
+                      lastMutatedBy={contact.lastMutatedBy}
+                      lastMutatedByDetail={contact.lastMutatedByDetail}
+                      updatedAt={contact.updatedAt.toISOString()}
+                    />
                   </div>
 
                   {phoneticSummary.nameReading || phoneticSummary.companyReading ? (
@@ -1317,6 +1331,17 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               </div>
             </div>
           </aside>
+        </section>
+
+        <section className={sectionCardClassName} id="contact-history">
+          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">History</p>
+          <h2 className="mt-1 text-lg font-semibold text-slate-900">Activity</h2>
+          <p className="mt-1 text-sm text-slate-500">
+            Every change to this contact — edits, imports, merges, and sync — in reverse order.
+          </p>
+          <div className="mt-4 overflow-hidden rounded-[1.4rem] border border-[#e9ece7] bg-white">
+            <ContactHistory contactId={contact.id} />
+          </div>
         </section>
       </div>
     </main>

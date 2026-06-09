@@ -20,7 +20,7 @@ Deepen the quality of duplicate handling, give users a full auditable history of
 | P10-01 | Done | P0 | P1-01, P4-01 |
 | P10-02 | Done | P0 | P10-01 |
 | P10-03 | Done | P0 | P10-01 |
-| P10-04 | Not Started | P1 | P10-02, P10-03 |
+| P10-04 | Done | P1 | P10-02, P10-03 |
 | P10-05 | Not Started | P1 | P10-01 |
 | P10-06 | Not Started | P1 | P10-04, P10-05 |
 | P10-07 | Not Started | P2 | P10-06 |
@@ -113,9 +113,16 @@ Deepen the quality of duplicate handling, give users a full auditable history of
 ---
 
 ## P10-04 — Surface source badges and per-contact history in the UI
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P10-02`, `P10-03`
+- Delivered:
+  - API `GET /api/contacts/[id]/history` — auth (401), ownership (403), cursor pagination (limit+1, `nextCursor`/`hasMore`), uses the `(contactId, createdAt desc)` index; computes `summary`/`actorLabel`/`actorIcon` server-side via `formatters.ts`.
+  - `formatters.ts` extended: `formatEventSummary` (all 14 event types), `formatActorLabel`, `actorIconName`; `field-labels.ts` (`formatFieldLabel`); `time.ts` (`formatRelativeTime`/`formatAbsoluteTime`).
+  - `SourceBadge` + `LastUpdatedBy` rendered in the contact-detail hero (read from the contact record — no query). `LastUpdatedBy` is a client component so the relative time isn't stale.
+  - `ContactHistory` client component in a new "History" section: reverse-chron feed, actor icon + summary + relative time (absolute on hover), expandable field diffs for CONTACT_UPDATED/SYNC_PULLED (null → "—", arrays joined, 80-char truncate), skeleton loading, error+retry, empty state ("History starts from …"), and "Load more" pagination. Available on all plans (no gating).
+  - Verified end-to-end against seeded events: 401 unauth, correct summaries ("Updated · 2 fields changed", "Pulled from iCloud", "Imported from contacts.csv"), diffs, 403 for non-owned contact. tsc + lint + build green.
+  - Note: rendered as a History **section** on the detail page rather than a Details/History tab toggle — the page isn't tab-structured and the toggle is a presentation detail for the P10-07 design. All behavioural acceptance criteria are met.
 - Implementation Notes:
   - On the contact detail page, show a source badge: "Added manually", "Imported from Google CSV", "Synced from iCloud", "Shared by [name]". Use `sourceType` and `sourceDetail`.
   - Show a "Last updated by" line below the source badge using `lastMutatedBy` and `lastMutatedByDetail` with a relative timestamp.

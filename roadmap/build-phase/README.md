@@ -114,7 +114,7 @@ This roadmap is the implementation source of truth for phases 1–16. Each phase
 | P10-01 | 10 | Done | P0 | P1-01, P4-01 | Unassigned | ActivityEvent model + EventType/Actor enums + indexes pushed; Zod payload schemas + append-only emitEvent helper |
 | P10-02 | 10 | Done | P0 | P10-01 | Unassigned | CRUD/merge/import/sync paths emit events via emitEvent + computeContactDiff (SYNC_PUSHED + share deferred — no path yet) |
 | P10-03 | 10 | Done | P0 | P10-01 | Unassigned | SourceType enum + source/lastMutatedBy fields; set on create + every mutation; formatSourceBadge; backfill run |
-| P10-04 | 10 | Not Started | P1 | P10-02, P10-03 | Unassigned | Source badges and History tab are visible and accurate on every contact detail page |
+| P10-04 | 10 | Done | P1 | P10-02, P10-03 | Unassigned | Source badge + last-updated line + History feed (load-more, expandable diffs) on contact detail; /api/contacts/[id]/history |
 | P10-05 | 10 | Not Started | P1 | P10-01 | Unassigned | Field-level merge UI, bulk accept, and 30-day undo all work correctly |
 | P10-06 | 10 | Not Started | P1 | P10-04, P10-05 | Unassigned | Activity feed loads, paginates, and filters correctly; Free users see gated state |
 | P10-07 | 10 | Not Started | P2 | P10-06 | Unassigned | Design brief covers all activity log and source badge surfaces and states |
