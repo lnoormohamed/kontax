@@ -59,4 +59,4 @@ export const sendEmail = async ({ to, subject, html, text }: EmailArgs): Promise
   }
 };
 
-export const appUrl = () => env.APP_URL ?? "https://kontax.app";
+export const appUrl = () => env.APP_URL ?? "https://vexon.co";

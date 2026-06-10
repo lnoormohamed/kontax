@@ -1,32 +1,16 @@
 import Link from "next/link";
 
 import { LandingReveal } from "~/app/_components/landing-reveal";
-import "~/app/_components/public-landing.css";
+import { PublicFooter } from "~/app/_components/public-footer";
+import { PublicNav } from "~/app/_components/public-nav";
+import "~/app/_components/public-site.css";
 
 export function PublicLanding() {
   return (
     <div className="kx">
       <LandingReveal />
 
-      {/* ─────────────────────────── NAV ─────────────────────────── */}
-      <header className="nav">
-        <div className="nav__inner">
-          <a className="brand" href="#top" aria-label="Kontax home">
-            <span className="brand__k">K</span>
-            <span className="brand__word">Kontax</span>
-          </a>
-          <nav className="nav__links" aria-label="Primary">
-            <a className="nav__link" href="#how">How it works</a>
-            <a className="nav__link" href="#features">Features</a>
-            <a className="nav__link" href="#privacy">Privacy</a>
-            <Link className="nav__link" href="/pricing">Pricing</Link>
-          </nav>
-          <div className="nav__actions">
-            <Link className="nav__link" href="/login">Log in</Link>
-            <Link className="btn-primary--sm" href="/register">Get started free</Link>
-          </div>
-        </div>
-      </header>
+      <PublicNav />
 
       <main id="top">
         {/* ─────────────────────────── HERO ─────────────────────────── */}
@@ -55,7 +39,7 @@ export function PublicLanding() {
                   </div>
                   <div className="chrome__url">
                     <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#8b938c" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="5" y="11" width="14" height="10" rx="2" /><path d="M8 11V7a4 4 0 018 0v4" /></svg>
-                    kontax.app
+                    vexon.co
                   </div>
                 </div>
                 <div className="app-header">
@@ -431,45 +415,7 @@ export function PublicLanding() {
         </section>
       </main>
 
-      {/* ─────────────────────────── FOOTER ─────────────────────────── */}
-      <footer className="footer">
-        <div className="footer__inner">
-          <div className="footer__brandcol">
-            <a className="brand" href="#top" aria-label="Kontax home">
-              <span className="brand__k">K</span>
-              <span className="brand__word">Kontax</span>
-            </a>
-            <p className="footer__tag">One address book, always up to date — across every device, app, and person you share with.</p>
-          </div>
-          <div className="footer__cols">
-            <div className="footer__col">
-              <span className="footer__col-title">Product</span>
-              <a className="footer__link" href="#features">Features</a>
-              <a className="footer__link" href="#how">How it works</a>
-              <Link className="footer__link" href="/pricing">Pricing</Link>
-              <a className="footer__link" href="#privacy">Privacy &amp; ownership</a>
-            </div>
-            <div className="footer__col">
-              <span className="footer__col-title">Company</span>
-              <Link className="footer__link" href="/privacy">Privacy policy</Link>
-              <Link className="footer__link" href="/terms">Terms of service</Link>
-            </div>
-            <div className="footer__col">
-              <span className="footer__col-title">Get started</span>
-              <Link className="footer__link" href="/login">Log in</Link>
-              <Link className="footer__link" href="/register">Register</Link>
-            </div>
-          </div>
-        </div>
-        <div className="footer__base">
-          <span className="footer__copy">© 2026 Kontax</span>
-          <div className="footer__base-links">
-            <Link href="/privacy">Privacy</Link>
-            <Link href="/terms">Terms</Link>
-            <Link href="/pricing">Pricing</Link>
-          </div>
-        </div>
-      </footer>
+      <PublicFooter />
     </div>
   );
 }
