@@ -34,6 +34,14 @@ const formatTimestamp = (value: Date) =>
     year: "numeric",
   }).format(value);
 
+// Left-rail metadata dates match the design: non-padded day (e.g. "8 Jun 2026").
+const formatMetaDate = (value: Date) =>
+  new Intl.DateTimeFormat("en-GB", {
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(value);
+
 
 const formatStoredDateValue = (value: string | null | undefined) => {
   if (!value) {
@@ -401,23 +409,25 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
           </span>
           <div className="flex shrink-0 items-center gap-2">
             <Link
-              className="rounded-[0.8rem] border border-[#d8ddd6] bg-white px-3.5 py-1.5 text-sm font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+              className="flex h-[34px] items-center gap-1.5 rounded-[8px] border border-transparent px-3 text-[13px] font-semibold text-[#5c655e] transition hover:border-[#d8ddd6] hover:bg-[#f2f4f0]"
               href={`/contacts/${contact.id}?tab=sharing`}
             >
+              <WorkspaceIcon name="share" size={16} />
               Share
             </Link>
             <form action={contact.archivedAt ? restoreContact : archiveContact}>
               <input name="contactId" type="hidden" value={contact.id} />
               <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}`} />
               <button
-                className="rounded-[0.8rem] border border-[#d8ddd6] bg-white px-3.5 py-1.5 text-sm font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+                className="flex h-[34px] items-center gap-1.5 rounded-[8px] border border-[#d8ddd6] bg-white px-3 text-[13px] font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
                 type="submit"
               >
+                <WorkspaceIcon name={contact.archivedAt ? "restore" : "archive"} size={16} />
                 {contact.archivedAt ? "Restore" : "Archive"}
               </button>
             </form>
             <details className="relative">
-              <summary className="grid h-8 w-8 cursor-pointer list-none place-items-center rounded-[0.8rem] border border-[#d8ddd6] bg-white text-[#5c655e] transition hover:bg-[#f2f4f0]">
+              <summary className="grid size-[34px] cursor-pointer list-none place-items-center rounded-[8px] border border-transparent text-[#5c655e] transition hover:border-[#d8ddd6] hover:bg-[#f2f4f0]">
                 <WorkspaceIcon name="more" size={18} />
               </summary>
               <div className="absolute right-0 z-10 mt-1 w-56 rounded-[1rem] border border-[#d8ddd6] bg-white p-1.5 shadow-lg">
@@ -546,15 +556,17 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
             <dl className="grid gap-2 text-[12px]">
               <div className="flex justify-between gap-3">
                 <dt className="text-[#8b938c]">Added</dt>
-                <dd className="text-right text-[#5c655e]">{formatTimestamp(contact.createdAt)}</dd>
+                <dd className="text-right text-[#5c655e]">{formatMetaDate(contact.createdAt)}</dd>
               </div>
               <div className="flex justify-between gap-3">
                 <dt className="text-[#8b938c]">Modified</dt>
-                <dd className="text-right text-[#5c655e]">{formatTimestamp(contact.updatedAt)}</dd>
+                <dd className="text-right text-[#5c655e]">{formatMetaDate(contact.updatedAt)}</dd>
               </div>
               <div className="flex justify-between gap-3">
                 <dt className="text-[#8b938c]">UID</dt>
-                <dd className="text-right font-mono text-[#5c655e]">{contact.id.slice(0, 8)}…</dd>
+                <dd className="text-right font-mono text-[#5c655e]" title={contact.syncUid}>
+                  {contact.syncUid.slice(0, 8)}…
+                </dd>
               </div>
               <div className="text-[#5c655e]">
                 <LastUpdatedBy

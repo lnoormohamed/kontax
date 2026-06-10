@@ -45,6 +45,12 @@ export async function AppShell({
         },
       })
     : 0;
+  // Green "connected" dot on the Sync footer link when a CardDAV account is live.
+  const syncConnected = session?.user?.id
+    ? (await db.syncAccount.count({
+        where: { userId: session.user.id, status: "ACTIVE" },
+      })) > 0
+    : false;
   const navItem = (href: string, icon: string, label: string, count?: number, badge?: boolean) => (
     <Link
       className="flex h-9 items-center gap-3 rounded-lg px-2.5 text-[13.5px] font-medium text-[#5c655e] transition hover:bg-[#f2f4f0]"
@@ -144,6 +150,9 @@ export async function AppShell({
               >
                 <WorkspaceIcon name={icon} size={15} />
                 <span className="flex-1">{label}</span>
+                {icon === "sync" && syncConnected ? (
+                  <span className="size-[7px] rounded-full bg-[#1f8a5b]" />
+                ) : null}
               </Link>
             ))}
           </div>
