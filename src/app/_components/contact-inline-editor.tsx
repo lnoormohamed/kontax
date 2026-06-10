@@ -1,9 +1,9 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 
-import { updateContactField } from "~/app/actions/contacts";
+import { updateContactEntries, updateContactField } from "~/app/actions/contacts";
 import {
   AddressGroup,
   MultiValueGroup,
@@ -90,11 +90,14 @@ function InlineField({
   field,
   initialValue,
   editable,
+  onBuffer,
 }: {
   contactId: string;
   field: FieldDef;
   initialValue: string;
   editable: boolean;
+  /** Buffered mode: report the committed value up instead of saving immediately. */
+  onBuffer?: (value: string) => void;
 }) {
   const [value, setValue] = useState(initialValue);
   const [draft, setDraft] = useState(initialValue);
@@ -116,6 +119,11 @@ function InlineField({
     }
     if (field.key === "fullName" && next.length === 0) {
       setDraft(value); // names can't be blank
+      return;
+    }
+    if (onBuffer) {
+      setValue(next);
+      onBuffer(next); // buffered — the real save happens on the Save button
       return;
     }
     setStatus("saving");
@@ -373,23 +381,267 @@ export type ContactEntries = {
   related: SimpleEntry[];
 };
 
-export function ContactInlineEditor({
+// Scalar fields that buffer into the working copy and commit on Save.
+const SCALAR_KEYS: FieldKey[] = [
+  ...IDENTITY_FIELDS.map((f) => f.key),
+  ...WORK_FIELDS.map((f) => f.key),
+  "birthday",
+  "notes",
+];
+
+type GroupKey = "emails" | "phones" | "websites" | "addresses" | "dates" | "related";
+
+type EditorDraft = {
+  scalars: Record<FieldKey, string>;
+  emails: SimpleEntry[];
+  phones: SimpleEntry[];
+  websites: SimpleEntry[];
+  addresses: AddressEntry[];
+  dates: SimpleEntry[];
+  related: SimpleEntry[];
+};
+
+// ── Edit controller: state shared by the header actions and the editor body ──
+type ContactEditCtx = {
+  contact: InlineEditorContact;
+  entries: ContactEntries;
+  editableShared: boolean;
+  mode: "read" | "edit";
+  draft: EditorDraft | null;
+  saving: boolean;
+  saveError: string | null;
+  enterEdit: () => void;
+  cancel: () => void;
+  save: () => void;
+  setScalar: (key: FieldKey, value: string) => void;
+  setGroup: <K extends GroupKey>(key: K, next: EditorDraft[K]) => void;
+};
+
+const ContactEditContext = createContext<ContactEditCtx | null>(null);
+
+function useContactEdit() {
+  const ctx = useContext(ContactEditContext);
+  if (!ctx) throw new Error("useContactEdit must be used within a ContactEditProvider");
+  return ctx;
+}
+
+/**
+ * Owns the buffered edit state. Wrap the detail header + body in this so the
+ * header's Edit / Cancel / Save buttons drive the editor below.
+ */
+export function ContactEditProvider({
   contact,
   entries,
   editableShared,
+  children,
 }: {
   contact: InlineEditorContact;
   entries: ContactEntries;
   /** false for a live-received contact: shared fields read-only, notes still editable */
   editableShared: boolean;
+  children: React.ReactNode;
 }) {
-  const editable = editableShared;
   const router = useRouter();
   const [mode, setMode] = useState<"read" | "edit">("read");
-  const done = () => {
-    setMode("read");
-    router.refresh();
+  const [draft, setDraft] = useState<EditorDraft | null>(null);
+  const [dirty, setDirty] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
+  const [confirmDiscard, setConfirmDiscard] = useState(false);
+
+  // Warn on tab close / reload while there are unsaved edits.
+  useEffect(() => {
+    if (mode !== "edit" || !dirty) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [mode, dirty]);
+
+  const enterEdit = () => {
+    setDraft({
+      scalars: Object.fromEntries(SCALAR_KEYS.map((k) => [k, contact[k] ?? ""])) as Record<
+        FieldKey,
+        string
+      >,
+      emails: entries.emails.map((e) => ({ ...e })),
+      phones: entries.phones.map((e) => ({ ...e })),
+      websites: entries.websites.map((e) => ({ ...e })),
+      addresses: entries.addresses.map((a) => ({ ...a })),
+      dates: entries.dates.map((e) => ({ ...e })),
+      related: entries.related.map((e) => ({ ...e })),
+    });
+    setDirty(false);
+    setSaveError(null);
+    setMode("edit");
   };
+
+  const exitToRead = () => {
+    setMode("read");
+    setDraft(null);
+    setDirty(false);
+    setSaving(false);
+    setSaveError(null);
+    setConfirmDiscard(false);
+  };
+
+  const setScalar = (key: FieldKey, value: string) => {
+    setDirty(true);
+    setSaveError(null);
+    setDraft((d) => (d ? { ...d, scalars: { ...d.scalars, [key]: value } } : d));
+  };
+  const setGroup = <K extends GroupKey>(key: K, next: EditorDraft[K]) => {
+    setDirty(true);
+    setSaveError(null);
+    setDraft((d) => (d ? { ...d, [key]: next } : d));
+  };
+
+  const cancel = () => {
+    if (dirty) {
+      setConfirmDiscard(true);
+      return;
+    }
+    exitToRead();
+  };
+
+  const save = async () => {
+    if (!draft) return;
+    setSaving(true);
+    setSaveError(null);
+    try {
+      for (const key of SCALAR_KEYS) {
+        const value = (draft.scalars[key] ?? "").trim();
+        if (value !== (contact[key] ?? "").trim()) {
+          await updateContactField(contact.id, key, value);
+        }
+      }
+      const groups: Array<[GroupKey, unknown[], unknown[]]> = [
+        ["emails", draft.emails, entries.emails],
+        ["phones", draft.phones, entries.phones],
+        ["websites", draft.websites, entries.websites],
+        ["addresses", draft.addresses, entries.addresses],
+        ["dates", draft.dates, entries.dates],
+        ["related", draft.related, entries.related],
+      ];
+      for (const [group, next, orig] of groups) {
+        if (JSON.stringify(next) !== JSON.stringify(orig)) {
+          await updateContactEntries(contact.id, group, next);
+        }
+      }
+      exitToRead();
+      router.refresh();
+    } catch {
+      setSaveError("Couldn't save changes — check your connection and try again.");
+      setSaving(false);
+    }
+  };
+
+  return (
+    <ContactEditContext.Provider
+      value={{
+        contact,
+        entries,
+        editableShared,
+        mode,
+        draft,
+        saving,
+        saveError,
+        enterEdit,
+        cancel,
+        save: () => void save(),
+        setScalar,
+        setGroup,
+      }}
+    >
+      {children}
+
+      {confirmDiscard ? (
+        <div
+          className="fixed inset-0 z-[90] grid place-items-center bg-[rgba(15,23,42,0.45)] p-4"
+          onClick={() => setConfirmDiscard(false)}
+        >
+          <div
+            className="w-full max-w-[400px] rounded-2xl bg-white p-6 shadow-[0_24px_60px_rgba(15,23,42,0.25)]"
+            onClick={(e) => e.stopPropagation()}
+            role="dialog"
+            aria-modal="true"
+          >
+            <h3 className="text-[18px] font-semibold text-[#1d2823]">Discard changes?</h3>
+            <p className="mt-2 text-[14px] leading-6 text-[#5c655e]">
+              You have unsaved edits. If you leave now they&rsquo;ll be lost.
+            </p>
+            <div className="mt-5 flex justify-end gap-2">
+              <button
+                className="rounded-xl border border-[#d8ddd6] px-4 py-2.5 text-[14px] font-semibold text-[#3a4540] transition hover:bg-[#f6f7f4]"
+                onClick={() => setConfirmDiscard(false)}
+                type="button"
+              >
+                Keep editing
+              </button>
+              <button
+                className="rounded-xl bg-[#b5472f] px-4 py-2.5 text-[14px] font-semibold text-white transition hover:bg-[#9a3a23]"
+                onClick={exitToRead}
+                type="button"
+              >
+                Discard
+              </button>
+            </div>
+          </div>
+        </div>
+      ) : null}
+    </ContactEditContext.Provider>
+  );
+}
+
+/** Edit / Cancel / Save controls — rendered in the detail page header. */
+export function ContactEditActions() {
+  const { mode, saving, enterEdit, cancel, save } = useContactEdit();
+  if (mode === "read") {
+    return (
+      <button
+        className="flex h-[34px] items-center gap-1.5 rounded-[8px] bg-[#17352e] px-3 text-[13px] font-semibold text-white transition hover:bg-[#20443b]"
+        onClick={enterEdit}
+        type="button"
+      >
+        <PencilIcon />
+        Edit
+      </button>
+    );
+  }
+  return (
+    <>
+      <button
+        className="flex h-[34px] items-center rounded-[8px] border border-[#d8ddd6] bg-white px-3 text-[13px] font-semibold text-[#5c655e] transition hover:bg-[#f2f4f0] disabled:opacity-50"
+        disabled={saving}
+        onClick={cancel}
+        type="button"
+      >
+        Cancel
+      </button>
+      <button
+        className="flex h-[34px] items-center gap-1.5 rounded-[8px] bg-[#17352e] px-3 text-[13px] font-semibold text-white transition hover:bg-[#20443b] disabled:cursor-not-allowed disabled:opacity-60"
+        disabled={saving}
+        onClick={save}
+        type="button"
+      >
+        {saving ? (
+          <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+        ) : (
+          <CheckIcon />
+        )}
+        {saving ? "Saving…" : "Save"}
+      </button>
+    </>
+  );
+}
+
+/** The Details-tab body — read view by default, buffered edit fields in edit mode. */
+export function ContactInlineEditor() {
+  const { contact, entries, editableShared, mode, draft, saveError, setScalar, setGroup } =
+    useContactEdit();
+  const editable = editableShared;
 
   return (
     <div className="grid gap-4">
@@ -400,131 +652,125 @@ export function ContactInlineEditor({
         </p>
       ) : null}
 
-      {/* read / edit toggle */}
-      <div className="flex items-center justify-between">
-        <span className="text-[13px] font-semibold text-[#5c655e]">
-          {mode === "read" ? "Contact details" : "Editing details"}
-        </span>
-        {mode === "read" ? (
-          <button
-            className="inline-flex items-center gap-1.5 rounded-lg border border-[#d8ddd6] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#1d2823] transition hover:bg-[#f6f7f4]"
-            onClick={() => setMode("edit")}
-            type="button"
-          >
-            <PencilIcon />
-            Edit
-          </button>
-        ) : (
-          <button
-            className="inline-flex items-center gap-1.5 rounded-lg bg-[#17352e] px-3.5 py-2 text-[13px] font-semibold text-white transition hover:bg-[#20443b]"
-            onClick={done}
-            type="button"
-          >
-            <CheckIcon />
-            Done
-          </button>
-        )}
-      </div>
+      {saveError ? (
+        <p className="rounded-[0.9rem] border border-[#ecd0c7] bg-[#f7e9e4] px-4 py-2.5 text-[13px] text-[#8f3320]">
+          {saveError}
+        </p>
+      ) : null}
 
-      {mode === "read" ? (
+      {mode === "read" || !draft ? (
         <ContactReadView contact={contact} entries={entries} />
       ) : (
         <div className="grid gap-4">
           <SectionCard title="Identity">
-        {IDENTITY_FIELDS.map((field) => (
-          <InlineField
-            contactId={contact.id}
-            editable={editable}
-            field={field}
-            initialValue={contact[field.key] ?? ""}
-            key={field.key}
-          />
-        ))}
-      </SectionCard>
+            {IDENTITY_FIELDS.map((field) => (
+              <InlineField
+                contactId={contact.id}
+                editable={editable}
+                field={field}
+                initialValue={draft.scalars[field.key] ?? ""}
+                key={field.key}
+                onBuffer={(v) => setScalar(field.key, v)}
+              />
+            ))}
+          </SectionCard>
 
-      <SectionCard title="Contact methods">
-        <MultiValueGroup
-          addText="Add email"
-          contactId={contact.id}
-          defaultLabel="Work"
-          editable={editable}
-          group="emails"
-          initial={entries.emails}
-          inputType="email"
-        />
-        {groupDivider}
-        <MultiValueGroup
-          addText="Add phone"
-          contactId={contact.id}
-          defaultLabel="Mobile"
-          editable={editable}
-          group="phones"
-          initial={entries.phones}
-          inputType="tel"
-        />
-        {groupDivider}
-        <MultiValueGroup
-          addText="Add website"
-          contactId={contact.id}
-          defaultLabel="Portfolio"
-          editable={editable}
-          group="websites"
-          initial={entries.websites}
-          inputType="url"
-        />
-      </SectionCard>
+          <SectionCard title="Contact methods">
+            <MultiValueGroup
+              addText="Add email"
+              contactId={contact.id}
+              defaultLabel="Work"
+              editable={editable}
+              group="emails"
+              initial={draft.emails}
+              inputType="email"
+              onChange={(n) => setGroup("emails", n)}
+            />
+            {groupDivider}
+            <MultiValueGroup
+              addText="Add phone"
+              contactId={contact.id}
+              defaultLabel="Mobile"
+              editable={editable}
+              group="phones"
+              initial={draft.phones}
+              inputType="tel"
+              onChange={(n) => setGroup("phones", n)}
+            />
+            {groupDivider}
+            <MultiValueGroup
+              addText="Add website"
+              contactId={contact.id}
+              defaultLabel="Portfolio"
+              editable={editable}
+              group="websites"
+              initial={draft.websites}
+              inputType="url"
+              onChange={(n) => setGroup("websites", n)}
+            />
+          </SectionCard>
 
-      <SectionCard title="Work">
-        {WORK_FIELDS.map((field) => (
-          <InlineField
-            contactId={contact.id}
-            editable={editable}
-            field={field}
-            initialValue={contact[field.key] ?? ""}
-            key={field.key}
-          />
-        ))}
-      </SectionCard>
+          <SectionCard title="Work">
+            {WORK_FIELDS.map((field) => (
+              <InlineField
+                contactId={contact.id}
+                editable={editable}
+                field={field}
+                initialValue={draft.scalars[field.key] ?? ""}
+                key={field.key}
+                onBuffer={(v) => setScalar(field.key, v)}
+              />
+            ))}
+          </SectionCard>
 
-      <SectionCard title="Personal">
-        <InlineField
-          contactId={contact.id}
-          editable={editable}
-          field={{ key: "birthday", label: "Birthday", display: "date" }}
-          initialValue={contact.birthday ?? ""}
-        />
-        {groupDivider}
-        <GroupLabel>Addresses</GroupLabel>
-        <AddressGroup contactId={contact.id} editable={editable} initial={entries.addresses} />
-        {groupDivider}
-        <GroupLabel>Related people</GroupLabel>
-        <MultiValueGroup
-          addText="Add related person"
-          contactId={contact.id}
-          defaultLabel="Spouse"
-          editable={editable}
-          group="related"
-          initial={entries.related}
-        />
-        {groupDivider}
-        <GroupLabel>Significant dates</GroupLabel>
-        <MultiValueGroup
-          addText="Add date"
-          contactId={contact.id}
-          defaultLabel="Anniversary"
-          editable={editable}
-          group="dates"
-          initial={entries.dates}
-          inputType="date"
-        />
-      </SectionCard>
+          <SectionCard title="Personal">
+            <InlineField
+              contactId={contact.id}
+              editable={editable}
+              field={{ key: "birthday", label: "Birthday", display: "date" }}
+              initialValue={draft.scalars.birthday ?? ""}
+              onBuffer={(v) => setScalar("birthday", v)}
+            />
+            {groupDivider}
+            <GroupLabel>Addresses</GroupLabel>
+            <AddressGroup
+              contactId={contact.id}
+              editable={editable}
+              initial={draft.addresses}
+              onChange={(n) => setGroup("addresses", n)}
+            />
+            {groupDivider}
+            <GroupLabel>Related people</GroupLabel>
+            <MultiValueGroup
+              addText="Add related person"
+              contactId={contact.id}
+              defaultLabel="Spouse"
+              editable={editable}
+              group="related"
+              initial={draft.related}
+              onChange={(n) => setGroup("related", n)}
+            />
+            {groupDivider}
+            <GroupLabel>Significant dates</GroupLabel>
+            <MultiValueGroup
+              addText="Add date"
+              contactId={contact.id}
+              defaultLabel="Anniversary"
+              editable={editable}
+              group="dates"
+              initial={draft.dates}
+              inputType="date"
+              onChange={(n) => setGroup("dates", n)}
+            />
+          </SectionCard>
 
           <SectionCard title="Notes">
             <InlineField
               contactId={contact.id}
               editable
               field={{ key: "notes", label: "Notes", type: "area" }}
-              initialValue={contact.notes ?? ""}
+              initialValue={draft.scalars.notes ?? ""}
+              onBuffer={(v) => setScalar("notes", v)}
             />
           </SectionCard>
         </div>

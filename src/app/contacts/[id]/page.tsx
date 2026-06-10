@@ -5,7 +5,11 @@ import { notFound, redirect } from "next/navigation";
 import { AppShell } from "~/app/_components/app-shell";
 import { ContactHistory } from "~/app/_components/contact-history";
 import { ContactFamilyPanel } from "~/app/_components/contact-family-panel";
-import { ContactInlineEditor } from "~/app/_components/contact-inline-editor";
+import {
+  ContactEditActions,
+  ContactEditProvider,
+  ContactInlineEditor,
+} from "~/app/_components/contact-inline-editor";
 import { ContactSharing } from "~/app/_components/contact-sharing";
 import { CopyMonoRow } from "~/app/_components/copy-field";
 import { LastUpdatedBy } from "~/app/_components/last-updated-by";
@@ -436,8 +440,44 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
   });
 
 
+  const editorContact = {
+    id: contact.id,
+    fullName: contact.fullName,
+    firstName: contact.firstName,
+    middleName: contact.middleName,
+    lastName: contact.lastName,
+    namePrefix: contact.namePrefix,
+    nameSuffix: contact.nameSuffix,
+    nickname: contact.nickname,
+    phoneticFirstName: contact.phoneticFirstName,
+    phoneticLastName: contact.phoneticLastName,
+    phoneticCompany: contact.phoneticCompany,
+    company: contact.company,
+    jobTitle: contact.jobTitle,
+    department: contact.department,
+    email: contact.email,
+    phone: contact.phone,
+    website: contact.website,
+    birthday: contact.birthday,
+    address: contact.address,
+    notes: contact.notes,
+  };
+  const editorEntries = {
+    emails: normaliseSimple(contact.emailEntries, contact.email, "Work"),
+    phones: normaliseSimple(contact.phoneEntries, contact.phone, "Mobile"),
+    websites: normaliseSimple(contact.websiteEntries, contact.website, "Portfolio"),
+    addresses: normaliseAddresses(contact.addressEntries, contact.address),
+    dates: normaliseDates(contact.significantDates),
+    related: normaliseRelated(contact.relatedPeople),
+  };
+
   return (
     <AppShell account={shellAccount} counts={shellCounts}>
+      <ContactEditProvider
+        contact={editorContact}
+        editableShared={!isLiveReceived}
+        entries={editorEntries}
+      >
       {/*
         Sub-header is a DIRECT child of the AppShell scroll container so that
         `sticky top-0` sticks for the entire scroll range. When it lives inside
@@ -474,6 +514,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 {contact.archivedAt ? "Restore" : "Archive"}
               </button>
             </form>
+            <ContactEditActions />
             <MoreMenu>
               {canAddToFamily ? (
                 <form action={addContactToFamilyBook}>
@@ -742,39 +783,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 viewerCanEdit={Boolean(familyMembership?.canEdit)}
               />
             ) : null}
-            <ContactInlineEditor
-              contact={{
-                id: contact.id,
-                fullName: contact.fullName,
-                firstName: contact.firstName,
-                middleName: contact.middleName,
-                lastName: contact.lastName,
-                namePrefix: contact.namePrefix,
-                nameSuffix: contact.nameSuffix,
-                nickname: contact.nickname,
-                phoneticFirstName: contact.phoneticFirstName,
-                phoneticLastName: contact.phoneticLastName,
-                phoneticCompany: contact.phoneticCompany,
-                company: contact.company,
-                jobTitle: contact.jobTitle,
-                department: contact.department,
-                email: contact.email,
-                phone: contact.phone,
-                website: contact.website,
-                birthday: contact.birthday,
-                address: contact.address,
-                notes: contact.notes,
-              }}
-              entries={{
-                emails: normaliseSimple(contact.emailEntries, contact.email, "Work"),
-                phones: normaliseSimple(contact.phoneEntries, contact.phone, "Mobile"),
-                websites: normaliseSimple(contact.websiteEntries, contact.website, "Portfolio"),
-                addresses: normaliseAddresses(contact.addressEntries, contact.address),
-                dates: normaliseDates(contact.significantDates),
-                related: normaliseRelated(contact.relatedPeople),
-              }}
-              editableShared={!isLiveReceived}
-            />
+            <ContactInlineEditor />
 
             <section className="overflow-hidden rounded-[14px] border border-[#d8ddd6] bg-white">
               <h3 className="px-5 pt-3.5 text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">
@@ -889,6 +898,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
           </main>
         </div>
       </div>
+      </ContactEditProvider>
     </AppShell>
   );
 }

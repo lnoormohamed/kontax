@@ -215,6 +215,7 @@ export function MultiValueGroup({
   addText,
   inputType = "text",
   editable,
+  onChange,
 }: {
   contactId: string;
   group: EntryGroupKey;
@@ -223,10 +224,16 @@ export function MultiValueGroup({
   addText: string;
   inputType?: string;
   editable: boolean;
+  /** Buffered mode: report changes up instead of persisting immediately. */
+  onChange?: (next: SimpleEntry[]) => void;
 }) {
   const [items, setItems] = useState<SimpleEntry[]>(initial);
 
   const persist = (next: SimpleEntry[]) => {
+    if (onChange) {
+      onChange(next);
+      return;
+    }
     void updateContactEntries(contactId, group, next).catch(() => {
       /* surfaced via revalidation; keep optimistic state */
     });
@@ -412,14 +419,21 @@ export function AddressGroup({
   contactId,
   initial,
   editable,
+  onChange,
 }: {
   contactId: string;
   initial: AddressEntry[];
   editable: boolean;
+  /** Buffered mode: report changes up instead of persisting immediately. */
+  onChange?: (next: AddressEntry[]) => void;
 }) {
   const [items, setItems] = useState<AddressEntry[]>(initial);
 
   const persist = (next: AddressEntry[]) => {
+    if (onChange) {
+      onChange(next);
+      return;
+    }
     void updateContactEntries(contactId, "addresses", next).catch(() => {
       /* optimistic */
     });
