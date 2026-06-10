@@ -3,23 +3,21 @@
 **Route:** `/sync`
 **Priority:** P1 — the core differentiator. Users who connect a CardDAV source get compound value from Kontax. The page must inspire confidence: green health dots, clear timestamps, no jargon beyond what is necessary.
 
-> **Freshness (2026-06-10) — needs realignment.** This page is **built but on the original dark theme** (cyan / `#08101c`), inconsistent with the **locked light design system** now used by the core surfaces (01/02/03/09/10). The *structure and content* are still valid; the visual treatment is what's stale. Send as a **"bring into the locked light system"** task — keep the layout/IA, restyle to ink `#1d2823` / green `#17352e` / blue `#4158f4` / hairline `#d8ddd6` / white surfaces / Geist. Note: inbound device connections (Kontax's own CardDAV server + app passwords) shipped in Phase 9 — reconcile the "reserved at the bottom" section with what now exists.
+> **Design decision locked (2026-06-10): light system.** This page uses the locked design language — ink `#1d2823`, secondary `#5c655e`, muted `#8b938c`, hairline `#d8ddd6`, surface `#f2f4f0`, brand green `#17352e`, CTA blue `#4158f4`, Geist. The current build is on the old dark theme and needs replacing. **Phase 9 note:** inbound device connections (Kontax as CardDAV server + app passwords) shipped and live in **Settings** — not on this page. The "Connect a device" placeholder at the bottom of this brief is retired; the sync page covers outbound connections only.
 
 ---
 
 ## Purpose
 
-The Sync Connections page lets a user manage their CardDAV client accounts — the external services that Kontax connects to in order to pull and push contacts. Examples: iCloud, Nextcloud, Fastmail, any CalDAV/CardDAV host. Each account has its own sync history, health status, and conflict queue.
+The Sync Connections page lets a user manage their CardDAV client accounts — the external services that Kontax connects to in order to pull and push contacts. Examples: iCloud, Nextcloud, Fastmail, any CardDAV host. Each account has its own sync history, health status, and conflict queue.
 
-This page is about **outbound connections from Kontax to other services**. It is distinct from Phase 9 (inbound connections: devices connecting to Kontax's own CardDAV server). The distinction must be visually clear — future sections for inbound device connections are reserved at the bottom of the page, separated by a divider and labelled differently.
+This page covers **outbound connections from Kontax to other services**. Inbound device connections (devices connecting to Kontax's CardDAV server) are managed in **Settings → Device connections**.
 
-The reference interaction model is a lightweight "source manager" — closer to how Reeder manages RSS feeds than a full iCloud settings panel. The left column is the source list; the right column is the detail and action panel. Focus and clarity over density.
+The interaction model is a lightweight source manager: left column is the account list, right column is detail and actions.
 
 ---
 
-## Layout
-
-### Overall structure (desktop ≥ 1280px)
+## Layout (Desktop ≥ 1280px)
 
 ```
 ┌──────────────────────────────────────────────────────────────────────┐
@@ -29,51 +27,32 @@ The reference interaction model is a lightweight "source manager" — closer to 
 │                                                                      │
 │  ┌────────────────────────┐  ┌───────────────────────────────────┐   │
 │  │  ACCOUNT LIST          │  │  ACCOUNT DETAIL PANEL             │   │
-│  │  (left column, fixed   │  │  (right column, scrollable)       │   │
-│  │   or sticky scroll)    │  │                                   │   │
-│  │                        │  │  ┌─────────────────────────────┐  │   │
-│  │  ┌──────────────────┐  │  │  │ Account name + URL          │  │   │
-│  │  │ iCloud    ● ──── │  │  │  │ Direction badge             │  │   │
-│  │  └──────────────────┘  │  │  │ Health summary              │  │   │
-│  │  ┌──────────────────┐  │  │  │ Last sync timestamp         │  │   │
-│  │  │ Nextcloud ● ──── │  │  │  └─────────────────────────────┘  │   │
-│  │  └──────────────────┘  │  │                                   │   │
-│  │  ┌──────────────────┐  │  │  ┌─────────────────────────────┐  │   │
-│  │  │ Fastmail  ● ──── │  │  │  │ SYNC JOB HISTORY table      │  │   │
-│  │  └──────────────────┘  │  │  └─────────────────────────────┘  │   │
+│  │  (left column, sticky) │  │  (right column, scrollable)       │   │
 │  │                        │  │                                   │   │
-│  │  [+ Add account]       │  │  ┌─────────────────────────────┐  │   │
-│  │                        │  │  │ CONFLICTS (if any)          │  │   │
-│  └────────────────────────┘  │  └─────────────────────────────┘  │   │
-│                              │                                   │   │
-│                              │  ACTION BUTTONS                   │   │
-│                              └───────────────────────────────────┘   │
-│                                                                      │
-│  ────────────────────────────────────────────────────────────────    │
-│                                                                      │
-│  ┌───────────────────────────────────────────────────────────────┐   │
-│  │  CONNECT A DEVICE (Phase 9 placeholder)                       │   │
-│  └───────────────────────────────────────────────────────────────┘   │
+│  │  ┌──────────────────┐  │  │  Account name · URL               │   │
+│  │  │ iCloud     ●     │  │  │  Direction badge · Health         │   │
+│  │  └──────────────────┘  │  │  Last sync timestamp              │   │
+│  │  ┌──────────────────┐  │  │  [Sync now] [Pause] [Edit] [Disc] │   │
+│  │  │ Nextcloud  ●     │  │  │                                   │   │
+│  │  └──────────────────┘  │  │  SYNC JOB HISTORY table          │   │
+│  │  ┌──────────────────┐  │  │                                   │   │
+│  │  │ Fastmail   ● err │  │  │  CONFLICTS (if any)               │   │
+│  │  └──────────────────┘  │  │                                   │   │
+│  │                        │  └───────────────────────────────────┘   │
+│  │  + Add account         │                                          │
+│  └────────────────────────┘                                          │
 └──────────────────────────────────────────────────────────────────────┘
 ```
 
-### Column proportions
+**Column proportions:** Left: 280px fixed. Right: fills remaining width, min 400px. Gap: 24px. Page padding: 32px each side. Max-width: 1200px centred.
 
-Left (account list): 280px fixed width. Right (detail panel): fills remaining width, min 400px.
-
-Gap between columns: 24px.
-
-Page horizontal padding: 32px each side on desktop. Max-width: 1200px, centred.
-
-### Tablet (768–1279px)
-
-The left column narrows to 240px. The detail panel takes the rest. On screens below ~960px, switch to a stacked layout: account list on top (full width, horizontal scroll if many accounts, or compact list), detail panel below.
+**Tablet (768–1279px):** Left narrows to 240px. Below ~960px, stack vertically: account list full-width on top, detail below.
 
 ---
 
 ## Back link
 
-Same style as `/settings`: `← Back to contacts`, 14px slate-500, top of content area, 20px margin below.
+`← Back to contacts` — `font-size: 14px`, `color: #5c655e`, `margin-bottom: 20px`.
 
 ---
 
@@ -83,10 +62,10 @@ Same style as `/settings`: `← Back to contacts`, 14px slate-500, top of conten
 
 ```
 ┌────────────────────────────┐
-│  Sync accounts             │
+│  SYNC ACCOUNTS             │  ← section label
 │                            │
 │  ┌──────────────────────┐  │
-│  │ [☁] iCloud       ●  │  │
+│  │ [☁] iCloud       ●  │  │  ← selected
 │  │     2 min ago        │  │
 │  └──────────────────────┘  │
 │  ┌──────────────────────┐  │
@@ -94,94 +73,75 @@ Same style as `/settings`: `← Back to contacts`, 14px slate-500, top of conten
 │  │     1 hour ago       │  │
 │  └──────────────────────┘  │
 │  ┌──────────────────────┐  │
-│  │ [✉] Fastmail      ●  │  │
-│  │     Error            │  │
+│  │ [✉] Fastmail      ●  │  │  ← error state
+│  │     Auth error       │  │
 │  └──────────────────────┘  │
 │                            │
 │  + Add account             │
 └────────────────────────────┘
 ```
 
-**Section label:** "Sync accounts" — 11px uppercase tracking-widest slate-400, 12px padding-bottom.
+**Section label:** "Sync accounts" — `font-size: 11px`, `font-weight: 700`, `letter-spacing: 0.1em`, `text-transform: uppercase`, `color: #8b938c`, `padding-bottom: 12px`.
 
-**Account list item:**
-- Height: 56px. Full width of the left column.
-- Left: platform icon (24×24px). Icons:
-  - iCloud: Apple iCloud icon (blue cloud) or a clean "☁" mark in #3b82f6
-  - Nextcloud: Nextcloud logo mark (green) or generic "N"
-  - Fastmail: Fastmail "FM" mark or envelope icon
-  - Generic/manual: grey cloud icon
-  - Use SVG icons. If a platform icon is unavailable, fall back to a grey cloud.
-- Middle (text block):
-  - Line 1: account label (14px semibold, slate-800). Truncated to one line with ellipsis.
-  - Line 2: relative timestamp "2 min ago" or error string "Auth error" (12px regular, slate-400 normally, red-500 on error).
-- Right: status dot (8px circle).
-  - Green (#16a34a): healthy
-  - Amber (#d97706): warning or needs attention
-  - Red (#dc2626): error or auth failed
-  - Grey (#94a3b8): paused
-  - The dot has a subtle pulse animation when a sync is in progress (2s loop, opacity 0.5–1.0).
-- Selected state: left border 3px brand green (#17352e), background: very light green tint (#f0fdf4).
-- Hover (unselected): background slate-50.
-- Click: loads account detail in the right panel. On mobile, navigates to a new view.
+**Account list item:** height 56px, full column width.
+- **Left:** platform icon, 24×24px. iCloud: blue cloud. Nextcloud: green N. Fastmail: envelope. Generic: cloud in `#8b938c`. SVG only — no raster.
+- **Centre:** name in `font-size: 14px`, `font-weight: 600`, `color: #1d2823` (truncated); timestamp / status string in `font-size: 12px`, `color: #8b938c` normally, `color: #b5472f` on error.
+- **Right:** status dot, 8px circle.
+  - Healthy: `#1f8a5b` (statusGreen)
+  - Warning / needs attention: `#bf8526` (amber)
+  - Error / auth failed: `#b5472f` (red)
+  - Paused / grey: `#8b938c` (muted)
+  - Syncing in progress: dot pulses (opacity 0.5–1, 2s loop)
+- **Selected state:** `border-left: 3px solid #17352e`, `background: #e3efe7` (statusGreenWash).
+- **Hover (unselected):** `background: #f2f4f0` (surface).
 
-**"+ Add account" button:**
-- Appears below the last account item, 8px gap.
-- Style: text button, `+` icon left, "Add account" label, 14px, `#4158f4`, no background.
-- Hover: underline.
-- Clicking: loads the Add Account form in the right detail panel (replaces whatever was shown there).
+**"+ Add account":** below the list, 8px gap. `color: #4158f4`, `font-size: 14px`, `font-weight: 500`, `+` icon left. Hover: underline. Opens the Add Account form in the right panel.
 
 ---
 
 ### 2. Account Detail Panel (right column)
 
-The detail panel has four zones stacked vertically:
+Four zones stacked vertically:
 
 ```
 ┌──────────────────────────────────────────────────────────┐
 │  ACCOUNT HEADER                                          │
-│  Large label · URL · Direction badge · Health summary   │
-│  Last sync: 2 minutes ago                               │
+│  Name · URL · Direction badge · Health summary           │
+│  Last synced: 2 minutes ago                              │
 │                                                          │
-│  ACTION BUTTONS                                          │
 │  [Sync now]  [Pause]  [Edit credentials]  [Disconnect]  │
 ├──────────────────────────────────────────────────────────┤
 │  SYNC JOB HISTORY                                        │
-│  Compact table                                           │
 ├──────────────────────────────────────────────────────────┤
-│  CONFLICTS (conditional)                                 │
-│  Only shown if conflicts exist                           │
+│  CONFLICTS (if any)                                      │
 └──────────────────────────────────────────────────────────┘
 ```
 
-**Account Header zone:**
+**Account Header:**
+- Account name: `font-size: 22px`, `font-weight: 600`, `color: #1d2823`.
+- URL: `font-size: 13px`, `color: #8b938c`, truncated, copy icon on hover.
+- **Direction badge:** pill, `font-size: 11px`, `font-weight: 600`, `border-radius: 999px`, `padding: 2px 10px`.
+  - Two-way: `background: #e3efe7`, `color: #1c6b48` (statusGreenWash / statusGreenText)
+  - Import only: `background: #f2f4f0`, `color: #5c655e`
+  - Export only: `background: #f2f4f0`, `color: #5c655e`
+- **Health summary:** `font-size: 13px`.
+  - Healthy: `● Connected` — `color: #1f8a5b`
+  - Warning: `● 3 consecutive failures` — `color: #bf8526`
+  - Error: `● Authentication failed` — `color: #b5472f`
+  - Paused: `● Paused` — `color: #8b938c`
+  - Re-auth needed: `● Re-authentication required` — `color: #bf8526`
+- Last sync: `font-size: 13px`, `color: #5c655e`.
 
-- Account label: 22px semibold, slate-900.
-- Below it: connection URL in 13px regular slate-400, truncated with a "copy" icon on hover.
-- Direction badge: pill chip. Options:
-  - "Two-way" — brand green bg (#dcfce7), green text (#166534)
-  - "Import only" — blue bg (#dbeafe), blue text (#1e40af)
-  - "Export only" — purple bg (#f3e8ff), purple text (#6b21a8)
-- Health summary line:
-  - Healthy: `● Connected` in green-600
-  - Warning: `● 3 consecutive failures` in amber-600
-  - Error: `● Authentication failed` in red-600
-  - Paused: `● Paused` in slate-400
-  - Needs re-auth: `● Re-authentication required` in amber-600
-- Last sync: "Last synced 2 minutes ago" or "Never synced" — 13px slate-500.
+**Action buttons:** horizontal row, `height: 34px`, `border-radius: 8px`, `font-size: 13px`, `font-weight: 600`.
+- **Sync now:** `background: #4158f4`, `color: #fff`. Hover: `#3347d8`. Disabled + spinner while syncing.
+- **Pause / Resume:** `border: 1px solid #d8ddd6`, `color: #1d2823`. Hover: `background: #f2f4f0`.
+- **Edit credentials:** `border: 1px solid #d8ddd6`, `color: #1d2823`. Hover: `background: #f2f4f0`.
+- **Disconnect:** `border: 1px solid #d8ddd6`, `color: #b5472f`. Hover: `background: #f3e1da`. Opens confirmation before disconnecting.
 
-**Action buttons zone:**
-
-Four buttons in a row (horizontal on desktop, wrap on narrow):
-- "Sync now" — primary, `#4158f4` bg, white text, 13px semibold, 36px height, rounded-lg. Disabled and shows spinner while sync is in progress.
-- "Pause" (or "Resume" when paused) — ghost button, slate-700, border #d8ddd6.
-- "Edit credentials" — ghost button, slate-700, border #d8ddd6. Opens a slide-in form or expands inline (see credential editing below).
-- "Disconnect" — ghost button, red-600 text, border red-200. Opens a confirmation modal before disconnecting.
-
-**Sync Job History zone:**
+**Sync Job History:**
 
 ```
-  Sync history
+  SYNC HISTORY
   ┌──────────────┬────────────┬──────────────────┬────────┐
   │ Date         │ Direction  │ Changes          │ Status │
   ├──────────────┼────────────┼──────────────────┼────────┤
@@ -193,22 +153,19 @@ Four buttons in a row (horizontal on desktop, wrap on narrow):
   Show older →
 ```
 
-- Section label: "Sync history" — 11px uppercase slate-400.
-- Table: no outer border, rows separated by 1px slate-100 divider.
-- Column widths: Date (auto), Direction (80px), Changes (120px), Status (60px).
-- Date: 13px regular slate-600. Same-day entries show time only ("14:32"). Prior days show day name or date.
-- Direction: small icon (↕ for two-way, ↓ for import, ↑ for export), 12px slate-500.
-- Changes: format "+X ~Y −Z" where X=created, Y=updated, Z=deleted. 13px monospace or tabular numbers, slate-600. Show "—" if no changes.
-- Status: ✓ in green-600, ✗ in red-600. On ✗, the cell is clickable and shows an error detail tooltip.
-- Show 5 rows by default. "Show older →" text link below loads more (paginated, or infinite scroll within the panel).
-- If no history: "No sync jobs yet. Click 'Sync now' to start." in slate-400, centered, 14px.
+- Section label: `font-size: 11px`, `font-weight: 700`, `letter-spacing: 0.1em`, `text-transform: uppercase`, `color: #8b938c`.
+- No outer border. Rows divided by `1px solid #e9ece7`.
+- Date: `font-size: 13px`, `color: #5c655e`.
+- Direction: small icon (↕/↓/↑), `color: #8b938c`.
+- Changes: "+X ~Y −Z" format, `font-size: 13px`, monospace (Geist Mono), `color: #5c655e`. "—" if none.
+- Status: ✓ in `#1f8a5b`, ✗ in `#b5472f`. Clicking ✗ shows error tooltip.
+- 5 rows default. "Show older →" text link, `color: #4158f4`.
+- Empty: "No sync jobs yet. Click 'Sync now' to start." — `color: #8b938c`, centred.
 
-**Conflicts zone (conditional):**
-
-Only appears if there are unresolved conflicts for this account.
+**Conflicts (conditional — only if unresolved conflicts exist):**
 
 ```
-  Open conflicts  (2)
+  OPEN CONFLICTS  (2)
   ┌────────────────────────────────────┬──────────────┐
   │ John Appleseed                     │ [Resolve →]  │
   │ Phone number conflict · Jun 5      │              │
@@ -218,215 +175,130 @@ Only appears if there are unresolved conflicts for this account.
   └────────────────────────────────────┴──────────────┘
 ```
 
-- Section label: "Open conflicts" with a count badge (red circle, white number, 16px circle).
-- Each row: contact name (14px semibold slate-800) + conflict description (13px slate-500) below it.
-- "Resolve →" button on the right: 13px `#4158f4`, text link style with hover underline.
-- Clicking "Resolve →" navigates to `/merge-suggestions/[id]` or a dedicated conflict resolution view.
-- If zero conflicts: this section is hidden entirely (not shown as "0 conflicts").
+- Section label + count badge: `background: #b5472f`, `color: #fff`, 16px circle.
+- Contact name: `font-size: 14px`, `font-weight: 600`, `color: #1d2823`. Conflict description: `font-size: 13px`, `color: #5c655e`.
+- "Resolve →": `color: #4158f4`, text link, hover underline. Links to `/merge-suggestions/[id]`.
+- Zero conflicts → section hidden entirely.
 
 ---
 
-### 3. Edit Credentials Flow
+### 3. Edit Credentials (inline expansion)
 
-Triggered by "Edit credentials" button in the action bar.
-
-The account header zone morphs into a form (inline expansion, not a modal):
+Triggered by "Edit credentials". Morphs the account header zone into a form:
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│  Edit credentials                        [×]             │
-│                                                          │
-│  Label         [iCloud contacts          ]               │
-│  Server URL    [https://contacts.icloud.com/…]          │
-│  Username      [user@icloud.com           ]              │
-│  Password      [••••••••••••••••          ] [show]       │
-│                                                          │
-│  [Test connection]                                       │
-│                                                          │
-│  [Save changes]     [Cancel]                             │
+│  Edit credentials                           [×]           │
+│  Label         [iCloud contacts            ]              │
+│  Server URL    [https://contacts.icloud.com/…]           │
+│  Username      [user@icloud.com            ]              │
+│  Password      [••••••••••••••••           ] [show]       │
+│                                                           │
+│  [Test connection]                                        │
+│  [Save changes]     [Cancel]                              │
 └──────────────────────────────────────────────────────────┘
 ```
 
-- The form slides in from the right or fades in over the header zone (CSS transition, ~200ms).
-- "Test connection" button: ghost style, tests the current form values against the server without saving. Returns a green "Connection successful" inline message or a red error.
-- "Save changes": `#4158f4` bg, white, full-width or aligned to left. Disabled until test succeeds, OR allow save without test (the user can choose to proceed without testing).
-- "Cancel": text link, closes the form and restores the account header view.
+- Slide-in / fade-in over the header zone, ~200ms.
+- Fields: `height: 44px`, `border-radius: 12px`, `border: 1px solid #d8ddd6`. Focus: `border-color: #4158f4`, `box-shadow: 0 0 0 3px rgba(65,88,244,0.18)`.
+- **Test connection:** `border: 1px solid #d8ddd6`, full-width or left-aligned. States: idle → spinner "Testing…" → green "Connection successful" (`color: #1f8a5b`) / red error (`color: #b5472f`).
+- **Save changes:** `background: #4158f4`, `color: #fff`.
+- **Cancel:** `color: #5c655e`, text button.
 
 ---
 
 ### 4. Add New Account Form
 
-Appears in the right detail panel when "+ Add account" is clicked. The left column still shows the account list (with no item selected).
+Appears in the right detail panel when "+ Add account" is clicked:
 
 ```
 ┌──────────────────────────────────────────────────────────┐
-│  Add sync account                                        │
-│                                                          │
-│  Quick-connect                                           │
-│  ┌────────────┐  ┌────────────┐  ┌────────────┐         │
-│  │  iCloud    │  │ Nextcloud  │  │  Fastmail  │         │
-│  └────────────┘  └────────────┘  └────────────┘         │
-│  ┌────────────┐                                          │
-│  │  Manual    │                                          │
-│  └────────────┘                                          │
-│                                                          │
-│  — or enter details manually —                           │
-│                                                          │
-│  Label         [                          ]              │
-│  Server URL    [                          ]              │
-│  Username      [                          ]              │
-│  Password      [                          ] [show]       │
-│                                                          │
-│  [Test connection]                                       │
-│                                                          │
-│  [Connect]     [Cancel]                                  │
+│  Add sync account                                         │
+│                                                           │
+│  Quick-connect                                            │
+│  ┌────────────┐  ┌────────────┐  ┌────────────┐          │
+│  │   iCloud   │  │ Nextcloud  │  │  Fastmail  │          │
+│  └────────────┘  └────────────┘  └────────────┘          │
+│  ┌────────────┐                                           │
+│  │   Manual   │                                           │
+│  └────────────┘                                           │
+│                                                           │
+│  Label         [                           ]              │
+│  Server URL    [                           ]              │
+│  Username      [                           ]              │
+│  Password      [                           ] [show]       │
+│                                                           │
+│  [Test connection]                                        │
+│  [Connect]     [Cancel]                                   │
 └──────────────────────────────────────────────────────────┘
 ```
 
-**Quick-connect tiles:**
-- 4 tiles in a 2×2 or horizontal row: iCloud, Nextcloud, Fastmail, Manual.
-- Each tile: 80px wide, 64px tall, platform icon (32px) centered + label below (11px, slate-600).
-- Clicking a tile pre-fills the Server URL with the canonical endpoint for that provider, and sets the Label. The user still fills in their credentials.
-- "Manual" tile: no pre-fill. Label blank, URL blank.
-- Selected tile gets a border: 2px `#4158f4`, background blue-50.
+**Quick-connect tiles:** 80×64px each. Platform icon (32px) + label (11px, `color: #5c655e`). `border: 1px solid #d8ddd6`, `border-radius: 10px`, `background: #fff`. Hover: `background: #f2f4f0`. Selected: `border: 2px solid #4158f4`, `background: #edf0fe`.
 
-**Form fields:**
-- Label, Server URL, Username, Password — standard input styling: border `#d8ddd6`, 12px radius, 44px height, 14px text.
-- Password field has a show/hide toggle (eye icon, 16px, slate-400).
-- All fields required. Inline validation on blur: red border + error text below field.
+**Form fields:** same as edit credentials above.
 
-**Test connection button:**
-- Ghost style, full-width or aligned left.
-- States: idle ("Test connection"), loading (spinner + "Testing…"), success (green check + "Connection successful"), failure (red × + "Could not connect: [error message]").
-- The test does a live round-trip from the server side.
-
-**Connect button:**
-- `#4158f4` bg, white, "Connect".
-- Clicking saves the account and triggers a first sync. The right panel transitions to the account detail view for the new account. The left list adds the new account item.
+**Connect:** `background: #4158f4`, `color: #fff`, "Connect". Triggers first sync and transitions to the new account's detail view.
 
 ---
 
 ## Health States (reference)
 
-| State | Dot colour | Label text | Detail panel message |
+| State | Dot | Label text | Detail message |
 |---|---|---|---|
-| Healthy | Green #16a34a | Last synced N ago | "Connected — syncing normally" |
-| Warning | Amber #d97706 | N ago | "3 consecutive sync failures — check credentials" |
-| Error | Red #dc2626 | Error | "Last sync failed: [error type]" |
-| Auth failed | Amber #d97706 | Auth error | "Re-authentication required. Update credentials." |
-| Paused | Grey #94a3b8 | Paused | "Sync is paused. Click Resume to continue." |
-| Never synced | Grey #94a3b8 | Never synced | "Click Sync now to start your first sync." |
-| Syncing | Animated green | Syncing… | "Sync in progress…" — progress spinner in action bar |
+| Healthy | `#1f8a5b` | Last synced N ago | "Connected — syncing normally" |
+| Warning | `#bf8526` | N ago | "3 consecutive sync failures" |
+| Error | `#b5472f` | Error | "Last sync failed: [error]" |
+| Auth failed | `#bf8526` | Auth error | "Re-authentication required" |
+| Paused | `#8b938c` | Paused | "Sync is paused. Click Resume." |
+| Never synced | `#8b938c` | Never synced | "Click Sync now to start." |
+| Syncing | `#1f8a5b` pulsing | Syncing… | "Sync in progress…" |
 
 ---
 
 ## Empty State (no accounts)
 
-When no accounts exist, the right panel is replaced by a full-width empty state centred in the page (or in the right column, which expands to fill the page on empty state).
+Full-width centred (replaces detail panel):
 
-```
-┌──────────────────────────────────────────────────────────┐
-│                                                          │
-│              [cloud sync illustration]                   │
-│                                                          │
-│          Connect your first sync account                 │
-│                                                          │
-│  Kontax connects to your existing contacts services      │
-│  via CardDAV, keeping everything in sync automatically.  │
-│                                                          │
-│  ┌────────┐  ┌───────────┐  ┌──────────┐                │
-│  │ iCloud │  │ Nextcloud │  │ Fastmail │                │
-│  └────────┘  └───────────┘  └──────────┘                │
-│                                                          │
-│            [+ Connect an account →]                      │
-│                                                          │
-└──────────────────────────────────────────────────────────┘
-```
-
-- Illustration: a minimal cloud with arrows (import/export direction) — a simple SVG, not a cartoon.
-- Headline: 20px semibold, slate-800.
-- Subtext: 14px regular, slate-500, max-width 380px centred.
-- Provider tiles: same style as the add form quick-connect tiles.
-- Primary CTA: "Connect an account →" — `#4158f4` bg, white text, rounded-xl, 44px height.
-- Left column (account list) still renders but shows only the "+ Add account" row — it does not disappear.
+- Icon: minimal cloud-sync SVG, 48px, `color: #d8ddd6`.
+- Headline: "Connect your first sync account" — `font-size: 20px`, `font-weight: 600`, `color: #1d2823`.
+- Subtext: "Kontax connects to your existing contacts services via CardDAV, keeping everything in sync automatically." — `font-size: 14px`, `color: #5c655e`, max-width 380px centred.
+- Quick-connect tiles (iCloud, Nextcloud, Fastmail) — same style as Add form.
+- CTA: `background: #4158f4`, `color: #fff`, "Connect an account →", `height: 44px`, `border-radius: 10px`.
+- Left column still renders (shows only "+ Add account").
 
 ---
 
 ## States
 
-**Loading**
-- Left column: 3 skeleton account items (icon circle + two bars).
-- Right panel: skeleton header zone (two bars), skeleton table rows.
+**Loading:** Skeleton account items (circle + two bars). Skeleton header zone + table rows. Skeleton `background: #f2f4f0`, animated shimmer.
 
-**Sync in progress**
-- Account list item: the status dot pulses.
-- Action bar: "Sync now" button is replaced by "Syncing…" with a spinner. It is disabled.
-- History table: a new row appears at the top with status "In progress" and an animated spinner in the Status column.
+**Sync in progress:** Dot pulses. "Sync now" → "Syncing…" + spinner (disabled). New history row at top: "In progress" + spinner in Status column.
 
-**First-time flow (new account added, never synced)**
-- After connecting, the detail panel shows: "Syncing for the first time…" with a progress bar if the count is known, or a spinner if not.
-- On completion: transitions to the normal healthy state, history table shows one row.
+**First-time sync:** "Syncing for the first time…" with progress bar if count known, spinner if not. Completes → healthy state.
 
-**Re-auth required**
-- The account item in the left list shows the amber dot and text "Re-auth required".
-- The detail panel shows a prominent amber banner at the top: "Re-authentication required. Your credentials may have changed or expired." with an "Update credentials →" link that opens the edit credentials form.
+**Re-auth required:** Amber dot in list. Amber banner at top of detail panel: `background: #f6edd9`, `border: 1px solid #e9ece7`, `color: #7a5a1a`. "Re-authentication required." + "Update credentials →" link.
 
-**Disconnect confirmation modal**
-- Title: "Disconnect [Account Name]?"
-- Body: "Contacts synced from this account will remain in Kontax but will no longer sync. This cannot be undone without reconnecting."
-- Two buttons: "Yes, disconnect" (red bg) and "Cancel" (ghost).
+**Disconnect confirmation:**
+- Title: "Disconnect [Account Name]?" — `font-size: 17px`, `font-weight: 700`, `color: #1d2823`.
+- Body: "Contacts synced from this account will remain in Kontax but will no longer sync." — `color: #5c655e`.
+- "Yes, disconnect": `background: #b5472f`, `color: #fff`. "Cancel": `color: #5c655e`, text.
 
 ---
 
 ## Mobile Layout (< 768px)
 
-The two-column layout collapses into a single-column flow:
+**Screen 1 — Account list (default):** Full-width items. "+ Add account" at bottom. Tap → navigate to Screen 2.
 
-**Screen 1: Account list view (default)**
-- Full-width account list, same item design but full width.
-- "+ Add account" at the bottom of the list.
-- Tapping an account item navigates forward (push transition) to Screen 2.
+**Screen 2 — Account detail:** Full-width panel. Back button "← Sync accounts" in sub-header. Action buttons wrap 2×2.
 
-**Screen 2: Account detail view**
-- Full-width detail panel.
-- A back button in the sub-header (or use the global header back affordance): "← Sync accounts".
-- Action buttons wrap to a 2×2 grid if needed, or scroll horizontally.
-- Sync history table: truncate columns. Show Date, Changes, Status. Direction is implied by the account's direction badge (shown in the header).
-- Conflicts section: same, below history.
-
-**Add account (mobile)**
-- Triggered from the list view "+ Add account".
-- Full-screen form. Quick-connect tiles are a 2×2 grid.
-- Keyboard: Server URL input triggers URL keyboard. Username triggers email keyboard.
+**Add account (mobile):** Full-screen form. Quick-connect tiles in 2×2 grid.
 
 ---
 
 ## Future Additions
 
-### Phase 9 — Connect a Device (CardDAV Server)
+### Sync frequency controls
+A "Sync every N hours" or "Manual only" selector per account. Inserts in the account header zone below the action buttons.
 
-This is the **inbound** counterpart: devices (iPhone, Android, macOS Contacts) connecting TO Kontax as a CardDAV server. It is completely separate from the client sync accounts above.
-
-A section at the bottom of the page, below a horizontal divider:
-
-```
-────────────────────────────────────────────────────────
-
-  Connect a device
-  Add Kontax to your iPhone, Android, or macOS Contacts
-  app. Your contacts stay in sync automatically.
-
-  [iPhone]  [Android]  [macOS]
-
-  App passwords                      [Generate password →]
-  Device          Created    Last used
-  iPhone 15       Jun 1      Today
-  MacBook         May 28     Yesterday
-                                     [Revoke]
-```
-
-- Design now: show this section as a placeholder card with the same lock / "Coming soon" treatment used in Settings.
-- Label: "Connect a device"
-- Description: "Use Kontax as your CardDAV contacts server for iPhone, Android, and macOS."
-- State: lock icon + "Coming soon" badge. No interactive elements.
-- When Phase 9 ships, this card expands in-place to show the full device connection UI, including platform setup guides and app password management.
+### Conflict queue page
+When conflicts are numerous, a dedicated `/sync/conflicts` page lists all conflicts across all accounts. The conflicts section in the detail panel links to it.
