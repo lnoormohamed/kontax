@@ -1616,3 +1616,16 @@ export const resolveSyncConflict = async (formData: FormData) => {
   revalidateSyncViews();
   redirect(redirectTo);
 };
+
+export const disconnectSyncAccount = async (formData: FormData) => {
+  const userId = await getRequiredUserId();
+  const syncAccountId = parseSyncAccountId(formData);
+  const redirectTo = getRedirectTarget(formData) ?? "/sync";
+
+  await db.syncAccount.deleteMany({
+    where: { id: syncAccountId, userId },
+  });
+
+  revalidateSyncViews();
+  redirect(redirectTo);
+};

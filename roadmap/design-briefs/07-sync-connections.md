@@ -11,7 +11,7 @@
 
 The Sync Connections page lets a user manage their CardDAV client accounts — the external services that Kontax connects to in order to pull and push contacts. Examples: iCloud, Nextcloud, Fastmail, any CardDAV host. Each account has its own sync history, health status, and conflict queue.
 
-This page covers **outbound connections from Kontax to other services**. Inbound device connections (devices connecting to Kontax's CardDAV server) are managed in **Settings → Device connections**.
+This page covers **outbound connections from Kontax to other services**. Inbound device connections (devices connecting to Kontax's CardDAV server) are managed in **Settings → Devices & app passwords** (`/settings/devices`).
 
 The interaction model is a lightweight source manager: left column is the account list, right column is detail and actions.
 
@@ -162,22 +162,33 @@ Four zones stacked vertically:
 - 5 rows default. "Show older →" text link, `color: #4158f4`.
 - Empty: "No sync jobs yet. Click 'Sync now' to start." — `color: #8b938c`, centred.
 
-**Conflicts (conditional — only if unresolved conflicts exist):**
+**Conflicts (conditional — only if unresolved sync conflicts exist):**
+
+> **Important — resolve in place, do not link out.** Sync conflicts are their own thing (a `SyncConflict` recorded when both Kontax and the remote address book changed a contact after the last healthy cursor). They are **not** merge suggestions and do **not** route to `/merge-suggestions/[id]`. Resolution happens **inside this panel** via `resolveSyncConflict`, with a side-by-side local-vs-remote comparison and three outcomes: **Keep local** (`KEEP_LOCAL`), **Keep remote** (`KEEP_REMOTE`), or **Manual merge** (`MANUAL_MERGE`).
 
 ```
   OPEN CONFLICTS  (2)
-  ┌────────────────────────────────────┬──────────────┐
-  │ John Appleseed                     │ [Resolve →]  │
-  │ Phone number conflict · Jun 5      │              │
-  ├────────────────────────────────────┼──────────────┤
-  │ Jane Doe                           │ [Resolve →]  │
-  │ Email address conflict · Jun 3     │              │
-  └────────────────────────────────────┴──────────────┘
+  ┌──────────────────────────────────────────────────────────┐
+  │  John Appleseed · phone number · Jun 5        [▾ Review]  │
+  │  ── expands to the resolver ──                           │
+  │                                                          │
+  │   Field        Kontax (local)      Remote               │
+  │   Phone        +1 415 555 0100     +1 415 555 0199      │
+  │   …only the differing fields are shown…                 │
+  │                                                          │
+  │   [ Keep local ]  [ Keep remote ]  [ Manual merge → ]    │
+  ├──────────────────────────────────────────────────────────┤
+  │  Jane Doe · email address · Jun 3             [▾ Review]  │
+  └──────────────────────────────────────────────────────────┘
 ```
 
 - Section label + count badge: `background: #b5472f`, `color: #fff`, 16px circle.
-- Contact name: `font-size: 14px`, `font-weight: 600`, `color: #1d2823`. Conflict description: `font-size: 13px`, `color: #5c655e`.
-- "Resolve →": `color: #4158f4`, text link, hover underline. Links to `/merge-suggestions/[id]`.
+- **Row (collapsed):** contact name `font-size: 14px`, `font-weight: 600`, `color: #1d2823`; conflict summary (field + date) `font-size: 13px`, `color: #5c655e`; a **Review** disclosure on the right (`color: #4158f4`).
+- **Resolver (expanded):** a compact **two-column comparison** — `Field | Kontax (local) | Remote` — showing only the fields that differ, with the two values side by side. Differing cells subtly tinted so the user can scan them.
+- **Outcome buttons:** `height: 34px`, `border-radius: 8px`, `font-size: 13px`, `font-weight: 600`.
+  - **Keep local** / **Keep remote:** `border: 1px solid #d8ddd6`, `color: #1d2823`, hover `background: #f2f4f0`.
+  - **Manual merge →:** `background: #4158f4`, `color: #fff` — opens the field-level manual-merge step (`getManualMergePreview`) where the user composes the surviving value per field.
+  - On resolve: the row collapses out with a brief "Resolved" confirmation; the count badge decrements.
 - Zero conflicts → section hidden entirely.
 
 ---
@@ -208,6 +219,8 @@ Triggered by "Edit credentials". Morphs the account header zone into a form:
 ---
 
 ### 4. Add New Account Form
+
+> **Current build vs. proposed.** Today the add flow is a **manual CardDAV form only** (Label · Server URL · Username · Provider app password · direction). The **Quick-connect tiles below are a proposed enhancement, not yet built** — design them, but mark them clearly as net-new so engineering knows they require new provider-preset logic. The manual form is the must-have; quick-connect is the nice-to-have on top.
 
 Appears in the right detail panel when "+ Add account" is clicked:
 
@@ -249,8 +262,11 @@ Appears in the right detail panel when "+ Add account" is clicked:
 | Warning | `#bf8526` | N ago | "3 consecutive sync failures" |
 | Error | `#b5472f` | Error | "Last sync failed: [error]" |
 | Auth failed | `#bf8526` | Auth error | "Re-authentication required" |
-| Paused | `#8b938c` | Paused | "Sync is paused. Click Resume." |
+| Paused by choice | `#8b938c` | Paused | "Sync is paused. Click Resume." |
+| Paused for safety | `#bf8526` | Paused | "Auto-paused after repeated failures. Fix the issue, then Resume." |
 | Never synced | `#8b938c` | Never synced | "Click Sync now to start." |
+
+> **Two paused sub-states.** The build distinguishes **paused by choice** (the user hit Pause — muted/grey) from **paused for safety** (auto-paused after the consecutive-failure streak — amber, and the detail panel should explain the cause and recovery). Design both; don't collapse them into one "Paused".
 | Syncing | `#1f8a5b` pulsing | Syncing… | "Sync in progress…" |
 
 ---
@@ -262,7 +278,7 @@ Full-width centred (replaces detail panel):
 - Icon: minimal cloud-sync SVG, 48px, `color: #d8ddd6`.
 - Headline: "Connect your first sync account" — `font-size: 20px`, `font-weight: 600`, `color: #1d2823`.
 - Subtext: "Kontax connects to your existing contacts services via CardDAV, keeping everything in sync automatically." — `font-size: 14px`, `color: #5c655e`, max-width 380px centred.
-- Quick-connect tiles (iCloud, Nextcloud, Fastmail) — same style as Add form.
+- Quick-connect tiles (iCloud, Nextcloud, Fastmail) — same style as Add form. _(Proposed/net-new — see §4; today the empty state leads straight into the manual form.)_
 - CTA: `background: #4158f4`, `color: #fff`, "Connect an account →", `height: 44px`, `border-radius: 10px`.
 - Left column still renders (shows only "+ Add account").
 

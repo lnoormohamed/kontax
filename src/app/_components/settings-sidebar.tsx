@@ -28,12 +28,12 @@ const SECTIONS = [
   { href: "/settings/profile", icon: "people", label: "Profile" },
   { href: "/settings/preferences", icon: "gear", label: "Preferences" },
   { href: "/settings/devices", icon: "phone", label: "Devices & app passwords" },
+  { href: "/sync", icon: "sync", label: "Sync connections" },
   { href: "/settings/security", icon: "emergency", label: "Security & session" },
 ] as const;
 
 const JUMP_LINKS = [
   { href: "/import-export", icon: "upload", label: "Import & export" },
-  { href: "/sync", icon: "sync", label: "Device & sync" },
   { href: "/merge/manual", icon: "merge", label: "Merge review" },
 ] as const;
 

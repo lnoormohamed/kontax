@@ -1,1969 +1,308 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
-import {
-  activateSyncAccount,
-  attachSyncCredentials,
-  createSyncAccount,
-  pauseSyncAccount,
-  prepareSyncRelink,
-  queueSyncJob,
-  revalidateSyncAccount,
-  revokeSyncCredentials,
-  resolveSyncConflict,
-  retrySyncJob,
-} from "~/app/actions/sync";
+import { SettingsSidebar } from "~/app/_components/settings-sidebar";
+import { SearchInput } from "~/app/_components/search-input";
+import { UserMenu } from "~/app/_components/user-menu";
+import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
 import { db } from "~/server/db";
+import { getUserFamilyMembership } from "~/server/family-access";
+import { getUserTeamMembership } from "~/server/team-access";
 import {
-  AUTO_PAUSE_FAILURE_STREAK,
   getConsecutiveFailureStreak,
   getSyncAccountOperationalHealth,
-  getSyncErrorSupportBucket,
 } from "~/server/sync-health";
-import { getSyncCredentialEncryptionStatus } from "~/server/sync-credentials";
+import {
+  SyncPageClient,
+  type SyncAccountData,
+  type SyncJobRow,
+  type SyncConflictData,
+} from "./_components/sync-page-client";
 
-type SyncPageProps = {
+// ── helpers ───────────────────────────────────────────────────────────────────
+const getInitials = (value: string) =>
+  value
+    .split(/\s+/)
+    .map((part) => part.trim()[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+
+const formatRelative = (date: Date | null): string | null => {
+  if (!date) return null;
+  const diffMs = Date.now() - date.getTime();
+  const diffMins = Math.floor(diffMs / 60_000);
+  if (diffMins < 2) return "Just now";
+  if (diffMins < 60) return `${diffMins} min ago`;
+  const diffHours = Math.floor(diffMins / 60);
+  if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? "" : "s"} ago`;
+  const diffDays = Math.floor(diffHours / 24);
+  if (diffDays < 7) return `${diffDays} day${diffDays === 1 ? "" : "s"} ago`;
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  }).format(date);
+};
+
+const formatJobTimestamp = (date: Date): string => {
+  const now = new Date();
+  const isToday =
+    date.getFullYear() === now.getFullYear() &&
+    date.getMonth() === now.getMonth() &&
+    date.getDate() === now.getDate();
+  const yesterday = new Date(now);
+  yesterday.setDate(yesterday.getDate() - 1);
+  const isYesterday =
+    date.getFullYear() === yesterday.getFullYear() &&
+    date.getMonth() === yesterday.getMonth() &&
+    date.getDate() === yesterday.getDate();
+
+  const time = new Intl.DateTimeFormat("en-GB", {
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+
+  if (isToday) return `Today ${time}`;
+  if (isYesterday) return `Yesterday ${time}`;
+  return new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "short" }).format(date);
+};
+
+// Extract a human-readable snapshot summary for conflict comparison rows.
+// The snapshots are stored as JSON blobs in the DB.
+const getSnapshotText = (snapshot: unknown, key: string): string => {
+  if (typeof snapshot !== "object" || snapshot === null) return "—";
+  const val = (snapshot as Record<string, unknown>)[key];
+  if (typeof val === "string" && val.trim()) return val.trim();
+  if (Array.isArray(val) && val.length > 0) {
+    return val
+      .filter((v): v is string => typeof v === "string" && v.trim().length > 0)
+      .join(" | ") || "—";
+  }
+  return "—";
+};
+
+const buildConflictRows = (
+  local: unknown,
+  remote: unknown,
+): Array<{ label: string; local: string; remote: string }> => {
+  const fields: Array<[string, string]> = [
+    ["Full name", "fullName"],
+    ["Emails", "emailAddresses"],
+    ["Phones", "phoneNumbers"],
+    ["Company", "company"],
+    ["Job title", "jobTitle"],
+    ["Website", "website"],
+    ["Birthday", "birthday"],
+    ["Notes", "notes"],
+  ];
+  return fields
+    .map(([label, key]) => ({
+      label,
+      local: getSnapshotText(local, key),
+      remote: getSnapshotText(remote, key),
+    }))
+    .filter((r) => r.local !== "—" || r.remote !== "—");
+};
+
+// ── page ──────────────────────────────────────────────────────────────────────
+type PageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
 
-const formatTimestamp = (value: Date | null) =>
-  value
-    ? new Intl.DateTimeFormat("en-GB", {
-        day: "2-digit",
-        month: "short",
-        year: "numeric",
-        hour: "2-digit",
-        minute: "2-digit",
-      }).format(value)
-    : "Not yet";
+export default async function SyncPage({ searchParams }: PageProps) {
+  const session = await auth();
+  if (!session?.user?.id) redirect("/login");
+  const userId = session.user.id;
 
-const getSearchValue = (
-  searchParams: Record<string, string | string[] | undefined> | undefined,
-  key: string,
-) => {
-  const value = searchParams?.[key];
-  return Array.isArray(value) ? value[0] : value;
-};
-
-const getEncryptionModeLabel = (mode: "dedicated" | "auth-secret-fallback" | "missing") => {
-  switch (mode) {
-    case "dedicated":
-      return "Dedicated sync key";
-    case "auth-secret-fallback":
-      return "AUTH_SECRET fallback";
-    default:
-      return "Not configured";
-  }
-};
-
-const getCredentialStateLabel = (account: {
-  credentialReference: string | null;
-  credentialRevokedAt: Date | null;
-}) => {
-  if (!account.credentialReference) {
-    return "Missing";
-  }
-
-  if (account.credentialRevokedAt) {
-    return "Revoked";
-  }
-
-  return "Active";
-};
-
-const getConnectionValidationLabel = (account: {
-  credentialReference: string | null;
-  credentialUpdatedAt: Date | null;
-  credentialLastValidatedAt: Date | null;
-  credentialRevokedAt: Date | null;
-  connectionValidatedAt: Date | null;
-}) => {
-  if (!account.credentialReference) {
-    return "Pending credentials";
-  }
-
-  if (account.credentialRevokedAt) {
-    return "Credentials revoked";
-  }
-
-  if (!account.credentialLastValidatedAt || !account.connectionValidatedAt) {
-    return "Validation required";
-  }
-
-  if (
-    account.credentialUpdatedAt &&
-    account.credentialLastValidatedAt.getTime() < account.credentialUpdatedAt.getTime()
-  ) {
-    return "Revalidation required";
-  }
-
-  return "Validated";
-};
-
-const getSyncAccountGuidance = (account: {
-  status: "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR";
-  credentialReference: string | null;
-  credentialRevokedAt: Date | null;
-  credentialUpdatedAt: Date | null;
-  credentialLastValidatedAt: Date | null;
-  connectionValidatedAt: Date | null;
-  lastErrorCode: string | null;
-  lastErrorMessage: string | null;
-}) => {
-  if (!account.credentialReference) {
-    return {
-      tone: "border-amber-300/20 bg-amber-300/10 text-amber-100",
-      title: "Add encrypted credentials",
-      body: "This account exists, but it cannot connect again until you attach CardDAV credentials.",
-    };
-  }
-
-  if (account.credentialRevokedAt || account.status === "NEEDS_REAUTH") {
-    return {
-      tone: "border-rose-300/20 bg-rose-300/10 text-rose-100",
-      title: "Credentials need attention",
-      body:
-        "The stored login is revoked or expired. Save fresh credentials, then run revalidate before queueing another sync.",
-    };
-  }
-
-  if (
-    !account.credentialLastValidatedAt ||
-    !account.connectionValidatedAt ||
-    (account.credentialUpdatedAt &&
-      account.credentialLastValidatedAt.getTime() < account.credentialUpdatedAt.getTime())
-  ) {
-    return {
-      tone: "border-cyan-300/20 bg-cyan-300/10 text-cyan-100",
-      title: "Revalidate before the next run",
-      body:
-        "Kontax has credentials, but the live CardDAV connection has not been freshly validated against the current secret and address book metadata.",
-    };
-  }
-
-  if (account.lastErrorCode || account.lastErrorMessage) {
-    return {
-      tone: "border-amber-300/20 bg-amber-300/10 text-amber-100",
-      title: "Recover from the latest sync issue",
-      body:
-        account.lastErrorMessage ??
-        "The last sync attempt needs attention. Revalidate if the provider changed, then retry a queued recovery run.",
-    };
-  }
-
-  if (account.status === "PAUSED") {
-    return {
-      tone: "border-slate-200/10 bg-white/5 text-slate-200",
-      title: "Paused by choice",
-      body:
-        "This connection is healthy enough to keep, but it will stay idle until you mark it active or queue another run.",
-    };
-  }
-
-  return {
-    tone: "border-emerald-300/20 bg-emerald-300/10 text-emerald-100",
-    title: "Ready for the next sync run",
-    body:
-      "Credentials and CardDAV discovery are both validated. You can queue the next import-first run with confidence.",
+  const resolvedParams = searchParams ? await searchParams : {};
+  const getParam = (key: string) => {
+    const v = resolvedParams[key];
+    return Array.isArray(v) ? v[0] : v;
   };
-};
 
-const getSyncLinkStatus = (link: {
-  lastSyncedAt: Date | null;
-  tombstonedAt: Date | null;
-  remoteDeletedAt: Date | null;
-  lastErrorCode: string | null;
-}) => {
-  if (link.tombstonedAt) {
-    return "Local tombstone";
-  }
+  const initialAccountId = getParam("account") ?? null;
 
-  if (link.remoteDeletedAt) {
-    return "Remote delete detected";
-  }
+  // Build flash message from redirect params
+  const flashMsg = (() => {
+    if (getParam("connected") === "1")
+      return "CardDAV account connected successfully — first sync queued.";
+    if (getParam("queued") === "1") return "Sync queued.";
+    if (getParam("paused") === "1") return "Sync paused.";
+    if (getParam("credentialsSaved") === "1") return "Credentials updated.";
+    if (getParam("credentialsRevoked") === "1") return "Credentials revoked.";
+    if (getParam("conflictResolved") === "1") return "Conflict resolved.";
+    if (getParam("connectFailed") === "1")
+      return getParam("connectError") ?? "Connection failed — check your URL and credentials.";
+    if (getParam("preflightFailed") === "1")
+      return "Preflight failed — check the account error state and try again.";
+    return null;
+  })();
 
-  if (link.lastErrorCode) {
-    return "Needs review";
-  }
+  const [planSummary, familyMembership, teamMembership, incomingShares, rawAccounts] =
+    await Promise.all([
+      getUserPlanSummary(userId),
+      getUserFamilyMembership(userId),
+      getUserTeamMembership(userId),
+      db.contactShare.count({
+        where: {
+          recipientUserId: userId,
+          shareType: { in: ["STATIC_COPY", "LIVE_SYNC"] },
+          status: "ACTIVE",
+          recipientContactId: null,
+        },
+      }),
+      db.syncAccount.findMany({
+        where: { userId },
+        orderBy: [{ updatedAt: "desc" }],
+        include: {
+          syncJobs: {
+            orderBy: { createdAt: "desc" },
+            take: 10,
+            select: {
+              id: true,
+              status: true,
+              syncDirection: true,
+              errorCode: true,
+              errorSummary: true,
+              createdCount: true,
+              updatedCount: true,
+              deletedCount: true,
+              createdAt: true,
+              completedAt: true,
+              startedAt: true,
+            },
+          },
+          syncConflicts: {
+            where: { status: "OPEN" },
+            orderBy: { detectedAt: "desc" },
+            take: 10,
+            include: {
+              contact: { select: { id: true, fullName: true } },
+            },
+          },
+        },
+      }),
+    ]);
 
-  if (link.lastSyncedAt) {
-    return "Linked and healthy";
-  }
+  // Serialise to plain data for client component
+  const accounts: SyncAccountData[] = rawAccounts.map((acct) => {
+    const recentJobs = acct.syncJobs.map((j) => ({
+      status: j.status as "QUEUED" | "RUNNING" | "SUCCEEDED" | "PARTIAL" | "FAILED",
+      errorCode: j.errorCode,
+    }));
 
-  return "Linked, waiting for first sync";
-};
+    const health = getSyncAccountOperationalHealth({
+      status: acct.status,
+      lastErrorCode: acct.lastErrorCode,
+      recentJobs,
+    });
 
-const getHealthPresentation = (account: {
-  status: "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR";
-  lastErrorCode: string | null;
-  syncJobs: Array<{
-    status: "QUEUED" | "RUNNING" | "SUCCEEDED" | "PARTIAL" | "FAILED";
-    errorCode: string | null;
-  }>;
-}) => {
-  const health = getSyncAccountOperationalHealth({
-    status: account.status,
-    lastErrorCode: account.lastErrorCode,
-    recentJobs: account.syncJobs,
+    const jobs: SyncJobRow[] = acct.syncJobs.map((j) => ({
+      id: j.id,
+      when: formatJobTimestamp(j.completedAt ?? j.startedAt ?? j.createdAt),
+      direction: j.syncDirection as "TWO_WAY" | "IMPORT_ONLY" | "EXPORT_ONLY",
+      added: j.createdCount,
+      modified: j.updatedCount,
+      deleted: j.deletedCount,
+      status: j.status === "SUCCEEDED" || j.status === "PARTIAL" ? "ok" : "fail",
+      error: j.errorSummary ?? null,
+    }));
+
+    const conflicts: SyncConflictData[] = acct.syncConflicts.map((cf) => ({
+      id: cf.id,
+      contactName: cf.contact?.fullName ?? "Unknown contact",
+      field: cf.conflictType.toLowerCase().replace(/_/g, " "),
+      date: formatJobTimestamp(cf.detectedAt),
+      comparisonRows: buildConflictRows(cf.localSnapshot, cf.remoteSnapshot),
+    }));
+
+    return {
+      id: acct.id,
+      label: acct.label,
+      baseUrl: acct.baseUrl,
+      direction: acct.syncDirection as "TWO_WAY" | "IMPORT_ONLY" | "EXPORT_ONLY",
+      status: acct.status as "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR",
+      health,
+      lastSyncedAtRelative: formatRelative(acct.lastSyncedAt),
+      lastErrorMessage: acct.lastErrorMessage ?? null,
+      consecutiveFailures: getConsecutiveFailureStreak(recentJobs),
+      jobs,
+      conflicts,
+    };
   });
 
-  switch (health) {
-    case "needs_reauth":
-      return {
-        label: "Needs reauthentication",
-        tone: "border-rose-300/20 bg-rose-300/10 text-rose-100",
-      };
-    case "paused_for_safety":
-      return {
-        label: "Paused for safety",
-        tone: "border-amber-300/20 bg-amber-300/10 text-amber-100",
-      };
-    case "needs_attention":
-      return {
-        label: "Needs attention",
-        tone: "border-amber-300/20 bg-amber-300/10 text-amber-100",
-      };
-    case "watch":
-      return {
-        label: "Watch closely",
-        tone: "border-cyan-300/20 bg-cyan-300/10 text-cyan-100",
-      };
-    default:
-      return {
-        label: "Healthy",
-        tone: "border-emerald-300/20 bg-emerald-300/10 text-emerald-100",
-      };
+  const userLabel = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
+
+  const shared: Array<{ id: "family" | "teams"; label: string; icon: string }> = [];
+  if (familyMembership || planSummary.plan === "FAMILY") {
+    shared.push({ id: "family", label: "Family management", icon: "users" });
   }
-};
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null;
-
-const getSnapshotStringArray = (value: unknown) =>
-  Array.isArray(value)
-    ? value.filter((item): item is string => typeof item === "string" && item.trim().length > 0)
-    : [];
-
-const getSnapshotAddressArray = (value: unknown) =>
-  Array.isArray(value)
-    ? value
-        .flatMap((item) => {
-          if (!isRecord(item)) {
-            return [];
-          }
-
-          const formatted = item.formatted;
-          return typeof formatted === "string" && formatted.trim().length > 0 ? [formatted] : [];
-        })
-        .filter(Boolean)
-    : [];
-
-const normalizeSnapshotText = (value: string | null) => {
-  const trimmed = value?.trim();
-  return trimmed && trimmed.length > 0 ? trimmed : "—";
-};
-
-const getConflictSnapshotView = (snapshot: unknown) => {
-  if (!isRecord(snapshot)) {
-    return null;
+  if (teamMembership || planSummary.plan === "TEAMS") {
+    shared.push({ id: "teams", label: "Team management", icon: "team" });
   }
-
-  const emailValues = getSnapshotStringArray(snapshot.emailAddresses);
-  const phoneValues = getSnapshotStringArray(snapshot.phoneNumbers);
-  const addressValues = getSnapshotAddressArray(snapshot.postalAddresses);
-  const deleted = snapshot.deleted === true;
-
-  return {
-    fullName:
-      typeof snapshot.fullName === "string" && snapshot.fullName.trim().length > 0
-        ? snapshot.fullName
-        : "—",
-    emails:
-      emailValues.length > 0
-        ? emailValues.join(" | ")
-        : typeof snapshot.email === "string" && snapshot.email.trim().length > 0
-          ? snapshot.email
-          : "—",
-    phones:
-      phoneValues.length > 0
-        ? phoneValues.join(" | ")
-        : typeof snapshot.phone === "string" && snapshot.phone.trim().length > 0
-          ? snapshot.phone
-          : "—",
-    company:
-      typeof snapshot.company === "string" && snapshot.company.trim().length > 0
-        ? snapshot.company
-        : "—",
-    jobTitle:
-      typeof snapshot.jobTitle === "string" && snapshot.jobTitle.trim().length > 0
-        ? snapshot.jobTitle
-        : "—",
-    website:
-      typeof snapshot.website === "string" && snapshot.website.trim().length > 0
-        ? snapshot.website
-        : "—",
-    birthday:
-      typeof snapshot.birthday === "string" && snapshot.birthday.trim().length > 0
-        ? snapshot.birthday
-        : "—",
-    address:
-      addressValues.length > 0
-        ? addressValues.join(" | ")
-        : typeof snapshot.address === "string" && snapshot.address.trim().length > 0
-          ? snapshot.address
-          : "—",
-    notes:
-      typeof snapshot.notes === "string" && snapshot.notes.trim().length > 0
-        ? snapshot.notes
-        : "—",
-    deleted,
-  };
-};
-
-const getConflictComparisonRows = (localSnapshot: unknown, remoteSnapshot: unknown) => {
-  const local = getConflictSnapshotView(localSnapshot);
-  const remote = getConflictSnapshotView(remoteSnapshot);
-
-  if (!local && !remote) {
-    return [];
-  }
-
-  const rows = [
-    {
-      label: "Full name",
-      local: normalizeSnapshotText(local?.fullName ?? null),
-      remote: normalizeSnapshotText(remote?.fullName ?? null),
-    },
-    {
-      label: "Emails",
-      local: normalizeSnapshotText(local?.emails ?? null),
-      remote: normalizeSnapshotText(remote?.emails ?? null),
-    },
-    {
-      label: "Phones",
-      local: normalizeSnapshotText(local?.phones ?? null),
-      remote: normalizeSnapshotText(remote?.phones ?? null),
-    },
-    {
-      label: "Company",
-      local: normalizeSnapshotText(local?.company ?? null),
-      remote: normalizeSnapshotText(remote?.company ?? null),
-    },
-    {
-      label: "Job title",
-      local: normalizeSnapshotText(local?.jobTitle ?? null),
-      remote: normalizeSnapshotText(remote?.jobTitle ?? null),
-    },
-    {
-      label: "Website",
-      local: normalizeSnapshotText(local?.website ?? null),
-      remote: normalizeSnapshotText(remote?.website ?? null),
-    },
-    {
-      label: "Birthday",
-      local: normalizeSnapshotText(local?.birthday ?? null),
-      remote: normalizeSnapshotText(remote?.birthday ?? null),
-    },
-    {
-      label: "Address",
-      local: normalizeSnapshotText(local?.address ?? null),
-      remote: normalizeSnapshotText(remote?.address ?? null),
-    },
-    {
-      label: "Notes",
-      local: normalizeSnapshotText(local?.notes ?? null),
-      remote: normalizeSnapshotText(remote?.notes ?? null),
-    },
-    {
-      label: "Remote delete intent",
-      local: local?.deleted ? "Local tombstone" : "Local still active",
-      remote: remote?.deleted ? "Remote missing / deleted" : "Remote still active",
-    },
-  ];
-
-  return rows.filter(
-    (row) => row.local !== "—" || row.remote !== "—" || row.label === "Remote delete intent",
-  );
-};
-
-const getSnapshotScalarValue = (snapshot: unknown, key: string) => {
-  if (!isRecord(snapshot)) {
-    return null;
-  }
-
-  const value = snapshot[key];
-  return typeof value === "string" && value.trim().length > 0 ? value.trim() : null;
-};
-
-const mergeDisplayList = (values: string[]) => {
-  const seen = new Set<string>();
-  const merged: string[] = [];
-
-  for (const value of values) {
-    const normalized = value.trim();
-    if (!normalized) {
-      continue;
-    }
-
-    const key = normalized.toLowerCase();
-    if (seen.has(key)) {
-      continue;
-    }
-
-    seen.add(key);
-    merged.push(normalized);
-  }
-
-  return merged;
-};
-
-const getManualMergePreview = (localSnapshot: unknown, remoteSnapshot: unknown) => {
-  const localView = getConflictSnapshotView(localSnapshot);
-  const remoteView = getConflictSnapshotView(remoteSnapshot);
-
-  const fullName =
-    getSnapshotScalarValue(localSnapshot, "fullName") ??
-    getSnapshotScalarValue(remoteSnapshot, "fullName") ??
-    "—";
-  const emails = mergeDisplayList(
-    [localView?.emails, remoteView?.emails]
-      .flatMap((value) => (value && value !== "—" ? value.split("|") : []))
-      .map((value) => value.trim()),
-  );
-  const phones = mergeDisplayList(
-    [localView?.phones, remoteView?.phones]
-      .flatMap((value) => (value && value !== "—" ? value.split("|") : []))
-      .map((value) => value.trim()),
-  );
-  const address =
-    localView?.address && localView.address !== "—"
-      ? localView.address
-      : remoteView?.address ?? "—";
-  const company =
-    getSnapshotScalarValue(localSnapshot, "company") ??
-    getSnapshotScalarValue(remoteSnapshot, "company") ??
-    "—";
-  const jobTitle =
-    getSnapshotScalarValue(localSnapshot, "jobTitle") ??
-    getSnapshotScalarValue(remoteSnapshot, "jobTitle") ??
-    "—";
-  const website =
-    getSnapshotScalarValue(localSnapshot, "website") ??
-    getSnapshotScalarValue(remoteSnapshot, "website") ??
-    "—";
-  const birthday =
-    getSnapshotScalarValue(localSnapshot, "birthday") ??
-    getSnapshotScalarValue(remoteSnapshot, "birthday") ??
-    "—";
-  const notesLocal = getSnapshotScalarValue(localSnapshot, "notes");
-  const notesRemote = getSnapshotScalarValue(remoteSnapshot, "notes");
-  const notes =
-    notesLocal && notesRemote && notesLocal !== notesRemote
-      ? `${notesLocal} | Remote note: ${notesRemote}`
-      : notesLocal ?? notesRemote ?? "—";
-
-  return [
-    { label: "Full name", value: fullName },
-    { label: "Emails", value: emails.length > 0 ? emails.join(" | ") : "—" },
-    { label: "Phones", value: phones.length > 0 ? phones.join(" | ") : "—" },
-    { label: "Company", value: company },
-    { label: "Job title", value: jobTitle },
-    { label: "Website", value: website },
-    { label: "Birthday", value: birthday },
-    { label: "Address", value: address },
-    { label: "Notes", value: notes },
-  ];
-};
-
-const getResolutionGuidance = (strategy: string) => {
-  switch (strategy) {
-    case "KEEP_LOCAL":
-      return "Push the current Kontax version back to CardDAV and treat local as the trusted winner.";
-    case "KEEP_REMOTE":
-      return "Replace the local record with the remote CardDAV version and preserve sync linkage.";
-    case "DUPLICATE_LOCAL":
-      return "Keep a duplicate of the current local record, then let the linked record take the remote version.";
-    case "ARCHIVE_LOCAL":
-      return "Archive the local record and treat the remote deletion or cleanup as intentional.";
-    case "MANUAL_MERGE":
-      return "Use this when neither side should win cleanly and a human-reviewed merge is still needed.";
-    default:
-      return null;
-  }
-};
-
-const conflictPolicyItems = [
-  {
-    title: "Edit vs edit",
-    body:
-      "If Kontax and the remote address book both changed after the last healthy cursor, we record a sync conflict instead of silently overwriting one side.",
-  },
-  {
-    title: "Archive and delete intent",
-    body:
-      "Archive actions stamp a tombstone locally so future CardDAV runs can propagate delete intent deliberately instead of treating removal like a missing row.",
-  },
-  {
-    title: "Merge lineage",
-    body:
-      "The surviving contact keeps its stable sync UID while the merged-away contact is archived with lineage metadata for support and recovery visibility.",
-  },
-  {
-    title: "Undo remains visible",
-    body:
-      "Merge undo restores pre-merge tombstone state and increments sync versions again, so recovery actions become first-class local changes rather than hidden rewrites.",
-  },
-] as const;
-
-const resolutionStrategyItems = [
-  "Keep local when Kontax holds the trusted final edit.",
-  "Keep remote when the device-side change should win.",
-  "Duplicate local when neither side should overwrite the other yet.",
-  "Archive local when the remote deletion or cleanup is intentional.",
-  "Manual merge when fields need a human-reviewed combination.",
-] as const;
-
-const compatibilityBands = [
-  {
-    label: "Expected to travel well",
-    value: "Full name, primary email, primary phone, company, notes",
-  },
-  {
-    label: "Likely client-dependent",
-    value: "Secondary identifiers, website, birthday, archive state, merge lineage",
-  },
-  {
-    label: "Kontax-local only",
-    value: "Billing entitlements, merge decisions, import/export history, sync conflict records",
-  },
-] as const;
-
-const iphoneNotes = [
-  "Best target is the native Contacts app through iOS Settings and a CardDAV account.",
-  "Core fields should round-trip most reliably; richer app-only metadata stays in Kontax.",
-  "Sync timing is mostly OS-controlled, so first-wave messaging should avoid promising instant propagation.",
-  "Support should expect account discovery, provider app-passwords, and limited in-app sync controls.",
-] as const;
-
-const androidNotes = [
-  "Treat third-party CardDAV clients such as DAVx5-style setups as the reference path.",
-  "Vendor Android builds vary, so Google Contacts alone is not a safe universal assumption.",
-  "Battery optimization and background restrictions can delay or suppress sync runs.",
-  "Support should assume extra setup friction around client install, permissions, and vendor-specific throttling.",
-] as const;
-
-const rolloutStages = [
-  "Stage 1: founder-only testing against a narrow provider and client mix.",
-  "Stage 2: invited power users with explicit recovery expectations and portability fallback ready.",
-  "Stage 3: broader beta only after conflict handling, credential rotation, and recovery tooling stay stable under load.",
-] as const;
-
-const syncTopologyItems = [
-  {
-    title: "SyncAccount",
-    body:
-      "Owns the remote CardDAV connection, collection URLs, direction, lifecycle state, remote collection tag, cursors, and encrypted credential references.",
-  },
-  {
-    title: "SyncContactLink",
-    body:
-      "Maps a canonical Kontax contact to a remote CardDAV record using remote href, remote UID, ETag, tombstones, and per-link error state.",
-  },
-  {
-    title: "SyncJob",
-    body:
-      "Tracks queueing, retries, cursors, worker leases, result counts, and partial or failed execution so support can inspect real sync history.",
-  },
-  {
-    title: "Local contact identity",
-    body:
-      "Each contact keeps a stable sync UID plus sync version and tombstone timestamps so device-facing identity does not depend on ad hoc edits.",
-  },
-] as const;
-
-const syncScopeItems = [
-  "Roadmap target: two-way CardDAV sync.",
-  "Fallback path: import-only bootstrap for risky providers, weak client behavior, or recovery mode.",
-  "Initial scope: one Kontax sync account to one remote address book.",
-  "Default coverage: all active contacts in that account.",
-  "Archived contacts stay local-only in the first sync model.",
-  "Filtered or tag-scoped sync is intentionally deferred.",
-] as const;
-
-export default async function SyncPage({ searchParams }: SyncPageProps) {
-  const session = await auth();
-
-  if (!session?.user?.id) {
-    redirect("/login");
-  }
-
-  const resolvedSearchParams = searchParams ? await searchParams : undefined;
-  const created = getSearchValue(resolvedSearchParams, "created") === "1";
-  const connected = getSearchValue(resolvedSearchParams, "connected") === "1";
-  const activated = getSearchValue(resolvedSearchParams, "activated") === "1";
-  const paused = getSearchValue(resolvedSearchParams, "paused") === "1";
-  const queued = getSearchValue(resolvedSearchParams, "queued") === "1";
-  const retryQueued = getSearchValue(resolvedSearchParams, "retryQueued") === "1";
-  const preflightFailed = getSearchValue(resolvedSearchParams, "preflightFailed") === "1";
-  const preflightCompleted = getSearchValue(resolvedSearchParams, "preflightCompleted") === "1";
-  const conflictResolved = getSearchValue(resolvedSearchParams, "conflictResolved") === "1";
-  const credentialsSaved = getSearchValue(resolvedSearchParams, "credentialsSaved") === "1";
-  const credentialsRevoked = getSearchValue(resolvedSearchParams, "credentialsRevoked") === "1";
-  const relinkPrepared = getSearchValue(resolvedSearchParams, "relinkPrepared") === "1";
-  const runnerProcessed = getSearchValue(resolvedSearchParams, "runnerProcessed") === "1";
-  const connectFailed = getSearchValue(resolvedSearchParams, "connectFailed") === "1";
-  const connectError = getSearchValue(resolvedSearchParams, "connectError");
-  const encryptionStatus = getSyncCredentialEncryptionStatus();
-
-  const [
-    planSummary,
-    syncAccounts,
-    recentLinkedContacts,
-    recentJobs,
-    recentConflicts,
-    queuedJobsCount,
-    openConflictsCount,
-  ] =
-    await Promise.all([
-    getUserPlanSummary(session.user.id),
-    db.syncAccount.findMany({
-      where: { userId: session.user.id },
-      orderBy: [{ updatedAt: "desc" }],
-      include: {
-        _count: {
-          select: {
-            syncJobs: true,
-            syncConflicts: true,
-            syncLinks: true,
-          },
-        },
-        syncJobs: {
-          orderBy: [{ createdAt: "desc" }],
-          take: 5,
-          select: {
-            id: true,
-            status: true,
-            trigger: true,
-            errorCode: true,
-            errorSummary: true,
-            createdAt: true,
-            completedAt: true,
-          },
-        },
-      },
-    }),
-    db.syncContactLink.findMany({
-      where: {
-        syncAccount: {
-          userId: session.user.id,
-        },
-      },
-      orderBy: [{ lastSyncedAt: "desc" }, { updatedAt: "desc" }],
-      take: 8,
-      select: {
-        id: true,
-        remoteUid: true,
-        remoteHref: true,
-        remoteETag: true,
-        lastSyncedAt: true,
-        tombstonedAt: true,
-        remoteDeletedAt: true,
-        lastErrorCode: true,
-        lastErrorMessage: true,
-        contact: {
-          select: {
-            id: true,
-            fullName: true,
-            email: true,
-            phone: true,
-            company: true,
-            archivedAt: true,
-          },
-        },
-        syncAccount: {
-          select: {
-            id: true,
-            label: true,
-            addressBookDisplayName: true,
-            status: true,
-          },
-        },
-        _count: {
-          select: {
-            syncConflicts: true,
-          },
-        },
-      },
-    }),
-    db.syncJob.findMany({
-      where: {
-        syncAccount: {
-          userId: session.user.id,
-        },
-      },
-      orderBy: [{ createdAt: "desc" }],
-      take: 5,
-      include: {
-        syncAccount: {
-          select: {
-            id: true,
-            label: true,
-          },
-        },
-      },
-    }),
-    db.syncConflict.findMany({
-      where: {
-        syncAccount: {
-          userId: session.user.id,
-        },
-      },
-      orderBy: [{ detectedAt: "desc" }],
-      take: 5,
-      include: {
-        contact: {
-          select: {
-            id: true,
-            fullName: true,
-          },
-        },
-        syncAccount: {
-          select: {
-            id: true,
-            label: true,
-          },
-        },
-      },
-    }),
-    db.syncJob.count({
-      where: {
-        status: "QUEUED",
-        syncAccount: {
-          userId: session.user.id,
-        },
-      },
-    }),
-    db.syncConflict.count({
-      where: {
-        status: "OPEN",
-        syncAccount: {
-          userId: session.user.id,
-        },
-      },
-    }),
-  ]);
-
-  const syncAccountsRemaining = Math.max(
-    planSummary.entitlements.syncAccountsLimit - syncAccounts.length,
-    0,
-  );
-  const canUseCardDavSync = planSummary.entitlements.cardDavSyncEnabled;
-  const activityItems = [
-    ...recentJobs.map((job) => ({
-      id: `job-${job.id}`,
-      occurredAt: job.completedAt ?? job.startedAt ?? job.createdAt,
-      title: `${job.syncAccount.label} job ${job.status.toLowerCase()}`,
-      body:
-        job.errorSummary ??
-        `Trigger ${job.trigger.toLowerCase()} · ${job.syncDirection.toLowerCase().replaceAll("_", " ")} · conflicts ${job.conflictCount}`,
-      tone:
-        job.status === "FAILED"
-          ? "border-rose-300/20 bg-rose-300/10 text-rose-100"
-          : job.status === "PARTIAL"
-            ? "border-amber-300/20 bg-amber-300/10 text-amber-100"
-            : "border-cyan-300/20 bg-cyan-300/10 text-cyan-100",
-    })),
-    ...recentConflicts.map((conflict) => ({
-      id: `conflict-${conflict.id}`,
-      occurredAt: conflict.resolvedAt ?? conflict.detectedAt,
-      title: `${conflict.syncAccount?.label ?? "Device sync"} conflict ${conflict.status.toLowerCase()}`,
-      body:
-        conflict.contact?.fullName
-          ? `${conflict.conflictType} · ${conflict.contact.fullName}`
-          : `${conflict.conflictType} · detached contact`,
-      tone:
-        conflict.status === "OPEN"
-          ? "border-amber-300/20 bg-amber-300/10 text-amber-100"
-          : "border-emerald-300/20 bg-emerald-300/10 text-emerald-100",
-    })),
-  ]
-    .sort((left, right) => right.occurredAt.getTime() - left.occurredAt.getTime())
-    .slice(0, 8);
 
   return (
-    <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),_transparent_30%),linear-gradient(180deg,#020617_0%,#07111d_45%,#0f172a_100%)] text-white">
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-8 lg:px-10 lg:py-12">
-        <div className="flex flex-col gap-4 rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-[0_30px_120px_rgba(2,8,23,0.45)] backdrop-blur sm:flex-row sm:items-end sm:justify-between">
-          <div>
-            <Link className="text-sm font-semibold text-cyan-200 hover:text-cyan-100" href="/">
-              ← Back to dashboard
-            </Link>
-            <p className="mt-4 text-sm uppercase tracking-[0.35em] text-cyan-200">Sync</p>
-            <h1 className="mt-3 text-4xl font-semibold tracking-tight text-white">
-              Prepare CardDAV sync without losing control of the core contact model.
-            </h1>
-            <p className="mt-3 max-w-2xl text-sm text-slate-300 sm:text-base">
-              Ticket `P5-01` starts the sync account surface. Ticket `P5-03` keeps credential
-              storage deliberately separate so encrypted secret handling can land cleanly before we
-              move real device credentials through the app.
-            </p>
-          </div>
+    <div className="flex h-screen flex-col overflow-hidden bg-[#f6f7f4]" style={{ fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif" }}>
+      {/* ── top header ── */}
+      <header className="shrink-0 border-b border-[#d8ddd6] bg-white" style={{ zIndex: 20 }}>
+        <div className="flex h-[60px] w-full items-center gap-4 px-4 lg:px-[18px]">
+          <Link className="flex shrink-0 items-center gap-2.5 lg:w-[230px]" href="/">
+            <span className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-[#17352e] text-[17px] font-bold text-[#dff0e7]">
+              K
+            </span>
+            <span className="text-[19px] font-bold tracking-[-0.01em] text-[#1d2823]">Kontax</span>
+          </Link>
 
-          <div className="grid gap-2 rounded-[1.5rem] border border-white/10 bg-[#08101c] p-5 text-sm text-slate-300">
-            <p>
-              <span className="text-slate-500">Plan:</span> {planSummary.planLabel}
-            </p>
-            <p>
-              <span className="text-slate-500">Sync accounts:</span> {syncAccounts.length} /{" "}
-              {planSummary.entitlements.syncAccountsLimit}
-            </p>
-            <p>
-              <span className="text-slate-500">CardDAV access:</span>{" "}
-              {canUseCardDavSync ? "Enabled" : "Upgrade required"}
-            </p>
+          <SearchInput filter="all" initialQuery="" sort="name" tab="people" view="compact" />
+
+          <div className="flex shrink-0 items-center gap-2.5">
+            <Link
+              className="inline-flex h-10 items-center gap-1.5 rounded-full bg-[#4158f4] px-4 text-sm font-semibold text-white transition hover:bg-[#3248db]"
+              href="/contacts/new"
+            >
+              <WorkspaceIcon name="plus" size={18} strokeWidth={2} />
+              <span className="hidden sm:inline">Create contact</span>
+            </Link>
+            <Link
+              aria-label={incomingShares > 0 ? `${incomingShares} pending shares` : "Notifications"}
+              className="relative hidden h-10 w-10 items-center justify-center rounded-full border border-[#d8ddd6] bg-white text-[#5c655e] transition hover:bg-[#f2f4f0] sm:inline-flex"
+              href="/shares"
+            >
+              <WorkspaceIcon name="bell" size={18} />
+              {incomingShares > 0 ? (
+                <span className="absolute -right-0.5 -top-0.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[#bf8526] px-1 text-[10px] font-bold text-white">
+                  {incomingShares}
+                </span>
+              ) : null}
+            </Link>
+            <UserMenu
+              email={session.user.email ?? ""}
+              initials={getInitials(userLabel)}
+              name={userLabel}
+            />
           </div>
         </div>
+      </header>
 
-        {created ? (
-          <div className="rounded-[1.75rem] border border-emerald-300/25 bg-emerald-300/10 p-4 text-sm text-emerald-100 shadow-[0_20px_60px_rgba(16,185,129,0.12)]">
-            Sync account saved successfully.
-          </div>
-        ) : null}
-        {connected ? (
-          <div className="rounded-[1.75rem] border border-emerald-300/25 bg-emerald-300/10 p-4 text-sm text-emerald-100 shadow-[0_20px_60px_rgba(16,185,129,0.12)]">
-            CardDAV connection validated successfully. Kontax saved the encrypted credentials and
-            discovered the remote principal and address book details, so this account is ready for
-            its first sync run.
-          </div>
-        ) : null}
-        {connectFailed ? (
-          <div className="rounded-[1.75rem] border border-rose-300/25 bg-rose-300/10 p-4 text-sm text-rose-100 shadow-[0_20px_60px_rgba(244,63,94,0.12)]">
-            {connectError ??
-              "CardDAV connection setup failed before Kontax could save the account. Review the endpoint, credentials, and provider-specific app password requirements, then try again."}
-          </div>
-        ) : null}
-        {activated ? (
-          <div className="rounded-[1.75rem] border border-cyan-300/25 bg-cyan-300/10 p-4 text-sm text-cyan-100 shadow-[0_20px_60px_rgba(34,211,238,0.12)]">
-            Sync account marked active.
-          </div>
-        ) : null}
-        {paused ? (
-          <div className="rounded-[1.75rem] border border-amber-300/25 bg-amber-300/10 p-4 text-sm text-amber-100 shadow-[0_20px_60px_rgba(251,191,36,0.12)]">
-            Sync account paused successfully.
-          </div>
-        ) : null}
-        {queued ? (
-          <div className="rounded-[1.75rem] border border-cyan-300/25 bg-cyan-300/10 p-4 text-sm text-cyan-100 shadow-[0_20px_60px_rgba(34,211,238,0.12)]">
-            Sync job queued successfully.
-          </div>
-        ) : null}
-        {retryQueued ? (
-          <div className="rounded-[1.75rem] border border-cyan-300/25 bg-cyan-300/10 p-4 text-sm text-cyan-100 shadow-[0_20px_60px_rgba(34,211,238,0.12)]">
-            Recovery retry queued successfully.
-          </div>
-        ) : null}
-        {preflightCompleted ? (
-          <div className="rounded-[1.75rem] border border-emerald-300/25 bg-emerald-300/10 p-4 text-sm text-emerald-100 shadow-[0_20px_60px_rgba(16,185,129,0.12)]">
-            CardDAV preflight completed successfully. Kontax discovered the remote principal and
-            address book metadata so the next run can move into queued sync execution.
-          </div>
-        ) : null}
-        {preflightFailed ? (
-          <div className="rounded-[1.75rem] border border-amber-300/25 bg-amber-300/10 p-4 text-sm text-amber-100 shadow-[0_20px_60px_rgba(251,191,36,0.12)]">
-            CardDAV preflight failed or was blocked. Check the latest sync job and the account
-            error state for the exact credential, network, or discovery issue before retrying.
-          </div>
-        ) : null}
-        {conflictResolved ? (
-          <div className="rounded-[1.75rem] border border-emerald-300/25 bg-emerald-300/10 p-4 text-sm text-emerald-100 shadow-[0_20px_60px_rgba(16,185,129,0.12)]">
-            Sync conflict resolution saved successfully.
-          </div>
-        ) : null}
-        {credentialsSaved ? (
-          <div className="rounded-[1.75rem] border border-emerald-300/25 bg-emerald-300/10 p-4 text-sm text-emerald-100 shadow-[0_20px_60px_rgba(16,185,129,0.12)]">
-            Encrypted sync credentials saved successfully.
-          </div>
-        ) : null}
-        {credentialsRevoked ? (
-          <div className="rounded-[1.75rem] border border-amber-300/25 bg-amber-300/10 p-4 text-sm text-amber-100 shadow-[0_20px_60px_rgba(251,191,36,0.12)]">
-            Stored sync credentials were revoked. This account now needs fresh encrypted credentials
-            before the next run.
-          </div>
-        ) : null}
-        {relinkPrepared ? (
-          <div className="rounded-[1.75rem] border border-cyan-300/25 bg-cyan-300/10 p-4 text-sm text-cyan-100 shadow-[0_20px_60px_rgba(34,211,238,0.12)]">
-            Sync relink preparation completed. Local sync links were reset and open conflicts were
-            closed out so you can review the account and then start a fresh recovery run.
-          </div>
-        ) : null}
-        {runnerProcessed ? (
-          <div className="rounded-[1.75rem] border border-emerald-300/25 bg-emerald-300/10 p-4 text-sm text-emerald-100 shadow-[0_20px_60px_rgba(16,185,129,0.12)]">
-            Queued sync jobs were handed to the background runner. Review recent jobs and conflict
-            activity below for the latest outcome.
-          </div>
-        ) : null}
+      {/* ── three-rail body ── */}
+      <div className="flex min-h-0 flex-1">
+        {/* Rail 1: Settings sidebar */}
+        <SettingsSidebar
+          account={{ name: userLabel, email: session.user.email ?? "", plan: planSummary.planLabel }}
+          shared={shared}
+        />
 
-        <section className="grid gap-6 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-          <div className="rounded-[2rem] border border-white/10 bg-[#08101c]/88 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.35)]">
-            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P5-01 data model</p>
-            <h2 className="mt-3 text-2xl font-semibold text-white">
-              CardDAV-ready sync structure is now a first-class product surface
-            </h2>
-            <p className="mt-3 max-w-3xl text-sm text-slate-400">
-              The schema foundation is already in place, and the sync center now makes the moving
-              pieces explicit so later execution logic does not have to invent its own model.
-            </p>
-            <div className="mt-5 grid gap-4 lg:grid-cols-2">
-              {syncTopologyItems.map((item) => (
-                <div
-                  className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4"
-                  key={item.title}
-                >
-                  <p className="text-sm font-semibold text-white">{item.title}</p>
-                  <p className="mt-2 text-sm text-slate-400">{item.body}</p>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.25)]">
-            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P5-02 scope and direction</p>
-            <h2 className="mt-3 text-2xl font-semibold text-white">
-              Two-way target, bootstrap fallback, and clear v1 boundaries
-            </h2>
-            <p className="mt-3 text-sm text-slate-400">
-              Sync is treated as a product decision, not just a transport toggle. The first-wave
-              scope stays intentionally narrow so support expectations remain understandable.
-            </p>
-            <div className="mt-5 rounded-[1.5rem] border border-white/10 bg-[#08101c] p-4 text-sm text-slate-300">
-              <div className="grid gap-2">
-                {syncScopeItems.map((item) => (
-                  <p key={item}>{item}</p>
-                ))}
-              </div>
-              <p className="mt-4 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-3 text-cyan-100">
-                Live execution note: the current production sync slice is bootstrap import-first.
-                Kontax imports and links remote contacts, but outbound CardDAV writes are still
-                intentionally deferred.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <section className="grid gap-6 xl:grid-cols-[minmax(0,1.2fr)_minmax(0,0.8fr)]">
-          <div className="rounded-[2rem] border border-white/10 bg-[#08101c]/88 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.35)]">
-            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P5-04 conflict policy</p>
-            <h2 className="mt-3 text-2xl font-semibold text-white">
-              Deterministic sync rules before real device traffic lands
-            </h2>
-            <p className="mt-3 max-w-3xl text-sm text-slate-400">
-              The sync center now makes the intended conflict and tombstone model explicit so later
-              CardDAV execution does not invent behavior ad hoc. When local and remote state both
-              move, we prefer recorded conflict state over silent mutation.
-            </p>
-            <div className="mt-5 grid gap-4 lg:grid-cols-2">
-              {conflictPolicyItems.map((item) => (
-                <div
-                  className="rounded-[1.5rem] border border-white/10 bg-white/5 p-4"
-                  key={item.title}
-                >
-                  <p className="text-sm font-semibold text-white">{item.title}</p>
-                  <p className="mt-2 text-sm text-slate-400">{item.body}</p>
-                </div>
-              ))}
-            </div>
-            <div className="mt-5 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)]">
-              <div className="rounded-[1.5rem] border border-white/10 bg-[#020617] p-4 text-sm text-slate-300">
-                <p className="font-semibold text-white">Resolution strategies</p>
-                <div className="mt-3 grid gap-2">
-                  {resolutionStrategyItems.map((item) => (
-                    <p key={item}>{item}</p>
-                  ))}
-                </div>
-              </div>
-              <div className="rounded-[1.5rem] border border-white/10 bg-[#020617] p-4 text-sm text-slate-300">
-                <p className="font-semibold text-white">Current signal</p>
-                <p className="mt-3">Open conflicts: {openConflictsCount}</p>
-                <p className="mt-1">Queued sync jobs: {queuedJobsCount}</p>
-                <p className="mt-1">
-                  Archive and delete intent should move through tombstones, while merges keep
-                  stable sync IDs for the surviving contact.
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.25)]">
-            <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P5-05 compatibility</p>
-            <h2 className="mt-3 text-2xl font-semibold text-white">
-              iPhone and Android support posture
-            </h2>
-            <p className="mt-3 text-sm text-slate-400">
-              First-wave CardDAV messaging should optimize for reliable core-contact interoperability
-              rather than perfect parity across every provider, client, and phone vendor.
-            </p>
-            <div className="mt-5 grid gap-4">
-              <div className="rounded-[1.5rem] border border-white/10 bg-[#08101c] p-4">
-                <p className="text-sm font-semibold text-white">Field support bands</p>
-                <div className="mt-3 grid gap-3">
-                  {compatibilityBands.map((band) => (
-                    <div key={band.label}>
-                      <p className="text-sm font-semibold text-cyan-100">{band.label}</p>
-                      <p className="mt-1 text-sm text-slate-400">{band.value}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="grid gap-4 lg:grid-cols-2">
-                <div className="rounded-[1.5rem] border border-white/10 bg-[#08101c] p-4">
-                  <p className="text-sm font-semibold text-white">iPhone</p>
-                  <div className="mt-3 grid gap-2 text-sm text-slate-400">
-                    {iphoneNotes.map((item) => (
-                      <p key={item}>{item}</p>
-                    ))}
-                  </div>
-                </div>
-                <div className="rounded-[1.5rem] border border-white/10 bg-[#08101c] p-4">
-                  <p className="text-sm font-semibold text-white">Android</p>
-                  <div className="mt-3 grid gap-2 text-sm text-slate-400">
-                    {androidNotes.map((item) => (
-                      <p key={item}>{item}</p>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <section className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-          <div className="grid gap-6">
-            <div className="rounded-[2rem] border border-white/10 bg-[#08101c]/88 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.35)]">
-              <div className="space-y-2">
-                <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Sync accounts</p>
-                <h2 className="text-2xl font-semibold text-white">Connect your contact home</h2>
-                <p className="text-sm text-slate-400">
-                  Start by validating a real CardDAV connection end to end. Kontax will encrypt the
-                  credentials, discover the principal and address book URLs, and only then save a
-                  live sync account that is ready for the first import run.
-                </p>
-              </div>
-
-              {canUseCardDavSync ? (
-                <form action={createSyncAccount} className="mt-6 grid gap-4">
-                  <input name="redirectTo" type="hidden" value="/sync" />
-
-                  <label className="grid gap-2 text-sm text-slate-200">
-                    <span>Connection label</span>
-                    <input
-                      className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
-                      name="label"
-                      placeholder="Personal iCloud"
-                      required
-                      type="text"
-                    />
-                  </label>
-
-                  <label className="grid gap-2 text-sm text-slate-200">
-                    <span>CardDAV base URL</span>
-                    <input
-                      className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
-                      name="baseUrl"
-                      placeholder="https://contacts.example.com/dav"
-                      required
-                      type="url"
-                    />
-                  </label>
-
-                  <div className="grid gap-4 lg:grid-cols-2">
-                    <label className="grid gap-2 text-sm text-slate-200">
-                      <span>Username or account email</span>
-                      <input
-                        autoComplete="username"
-                        className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
-                        name="username"
-                        placeholder="you@example.com"
-                        required
-                        type="text"
-                      />
-                    </label>
-
-                    <label className="grid gap-2 text-sm text-slate-200">
-                      <span>Password or app password</span>
-                      <input
-                        autoComplete="current-password"
-                        className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
-                        name="password"
-                        placeholder="Provider app password"
-                        required
-                        type="password"
-                      />
-                    </label>
-                  </div>
-
-                  <label className="grid gap-2 text-sm text-slate-200">
-                    <span>Credential note</span>
-                    <input
-                      className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
-                      name="note"
-                      placeholder="Optional note for this credential set"
-                      type="text"
-                    />
-                  </label>
-
-                  <div className="grid gap-4 lg:grid-cols-2">
-                    <label className="grid gap-2 text-sm text-slate-200">
-                      <span>Principal URL hint</span>
-                      <input
-                        className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
-                        name="principalUrl"
-                        placeholder="https://contacts.example.com/principals/me"
-                        type="url"
-                      />
-                    </label>
-
-                    <label className="grid gap-2 text-sm text-slate-200">
-                      <span>Address book URL hint</span>
-                      <input
-                        className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
-                        name="addressBookUrl"
-                        placeholder="https://contacts.example.com/addressbooks/me/default"
-                        type="url"
-                      />
-                    </label>
-                  </div>
-
-                  <label className="grid gap-2 text-sm text-slate-200">
-                    <span>Sync direction</span>
-                    <select
-                      className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-cyan-300"
-                      defaultValue="TWO_WAY"
-                      name="syncDirection"
-                    >
-                      <option className="bg-slate-950 text-white" value="TWO_WAY">
-                        Two-way sync
-                      </option>
-                      <option className="bg-slate-950 text-white" value="IMPORT_ONLY">
-                        Import only
-                      </option>
-                      <option className="bg-slate-950 text-white" value="EXPORT_ONLY">
-                        Export only
-                      </option>
-                    </select>
-                  </label>
-
-                  <div className="rounded-2xl border border-white/10 bg-[#08101c] p-4 text-sm text-slate-300">
-                    <p>
-                      Kontax validates the endpoint before saving anything. If discovery or
-                      authentication fails, the connection is not created.
-                    </p>
-                    <p className="mt-1 text-slate-500">
-                      Principal and address book URLs are optional hints. Leave them blank unless
-                      your provider documentation requires a specific path.
-                    </p>
-                  </div>
-
-                  <div className="rounded-2xl border border-white/10 bg-[#08101c] p-4 text-sm text-slate-300">
-                    <p>
-                      Encryption backend: {getEncryptionModeLabel(encryptionStatus.mode)}
-                    </p>
-                    <p className="mt-1 text-slate-500">
-                      Key reference: {encryptionStatus.keyRef ?? "Missing"}
-                    </p>
-                  </div>
-
-                  <button
-                    className="rounded-full bg-cyan-300 px-5 py-3 font-semibold text-slate-950 transition hover:bg-cyan-200"
-                    type="submit"
-                  >
-                    Connect CardDAV account
-                  </button>
-                </form>
-              ) : (
-                <div className="mt-6 rounded-[1.75rem] border border-amber-300/20 bg-amber-300/10 p-5 text-sm text-amber-100">
-                  CardDAV sync is currently gated to the Pro plan. You can still use import,
-                  export, merge, and the core contact experience on your current plan while we keep
-                  building out the sync layer.
-                </div>
-              )}
-            </div>
-
-            <div className="rounded-[2rem] border border-white/10 bg-[#08101c]/88 p-6 shadow-[0_20px_80px_rgba(2,8,23,0.35)]">
-              <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Configured accounts</p>
-              <div className="mt-4 grid gap-4">
-                {syncAccounts.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-white/15 bg-white/5 p-5 text-sm text-slate-400">
-                    No sync accounts yet. Once one is saved, this is where we will track lifecycle,
-                    job health, and conflict counts.
-                  </div>
-                ) : (
-                  syncAccounts.map((account) => (
-                    <article
-                      className="rounded-[1.75rem] border border-white/10 bg-white/5 p-5"
-                      key={account.id}
-                    >
-                      {(() => {
-                        const healthPresentation = getHealthPresentation(account);
-                        const latestSupportBucket = getSyncErrorSupportBucket(account.lastErrorCode);
-                        const failureStreak = getConsecutiveFailureStreak(account.syncJobs);
-
-                        return (
-                          <>
-                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                        <div>
-                          <div className="flex flex-wrap items-center gap-3">
-                            <h3 className="text-xl font-semibold text-white">{account.label}</h3>
-                            <span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-100">
-                              {account.status.toLowerCase()}
-                            </span>
-                            <span className="rounded-full border border-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-slate-300">
-                              {account.syncDirection.replaceAll("_", " ").toLowerCase()}
-                            </span>
-                            <span
-                              className={`rounded-full border px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] ${healthPresentation.tone}`}
-                            >
-                              {healthPresentation.label}
-                            </span>
-                          </div>
-                          <p className="mt-2 break-all text-sm text-slate-400">{account.baseUrl}</p>
-                          <div className="mt-3 grid gap-2 text-sm text-slate-400 sm:grid-cols-2">
-                            <p>Address book name: {account.addressBookDisplayName ?? "Not discovered yet"}</p>
-                            <p>Principal: {account.principalUrl ?? "Not stored yet"}</p>
-                            <p>Address book: {account.addressBookUrl ?? "Not stored yet"}</p>
-                            <p>
-                              Credentials:{" "}
-                              {account.credentialReference && !account.credentialRevokedAt
-                                ? "Attached"
-                                : "Missing"}
-                            </p>
-                            <p>Credential state: {getCredentialStateLabel(account)}</p>
-                            <p>Validation state: {getConnectionValidationLabel(account)}</p>
-                            <p>
-                              Credential version: {account.credentialVersion}
-                            </p>
-                            <p>
-                              Key reference: {account.encryptionKeyRef ?? "Not attached"}
-                            </p>
-                            <p>
-                              Updated: {formatTimestamp(account.credentialUpdatedAt)}
-                            </p>
-                            <p>
-                              Credential validated: {formatTimestamp(account.credentialLastValidatedAt)}
-                            </p>
-                            <p>
-                              Revoked: {formatTimestamp(account.credentialRevokedAt)}
-                            </p>
-                            <p>
-                              Connection validated: {formatTimestamp(account.connectionValidatedAt)}
-                            </p>
-                            <p>Last success: {formatTimestamp(account.lastSucceededAt)}</p>
-                            <p>Last sync: {formatTimestamp(account.lastSyncedAt)}</p>
-                            <p>Support bucket: {latestSupportBucket}</p>
-                            <p>
-                              Failure streak: {failureStreak} / {AUTO_PAUSE_FAILURE_STREAK}
-                            </p>
-                          </div>
-                          {account.lastErrorMessage ? (
-                            <p className="mt-3 rounded-2xl border border-rose-300/20 bg-rose-300/10 p-3 text-sm text-rose-100">
-                              {account.lastErrorCode ? `${account.lastErrorCode}: ` : ""}
-                              {account.lastErrorMessage}
-                            </p>
-                          ) : null}
-                          <div
-                            className={`mt-3 rounded-2xl border p-3 text-sm ${getSyncAccountGuidance(account).tone}`}
-                          >
-                            <p className="font-semibold text-white">
-                              {getSyncAccountGuidance(account).title}
-                            </p>
-                            <p className="mt-2">{getSyncAccountGuidance(account).body}</p>
-                          </div>
-                        </div>
-
-                        <div className="grid gap-3 text-sm text-slate-300 sm:min-w-44">
-                          <div className="rounded-2xl border border-white/10 bg-[#08101c] p-4">
-                            <p>Jobs tracked: {account._count.syncJobs}</p>
-                            <p className="mt-1">Open conflicts: {account._count.syncConflicts}</p>
-                            <p className="mt-1">Linked contacts: {account._count.syncLinks}</p>
-                            <p className="mt-1">
-                              Auto-pause threshold: {AUTO_PAUSE_FAILURE_STREAK} failed runs
-                            </p>
-                          </div>
-                          {account.status === "ACTIVE" ? (
-                            <form action={pauseSyncAccount}>
-                              <input name="redirectTo" type="hidden" value="/sync?paused=1" />
-                              <input name="syncAccountId" type="hidden" value={account.id} />
-                              <button
-                                className="w-full rounded-full border border-amber-300/30 px-4 py-3 font-semibold text-amber-200 transition hover:border-amber-200 hover:text-white"
-                                type="submit"
-                              >
-                                Pause sync
-                              </button>
-                            </form>
-                          ) : (
-                            <form action={activateSyncAccount}>
-                              <input name="redirectTo" type="hidden" value="/sync?activated=1" />
-                              <input name="syncAccountId" type="hidden" value={account.id} />
-                              <button
-                                className="w-full rounded-full bg-cyan-300 px-4 py-3 font-semibold text-slate-950 transition hover:bg-cyan-200"
-                                type="submit"
-                              >
-                                Mark active
-                              </button>
-                            </form>
-                          )}
-                          {account.credentialReference && !account.credentialRevokedAt ? (
-                            <form action={revalidateSyncAccount}>
-                              <input
-                                name="redirectTo"
-                                type="hidden"
-                                value="/sync?preflightCompleted=1"
-                              />
-                              <input name="syncAccountId" type="hidden" value={account.id} />
-                              <button
-                                className="w-full rounded-full border border-cyan-300/30 px-4 py-3 font-semibold text-cyan-100 transition hover:border-cyan-200 hover:text-white"
-                                type="submit"
-                              >
-                                Revalidate connection
-                              </button>
-                            </form>
-                          ) : null}
-                          <form action={queueSyncJob}>
-                            <input
-                              name="redirectTo"
-                              type="hidden"
-                              value={
-                                account.credentialReference &&
-                                !account.credentialRevokedAt &&
-                                account.remoteAccountId &&
-                                account.principalUrl &&
-                                account.addressBookUrl &&
-                                account.connectionValidatedAt &&
-                                account.credentialLastValidatedAt &&
-                                (!account.credentialUpdatedAt ||
-                                  account.credentialLastValidatedAt.getTime() >=
-                                    account.credentialUpdatedAt.getTime())
-                                  ? "/sync?queued=1"
-                                  : account.credentialReference && !account.credentialRevokedAt
-                                    ? "/sync?preflightCompleted=1"
-                                    : "/sync?preflightFailed=1"
-                              }
-                            />
-                            <input name="syncAccountId" type="hidden" value={account.id} />
-                            <button
-                              className="w-full rounded-full border border-white/10 px-4 py-3 font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-100"
-                              type="submit"
-                            >
-                              {account.credentialReference &&
-                              !account.credentialRevokedAt &&
-                              account.remoteAccountId &&
-                              account.principalUrl &&
-                              account.addressBookUrl &&
-                              account.connectionValidatedAt &&
-                              account.credentialLastValidatedAt &&
-                              (!account.credentialUpdatedAt ||
-                                account.credentialLastValidatedAt.getTime() >=
-                                  account.credentialUpdatedAt.getTime())
-                                ? "Queue sync run"
-                                : "Preflight and queue sync"}
-                            </button>
-                          </form>
-                        </div>
-                      </div>
-                          </>
-                        );
-                      })()}
-
-                      <div className="mt-4 rounded-[1.5rem] border border-white/10 bg-[#08101c]/80 p-4">
-                        <p className="text-sm font-semibold text-white">Encrypted credentials</p>
-                        <p className="mt-2 text-sm text-slate-400">
-                          Ticket `P5-03`: credentials are stored as an encrypted server-side
-                          envelope, tracked with key references and rotation metadata instead of
-                          being written as plain text fields.
-                        </p>
-                        {encryptionStatus.available ? (
-                          <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_220px]">
-                            <form action={attachSyncCredentials} className="grid gap-3">
-                              <input
-                                name="redirectTo"
-                                type="hidden"
-                                value="/sync?credentialsSaved=1"
-                              />
-                              <input name="syncAccountId" type="hidden" value={account.id} />
-                              <input
-                                autoComplete="username"
-                                className="rounded-full border border-white/10 bg-[#020617] px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
-                                name="username"
-                                placeholder="CardDAV username or email"
-                                type="text"
-                              />
-                              <input
-                                autoComplete="current-password"
-                                className="rounded-full border border-white/10 bg-[#020617] px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
-                                name="password"
-                                placeholder="App password or account password"
-                                type="password"
-                              />
-                              <input
-                                className="rounded-full border border-white/10 bg-[#020617] px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
-                                name="note"
-                                placeholder="Optional note for this credential set"
-                                type="text"
-                              />
-                              <button
-                                className="rounded-full border border-cyan-300/30 px-4 py-3 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200 hover:text-white"
-                                type="submit"
-                              >
-                                {account.credentialReference && !account.credentialRevokedAt
-                                  ? "Rotate encrypted credentials"
-                                  : "Attach encrypted credentials"}
-                              </button>
-                            </form>
-                            <div className="grid gap-3 self-start">
-                              <div className="rounded-2xl border border-white/10 bg-[#020617] p-4 text-sm text-slate-400">
-                                <p>Backend mode: {getEncryptionModeLabel(encryptionStatus.mode)}</p>
-                                <p className="mt-1">
-                                  Active key ref: {encryptionStatus.keyRef ?? "Missing"}
-                                </p>
-                              </div>
-                              {account.credentialReference ? (
-                                <form action={revokeSyncCredentials}>
-                                  <input
-                                    name="redirectTo"
-                                    type="hidden"
-                                    value="/sync?credentialsRevoked=1"
-                                  />
-                                  <input
-                                    name="syncAccountId"
-                                    type="hidden"
-                                    value={account.id}
-                                  />
-                                  <button
-                                    className="w-full rounded-full border border-amber-300/30 px-4 py-3 text-sm font-semibold text-amber-200 transition hover:border-amber-200 hover:text-white"
-                                    type="submit"
-                                  >
-                                    Revoke stored credentials
-                                  </button>
-                                </form>
-                              ) : null}
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="mt-4 rounded-2xl border border-amber-300/20 bg-amber-300/10 p-4 text-sm text-amber-100">
-                            Set `SYNC_CREDENTIAL_ENCRYPTION_KEY` for a dedicated sync-secret key,
-                            or keep `AUTH_SECRET` available as the fallback. Credential capture is
-                            blocked until one of those server secrets exists.
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="mt-4 rounded-[1.5rem] border border-white/10 bg-[#08101c]/80 p-4">
-                        <p className="text-sm font-semibold text-white">Credential lifecycle and audit posture</p>
-                        <p className="mt-2 text-sm text-slate-400">
-                          Ticket `P5-03`: credentials stay out of primary relational fields. What
-                          we keep here is the audit-facing metadata needed for rotation, revoke,
-                          reauth, and support inspection.
-                        </p>
-                        <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,0.9fr)]">
-                          <div className="rounded-2xl border border-white/10 bg-[#020617] p-4 text-sm text-slate-300">
-                            <p className="font-semibold text-white">Stored metadata</p>
-                            <p className="mt-2">Credential state: {getCredentialStateLabel(account)}</p>
-                            <p className="mt-1">Validation state: {getConnectionValidationLabel(account)}</p>
-                            <p className="mt-1">Credential version: {account.credentialVersion}</p>
-                            <p className="mt-1">Updated at: {formatTimestamp(account.credentialUpdatedAt)}</p>
-                            <p className="mt-1">Credential validated at: {formatTimestamp(account.credentialLastValidatedAt)}</p>
-                            <p className="mt-1">Revoked at: {formatTimestamp(account.credentialRevokedAt)}</p>
-                            <p className="mt-1">Connection validated at: {formatTimestamp(account.connectionValidatedAt)}</p>
-                            <p className="mt-1">Encryption key ref: {account.encryptionKeyRef ?? "Missing"}</p>
-                          </div>
-                          <div className="rounded-2xl border border-white/10 bg-[#020617] p-4 text-sm text-slate-300">
-                            <p className="font-semibold text-white">Operational expectations</p>
-                            <p className="mt-2">1. Rotate credentials by attaching a fresh encrypted set.</p>
-                            <p className="mt-1">2. Revalidate the connection after any credential change before queuing sync work.</p>
-                            <p className="mt-1">3. Revoke when a provider app password or token is no longer trusted.</p>
-                            <p className="mt-1">4. Treat `NEEDS_REAUTH` as a hard stop for queued sync work.</p>
-                            <p className="mt-1">5. Keep raw usernames and passwords out of logs and recovery exports.</p>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="mt-4 rounded-[1.5rem] border border-white/10 bg-[#08101c]/80 p-4">
-                        <p className="text-sm font-semibold text-white">Recovery toolkit</p>
-                        <p className="mt-2 text-sm text-slate-400">
-                          Ticket `P7-05`: when sync health gets messy, the safest path is pause,
-                          export, inspect, then relink. Recovery actions here avoid touching your
-                          underlying Kontax contacts while still giving support enough telemetry to
-                          diagnose repeated failures.
-                        </p>
-                        <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-                          <a
-                            className="inline-flex items-center justify-center rounded-full border border-white/10 px-4 py-3 text-sm font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-100"
-                            href={`/api/exports/sync-recovery?syncAccountId=${account.id}`}
-                          >
-                            Download support package
-                          </a>
-                          <form action={prepareSyncRelink}>
-                            <input
-                              name="redirectTo"
-                              type="hidden"
-                              value="/sync?relinkPrepared=1"
-                            />
-                            <input name="syncAccountId" type="hidden" value={account.id} />
-                            <button
-                              className="w-full rounded-full border border-cyan-300/30 px-4 py-3 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200 hover:text-white"
-                              type="submit"
-                            >
-                              Prepare relink reset
-                            </button>
-                          </form>
-                        </div>
-                        <div className="mt-4 rounded-2xl border border-white/10 bg-[#020617] p-4 text-sm text-slate-400">
-                          <p>Recommended recovery order</p>
-                          <p className="mt-2">1. Pause sync if the account is still active.</p>
-                          <p className="mt-1">2. Export a recovery package before any reset.</p>
-                          <p className="mt-1">
-                            3. Prepare relink to clear local sync links and stale open conflicts.
-                          </p>
-                          <p className="mt-1">
-                            4. Run a fresh preflight or queue a new recovery sync run.
-                          </p>
-                        </div>
-                      </div>
-
-                      {account.syncJobs[0] ? (
-                        <p className="mt-4 text-sm text-slate-500">
-                          Latest job: {account.syncJobs[0].status.toLowerCase()} via{" "}
-                          {account.syncJobs[0].trigger.toLowerCase()} on{" "}
-                          {formatTimestamp(account.syncJobs[0].createdAt)}
-                        </p>
-                      ) : (
-                        <p className="mt-4 text-sm text-slate-500">
-                          No sync jobs yet. Ticket `P5-04` will attach scheduling, retries, and
-                          conflict-aware execution.
-                        </p>
-                      )}
-                    </article>
-                  ))
-                )}
-              </div>
-            </div>
-          </div>
-
-          <aside className="grid gap-6 self-start">
-            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
-              <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Plan fit</p>
-              <p className="mt-4 text-sm text-slate-300">
-                Ticket `P5-02`: sync remains product-aware from the start so we can gate premium
-                capability without forcing a redesign of ownership or auth later.
-              </p>
-              <div className="mt-4 rounded-2xl border border-white/10 bg-[#08101c] p-4 text-sm text-slate-300">
-                <p>Accounts remaining: {syncAccountsRemaining}</p>
-                <p className="mt-1">
-                  Live CardDAV entitlement: {canUseCardDavSync ? "Yes" : "No"}
-                </p>
-                <p className="mt-1">Queued jobs: {queuedJobsCount}</p>
-                <p className="mt-1">Open conflicts: {openConflictsCount}</p>
-              </div>
-            </div>
-
-            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
-              <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P5-06 rollout</p>
-              <p className="mt-4 text-sm text-slate-300">
-                Ticket `P5-06`: the sync center now pairs recovery actions with an explicit staged
-                rollout and support posture so we can introduce CardDAV gradually instead of all at
-                once.
-              </p>
-              <div className="mt-4 rounded-2xl border border-white/10 bg-[#08101c] p-4">
-                <div className="grid gap-2">
-                  {rolloutStages.map((item) => (
-                    <p key={item}>{item}</p>
-                  ))}
-                </div>
-              </div>
-              <div className="mt-4 rounded-2xl border border-white/10 bg-[#08101c] p-4">
-                <p className="font-semibold text-white">Support checklist</p>
-                <p className="mt-2">1. Pause the account before risky recovery steps.</p>
-                <p className="mt-1">2. Export the recovery package before resetting links.</p>
-                <p className="mt-1">3. Review recent job failures and open conflicts together.</p>
-                <p className="mt-1">
-                  4. Prefer relink or bootstrap recovery over silent destructive repair.
-                </p>
-              </div>
-            </div>
-
-            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
-              <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">P5-03 orchestration</p>
-              <p className="mt-4 text-sm text-slate-300">
-                Queue and retry behavior should stay inspectable before background workers become
-                more autonomous. The current surface exposes the metadata we need for safer support
-                triage.
-              </p>
-              <div className="mt-4 rounded-2xl border border-white/10 bg-[#08101c] p-4">
-                <p>Retry model: bounded attempts with backoff and idempotency.</p>
-                <p className="mt-1">
-                  Failure buckets: authentication, connectivity, conflict, rate-limit, protocol/data.
-                </p>
-                <p className="mt-1">
-                  Cursor posture: resume from the most recent known before/after marker.
-                </p>
-                <p className="mt-1">
-                  Worker posture: one lease per job attempt, inspectable from job history.
-                </p>
-              </div>
-            </div>
-
-            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
-              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                  <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">
-                    Linked contacts
-                  </p>
-                  <p className="mt-2 text-sm text-slate-400">
-                    This is the plain-language contact-level view for `P7-04`: which people are
-                    linked to CardDAV already, which source they came from, and which records still
-                    need review.
-                  </p>
-                </div>
-                <Link
-                  className="text-sm font-semibold text-cyan-200 hover:text-cyan-100"
-                  href="/import-export"
-                >
-                  Compare with import/export →
-                </Link>
-              </div>
-              <div className="mt-4 grid gap-3">
-                {recentLinkedContacts.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-white/15 bg-white/5 p-4 text-slate-400">
-                    No CardDAV-linked contacts yet. After the first successful run, linked contacts
-                    will show up here with source visibility and recovery context.
-                  </div>
-                ) : (
-                  recentLinkedContacts.map((link) => (
-                    <div className="rounded-2xl border border-white/10 bg-[#08101c]/70 p-4" key={link.id}>
-                      <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
-                        <div>
-                          <Link
-                            className="font-semibold text-white hover:text-cyan-100"
-                            href={`/contacts/${link.contact.id}`}
-                          >
-                            {link.contact.fullName}
-                          </Link>
-                          <p className="mt-1 text-slate-400">
-                            {link.syncAccount.label}
-                            {link.syncAccount.addressBookDisplayName
-                              ? ` · ${link.syncAccount.addressBookDisplayName}`
-                              : ""}
-                          </p>
-                          <p className="mt-1 text-slate-500">
-                            {link.contact.company ?? "No company"} · {link.contact.email ?? "No email"} ·{" "}
-                            {link.contact.phone ?? "No phone"}
-                          </p>
-                        </div>
-                        <div className="text-left sm:text-right">
-                          <p className="text-xs uppercase tracking-[0.2em] text-cyan-200">
-                            {getSyncLinkStatus(link)}
-                          </p>
-                          <p className="mt-1 text-xs text-slate-500">
-                            Last sync {formatTimestamp(link.lastSyncedAt)}
-                          </p>
-                        </div>
-                      </div>
-                      <div className="mt-3 grid gap-2 text-sm text-slate-400 sm:grid-cols-2">
-                        <p>Remote UID: {link.remoteUid ?? "Not stored yet"}</p>
-                        <p>Remote ETag: {link.remoteETag ?? "Not stored yet"}</p>
-                        <p>Remote href: {link.remoteHref ?? "Not stored yet"}</p>
-                        <p>Open link conflicts: {link._count.syncConflicts}</p>
-                        <p>Account state: {link.syncAccount.status.toLowerCase()}</p>
-                        <p>Contact state: {link.contact.archivedAt ? "Archived locally" : "Active locally"}</p>
-                      </div>
-                      {link.lastErrorMessage ? (
-                        <p className="mt-3 rounded-2xl border border-amber-300/20 bg-amber-300/10 p-3 text-sm text-amber-100">
-                          {link.lastErrorCode ? `${link.lastErrorCode}: ` : ""}
-                          {link.lastErrorMessage}
-                        </p>
-                      ) : null}
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-
-            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
-              <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Recent jobs</p>
-              <div className="mt-4 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-4 text-sm text-cyan-100">
-                <p className="font-semibold text-white">P7-02 background runner</p>
-                <p className="mt-2">
-                  Queue first, then process jobs through the dedicated runner so sync execution can
-                  be retried, inspected, and later scheduled without tying work to the request that
-                  queued it.
-                </p>
-                <form action="/api/sync/run" className="mt-4" method="post">
-                  <input name="redirectTo" type="hidden" value="/sync?runnerProcessed=1" />
-                  <input name="limit" type="hidden" value="5" />
-                  <button
-                    className="rounded-full border border-cyan-200/40 px-4 py-2 text-sm font-semibold text-white transition hover:border-cyan-100 hover:text-cyan-50"
-                    type="submit"
-                  >
-                    Run queued jobs now
-                  </button>
-                </form>
-              </div>
-              <div className="mt-4 grid gap-3">
-                {recentJobs.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-white/15 bg-white/5 p-4 text-slate-400">
-                    No sync jobs have been recorded yet.
-                  </div>
-                ) : (
-                  recentJobs.map((job) => (
-                    <div className="rounded-2xl border border-white/10 bg-[#08101c]/70 p-4" key={job.id}>
-                      <p className="font-semibold text-white">{job.syncAccount.label}</p>
-                      <p className="mt-1 text-slate-400">
-                        {job.status} · {job.trigger} · {job.syncDirection}
-                      </p>
-                      <p className="mt-1 text-slate-500">
-                        Attempt {job.attemptCount} of {job.maxAttempts} · created{" "}
-                        {formatTimestamp(job.createdAt)}
-                      </p>
-                      <p className="mt-1 text-slate-500">
-                        Next retry {formatTimestamp(job.nextRetryAt)} · conflicts {job.conflictCount}
-                      </p>
-                      <p className="mt-1 text-slate-500">
-                        Support bucket {getSyncErrorSupportBucket(job.errorCode)} · cursor{" "}
-                        {job.cursorAfter ?? job.cursorBefore ?? "not recorded"}
-                      </p>
-                      <p className="mt-1 text-slate-500">
-                        Lease {formatTimestamp(job.leaseExpiresAt)} · worker {job.workerId ?? "unassigned"}
-                      </p>
-                      <p className="mt-1 text-slate-500">
-                        Result counts imported {job.createdCount} · matched {job.updatedCount} · remote
-                        writes {job.deletedCount} · deferred local-only changes {job.skippedCount}
-                      </p>
-                      {job.errorSummary ? (
-                        <p className="mt-2 text-sm text-amber-100">
-                          {job.errorCode ? `${job.errorCode}: ` : ""}
-                          {job.errorSummary}
-                        </p>
-                      ) : null}
-                      {(job.status === "FAILED" || job.status === "PARTIAL") &&
-                      job.attemptCount < job.maxAttempts ? (
-                        <div className="mt-3 flex flex-col gap-3 sm:flex-row">
-                          <form action={retrySyncJob}>
-                            <input name="redirectTo" type="hidden" value="/sync?retryQueued=1" />
-                            <input name="syncJobId" type="hidden" value={job.id} />
-                            <button
-                              className="rounded-full border border-cyan-300/30 px-4 py-2 text-sm font-semibold text-cyan-100 transition hover:border-cyan-200 hover:text-white"
-                              type="submit"
-                            >
-                              Queue recovery retry
-                            </button>
-                          </form>
-                          <a
-                            className="rounded-full border border-white/10 px-4 py-2 text-center text-sm font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-100"
-                            href={`/api/exports/sync-recovery?syncAccountId=${job.syncAccount.id}`}
-                          >
-                            Download support package
-                          </a>
-                        </div>
-                      ) : null}
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-
-            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
-              <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Activity timeline</p>
-              <div className="mt-4 grid gap-3">
-                {activityItems.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-white/15 bg-white/5 p-4 text-slate-400">
-                    No sync activity yet.
-                  </div>
-                ) : (
-                  activityItems.map((item) => (
-                    <div className={`rounded-2xl border p-4 ${item.tone}`} key={item.id}>
-                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-                        <p className="font-semibold text-white">{item.title}</p>
-                        <p className="text-xs uppercase tracking-[0.2em] text-slate-300">
-                          {formatTimestamp(item.occurredAt)}
-                        </p>
-                      </div>
-                      <p className="mt-2 text-sm">{item.body}</p>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-
-            <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 text-sm text-slate-300">
-              <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Open conflicts</p>
-              <div className="mt-4 grid gap-3">
-                {recentConflicts.length === 0 ? (
-                  <div className="rounded-2xl border border-dashed border-white/15 bg-white/5 p-4 text-slate-400">
-                    No sync conflicts yet.
-                  </div>
-                ) : (
-                  recentConflicts.map((conflict) => (
-                    <div
-                      className="rounded-2xl border border-white/10 bg-[#08101c]/70 p-4"
-                      key={conflict.id}
-                    >
-                      {(() => {
-                        const comparisonRows = getConflictComparisonRows(
-                          conflict.localSnapshot,
-                          conflict.remoteSnapshot,
-                        );
-                        const manualMergePreview = getManualMergePreview(
-                          conflict.localSnapshot,
-                          conflict.remoteSnapshot,
-                        );
-
-                        return (
-                          <>
-                      <p className="font-semibold text-white">{conflict.syncAccount?.label ?? "Device sync"}</p>
-                      <p className="mt-1 text-slate-400">
-                        {conflict.conflictType} · {conflict.status}
-                      </p>
-                      <p className="mt-1 text-slate-500">
-                        Contact: {conflict.contact?.fullName ?? "Detached record"} · detected{" "}
-                        {formatTimestamp(conflict.detectedAt)}
-                      </p>
-                      <p className="mt-1 text-slate-500">
-                        Remote ETag: {conflict.remoteETag ?? "Unknown"} · snapshots{" "}
-                        {conflict.localSnapshot ? "local" : "no local"} /{" "}
-                        {conflict.remoteSnapshot ? "remote" : "no remote"}
-                      </p>
-                      {conflict.resolutionNotes ? (
-                        <p className="mt-2 text-slate-400">{conflict.resolutionNotes}</p>
-                      ) : null}
-                      {comparisonRows.length > 0 ? (
-                        <div className="mt-4 overflow-hidden rounded-2xl border border-white/10 bg-[#020617]/80">
-                          <div className="grid grid-cols-[140px_minmax(0,1fr)_minmax(0,1fr)] border-b border-white/10 bg-white/5 px-4 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-slate-500">
-                            <p>Field</p>
-                            <p>Local</p>
-                            <p>Remote</p>
-                          </div>
-                          <div className="divide-y divide-white/10">
-                            {comparisonRows.map((row) => {
-                              const changed = row.local !== row.remote;
-
-                              return (
-                                <div
-                                  className={`grid grid-cols-[140px_minmax(0,1fr)_minmax(0,1fr)] gap-3 px-4 py-3 text-sm ${
-                                    changed ? "bg-amber-300/5" : ""
-                                  }`}
-                                  key={`${conflict.id}-${row.label}`}
-                                >
-                                  <p className="font-medium text-slate-300">{row.label}</p>
-                                  <p className={changed ? "text-white" : "text-slate-400"}>
-                                    {row.local}
-                                  </p>
-                                  <p className={changed ? "text-amber-100" : "text-slate-400"}>
-                                    {row.remote}
-                                  </p>
-                                </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      ) : null}
-                      <div className="mt-4 rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-4 text-sm text-cyan-100">
-                        <p className="font-semibold text-white">P7-01 manual merge preview</p>
-                        <p className="mt-2 text-cyan-100/80">
-                          Manual merge prefers the current local naming fields, keeps useful remote
-                          data when local values are blank, combines multi-value identifiers, and
-                          appends non-duplicate notes before writing the merged record back to
-                          CardDAV.
-                        </p>
-                        <div className="mt-3 grid gap-2">
-                          {manualMergePreview.map((row) => (
-                            <div
-                              className="grid gap-1 rounded-2xl border border-white/10 bg-[#020617]/60 px-3 py-2 sm:grid-cols-[120px_minmax(0,1fr)]"
-                              key={`${conflict.id}-merge-${row.label}`}
-                            >
-                              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                                {row.label}
-                              </p>
-                              <p className="text-sm text-white">{row.value}</p>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                      {conflict.status === "OPEN" ? (
-                        <form action={resolveSyncConflict} className="mt-3 grid gap-3">
-                          <input
-                            name="redirectTo"
-                            type="hidden"
-                            value="/sync?conflictResolved=1"
-                          />
-                          <input name="syncConflictId" type="hidden" value={conflict.id} />
-                          <select
-                            className="rounded-full border border-white/10 bg-[#020617] px-4 py-3 text-sm text-white outline-none transition focus:border-cyan-300"
-                            defaultValue="KEEP_LOCAL"
-                            name="resolutionStrategy"
-                          >
-                            <option className="bg-slate-950 text-white" value="KEEP_LOCAL">
-                              Keep local
-                            </option>
-                            <option className="bg-slate-950 text-white" value="KEEP_REMOTE">
-                              Keep remote
-                            </option>
-                            <option className="bg-slate-950 text-white" value="DUPLICATE_LOCAL">
-                              Duplicate local
-                            </option>
-                            <option className="bg-slate-950 text-white" value="ARCHIVE_LOCAL">
-                              Archive local
-                            </option>
-                            <option className="bg-slate-950 text-white" value="MANUAL_MERGE">
-                              Manual merge
-                            </option>
-                          </select>
-                          <div className="rounded-2xl border border-cyan-300/20 bg-cyan-300/10 p-3 text-sm text-cyan-100">
-                            <p className="font-semibold text-white">Resolution guide</p>
-                            <div className="mt-2 space-y-2">
-                              {[
-                                "KEEP_LOCAL",
-                                "KEEP_REMOTE",
-                                "DUPLICATE_LOCAL",
-                                "ARCHIVE_LOCAL",
-                                "MANUAL_MERGE",
-                              ].map((strategy) => (
-                                <p key={`${conflict.id}-${strategy}`}>
-                                  <span className="font-semibold">{strategy}:</span>{" "}
-                                  {getResolutionGuidance(strategy)}
-                                </p>
-                              ))}
-                            </div>
-                          </div>
-                          <input
-                            className="rounded-full border border-white/10 bg-[#020617] px-4 py-3 text-sm text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-300"
-                            name="resolutionNotes"
-                            placeholder="Optional support note for this resolution"
-                            type="text"
-                          />
-                          <button
-                            className="rounded-full border border-emerald-300/30 px-4 py-2 text-sm font-semibold text-emerald-100 transition hover:border-emerald-200 hover:text-white"
-                            type="submit"
-                          >
-                            Save resolution
-                          </button>
-                        </form>
-                      ) : (
-                        <p className="mt-2 text-emerald-100">
-                          Resolution: {conflict.resolutionStrategy ?? "Saved"}
-                        </p>
-                      )}
-                          </>
-                        );
-                      })()}
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
-          </aside>
-        </section>
+        {/* Rails 2+3: account list + detail (client-managed) */}
+        <SyncPageClient
+          accounts={accounts}
+          initialAccountId={initialAccountId}
+          flash={flashMsg}
+        />
       </div>
-    </main>
+    </div>
   );
 }
