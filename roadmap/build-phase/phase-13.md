@@ -23,7 +23,7 @@ Make the Family plan a real product by letting family members share a common add
 | P13-02 | Done | P0 | P13-01 |
 | P13-03 | Done | P0 | P13-01, P10-01, P10-02 |
 | P13-04 | Not Started | P1 | P13-02, P13-03, P10-01 |
-| P13-05 | Not Started | P1 | P13-04 |
+| P13-05 | Done | P1 | P13-04 |
 | P13-06 | Not Started | P1 | P13-04 |
 | P13-07 | Not Started | P1 | P13-05, P13-06 |
 | P13-08 | Not Started | P2 | P13-07, P9-04 |
@@ -135,7 +135,7 @@ Make the Family plan a real product by letting family members share a common add
 ---
 
 ## P13-05 — Shared address book in the contacts workspace
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P13-04`
 - Implementation Notes:

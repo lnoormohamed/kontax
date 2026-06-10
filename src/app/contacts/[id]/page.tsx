@@ -515,6 +515,12 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
 
             <div className="mt-3.5 flex flex-wrap gap-2">
               <SourceBadge sourceType={contact.sourceType} sourceDetail={contact.sourceDetail} />
+              {isSharedContact ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#eaf0fb] px-2.5 py-1 text-[11px] font-semibold text-[#3a4ab0]">
+                  <WorkspaceIcon name="users" size={12} strokeWidth={1.8} />
+                  {familyContext?.groupName ?? "Family book"}
+                </span>
+              ) : null}
               {contact.isEmergency ? (
                 <span className="inline-flex items-center gap-1 rounded-full bg-[#f3e1da] px-2.5 py-1 text-[11px] font-semibold text-[#b5472f]">
                   <WorkspaceIcon name="emergency" size={12} strokeWidth={1.8} />

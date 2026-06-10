@@ -115,9 +115,10 @@ function MultiValue({
   );
 }
 
-export function CreateContactForm() {
+export function CreateContactForm({ familyBookName }: { familyBookName?: string | null }) {
   const [mode, setMode] = useState<"person" | "org">("person");
   const [showMore, setShowMore] = useState(false);
+  const [target, setTarget] = useState<"private" | "family">("private");
 
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
@@ -207,6 +208,7 @@ export function CreateContactForm() {
         {Object.entries(hidden).map(([name, value]) => (
           <input key={name} name={name} type="hidden" value={value} />
         ))}
+        <input name="target" type="hidden" value={target} />
 
         {/* sticky action bar */}
         <div className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-[#d8ddd6] bg-white/95 px-4 backdrop-blur lg:px-6">
@@ -226,6 +228,32 @@ export function CreateContactForm() {
         </div>
 
         <div className="mx-auto grid w-full max-w-[600px] gap-5 px-4 py-7 lg:px-0">
+          {/* save-to target (Family plan members only) */}
+          {familyBookName ? (
+            <div className="flex items-center justify-center gap-2 text-[13px]">
+              <span className="text-[#8b938c]">Save to</span>
+              <div className="inline-flex rounded-[0.7rem] bg-[#f2f4f0] p-0.5 font-semibold">
+                {(
+                  [
+                    ["private", "Private"],
+                    ["family", familyBookName],
+                  ] as const
+                ).map(([key, label]) => (
+                  <button
+                    className={`rounded-[0.55rem] px-3 py-1 transition ${
+                      target === key ? "bg-white text-[#1d2823] shadow-sm" : "text-[#8b938c]"
+                    }`}
+                    key={key}
+                    onClick={() => setTarget(key)}
+                    type="button"
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          ) : null}
+
           {/* avatar + person/org toggle */}
           <div className="flex flex-col items-center gap-3">
             <div className="grid h-20 w-20 place-items-center rounded-full bg-[#e7efe9] text-2xl font-semibold text-[#17352e]">

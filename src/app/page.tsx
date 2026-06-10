@@ -7,6 +7,7 @@ import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary, isActivityLogEnabled } from "~/server/billing";
 import { getOpenMergeSuggestionsForUser, getRecentMergesForUser } from "~/server/contact-merge";
+import { getUserFamilyMembership } from "~/server/family-access";
 import { db } from "~/server/db";
 
 type HomePageProps = {
@@ -362,97 +363,103 @@ export default async function Home({ searchParams }: HomePageProps) {
                 isEmergency: true,
               }
         : {};
-  const [activeContacts, archivedContacts, mergeSuggestions, planSummary] = await Promise.all([
-    db.contact.findMany({
-      where: {
-        userId: session.user.id,
-        archivedAt: null,
-        ...searchConditions,
-        ...filterConditions,
-      },
-      orderBy:
-        selectedSort === "name"
-          ? {
-              isFavorite: "desc" as const,
-            }
-          : {
-              updatedAt: "desc" as const,
-            },
-      select: {
-        id: true,
-        fullName: true,
-        firstName: true,
-        lastName: true,
-        phoneticFirstName: true,
-        phoneticLastName: true,
-        nickname: true,
-        email: true,
-        phone: true,
-        company: true,
-        phoneticCompany: true,
-        jobTitle: true,
-        website: true,
-        birthday: true,
-        address: true,
-        isFavorite: true,
-        isEmergency: true,
-        notes: true,
-        archivedAt: true,
-        updatedAt: true,
-      },
-    }),
-    db.contact.findMany({
-      where: {
-        userId: session.user.id,
-        NOT: {
-          archivedAt: null,
-        },
-        ...searchConditions,
-        ...filterConditions,
-      },
-      orderBy:
-        selectedSort === "name"
-          ? [
-              {
-                isFavorite: "desc" as const,
-              },
-              {
-                archivedAt: "desc" as const,
-              },
-            ]
-          : {
-              archivedAt: "desc",
-            },
-      select: {
-        id: true,
-        fullName: true,
-        firstName: true,
-        lastName: true,
-        phoneticFirstName: true,
-        phoneticLastName: true,
-        nickname: true,
-        email: true,
-        phone: true,
-        company: true,
-        phoneticCompany: true,
-        jobTitle: true,
-        website: true,
-        birthday: true,
-        address: true,
-        isFavorite: true,
-        isEmergency: true,
-        notes: true,
-        archivedAt: true,
-        updatedAt: true,
-      },
-    }),
-    getOpenMergeSuggestionsForUser(session.user.id),
-    getUserPlanSummary(session.user.id),
-  ]);
+  const contactListSelect = {
+    id: true,
+    fullName: true,
+    firstName: true,
+    lastName: true,
+    phoneticFirstName: true,
+    phoneticLastName: true,
+    nickname: true,
+    email: true,
+    phone: true,
+    company: true,
+    phoneticCompany: true,
+    jobTitle: true,
+    website: true,
+    birthday: true,
+    address: true,
+    isFavorite: true,
+    isEmergency: true,
+    notes: true,
+    archivedAt: true,
+    updatedAt: true,
+  } as const;
 
-  const [peopleCount, favoritesCount, emergencyCount, archivedCount, incomingSharesCount] =
+  // Family (P13-05): the user's family-book contacts surface alongside private
+  // ones. `scope` (all | private | family) toggles which sets are shown.
+  const familyMembership = await getUserFamilyMembership(session.user.id);
+  const familyBookWhere = familyMembership
+    ? {
+        groupContacts: {
+          some: {
+            groupAddressBook: {
+              group: { members: { some: { userId: session.user.id, inviteStatus: "ACCEPTED" as const } } },
+            },
+          },
+        },
+      }
+    : null;
+  const scopeParam = await getSingleParam(searchParams, "scope");
+  const scope = scopeParam === "private" || scopeParam === "family" ? scopeParam : "all";
+  const includePrivate = scope !== "family";
+  const includeShared = scope !== "private" && Boolean(familyBookWhere);
+
+  const [privateActive, sharedActive, archivedContacts, mergeSuggestions, planSummary] =
     await Promise.all([
-    db.contact.count({ where: { userId: session.user.id, archivedAt: null } }),
+      includePrivate
+        ? db.contact.findMany({
+            where: {
+              userId: session.user.id,
+              archivedAt: null,
+              groupContacts: { none: {} },
+              ...searchConditions,
+              ...filterConditions,
+            },
+            orderBy: selectedSort === "name" ? { isFavorite: "desc" as const } : { updatedAt: "desc" as const },
+            select: contactListSelect,
+          })
+        : Promise.resolve([]),
+      includeShared && familyBookWhere
+        ? db.contact.findMany({
+            where: {
+              archivedAt: null,
+              ...familyBookWhere,
+              ...searchConditions,
+              ...filterConditions,
+            },
+            orderBy: { updatedAt: "desc" as const },
+            select: contactListSelect,
+          })
+        : Promise.resolve([]),
+      db.contact.findMany({
+        where: {
+          userId: session.user.id,
+          NOT: { archivedAt: null },
+          ...searchConditions,
+          ...filterConditions,
+        },
+        orderBy:
+          selectedSort === "name"
+            ? [{ isFavorite: "desc" as const }, { archivedAt: "desc" as const }]
+            : { archivedAt: "desc" },
+        select: contactListSelect,
+      }),
+      getOpenMergeSuggestionsForUser(session.user.id),
+      getUserPlanSummary(session.user.id),
+    ]);
+
+  const activeContacts = [
+    ...privateActive.map((c) => ({ ...c, isShared: false })),
+    ...sharedActive.map((c) => ({ ...c, isShared: true })),
+  ];
+
+  const [privatePeopleCount, sharedPeopleCount, favoritesCount, emergencyCount, archivedCount, incomingSharesCount] =
+    await Promise.all([
+    db.contact.count({ where: { userId: session.user.id, archivedAt: null, groupContacts: { none: {} } } }),
+    familyBookWhere
+      ? db.contact.count({ where: { archivedAt: null, ...familyBookWhere } })
+      : Promise.resolve(0),
     db.contact.count({ where: { userId: session.user.id, archivedAt: null, isFavorite: true } }),
     db.contact.count({ where: { userId: session.user.id, archivedAt: null, isEmergency: true } }),
     db.contact.count({ where: { userId: session.user.id, NOT: { archivedAt: null } } }),
@@ -465,6 +472,7 @@ export default async function Home({ searchParams }: HomePageProps) {
       },
     }),
   ]);
+  const peopleCount = privatePeopleCount + sharedPeopleCount;
 
   const highConfidenceCount = mergeSuggestions.filter(
     (suggestion) => suggestion.confidence === "high",
@@ -472,14 +480,15 @@ export default async function Home({ searchParams }: HomePageProps) {
   const recentMerges =
     selectedTab === "duplicates" ? await getRecentMergesForUser(session.user.id) : [];
 
+  const archivedWithFlag = archivedContacts.map((c) => ({ ...c, isShared: false }));
   const sortedActiveContacts =
     selectedSort === "name"
       ? [...activeContacts].sort(compareWorkspaceContacts)
-      : activeContacts;
+      : [...activeContacts].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
   const sortedArchivedContacts =
     selectedSort === "name"
-      ? [...archivedContacts].sort(compareWorkspaceContacts)
-      : archivedContacts;
+      ? [...archivedWithFlag].sort(compareWorkspaceContacts)
+      : archivedWithFlag;
 
   const userLabel = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
   const userInitials = getInitials(userLabel);
@@ -562,6 +571,8 @@ export default async function Home({ searchParams }: HomePageProps) {
         }}
         query={query}
         viewMode={selectedView}
+        currentScope={scope}
+        hasFamily={Boolean(familyMembership)}
         counts={{
           people: peopleCount,
           favorites: favoritesCount,

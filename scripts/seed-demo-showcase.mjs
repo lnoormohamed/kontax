@@ -337,6 +337,41 @@ const main = async () => {
       data: { defaultAddressBookId: group.addressBooks[0]?.id },
     });
   }
+
+  // A few contacts living in the family shared book (owned by the owner,
+  // linked via GroupContact) so the Family badge + Private/Family/All filter
+  // have data to show.
+  const familyGroup = await db.group.findFirst({
+    where: { ownerId: user.id, type: "FAMILY" },
+    select: { defaultAddressBookId: true },
+  });
+  if (familyGroup?.defaultAddressBookId) {
+    const sharedFamilyContacts = [
+      { fullName: "Grandma Ngozi", firstName: "Ngozi", lastName: "Okafor", phone: "+2348090000001", email: "grandma@okafor.example" },
+      { fullName: "Uncle Emeka", firstName: "Emeka", lastName: "Okafor", phone: "+2348090000002", email: "emeka@okafor.example", company: "Okafor & Sons" },
+      { fullName: "Dr Adeyemi (family GP)", firstName: "Bisi", lastName: "Adeyemi", phone: "+2348090000003", email: "clinic@adeyemi.example", jobTitle: "General Practitioner" },
+    ];
+    for (const c of sharedFamilyContacts) {
+      const created = await db.contact.create({
+        data: {
+          userId: user.id,
+          labels: [SHOWCASE_LABEL],
+          ...c,
+          sourceType: "MANUAL",
+          sourceDetail: "Okafor Family (family book)",
+          lastMutatedBy: "MANUAL",
+        },
+      });
+      await db.groupContact.create({
+        data: {
+          groupAddressBookId: familyGroup.defaultAddressBookId,
+          contactId: created.id,
+          addedByUserId: user.id,
+        },
+      });
+    }
+  }
+
   const amaraSnapshot = {
     ownerName,
     fullName: "Amara Okafor",

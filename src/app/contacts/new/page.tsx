@@ -5,6 +5,7 @@ import { CreateContactForm } from "~/app/_components/create-contact-form";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
 import { db } from "~/server/db";
+import { getUserFamilyMembership } from "~/server/family-access";
 
 export default async function NewContactPage() {
   const session = await auth();
@@ -23,6 +24,10 @@ export default async function NewContactPage() {
       db.mergeSuggestion.count({ where: { userId, status: "OPEN" } }),
     ]);
 
+  const familyMembership = await getUserFamilyMembership(userId);
+  const familyTarget =
+    familyMembership?.canEdit && familyMembership.bookId ? familyMembership.groupName : null;
+
   const name = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
 
   return (
@@ -35,7 +40,7 @@ export default async function NewContactPage() {
         duplicates: duplicatesCount,
       }}
     >
-      <CreateContactForm />
+      <CreateContactForm familyBookName={familyTarget} />
     </AppShell>
   );
 }

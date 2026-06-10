@@ -14,7 +14,7 @@ import {
 } from "~/server/contact-merge";
 import { propagateLiveShares } from "~/server/contact-shares";
 import { db } from "~/server/db";
-import { editableContactWhere } from "~/server/family-access";
+import { editableContactWhere, getUserFamilyMembership } from "~/server/family-access";
 import { emitEvent } from "~/lib/activity";
 import { computeContactDiff } from "~/lib/activity/diff";
 import { applyAutoFilledPhoneticFields } from "~/server/phonetics";
@@ -488,22 +488,51 @@ export const createContact = async (formData: FormData) => {
   });
   const phoneticFields = applyAutoFilledPhoneticFields(input, userSettings?.autoFillPhoneticNames ?? false);
 
-  await assertCanCreateContacts(userId);
+  // Family (P13-05): "Save to → Family" creates the contact in the shared book.
+  // A shared contact is owned (nominally) by the group owner; the creating
+  // member must have canEdit. Falls back to a private contact otherwise.
+  const targetFamily = (formData.get("target") === "family");
+  const familyTarget = targetFamily ? await getUserFamilyMembership(userId) : null;
+  const useFamily = Boolean(familyTarget?.canEdit && familyTarget?.bookId);
+
+  if (!useFamily) {
+    await assertCanCreateContacts(userId);
+  }
 
   const createdContact = await db.$transaction(async (tx) => {
+    let ownerId = userId;
+    if (useFamily && familyTarget) {
+      const group = await tx.group.findUnique({
+        where: { id: familyTarget.groupId },
+        select: { ownerId: true },
+      });
+      ownerId = group?.ownerId ?? userId;
+    }
     const contact = await tx.contact.create({
       data: {
-        userId,
+        userId: ownerId,
         ...input,
         ...phoneticFields,
+        ...(useFamily && familyTarget
+          ? { sourceDetail: `${familyTarget.groupName} (family book)` }
+          : {}),
       },
     });
+    if (useFamily && familyTarget?.bookId) {
+      await tx.groupContact.create({
+        data: {
+          groupAddressBookId: familyTarget.bookId,
+          contactId: contact.id,
+          addedByUserId: userId,
+        },
+      });
+    }
     await emitEvent(tx, {
       userId,
       contactId: contact.id,
       eventType: "CONTACT_CREATED",
       actor: "USER",
-      payload: {},
+      payload: useFamily && familyTarget ? { familyBook: familyTarget.groupName } : {},
     });
     return contact;
   });

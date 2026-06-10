@@ -26,6 +26,7 @@ type DashboardContact = {
   address: string | null;
   isFavorite: boolean;
   isEmergency: boolean;
+  isShared: boolean;
   notes: string | null;
   archivedAt: Date | null;
   updatedAt: Date;
@@ -63,6 +64,8 @@ type ContactDashboardProps = {
   mergeSuggestions: PersistedMergeSuggestion[];
   mergeSuggestionsRefreshed: boolean;
   viewMode: WorkspaceView;
+  currentScope: "all" | "private" | "family";
+  hasFamily: boolean;
   counts: {
     people: number;
     favorites: number;
@@ -97,6 +100,8 @@ export function ContactDashboard({
   mergeSuggestions,
   mergeSuggestionsRefreshed,
   viewMode,
+  currentScope,
+  hasFamily,
   counts,
   account,
   syncState,
@@ -111,13 +116,22 @@ export function ContactDashboard({
   });
   const buildHref = (
     tab: WorkspaceTab,
-    overrides?: { filter?: WorkspaceFilter; sort?: WorkspaceSort; view?: WorkspaceView },
+    overrides?: {
+      filter?: WorkspaceFilter;
+      sort?: WorkspaceSort;
+      view?: WorkspaceView;
+      scope?: "all" | "private" | "family";
+    },
   ) => {
     const params = new URLSearchParams();
     params.set("tab", tab);
     params.set("filter", overrides?.filter ?? currentFilter);
     params.set("sort", overrides?.sort ?? currentSort);
     params.set("view", overrides?.view ?? viewMode);
+    const scope = overrides?.scope ?? currentScope;
+    if (scope !== "all") {
+      params.set("scope", scope);
+    }
     if (query) {
       params.set("q", query);
     }
@@ -349,6 +363,13 @@ export function ContactDashboard({
                 {segment("Compact", viewMode === "compact", buildHref(currentTab, { view: "compact" }))}
                 {segment("Cozy", viewMode === "cozy", buildHref(currentTab, { view: "cozy" }))}
               </div>
+              {hasFamily && currentTab === "people" ? (
+                <div className="flex items-center gap-1 rounded-lg bg-[#f2f4f0] p-0.5">
+                  {segment("All", currentScope === "all", buildHref("people", { scope: "all" }))}
+                  {segment("Private", currentScope === "private", buildHref("people", { scope: "private" }))}
+                  {segment("Family", currentScope === "family", buildHref("people", { scope: "family" }))}
+                </div>
+              ) : null}
             </>
           ) : (
             <div className="flex items-center gap-2">
