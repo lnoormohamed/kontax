@@ -38,7 +38,7 @@ Rebuild the main contacts page (`/`) into the approved design: Direction A's lef
 ---
 
 ## P16-01 — Sidebar shell + header (Direction A)
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P0`
 - Dependencies: `P8-01`
 - Implementation Notes:
@@ -55,7 +55,7 @@ Rebuild the main contacts page (`/`) into the approved design: Direction A's lef
   - Labels and shared-book sidebar sections are future (Phase 13/15) — leave structural room, don't build dead UI.
 
 ## P16-02 — Column rows (Direction B) with grouping
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P0`
 - Dependencies: `P16-01`
 - Implementation Notes:
@@ -69,7 +69,7 @@ Rebuild the main contacts page (`/`) into the approved design: Direction A's lef
   - Group letter = first letter of last name (fallback company), matching the existing sort key.
 
 ## P16-03 — Inline RowBadges cluster (delivers P15-01)
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P0`
 - Dependencies: `P16-02`
 - Implementation Notes:
@@ -82,7 +82,7 @@ Rebuild the main contacts page (`/`) into the approved design: Direction A's lef
   - Non-favorite star is hover-only (calm default) — favorite status only shows when on. Intentional.
 
 ## P16-04 — Bulk select (hover checkbox + contextual bar)
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P16-02`
 - Implementation Notes:
@@ -92,7 +92,7 @@ Rebuild the main contacts page (`/`) into the approved design: Direction A's lef
   - Selection works via hover checkboxes; contextual bar shows only on selection; bulk archive/restore function unchanged.
 
 ## P16-05 — States (search / empty / banners)
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P16-02`
 - Implementation Notes:
@@ -103,7 +103,7 @@ Rebuild the main contacts page (`/`) into the approved design: Direction A's lef
   - All states render in the new shell; banners are dismissible/non-blocking; locked state disables create/edit with explanation.
 
 ## P16-06 — Duplicates + Archived in the new shell
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P16-02`
 - Implementation Notes:
@@ -112,7 +112,7 @@ Rebuild the main contacts page (`/`) into the approved design: Direction A's lef
   - Duplicates pair cards and Archived restore/delete work within the sidebar shell.
 
 ## P16-07 — Mobile cozy fallback + bottom nav
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P16-02`
 - Implementation Notes:

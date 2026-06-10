@@ -11,8 +11,8 @@ import {
   permanentlyDeleteContact,
   restoreContact,
   restoreContactsBulk,
-  toggleFavoriteContact,
 } from "~/app/actions/contacts";
+import { ContactBadgeCluster } from "~/app/_components/contact-badge-cluster";
 
 type WorkspaceContact = {
   id: string;
@@ -29,6 +29,7 @@ type WorkspaceContact = {
   birthday: string | null;
   address: string | null;
   isFavorite: boolean;
+  isEmergency: boolean;
   notes: string | null;
   archivedAt: Date | null;
   updatedAt: Date;
@@ -120,30 +121,16 @@ function Avatar({ name, size }: { name: string; size: number }) {
   );
 }
 
-// Inline cluster after the name: favorite toggle + status badges.
-// Status badges (family/team/live/emergency) read from optional contact flags
-// that land in later phases; favorite is live now.
+// Inline cluster after the name: favorite toggle + governed status badges.
+// Delegates to the shared ContactBadgeCluster (P15-01) so the icon vocabulary
+// is identical across rows, the detail page, and future sidebar groupings.
 function RowBadges({ contact, mode }: { contact: WorkspaceContact; mode: "active" | "archived" }) {
   return (
-    <span className="inline-flex shrink-0 items-center gap-1">
-      <form action={toggleFavoriteContact} className="inline-flex">
-        <input name="contactId" type="hidden" value={contact.id} />
-        <input name="redirectTo" type="hidden" value={mode === "active" ? "/?tab=people" : "/?tab=archived"} />
-        <button
-          aria-label={contact.isFavorite ? "Unfavorite" : "Favorite"}
-          aria-pressed={contact.isFavorite}
-          className={`grid h-[22px] w-[22px] place-items-center rounded-md text-sm leading-none transition hover:bg-[rgba(0,0,0,0.06)] ${
-            contact.isFavorite
-              ? "text-amber-500"
-              : "text-slate-300 opacity-0 group-hover:opacity-100"
-          }`}
-          title={contact.isFavorite ? "Unfavorite" : "Favorite"}
-          type="submit"
-        >
-          {contact.isFavorite ? "★" : "☆"}
-        </button>
-      </form>
-    </span>
+    <ContactBadgeCluster
+      contactId={contact.id}
+      flags={{ isFavorite: contact.isFavorite, isEmergency: contact.isEmergency }}
+      redirectTo={mode === "active" ? "/?tab=people" : "/?tab=archived"}
+    />
   );
 }
 

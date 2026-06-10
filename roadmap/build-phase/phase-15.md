@@ -17,15 +17,15 @@ Give the contacts list a single, governed way to show what a contact *is* and *w
 ## Phase Tracker
 | Ticket | Status | Priority | Depends On |
 | --- | --- | --- | --- |
-| P15-01 | Not Started | P1 | P8-01c |
-| P15-02 | Not Started | P1 | P15-01 |
+| P15-01 | Done | P1 | P8-01c |
+| P15-02 | Done | P1 | P15-01 |
 | P15-03 | Not Started | P2 | P15-01, P10-01 |
 | P15-04 | Not Started | P2 | P15-01 |
 
 ---
 
 ## P15-01 — Row context icon system (shared badge component)
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P8-01c`
 - Implementation Notes:
@@ -52,7 +52,7 @@ Give the contacts list a single, governed way to show what a contact *is* and *w
 ---
 
 ## P15-02 — Emergency contact designation
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P15-01`
 - Implementation Notes:

@@ -791,6 +791,39 @@ export const toggleFavoriteContact = async (formData: FormData) => {
   }
 };
 
+// Emergency designation (P15-02) — Kontax-local user state, mirrors favorites.
+// Not translated to CardDAV/vCard semantics in v1.
+export const toggleEmergencyContact = async (formData: FormData) => {
+  const userId = await getRequiredUserId();
+  const contactId = parseContactId(formData);
+  const redirectTo = getRedirectTarget(formData);
+
+  const existingContact = await db.contact.findFirst({
+    where: { id: contactId, userId },
+    select: { id: true, isEmergency: true },
+  });
+
+  if (!existingContact) {
+    throw new Error("Contact not found.");
+  }
+
+  await db.contact.update({
+    where: { id: existingContact.id },
+    data: {
+      isEmergency: !existingContact.isEmergency,
+      lastMutatedBy: "MANUAL",
+      lastMutatedByDetail: null,
+      syncVersion: { increment: 1 },
+    },
+  });
+
+  revalidateContactViews(contactId);
+
+  if (redirectTo) {
+    redirect(redirectTo);
+  }
+};
+
 export const archiveContact = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const contactId = parseContactId(formData);

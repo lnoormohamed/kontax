@@ -25,6 +25,7 @@ type DashboardContact = {
   birthday: string | null;
   address: string | null;
   isFavorite: boolean;
+  isEmergency: boolean;
   notes: string | null;
   archivedAt: Date | null;
   updatedAt: Date;
@@ -47,7 +48,7 @@ type PlanSummary = {
 };
 
 type WorkspaceTab = "people" | "archived" | "duplicates" | "activity";
-type WorkspaceFilter = "all" | "recent" | "incomplete" | "favorites";
+type WorkspaceFilter = "all" | "recent" | "incomplete" | "favorites" | "emergency";
 type WorkspaceSort = "updated" | "name";
 type WorkspaceView = "compact" | "cozy";
 
@@ -62,7 +63,13 @@ type ContactDashboardProps = {
   mergeSuggestions: PersistedMergeSuggestion[];
   mergeSuggestionsRefreshed: boolean;
   viewMode: WorkspaceView;
-  counts: { people: number; favorites: number; archived: number; duplicates: number };
+  counts: {
+    people: number;
+    favorites: number;
+    emergency: number;
+    archived: number;
+    duplicates: number;
+  };
   incomingShares?: number;
   account: { name: string; email: string };
   syncState: "ok" | "warning" | "error";
@@ -118,7 +125,8 @@ export function ContactDashboard({
   };
 
   const isFavoritesView = currentTab === "people" && currentFilter === "favorites";
-  const peopleActive = currentTab === "people" && !isFavoritesView;
+  const isEmergencyView = currentTab === "people" && currentFilter === "emergency";
+  const peopleActive = currentTab === "people" && !isFavoritesView && !isEmergencyView;
   const groupByLetter = currentSort === "name" && !query;
 
   const showGrace = planSummary.lifecycleState === "GRACE";
@@ -241,6 +249,7 @@ export function ContactDashboard({
           </div>
         ) : null}
         {navItem(isFavoritesView, buildHref("people", { filter: "favorites" }), "star", "Favorites", counts.favorites)}
+        {navItem(isEmergencyView, buildHref("people", { filter: "emergency" }), "emergency", "Emergency", counts.emergency)}
         {navItem(currentTab === "archived", buildHref("archived", { filter: "all" }), "archive", "Archived", counts.archived)}
         {navItem(
           currentTab === "duplicates",
@@ -360,9 +369,11 @@ export function ContactDashboard({
                   ? `No contacts match “${query}”.`
                   : isFavoritesView
                     ? "No favorites yet. Star a contact to pin it here."
-                    : currentFilter === "incomplete"
-                      ? "No contacts are missing details."
-                      : "Your contacts list is empty. Add your first contact or import from Google, Apple, or Outlook."
+                    : isEmergencyView
+                      ? "No emergency contacts yet. Mark a contact as emergency to pull it up fast."
+                      : currentFilter === "incomplete"
+                        ? "No contacts are missing details."
+                        : "Your contacts list is empty. Add your first contact or import from Google, Apple, or Outlook."
               }
               groupByLetter={groupByLetter}
               mode="active"

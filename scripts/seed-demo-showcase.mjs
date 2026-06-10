@@ -187,6 +187,7 @@ const main = async () => {
       ],
       customFields: [{ label: "department", value: "Clinical Leadership" }],
       isFavorite: true,
+      isEmergency: true,
       notes: "Met at the Lagos HealthTech summit. Prefers WhatsApp. Reviewing Q3 partnership.",
       sourceDetail: "Created in Kontax",
     }),

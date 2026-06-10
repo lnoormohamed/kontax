@@ -249,6 +249,7 @@ model Contact {
   address               String?
   avatarUrl             String?
   isFavorite            Boolean           @default(false)
+  isEmergency           Boolean           @default(false)
   labels                Json?
   websiteEntries        Json?
   emailAddresses        Json?

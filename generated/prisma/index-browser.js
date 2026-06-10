@@ -171,6 +171,7 @@ exports.Prisma.ContactScalarFieldEnum = {
   address: 'address',
   avatarUrl: 'avatarUrl',
   isFavorite: 'isFavorite',
+  isEmergency: 'isEmergency',
   labels: 'labels',
   websiteEntries: 'websiteEntries',
   emailAddresses: 'emailAddresses',

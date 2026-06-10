@@ -5967,6 +5967,7 @@ export namespace Prisma {
     address: string | null
     avatarUrl: string | null
     isFavorite: boolean | null
+    isEmergency: boolean | null
     notes: string | null
     sourceType: $Enums.SourceType | null
     sourceDetail: string | null
@@ -6005,6 +6006,7 @@ export namespace Prisma {
     address: string | null
     avatarUrl: string | null
     isFavorite: boolean | null
+    isEmergency: boolean | null
     notes: string | null
     sourceType: $Enums.SourceType | null
     sourceDetail: string | null
@@ -6043,6 +6045,7 @@ export namespace Prisma {
     address: number
     avatarUrl: number
     isFavorite: number
+    isEmergency: number
     labels: number
     websiteEntries: number
     emailAddresses: number
@@ -6102,6 +6105,7 @@ export namespace Prisma {
     address?: true
     avatarUrl?: true
     isFavorite?: true
+    isEmergency?: true
     notes?: true
     sourceType?: true
     sourceDetail?: true
@@ -6140,6 +6144,7 @@ export namespace Prisma {
     address?: true
     avatarUrl?: true
     isFavorite?: true
+    isEmergency?: true
     notes?: true
     sourceType?: true
     sourceDetail?: true
@@ -6178,6 +6183,7 @@ export namespace Prisma {
     address?: true
     avatarUrl?: true
     isFavorite?: true
+    isEmergency?: true
     labels?: true
     websiteEntries?: true
     emailAddresses?: true
@@ -6314,6 +6320,7 @@ export namespace Prisma {
     address: string | null
     avatarUrl: string | null
     isFavorite: boolean
+    isEmergency: boolean
     labels: JsonValue | null
     websiteEntries: JsonValue | null
     emailAddresses: JsonValue | null
@@ -6382,6 +6389,7 @@ export namespace Prisma {
     address?: boolean
     avatarUrl?: boolean
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: boolean
     websiteEntries?: boolean
     emailAddresses?: boolean
@@ -6443,6 +6451,7 @@ export namespace Prisma {
     address?: boolean
     avatarUrl?: boolean
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: boolean
     websiteEntries?: boolean
     emailAddresses?: boolean
@@ -6495,6 +6504,7 @@ export namespace Prisma {
     address?: boolean
     avatarUrl?: boolean
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: boolean
     websiteEntries?: boolean
     emailAddresses?: boolean
@@ -6547,6 +6557,7 @@ export namespace Prisma {
     address?: boolean
     avatarUrl?: boolean
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: boolean
     websiteEntries?: boolean
     emailAddresses?: boolean
@@ -6568,7 +6579,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ContactOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "importJobId" | "mergedIntoContactId" | "syncUid" | "syncVersion" | "syncTombstoneAt" | "fullName" | "firstName" | "middleName" | "lastName" | "phoneticFirstName" | "phoneticLastName" | "namePrefix" | "nameSuffix" | "nickname" | "email" | "phone" | "company" | "phoneticCompany" | "jobTitle" | "department" | "website" | "birthday" | "address" | "avatarUrl" | "isFavorite" | "labels" | "websiteEntries" | "emailAddresses" | "phoneNumbers" | "postalAddresses" | "emailEntries" | "phoneEntries" | "addressEntries" | "significantDates" | "relatedPeople" | "customFields" | "notes" | "sourceType" | "sourceDetail" | "lastMutatedBy" | "lastMutatedByDetail" | "archivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["contact"]>
+  export type ContactOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "importJobId" | "mergedIntoContactId" | "syncUid" | "syncVersion" | "syncTombstoneAt" | "fullName" | "firstName" | "middleName" | "lastName" | "phoneticFirstName" | "phoneticLastName" | "namePrefix" | "nameSuffix" | "nickname" | "email" | "phone" | "company" | "phoneticCompany" | "jobTitle" | "department" | "website" | "birthday" | "address" | "avatarUrl" | "isFavorite" | "isEmergency" | "labels" | "websiteEntries" | "emailAddresses" | "phoneNumbers" | "postalAddresses" | "emailEntries" | "phoneEntries" | "addressEntries" | "significantDates" | "relatedPeople" | "customFields" | "notes" | "sourceType" | "sourceDetail" | "lastMutatedBy" | "lastMutatedByDetail" | "archivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["contact"]>
   export type ContactInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     importJob?: boolean | Contact$importJobArgs<ExtArgs>
@@ -6637,6 +6648,7 @@ export namespace Prisma {
       address: string | null
       avatarUrl: string | null
       isFavorite: boolean
+      isEmergency: boolean
       labels: Prisma.JsonValue | null
       websiteEntries: Prisma.JsonValue | null
       emailAddresses: Prisma.JsonValue | null
@@ -7117,6 +7129,7 @@ export namespace Prisma {
     readonly address: FieldRef<"Contact", 'String'>
     readonly avatarUrl: FieldRef<"Contact", 'String'>
     readonly isFavorite: FieldRef<"Contact", 'Boolean'>
+    readonly isEmergency: FieldRef<"Contact", 'Boolean'>
     readonly labels: FieldRef<"Contact", 'Json'>
     readonly websiteEntries: FieldRef<"Contact", 'Json'>
     readonly emailAddresses: FieldRef<"Contact", 'Json'>
@@ -26692,6 +26705,7 @@ export namespace Prisma {
     address: 'address',
     avatarUrl: 'avatarUrl',
     isFavorite: 'isFavorite',
+    isEmergency: 'isEmergency',
     labels: 'labels',
     websiteEntries: 'websiteEntries',
     emailAddresses: 'emailAddresses',
@@ -27790,6 +27804,7 @@ export namespace Prisma {
     address?: StringNullableFilter<"Contact"> | string | null
     avatarUrl?: StringNullableFilter<"Contact"> | string | null
     isFavorite?: BoolFilter<"Contact"> | boolean
+    isEmergency?: BoolFilter<"Contact"> | boolean
     labels?: JsonNullableFilter<"Contact">
     websiteEntries?: JsonNullableFilter<"Contact">
     emailAddresses?: JsonNullableFilter<"Contact">
@@ -27850,6 +27865,7 @@ export namespace Prisma {
     address?: SortOrderInput | SortOrder
     avatarUrl?: SortOrderInput | SortOrder
     isFavorite?: SortOrder
+    isEmergency?: SortOrder
     labels?: SortOrderInput | SortOrder
     websiteEntries?: SortOrderInput | SortOrder
     emailAddresses?: SortOrderInput | SortOrder
@@ -27913,6 +27929,7 @@ export namespace Prisma {
     address?: StringNullableFilter<"Contact"> | string | null
     avatarUrl?: StringNullableFilter<"Contact"> | string | null
     isFavorite?: BoolFilter<"Contact"> | boolean
+    isEmergency?: BoolFilter<"Contact"> | boolean
     labels?: JsonNullableFilter<"Contact">
     websiteEntries?: JsonNullableFilter<"Contact">
     emailAddresses?: JsonNullableFilter<"Contact">
@@ -27973,6 +27990,7 @@ export namespace Prisma {
     address?: SortOrderInput | SortOrder
     avatarUrl?: SortOrderInput | SortOrder
     isFavorite?: SortOrder
+    isEmergency?: SortOrder
     labels?: SortOrderInput | SortOrder
     websiteEntries?: SortOrderInput | SortOrder
     emailAddresses?: SortOrderInput | SortOrder
@@ -28030,6 +28048,7 @@ export namespace Prisma {
     address?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     avatarUrl?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     isFavorite?: BoolWithAggregatesFilter<"Contact"> | boolean
+    isEmergency?: BoolWithAggregatesFilter<"Contact"> | boolean
     labels?: JsonNullableWithAggregatesFilter<"Contact">
     websiteEntries?: JsonNullableWithAggregatesFilter<"Contact">
     emailAddresses?: JsonNullableWithAggregatesFilter<"Contact">
@@ -29998,6 +30017,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -30058,6 +30078,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -30112,6 +30133,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -30172,6 +30194,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -30229,6 +30252,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -30275,6 +30299,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -30324,6 +30349,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -32741,6 +32767,7 @@ export namespace Prisma {
     address?: SortOrder
     avatarUrl?: SortOrder
     isFavorite?: SortOrder
+    isEmergency?: SortOrder
     labels?: SortOrder
     websiteEntries?: SortOrder
     emailAddresses?: SortOrder
@@ -32794,6 +32821,7 @@ export namespace Prisma {
     address?: SortOrder
     avatarUrl?: SortOrder
     isFavorite?: SortOrder
+    isEmergency?: SortOrder
     notes?: SortOrder
     sourceType?: SortOrder
     sourceDetail?: SortOrder
@@ -32832,6 +32860,7 @@ export namespace Prisma {
     address?: SortOrder
     avatarUrl?: SortOrder
     isFavorite?: SortOrder
+    isEmergency?: SortOrder
     notes?: SortOrder
     sourceType?: SortOrder
     sourceDetail?: SortOrder
@@ -37285,6 +37314,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -37343,6 +37373,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -38014,6 +38045,7 @@ export namespace Prisma {
     address?: StringNullableFilter<"Contact"> | string | null
     avatarUrl?: StringNullableFilter<"Contact"> | string | null
     isFavorite?: BoolFilter<"Contact"> | boolean
+    isEmergency?: BoolFilter<"Contact"> | boolean
     labels?: JsonNullableFilter<"Contact">
     websiteEntries?: JsonNullableFilter<"Contact">
     emailAddresses?: JsonNullableFilter<"Contact">
@@ -39127,6 +39159,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -39186,6 +39219,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -39244,6 +39278,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -39302,6 +39337,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -39628,6 +39664,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -39687,6 +39724,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -40235,6 +40273,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -40293,6 +40332,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -40597,6 +40637,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -40656,6 +40697,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -40714,6 +40756,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -40773,6 +40816,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -40939,6 +40983,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -40998,6 +41043,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -41062,6 +41108,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -41121,6 +41168,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -41811,6 +41859,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -41870,6 +41919,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -42068,6 +42118,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -42127,6 +42178,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -42446,6 +42498,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -42505,6 +42558,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -42719,6 +42773,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -42778,6 +42833,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -42917,6 +42973,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -42976,6 +43033,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -43104,6 +43162,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -43163,6 +43222,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -43873,6 +43933,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -43932,6 +43993,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -44043,6 +44105,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -44102,6 +44165,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -44230,6 +44294,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -44289,6 +44354,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -44412,6 +44478,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -44471,6 +44538,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -44536,6 +44604,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -44816,6 +44885,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -44874,6 +44944,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -44930,6 +45001,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -45811,6 +45883,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -46232,6 +46305,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -46290,6 +46364,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -46346,6 +46421,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -46576,6 +46652,7 @@ export namespace Prisma {
     address?: string | null
     avatarUrl?: string | null
     isFavorite?: boolean
+    isEmergency?: boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -46622,6 +46699,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -46680,6 +46758,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue
@@ -46736,6 +46815,7 @@ export namespace Prisma {
     address?: NullableStringFieldUpdateOperationsInput | string | null
     avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
     labels?: NullableJsonNullValueInput | InputJsonValue
     websiteEntries?: NullableJsonNullValueInput | InputJsonValue
     emailAddresses?: NullableJsonNullValueInput | InputJsonValue

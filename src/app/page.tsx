@@ -14,7 +14,7 @@ type HomePageProps = {
 };
 
 type ContactsWorkspaceTab = "people" | "archived" | "duplicates" | "activity";
-type ContactsWorkspaceFilter = "all" | "recent" | "incomplete" | "favorites";
+type ContactsWorkspaceFilter = "all" | "recent" | "incomplete" | "favorites" | "emergency";
 type ContactsWorkspaceSort = "updated" | "name";
 type ContactsWorkspaceView = "compact" | "cozy";
 
@@ -50,7 +50,12 @@ const getSelectedFilter = async (
 ): Promise<ContactsWorkspaceFilter> => {
   const filter = await getSingleParam(searchParams, "filter");
 
-  if (filter === "recent" || filter === "incomplete" || filter === "favorites") {
+  if (
+    filter === "recent" ||
+    filter === "incomplete" ||
+    filter === "favorites" ||
+    filter === "emergency"
+  ) {
     return filter;
   }
 
@@ -352,6 +357,10 @@ export default async function Home({ searchParams }: HomePageProps) {
           ? {
               isFavorite: true,
             }
+          : selectedFilter === "emergency"
+            ? {
+                isEmergency: true,
+              }
         : {};
   const [activeContacts, archivedContacts, mergeSuggestions, planSummary] = await Promise.all([
     db.contact.findMany({
@@ -386,6 +395,7 @@ export default async function Home({ searchParams }: HomePageProps) {
         birthday: true,
         address: true,
         isFavorite: true,
+        isEmergency: true,
         notes: true,
         archivedAt: true,
         updatedAt: true,
@@ -430,6 +440,7 @@ export default async function Home({ searchParams }: HomePageProps) {
         birthday: true,
         address: true,
         isFavorite: true,
+        isEmergency: true,
         notes: true,
         archivedAt: true,
         updatedAt: true,
@@ -439,9 +450,11 @@ export default async function Home({ searchParams }: HomePageProps) {
     getUserPlanSummary(session.user.id),
   ]);
 
-  const [peopleCount, favoritesCount, archivedCount, incomingSharesCount] = await Promise.all([
+  const [peopleCount, favoritesCount, emergencyCount, archivedCount, incomingSharesCount] =
+    await Promise.all([
     db.contact.count({ where: { userId: session.user.id, archivedAt: null } }),
     db.contact.count({ where: { userId: session.user.id, archivedAt: null, isFavorite: true } }),
+    db.contact.count({ where: { userId: session.user.id, archivedAt: null, isEmergency: true } }),
     db.contact.count({ where: { userId: session.user.id, NOT: { archivedAt: null } } }),
     db.contactShare.count({
       where: {
@@ -552,6 +565,7 @@ export default async function Home({ searchParams }: HomePageProps) {
         counts={{
           people: peopleCount,
           favorites: favoritesCount,
+          emergency: emergencyCount,
           archived: archivedCount,
           duplicates: mergeSuggestions.length,
         }}
