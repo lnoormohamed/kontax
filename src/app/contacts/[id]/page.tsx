@@ -568,13 +568,11 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                   {contact.syncUid.slice(0, 8)}…
                 </dd>
               </div>
-              <div className="text-[#5c655e]">
-                <LastUpdatedBy
-                  lastMutatedBy={contact.lastMutatedBy}
-                  lastMutatedByDetail={contact.lastMutatedByDetail}
-                  updatedAt={contact.updatedAt.toISOString()}
-                />
-              </div>
+              <LastUpdatedBy
+                lastMutatedBy={contact.lastMutatedBy}
+                lastMutatedByDetail={contact.lastMutatedByDetail}
+                updatedAt={contact.updatedAt.toISOString()}
+              />
             </dl>
           </aside>
 
