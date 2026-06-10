@@ -105,6 +105,74 @@ const getInitials = (value: string) =>
 const sectionCardClassName =
   "rounded-[14px] border border-[#d8ddd6] bg-white p-5 sm:p-6";
 
+// Normalise the contact's Json entry columns into the shapes the inline editor
+// expects. Tolerates legacy shapes ({relationship,name}, {date}, CardDAV postal
+// keys) and falls back to the scalar mirror column when no entries exist.
+const asArray = (value: unknown): Record<string, unknown>[] =>
+  Array.isArray(value) ? (value.filter((v) => v && typeof v === "object") as Record<string, unknown>[]) : [];
+
+const str = (value: unknown): string => (typeof value === "string" ? value : "");
+
+const normaliseSimple = (
+  raw: unknown,
+  scalar: string | null,
+  fallbackLabel: string,
+): { label: string; value: string }[] => {
+  const items = asArray(raw)
+    .map((e) => ({ label: str(e.label) || fallbackLabel, value: str(e.value) }))
+    .filter((e) => e.value.length > 0);
+  if (items.length === 0 && scalar) {
+    return [{ label: fallbackLabel, value: scalar }];
+  }
+  return items;
+};
+
+const normaliseRelated = (raw: unknown): { label: string; value: string }[] =>
+  asArray(raw)
+    .map((e) => ({
+      label: str(e.label) || str(e.relationship) || "Other",
+      value: str(e.value) || str(e.name),
+    }))
+    .filter((e) => e.value.length > 0);
+
+const normaliseDates = (raw: unknown): { label: string; value: string }[] =>
+  asArray(raw)
+    .map((e) => ({ label: str(e.label) || "Anniversary", value: str(e.value) || str(e.date) }))
+    .filter((e) => e.value.length > 0);
+
+const normaliseAddresses = (
+  raw: unknown,
+  scalar: string | null,
+): {
+  label: string;
+  street: string;
+  city: string;
+  state: string;
+  postcode: string;
+  country: string;
+}[] => {
+  const items = asArray(raw).map((a) => {
+    const street = str(a.street) || [str(a.streetLine1), str(a.streetLine2)].filter(Boolean).join(", ");
+    const city = str(a.city) || str(a.cityOrTown);
+    const state = str(a.state) || str(a.region) || str(a.stateOrProvince);
+    const postcode = str(a.postcode) || str(a.postalCode);
+    const country = str(a.country) || str(a.countryOrRegion);
+    const anyStructured = street || city || state || postcode || country;
+    return {
+      label: str(a.label) || "Home",
+      street: anyStructured ? street : str(a.formatted),
+      city,
+      state,
+      postcode,
+      country,
+    };
+  });
+  if (items.length === 0 && scalar) {
+    return [{ label: "Home", street: scalar, city: "", state: "", postcode: "", country: "" }];
+  }
+  return items;
+};
+
 export default async function ContactDetailPage({ params, searchParams }: ContactDetailPageProps) {
   const session = await auth();
 
@@ -515,6 +583,14 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 birthday: contact.birthday,
                 address: contact.address,
                 notes: contact.notes,
+              }}
+              entries={{
+                emails: normaliseSimple(contact.emailEntries, contact.email, "Work"),
+                phones: normaliseSimple(contact.phoneEntries, contact.phone, "Mobile"),
+                websites: normaliseSimple(contact.websiteEntries, contact.website, "Portfolio"),
+                addresses: normaliseAddresses(contact.addressEntries, contact.address),
+                dates: normaliseDates(contact.significantDates),
+                related: normaliseRelated(contact.relatedPeople),
               }}
               editableShared={!isLiveReceived}
             />

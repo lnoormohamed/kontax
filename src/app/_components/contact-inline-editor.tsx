@@ -3,6 +3,12 @@
 import { useState } from "react";
 
 import { updateContactField } from "~/app/actions/contacts";
+import {
+  AddressGroup,
+  MultiValueGroup,
+  type AddressEntry,
+  type SimpleEntry,
+} from "~/app/_components/contact-multi-value";
 
 export type InlineEditorContact = {
   id: string;
@@ -58,49 +64,22 @@ const formatDateDisplay = (value: string): string => {
   }).format(new Date(Date.UTC(Number(year), Number(month) - 1, Number(day))));
 };
 
-const SECTIONS: Array<{ id: string; title: string; fields: FieldDef[] }> = [
-  {
-    id: "identity",
-    title: "Identity",
-    fields: [
-      { key: "fullName", label: "Full name" },
-      { key: "firstName", label: "First name" },
-      { key: "middleName", label: "Middle name" },
-      { key: "lastName", label: "Last name" },
-      { key: "namePrefix", label: "Prefix" },
-      { key: "nameSuffix", label: "Suffix" },
-      { key: "nickname", label: "Nickname" },
-      { key: "phoneticFirstName", label: "Phonetic first" },
-      { key: "phoneticLastName", label: "Phonetic last" },
-    ],
-  },
-  {
-    id: "methods",
-    title: "Contact methods",
-    fields: [
-      { key: "email", label: "Email", type: "email" },
-      { key: "phone", label: "Phone", type: "tel" },
-      { key: "website", label: "Website", type: "url" },
-    ],
-  },
-  {
-    id: "work",
-    title: "Work",
-    fields: [
-      { key: "company", label: "Company" },
-      { key: "jobTitle", label: "Job title" },
-      { key: "phoneticCompany", label: "Phonetic company" },
-    ],
-  },
-  {
-    id: "personal",
-    title: "Personal",
-    fields: [
-      { key: "birthday", label: "Birthday", display: "date" },
-      { key: "address", label: "Address", type: "area" },
-    ],
-  },
-  { id: "notes", title: "Notes", fields: [{ key: "notes", label: "Notes", type: "area" }] },
+const IDENTITY_FIELDS: FieldDef[] = [
+  { key: "fullName", label: "Full name" },
+  { key: "firstName", label: "First name" },
+  { key: "middleName", label: "Middle name" },
+  { key: "lastName", label: "Last name" },
+  { key: "namePrefix", label: "Prefix" },
+  { key: "nameSuffix", label: "Suffix" },
+  { key: "nickname", label: "Nickname" },
+  { key: "phoneticFirstName", label: "Phonetic first" },
+  { key: "phoneticLastName", label: "Phonetic last" },
+];
+
+const WORK_FIELDS: FieldDef[] = [
+  { key: "company", label: "Company" },
+  { key: "jobTitle", label: "Job title" },
+  { key: "phoneticCompany", label: "Phonetic company" },
 ];
 
 function InlineField({
@@ -226,14 +205,48 @@ function InlineField({
   );
 }
 
+function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <section className="overflow-hidden rounded-[14px] border border-[#d8ddd6] bg-white">
+      <h3 className="px-5 pt-3.5 text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">
+        {title}
+      </h3>
+      <div className="mt-3 h-px bg-[#e9ece7]" />
+      <div className="px-2 pb-2.5 pt-1.5">{children}</div>
+    </section>
+  );
+}
+
+function GroupLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="mb-0.5 ml-[13px] mt-2 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8b938c]">
+      {children}
+    </div>
+  );
+}
+
+const groupDivider = <div className="mx-[11px] my-0.5 h-px bg-[#e9ece7]" />;
+
+export type ContactEntries = {
+  emails: SimpleEntry[];
+  phones: SimpleEntry[];
+  websites: SimpleEntry[];
+  addresses: AddressEntry[];
+  dates: SimpleEntry[];
+  related: SimpleEntry[];
+};
+
 export function ContactInlineEditor({
   contact,
+  entries,
   editableShared,
 }: {
   contact: InlineEditorContact;
+  entries: ContactEntries;
   /** false for a live-received contact: shared fields read-only, notes still editable */
   editableShared: boolean;
 }) {
+  const editable = editableShared;
   return (
     <div className="grid gap-4">
       {!editableShared ? (
@@ -242,28 +255,104 @@ export function ContactInlineEditor({
           notes stay private and editable.
         </p>
       ) : null}
-      {SECTIONS.map((section) => (
-        <section
-          className="overflow-hidden rounded-[14px] border border-[#d8ddd6] bg-white"
-          key={section.id}
-        >
-          <h3 className="px-5 pt-3.5 text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">
-            {section.title}
-          </h3>
-          <div className="mt-3 h-px bg-[#e9ece7]" />
-          <div className="px-2 pb-2.5 pt-1.5">
-            {section.fields.map((field) => (
-              <InlineField
-                contactId={contact.id}
-                editable={editableShared || field.key === "notes"}
-                field={field}
-                initialValue={contact[field.key] ?? ""}
-                key={field.key}
-              />
-            ))}
-          </div>
-        </section>
-      ))}
+
+      <SectionCard title="Identity">
+        {IDENTITY_FIELDS.map((field) => (
+          <InlineField
+            contactId={contact.id}
+            editable={editable}
+            field={field}
+            initialValue={contact[field.key] ?? ""}
+            key={field.key}
+          />
+        ))}
+      </SectionCard>
+
+      <SectionCard title="Contact methods">
+        <MultiValueGroup
+          addText="Add email"
+          contactId={contact.id}
+          defaultLabel="Work"
+          editable={editable}
+          group="emails"
+          initial={entries.emails}
+          inputType="email"
+        />
+        {groupDivider}
+        <MultiValueGroup
+          addText="Add phone"
+          contactId={contact.id}
+          defaultLabel="Mobile"
+          editable={editable}
+          group="phones"
+          initial={entries.phones}
+          inputType="tel"
+        />
+        {groupDivider}
+        <MultiValueGroup
+          addText="Add website"
+          contactId={contact.id}
+          defaultLabel="Portfolio"
+          editable={editable}
+          group="websites"
+          initial={entries.websites}
+          inputType="url"
+        />
+      </SectionCard>
+
+      <SectionCard title="Work">
+        {WORK_FIELDS.map((field) => (
+          <InlineField
+            contactId={contact.id}
+            editable={editable}
+            field={field}
+            initialValue={contact[field.key] ?? ""}
+            key={field.key}
+          />
+        ))}
+      </SectionCard>
+
+      <SectionCard title="Personal">
+        <InlineField
+          contactId={contact.id}
+          editable={editable}
+          field={{ key: "birthday", label: "Birthday", display: "date" }}
+          initialValue={contact.birthday ?? ""}
+        />
+        {groupDivider}
+        <GroupLabel>Addresses</GroupLabel>
+        <AddressGroup contactId={contact.id} editable={editable} initial={entries.addresses} />
+        {groupDivider}
+        <GroupLabel>Related people</GroupLabel>
+        <MultiValueGroup
+          addText="Add related person"
+          contactId={contact.id}
+          defaultLabel="Spouse"
+          editable={editable}
+          group="related"
+          initial={entries.related}
+        />
+        {groupDivider}
+        <GroupLabel>Significant dates</GroupLabel>
+        <MultiValueGroup
+          addText="Add date"
+          contactId={contact.id}
+          defaultLabel="Anniversary"
+          editable={editable}
+          group="dates"
+          initial={entries.dates}
+          inputType="date"
+        />
+      </SectionCard>
+
+      <SectionCard title="Notes">
+        <InlineField
+          contactId={contact.id}
+          editable
+          field={{ key: "notes", label: "Notes", type: "area" }}
+          initialValue={contact.notes ?? ""}
+        />
+      </SectionCard>
     </div>
   );
 }

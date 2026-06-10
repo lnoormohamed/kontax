@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 
+import { Prisma } from "../../../generated/prisma";
 import { auth } from "~/server/auth";
 import { assertCanCreateContacts } from "~/server/billing";
 import {
@@ -627,6 +628,111 @@ export const updateContactField = async (contactId: string, field: string, rawVa
         syncVersion: { increment: 1 },
       },
     });
+    const diffs = computeContactDiff(before, after);
+    if (diffs.length > 0) {
+      await emitEvent(tx, {
+        userId,
+        contactId,
+        eventType: "CONTACT_UPDATED",
+        actor: "USER",
+        payload: { diffs },
+      });
+    }
+  });
+
+  await propagateLiveShares(userId, contactId);
+  revalidateContactViews(contactId);
+};
+
+// --- Multi-value entry groups (P17-02 follow-up) -----------------------------
+// Emails / phones / websites / addresses / significant dates / related people
+// are stored as Json arrays. Each group maps to a Json column and, where it has
+// a "primary" scalar mirror (used by list views + search), keeps that in sync
+// with the first entry.
+
+const simpleEntrySchema = z.object({
+  label: z.string().trim().max(40),
+  value: z.string().trim().max(400),
+});
+
+const addressEntrySchema = z.object({
+  label: z.string().trim().max(40),
+  street: z.string().trim().max(200).optional().default(""),
+  city: z.string().trim().max(120).optional().default(""),
+  state: z.string().trim().max(120).optional().default(""),
+  postcode: z.string().trim().max(40).optional().default(""),
+  country: z.string().trim().max(120).optional().default(""),
+});
+
+type AddressEntry = z.infer<typeof addressEntrySchema>;
+
+const formatAddressEntry = (a: AddressEntry): string =>
+  [a.street, [a.city, a.state].filter(Boolean).join(", "), a.postcode, a.country]
+    .map((part) => part.trim())
+    .filter(Boolean)
+    .join(", ");
+
+const ENTRY_GROUPS = {
+  emails: { column: "emailEntries", scalar: "email" },
+  phones: { column: "phoneEntries", scalar: "phone" },
+  websites: { column: "websiteEntries", scalar: "website" },
+  addresses: { column: "addressEntries", scalar: "address" },
+  dates: { column: "significantDates", scalar: null },
+  related: { column: "relatedPeople", scalar: null },
+} as const;
+
+type EntryGroup = keyof typeof ENTRY_GROUPS;
+
+const isEntryGroup = (value: string): value is EntryGroup => value in ENTRY_GROUPS;
+
+export const updateContactEntries = async (
+  contactId: string,
+  group: string,
+  rawEntries: unknown,
+) => {
+  const userId = await getRequiredUserId();
+  if (!isEntryGroup(group)) {
+    throw new Error("Unknown contact field group.");
+  }
+  const { column, scalar } = ENTRY_GROUPS[group];
+
+  // Validate + normalise the incoming entries for this group.
+  let columnValue: Prisma.InputJsonValue | typeof Prisma.DbNull;
+  let scalarValue: string | null = null;
+  if (group === "addresses") {
+    const parsed = z.array(addressEntrySchema).parse(rawEntries);
+    const entries = parsed
+      .map((a) => ({ ...a, formatted: formatAddressEntry(a) }))
+      .filter((a) => a.formatted.length > 0 || a.street || a.city);
+    columnValue = entries.length > 0 ? entries : Prisma.DbNull;
+    scalarValue = entries[0]?.formatted ?? null;
+  } else {
+    const parsed = z.array(simpleEntrySchema).parse(rawEntries);
+    const entries = parsed
+      .map((e) => ({
+        label: e.label,
+        value: group === "emails" ? e.value.toLowerCase() : e.value,
+      }))
+      .filter((e) => e.value.length > 0);
+    columnValue = entries.length > 0 ? entries : Prisma.DbNull;
+    scalarValue = entries[0]?.value ?? null;
+  }
+
+  await db.$transaction(async (tx) => {
+    const before = await tx.contact.findFirst({ where: { id: contactId, userId } });
+    if (!before) {
+      throw new Error("Contact not found.");
+    }
+    const data: Record<string, unknown> = {
+      [column]: columnValue,
+      lastMutatedBy: "MANUAL",
+      lastMutatedByDetail: null,
+      syncVersion: { increment: 1 },
+    };
+    if (scalar) {
+      data[scalar] = scalarValue;
+    }
+    const after = await tx.contact.update({ where: { id: contactId }, data });
     const diffs = computeContactDiff(before, after);
     if (diffs.length > 0) {
       await emitEvent(tx, {
