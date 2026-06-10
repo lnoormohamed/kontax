@@ -103,7 +103,7 @@ const getInitials = (value: string) =>
     .toUpperCase();
 
 const sectionCardClassName =
-  "rounded-[2rem] border border-[#d8ddd6] bg-white p-5 shadow-sm sm:p-6";
+  "rounded-[14px] border border-[#d8ddd6] bg-white p-5 sm:p-6";
 
 export default async function ContactDetailPage({ params, searchParams }: ContactDetailPageProps) {
   const session = await auth();
@@ -553,8 +553,8 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
 
         {detailTab === "sharing" ? (
           <section className={sectionCardClassName} id="contact-sharing">
-            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Sharing</p>
-            <h2 className="mt-1 text-lg font-semibold text-slate-900">Share this contact</h2>
+            <p className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">Sharing</p>
+            <h2 className="mt-1 text-[17px] font-semibold text-[#1d2823]">Share this contact</h2>
 
             {/* vCard share link (all plans) */}
             <div className="mt-5 rounded-[1.4rem] border border-[#d8ddd6] bg-white p-5">
@@ -569,7 +569,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 <form action={createVcardShareLink}>
                   <input name="contactId" type="hidden" value={contact.id} />
                   <button
-                    className="rounded-[0.8rem] bg-[#17352e] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#20443b]"
+                    className="rounded-[0.8rem] bg-[#4158f4] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3248db]"
                     type="submit"
                   >
                     Create share link
@@ -710,7 +710,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                       type="email"
                     />
                     <button
-                      className="rounded-[0.8rem] bg-[#17352e] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#20443b]"
+                      className="rounded-[0.8rem] bg-[#4158f4] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3248db]"
                       type="submit"
                     >
                       Share live
@@ -781,9 +781,9 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
 
         {detailTab === "history" ? (
         <section className={sectionCardClassName} id="contact-history">
-          <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">History</p>
-          <h2 className="mt-1 text-lg font-semibold text-slate-900">Activity</h2>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">History</p>
+          <h2 className="mt-1 text-[17px] font-semibold text-[#1d2823]">Activity</h2>
+          <p className="mt-1 text-sm text-[#5c655e]">
             Every change to this contact — edits, imports, merges, and sync — in reverse order.
           </p>
           <div className="mt-4 overflow-hidden rounded-[1.4rem] border border-[#e9ece7] bg-white">
