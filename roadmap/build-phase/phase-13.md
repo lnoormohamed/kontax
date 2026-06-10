@@ -26,7 +26,7 @@ Make the Family plan a real product by letting family members share a common add
 | P13-05 | Done | P1 | P13-04 |
 | P13-06 | Done | P1 | P13-04 |
 | P13-07 | Done | P1 | P13-05, P13-06 |
-| P13-08 | Not Started | P2 | P13-07, P9-04 |
+| P13-08 | Done | P2 | P13-07, P9-04 |
 
 ---
 
@@ -201,7 +201,8 @@ Make the Family plan a real product by letting family members share a common add
 ---
 
 ## P13-08 — Family shared address book CardDAV server exposure (optional)
-- Status: `Not Started`
+- Status: `Done`
+- Shipped in server.mjs: the shared book is exposed as `/dav/addressbooks/{userId}/family/` alongside `/default/`, listed in the home-set PROPFIND for members. PROPFIND/REPORT/GET serve the book's contacts; PUT/DELETE require canEdit (create → Contact owned by group owner + GroupContact; update bumps version; delete soft-archives) and emit FAMILY_MEMBER attribution events. Note: P9-07 on-device compatibility testing still pending — verify against iOS/macOS/DAVx⁵ before GA.
 - Priority: `P2`
 - Dependencies: `P13-07`, `P9-04`
 - Implementation Notes:

@@ -364,6 +364,21 @@ const etagForContact = (contact) => `"v${contact.syncVersion}"`;
 const contactResourceHref = (userId, syncUid) =>
   `/dav/addressbooks/${userId}/default/${encodeURIComponent(syncUid)}.vcf`;
 
+// P13-08: family shared book exposed as a second collection per member.
+const getFamilyCollectionUserId = (pathname) =>
+  pathname.match(/^\/dav\/addressbooks\/([^/]+)\/family\/?$/)?.[1];
+const getFamilyResourceParams = (pathname) => {
+  const match = pathname.match(/^\/dav\/addressbooks\/([^/]+)\/family\/([^/]+)$/);
+  if (!match) {
+    return null;
+  }
+  const rawUid = match[2];
+  const uid = rawUid.endsWith(".vcf") ? rawUid.slice(0, -4) : rawUid;
+  return { userId: match[1], uid: decodeURIComponent(uid) };
+};
+const familyResourceHref = (userId, syncUid) =>
+  `/dav/addressbooks/${userId}/family/${encodeURIComponent(syncUid)}.vcf`;
+
 const escapeVCardValue = (value) =>
   String(value ?? "")
     .replaceAll("\\", "\\\\")
@@ -662,6 +677,67 @@ const fetchActiveContacts = (userId) =>
     orderBy: { syncUid: "asc" },
   });
 
+// P13-08: the user's accepted family book (owner id + default book + edit right).
+const getFamilyBookForUser = async (userId) => {
+  const member = await prisma.groupMember.findFirst({
+    where: { userId, inviteStatus: "ACCEPTED", group: { type: "FAMILY" } },
+    include: {
+      group: { select: { ownerId: true, defaultAddressBookId: true, name: true } },
+    },
+  });
+  if (!member?.group?.defaultAddressBookId) {
+    return null;
+  }
+  return {
+    ownerId: member.group.ownerId,
+    bookId: member.group.defaultAddressBookId,
+    canEdit: member.canEdit,
+    groupName: member.group.name,
+  };
+};
+
+const fetchFamilyContacts = (bookId) =>
+  prisma.contact.findMany({
+    where: {
+      archivedAt: null,
+      syncTombstoneAt: null,
+      groupContacts: { some: { groupAddressBookId: bookId } },
+    },
+    orderBy: { syncUid: "asc" },
+  });
+
+const computeFamilyCTag = async (bookId) => {
+  const mostRecent = await prisma.contact.findFirst({
+    where: { groupContacts: { some: { groupAddressBookId: bookId } } },
+    orderBy: { updatedAt: "desc" },
+    select: { updatedAt: true },
+  });
+  return mostRecent?.updatedAt.toISOString() ?? "empty";
+};
+
+// Best-effort activity attribution for a family-book change made over CardDAV.
+const emitFamilyDavEvent = async (userId, contactId, eventType) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { name: true, email: true },
+    });
+    const name = user?.name?.trim() ?? user?.email ?? "A family member";
+    await prisma.activityEvent.create({
+      data: {
+        userId,
+        contactId,
+        eventType,
+        actor: "FAMILY_MEMBER",
+        actorDetail: `${name} via Family Book (CardDAV)`,
+        payload: {},
+      },
+    });
+  } catch (error) {
+    console.error("Failed to log family CardDAV event", error);
+  }
+};
+
 // P9-08: record an inbound device-write conflict (stale If-Match on PUT/DELETE).
 // Default resolution is last-write-wins (server is authoritative); the record is
 // kept OPEN for the Phase 10 activity log / review UI. Never throws into the
@@ -838,9 +914,248 @@ const handleAddressBooks = async (req, res, requestUrl) => {
       href: `${homeHref}default/`,
       ...splitDavProps(defaultProps, requestedNames),
     });
+
+    // P13-08: surface the shared family book as a second collection.
+    const familyBook = await getFamilyBookForUser(user.id);
+    if (familyBook) {
+      const familyProps = [
+        { name: "displayname", value: `${familyBook.groupName} (Family)` },
+        { name: "resourcetype", types: ["collection", "addressbook"] },
+        { name: "getctag", value: await computeFamilyCTag(familyBook.bookId) },
+        { name: "supported-address-data" },
+      ];
+      responses.push({
+        href: `${homeHref}family/`,
+        ...splitDavProps(familyProps, requestedNames),
+      });
+    }
   }
 
   return xmlResponse(res, buildPropfindResponse(responses));
+};
+
+const handleFamilyCollection = async (req, res, requestUrl) => {
+  const userId = getFamilyCollectionUserId(requestUrl.pathname);
+  if (!userId) {
+    return false;
+  }
+  const allow = "OPTIONS, PROPFIND, REPORT";
+  if (req.method === "OPTIONS") {
+    return options(res, allow);
+  }
+  if (req.method !== "PROPFIND" && req.method !== "REPORT") {
+    return methodNotAllowed(res, allow);
+  }
+
+  const authResult = await requireDavAuth(req, res, userId);
+  if (!authResult) {
+    return true;
+  }
+  const familyBook = await getFamilyBookForUser(userId);
+  if (!familyBook) {
+    return notFound(res);
+  }
+
+  const collectionHref = `/dav/addressbooks/${userId}/family/`;
+
+  if (req.method === "PROPFIND") {
+    const depth = req.headers.depth ?? "0";
+    if (depth === "infinity") {
+      return forbidden(res);
+    }
+    if (depth !== "0" && depth !== "1") {
+      return send(res, 400, "Unsupported Depth", { "Content-Type": "text/plain; charset=utf-8" });
+    }
+    const requestedNames = extractRequestedPropNames(await readRequestBody(req));
+    const collectionProps = [
+      { name: "displayname", value: `${familyBook.groupName} (Family)` },
+      { name: "resourcetype", types: ["collection", "addressbook"] },
+      { name: "getctag", value: await computeFamilyCTag(familyBook.bookId) },
+      { name: "supported-address-data" },
+    ];
+    const responses = [
+      {
+        href: collectionHref,
+        ...splitDavProps(collectionProps, requestedNames),
+      },
+    ];
+    if (depth === "1") {
+      const contacts = await fetchFamilyContacts(familyBook.bookId);
+      for (const contact of contacts) {
+        const props = [{ name: "getetag", value: etagForContact(contact) }];
+        responses.push({
+          href: familyResourceHref(userId, contact.syncUid),
+          ...splitDavProps(props, requestedNames),
+        });
+      }
+    }
+    return xmlResponse(res, buildPropfindResponse(responses));
+  }
+
+  // REPORT (addressbook-query)
+  await readRequestBody(req);
+  const contacts = await fetchFamilyContacts(familyBook.bookId);
+  const responses = contacts.map((contact) => ({
+    href: familyResourceHref(userId, contact.syncUid),
+    props: [
+      { name: "getetag", value: etagForContact(contact) },
+      { name: "address-data", value: serializeContactToVCard(contact) },
+    ],
+    notFoundProps: [],
+  }));
+  return xmlResponse(res, buildPropfindResponse(responses));
+};
+
+const handleFamilyResource = async (req, res, requestUrl) => {
+  const params = getFamilyResourceParams(requestUrl.pathname);
+  if (!params) {
+    return false;
+  }
+  const { userId, uid } = params;
+  const allow = "OPTIONS, GET, PUT, DELETE";
+  if (req.method === "OPTIONS") {
+    return options(res, allow);
+  }
+  if (!["GET", "HEAD", "PUT", "DELETE"].includes(req.method)) {
+    return methodNotAllowed(res, allow);
+  }
+  const authResult = await requireDavAuth(req, res, userId);
+  if (!authResult) {
+    return true;
+  }
+  const familyBook = await getFamilyBookForUser(userId);
+  if (!familyBook) {
+    return notFound(res);
+  }
+
+  // A contact in this user's family book, matched by its sync UID.
+  const findInBook = () =>
+    prisma.contact.findFirst({
+      where: { syncUid: uid, groupContacts: { some: { groupAddressBookId: familyBook.bookId } } },
+    });
+  const existing = await findInBook();
+
+  if (req.method === "GET" || req.method === "HEAD") {
+    if (!existing || existing.archivedAt || existing.syncTombstoneAt) {
+      return notFound(res);
+    }
+    const etag = etagForContact(existing);
+    const ifNoneMatch = req.headers["if-none-match"];
+    if (ifNoneMatch && ifNoneMatch.split(",").map((v) => v.trim()).includes(etag)) {
+      return notModified(res, etag);
+    }
+    return vcardResponse(res, req.method === "HEAD" ? null : serializeContactToVCard(existing), etag);
+  }
+
+  // Writes require edit rights on the family book.
+  if (!familyBook.canEdit) {
+    return forbidden(res);
+  }
+
+  if (req.method === "PUT") {
+    const body = await readRequestBody(req);
+    if (isGroupVCard(body)) {
+      return unsupportedMediaType(res);
+    }
+    const bodyUid = getVCardUid(body);
+    if (bodyUid && bodyUid !== uid) {
+      return unprocessable(res, "UID in vCard body does not match the resource URL.");
+    }
+    const ifMatch = req.headers["if-match"];
+    const ifNoneMatch = req.headers["if-none-match"];
+    if (ifMatch) {
+      if (!existing || existing.syncTombstoneAt) {
+        return preconditionFailed(res);
+      }
+      if (!ifMatch.split(",").map((v) => v.trim()).includes(etagForContact(existing))) {
+        await logDeviceWriteConflict({
+          contact: existing,
+          appPasswordId: authResult.appPasswordId,
+          clientEtag: ifMatch,
+          incomingVCard: body,
+          conflictType: "VERSION_MISMATCH",
+        });
+        return preconditionFailed(res);
+      }
+    }
+    if (ifNoneMatch === "*" && existing && !existing.syncTombstoneAt) {
+      return preconditionFailed(res);
+    }
+
+    const fields = parseVCardToContactFields(body);
+    if (!fields.fullName || !fields.fullName.trim()) {
+      const derived = [fields.firstName, fields.lastName].filter(Boolean).join(" ").trim();
+      fields.fullName = derived || fields.company || fields.email || "Unnamed contact";
+    }
+
+    if (!existing) {
+      // Device added a contact to the family collection → create in the book,
+      // owned (nominally) by the group owner, linked via GroupContact.
+      const created = await prisma.$transaction(async (tx) => {
+        const contact = await tx.contact.create({
+          data: {
+            userId: familyBook.ownerId,
+            syncUid: uid,
+            syncVersion: 1,
+            sourceType: "SYNC_CARDDAV",
+            sourceDetail: `${familyBook.groupName} (family book)`,
+            ...fields,
+          },
+        });
+        await tx.groupContact.create({
+          data: { groupAddressBookId: familyBook.bookId, contactId: contact.id, addedByUserId: userId },
+        });
+        return contact;
+      });
+      await emitFamilyDavEvent(userId, created.id, "CONTACT_CREATED");
+      return send(res, 201, null, { ETag: etagForContact(created) });
+    }
+
+    const updated = await prisma.$transaction(async (tx) => {
+      const current = await tx.contact.findFirst({
+        where: { id: existing.id },
+        select: { id: true, syncVersion: true },
+      });
+      return tx.contact.update({
+        where: { id: current.id },
+        data: {
+          ...fields,
+          syncVersion: (current.syncVersion ?? 0) + 1,
+          syncTombstoneAt: null,
+          archivedAt: null,
+        },
+      });
+    });
+    await emitFamilyDavEvent(userId, updated.id, "CONTACT_UPDATED");
+    return send(res, 204, null, { ETag: etagForContact(updated) });
+  }
+
+  // DELETE → soft-archive the shared contact (other members see it archived).
+  if (!existing || existing.syncTombstoneAt) {
+    return notFound(res);
+  }
+  const ifMatch = req.headers["if-match"];
+  if (ifMatch && !ifMatch.split(",").map((v) => v.trim()).includes(etagForContact(existing))) {
+    await logDeviceWriteConflict({
+      contact: existing,
+      appPasswordId: authResult.appPasswordId,
+      clientEtag: ifMatch,
+      incomingVCard: null,
+      conflictType: "DELETE_CONFLICT",
+    });
+    return preconditionFailed(res);
+  }
+  const now = new Date();
+  await prisma.contact.update({
+    where: { id: existing.id },
+    data: {
+      syncTombstoneAt: now,
+      archivedAt: existing.archivedAt ?? now,
+      syncVersion: existing.syncVersion + 1,
+    },
+  });
+  await emitFamilyDavEvent(userId, existing.id, "CONTACT_ARCHIVED");
+  return send(res, 204, null);
 };
 
 const handleAddressBookCollection = async (req, res, requestUrl) => {
@@ -1099,6 +1414,14 @@ const handleDavRequest = async (req, res) => {
   }
 
   if (await handlePrincipal(req, res, requestUrl)) {
+    return true;
+  }
+
+  if (await handleFamilyResource(req, res, requestUrl)) {
+    return true;
+  }
+
+  if (await handleFamilyCollection(req, res, requestUrl)) {
     return true;
   }
 
