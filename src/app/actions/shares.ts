@@ -1,0 +1,283 @@
+"use server";
+
+import { randomBytes } from "node:crypto";
+import { revalidatePath } from "next/cache";
+
+import { emitEvent } from "~/lib/activity";
+import { auth } from "~/server/auth";
+import { assertCanStaticShare, getUserBillingContext } from "~/server/billing";
+import { db } from "~/server/db";
+
+const FREE_LINK_TTL_MS = 7 * 24 * 60 * 60 * 1000;
+
+const requireUserId = async () => {
+  const session = await auth();
+  if (!session?.user?.id) {
+    throw new Error("You need to be signed in.");
+  }
+  return session.user.id;
+};
+
+const str = (formData: FormData, key: string) => {
+  const value = formData.get(key);
+  return typeof value === "string" ? value.trim() : "";
+};
+
+// Fields copied into the static-share snapshot and used to recreate the
+// recipient's independent copy on acceptance.
+const SNAPSHOT_SELECT = {
+  fullName: true,
+  firstName: true,
+  middleName: true,
+  lastName: true,
+  phoneticFirstName: true,
+  phoneticLastName: true,
+  namePrefix: true,
+  nameSuffix: true,
+  nickname: true,
+  email: true,
+  emailAddresses: true,
+  emailEntries: true,
+  phone: true,
+  phoneNumbers: true,
+  phoneEntries: true,
+  company: true,
+  phoneticCompany: true,
+  jobTitle: true,
+  website: true,
+  websiteEntries: true,
+  birthday: true,
+  address: true,
+  postalAddresses: true,
+  addressEntries: true,
+  labels: true,
+  significantDates: true,
+  relatedPeople: true,
+  customFields: true,
+  notes: true,
+} as const;
+
+// ── P12-02: vCard share link (all plans) ─────────────────────────────────────
+
+export const createVcardShareLink = async (formData: FormData) => {
+  const userId = await requireUserId();
+  const contactId = str(formData, "contactId");
+  if (!contactId) {
+    throw new Error("Missing contact.");
+  }
+
+  const contact = await db.contact.findFirst({
+    where: { id: contactId, userId },
+    select: { id: true },
+  });
+  if (!contact) {
+    throw new Error("Contact not found.");
+  }
+
+  // Free links expire after 7 days; paid plans default to no expiry.
+  const billing = await getUserBillingContext(userId);
+  const expiresAt = billing.plan === "FREE" ? new Date(Date.now() + FREE_LINK_TTL_MS) : null;
+
+  await db.contactShare.create({
+    data: {
+      ownerUserId: userId,
+      contactId,
+      shareType: "VCARD_LINK",
+      token: randomBytes(24).toString("base64url"),
+      status: "ACTIVE",
+      expiresAt,
+    },
+  });
+
+  revalidatePath(`/contacts/${contactId}`);
+};
+
+export const revokeShare = async (formData: FormData) => {
+  const userId = await requireUserId();
+  const shareId = str(formData, "shareId");
+  const contactId = str(formData, "contactId");
+
+  await db.contactShare.updateMany({
+    where: { id: shareId, ownerUserId: userId, status: "ACTIVE" },
+    data: { status: "REVOKED", revokedAt: new Date() },
+  });
+
+  if (contactId) {
+    revalidatePath(`/contacts/${contactId}`);
+  }
+};
+
+// ── P12-03: static Kontax-to-Kontax share (Pro and above) ────────────────────
+
+export const createStaticShare = async (formData: FormData) => {
+  const userId = await requireUserId();
+  await assertCanStaticShare(userId); // Pro+ gate
+
+  const contactId = str(formData, "contactId");
+  const recipientEmail = str(formData, "recipientEmail").toLowerCase();
+  if (!contactId || !recipientEmail) {
+    throw new Error("Enter a recipient email.");
+  }
+
+  const [contact, owner, recipient] = await Promise.all([
+    db.contact.findFirst({ where: { id: contactId, userId }, select: SNAPSHOT_SELECT }),
+    db.user.findUnique({ where: { id: userId }, select: { name: true, email: true } }),
+    db.user.findUnique({ where: { email: recipientEmail }, select: { id: true } }),
+  ]);
+  if (!contact) {
+    throw new Error("Contact not found.");
+  }
+  if (recipient?.id === userId) {
+    throw new Error("You can't share a contact with yourself.");
+  }
+
+  const trimmedOwnerName = owner?.name?.trim() ?? "";
+  const ownerName =
+    trimmedOwnerName.length > 0 ? trimmedOwnerName : (owner?.email ?? "A Kontax user");
+
+  await db.contactShare.create({
+    data: {
+      ownerUserId: userId,
+      contactId,
+      shareType: "STATIC_COPY",
+      status: "ACTIVE",
+      recipientUserId: recipient?.id ?? null,
+      recipientEmail,
+      // Snapshot the contact at share time so it's deliverable even if the owner
+      // later edits/archives/deletes the original (P12-03 risk note).
+      snapshot: { ...contact, ownerName },
+    },
+  });
+
+  // NOTE: email delivery (in-app + invite-to-register for non-account
+  // recipients) is wired in P12-06 once an email service is configured. For now
+  // an existing recipient sees the pending share in their "Shared with me" inbox.
+
+  revalidatePath(`/contacts/${contactId}`);
+};
+
+type ShareSnapshot = {
+  ownerName?: string;
+  fullName?: string;
+  firstName?: string | null;
+  middleName?: string | null;
+  lastName?: string | null;
+  phoneticFirstName?: string | null;
+  phoneticLastName?: string | null;
+  namePrefix?: string | null;
+  nameSuffix?: string | null;
+  nickname?: string | null;
+  email?: string | null;
+  emailAddresses?: unknown;
+  emailEntries?: unknown;
+  phone?: string | null;
+  phoneNumbers?: unknown;
+  phoneEntries?: unknown;
+  company?: string | null;
+  phoneticCompany?: string | null;
+  jobTitle?: string | null;
+  website?: string | null;
+  websiteEntries?: unknown;
+  birthday?: string | null;
+  address?: string | null;
+  postalAddresses?: unknown;
+  addressEntries?: unknown;
+  labels?: unknown;
+  significantDates?: unknown;
+  relatedPeople?: unknown;
+  customFields?: unknown;
+  notes?: string | null;
+};
+
+export const acceptStaticShare = async (formData: FormData) => {
+  const userId = await requireUserId();
+  const shareId = str(formData, "shareId");
+
+  await db.$transaction(async (tx) => {
+    const share = await tx.contactShare.findFirst({
+      where: {
+        id: shareId,
+        recipientUserId: userId,
+        shareType: "STATIC_COPY",
+        status: "ACTIVE",
+        recipientContactId: null,
+      },
+      select: { id: true, snapshot: true },
+    });
+    if (!share?.snapshot) {
+      throw new Error("Share not found or already handled.");
+    }
+
+    const snap = share.snapshot as ShareSnapshot;
+    const { ownerName, ...fields } = snap;
+
+    const created = await tx.contact.create({
+      data: {
+        userId,
+        fullName: fields.fullName ?? "Shared contact",
+        firstName: fields.firstName ?? null,
+        middleName: fields.middleName ?? null,
+        lastName: fields.lastName ?? null,
+        phoneticFirstName: fields.phoneticFirstName ?? null,
+        phoneticLastName: fields.phoneticLastName ?? null,
+        namePrefix: fields.namePrefix ?? null,
+        nameSuffix: fields.nameSuffix ?? null,
+        nickname: fields.nickname ?? null,
+        email: fields.email ?? null,
+        emailAddresses: (fields.emailAddresses ?? undefined) as never,
+        emailEntries: (fields.emailEntries ?? undefined) as never,
+        phone: fields.phone ?? null,
+        phoneNumbers: (fields.phoneNumbers ?? undefined) as never,
+        phoneEntries: (fields.phoneEntries ?? undefined) as never,
+        company: fields.company ?? null,
+        phoneticCompany: fields.phoneticCompany ?? null,
+        jobTitle: fields.jobTitle ?? null,
+        website: fields.website ?? null,
+        websiteEntries: (fields.websiteEntries ?? undefined) as never,
+        birthday: fields.birthday ?? null,
+        address: fields.address ?? null,
+        postalAddresses: (fields.postalAddresses ?? undefined) as never,
+        addressEntries: (fields.addressEntries ?? undefined) as never,
+        labels: (fields.labels ?? undefined) as never,
+        significantDates: (fields.significantDates ?? undefined) as never,
+        relatedPeople: (fields.relatedPeople ?? undefined) as never,
+        customFields: (fields.customFields ?? undefined) as never,
+        notes: fields.notes ?? null,
+        sourceType: "SHARED_STATIC",
+        sourceDetail: ownerName ?? null,
+        lastMutatedBy: "SHARED_STATIC",
+        lastMutatedByDetail: ownerName ?? null,
+      },
+      select: { id: true },
+    });
+
+    await tx.contactShare.update({
+      where: { id: share.id },
+      data: { recipientContactId: created.id },
+    });
+
+    await emitEvent(tx, {
+      userId,
+      contactId: created.id,
+      eventType: "CONTACT_SHARE_RECEIVED",
+      actor: "SHARE",
+      actorDetail: ownerName ?? null,
+      payload: { recipientHint: ownerName ?? undefined },
+    });
+  });
+
+  revalidatePath("/shares");
+  revalidatePath("/");
+};
+
+export const declineStaticShare = async (formData: FormData) => {
+  const userId = await requireUserId();
+  const shareId = str(formData, "shareId");
+
+  await db.contactShare.updateMany({
+    where: { id: shareId, recipientUserId: userId, status: "ACTIVE", recipientContactId: null },
+    data: { status: "DECLINED" },
+  });
+
+  revalidatePath("/shares");
+};

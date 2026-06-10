@@ -188,6 +188,8 @@ model User {
     activityEvents       ActivityEvent[]
     ownedGroups          Group[]                @relation("GroupOwner")
     groupMemberships     GroupMember[]
+    contactSharesOwned    ContactShare[]        @relation("ShareOwner")
+    contactSharesReceived ContactShare[]        @relation("ShareRecipient")
     createdAt            DateTime               @default(now())
     updatedAt            DateTime               @updatedAt
 }
@@ -219,6 +221,8 @@ model Contact {
     syncLinks   SyncContactLink[]
     syncConflicts SyncConflict[]
     activityEvents ActivityEvent[]
+    sharesFromContact     ContactShare[] @relation("ShareSourceContact")
+    sharesAsRecipientCopy ContactShare[] @relation("ShareRecipientContact")
     mergedIntoContactId String?
     mergedIntoContact Contact? @relation("ContactMergeLineage", fields: [mergedIntoContactId], references: [id], onDelete: SetNull)
     mergedChildren Contact[] @relation("ContactMergeLineage")
@@ -640,4 +644,49 @@ model GroupAddressBook {
     group       Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
     @@index([groupId])
+}
+
+// --- Contact sharing (Phase 12) ----------------------------------------------
+
+enum ShareType {
+    VCARD_LINK
+    STATIC_COPY
+    LIVE_SYNC
+}
+
+enum ShareStatus {
+    ACTIVE
+    REVOKED
+    EXPIRED
+    DECLINED
+}
+
+model ContactShare {
+    id                 String      @id @default(cuid())
+    ownerUserId        String
+    contactId          String?
+    shareType          ShareType
+    token              String?     @unique
+    recipientUserId    String?
+    recipientEmail     String?
+    recipientContactId String?
+    status             ShareStatus @default(ACTIVE)
+    // Snapshot of the shared contact's portable fields at share time, so a
+    // static share is still deliverable if the owner edits/archives/deletes the
+    // original before the recipient accepts (P12-03).
+    snapshot           Json?
+    expiresAt          DateTime?
+    revokedAt          DateTime?
+    lastPushedAt       DateTime?
+    downloadCount      Int         @default(0)
+    createdAt          DateTime    @default(now())
+    updatedAt          DateTime    @updatedAt
+    owner              User        @relation("ShareOwner", fields: [ownerUserId], references: [id], onDelete: Cascade)
+    contact            Contact?    @relation("ShareSourceContact", fields: [contactId], references: [id], onDelete: SetNull)
+    recipientUser      User?       @relation("ShareRecipient", fields: [recipientUserId], references: [id], onDelete: SetNull)
+    recipientContact   Contact?    @relation("ShareRecipientContact", fields: [recipientContactId], references: [id], onDelete: SetNull)
+
+    @@index([ownerUserId, status, createdAt])
+    @@index([recipientUserId, status])
+    @@index([recipientEmail, status])
 }

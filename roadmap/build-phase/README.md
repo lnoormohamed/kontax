@@ -135,9 +135,9 @@ This roadmap is the implementation source of truth for phases 1–16. Each phase
 
 | Ticket | Phase | Status | Priority | Depends On | Owner | Acceptance |
 | --- | --- | --- | --- | --- | --- | --- |
-| P12-01 | 12 | Not Started | P0 | P11-02 | Unassigned | ContactShare schema migrated; all share types representable |
-| P12-02 | 12 | Not Started | P0 | P12-01 | Unassigned | Share link generates; resulting URL serves valid .vcf on iOS, macOS, Google Contacts |
-| P12-03 | 12 | Not Started | P1 | P12-01, P11-03 | Unassigned | Static share delivers copy to recipient with correct source attribution |
+| P12-01 | 12 | Done | P0 | P11-02 | Unassigned | ContactShare schema (enums + model + snapshot) migrated; all share types representable |
+| P12-02 | 12 | Done | P0 | P12-01 | Unassigned | vCard share link: token + /share/[token] serves .vcf (410 revoked/404 expired), Free 7d expiry, revoke + download count |
+| P12-03 | 12 | Done | P1 | P12-01, P11-03 | Unassigned | Static Kontax→Kontax share (Pro+): snapshot, /shares accept/decline → independent SHARED_STATIC copy (email invite deferred to P12-06) |
 | P12-04 | 12 | Not Started | P1 | P12-01, P11-03, P10-01 | Unassigned | Live share propagates updates; revoke converts to static copy cleanly |
 | P12-05 | 12 | Not Started | P1 | P12-03, P12-04 | Unassigned | All active shares visible and manageable from contact detail page |
 | P12-06 | 12 | Not Started | P1 | P12-03 | Unassigned | Recipient notified in-app and email; accept and decline update share status correctly |

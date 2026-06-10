@@ -98,6 +98,11 @@ export type GroupMember = $Result.DefaultSelection<Prisma.$GroupMemberPayload>
  * 
  */
 export type GroupAddressBook = $Result.DefaultSelection<Prisma.$GroupAddressBookPayload>
+/**
+ * Model ContactShare
+ * 
+ */
+export type ContactShare = $Result.DefaultSelection<Prisma.$ContactSharePayload>
 
 /**
  * Enums
@@ -371,6 +376,25 @@ export const Actor: {
 
 export type Actor = (typeof Actor)[keyof typeof Actor]
 
+
+export const ShareType: {
+  VCARD_LINK: 'VCARD_LINK',
+  STATIC_COPY: 'STATIC_COPY',
+  LIVE_SYNC: 'LIVE_SYNC'
+};
+
+export type ShareType = (typeof ShareType)[keyof typeof ShareType]
+
+
+export const ShareStatus: {
+  ACTIVE: 'ACTIVE',
+  REVOKED: 'REVOKED',
+  EXPIRED: 'EXPIRED',
+  DECLINED: 'DECLINED'
+};
+
+export type ShareStatus = (typeof ShareStatus)[keyof typeof ShareStatus]
+
 }
 
 export type AccountLifecycleState = $Enums.AccountLifecycleState
@@ -480,6 +504,14 @@ export const EventType: typeof $Enums.EventType
 export type Actor = $Enums.Actor
 
 export const Actor: typeof $Enums.Actor
+
+export type ShareType = $Enums.ShareType
+
+export const ShareType: typeof $Enums.ShareType
+
+export type ShareStatus = $Enums.ShareStatus
+
+export const ShareStatus: typeof $Enums.ShareStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -768,6 +800,16 @@ export class PrismaClient<
     * ```
     */
   get groupAddressBook(): Prisma.GroupAddressBookDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.contactShare`: Exposes CRUD operations for the **ContactShare** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ContactShares
+    * const contactShares = await prisma.contactShare.findMany()
+    * ```
+    */
+  get contactShare(): Prisma.ContactShareDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1225,7 +1267,8 @@ export namespace Prisma {
     ActivityEvent: 'ActivityEvent',
     Group: 'Group',
     GroupMember: 'GroupMember',
-    GroupAddressBook: 'GroupAddressBook'
+    GroupAddressBook: 'GroupAddressBook',
+    ContactShare: 'ContactShare'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1244,7 +1287,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncContactLink" | "syncJob" | "syncConflict" | "activityEvent" | "group" | "groupMember" | "groupAddressBook"
+      modelProps: "user" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncContactLink" | "syncJob" | "syncConflict" | "activityEvent" | "group" | "groupMember" | "groupAddressBook" | "contactShare"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2506,6 +2549,80 @@ export namespace Prisma {
           }
         }
       }
+      ContactShare: {
+        payload: Prisma.$ContactSharePayload<ExtArgs>
+        fields: Prisma.ContactShareFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ContactShareFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactSharePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ContactShareFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactSharePayload>
+          }
+          findFirst: {
+            args: Prisma.ContactShareFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactSharePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ContactShareFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactSharePayload>
+          }
+          findMany: {
+            args: Prisma.ContactShareFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactSharePayload>[]
+          }
+          create: {
+            args: Prisma.ContactShareCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactSharePayload>
+          }
+          createMany: {
+            args: Prisma.ContactShareCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ContactShareCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactSharePayload>[]
+          }
+          delete: {
+            args: Prisma.ContactShareDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactSharePayload>
+          }
+          update: {
+            args: Prisma.ContactShareUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactSharePayload>
+          }
+          deleteMany: {
+            args: Prisma.ContactShareDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ContactShareUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ContactShareUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactSharePayload>[]
+          }
+          upsert: {
+            args: Prisma.ContactShareUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ContactSharePayload>
+          }
+          aggregate: {
+            args: Prisma.ContactShareAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateContactShare>
+          }
+          groupBy: {
+            args: Prisma.ContactShareGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ContactShareGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ContactShareCountArgs<ExtArgs>
+            result: $Utils.Optional<ContactShareCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2619,6 +2736,7 @@ export namespace Prisma {
     group?: GroupOmit
     groupMember?: GroupMemberOmit
     groupAddressBook?: GroupAddressBookOmit
+    contactShare?: ContactShareOmit
   }
 
   /* Types for Logging */
@@ -2710,6 +2828,8 @@ export namespace Prisma {
     activityEvents: number
     ownedGroups: number
     groupMemberships: number
+    contactSharesOwned: number
+    contactSharesReceived: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -2724,6 +2844,8 @@ export namespace Prisma {
     activityEvents?: boolean | UserCountOutputTypeCountActivityEventsArgs
     ownedGroups?: boolean | UserCountOutputTypeCountOwnedGroupsArgs
     groupMemberships?: boolean | UserCountOutputTypeCountGroupMembershipsArgs
+    contactSharesOwned?: boolean | UserCountOutputTypeCountContactSharesOwnedArgs
+    contactSharesReceived?: boolean | UserCountOutputTypeCountContactSharesReceivedArgs
   }
 
   // Custom InputTypes
@@ -2814,6 +2936,20 @@ export namespace Prisma {
     where?: GroupMemberWhereInput
   }
 
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountContactSharesOwnedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ContactShareWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountContactSharesReceivedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ContactShareWhereInput
+  }
+
 
   /**
    * Count Type AppPasswordCountOutputType
@@ -2856,6 +2992,8 @@ export namespace Prisma {
     syncLinks: number
     syncConflicts: number
     activityEvents: number
+    sharesFromContact: number
+    sharesAsRecipientCopy: number
     mergedChildren: number
   }
 
@@ -2865,6 +3003,8 @@ export namespace Prisma {
     syncLinks?: boolean | ContactCountOutputTypeCountSyncLinksArgs
     syncConflicts?: boolean | ContactCountOutputTypeCountSyncConflictsArgs
     activityEvents?: boolean | ContactCountOutputTypeCountActivityEventsArgs
+    sharesFromContact?: boolean | ContactCountOutputTypeCountSharesFromContactArgs
+    sharesAsRecipientCopy?: boolean | ContactCountOutputTypeCountSharesAsRecipientCopyArgs
     mergedChildren?: boolean | ContactCountOutputTypeCountMergedChildrenArgs
   }
 
@@ -2912,6 +3052,20 @@ export namespace Prisma {
    */
   export type ContactCountOutputTypeCountActivityEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ActivityEventWhereInput
+  }
+
+  /**
+   * ContactCountOutputType without action
+   */
+  export type ContactCountOutputTypeCountSharesFromContactArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ContactShareWhereInput
+  }
+
+  /**
+   * ContactCountOutputType without action
+   */
+  export type ContactCountOutputTypeCountSharesAsRecipientCopyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ContactShareWhereInput
   }
 
   /**
@@ -3370,6 +3524,8 @@ export namespace Prisma {
     activityEvents?: boolean | User$activityEventsArgs<ExtArgs>
     ownedGroups?: boolean | User$ownedGroupsArgs<ExtArgs>
     groupMemberships?: boolean | User$groupMembershipsArgs<ExtArgs>
+    contactSharesOwned?: boolean | User$contactSharesOwnedArgs<ExtArgs>
+    contactSharesReceived?: boolean | User$contactSharesReceivedArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -3420,6 +3576,8 @@ export namespace Prisma {
     activityEvents?: boolean | User$activityEventsArgs<ExtArgs>
     ownedGroups?: boolean | User$ownedGroupsArgs<ExtArgs>
     groupMemberships?: boolean | User$groupMembershipsArgs<ExtArgs>
+    contactSharesOwned?: boolean | User$contactSharesOwnedArgs<ExtArgs>
+    contactSharesReceived?: boolean | User$contactSharesReceivedArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -3440,6 +3598,8 @@ export namespace Prisma {
       activityEvents: Prisma.$ActivityEventPayload<ExtArgs>[]
       ownedGroups: Prisma.$GroupPayload<ExtArgs>[]
       groupMemberships: Prisma.$GroupMemberPayload<ExtArgs>[]
+      contactSharesOwned: Prisma.$ContactSharePayload<ExtArgs>[]
+      contactSharesReceived: Prisma.$ContactSharePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -3856,6 +4016,8 @@ export namespace Prisma {
     activityEvents<T extends User$activityEventsArgs<ExtArgs> = {}>(args?: Subset<T, User$activityEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActivityEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     ownedGroups<T extends User$ownedGroupsArgs<ExtArgs> = {}>(args?: Subset<T, User$ownedGroupsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GroupPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     groupMemberships<T extends User$groupMembershipsArgs<ExtArgs> = {}>(args?: Subset<T, User$groupMembershipsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GroupMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    contactSharesOwned<T extends User$contactSharesOwnedArgs<ExtArgs> = {}>(args?: Subset<T, User$contactSharesOwnedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactSharePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    contactSharesReceived<T extends User$contactSharesReceivedArgs<ExtArgs> = {}>(args?: Subset<T, User$contactSharesReceivedArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactSharePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4561,6 +4723,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: GroupMemberScalarFieldEnum | GroupMemberScalarFieldEnum[]
+  }
+
+  /**
+   * User.contactSharesOwned
+   */
+  export type User$contactSharesOwnedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactShare
+     */
+    select?: ContactShareSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactShare
+     */
+    omit?: ContactShareOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactShareInclude<ExtArgs> | null
+    where?: ContactShareWhereInput
+    orderBy?: ContactShareOrderByWithRelationInput | ContactShareOrderByWithRelationInput[]
+    cursor?: ContactShareWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ContactShareScalarFieldEnum | ContactShareScalarFieldEnum[]
+  }
+
+  /**
+   * User.contactSharesReceived
+   */
+  export type User$contactSharesReceivedArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactShare
+     */
+    select?: ContactShareSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactShare
+     */
+    omit?: ContactShareOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactShareInclude<ExtArgs> | null
+    where?: ContactShareWhereInput
+    orderBy?: ContactShareOrderByWithRelationInput | ContactShareOrderByWithRelationInput[]
+    cursor?: ContactShareWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ContactShareScalarFieldEnum | ContactShareScalarFieldEnum[]
   }
 
   /**
@@ -6190,6 +6400,8 @@ export namespace Prisma {
     syncLinks?: boolean | Contact$syncLinksArgs<ExtArgs>
     syncConflicts?: boolean | Contact$syncConflictsArgs<ExtArgs>
     activityEvents?: boolean | Contact$activityEventsArgs<ExtArgs>
+    sharesFromContact?: boolean | Contact$sharesFromContactArgs<ExtArgs>
+    sharesAsRecipientCopy?: boolean | Contact$sharesAsRecipientCopyArgs<ExtArgs>
     mergedIntoContact?: boolean | Contact$mergedIntoContactArgs<ExtArgs>
     mergedChildren?: boolean | Contact$mergedChildrenArgs<ExtArgs>
     _count?: boolean | ContactCountOutputTypeDefaultArgs<ExtArgs>
@@ -6354,6 +6566,8 @@ export namespace Prisma {
     syncLinks?: boolean | Contact$syncLinksArgs<ExtArgs>
     syncConflicts?: boolean | Contact$syncConflictsArgs<ExtArgs>
     activityEvents?: boolean | Contact$activityEventsArgs<ExtArgs>
+    sharesFromContact?: boolean | Contact$sharesFromContactArgs<ExtArgs>
+    sharesAsRecipientCopy?: boolean | Contact$sharesAsRecipientCopyArgs<ExtArgs>
     mergedIntoContact?: boolean | Contact$mergedIntoContactArgs<ExtArgs>
     mergedChildren?: boolean | Contact$mergedChildrenArgs<ExtArgs>
     _count?: boolean | ContactCountOutputTypeDefaultArgs<ExtArgs>
@@ -6379,6 +6593,8 @@ export namespace Prisma {
       syncLinks: Prisma.$SyncContactLinkPayload<ExtArgs>[]
       syncConflicts: Prisma.$SyncConflictPayload<ExtArgs>[]
       activityEvents: Prisma.$ActivityEventPayload<ExtArgs>[]
+      sharesFromContact: Prisma.$ContactSharePayload<ExtArgs>[]
+      sharesAsRecipientCopy: Prisma.$ContactSharePayload<ExtArgs>[]
       mergedIntoContact: Prisma.$ContactPayload<ExtArgs> | null
       mergedChildren: Prisma.$ContactPayload<ExtArgs>[]
     }
@@ -6829,6 +7045,8 @@ export namespace Prisma {
     syncLinks<T extends Contact$syncLinksArgs<ExtArgs> = {}>(args?: Subset<T, Contact$syncLinksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncContactLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     syncConflicts<T extends Contact$syncConflictsArgs<ExtArgs> = {}>(args?: Subset<T, Contact$syncConflictsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncConflictPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     activityEvents<T extends Contact$activityEventsArgs<ExtArgs> = {}>(args?: Subset<T, Contact$activityEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActivityEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    sharesFromContact<T extends Contact$sharesFromContactArgs<ExtArgs> = {}>(args?: Subset<T, Contact$sharesFromContactArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactSharePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    sharesAsRecipientCopy<T extends Contact$sharesAsRecipientCopyArgs<ExtArgs> = {}>(args?: Subset<T, Contact$sharesAsRecipientCopyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactSharePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     mergedIntoContact<T extends Contact$mergedIntoContactArgs<ExtArgs> = {}>(args?: Subset<T, Contact$mergedIntoContactArgs<ExtArgs>>): Prisma__ContactClient<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     mergedChildren<T extends Contact$mergedChildrenArgs<ExtArgs> = {}>(args?: Subset<T, Contact$mergedChildrenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -7437,6 +7655,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ActivityEventScalarFieldEnum | ActivityEventScalarFieldEnum[]
+  }
+
+  /**
+   * Contact.sharesFromContact
+   */
+  export type Contact$sharesFromContactArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactShare
+     */
+    select?: ContactShareSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactShare
+     */
+    omit?: ContactShareOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactShareInclude<ExtArgs> | null
+    where?: ContactShareWhereInput
+    orderBy?: ContactShareOrderByWithRelationInput | ContactShareOrderByWithRelationInput[]
+    cursor?: ContactShareWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ContactShareScalarFieldEnum | ContactShareScalarFieldEnum[]
+  }
+
+  /**
+   * Contact.sharesAsRecipientCopy
+   */
+  export type Contact$sharesAsRecipientCopyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactShare
+     */
+    select?: ContactShareSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactShare
+     */
+    omit?: ContactShareOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactShareInclude<ExtArgs> | null
+    where?: ContactShareWhereInput
+    orderBy?: ContactShareOrderByWithRelationInput | ContactShareOrderByWithRelationInput[]
+    cursor?: ContactShareWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ContactShareScalarFieldEnum | ContactShareScalarFieldEnum[]
   }
 
   /**
@@ -25006,6 +25272,1318 @@ export namespace Prisma {
 
 
   /**
+   * Model ContactShare
+   */
+
+  export type AggregateContactShare = {
+    _count: ContactShareCountAggregateOutputType | null
+    _avg: ContactShareAvgAggregateOutputType | null
+    _sum: ContactShareSumAggregateOutputType | null
+    _min: ContactShareMinAggregateOutputType | null
+    _max: ContactShareMaxAggregateOutputType | null
+  }
+
+  export type ContactShareAvgAggregateOutputType = {
+    downloadCount: number | null
+  }
+
+  export type ContactShareSumAggregateOutputType = {
+    downloadCount: number | null
+  }
+
+  export type ContactShareMinAggregateOutputType = {
+    id: string | null
+    ownerUserId: string | null
+    contactId: string | null
+    shareType: $Enums.ShareType | null
+    token: string | null
+    recipientUserId: string | null
+    recipientEmail: string | null
+    recipientContactId: string | null
+    status: $Enums.ShareStatus | null
+    expiresAt: Date | null
+    revokedAt: Date | null
+    lastPushedAt: Date | null
+    downloadCount: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ContactShareMaxAggregateOutputType = {
+    id: string | null
+    ownerUserId: string | null
+    contactId: string | null
+    shareType: $Enums.ShareType | null
+    token: string | null
+    recipientUserId: string | null
+    recipientEmail: string | null
+    recipientContactId: string | null
+    status: $Enums.ShareStatus | null
+    expiresAt: Date | null
+    revokedAt: Date | null
+    lastPushedAt: Date | null
+    downloadCount: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ContactShareCountAggregateOutputType = {
+    id: number
+    ownerUserId: number
+    contactId: number
+    shareType: number
+    token: number
+    recipientUserId: number
+    recipientEmail: number
+    recipientContactId: number
+    status: number
+    snapshot: number
+    expiresAt: number
+    revokedAt: number
+    lastPushedAt: number
+    downloadCount: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ContactShareAvgAggregateInputType = {
+    downloadCount?: true
+  }
+
+  export type ContactShareSumAggregateInputType = {
+    downloadCount?: true
+  }
+
+  export type ContactShareMinAggregateInputType = {
+    id?: true
+    ownerUserId?: true
+    contactId?: true
+    shareType?: true
+    token?: true
+    recipientUserId?: true
+    recipientEmail?: true
+    recipientContactId?: true
+    status?: true
+    expiresAt?: true
+    revokedAt?: true
+    lastPushedAt?: true
+    downloadCount?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ContactShareMaxAggregateInputType = {
+    id?: true
+    ownerUserId?: true
+    contactId?: true
+    shareType?: true
+    token?: true
+    recipientUserId?: true
+    recipientEmail?: true
+    recipientContactId?: true
+    status?: true
+    expiresAt?: true
+    revokedAt?: true
+    lastPushedAt?: true
+    downloadCount?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ContactShareCountAggregateInputType = {
+    id?: true
+    ownerUserId?: true
+    contactId?: true
+    shareType?: true
+    token?: true
+    recipientUserId?: true
+    recipientEmail?: true
+    recipientContactId?: true
+    status?: true
+    snapshot?: true
+    expiresAt?: true
+    revokedAt?: true
+    lastPushedAt?: true
+    downloadCount?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ContactShareAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ContactShare to aggregate.
+     */
+    where?: ContactShareWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ContactShares to fetch.
+     */
+    orderBy?: ContactShareOrderByWithRelationInput | ContactShareOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ContactShareWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ContactShares from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ContactShares.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ContactShares
+    **/
+    _count?: true | ContactShareCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ContactShareAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ContactShareSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ContactShareMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ContactShareMaxAggregateInputType
+  }
+
+  export type GetContactShareAggregateType<T extends ContactShareAggregateArgs> = {
+        [P in keyof T & keyof AggregateContactShare]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateContactShare[P]>
+      : GetScalarType<T[P], AggregateContactShare[P]>
+  }
+
+
+
+
+  export type ContactShareGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ContactShareWhereInput
+    orderBy?: ContactShareOrderByWithAggregationInput | ContactShareOrderByWithAggregationInput[]
+    by: ContactShareScalarFieldEnum[] | ContactShareScalarFieldEnum
+    having?: ContactShareScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ContactShareCountAggregateInputType | true
+    _avg?: ContactShareAvgAggregateInputType
+    _sum?: ContactShareSumAggregateInputType
+    _min?: ContactShareMinAggregateInputType
+    _max?: ContactShareMaxAggregateInputType
+  }
+
+  export type ContactShareGroupByOutputType = {
+    id: string
+    ownerUserId: string
+    contactId: string | null
+    shareType: $Enums.ShareType
+    token: string | null
+    recipientUserId: string | null
+    recipientEmail: string | null
+    recipientContactId: string | null
+    status: $Enums.ShareStatus
+    snapshot: JsonValue | null
+    expiresAt: Date | null
+    revokedAt: Date | null
+    lastPushedAt: Date | null
+    downloadCount: number
+    createdAt: Date
+    updatedAt: Date
+    _count: ContactShareCountAggregateOutputType | null
+    _avg: ContactShareAvgAggregateOutputType | null
+    _sum: ContactShareSumAggregateOutputType | null
+    _min: ContactShareMinAggregateOutputType | null
+    _max: ContactShareMaxAggregateOutputType | null
+  }
+
+  type GetContactShareGroupByPayload<T extends ContactShareGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ContactShareGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ContactShareGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ContactShareGroupByOutputType[P]>
+            : GetScalarType<T[P], ContactShareGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ContactShareSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    ownerUserId?: boolean
+    contactId?: boolean
+    shareType?: boolean
+    token?: boolean
+    recipientUserId?: boolean
+    recipientEmail?: boolean
+    recipientContactId?: boolean
+    status?: boolean
+    snapshot?: boolean
+    expiresAt?: boolean
+    revokedAt?: boolean
+    lastPushedAt?: boolean
+    downloadCount?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    owner?: boolean | UserDefaultArgs<ExtArgs>
+    contact?: boolean | ContactShare$contactArgs<ExtArgs>
+    recipientUser?: boolean | ContactShare$recipientUserArgs<ExtArgs>
+    recipientContact?: boolean | ContactShare$recipientContactArgs<ExtArgs>
+  }, ExtArgs["result"]["contactShare"]>
+
+  export type ContactShareSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    ownerUserId?: boolean
+    contactId?: boolean
+    shareType?: boolean
+    token?: boolean
+    recipientUserId?: boolean
+    recipientEmail?: boolean
+    recipientContactId?: boolean
+    status?: boolean
+    snapshot?: boolean
+    expiresAt?: boolean
+    revokedAt?: boolean
+    lastPushedAt?: boolean
+    downloadCount?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    owner?: boolean | UserDefaultArgs<ExtArgs>
+    contact?: boolean | ContactShare$contactArgs<ExtArgs>
+    recipientUser?: boolean | ContactShare$recipientUserArgs<ExtArgs>
+    recipientContact?: boolean | ContactShare$recipientContactArgs<ExtArgs>
+  }, ExtArgs["result"]["contactShare"]>
+
+  export type ContactShareSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    ownerUserId?: boolean
+    contactId?: boolean
+    shareType?: boolean
+    token?: boolean
+    recipientUserId?: boolean
+    recipientEmail?: boolean
+    recipientContactId?: boolean
+    status?: boolean
+    snapshot?: boolean
+    expiresAt?: boolean
+    revokedAt?: boolean
+    lastPushedAt?: boolean
+    downloadCount?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    owner?: boolean | UserDefaultArgs<ExtArgs>
+    contact?: boolean | ContactShare$contactArgs<ExtArgs>
+    recipientUser?: boolean | ContactShare$recipientUserArgs<ExtArgs>
+    recipientContact?: boolean | ContactShare$recipientContactArgs<ExtArgs>
+  }, ExtArgs["result"]["contactShare"]>
+
+  export type ContactShareSelectScalar = {
+    id?: boolean
+    ownerUserId?: boolean
+    contactId?: boolean
+    shareType?: boolean
+    token?: boolean
+    recipientUserId?: boolean
+    recipientEmail?: boolean
+    recipientContactId?: boolean
+    status?: boolean
+    snapshot?: boolean
+    expiresAt?: boolean
+    revokedAt?: boolean
+    lastPushedAt?: boolean
+    downloadCount?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ContactShareOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerUserId" | "contactId" | "shareType" | "token" | "recipientUserId" | "recipientEmail" | "recipientContactId" | "status" | "snapshot" | "expiresAt" | "revokedAt" | "lastPushedAt" | "downloadCount" | "createdAt" | "updatedAt", ExtArgs["result"]["contactShare"]>
+  export type ContactShareInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    owner?: boolean | UserDefaultArgs<ExtArgs>
+    contact?: boolean | ContactShare$contactArgs<ExtArgs>
+    recipientUser?: boolean | ContactShare$recipientUserArgs<ExtArgs>
+    recipientContact?: boolean | ContactShare$recipientContactArgs<ExtArgs>
+  }
+  export type ContactShareIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    owner?: boolean | UserDefaultArgs<ExtArgs>
+    contact?: boolean | ContactShare$contactArgs<ExtArgs>
+    recipientUser?: boolean | ContactShare$recipientUserArgs<ExtArgs>
+    recipientContact?: boolean | ContactShare$recipientContactArgs<ExtArgs>
+  }
+  export type ContactShareIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    owner?: boolean | UserDefaultArgs<ExtArgs>
+    contact?: boolean | ContactShare$contactArgs<ExtArgs>
+    recipientUser?: boolean | ContactShare$recipientUserArgs<ExtArgs>
+    recipientContact?: boolean | ContactShare$recipientContactArgs<ExtArgs>
+  }
+
+  export type $ContactSharePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ContactShare"
+    objects: {
+      owner: Prisma.$UserPayload<ExtArgs>
+      contact: Prisma.$ContactPayload<ExtArgs> | null
+      recipientUser: Prisma.$UserPayload<ExtArgs> | null
+      recipientContact: Prisma.$ContactPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      ownerUserId: string
+      contactId: string | null
+      shareType: $Enums.ShareType
+      token: string | null
+      recipientUserId: string | null
+      recipientEmail: string | null
+      recipientContactId: string | null
+      status: $Enums.ShareStatus
+      snapshot: Prisma.JsonValue | null
+      expiresAt: Date | null
+      revokedAt: Date | null
+      lastPushedAt: Date | null
+      downloadCount: number
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["contactShare"]>
+    composites: {}
+  }
+
+  type ContactShareGetPayload<S extends boolean | null | undefined | ContactShareDefaultArgs> = $Result.GetResult<Prisma.$ContactSharePayload, S>
+
+  type ContactShareCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ContactShareFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ContactShareCountAggregateInputType | true
+    }
+
+  export interface ContactShareDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ContactShare'], meta: { name: 'ContactShare' } }
+    /**
+     * Find zero or one ContactShare that matches the filter.
+     * @param {ContactShareFindUniqueArgs} args - Arguments to find a ContactShare
+     * @example
+     * // Get one ContactShare
+     * const contactShare = await prisma.contactShare.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ContactShareFindUniqueArgs>(args: SelectSubset<T, ContactShareFindUniqueArgs<ExtArgs>>): Prisma__ContactShareClient<$Result.GetResult<Prisma.$ContactSharePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ContactShare that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ContactShareFindUniqueOrThrowArgs} args - Arguments to find a ContactShare
+     * @example
+     * // Get one ContactShare
+     * const contactShare = await prisma.contactShare.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ContactShareFindUniqueOrThrowArgs>(args: SelectSubset<T, ContactShareFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ContactShareClient<$Result.GetResult<Prisma.$ContactSharePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ContactShare that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactShareFindFirstArgs} args - Arguments to find a ContactShare
+     * @example
+     * // Get one ContactShare
+     * const contactShare = await prisma.contactShare.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ContactShareFindFirstArgs>(args?: SelectSubset<T, ContactShareFindFirstArgs<ExtArgs>>): Prisma__ContactShareClient<$Result.GetResult<Prisma.$ContactSharePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ContactShare that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactShareFindFirstOrThrowArgs} args - Arguments to find a ContactShare
+     * @example
+     * // Get one ContactShare
+     * const contactShare = await prisma.contactShare.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ContactShareFindFirstOrThrowArgs>(args?: SelectSubset<T, ContactShareFindFirstOrThrowArgs<ExtArgs>>): Prisma__ContactShareClient<$Result.GetResult<Prisma.$ContactSharePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ContactShares that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactShareFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ContactShares
+     * const contactShares = await prisma.contactShare.findMany()
+     * 
+     * // Get first 10 ContactShares
+     * const contactShares = await prisma.contactShare.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const contactShareWithIdOnly = await prisma.contactShare.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ContactShareFindManyArgs>(args?: SelectSubset<T, ContactShareFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactSharePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ContactShare.
+     * @param {ContactShareCreateArgs} args - Arguments to create a ContactShare.
+     * @example
+     * // Create one ContactShare
+     * const ContactShare = await prisma.contactShare.create({
+     *   data: {
+     *     // ... data to create a ContactShare
+     *   }
+     * })
+     * 
+     */
+    create<T extends ContactShareCreateArgs>(args: SelectSubset<T, ContactShareCreateArgs<ExtArgs>>): Prisma__ContactShareClient<$Result.GetResult<Prisma.$ContactSharePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ContactShares.
+     * @param {ContactShareCreateManyArgs} args - Arguments to create many ContactShares.
+     * @example
+     * // Create many ContactShares
+     * const contactShare = await prisma.contactShare.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ContactShareCreateManyArgs>(args?: SelectSubset<T, ContactShareCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ContactShares and returns the data saved in the database.
+     * @param {ContactShareCreateManyAndReturnArgs} args - Arguments to create many ContactShares.
+     * @example
+     * // Create many ContactShares
+     * const contactShare = await prisma.contactShare.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ContactShares and only return the `id`
+     * const contactShareWithIdOnly = await prisma.contactShare.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ContactShareCreateManyAndReturnArgs>(args?: SelectSubset<T, ContactShareCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactSharePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ContactShare.
+     * @param {ContactShareDeleteArgs} args - Arguments to delete one ContactShare.
+     * @example
+     * // Delete one ContactShare
+     * const ContactShare = await prisma.contactShare.delete({
+     *   where: {
+     *     // ... filter to delete one ContactShare
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ContactShareDeleteArgs>(args: SelectSubset<T, ContactShareDeleteArgs<ExtArgs>>): Prisma__ContactShareClient<$Result.GetResult<Prisma.$ContactSharePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ContactShare.
+     * @param {ContactShareUpdateArgs} args - Arguments to update one ContactShare.
+     * @example
+     * // Update one ContactShare
+     * const contactShare = await prisma.contactShare.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ContactShareUpdateArgs>(args: SelectSubset<T, ContactShareUpdateArgs<ExtArgs>>): Prisma__ContactShareClient<$Result.GetResult<Prisma.$ContactSharePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ContactShares.
+     * @param {ContactShareDeleteManyArgs} args - Arguments to filter ContactShares to delete.
+     * @example
+     * // Delete a few ContactShares
+     * const { count } = await prisma.contactShare.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ContactShareDeleteManyArgs>(args?: SelectSubset<T, ContactShareDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ContactShares.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactShareUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ContactShares
+     * const contactShare = await prisma.contactShare.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ContactShareUpdateManyArgs>(args: SelectSubset<T, ContactShareUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ContactShares and returns the data updated in the database.
+     * @param {ContactShareUpdateManyAndReturnArgs} args - Arguments to update many ContactShares.
+     * @example
+     * // Update many ContactShares
+     * const contactShare = await prisma.contactShare.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ContactShares and only return the `id`
+     * const contactShareWithIdOnly = await prisma.contactShare.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ContactShareUpdateManyAndReturnArgs>(args: SelectSubset<T, ContactShareUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactSharePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ContactShare.
+     * @param {ContactShareUpsertArgs} args - Arguments to update or create a ContactShare.
+     * @example
+     * // Update or create a ContactShare
+     * const contactShare = await prisma.contactShare.upsert({
+     *   create: {
+     *     // ... data to create a ContactShare
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ContactShare we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ContactShareUpsertArgs>(args: SelectSubset<T, ContactShareUpsertArgs<ExtArgs>>): Prisma__ContactShareClient<$Result.GetResult<Prisma.$ContactSharePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ContactShares.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactShareCountArgs} args - Arguments to filter ContactShares to count.
+     * @example
+     * // Count the number of ContactShares
+     * const count = await prisma.contactShare.count({
+     *   where: {
+     *     // ... the filter for the ContactShares we want to count
+     *   }
+     * })
+    **/
+    count<T extends ContactShareCountArgs>(
+      args?: Subset<T, ContactShareCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ContactShareCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ContactShare.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactShareAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ContactShareAggregateArgs>(args: Subset<T, ContactShareAggregateArgs>): Prisma.PrismaPromise<GetContactShareAggregateType<T>>
+
+    /**
+     * Group by ContactShare.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ContactShareGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ContactShareGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ContactShareGroupByArgs['orderBy'] }
+        : { orderBy?: ContactShareGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ContactShareGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetContactShareGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ContactShare model
+   */
+  readonly fields: ContactShareFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ContactShare.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ContactShareClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    owner<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    contact<T extends ContactShare$contactArgs<ExtArgs> = {}>(args?: Subset<T, ContactShare$contactArgs<ExtArgs>>): Prisma__ContactClient<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    recipientUser<T extends ContactShare$recipientUserArgs<ExtArgs> = {}>(args?: Subset<T, ContactShare$recipientUserArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    recipientContact<T extends ContactShare$recipientContactArgs<ExtArgs> = {}>(args?: Subset<T, ContactShare$recipientContactArgs<ExtArgs>>): Prisma__ContactClient<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ContactShare model
+   */
+  interface ContactShareFieldRefs {
+    readonly id: FieldRef<"ContactShare", 'String'>
+    readonly ownerUserId: FieldRef<"ContactShare", 'String'>
+    readonly contactId: FieldRef<"ContactShare", 'String'>
+    readonly shareType: FieldRef<"ContactShare", 'ShareType'>
+    readonly token: FieldRef<"ContactShare", 'String'>
+    readonly recipientUserId: FieldRef<"ContactShare", 'String'>
+    readonly recipientEmail: FieldRef<"ContactShare", 'String'>
+    readonly recipientContactId: FieldRef<"ContactShare", 'String'>
+    readonly status: FieldRef<"ContactShare", 'ShareStatus'>
+    readonly snapshot: FieldRef<"ContactShare", 'Json'>
+    readonly expiresAt: FieldRef<"ContactShare", 'DateTime'>
+    readonly revokedAt: FieldRef<"ContactShare", 'DateTime'>
+    readonly lastPushedAt: FieldRef<"ContactShare", 'DateTime'>
+    readonly downloadCount: FieldRef<"ContactShare", 'Int'>
+    readonly createdAt: FieldRef<"ContactShare", 'DateTime'>
+    readonly updatedAt: FieldRef<"ContactShare", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ContactShare findUnique
+   */
+  export type ContactShareFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactShare
+     */
+    select?: ContactShareSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactShare
+     */
+    omit?: ContactShareOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactShareInclude<ExtArgs> | null
+    /**
+     * Filter, which ContactShare to fetch.
+     */
+    where: ContactShareWhereUniqueInput
+  }
+
+  /**
+   * ContactShare findUniqueOrThrow
+   */
+  export type ContactShareFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactShare
+     */
+    select?: ContactShareSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactShare
+     */
+    omit?: ContactShareOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactShareInclude<ExtArgs> | null
+    /**
+     * Filter, which ContactShare to fetch.
+     */
+    where: ContactShareWhereUniqueInput
+  }
+
+  /**
+   * ContactShare findFirst
+   */
+  export type ContactShareFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactShare
+     */
+    select?: ContactShareSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactShare
+     */
+    omit?: ContactShareOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactShareInclude<ExtArgs> | null
+    /**
+     * Filter, which ContactShare to fetch.
+     */
+    where?: ContactShareWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ContactShares to fetch.
+     */
+    orderBy?: ContactShareOrderByWithRelationInput | ContactShareOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ContactShares.
+     */
+    cursor?: ContactShareWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ContactShares from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ContactShares.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ContactShares.
+     */
+    distinct?: ContactShareScalarFieldEnum | ContactShareScalarFieldEnum[]
+  }
+
+  /**
+   * ContactShare findFirstOrThrow
+   */
+  export type ContactShareFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactShare
+     */
+    select?: ContactShareSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactShare
+     */
+    omit?: ContactShareOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactShareInclude<ExtArgs> | null
+    /**
+     * Filter, which ContactShare to fetch.
+     */
+    where?: ContactShareWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ContactShares to fetch.
+     */
+    orderBy?: ContactShareOrderByWithRelationInput | ContactShareOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ContactShares.
+     */
+    cursor?: ContactShareWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ContactShares from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ContactShares.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ContactShares.
+     */
+    distinct?: ContactShareScalarFieldEnum | ContactShareScalarFieldEnum[]
+  }
+
+  /**
+   * ContactShare findMany
+   */
+  export type ContactShareFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactShare
+     */
+    select?: ContactShareSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactShare
+     */
+    omit?: ContactShareOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactShareInclude<ExtArgs> | null
+    /**
+     * Filter, which ContactShares to fetch.
+     */
+    where?: ContactShareWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ContactShares to fetch.
+     */
+    orderBy?: ContactShareOrderByWithRelationInput | ContactShareOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ContactShares.
+     */
+    cursor?: ContactShareWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ContactShares from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ContactShares.
+     */
+    skip?: number
+    distinct?: ContactShareScalarFieldEnum | ContactShareScalarFieldEnum[]
+  }
+
+  /**
+   * ContactShare create
+   */
+  export type ContactShareCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactShare
+     */
+    select?: ContactShareSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactShare
+     */
+    omit?: ContactShareOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactShareInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ContactShare.
+     */
+    data: XOR<ContactShareCreateInput, ContactShareUncheckedCreateInput>
+  }
+
+  /**
+   * ContactShare createMany
+   */
+  export type ContactShareCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ContactShares.
+     */
+    data: ContactShareCreateManyInput | ContactShareCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ContactShare createManyAndReturn
+   */
+  export type ContactShareCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactShare
+     */
+    select?: ContactShareSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactShare
+     */
+    omit?: ContactShareOmit<ExtArgs> | null
+    /**
+     * The data used to create many ContactShares.
+     */
+    data: ContactShareCreateManyInput | ContactShareCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactShareIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ContactShare update
+   */
+  export type ContactShareUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactShare
+     */
+    select?: ContactShareSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactShare
+     */
+    omit?: ContactShareOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactShareInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ContactShare.
+     */
+    data: XOR<ContactShareUpdateInput, ContactShareUncheckedUpdateInput>
+    /**
+     * Choose, which ContactShare to update.
+     */
+    where: ContactShareWhereUniqueInput
+  }
+
+  /**
+   * ContactShare updateMany
+   */
+  export type ContactShareUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ContactShares.
+     */
+    data: XOR<ContactShareUpdateManyMutationInput, ContactShareUncheckedUpdateManyInput>
+    /**
+     * Filter which ContactShares to update
+     */
+    where?: ContactShareWhereInput
+    /**
+     * Limit how many ContactShares to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ContactShare updateManyAndReturn
+   */
+  export type ContactShareUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactShare
+     */
+    select?: ContactShareSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactShare
+     */
+    omit?: ContactShareOmit<ExtArgs> | null
+    /**
+     * The data used to update ContactShares.
+     */
+    data: XOR<ContactShareUpdateManyMutationInput, ContactShareUncheckedUpdateManyInput>
+    /**
+     * Filter which ContactShares to update
+     */
+    where?: ContactShareWhereInput
+    /**
+     * Limit how many ContactShares to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactShareIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ContactShare upsert
+   */
+  export type ContactShareUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactShare
+     */
+    select?: ContactShareSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactShare
+     */
+    omit?: ContactShareOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactShareInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ContactShare to update in case it exists.
+     */
+    where: ContactShareWhereUniqueInput
+    /**
+     * In case the ContactShare found by the `where` argument doesn't exist, create a new ContactShare with this data.
+     */
+    create: XOR<ContactShareCreateInput, ContactShareUncheckedCreateInput>
+    /**
+     * In case the ContactShare was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ContactShareUpdateInput, ContactShareUncheckedUpdateInput>
+  }
+
+  /**
+   * ContactShare delete
+   */
+  export type ContactShareDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactShare
+     */
+    select?: ContactShareSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactShare
+     */
+    omit?: ContactShareOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactShareInclude<ExtArgs> | null
+    /**
+     * Filter which ContactShare to delete.
+     */
+    where: ContactShareWhereUniqueInput
+  }
+
+  /**
+   * ContactShare deleteMany
+   */
+  export type ContactShareDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ContactShares to delete
+     */
+    where?: ContactShareWhereInput
+    /**
+     * Limit how many ContactShares to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ContactShare.contact
+   */
+  export type ContactShare$contactArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Contact
+     */
+    select?: ContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Contact
+     */
+    omit?: ContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactInclude<ExtArgs> | null
+    where?: ContactWhereInput
+  }
+
+  /**
+   * ContactShare.recipientUser
+   */
+  export type ContactShare$recipientUserArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * ContactShare.recipientContact
+   */
+  export type ContactShare$recipientContactArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Contact
+     */
+    select?: ContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Contact
+     */
+    omit?: ContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactInclude<ExtArgs> | null
+    where?: ContactWhereInput
+  }
+
+  /**
+   * ContactShare without action
+   */
+  export type ContactShareDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ContactShare
+     */
+    select?: ContactShareSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ContactShare
+     */
+    omit?: ContactShareOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactShareInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -25394,6 +26972,28 @@ export namespace Prisma {
   };
 
   export type GroupAddressBookScalarFieldEnum = (typeof GroupAddressBookScalarFieldEnum)[keyof typeof GroupAddressBookScalarFieldEnum]
+
+
+  export const ContactShareScalarFieldEnum: {
+    id: 'id',
+    ownerUserId: 'ownerUserId',
+    contactId: 'contactId',
+    shareType: 'shareType',
+    token: 'token',
+    recipientUserId: 'recipientUserId',
+    recipientEmail: 'recipientEmail',
+    recipientContactId: 'recipientContactId',
+    status: 'status',
+    snapshot: 'snapshot',
+    expiresAt: 'expiresAt',
+    revokedAt: 'revokedAt',
+    lastPushedAt: 'lastPushedAt',
+    downloadCount: 'downloadCount',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ContactShareScalarFieldEnum = (typeof ContactShareScalarFieldEnum)[keyof typeof ContactShareScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -25891,6 +27491,34 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'ShareType'
+   */
+  export type EnumShareTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ShareType'>
+    
+
+
+  /**
+   * Reference to a field of type 'ShareType[]'
+   */
+  export type ListEnumShareTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ShareType[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'ShareStatus'
+   */
+  export type EnumShareStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ShareStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'ShareStatus[]'
+   */
+  export type ListEnumShareStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ShareStatus[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -25931,6 +27559,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventListRelationFilter
     ownedGroups?: GroupListRelationFilter
     groupMemberships?: GroupMemberListRelationFilter
+    contactSharesOwned?: ContactShareListRelationFilter
+    contactSharesReceived?: ContactShareListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -25954,6 +27584,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventOrderByRelationAggregateInput
     ownedGroups?: GroupOrderByRelationAggregateInput
     groupMemberships?: GroupMemberOrderByRelationAggregateInput
+    contactSharesOwned?: ContactShareOrderByRelationAggregateInput
+    contactSharesReceived?: ContactShareOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -25980,6 +27612,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventListRelationFilter
     ownedGroups?: GroupListRelationFilter
     groupMemberships?: GroupMemberListRelationFilter
+    contactSharesOwned?: ContactShareListRelationFilter
+    contactSharesReceived?: ContactShareListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -26139,6 +27773,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkListRelationFilter
     syncConflicts?: SyncConflictListRelationFilter
     activityEvents?: ActivityEventListRelationFilter
+    sharesFromContact?: ContactShareListRelationFilter
+    sharesAsRecipientCopy?: ContactShareListRelationFilter
     mergedIntoContact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
     mergedChildren?: ContactListRelationFilter
   }
@@ -26196,6 +27832,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkOrderByRelationAggregateInput
     syncConflicts?: SyncConflictOrderByRelationAggregateInput
     activityEvents?: ActivityEventOrderByRelationAggregateInput
+    sharesFromContact?: ContactShareOrderByRelationAggregateInput
+    sharesAsRecipientCopy?: ContactShareOrderByRelationAggregateInput
     mergedIntoContact?: ContactOrderByWithRelationInput
     mergedChildren?: ContactOrderByRelationAggregateInput
   }
@@ -26256,6 +27894,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkListRelationFilter
     syncConflicts?: SyncConflictListRelationFilter
     activityEvents?: ActivityEventListRelationFilter
+    sharesFromContact?: ContactShareListRelationFilter
+    sharesAsRecipientCopy?: ContactShareListRelationFilter
     mergedIntoContact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
     mergedChildren?: ContactListRelationFilter
   }, "id" | "syncUid">
@@ -27942,6 +29582,127 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"GroupAddressBook"> | Date | string
   }
 
+  export type ContactShareWhereInput = {
+    AND?: ContactShareWhereInput | ContactShareWhereInput[]
+    OR?: ContactShareWhereInput[]
+    NOT?: ContactShareWhereInput | ContactShareWhereInput[]
+    id?: StringFilter<"ContactShare"> | string
+    ownerUserId?: StringFilter<"ContactShare"> | string
+    contactId?: StringNullableFilter<"ContactShare"> | string | null
+    shareType?: EnumShareTypeFilter<"ContactShare"> | $Enums.ShareType
+    token?: StringNullableFilter<"ContactShare"> | string | null
+    recipientUserId?: StringNullableFilter<"ContactShare"> | string | null
+    recipientEmail?: StringNullableFilter<"ContactShare"> | string | null
+    recipientContactId?: StringNullableFilter<"ContactShare"> | string | null
+    status?: EnumShareStatusFilter<"ContactShare"> | $Enums.ShareStatus
+    snapshot?: JsonNullableFilter<"ContactShare">
+    expiresAt?: DateTimeNullableFilter<"ContactShare"> | Date | string | null
+    revokedAt?: DateTimeNullableFilter<"ContactShare"> | Date | string | null
+    lastPushedAt?: DateTimeNullableFilter<"ContactShare"> | Date | string | null
+    downloadCount?: IntFilter<"ContactShare"> | number
+    createdAt?: DateTimeFilter<"ContactShare"> | Date | string
+    updatedAt?: DateTimeFilter<"ContactShare"> | Date | string
+    owner?: XOR<UserScalarRelationFilter, UserWhereInput>
+    contact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
+    recipientUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    recipientContact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
+  }
+
+  export type ContactShareOrderByWithRelationInput = {
+    id?: SortOrder
+    ownerUserId?: SortOrder
+    contactId?: SortOrderInput | SortOrder
+    shareType?: SortOrder
+    token?: SortOrderInput | SortOrder
+    recipientUserId?: SortOrderInput | SortOrder
+    recipientEmail?: SortOrderInput | SortOrder
+    recipientContactId?: SortOrderInput | SortOrder
+    status?: SortOrder
+    snapshot?: SortOrderInput | SortOrder
+    expiresAt?: SortOrderInput | SortOrder
+    revokedAt?: SortOrderInput | SortOrder
+    lastPushedAt?: SortOrderInput | SortOrder
+    downloadCount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    owner?: UserOrderByWithRelationInput
+    contact?: ContactOrderByWithRelationInput
+    recipientUser?: UserOrderByWithRelationInput
+    recipientContact?: ContactOrderByWithRelationInput
+  }
+
+  export type ContactShareWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    token?: string
+    AND?: ContactShareWhereInput | ContactShareWhereInput[]
+    OR?: ContactShareWhereInput[]
+    NOT?: ContactShareWhereInput | ContactShareWhereInput[]
+    ownerUserId?: StringFilter<"ContactShare"> | string
+    contactId?: StringNullableFilter<"ContactShare"> | string | null
+    shareType?: EnumShareTypeFilter<"ContactShare"> | $Enums.ShareType
+    recipientUserId?: StringNullableFilter<"ContactShare"> | string | null
+    recipientEmail?: StringNullableFilter<"ContactShare"> | string | null
+    recipientContactId?: StringNullableFilter<"ContactShare"> | string | null
+    status?: EnumShareStatusFilter<"ContactShare"> | $Enums.ShareStatus
+    snapshot?: JsonNullableFilter<"ContactShare">
+    expiresAt?: DateTimeNullableFilter<"ContactShare"> | Date | string | null
+    revokedAt?: DateTimeNullableFilter<"ContactShare"> | Date | string | null
+    lastPushedAt?: DateTimeNullableFilter<"ContactShare"> | Date | string | null
+    downloadCount?: IntFilter<"ContactShare"> | number
+    createdAt?: DateTimeFilter<"ContactShare"> | Date | string
+    updatedAt?: DateTimeFilter<"ContactShare"> | Date | string
+    owner?: XOR<UserScalarRelationFilter, UserWhereInput>
+    contact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
+    recipientUser?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    recipientContact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
+  }, "id" | "token">
+
+  export type ContactShareOrderByWithAggregationInput = {
+    id?: SortOrder
+    ownerUserId?: SortOrder
+    contactId?: SortOrderInput | SortOrder
+    shareType?: SortOrder
+    token?: SortOrderInput | SortOrder
+    recipientUserId?: SortOrderInput | SortOrder
+    recipientEmail?: SortOrderInput | SortOrder
+    recipientContactId?: SortOrderInput | SortOrder
+    status?: SortOrder
+    snapshot?: SortOrderInput | SortOrder
+    expiresAt?: SortOrderInput | SortOrder
+    revokedAt?: SortOrderInput | SortOrder
+    lastPushedAt?: SortOrderInput | SortOrder
+    downloadCount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ContactShareCountOrderByAggregateInput
+    _avg?: ContactShareAvgOrderByAggregateInput
+    _max?: ContactShareMaxOrderByAggregateInput
+    _min?: ContactShareMinOrderByAggregateInput
+    _sum?: ContactShareSumOrderByAggregateInput
+  }
+
+  export type ContactShareScalarWhereWithAggregatesInput = {
+    AND?: ContactShareScalarWhereWithAggregatesInput | ContactShareScalarWhereWithAggregatesInput[]
+    OR?: ContactShareScalarWhereWithAggregatesInput[]
+    NOT?: ContactShareScalarWhereWithAggregatesInput | ContactShareScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ContactShare"> | string
+    ownerUserId?: StringWithAggregatesFilter<"ContactShare"> | string
+    contactId?: StringNullableWithAggregatesFilter<"ContactShare"> | string | null
+    shareType?: EnumShareTypeWithAggregatesFilter<"ContactShare"> | $Enums.ShareType
+    token?: StringNullableWithAggregatesFilter<"ContactShare"> | string | null
+    recipientUserId?: StringNullableWithAggregatesFilter<"ContactShare"> | string | null
+    recipientEmail?: StringNullableWithAggregatesFilter<"ContactShare"> | string | null
+    recipientContactId?: StringNullableWithAggregatesFilter<"ContactShare"> | string | null
+    status?: EnumShareStatusWithAggregatesFilter<"ContactShare"> | $Enums.ShareStatus
+    snapshot?: JsonNullableWithAggregatesFilter<"ContactShare">
+    expiresAt?: DateTimeNullableWithAggregatesFilter<"ContactShare"> | Date | string | null
+    revokedAt?: DateTimeNullableWithAggregatesFilter<"ContactShare"> | Date | string | null
+    lastPushedAt?: DateTimeNullableWithAggregatesFilter<"ContactShare"> | Date | string | null
+    downloadCount?: IntWithAggregatesFilter<"ContactShare"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"ContactShare"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"ContactShare"> | Date | string
+  }
+
   export type UserCreateInput = {
     id?: string
     name?: string | null
@@ -27963,6 +29724,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
     ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
     groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -27986,6 +29749,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
     ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
     groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserUpdateInput = {
@@ -28009,6 +29774,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
     ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
     groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -28032,6 +29799,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
     ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
     groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -28197,6 +29966,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -28252,6 +30023,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -28305,6 +30078,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -28360,6 +30135,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -30311,6 +32088,135 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ContactShareCreateInput = {
+    id?: string
+    shareType: $Enums.ShareType
+    token?: string | null
+    recipientEmail?: string | null
+    status?: $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: Date | string | null
+    revokedAt?: Date | string | null
+    lastPushedAt?: Date | string | null
+    downloadCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    owner: UserCreateNestedOneWithoutContactSharesOwnedInput
+    contact?: ContactCreateNestedOneWithoutSharesFromContactInput
+    recipientUser?: UserCreateNestedOneWithoutContactSharesReceivedInput
+    recipientContact?: ContactCreateNestedOneWithoutSharesAsRecipientCopyInput
+  }
+
+  export type ContactShareUncheckedCreateInput = {
+    id?: string
+    ownerUserId: string
+    contactId?: string | null
+    shareType: $Enums.ShareType
+    token?: string | null
+    recipientUserId?: string | null
+    recipientEmail?: string | null
+    recipientContactId?: string | null
+    status?: $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: Date | string | null
+    revokedAt?: Date | string | null
+    lastPushedAt?: Date | string | null
+    downloadCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactShareUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    shareType?: EnumShareTypeFieldUpdateOperationsInput | $Enums.ShareType
+    token?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumShareStatusFieldUpdateOperationsInput | $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    owner?: UserUpdateOneRequiredWithoutContactSharesOwnedNestedInput
+    contact?: ContactUpdateOneWithoutSharesFromContactNestedInput
+    recipientUser?: UserUpdateOneWithoutContactSharesReceivedNestedInput
+    recipientContact?: ContactUpdateOneWithoutSharesAsRecipientCopyNestedInput
+  }
+
+  export type ContactShareUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ownerUserId?: StringFieldUpdateOperationsInput | string
+    contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    shareType?: EnumShareTypeFieldUpdateOperationsInput | $Enums.ShareType
+    token?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumShareStatusFieldUpdateOperationsInput | $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactShareCreateManyInput = {
+    id?: string
+    ownerUserId: string
+    contactId?: string | null
+    shareType: $Enums.ShareType
+    token?: string | null
+    recipientUserId?: string | null
+    recipientEmail?: string | null
+    recipientContactId?: string | null
+    status?: $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: Date | string | null
+    revokedAt?: Date | string | null
+    lastPushedAt?: Date | string | null
+    downloadCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactShareUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    shareType?: EnumShareTypeFieldUpdateOperationsInput | $Enums.ShareType
+    token?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumShareStatusFieldUpdateOperationsInput | $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactShareUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ownerUserId?: StringFieldUpdateOperationsInput | string
+    contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    shareType?: EnumShareTypeFieldUpdateOperationsInput | $Enums.ShareType
+    token?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumShareStatusFieldUpdateOperationsInput | $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -30435,6 +32341,12 @@ export namespace Prisma {
     none?: GroupMemberWhereInput
   }
 
+  export type ContactShareListRelationFilter = {
+    every?: ContactShareWhereInput
+    some?: ContactShareWhereInput
+    none?: ContactShareWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -30481,6 +32393,10 @@ export namespace Prisma {
   }
 
   export type GroupMemberOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ContactShareOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -32371,6 +34287,108 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
+  export type EnumShareTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.ShareType | EnumShareTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.ShareType[] | ListEnumShareTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ShareType[] | ListEnumShareTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumShareTypeFilter<$PrismaModel> | $Enums.ShareType
+  }
+
+  export type EnumShareStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.ShareStatus | EnumShareStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ShareStatus[] | ListEnumShareStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ShareStatus[] | ListEnumShareStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumShareStatusFilter<$PrismaModel> | $Enums.ShareStatus
+  }
+
+  export type UserNullableScalarRelationFilter = {
+    is?: UserWhereInput | null
+    isNot?: UserWhereInput | null
+  }
+
+  export type ContactShareCountOrderByAggregateInput = {
+    id?: SortOrder
+    ownerUserId?: SortOrder
+    contactId?: SortOrder
+    shareType?: SortOrder
+    token?: SortOrder
+    recipientUserId?: SortOrder
+    recipientEmail?: SortOrder
+    recipientContactId?: SortOrder
+    status?: SortOrder
+    snapshot?: SortOrder
+    expiresAt?: SortOrder
+    revokedAt?: SortOrder
+    lastPushedAt?: SortOrder
+    downloadCount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ContactShareAvgOrderByAggregateInput = {
+    downloadCount?: SortOrder
+  }
+
+  export type ContactShareMaxOrderByAggregateInput = {
+    id?: SortOrder
+    ownerUserId?: SortOrder
+    contactId?: SortOrder
+    shareType?: SortOrder
+    token?: SortOrder
+    recipientUserId?: SortOrder
+    recipientEmail?: SortOrder
+    recipientContactId?: SortOrder
+    status?: SortOrder
+    expiresAt?: SortOrder
+    revokedAt?: SortOrder
+    lastPushedAt?: SortOrder
+    downloadCount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ContactShareMinOrderByAggregateInput = {
+    id?: SortOrder
+    ownerUserId?: SortOrder
+    contactId?: SortOrder
+    shareType?: SortOrder
+    token?: SortOrder
+    recipientUserId?: SortOrder
+    recipientEmail?: SortOrder
+    recipientContactId?: SortOrder
+    status?: SortOrder
+    expiresAt?: SortOrder
+    revokedAt?: SortOrder
+    lastPushedAt?: SortOrder
+    downloadCount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ContactShareSumOrderByAggregateInput = {
+    downloadCount?: SortOrder
+  }
+
+  export type EnumShareTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ShareType | EnumShareTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.ShareType[] | ListEnumShareTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ShareType[] | ListEnumShareTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumShareTypeWithAggregatesFilter<$PrismaModel> | $Enums.ShareType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumShareTypeFilter<$PrismaModel>
+    _max?: NestedEnumShareTypeFilter<$PrismaModel>
+  }
+
+  export type EnumShareStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ShareStatus | EnumShareStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ShareStatus[] | ListEnumShareStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ShareStatus[] | ListEnumShareStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumShareStatusWithAggregatesFilter<$PrismaModel> | $Enums.ShareStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumShareStatusFilter<$PrismaModel>
+    _max?: NestedEnumShareStatusFilter<$PrismaModel>
+  }
+
   export type AppPasswordCreateNestedManyWithoutUserInput = {
     create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
@@ -32454,6 +34472,20 @@ export namespace Prisma {
     connect?: GroupMemberWhereUniqueInput | GroupMemberWhereUniqueInput[]
   }
 
+  export type ContactShareCreateNestedManyWithoutOwnerInput = {
+    create?: XOR<ContactShareCreateWithoutOwnerInput, ContactShareUncheckedCreateWithoutOwnerInput> | ContactShareCreateWithoutOwnerInput[] | ContactShareUncheckedCreateWithoutOwnerInput[]
+    connectOrCreate?: ContactShareCreateOrConnectWithoutOwnerInput | ContactShareCreateOrConnectWithoutOwnerInput[]
+    createMany?: ContactShareCreateManyOwnerInputEnvelope
+    connect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+  }
+
+  export type ContactShareCreateNestedManyWithoutRecipientUserInput = {
+    create?: XOR<ContactShareCreateWithoutRecipientUserInput, ContactShareUncheckedCreateWithoutRecipientUserInput> | ContactShareCreateWithoutRecipientUserInput[] | ContactShareUncheckedCreateWithoutRecipientUserInput[]
+    connectOrCreate?: ContactShareCreateOrConnectWithoutRecipientUserInput | ContactShareCreateOrConnectWithoutRecipientUserInput[]
+    createMany?: ContactShareCreateManyRecipientUserInputEnvelope
+    connect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+  }
+
   export type AppPasswordUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
@@ -32535,6 +34567,20 @@ export namespace Prisma {
     connectOrCreate?: GroupMemberCreateOrConnectWithoutUserInput | GroupMemberCreateOrConnectWithoutUserInput[]
     createMany?: GroupMemberCreateManyUserInputEnvelope
     connect?: GroupMemberWhereUniqueInput | GroupMemberWhereUniqueInput[]
+  }
+
+  export type ContactShareUncheckedCreateNestedManyWithoutOwnerInput = {
+    create?: XOR<ContactShareCreateWithoutOwnerInput, ContactShareUncheckedCreateWithoutOwnerInput> | ContactShareCreateWithoutOwnerInput[] | ContactShareUncheckedCreateWithoutOwnerInput[]
+    connectOrCreate?: ContactShareCreateOrConnectWithoutOwnerInput | ContactShareCreateOrConnectWithoutOwnerInput[]
+    createMany?: ContactShareCreateManyOwnerInputEnvelope
+    connect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+  }
+
+  export type ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput = {
+    create?: XOR<ContactShareCreateWithoutRecipientUserInput, ContactShareUncheckedCreateWithoutRecipientUserInput> | ContactShareCreateWithoutRecipientUserInput[] | ContactShareUncheckedCreateWithoutRecipientUserInput[]
+    connectOrCreate?: ContactShareCreateOrConnectWithoutRecipientUserInput | ContactShareCreateOrConnectWithoutRecipientUserInput[]
+    createMany?: ContactShareCreateManyRecipientUserInputEnvelope
+    connect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -32721,6 +34767,34 @@ export namespace Prisma {
     deleteMany?: GroupMemberScalarWhereInput | GroupMemberScalarWhereInput[]
   }
 
+  export type ContactShareUpdateManyWithoutOwnerNestedInput = {
+    create?: XOR<ContactShareCreateWithoutOwnerInput, ContactShareUncheckedCreateWithoutOwnerInput> | ContactShareCreateWithoutOwnerInput[] | ContactShareUncheckedCreateWithoutOwnerInput[]
+    connectOrCreate?: ContactShareCreateOrConnectWithoutOwnerInput | ContactShareCreateOrConnectWithoutOwnerInput[]
+    upsert?: ContactShareUpsertWithWhereUniqueWithoutOwnerInput | ContactShareUpsertWithWhereUniqueWithoutOwnerInput[]
+    createMany?: ContactShareCreateManyOwnerInputEnvelope
+    set?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    disconnect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    delete?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    connect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    update?: ContactShareUpdateWithWhereUniqueWithoutOwnerInput | ContactShareUpdateWithWhereUniqueWithoutOwnerInput[]
+    updateMany?: ContactShareUpdateManyWithWhereWithoutOwnerInput | ContactShareUpdateManyWithWhereWithoutOwnerInput[]
+    deleteMany?: ContactShareScalarWhereInput | ContactShareScalarWhereInput[]
+  }
+
+  export type ContactShareUpdateManyWithoutRecipientUserNestedInput = {
+    create?: XOR<ContactShareCreateWithoutRecipientUserInput, ContactShareUncheckedCreateWithoutRecipientUserInput> | ContactShareCreateWithoutRecipientUserInput[] | ContactShareUncheckedCreateWithoutRecipientUserInput[]
+    connectOrCreate?: ContactShareCreateOrConnectWithoutRecipientUserInput | ContactShareCreateOrConnectWithoutRecipientUserInput[]
+    upsert?: ContactShareUpsertWithWhereUniqueWithoutRecipientUserInput | ContactShareUpsertWithWhereUniqueWithoutRecipientUserInput[]
+    createMany?: ContactShareCreateManyRecipientUserInputEnvelope
+    set?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    disconnect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    delete?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    connect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    update?: ContactShareUpdateWithWhereUniqueWithoutRecipientUserInput | ContactShareUpdateWithWhereUniqueWithoutRecipientUserInput[]
+    updateMany?: ContactShareUpdateManyWithWhereWithoutRecipientUserInput | ContactShareUpdateManyWithWhereWithoutRecipientUserInput[]
+    deleteMany?: ContactShareScalarWhereInput | ContactShareScalarWhereInput[]
+  }
+
   export type AppPasswordUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
@@ -32885,6 +34959,34 @@ export namespace Prisma {
     deleteMany?: GroupMemberScalarWhereInput | GroupMemberScalarWhereInput[]
   }
 
+  export type ContactShareUncheckedUpdateManyWithoutOwnerNestedInput = {
+    create?: XOR<ContactShareCreateWithoutOwnerInput, ContactShareUncheckedCreateWithoutOwnerInput> | ContactShareCreateWithoutOwnerInput[] | ContactShareUncheckedCreateWithoutOwnerInput[]
+    connectOrCreate?: ContactShareCreateOrConnectWithoutOwnerInput | ContactShareCreateOrConnectWithoutOwnerInput[]
+    upsert?: ContactShareUpsertWithWhereUniqueWithoutOwnerInput | ContactShareUpsertWithWhereUniqueWithoutOwnerInput[]
+    createMany?: ContactShareCreateManyOwnerInputEnvelope
+    set?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    disconnect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    delete?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    connect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    update?: ContactShareUpdateWithWhereUniqueWithoutOwnerInput | ContactShareUpdateWithWhereUniqueWithoutOwnerInput[]
+    updateMany?: ContactShareUpdateManyWithWhereWithoutOwnerInput | ContactShareUpdateManyWithWhereWithoutOwnerInput[]
+    deleteMany?: ContactShareScalarWhereInput | ContactShareScalarWhereInput[]
+  }
+
+  export type ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput = {
+    create?: XOR<ContactShareCreateWithoutRecipientUserInput, ContactShareUncheckedCreateWithoutRecipientUserInput> | ContactShareCreateWithoutRecipientUserInput[] | ContactShareUncheckedCreateWithoutRecipientUserInput[]
+    connectOrCreate?: ContactShareCreateOrConnectWithoutRecipientUserInput | ContactShareCreateOrConnectWithoutRecipientUserInput[]
+    upsert?: ContactShareUpsertWithWhereUniqueWithoutRecipientUserInput | ContactShareUpsertWithWhereUniqueWithoutRecipientUserInput[]
+    createMany?: ContactShareCreateManyRecipientUserInputEnvelope
+    set?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    disconnect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    delete?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    connect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    update?: ContactShareUpdateWithWhereUniqueWithoutRecipientUserInput | ContactShareUpdateWithWhereUniqueWithoutRecipientUserInput[]
+    updateMany?: ContactShareUpdateManyWithWhereWithoutRecipientUserInput | ContactShareUpdateManyWithWhereWithoutRecipientUserInput[]
+    deleteMany?: ContactShareScalarWhereInput | ContactShareScalarWhereInput[]
+  }
+
   export type UserCreateNestedOneWithoutAppPasswordsInput = {
     create?: XOR<UserCreateWithoutAppPasswordsInput, UserUncheckedCreateWithoutAppPasswordsInput>
     connectOrCreate?: UserCreateOrConnectWithoutAppPasswordsInput
@@ -32992,6 +35094,20 @@ export namespace Prisma {
     connect?: ActivityEventWhereUniqueInput | ActivityEventWhereUniqueInput[]
   }
 
+  export type ContactShareCreateNestedManyWithoutContactInput = {
+    create?: XOR<ContactShareCreateWithoutContactInput, ContactShareUncheckedCreateWithoutContactInput> | ContactShareCreateWithoutContactInput[] | ContactShareUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: ContactShareCreateOrConnectWithoutContactInput | ContactShareCreateOrConnectWithoutContactInput[]
+    createMany?: ContactShareCreateManyContactInputEnvelope
+    connect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+  }
+
+  export type ContactShareCreateNestedManyWithoutRecipientContactInput = {
+    create?: XOR<ContactShareCreateWithoutRecipientContactInput, ContactShareUncheckedCreateWithoutRecipientContactInput> | ContactShareCreateWithoutRecipientContactInput[] | ContactShareUncheckedCreateWithoutRecipientContactInput[]
+    connectOrCreate?: ContactShareCreateOrConnectWithoutRecipientContactInput | ContactShareCreateOrConnectWithoutRecipientContactInput[]
+    createMany?: ContactShareCreateManyRecipientContactInputEnvelope
+    connect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+  }
+
   export type ContactCreateNestedOneWithoutMergedChildrenInput = {
     create?: XOR<ContactCreateWithoutMergedChildrenInput, ContactUncheckedCreateWithoutMergedChildrenInput>
     connectOrCreate?: ContactCreateOrConnectWithoutMergedChildrenInput
@@ -33038,6 +35154,20 @@ export namespace Prisma {
     connectOrCreate?: ActivityEventCreateOrConnectWithoutContactInput | ActivityEventCreateOrConnectWithoutContactInput[]
     createMany?: ActivityEventCreateManyContactInputEnvelope
     connect?: ActivityEventWhereUniqueInput | ActivityEventWhereUniqueInput[]
+  }
+
+  export type ContactShareUncheckedCreateNestedManyWithoutContactInput = {
+    create?: XOR<ContactShareCreateWithoutContactInput, ContactShareUncheckedCreateWithoutContactInput> | ContactShareCreateWithoutContactInput[] | ContactShareUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: ContactShareCreateOrConnectWithoutContactInput | ContactShareCreateOrConnectWithoutContactInput[]
+    createMany?: ContactShareCreateManyContactInputEnvelope
+    connect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+  }
+
+  export type ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput = {
+    create?: XOR<ContactShareCreateWithoutRecipientContactInput, ContactShareUncheckedCreateWithoutRecipientContactInput> | ContactShareCreateWithoutRecipientContactInput[] | ContactShareUncheckedCreateWithoutRecipientContactInput[]
+    connectOrCreate?: ContactShareCreateOrConnectWithoutRecipientContactInput | ContactShareCreateOrConnectWithoutRecipientContactInput[]
+    createMany?: ContactShareCreateManyRecipientContactInputEnvelope
+    connect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
   }
 
   export type ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput = {
@@ -33147,6 +35277,34 @@ export namespace Prisma {
     deleteMany?: ActivityEventScalarWhereInput | ActivityEventScalarWhereInput[]
   }
 
+  export type ContactShareUpdateManyWithoutContactNestedInput = {
+    create?: XOR<ContactShareCreateWithoutContactInput, ContactShareUncheckedCreateWithoutContactInput> | ContactShareCreateWithoutContactInput[] | ContactShareUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: ContactShareCreateOrConnectWithoutContactInput | ContactShareCreateOrConnectWithoutContactInput[]
+    upsert?: ContactShareUpsertWithWhereUniqueWithoutContactInput | ContactShareUpsertWithWhereUniqueWithoutContactInput[]
+    createMany?: ContactShareCreateManyContactInputEnvelope
+    set?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    disconnect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    delete?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    connect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    update?: ContactShareUpdateWithWhereUniqueWithoutContactInput | ContactShareUpdateWithWhereUniqueWithoutContactInput[]
+    updateMany?: ContactShareUpdateManyWithWhereWithoutContactInput | ContactShareUpdateManyWithWhereWithoutContactInput[]
+    deleteMany?: ContactShareScalarWhereInput | ContactShareScalarWhereInput[]
+  }
+
+  export type ContactShareUpdateManyWithoutRecipientContactNestedInput = {
+    create?: XOR<ContactShareCreateWithoutRecipientContactInput, ContactShareUncheckedCreateWithoutRecipientContactInput> | ContactShareCreateWithoutRecipientContactInput[] | ContactShareUncheckedCreateWithoutRecipientContactInput[]
+    connectOrCreate?: ContactShareCreateOrConnectWithoutRecipientContactInput | ContactShareCreateOrConnectWithoutRecipientContactInput[]
+    upsert?: ContactShareUpsertWithWhereUniqueWithoutRecipientContactInput | ContactShareUpsertWithWhereUniqueWithoutRecipientContactInput[]
+    createMany?: ContactShareCreateManyRecipientContactInputEnvelope
+    set?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    disconnect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    delete?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    connect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    update?: ContactShareUpdateWithWhereUniqueWithoutRecipientContactInput | ContactShareUpdateWithWhereUniqueWithoutRecipientContactInput[]
+    updateMany?: ContactShareUpdateManyWithWhereWithoutRecipientContactInput | ContactShareUpdateManyWithWhereWithoutRecipientContactInput[]
+    deleteMany?: ContactShareScalarWhereInput | ContactShareScalarWhereInput[]
+  }
+
   export type ContactUpdateOneWithoutMergedChildrenNestedInput = {
     create?: XOR<ContactCreateWithoutMergedChildrenInput, ContactUncheckedCreateWithoutMergedChildrenInput>
     connectOrCreate?: ContactCreateOrConnectWithoutMergedChildrenInput
@@ -33239,6 +35397,34 @@ export namespace Prisma {
     update?: ActivityEventUpdateWithWhereUniqueWithoutContactInput | ActivityEventUpdateWithWhereUniqueWithoutContactInput[]
     updateMany?: ActivityEventUpdateManyWithWhereWithoutContactInput | ActivityEventUpdateManyWithWhereWithoutContactInput[]
     deleteMany?: ActivityEventScalarWhereInput | ActivityEventScalarWhereInput[]
+  }
+
+  export type ContactShareUncheckedUpdateManyWithoutContactNestedInput = {
+    create?: XOR<ContactShareCreateWithoutContactInput, ContactShareUncheckedCreateWithoutContactInput> | ContactShareCreateWithoutContactInput[] | ContactShareUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: ContactShareCreateOrConnectWithoutContactInput | ContactShareCreateOrConnectWithoutContactInput[]
+    upsert?: ContactShareUpsertWithWhereUniqueWithoutContactInput | ContactShareUpsertWithWhereUniqueWithoutContactInput[]
+    createMany?: ContactShareCreateManyContactInputEnvelope
+    set?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    disconnect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    delete?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    connect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    update?: ContactShareUpdateWithWhereUniqueWithoutContactInput | ContactShareUpdateWithWhereUniqueWithoutContactInput[]
+    updateMany?: ContactShareUpdateManyWithWhereWithoutContactInput | ContactShareUpdateManyWithWhereWithoutContactInput[]
+    deleteMany?: ContactShareScalarWhereInput | ContactShareScalarWhereInput[]
+  }
+
+  export type ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput = {
+    create?: XOR<ContactShareCreateWithoutRecipientContactInput, ContactShareUncheckedCreateWithoutRecipientContactInput> | ContactShareCreateWithoutRecipientContactInput[] | ContactShareUncheckedCreateWithoutRecipientContactInput[]
+    connectOrCreate?: ContactShareCreateOrConnectWithoutRecipientContactInput | ContactShareCreateOrConnectWithoutRecipientContactInput[]
+    upsert?: ContactShareUpsertWithWhereUniqueWithoutRecipientContactInput | ContactShareUpsertWithWhereUniqueWithoutRecipientContactInput[]
+    createMany?: ContactShareCreateManyRecipientContactInputEnvelope
+    set?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    disconnect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    delete?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    connect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+    update?: ContactShareUpdateWithWhereUniqueWithoutRecipientContactInput | ContactShareUpdateWithWhereUniqueWithoutRecipientContactInput[]
+    updateMany?: ContactShareUpdateManyWithWhereWithoutRecipientContactInput | ContactShareUpdateManyWithWhereWithoutRecipientContactInput[]
+    deleteMany?: ContactShareScalarWhereInput | ContactShareScalarWhereInput[]
   }
 
   export type ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput = {
@@ -34145,6 +36331,76 @@ export namespace Prisma {
     update?: XOR<XOR<GroupUpdateToOneWithWhereWithoutAddressBooksInput, GroupUpdateWithoutAddressBooksInput>, GroupUncheckedUpdateWithoutAddressBooksInput>
   }
 
+  export type UserCreateNestedOneWithoutContactSharesOwnedInput = {
+    create?: XOR<UserCreateWithoutContactSharesOwnedInput, UserUncheckedCreateWithoutContactSharesOwnedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutContactSharesOwnedInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type ContactCreateNestedOneWithoutSharesFromContactInput = {
+    create?: XOR<ContactCreateWithoutSharesFromContactInput, ContactUncheckedCreateWithoutSharesFromContactInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutSharesFromContactInput
+    connect?: ContactWhereUniqueInput
+  }
+
+  export type UserCreateNestedOneWithoutContactSharesReceivedInput = {
+    create?: XOR<UserCreateWithoutContactSharesReceivedInput, UserUncheckedCreateWithoutContactSharesReceivedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutContactSharesReceivedInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type ContactCreateNestedOneWithoutSharesAsRecipientCopyInput = {
+    create?: XOR<ContactCreateWithoutSharesAsRecipientCopyInput, ContactUncheckedCreateWithoutSharesAsRecipientCopyInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutSharesAsRecipientCopyInput
+    connect?: ContactWhereUniqueInput
+  }
+
+  export type EnumShareTypeFieldUpdateOperationsInput = {
+    set?: $Enums.ShareType
+  }
+
+  export type EnumShareStatusFieldUpdateOperationsInput = {
+    set?: $Enums.ShareStatus
+  }
+
+  export type UserUpdateOneRequiredWithoutContactSharesOwnedNestedInput = {
+    create?: XOR<UserCreateWithoutContactSharesOwnedInput, UserUncheckedCreateWithoutContactSharesOwnedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutContactSharesOwnedInput
+    upsert?: UserUpsertWithoutContactSharesOwnedInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutContactSharesOwnedInput, UserUpdateWithoutContactSharesOwnedInput>, UserUncheckedUpdateWithoutContactSharesOwnedInput>
+  }
+
+  export type ContactUpdateOneWithoutSharesFromContactNestedInput = {
+    create?: XOR<ContactCreateWithoutSharesFromContactInput, ContactUncheckedCreateWithoutSharesFromContactInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutSharesFromContactInput
+    upsert?: ContactUpsertWithoutSharesFromContactInput
+    disconnect?: ContactWhereInput | boolean
+    delete?: ContactWhereInput | boolean
+    connect?: ContactWhereUniqueInput
+    update?: XOR<XOR<ContactUpdateToOneWithWhereWithoutSharesFromContactInput, ContactUpdateWithoutSharesFromContactInput>, ContactUncheckedUpdateWithoutSharesFromContactInput>
+  }
+
+  export type UserUpdateOneWithoutContactSharesReceivedNestedInput = {
+    create?: XOR<UserCreateWithoutContactSharesReceivedInput, UserUncheckedCreateWithoutContactSharesReceivedInput>
+    connectOrCreate?: UserCreateOrConnectWithoutContactSharesReceivedInput
+    upsert?: UserUpsertWithoutContactSharesReceivedInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutContactSharesReceivedInput, UserUpdateWithoutContactSharesReceivedInput>, UserUncheckedUpdateWithoutContactSharesReceivedInput>
+  }
+
+  export type ContactUpdateOneWithoutSharesAsRecipientCopyNestedInput = {
+    create?: XOR<ContactCreateWithoutSharesAsRecipientCopyInput, ContactUncheckedCreateWithoutSharesAsRecipientCopyInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutSharesAsRecipientCopyInput
+    upsert?: ContactUpsertWithoutSharesAsRecipientCopyInput
+    disconnect?: ContactWhereInput | boolean
+    delete?: ContactWhereInput | boolean
+    connect?: ContactWhereUniqueInput
+    update?: XOR<XOR<ContactUpdateToOneWithWhereWithoutSharesAsRecipientCopyInput, ContactUpdateWithoutSharesAsRecipientCopyInput>, ContactUncheckedUpdateWithoutSharesAsRecipientCopyInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -34851,6 +37107,40 @@ export namespace Prisma {
     _max?: NestedEnumGroupInviteStatusFilter<$PrismaModel>
   }
 
+  export type NestedEnumShareTypeFilter<$PrismaModel = never> = {
+    equals?: $Enums.ShareType | EnumShareTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.ShareType[] | ListEnumShareTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ShareType[] | ListEnumShareTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumShareTypeFilter<$PrismaModel> | $Enums.ShareType
+  }
+
+  export type NestedEnumShareStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.ShareStatus | EnumShareStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ShareStatus[] | ListEnumShareStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ShareStatus[] | ListEnumShareStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumShareStatusFilter<$PrismaModel> | $Enums.ShareStatus
+  }
+
+  export type NestedEnumShareTypeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ShareType | EnumShareTypeFieldRefInput<$PrismaModel>
+    in?: $Enums.ShareType[] | ListEnumShareTypeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ShareType[] | ListEnumShareTypeFieldRefInput<$PrismaModel>
+    not?: NestedEnumShareTypeWithAggregatesFilter<$PrismaModel> | $Enums.ShareType
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumShareTypeFilter<$PrismaModel>
+    _max?: NestedEnumShareTypeFilter<$PrismaModel>
+  }
+
+  export type NestedEnumShareStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ShareStatus | EnumShareStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.ShareStatus[] | ListEnumShareStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ShareStatus[] | ListEnumShareStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumShareStatusWithAggregatesFilter<$PrismaModel> | $Enums.ShareStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumShareStatusFilter<$PrismaModel>
+    _max?: NestedEnumShareStatusFilter<$PrismaModel>
+  }
+
   export type AppPasswordCreateWithoutUserInput = {
     id?: string
     label: string
@@ -34932,6 +37222,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -34986,6 +37278,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -35451,6 +37745,98 @@ export namespace Prisma {
 
   export type GroupMemberCreateManyUserInputEnvelope = {
     data: GroupMemberCreateManyUserInput | GroupMemberCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ContactShareCreateWithoutOwnerInput = {
+    id?: string
+    shareType: $Enums.ShareType
+    token?: string | null
+    recipientEmail?: string | null
+    status?: $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: Date | string | null
+    revokedAt?: Date | string | null
+    lastPushedAt?: Date | string | null
+    downloadCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contact?: ContactCreateNestedOneWithoutSharesFromContactInput
+    recipientUser?: UserCreateNestedOneWithoutContactSharesReceivedInput
+    recipientContact?: ContactCreateNestedOneWithoutSharesAsRecipientCopyInput
+  }
+
+  export type ContactShareUncheckedCreateWithoutOwnerInput = {
+    id?: string
+    contactId?: string | null
+    shareType: $Enums.ShareType
+    token?: string | null
+    recipientUserId?: string | null
+    recipientEmail?: string | null
+    recipientContactId?: string | null
+    status?: $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: Date | string | null
+    revokedAt?: Date | string | null
+    lastPushedAt?: Date | string | null
+    downloadCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactShareCreateOrConnectWithoutOwnerInput = {
+    where: ContactShareWhereUniqueInput
+    create: XOR<ContactShareCreateWithoutOwnerInput, ContactShareUncheckedCreateWithoutOwnerInput>
+  }
+
+  export type ContactShareCreateManyOwnerInputEnvelope = {
+    data: ContactShareCreateManyOwnerInput | ContactShareCreateManyOwnerInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ContactShareCreateWithoutRecipientUserInput = {
+    id?: string
+    shareType: $Enums.ShareType
+    token?: string | null
+    recipientEmail?: string | null
+    status?: $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: Date | string | null
+    revokedAt?: Date | string | null
+    lastPushedAt?: Date | string | null
+    downloadCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    owner: UserCreateNestedOneWithoutContactSharesOwnedInput
+    contact?: ContactCreateNestedOneWithoutSharesFromContactInput
+    recipientContact?: ContactCreateNestedOneWithoutSharesAsRecipientCopyInput
+  }
+
+  export type ContactShareUncheckedCreateWithoutRecipientUserInput = {
+    id?: string
+    ownerUserId: string
+    contactId?: string | null
+    shareType: $Enums.ShareType
+    token?: string | null
+    recipientEmail?: string | null
+    recipientContactId?: string | null
+    status?: $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: Date | string | null
+    revokedAt?: Date | string | null
+    lastPushedAt?: Date | string | null
+    downloadCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactShareCreateOrConnectWithoutRecipientUserInput = {
+    where: ContactShareWhereUniqueInput
+    create: XOR<ContactShareCreateWithoutRecipientUserInput, ContactShareUncheckedCreateWithoutRecipientUserInput>
+  }
+
+  export type ContactShareCreateManyRecipientUserInputEnvelope = {
+    data: ContactShareCreateManyRecipientUserInput | ContactShareCreateManyRecipientUserInput[]
     skipDuplicates?: boolean
   }
 
@@ -35924,6 +38310,60 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"GroupMember"> | Date | string
   }
 
+  export type ContactShareUpsertWithWhereUniqueWithoutOwnerInput = {
+    where: ContactShareWhereUniqueInput
+    update: XOR<ContactShareUpdateWithoutOwnerInput, ContactShareUncheckedUpdateWithoutOwnerInput>
+    create: XOR<ContactShareCreateWithoutOwnerInput, ContactShareUncheckedCreateWithoutOwnerInput>
+  }
+
+  export type ContactShareUpdateWithWhereUniqueWithoutOwnerInput = {
+    where: ContactShareWhereUniqueInput
+    data: XOR<ContactShareUpdateWithoutOwnerInput, ContactShareUncheckedUpdateWithoutOwnerInput>
+  }
+
+  export type ContactShareUpdateManyWithWhereWithoutOwnerInput = {
+    where: ContactShareScalarWhereInput
+    data: XOR<ContactShareUpdateManyMutationInput, ContactShareUncheckedUpdateManyWithoutOwnerInput>
+  }
+
+  export type ContactShareScalarWhereInput = {
+    AND?: ContactShareScalarWhereInput | ContactShareScalarWhereInput[]
+    OR?: ContactShareScalarWhereInput[]
+    NOT?: ContactShareScalarWhereInput | ContactShareScalarWhereInput[]
+    id?: StringFilter<"ContactShare"> | string
+    ownerUserId?: StringFilter<"ContactShare"> | string
+    contactId?: StringNullableFilter<"ContactShare"> | string | null
+    shareType?: EnumShareTypeFilter<"ContactShare"> | $Enums.ShareType
+    token?: StringNullableFilter<"ContactShare"> | string | null
+    recipientUserId?: StringNullableFilter<"ContactShare"> | string | null
+    recipientEmail?: StringNullableFilter<"ContactShare"> | string | null
+    recipientContactId?: StringNullableFilter<"ContactShare"> | string | null
+    status?: EnumShareStatusFilter<"ContactShare"> | $Enums.ShareStatus
+    snapshot?: JsonNullableFilter<"ContactShare">
+    expiresAt?: DateTimeNullableFilter<"ContactShare"> | Date | string | null
+    revokedAt?: DateTimeNullableFilter<"ContactShare"> | Date | string | null
+    lastPushedAt?: DateTimeNullableFilter<"ContactShare"> | Date | string | null
+    downloadCount?: IntFilter<"ContactShare"> | number
+    createdAt?: DateTimeFilter<"ContactShare"> | Date | string
+    updatedAt?: DateTimeFilter<"ContactShare"> | Date | string
+  }
+
+  export type ContactShareUpsertWithWhereUniqueWithoutRecipientUserInput = {
+    where: ContactShareWhereUniqueInput
+    update: XOR<ContactShareUpdateWithoutRecipientUserInput, ContactShareUncheckedUpdateWithoutRecipientUserInput>
+    create: XOR<ContactShareCreateWithoutRecipientUserInput, ContactShareUncheckedCreateWithoutRecipientUserInput>
+  }
+
+  export type ContactShareUpdateWithWhereUniqueWithoutRecipientUserInput = {
+    where: ContactShareWhereUniqueInput
+    data: XOR<ContactShareUpdateWithoutRecipientUserInput, ContactShareUncheckedUpdateWithoutRecipientUserInput>
+  }
+
+  export type ContactShareUpdateManyWithWhereWithoutRecipientUserInput = {
+    where: ContactShareScalarWhereInput
+    data: XOR<ContactShareUpdateManyMutationInput, ContactShareUncheckedUpdateManyWithoutRecipientUserInput>
+  }
+
   export type UserCreateWithoutAppPasswordsInput = {
     id?: string
     name?: string | null
@@ -35944,6 +38384,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
     ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
     groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserUncheckedCreateWithoutAppPasswordsInput = {
@@ -35966,6 +38408,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
     ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
     groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserCreateOrConnectWithoutAppPasswordsInput = {
@@ -36058,6 +38502,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
     ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
     groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAppPasswordsInput = {
@@ -36080,6 +38526,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
     ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
     groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type SyncConflictUpsertWithWhereUniqueWithoutAppPasswordInput = {
@@ -36144,6 +38592,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
     ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
     groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserUncheckedCreateWithoutContactsInput = {
@@ -36166,6 +38616,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
     ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
     groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserCreateOrConnectWithoutContactsInput = {
@@ -36450,6 +38902,98 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ContactShareCreateWithoutContactInput = {
+    id?: string
+    shareType: $Enums.ShareType
+    token?: string | null
+    recipientEmail?: string | null
+    status?: $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: Date | string | null
+    revokedAt?: Date | string | null
+    lastPushedAt?: Date | string | null
+    downloadCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    owner: UserCreateNestedOneWithoutContactSharesOwnedInput
+    recipientUser?: UserCreateNestedOneWithoutContactSharesReceivedInput
+    recipientContact?: ContactCreateNestedOneWithoutSharesAsRecipientCopyInput
+  }
+
+  export type ContactShareUncheckedCreateWithoutContactInput = {
+    id?: string
+    ownerUserId: string
+    shareType: $Enums.ShareType
+    token?: string | null
+    recipientUserId?: string | null
+    recipientEmail?: string | null
+    recipientContactId?: string | null
+    status?: $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: Date | string | null
+    revokedAt?: Date | string | null
+    lastPushedAt?: Date | string | null
+    downloadCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactShareCreateOrConnectWithoutContactInput = {
+    where: ContactShareWhereUniqueInput
+    create: XOR<ContactShareCreateWithoutContactInput, ContactShareUncheckedCreateWithoutContactInput>
+  }
+
+  export type ContactShareCreateManyContactInputEnvelope = {
+    data: ContactShareCreateManyContactInput | ContactShareCreateManyContactInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ContactShareCreateWithoutRecipientContactInput = {
+    id?: string
+    shareType: $Enums.ShareType
+    token?: string | null
+    recipientEmail?: string | null
+    status?: $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: Date | string | null
+    revokedAt?: Date | string | null
+    lastPushedAt?: Date | string | null
+    downloadCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    owner: UserCreateNestedOneWithoutContactSharesOwnedInput
+    contact?: ContactCreateNestedOneWithoutSharesFromContactInput
+    recipientUser?: UserCreateNestedOneWithoutContactSharesReceivedInput
+  }
+
+  export type ContactShareUncheckedCreateWithoutRecipientContactInput = {
+    id?: string
+    ownerUserId: string
+    contactId?: string | null
+    shareType: $Enums.ShareType
+    token?: string | null
+    recipientUserId?: string | null
+    recipientEmail?: string | null
+    status?: $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: Date | string | null
+    revokedAt?: Date | string | null
+    lastPushedAt?: Date | string | null
+    downloadCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactShareCreateOrConnectWithoutRecipientContactInput = {
+    where: ContactShareWhereUniqueInput
+    create: XOR<ContactShareCreateWithoutRecipientContactInput, ContactShareUncheckedCreateWithoutRecipientContactInput>
+  }
+
+  export type ContactShareCreateManyRecipientContactInputEnvelope = {
+    data: ContactShareCreateManyRecipientContactInput | ContactShareCreateManyRecipientContactInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ContactCreateWithoutMergedChildrenInput = {
     id?: string
     syncUid?: string
@@ -36500,6 +39044,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
   }
 
@@ -36554,6 +39100,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
   }
 
   export type ContactCreateOrConnectWithoutMergedChildrenInput = {
@@ -36611,6 +39159,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -36664,6 +39214,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -36708,6 +39260,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
     ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
     groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutContactsInput = {
@@ -36730,6 +39284,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
     ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
     groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type ImportJobUpsertWithoutContactsInput = {
@@ -36892,6 +39448,38 @@ export namespace Prisma {
     data: XOR<ActivityEventUpdateManyMutationInput, ActivityEventUncheckedUpdateManyWithoutContactInput>
   }
 
+  export type ContactShareUpsertWithWhereUniqueWithoutContactInput = {
+    where: ContactShareWhereUniqueInput
+    update: XOR<ContactShareUpdateWithoutContactInput, ContactShareUncheckedUpdateWithoutContactInput>
+    create: XOR<ContactShareCreateWithoutContactInput, ContactShareUncheckedCreateWithoutContactInput>
+  }
+
+  export type ContactShareUpdateWithWhereUniqueWithoutContactInput = {
+    where: ContactShareWhereUniqueInput
+    data: XOR<ContactShareUpdateWithoutContactInput, ContactShareUncheckedUpdateWithoutContactInput>
+  }
+
+  export type ContactShareUpdateManyWithWhereWithoutContactInput = {
+    where: ContactShareScalarWhereInput
+    data: XOR<ContactShareUpdateManyMutationInput, ContactShareUncheckedUpdateManyWithoutContactInput>
+  }
+
+  export type ContactShareUpsertWithWhereUniqueWithoutRecipientContactInput = {
+    where: ContactShareWhereUniqueInput
+    update: XOR<ContactShareUpdateWithoutRecipientContactInput, ContactShareUncheckedUpdateWithoutRecipientContactInput>
+    create: XOR<ContactShareCreateWithoutRecipientContactInput, ContactShareUncheckedCreateWithoutRecipientContactInput>
+  }
+
+  export type ContactShareUpdateWithWhereUniqueWithoutRecipientContactInput = {
+    where: ContactShareWhereUniqueInput
+    data: XOR<ContactShareUpdateWithoutRecipientContactInput, ContactShareUncheckedUpdateWithoutRecipientContactInput>
+  }
+
+  export type ContactShareUpdateManyWithWhereWithoutRecipientContactInput = {
+    where: ContactShareScalarWhereInput
+    data: XOR<ContactShareUpdateManyMutationInput, ContactShareUncheckedUpdateManyWithoutRecipientContactInput>
+  }
+
   export type ContactUpsertWithoutMergedChildrenInput = {
     update: XOR<ContactUpdateWithoutMergedChildrenInput, ContactUncheckedUpdateWithoutMergedChildrenInput>
     create: XOR<ContactCreateWithoutMergedChildrenInput, ContactUncheckedCreateWithoutMergedChildrenInput>
@@ -36953,6 +39541,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
   }
 
@@ -37007,6 +39597,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
   }
 
   export type ContactUpsertWithWhereUniqueWithoutMergedIntoContactInput = {
@@ -37045,6 +39637,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
     ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
     groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserUncheckedCreateWithoutSubscriptionCustomerInput = {
@@ -37067,6 +39661,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
     ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
     groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserCreateOrConnectWithoutSubscriptionCustomerInput = {
@@ -37185,6 +39781,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
     ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
     groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSubscriptionCustomerInput = {
@@ -37207,6 +39805,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
     ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
     groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type SubscriptionUpsertWithWhereUniqueWithoutSubscriptionCustomerInput = {
@@ -37245,6 +39845,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
     ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
     groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserUncheckedCreateWithoutSubscriptionsInput = {
@@ -37267,6 +39869,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
     ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
     groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserCreateOrConnectWithoutSubscriptionsInput = {
@@ -37364,6 +39968,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
     ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
     groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSubscriptionsInput = {
@@ -37386,6 +39992,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
     ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
     groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type SubscriptionCustomerUpsertWithoutSubscriptionsInput = {
@@ -37455,6 +40063,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
     ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
     groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserUncheckedCreateWithoutImportJobsInput = {
@@ -37477,6 +40087,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
     ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
     groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserCreateOrConnectWithoutImportJobsInput = {
@@ -37533,6 +40145,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -37587,6 +40201,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -37631,6 +40247,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
     ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
     groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutImportJobsInput = {
@@ -37653,6 +40271,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
     ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
     groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type ContactUpsertWithWhereUniqueWithoutImportJobInput = {
@@ -37691,6 +40311,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
     ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
     groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserUncheckedCreateWithoutExportJobsInput = {
@@ -37713,6 +40335,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
     ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
     groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserCreateOrConnectWithoutExportJobsInput = {
@@ -37751,6 +40375,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
     ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
     groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutExportJobsInput = {
@@ -37773,6 +40399,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
     ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
     groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type UserCreateWithoutMergeSuggestionsInput = {
@@ -37795,6 +40423,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
     ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
     groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserUncheckedCreateWithoutMergeSuggestionsInput = {
@@ -37817,6 +40447,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
     ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
     groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserCreateOrConnectWithoutMergeSuggestionsInput = {
@@ -37873,6 +40505,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -37927,6 +40561,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -37984,6 +40620,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -38038,6 +40676,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -38115,6 +40755,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
     ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
     groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMergeSuggestionsInput = {
@@ -38137,6 +40779,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
     ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
     groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type ContactUpsertWithoutLeftMergeSuggestionsInput = {
@@ -38199,6 +40843,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -38253,6 +40899,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -38316,6 +40964,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -38370,6 +41020,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -38452,6 +41104,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
     ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
     groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserUncheckedCreateWithoutMergeDecisionsInput = {
@@ -38474,6 +41128,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
     ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
     groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserCreateOrConnectWithoutMergeDecisionsInput = {
@@ -38561,6 +41217,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
     ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
     groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMergeDecisionsInput = {
@@ -38583,6 +41241,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
     ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
     groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type UserCreateWithoutSyncAccountsInput = {
@@ -38605,6 +41265,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
     ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
     groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserUncheckedCreateWithoutSyncAccountsInput = {
@@ -38627,6 +41289,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
     ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
     groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserCreateOrConnectWithoutSyncAccountsInput = {
@@ -38823,6 +41487,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
     ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
     groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSyncAccountsInput = {
@@ -38845,6 +41511,8 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
     ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
     groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type SyncContactLinkUpsertWithWhereUniqueWithoutSyncAccountInput = {
@@ -39043,6 +41711,8 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -39097,6 +41767,8 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -39294,6 +41966,8 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -39348,6 +42022,8 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -39666,6 +42342,8 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -39720,6 +42398,8 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -39933,6 +42613,8 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -39987,6 +42669,8 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -40043,6 +42727,8 @@ export namespace Prisma {
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
     groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserUncheckedCreateWithoutActivityEventsInput = {
@@ -40065,6 +42751,8 @@ export namespace Prisma {
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
     groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserCreateOrConnectWithoutActivityEventsInput = {
@@ -40121,6 +42809,8 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -40175,6 +42865,8 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -40214,6 +42906,8 @@ export namespace Prisma {
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
     groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutActivityEventsInput = {
@@ -40236,6 +42930,8 @@ export namespace Prisma {
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
     groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type ContactUpsertWithoutActivityEventsInput = {
@@ -40298,6 +42994,8 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -40352,6 +43050,8 @@ export namespace Prisma {
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -40375,6 +43075,8 @@ export namespace Prisma {
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
     groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserUncheckedCreateWithoutOwnedGroupsInput = {
@@ -40397,6 +43099,8 @@ export namespace Prisma {
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
     groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserCreateOrConnectWithoutOwnedGroupsInput = {
@@ -40562,6 +43266,8 @@ export namespace Prisma {
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
     groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOwnedGroupsInput = {
@@ -40584,6 +43290,8 @@ export namespace Prisma {
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
     groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type SubscriptionUpsertWithoutGroupsInput = {
@@ -40760,6 +43468,8 @@ export namespace Prisma {
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
     ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserUncheckedCreateWithoutGroupMembershipsInput = {
@@ -40782,6 +43492,8 @@ export namespace Prisma {
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
     ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
   }
 
   export type UserCreateOrConnectWithoutGroupMembershipsInput = {
@@ -40855,6 +43567,8 @@ export namespace Prisma {
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
     ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutGroupMembershipsInput = {
@@ -40877,6 +43591,8 @@ export namespace Prisma {
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
     ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
   }
 
   export type GroupCreateWithoutAddressBooksInput = {
@@ -40941,6 +43657,702 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
+  }
+
+  export type UserCreateWithoutContactSharesOwnedInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+  }
+
+  export type UserUncheckedCreateWithoutContactSharesOwnedInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+  }
+
+  export type UserCreateOrConnectWithoutContactSharesOwnedInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutContactSharesOwnedInput, UserUncheckedCreateWithoutContactSharesOwnedInput>
+  }
+
+  export type ContactCreateWithoutSharesFromContactInput = {
+    id?: string
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
+    nickname?: string | null
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    phoneticCompany?: string | null
+    jobTitle?: string | null
+    website?: string | null
+    birthday?: string | null
+    address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutContactsInput
+    importJob?: ImportJobCreateNestedOneWithoutContactsInput
+    leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
+    mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
+    mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactUncheckedCreateWithoutSharesFromContactInput = {
+    id?: string
+    userId: string
+    importJobId?: string | null
+    mergedIntoContactId?: string | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
+    nickname?: string | null
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    phoneticCompany?: string | null
+    jobTitle?: string | null
+    website?: string | null
+    birthday?: string | null
+    address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
+    mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactCreateOrConnectWithoutSharesFromContactInput = {
+    where: ContactWhereUniqueInput
+    create: XOR<ContactCreateWithoutSharesFromContactInput, ContactUncheckedCreateWithoutSharesFromContactInput>
+  }
+
+  export type UserCreateWithoutContactSharesReceivedInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+  }
+
+  export type UserUncheckedCreateWithoutContactSharesReceivedInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+  }
+
+  export type UserCreateOrConnectWithoutContactSharesReceivedInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutContactSharesReceivedInput, UserUncheckedCreateWithoutContactSharesReceivedInput>
+  }
+
+  export type ContactCreateWithoutSharesAsRecipientCopyInput = {
+    id?: string
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
+    nickname?: string | null
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    phoneticCompany?: string | null
+    jobTitle?: string | null
+    website?: string | null
+    birthday?: string | null
+    address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutContactsInput
+    importJob?: ImportJobCreateNestedOneWithoutContactsInput
+    leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
+    mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
+    mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactUncheckedCreateWithoutSharesAsRecipientCopyInput = {
+    id?: string
+    userId: string
+    importJobId?: string | null
+    mergedIntoContactId?: string | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
+    nickname?: string | null
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    phoneticCompany?: string | null
+    jobTitle?: string | null
+    website?: string | null
+    birthday?: string | null
+    address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
+    mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactCreateOrConnectWithoutSharesAsRecipientCopyInput = {
+    where: ContactWhereUniqueInput
+    create: XOR<ContactCreateWithoutSharesAsRecipientCopyInput, ContactUncheckedCreateWithoutSharesAsRecipientCopyInput>
+  }
+
+  export type UserUpsertWithoutContactSharesOwnedInput = {
+    update: XOR<UserUpdateWithoutContactSharesOwnedInput, UserUncheckedUpdateWithoutContactSharesOwnedInput>
+    create: XOR<UserCreateWithoutContactSharesOwnedInput, UserUncheckedCreateWithoutContactSharesOwnedInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutContactSharesOwnedInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutContactSharesOwnedInput, UserUncheckedUpdateWithoutContactSharesOwnedInput>
+  }
+
+  export type UserUpdateWithoutContactSharesOwnedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutContactSharesOwnedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+  }
+
+  export type ContactUpsertWithoutSharesFromContactInput = {
+    update: XOR<ContactUpdateWithoutSharesFromContactInput, ContactUncheckedUpdateWithoutSharesFromContactInput>
+    create: XOR<ContactCreateWithoutSharesFromContactInput, ContactUncheckedCreateWithoutSharesFromContactInput>
+    where?: ContactWhereInput
+  }
+
+  export type ContactUpdateToOneWithWhereWithoutSharesFromContactInput = {
+    where?: ContactWhereInput
+    data: XOR<ContactUpdateWithoutSharesFromContactInput, ContactUncheckedUpdateWithoutSharesFromContactInput>
+  }
+
+  export type ContactUpdateWithoutSharesFromContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
+    nickname?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    birthday?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutContactsNestedInput
+    importJob?: ImportJobUpdateOneWithoutContactsNestedInput
+    leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
+    mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
+    mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+  }
+
+  export type ContactUncheckedUpdateWithoutSharesFromContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
+    nickname?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    birthday?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
+    mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
+  }
+
+  export type UserUpsertWithoutContactSharesReceivedInput = {
+    update: XOR<UserUpdateWithoutContactSharesReceivedInput, UserUncheckedUpdateWithoutContactSharesReceivedInput>
+    create: XOR<UserCreateWithoutContactSharesReceivedInput, UserUncheckedCreateWithoutContactSharesReceivedInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutContactSharesReceivedInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutContactSharesReceivedInput, UserUncheckedUpdateWithoutContactSharesReceivedInput>
+  }
+
+  export type UserUpdateWithoutContactSharesReceivedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutContactSharesReceivedInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+  }
+
+  export type ContactUpsertWithoutSharesAsRecipientCopyInput = {
+    update: XOR<ContactUpdateWithoutSharesAsRecipientCopyInput, ContactUncheckedUpdateWithoutSharesAsRecipientCopyInput>
+    create: XOR<ContactCreateWithoutSharesAsRecipientCopyInput, ContactUncheckedCreateWithoutSharesAsRecipientCopyInput>
+    where?: ContactWhereInput
+  }
+
+  export type ContactUpdateToOneWithWhereWithoutSharesAsRecipientCopyInput = {
+    where?: ContactWhereInput
+    data: XOR<ContactUpdateWithoutSharesAsRecipientCopyInput, ContactUncheckedUpdateWithoutSharesAsRecipientCopyInput>
+  }
+
+  export type ContactUpdateWithoutSharesAsRecipientCopyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
+    nickname?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    birthday?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutContactsNestedInput
+    importJob?: ImportJobUpdateOneWithoutContactsNestedInput
+    leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
+    mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
+    mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+  }
+
+  export type ContactUncheckedUpdateWithoutSharesAsRecipientCopyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
+    nickname?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    birthday?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
+    mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
   export type AppPasswordCreateManyUserInput = {
@@ -41162,6 +44574,42 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type ContactShareCreateManyOwnerInput = {
+    id?: string
+    contactId?: string | null
+    shareType: $Enums.ShareType
+    token?: string | null
+    recipientUserId?: string | null
+    recipientEmail?: string | null
+    recipientContactId?: string | null
+    status?: $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: Date | string | null
+    revokedAt?: Date | string | null
+    lastPushedAt?: Date | string | null
+    downloadCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactShareCreateManyRecipientUserInput = {
+    id?: string
+    ownerUserId: string
+    contactId?: string | null
+    shareType: $Enums.ShareType
+    token?: string | null
+    recipientEmail?: string | null
+    recipientContactId?: string | null
+    status?: $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: Date | string | null
+    revokedAt?: Date | string | null
+    lastPushedAt?: Date | string | null
+    downloadCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type AppPasswordUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     label?: StringFieldUpdateOperationsInput | string
@@ -41243,6 +44691,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -41297,6 +44747,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -41849,6 +45301,114 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ContactShareUpdateWithoutOwnerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    shareType?: EnumShareTypeFieldUpdateOperationsInput | $Enums.ShareType
+    token?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumShareStatusFieldUpdateOperationsInput | $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contact?: ContactUpdateOneWithoutSharesFromContactNestedInput
+    recipientUser?: UserUpdateOneWithoutContactSharesReceivedNestedInput
+    recipientContact?: ContactUpdateOneWithoutSharesAsRecipientCopyNestedInput
+  }
+
+  export type ContactShareUncheckedUpdateWithoutOwnerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    shareType?: EnumShareTypeFieldUpdateOperationsInput | $Enums.ShareType
+    token?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumShareStatusFieldUpdateOperationsInput | $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactShareUncheckedUpdateManyWithoutOwnerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    shareType?: EnumShareTypeFieldUpdateOperationsInput | $Enums.ShareType
+    token?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumShareStatusFieldUpdateOperationsInput | $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactShareUpdateWithoutRecipientUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    shareType?: EnumShareTypeFieldUpdateOperationsInput | $Enums.ShareType
+    token?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumShareStatusFieldUpdateOperationsInput | $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    owner?: UserUpdateOneRequiredWithoutContactSharesOwnedNestedInput
+    contact?: ContactUpdateOneWithoutSharesFromContactNestedInput
+    recipientContact?: ContactUpdateOneWithoutSharesAsRecipientCopyNestedInput
+  }
+
+  export type ContactShareUncheckedUpdateWithoutRecipientUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ownerUserId?: StringFieldUpdateOperationsInput | string
+    contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    shareType?: EnumShareTypeFieldUpdateOperationsInput | $Enums.ShareType
+    token?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumShareStatusFieldUpdateOperationsInput | $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactShareUncheckedUpdateManyWithoutRecipientUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ownerUserId?: StringFieldUpdateOperationsInput | string
+    contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    shareType?: EnumShareTypeFieldUpdateOperationsInput | $Enums.ShareType
+    token?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumShareStatusFieldUpdateOperationsInput | $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type SyncConflictCreateManyAppPasswordInput = {
     id?: string
     syncAccountId?: string | null
@@ -42018,6 +45578,42 @@ export namespace Prisma {
     actorDetail?: string | null
     payload?: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
+  }
+
+  export type ContactShareCreateManyContactInput = {
+    id?: string
+    ownerUserId: string
+    shareType: $Enums.ShareType
+    token?: string | null
+    recipientUserId?: string | null
+    recipientEmail?: string | null
+    recipientContactId?: string | null
+    status?: $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: Date | string | null
+    revokedAt?: Date | string | null
+    lastPushedAt?: Date | string | null
+    downloadCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactShareCreateManyRecipientContactInput = {
+    id?: string
+    ownerUserId: string
+    contactId?: string | null
+    shareType: $Enums.ShareType
+    token?: string | null
+    recipientUserId?: string | null
+    recipientEmail?: string | null
+    status?: $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: Date | string | null
+    revokedAt?: Date | string | null
+    lastPushedAt?: Date | string | null
+    downloadCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type ContactCreateManyMergedIntoContactInput = {
@@ -42322,6 +45918,114 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ContactShareUpdateWithoutContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    shareType?: EnumShareTypeFieldUpdateOperationsInput | $Enums.ShareType
+    token?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumShareStatusFieldUpdateOperationsInput | $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    owner?: UserUpdateOneRequiredWithoutContactSharesOwnedNestedInput
+    recipientUser?: UserUpdateOneWithoutContactSharesReceivedNestedInput
+    recipientContact?: ContactUpdateOneWithoutSharesAsRecipientCopyNestedInput
+  }
+
+  export type ContactShareUncheckedUpdateWithoutContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ownerUserId?: StringFieldUpdateOperationsInput | string
+    shareType?: EnumShareTypeFieldUpdateOperationsInput | $Enums.ShareType
+    token?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumShareStatusFieldUpdateOperationsInput | $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactShareUncheckedUpdateManyWithoutContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ownerUserId?: StringFieldUpdateOperationsInput | string
+    shareType?: EnumShareTypeFieldUpdateOperationsInput | $Enums.ShareType
+    token?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumShareStatusFieldUpdateOperationsInput | $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactShareUpdateWithoutRecipientContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    shareType?: EnumShareTypeFieldUpdateOperationsInput | $Enums.ShareType
+    token?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumShareStatusFieldUpdateOperationsInput | $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    owner?: UserUpdateOneRequiredWithoutContactSharesOwnedNestedInput
+    contact?: ContactUpdateOneWithoutSharesFromContactNestedInput
+    recipientUser?: UserUpdateOneWithoutContactSharesReceivedNestedInput
+  }
+
+  export type ContactShareUncheckedUpdateWithoutRecipientContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ownerUserId?: StringFieldUpdateOperationsInput | string
+    contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    shareType?: EnumShareTypeFieldUpdateOperationsInput | $Enums.ShareType
+    token?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumShareStatusFieldUpdateOperationsInput | $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactShareUncheckedUpdateManyWithoutRecipientContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ownerUserId?: StringFieldUpdateOperationsInput | string
+    contactId?: NullableStringFieldUpdateOperationsInput | string | null
+    shareType?: EnumShareTypeFieldUpdateOperationsInput | $Enums.ShareType
+    token?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    recipientEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumShareStatusFieldUpdateOperationsInput | $Enums.ShareStatus
+    snapshot?: NullableJsonNullValueInput | InputJsonValue
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    downloadCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type ContactUpdateWithoutMergedIntoContactInput = {
     id?: StringFieldUpdateOperationsInput | string
     syncUid?: StringFieldUpdateOperationsInput | string
@@ -42372,6 +46076,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -42425,6 +46131,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -42753,6 +46461,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -42807,6 +46517,8 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 

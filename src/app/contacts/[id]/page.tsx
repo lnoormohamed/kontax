@@ -1,8 +1,11 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 
 import { AppShell } from "~/app/_components/app-shell";
 import { ContactHistory } from "~/app/_components/contact-history";
+import { CopyField } from "~/app/_components/copy-field";
+import { createStaticShare, createVcardShareLink, revokeShare } from "~/app/actions/shares";
 import { ContactPhoneticAssistant } from "~/app/_components/contact-phonetic-assistant";
 import { LastUpdatedBy } from "~/app/_components/last-updated-by";
 import { SourceBadge } from "~/app/_components/source-badge";
@@ -252,6 +255,33 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     archived: shellArchived,
     duplicates: shellDuplicates,
   };
+
+  // Sharing (Phase 12): owner-side shares for this contact + the public origin.
+  const headerList = await headers();
+  const shareHost = headerList.get("x-forwarded-host") ?? headerList.get("host") ?? "localhost:3000";
+  const shareProto =
+    headerList.get("x-forwarded-proto")?.split(",")[0]?.trim() ??
+    (shareHost.startsWith("localhost") ? "http" : "https");
+  const shareOrigin = `${shareProto}://${shareHost}`;
+  const contactShares = await db.contactShare.findMany({
+    where: { contactId: contact.id, ownerUserId: session.user.id },
+    orderBy: { createdAt: "desc" },
+    select: {
+      id: true,
+      shareType: true,
+      token: true,
+      status: true,
+      expiresAt: true,
+      downloadCount: true,
+      recipientEmail: true,
+      recipientContactId: true,
+    },
+  });
+  const vcardLinks = contactShares.filter(
+    (share) => share.shareType === "VCARD_LINK" && share.status === "ACTIVE",
+  );
+  const staticShares = contactShares.filter((share) => share.shareType === "STATIC_COPY");
+  const staticShareEnabled = shellPlan.entitlements.staticShareEnabled;
 
   const syncLinks = await db.syncContactLink.findMany({
     where: {
@@ -1389,12 +1419,108 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
           <section className={sectionCardClassName} id="contact-sharing">
             <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Sharing</p>
             <h2 className="mt-1 text-lg font-semibold text-slate-900">Share this contact</h2>
-            <div className="mt-4 rounded-[1.4rem] border border-dashed border-[#d8ddd6] bg-[#f6f7f4] px-6 py-10 text-center">
-              <p className="text-sm font-semibold text-[#1d2823]">Sharing is coming soon</p>
-              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#5c655e]">
-                You&apos;ll be able to add this contact to a family or team book, send a copy, or share
-                a live link that stays in sync. Until then, use Export to share a vCard.
+
+            {/* vCard share link (all plans) */}
+            <div className="mt-5 rounded-[1.4rem] border border-[#d8ddd6] bg-white p-5">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <div>
+                  <p className="text-sm font-semibold text-[#1d2823]">vCard link</p>
+                  <p className="mt-0.5 text-[13px] text-[#5c655e]">
+                    Anyone with the link can download this contact as a .vcf file.
+                    {shellPlan.plan === "FREE" ? " Free links expire after 7 days." : ""}
+                  </p>
+                </div>
+                <form action={createVcardShareLink}>
+                  <input name="contactId" type="hidden" value={contact.id} />
+                  <button
+                    className="rounded-[0.8rem] bg-[#17352e] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#20443b]"
+                    type="submit"
+                  >
+                    Create share link
+                  </button>
+                </form>
+              </div>
+
+              {vcardLinks.length > 0 ? (
+                <div className="mt-4 grid gap-3">
+                  {vcardLinks.map((link) => (
+                    <div key={link.id}>
+                      <CopyField
+                        helper={`${link.downloadCount} download${link.downloadCount === 1 ? "" : "s"}${
+                          link.expiresAt
+                            ? ` · expires ${formatTimestamp(link.expiresAt)}`
+                            : " · no expiry"
+                        }`}
+                        label="Share link"
+                        value={`${shareOrigin}/share/${link.token}`}
+                      />
+                      <form action={revokeShare}>
+                        <input name="shareId" type="hidden" value={link.id} />
+                        <input name="contactId" type="hidden" value={contact.id} />
+                        <button
+                          className="mt-1.5 text-[13px] font-semibold text-[#b5472f]"
+                          type="submit"
+                        >
+                          Revoke link
+                        </button>
+                      </form>
+                    </div>
+                  ))}
+                </div>
+              ) : null}
+            </div>
+
+            {/* static Kontax-to-Kontax share (Pro and above) */}
+            <div className="mt-4 rounded-[1.4rem] border border-[#d8ddd6] bg-white p-5">
+              <p className="text-sm font-semibold text-[#1d2823]">Share with a Kontax user</p>
+              <p className="mt-0.5 text-[13px] text-[#5c655e]">
+                Send a one-time copy to another Kontax account. Their copy is independent of yours.
               </p>
+              {staticShareEnabled ? (
+                <form action={createStaticShare} className="mt-3 flex flex-wrap items-center gap-2">
+                  <input name="contactId" type="hidden" value={contact.id} />
+                  <input
+                    className="min-w-[220px] flex-1 rounded-[0.7rem] border border-[#d8ddd6] bg-white px-3 py-2 text-sm text-[#1d2823] outline-none focus:border-[#4158f4]"
+                    name="recipientEmail"
+                    placeholder="name@email.com"
+                    required
+                    type="email"
+                  />
+                  <button
+                    className="rounded-[0.8rem] bg-[#4158f4] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3248db]"
+                    type="submit"
+                  >
+                    Send copy
+                  </button>
+                </form>
+              ) : (
+                <div className="mt-3 flex items-center justify-between gap-3 rounded-[0.9rem] bg-[#f6edd9] px-4 py-3 text-[13px] text-[#7a5a1a]">
+                  <span>Sharing with another Kontax user is a Pro feature.</span>
+                  <Link className="shrink-0 font-semibold underline" href="/pricing">
+                    Upgrade
+                  </Link>
+                </div>
+              )}
+
+              {staticShares.length > 0 ? (
+                <ul className="mt-4 grid gap-2">
+                  {staticShares.map((share) => (
+                    <li
+                      className="flex items-center justify-between gap-3 border-b border-[#edf0ea] pb-2 text-[13px] last:border-b-0"
+                      key={share.id}
+                    >
+                      <span className="text-[#1d2823]">{share.recipientEmail}</span>
+                      <span className="text-[#8b938c]">
+                        {share.status === "DECLINED"
+                          ? "Declined"
+                          : share.recipientContactId
+                            ? "Accepted"
+                            : "Pending"}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
             </div>
           </section>
         ) : null}

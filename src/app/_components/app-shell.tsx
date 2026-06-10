@@ -106,6 +106,7 @@ export function AppShell({
           {navItem("/?tab=archived&filter=all", "archive", "Archived", counts?.archived)}
           {navItem("/?tab=duplicates&filter=all", "people", "Duplicates", counts?.duplicates, true)}
           {navItem("/?tab=activity", "clock", "Activity")}
+          {navItem("/shares", "download", "Shared with me")}
 
           <div className="mt-auto border-t border-[#e9ece7] pt-2">
             {(

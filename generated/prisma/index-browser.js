@@ -447,6 +447,25 @@ exports.Prisma.GroupAddressBookScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.ContactShareScalarFieldEnum = {
+  id: 'id',
+  ownerUserId: 'ownerUserId',
+  contactId: 'contactId',
+  shareType: 'shareType',
+  token: 'token',
+  recipientUserId: 'recipientUserId',
+  recipientEmail: 'recipientEmail',
+  recipientContactId: 'recipientContactId',
+  status: 'status',
+  snapshot: 'snapshot',
+  expiresAt: 'expiresAt',
+  revokedAt: 'revokedAt',
+  lastPushedAt: 'lastPushedAt',
+  downloadCount: 'downloadCount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -664,6 +683,19 @@ exports.GroupInviteStatus = exports.$Enums.GroupInviteStatus = {
   REVOKED: 'REVOKED'
 };
 
+exports.ShareType = exports.$Enums.ShareType = {
+  VCARD_LINK: 'VCARD_LINK',
+  STATIC_COPY: 'STATIC_COPY',
+  LIVE_SYNC: 'LIVE_SYNC'
+};
+
+exports.ShareStatus = exports.$Enums.ShareStatus = {
+  ACTIVE: 'ACTIVE',
+  REVOKED: 'REVOKED',
+  EXPIRED: 'EXPIRED',
+  DECLINED: 'DECLINED'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   AppPassword: 'AppPassword',
@@ -681,7 +713,8 @@ exports.Prisma.ModelName = {
   ActivityEvent: 'ActivityEvent',
   Group: 'Group',
   GroupMember: 'GroupMember',
-  GroupAddressBook: 'GroupAddressBook'
+  GroupAddressBook: 'GroupAddressBook',
+  ContactShare: 'ContactShare'
 };
 
 /**

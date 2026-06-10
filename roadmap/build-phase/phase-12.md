@@ -19,9 +19,9 @@ Let users share individual contacts with people inside and outside of Kontax, in
 ## Phase Tracker
 | Ticket | Status | Priority | Depends On |
 | --- | --- | --- | --- |
-| P12-01 | Not Started | P0 | P11-02 |
-| P12-02 | Not Started | P0 | P12-01 |
-| P12-03 | Not Started | P1 | P12-01, P11-03 |
+| P12-01 | Done | P0 | P11-02 |
+| P12-02 | Done | P0 | P12-01 |
+| P12-03 | Done | P1 | P12-01, P11-03 |
 | P12-04 | Not Started | P1 | P12-01, P11-03, P10-01 |
 | P12-05 | Not Started | P1 | P12-03, P12-04 |
 | P12-06 | Not Started | P1 | P12-03 |
@@ -31,9 +31,11 @@ Let users share individual contacts with people inside and outside of Kontax, in
 ---
 
 ## P12-01 — Define ContactShare schema
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P0`
 - Dependencies: `P11-02`
+- Delivered:
+  - Added `ShareType` (VCARD_LINK/STATIC_COPY/LIVE_SYNC), `ShareStatus` (ACTIVE/REVOKED/EXPIRED/DECLINED), and the `ContactShare` model (owner/contact/recipient relations, unique `token`, `recipientEmail`, `recipientContactId`, `expiresAt`, `revokedAt`, `lastPushedAt`, `downloadCount`, plus a **`snapshot` Json** so static shares stay deliverable after the original changes/deletes). Indexes on `(ownerUserId,status,createdAt)`, `(recipientUserId,status)`, `(recipientEmail,status)`. `db push` clean (new enums owned by kontax). Back-relations on `User`/`Contact`; FKs `SetNull` so a deleted contact doesn't drop the share.
 - Implementation Notes:
   - Add a `ShareType` enum: `VCARD_LINK`, `STATIC_COPY`, `LIVE_SYNC`.
   - Add a `ShareStatus` enum: `ACTIVE`, `REVOKED`, `EXPIRED`, `DECLINED`.
@@ -64,9 +66,14 @@ Let users share individual contacts with people inside and outside of Kontax, in
 ---
 
 ## P12-02 — Implement vCard share link (all plans)
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P0`
 - Dependencies: `P12-01`
+- Delivered:
+  - `createVcardShareLink` action (`actions/shares.ts`): creates a `VCARD_LINK` share with a `crypto.randomBytes(24).toString("base64url")` token; **Free → 7-day expiry, paid → no expiry**.
+  - Public **`GET /share/[token]`** route (no auth): validates the token, returns **410** for revoked, **404** for expired/missing/deleted-contact, increments `downloadCount`, and serves a `.vcf` via `contactsToVCard` with `Content-Disposition: attachment`.
+  - Contact-detail **Sharing tab** UI: "Create share link" + a list of active links (CopyField URL, download count, expiry) each with **Revoke**.
+  - Verified end-to-end against the DB (vCard generates `BEGIN…END:VCARD`).
 - Implementation Notes:
   - Add a "Share" action to the contact detail page. First option is "Copy share link."
   - On action: create a `ContactShare` record with `shareType: VCARD_LINK`, generate a secure random token, and return the share URL: `https://kontax.app/share/{token}`.
@@ -89,9 +96,15 @@ Let users share individual contacts with people inside and outside of Kontax, in
 ---
 
 ## P12-03 — Implement static Kontax-to-Kontax share (Pro and above)
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P12-01`, `P11-03`
+- Delivered:
+  - `createStaticShare` action (**Pro+ via `assertCanStaticShare`**): looks up the recipient by email, creates a `STATIC_COPY` share with a **snapshot** of the contact's portable fields + owner name (deliverable even if the original later changes). Self-share blocked.
+  - `acceptStaticShare` / `declineStaticShare` actions: accept creates an **independent copy** in the recipient's account (`sourceType: SHARED_STATIC`, `sourceDetail` = owner name) from the snapshot, sets `recipientContactId`, and emits a `CONTACT_SHARE_RECEIVED` event; decline sets `DECLINED`.
+  - Recipient surface: **`/shares`** ("Shared with me") inside the AppShell lists pending shares with Accept/Decline; "Shared with me" added to the sidebar. Owner sees sent shares (Pending/Accepted/Declined) in the contact Sharing tab.
+  - Verified end-to-end (snapshot → copy with correct source attribution).
+  - **Deferred (flagged):** email delivery + invite-to-register for recipients without a Kontax account — no email service is wired yet; the share record is created with `recipientEmail` and is ready to link on registration when P12-06 adds notifications/email. Existing recipients see it in-app immediately.
 - Implementation Notes:
   - Second option in the "Share" action is "Share with a Kontax user." User enters the recipient's email address.
   - If the recipient is an existing Kontax user: create a `ContactShare` record with `shareType: STATIC_COPY` and `recipientUserId`. Deliver a notification (in-app + email) to the recipient: "Someone shared a contact with you."
