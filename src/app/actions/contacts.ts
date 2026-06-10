@@ -11,6 +11,7 @@ import {
   mergeContactsForUser,
   undoMergedContactsForUser,
 } from "~/server/contact-merge";
+import { propagateLiveShares } from "~/server/contact-shares";
 import { db } from "~/server/db";
 import { emitEvent } from "~/lib/activity";
 import { computeContactDiff } from "~/lib/activity/diff";
@@ -562,6 +563,9 @@ export const updateContact = async (formData: FormData) => {
         payload: { diffs },
       });
     }
+
+    // Live sharing (P12-04): push this edit to any active live recipient copies.
+    await propagateLiveShares(tx, userId, contactId);
   });
 
   revalidateContactViews(contactId);

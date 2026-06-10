@@ -2,7 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { AppShell } from "~/app/_components/app-shell";
-import { acceptStaticShare, declineStaticShare } from "~/app/actions/shares";
+import { acceptLiveShare, acceptStaticShare, declineStaticShare } from "~/app/actions/shares";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
 import { db } from "~/server/db";
@@ -25,12 +25,12 @@ export default async function SharesPage() {
     db.contactShare.findMany({
       where: {
         recipientUserId: userId,
-        shareType: "STATIC_COPY",
+        shareType: { in: ["STATIC_COPY", "LIVE_SYNC"] },
         status: "ACTIVE",
         recipientContactId: null,
       },
       orderBy: { createdAt: "desc" },
-      select: { id: true, snapshot: true, createdAt: true },
+      select: { id: true, snapshot: true, createdAt: true, shareType: true },
     }),
   ]);
 
@@ -63,6 +63,7 @@ export default async function SharesPage() {
               const snap = share.snapshot as ShareSnapshot;
               const contactName = snap?.fullName ?? "Shared contact";
               const ownerName = snap?.ownerName ?? "A Kontax user";
+              const isLive = share.shareType === "LIVE_SYNC";
               return (
                 <li
                   className="flex flex-wrap items-center justify-between gap-3 rounded-[1.4rem] border border-[#d8ddd6] bg-white p-4"
@@ -72,7 +73,7 @@ export default async function SharesPage() {
                     <p className="text-sm font-semibold text-[#1d2823]">{contactName}</p>
                     <p className="mt-0.5 text-[13px] text-[#5c655e]">
                       Shared by {ownerName}
-                      {snap?.email ? ` · ${snap.email}` : ""}
+                      {isLive ? " · live (stays in sync)" : ""}
                     </p>
                   </div>
                   <div className="flex shrink-0 items-center gap-2">
@@ -85,7 +86,7 @@ export default async function SharesPage() {
                         Decline
                       </button>
                     </form>
-                    <form action={acceptStaticShare}>
+                    <form action={isLive ? acceptLiveShare : acceptStaticShare}>
                       <input name="shareId" type="hidden" value={share.id} />
                       <button
                         className="rounded-[0.8rem] bg-[#17352e] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#20443b]"

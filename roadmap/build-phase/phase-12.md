@@ -22,7 +22,7 @@ Let users share individual contacts with people inside and outside of Kontax, in
 | P12-01 | Done | P0 | P11-02 |
 | P12-02 | Done | P0 | P12-01 |
 | P12-03 | Done | P1 | P12-01, P11-03 |
-| P12-04 | Not Started | P1 | P12-01, P11-03, P10-01 |
+| P12-04 | Done | P1 | P12-01, P11-03, P10-01 |
 | P12-05 | Not Started | P1 | P12-03, P12-04 |
 | P12-06 | Not Started | P1 | P12-03 |
 | P12-07 | Not Started | P2 | P12-05, P12-06 |
@@ -125,9 +125,17 @@ Let users share individual contacts with people inside and outside of Kontax, in
 ---
 
 ## P12-04 — Implement live Kontax-to-Kontax share (Pro and above, both parties)
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P12-01`, `P11-03`, `P10-01`
+- Delivered:
+  - `createLiveShare` (Pro+ via `assertCanLiveShare`) — `LIVE_SYNC` share + snapshot; **circular-share guard** (can't live-re-share a contact you received as `SHARED_LIVE`); self-share blocked.
+  - `acceptLiveShare` — **both-parties gate**: paid recipient → linked `SHARED_LIVE` copy (+ `lastPushedAt`); **Free recipient → automatic fallback to a static copy** and the share is recorded as `STATIC_COPY` so the owner sees it didn't go live.
+  - **Propagation** (`propagateLiveShares` in `src/server/contact-shares.ts`) — mutation-triggered: hooked into `updateContact`'s transaction (no polling). Pushes shared fields to every active live recipient copy, **preserves the recipient's private notes**, stamps `lastPushedAt`, and emits `SYNC_PUSHED` on the recipient side.
+  - **Revoke / unlink / downgrade → static:** owner `revokeShare` and recipient `unlinkLiveShare` both convert the recipient copy to `SHARED_STATIC` (keeps the last-synced version); a recipient who has since downgraded to Free is lazily converted to static on the next propagation.
+  - UI: contact Sharing tab gains "Share live — keeps in sync" (Pro-gated) + a live-shares list with status; recipients see a "Live from [owner]" panel with **Unlink**; `/shares` accepts live shares too.
+  - Verified end-to-end against the DB: paid push updates fields + keeps the private note; Free downgrade converts to static and freezes the copy.
+  - **Deferred (flagged for P12-08):** propagation currently runs only from the single-contact `updateContact` path; the **merge interaction** (a merged contact's live shares → survivor inherits, absorbed's revoked) and bulk/sync mutation paths are not yet hooked. Near-real-time = synchronous-in-request (fine at current scale); a queue/job is a later hardening.
 - Implementation Notes:
   - Third option in the "Share" action is "Share live — keeps in sync." Only available when the sender is on a paid plan. On acceptance, the recipient must also be on a paid plan. If the recipient is on Free, fallback to static share and inform the sender.
   - On creation: create a `ContactShare` record with `shareType: LIVE_SYNC`. Send notification to recipient. Recipient can accept or decline.

@@ -5,7 +5,13 @@ import { notFound, redirect } from "next/navigation";
 import { AppShell } from "~/app/_components/app-shell";
 import { ContactHistory } from "~/app/_components/contact-history";
 import { CopyField } from "~/app/_components/copy-field";
-import { createStaticShare, createVcardShareLink, revokeShare } from "~/app/actions/shares";
+import {
+  createLiveShare,
+  createStaticShare,
+  createVcardShareLink,
+  revokeShare,
+  unlinkLiveShare,
+} from "~/app/actions/shares";
 import { ContactPhoneticAssistant } from "~/app/_components/contact-phonetic-assistant";
 import { LastUpdatedBy } from "~/app/_components/last-updated-by";
 import { SourceBadge } from "~/app/_components/source-badge";
@@ -281,7 +287,11 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     (share) => share.shareType === "VCARD_LINK" && share.status === "ACTIVE",
   );
   const staticShares = contactShares.filter((share) => share.shareType === "STATIC_COPY");
+  const liveShares = contactShares.filter((share) => share.shareType === "LIVE_SYNC");
   const staticShareEnabled = shellPlan.entitlements.staticShareEnabled;
+  const liveShareEnabled = shellPlan.entitlements.liveShareEnabled;
+  // This contact is a live copy the current user received (recipient side).
+  const isLiveReceived = contact.sourceType === "SHARED_LIVE";
 
   const syncLinks = await db.syncContactLink.findMany({
     where: {
@@ -1522,6 +1532,83 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 </ul>
               ) : null}
             </div>
+
+            {/* live Kontax-to-Kontax share (Pro and above, both parties) */}
+            {isLiveReceived ? (
+              <div className="mt-4 rounded-[1.4rem] border border-[#cfe0d2] bg-[#eef5ef] p-5">
+                <p className="text-sm font-semibold text-[#17352e]">
+                  Live from {contact.sourceDetail ?? "another Kontax user"}
+                </p>
+                <p className="mt-0.5 text-[13px] text-[#3f5a50]">
+                  This contact stays in sync with its owner — shared fields are read-only. Your notes
+                  stay private. Unlink to keep a frozen copy you can edit.
+                </p>
+                <form action={unlinkLiveShare} className="mt-3">
+                  <input name="contactId" type="hidden" value={contact.id} />
+                  <button
+                    className="rounded-[0.8rem] border border-[#d8ddd6] bg-white px-3.5 py-2 text-sm font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+                    type="submit"
+                  >
+                    Unlink (keep a static copy)
+                  </button>
+                </form>
+              </div>
+            ) : (
+              <div className="mt-4 rounded-[1.4rem] border border-[#d8ddd6] bg-white p-5">
+                <p className="text-sm font-semibold text-[#1d2823]">Share live — keeps in sync</p>
+                <p className="mt-0.5 text-[13px] text-[#5c655e]">
+                  The recipient gets a linked copy that updates whenever you edit this contact. Both
+                  of you must be on a paid plan.
+                </p>
+                {liveShareEnabled ? (
+                  <form action={createLiveShare} className="mt-3 flex flex-wrap items-center gap-2">
+                    <input name="contactId" type="hidden" value={contact.id} />
+                    <input
+                      className="min-w-[220px] flex-1 rounded-[0.7rem] border border-[#d8ddd6] bg-white px-3 py-2 text-sm text-[#1d2823] outline-none focus:border-[#4158f4]"
+                      name="recipientEmail"
+                      placeholder="name@email.com"
+                      required
+                      type="email"
+                    />
+                    <button
+                      className="rounded-[0.8rem] bg-[#17352e] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#20443b]"
+                      type="submit"
+                    >
+                      Share live
+                    </button>
+                  </form>
+                ) : (
+                  <div className="mt-3 flex items-center justify-between gap-3 rounded-[0.9rem] bg-[#f6edd9] px-4 py-3 text-[13px] text-[#7a5a1a]">
+                    <span>Live sharing is a Pro feature.</span>
+                    <Link className="shrink-0 font-semibold underline" href="/pricing">
+                      Upgrade
+                    </Link>
+                  </div>
+                )}
+
+                {liveShares.length > 0 ? (
+                  <ul className="mt-4 grid gap-2">
+                    {liveShares.map((share) => (
+                      <li
+                        className="flex items-center justify-between gap-3 border-b border-[#edf0ea] pb-2 text-[13px] last:border-b-0"
+                        key={share.id}
+                      >
+                        <span className="text-[#1d2823]">{share.recipientEmail}</span>
+                        <span className="text-[#8b938c]">
+                          {share.status === "REVOKED"
+                            ? "Revoked"
+                            : share.status === "DECLINED"
+                              ? "Declined"
+                              : share.recipientContactId
+                                ? "Live"
+                                : "Pending"}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            )}
           </section>
         ) : null}
 
