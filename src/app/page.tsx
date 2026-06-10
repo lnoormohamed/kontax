@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { ContactDashboard } from "~/app/_components/contact-dashboard";
+import { PublicLanding } from "~/app/_components/public-landing";
 import { SearchInput } from "~/app/_components/search-input";
 import { UserMenu } from "~/app/_components/user-menu";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
@@ -272,54 +273,6 @@ const compareWorkspaceContacts = (
 
   return 0;
 };
-
-const PublicLanding = () => (
-  <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),_transparent_30%),linear-gradient(180deg,#020617_0%,#07111d_45%,#0f172a_100%)] text-white">
-    <div className="mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-center gap-12 px-6 py-12 lg:flex-row lg:items-center lg:justify-between lg:px-10">
-      <section className="max-w-2xl space-y-6">
-        <p className="text-sm uppercase tracking-[0.35em] text-cyan-200">Kontax</p>
-        <h1 className="text-5xl font-semibold tracking-tight text-white sm:text-6xl">
-          Your personal contact home, built to stay clean as life gets messier.
-        </h1>
-        <p className="max-w-xl text-base text-slate-300 sm:text-lg">
-          Save the people who matter, keep details current, and grow into imports, merge tools,
-          and sync without rebuilding your contact foundation later.
-        </p>
-        <div className="flex flex-col gap-3 sm:flex-row">
-          <Link
-            className="rounded-full bg-white px-6 py-3 text-center font-semibold text-slate-950 transition hover:bg-cyan-100"
-            href="/register"
-          >
-            Create account
-          </Link>
-          <Link
-            className="rounded-full border border-white/15 px-6 py-3 text-center font-semibold text-white transition hover:border-cyan-300 hover:text-cyan-100"
-            href="/login"
-          >
-            Log in
-          </Link>
-        </div>
-      </section>
-
-      <section className="grid max-w-xl gap-4 rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-[0_30px_120px_rgba(2,8,23,0.45)] backdrop-blur sm:grid-cols-2">
-        <div className="rounded-[1.5rem] border border-white/10 bg-[#08101c] p-5">
-          <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Today</p>
-          <p className="mt-3 text-3xl font-semibold text-white">Contact dashboard</p>
-          <p className="mt-2 text-sm text-slate-400">
-            Sign up, save people, archive safely, and manage details from one workspace.
-          </p>
-        </div>
-        <div className="rounded-[1.5rem] border border-white/10 bg-[#08101c] p-5">
-          <p className="text-sm uppercase tracking-[0.3em] text-cyan-200">Next</p>
-          <p className="mt-3 text-3xl font-semibold text-white">Billing and portability</p>
-          <p className="mt-2 text-sm text-slate-400">
-            Plans, import jobs, and portable export formats are now part of the foundation.
-          </p>
-        </div>
-      </section>
-    </div>
-  </main>
-);
 
 export default async function Home({ searchParams }: HomePageProps) {
   const session = await auth();
