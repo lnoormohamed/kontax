@@ -212,9 +212,12 @@ Let users share individual contacts with people inside and outside of Kontax, in
 ---
 
 ## P12-07 — Design brief: sharing UI
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P2`
 - Dependencies: `P12-05`, `P12-06`
+- Delivered:
+  - Wrote `roadmap/design-briefs/12-sharing-ui.md` (indexed) as an **as-built** brief, explicitly split into **owner** (Sharing tab: vCard link / static / live blocks, plan-gate amber upgrade prompts, status rows + revoke, last-synced) and **recipient** (header bell + sidebar badge, `/shares` accept/decline → navigate, "Live from [owner]" panel with unlink + read-only shared fields / private notes) views.
+  - Covers all plan-gate states, empty states, and the ticket's explicit risk: **"Live from [person]" (green wash) must read differently from sync-source badges (neutral, account-referent)** from Phases 9/10. Locked light system throughout.
 - Implementation Notes:
   - Produce a design brief covering:
     - Share action button placement on contact detail page.
