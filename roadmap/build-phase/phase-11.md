@@ -22,7 +22,7 @@ Restructure the subscription model around four tiers that reflect how people act
 | P11-02 | Done | P0 | P11-01 |
 | P11-03 | Done | P0 | P11-01 |
 | P11-04 | Done | P1 | P11-02, P11-03 |
-| P11-05 | Not Started | P1 | P11-01, P10-01 |
+| P11-05 | Done | P1 | P11-01, P10-01 |
 | P11-06 | Not Started | P2 | P11-05 |
 
 ---
@@ -192,9 +192,16 @@ Restructure the subscription model around four tiers that reflect how people act
 ---
 
 ## P11-05 — Activity log retention enforcement job
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P11-01`, `P10-01`
+- Delivered:
+  - `scripts/prune-activity-retention.mjs` + `npm run prune:activity` (and `--dry-run`). Per-user (not bulk), idempotent, safe to re-run. Deletes `ActivityEvent` rows older than the user's plan window: **Pro 90d, Family 365d**; **Free (0) and Teams (null) are skipped** (never pruned).
+  - **Mechanism:** CLI script run by an external scheduler (Coolify scheduled task / cron). Suggested nightly cron: `0 3 * * * cd /app && node scripts/prune-activity-retention.mjs`.
+  - **Retention semantics decision (2026-06-10):** retention physically deletes events and therefore bounds **both** the global feed and per-contact history. The matrix's "Pro unlimited per-contact history" was a conflict with this job and has been **revised to 90 days**; Free is never deleted (kept; query-capped to last 10). Documented in `p11-01-plan-feature-matrix.md`.
+  - **Downgrade handling:** because the window is derived from the user's *current* active plan at run time, a downgraded user is pruned to the new (shorter) window on the next nightly run — matching the ticket's "prune on next run after downgrade is confirmed."
+  - Verified with `--dry-run` against the DB (1 PRO user, 0 events outside the 90d window, no errors).
+  - **Deviations (flagged):** (1) the ticket asked to log each run as a `SYSTEM` `ActivityEvent`; not done — there is no suitable `EventType` enum value, adding one needs DB-owner DDL (same enum-ownership constraint as P11-02), and such a marker would itself be pruned. The run summary is written to stdout for the scheduler's logs instead. (2) The plan→retention map is duplicated in the `.mjs` script (can't import the TS `billing.ts`); kept in sync with `PLAN_DEFAULTS`.
 - Implementation Notes:
   - Add a background job that runs nightly and prunes `ActivityEvent` rows older than the user's plan retention window.
   - Free: delete events older than 0 days on the global feed (per-contact history last 10 events is enforced at query time, not by deletion — keep all events but limit query results).

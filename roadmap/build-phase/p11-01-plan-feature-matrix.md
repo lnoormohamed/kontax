@@ -83,7 +83,7 @@ The current `billing.ts` PLAN_DEFAULTS map (`FREE`, `PLUS`, `PRO`) and the Prism
 
 #### Contacts
 - Unlimited contacts. The `contactsLimit` entitlement field is set to `null` and enforcement code must treat `null` as no ceiling (not as zero).
-- Per-contact history: unlimited. All ActivityEvent rows for a contact are visible in the contact detail view with no pagination gate.
+- Per-contact history: bounded by the **90-day retention window** (revised 2026-06-10 — was "unlimited"). All retained ActivityEvent rows for a contact are visible with no pagination gate, but events older than 90 days are physically removed by the P11-05 prune job. Rationale: the global feed and per-contact history read the same `ActivityEvent` rows, so a single physical retention window governs both; "unlimited per-contact history" contradicted the prune job and is superseded. (Free is never physically pruned — it keeps all rows and caps the view to the last 10 at query time.)
 - Source badges: same as Free.
 
 #### Import
@@ -247,8 +247,9 @@ Notes on null semantics:
 - `appPasswordsLimit` is currently **hardcoded** in `getActiveAppPasswordLimit` (`src/server/app-passwords.ts`) as FREE=1, PLUS=3, PRO=null. P11-02 adds the field to `Subscription`; **P11-03 must read the field and set PRO=5** (matching this matrix), replacing the hardcoded values.
 - `contactsLimit: null` = no ceiling. Enforcement code must check `if (limit !== null && used >= limit)`.
 - `monthlyImportLimit: null` = no ceiling. Same null check.
-- `activityLogRetentionDays: null` = keep forever. Retention job skips users where this is null.
-- `activityLogRetentionDays: 0` = no global feed (Free). Retention job removes all global feed events for these users on each run (per-contact query-time limit of 10 is separate).
+- `activityLogRetentionDays: null` = keep forever (Teams). The P11-05 prune job skips these users.
+- `activityLogRetentionDays: 0` = no global feed (Free). **Revised 2026-06-10:** the prune job **skips** Free users — it does **not** delete their events. Free keeps all rows; the global feed is gated and per-contact history is capped to the last 10 at query time. (Deleting Free events would erase per-contact history, which the matrix preserves.)
+- `activityLogRetentionDays > 0` (Pro 90 / Family 365): the prune job physically deletes that user's `ActivityEvent` rows older than the window. This bounds both the global feed and per-contact history. **Personal vs shared-book note:** this field currently governs *personal* activity. The 365 (Family) / unlimited (Teams) shared-book & team-audit retentions apply to `GroupAddressBook` activity, which does not exist until Phases 13–14; revisit when shared books ship.
 - `sharedAddressBooksLimit: null` = unlimited books (Teams only).
 - `memberSlotsLimit: null` = single-user plans, group features not applicable.
 

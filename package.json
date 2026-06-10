@@ -17,6 +17,7 @@
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "preview": "next build && next start",
+    "prune:activity": "node scripts/prune-activity-retention.mjs",
     "start": "node server.mjs",
     "typecheck": "tsc --noEmit"
   },
