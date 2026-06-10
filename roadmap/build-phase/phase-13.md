@@ -25,7 +25,7 @@ Make the Family plan a real product by letting family members share a common add
 | P13-04 | Done | P1 | P13-02, P13-03, P10-01 |
 | P13-05 | Done | P1 | P13-04 |
 | P13-06 | Done | P1 | P13-04 |
-| P13-07 | Not Started | P1 | P13-05, P13-06 |
+| P13-07 | Done | P1 | P13-05, P13-06 |
 | P13-08 | Not Started | P2 | P13-07, P9-04 |
 
 ---
@@ -178,7 +178,8 @@ Make the Family plan a real product by letting family members share a common add
 ---
 
 ## P13-07 — Design brief: family plan surfaces
-- Status: `Not Started`
+- Status: `Done`
+- Shipped as-built brief `roadmap/design-briefs/13-family-plan-surfaces.md` (owner vs member views, all surfaces, destructive-action patterns, warm tone, open questions).
 - Priority: `P1`
 - Dependencies: `P13-05`, `P13-06`
 - Implementation Notes:
