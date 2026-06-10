@@ -9,10 +9,12 @@ import {
   deleteTeamBook,
   inviteTeamMember,
   leaveTeam,
+  linkTeamSyncAccount,
   removeTeamMember,
   resendTeamInvite,
   setMemberBookPermission,
   setTeamMemberRole,
+  unlinkTeamSyncAccount,
 } from "~/app/actions/teams";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
@@ -162,6 +164,24 @@ export default async function TeamSettingsPage() {
         : {};
     return perms[bookId] ?? "EDIT";
   };
+
+  // P14-06: the admin's connected CardDAV accounts + the team's sync links.
+  const [mySyncAccounts, teamSyncLinks] = await Promise.all([
+    db.syncAccount.findMany({
+      where: { userId },
+      orderBy: { createdAt: "asc" },
+      select: { id: true, label: true },
+    }),
+    db.teamSyncAccount.findMany({
+      where: { groupId: ownedTeam.id },
+      include: {
+        syncAccount: { select: { label: true, status: true } },
+        addressBook: { select: { name: true } },
+      },
+    }),
+  ]);
+  const linkedAccountIds = new Set(teamSyncLinks.map((l) => l.syncAccountId));
+  const linkableAccounts = mySyncAccounts.filter((a) => !linkedAccountIds.has(a.id));
 
   return (
     <Shell>
@@ -380,6 +400,81 @@ export default async function TeamSettingsPage() {
                 Send invite
               </button>
             </form>
+          )}
+        </section>
+
+        {/* Team CardDAV sync accounts */}
+        <section className="rounded-[14px] border border-[#d8ddd6] bg-white p-5">
+          <p className="text-sm font-semibold text-[#1d2823]">Sync accounts</p>
+          <p className="mt-1 text-[13px] text-[#8b938c]">
+            Sync a team book to an external CardDAV provider (Google Workspace, Nextcloud…). Connect
+            an account under{" "}
+            <Link className="font-semibold text-[#4158f4]" href="/sync">
+              Sync
+            </Link>
+            , then link it to a book here.
+          </p>
+
+          {teamSyncLinks.length > 0 ? (
+            <div className="mt-3 grid gap-2">
+              {teamSyncLinks.map((l) => (
+                <div
+                  className="flex items-center justify-between gap-3 border-b border-[#e9ece7] pb-2 text-[13px] last:border-b-0"
+                  key={l.id}
+                >
+                  <span className="min-w-0">
+                    <span className="text-[#1d2823]">{l.syncAccount.label}</span>
+                    <span className="text-[#8b938c]"> → {l.addressBook.name}</span>
+                  </span>
+                  <form action={unlinkTeamSyncAccount}>
+                    <input name="teamSyncAccountId" type="hidden" value={l.id} />
+                    <button className="shrink-0 font-semibold text-[#b5472f]" type="submit">
+                      Unlink
+                    </button>
+                  </form>
+                </div>
+              ))}
+            </div>
+          ) : null}
+
+          {linkableAccounts.length > 0 && activeBooks.length > 0 ? (
+            <form action={linkTeamSyncAccount} className="mt-3 flex flex-wrap items-center gap-2">
+              <select
+                className="rounded-[9px] border border-[#d8ddd6] bg-white px-2.5 py-2 text-[13px]"
+                name="syncAccountId"
+                required
+              >
+                {linkableAccounts.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.label}
+                  </option>
+                ))}
+              </select>
+              <span className="text-[13px] text-[#8b938c]">→</span>
+              <select
+                className="rounded-[9px] border border-[#d8ddd6] bg-white px-2.5 py-2 text-[13px]"
+                name="bookId"
+                required
+              >
+                {activeBooks.map((b) => (
+                  <option key={b.id} value={b.id}>
+                    {b.name}
+                  </option>
+                ))}
+              </select>
+              <button
+                className="rounded-[9px] bg-[#4158f4] px-3.5 py-2 text-[13px] font-semibold text-white transition hover:bg-[#3248db]"
+                type="submit"
+              >
+                Link
+              </button>
+            </form>
+          ) : (
+            <p className="mt-3 text-[12px] text-[#8b938c]">
+              {activeBooks.length === 0
+                ? "Create an address book first."
+                : "Connect a CardDAV account under Sync to link it here."}
+            </p>
           )}
         </section>
 

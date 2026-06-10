@@ -233,6 +233,15 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
           remoteCTag: true,
           credentialReference: true,
           credentialRevokedAt: true,
+          // P14-06: when linked to a team book, sync operates on that book's
+          // contacts (owned by the group owner) instead of personal contacts.
+          teamLink: {
+            select: {
+              addressBookId: true,
+              addressBook: { select: { name: true } },
+              group: { select: { name: true, ownerId: true } },
+            },
+          },
         },
       },
     },
@@ -319,6 +328,17 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
       continue;
     }
 
+    // P14-06: resolve the sync scope. Team-linked accounts operate on a team
+    // book's contacts (owned by the group owner); personal accounts unchanged.
+    const teamLink = job.syncAccount.teamLink;
+    const scopeUserId = teamLink ? teamLink.group.ownerId : job.syncAccount.userId;
+    const scopeLabel = teamLink
+      ? `${job.syncAccount.label} · ${teamLink.group.name} · ${teamLink.addressBook.name}`
+      : job.syncAccount.label;
+    const contactScopeWhere = teamLink
+      ? { groupContacts: { some: { groupAddressBookId: teamLink.addressBookId } } }
+      : { userId: job.syncAccount.userId };
+
     let decryptedCredentials: ReturnType<typeof decryptSyncCredentialPayload>;
 
     try {
@@ -365,7 +385,7 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
         remoteUids.length > 0
           ? await db.contact.findMany({
               where: {
-                userId: job.syncAccount.userId,
+                ...contactScopeWhere,
                 syncUid: {
                   in: remoteUids,
                 },
@@ -540,7 +560,7 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
         for (const card of unmatchedCards) {
           const createdContact = await tx.contact.create({
             data: {
-              userId: job.syncAccount.userId,
+              userId: scopeUserId,
               syncUid: card.uid,
               fullName: card.fullName,
               firstName: card.firstName,
@@ -566,14 +586,25 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
               addressEntries: card.addressEntries.length > 0 ? card.addressEntries : undefined,
               notes: card.notes,
               sourceType: "SYNC_CARDDAV",
-              sourceDetail: job.syncAccount.label,
+              sourceDetail: scopeLabel,
               lastMutatedBy: "SYNC_CARDDAV",
-              lastMutatedByDetail: job.syncAccount.label,
+              lastMutatedByDetail: scopeLabel,
             },
             select: {
               id: true,
             },
           });
+
+          // P14-06: link a team-synced contact into the team book.
+          if (teamLink) {
+            await tx.groupContact.create({
+              data: {
+                groupAddressBookId: teamLink.addressBookId,
+                contactId: createdContact.id,
+                addedByUserId: job.syncAccount.userId,
+              },
+            });
+          }
 
           const remoteEntry = remoteEntryByUid.get(card.uid);
 
@@ -593,7 +624,7 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
             contactId: createdContact.id,
             eventType: "SYNC_PULLED",
             actor: "SYNC",
-            actorDetail: job.syncAccount.label,
+            actorDetail: scopeLabel,
             payload: { syncAccountId: job.syncAccountId, syncAccountLabel: job.syncAccount.label },
           });
         }
@@ -632,7 +663,7 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
             contactId: remoteApply.contactId,
             eventType: "SYNC_PULLED",
             actor: "SYNC",
-            actorDetail: job.syncAccount.label,
+            actorDetail: scopeLabel,
             payload: { syncAccountId: job.syncAccountId, syncAccountLabel: job.syncAccount.label },
           });
         }
@@ -658,7 +689,7 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
             contactId: conflictEntry.contactId,
             eventType: "SYNC_CONFLICT_DETECTED",
             actor: "SYNC",
-            actorDetail: job.syncAccount.label,
+            actorDetail: scopeLabel,
             payload: {
               conflictType: conflictEntry.type,
               remoteETag: conflictEntry.remoteETag ?? undefined,

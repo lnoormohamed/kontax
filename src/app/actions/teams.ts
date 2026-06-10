@@ -496,6 +496,63 @@ export const addContactToTeamBook = async (formData: FormData) => {
   revalidatePath(`/contacts/${contactId}`);
 };
 
+// --- Team CardDAV sync accounts (P14-06) ------------------------------------
+// Link one of the admin's connected CardDAV accounts to a team book; sync then
+// operates on that book's contacts (handled in the sync runner).
+export const linkTeamSyncAccount = async (formData: FormData) => {
+  const userId = await requireUserId();
+  const syncAccountId = str(formData, "syncAccountId");
+  const bookId = str(formData, "bookId");
+  const manageable = await getManageableTeam(userId);
+  if (!manageable) {
+    throw new Error("Only the team owner or an admin can manage sync accounts.");
+  }
+  const [account, book] = await Promise.all([
+    db.syncAccount.findFirst({ where: { id: syncAccountId, userId }, select: { id: true } }),
+    db.groupAddressBook.findFirst({
+      where: { id: bookId, groupId: manageable.team.id },
+      select: { id: true },
+    }),
+  ]);
+  if (!account) {
+    throw new Error("That sync account isn't yours to link.");
+  }
+  if (!book) {
+    throw new Error("Address book not found.");
+  }
+  const existing = await db.teamSyncAccount.findUnique({ where: { syncAccountId } });
+  if (existing) {
+    throw new Error("That sync account is already linked.");
+  }
+  await db.teamSyncAccount.create({
+    data: {
+      groupId: manageable.team.id,
+      syncAccountId,
+      addressBookId: bookId,
+      addedByUserId: userId,
+    },
+  });
+  revalidatePath("/settings/teams");
+};
+
+export const unlinkTeamSyncAccount = async (formData: FormData) => {
+  const userId = await requireUserId();
+  const teamSyncAccountId = str(formData, "teamSyncAccountId");
+  const manageable = await getManageableTeam(userId);
+  if (!manageable) {
+    throw new Error("Only the team owner or an admin can manage sync accounts.");
+  }
+  const link = await db.teamSyncAccount.findFirst({
+    where: { id: teamSyncAccountId, groupId: manageable.team.id },
+    select: { id: true },
+  });
+  if (!link) {
+    throw new Error("Sync link not found.");
+  }
+  await db.teamSyncAccount.delete({ where: { id: link.id } });
+  revalidatePath("/settings/teams");
+};
+
 export const leaveTeam = async (formData: FormData) => {
   const userId = await requireUserId();
   const groupId = str(formData, "groupId");

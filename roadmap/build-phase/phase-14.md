@@ -24,7 +24,7 @@ Bring Kontax's contacts hub to small teams and organisations. A team can maintai
 | P14-03 | Done | P0 | P14-01 |
 | P14-04 | Done | P1 | P14-02, P14-03, P10-01, P10-02 |
 | P14-05 | Done | P1 | P14-04, P10-01 |
-| P14-06 | Not Started | P1 | P14-04, P5-01, P7-03 |
+| P14-06 | Done | P1 | P14-04, P5-01, P7-03 |
 | P14-07 | Done | P1 | P14-05, P14-06 |
 | P14-08 | Not Started | P2 | P14-07 |
 | P14-09 | Not Started | P2 | P14-07, P9-04 |
@@ -147,7 +147,8 @@ Bring Kontax's contacts hub to small teams and organisations. A team can maintai
 ---
 
 ## P14-06 — Team-level CardDAV sync accounts
-- Status: `Not Started`
+- Status: `Done`
+- Shipped: link an admin's connected CardDAV account to a team book (TeamSyncAccount) / unlink, managed in /settings/teams. The sync runner resolves a team scope when an account is team-linked — pull/match/create operate on the book's contacts (owned by the group owner, linked via GroupContact), attributed `[label · team · book]` with actor SYNC. Personal sync is byte-identical when there's no team link. Conflicts are recorded on the team contact (SyncConflict). **Deferred:** a dedicated admin-only conflict surface (conflicts currently appear via the standard sync surfaces) and EXPORT/two-way push parity for team books (the runner's first slice is import/bootstrap).
 - Priority: `P1`
 - Dependencies: `P14-04`, `P5-01`, `P7-03`
 - Implementation Notes:
