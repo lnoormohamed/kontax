@@ -27,7 +27,7 @@ Bring Kontax's contacts hub to small teams and organisations. A team can maintai
 | P14-06 | Done | P1 | P14-04, P5-01, P7-03 |
 | P14-07 | Done | P1 | P14-05, P14-06 |
 | P14-08 | Done | P2 | P14-07 |
-| P14-09 | Not Started | P2 | P14-07, P9-04 |
+| P14-09 | Done | P2 | P14-07, P9-04 |
 
 ---
 
@@ -214,7 +214,8 @@ Bring Kontax's contacts hub to small teams and organisations. A team can maintai
 ---
 
 ## P14-09 — Teams CardDAV server exposure (optional)
-- Status: `Not Started`
+- Status: `Done`
+- Shipped in server.mjs: each accessible team book exposed as /dav/addressbooks/{userId}/team-{bookId}/ (named "{Team} · {Book}"), listed in the home-set PROPFIND. PROPFIND/REPORT/GET serve the book's contacts; PUT/DELETE require the member's per-book EDIT permission (create → Contact owned by group owner + GroupContact, update bumps version, delete soft-archives) with TEAM_MEMBER attribution. Caveat: P9-07 on-device compatibility testing still pending — verify on iOS/macOS/DAVx⁵ before GA.
 - Priority: `P2`
 - Dependencies: `P14-07`, `P9-04`
 - Implementation Notes:

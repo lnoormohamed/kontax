@@ -379,6 +379,23 @@ const getFamilyResourceParams = (pathname) => {
 const familyResourceHref = (userId, syncUid) =>
   `/dav/addressbooks/${userId}/family/${encodeURIComponent(syncUid)}.vcf`;
 
+// P14-09: each accessible team book exposed as /dav/addressbooks/{userId}/team-{bookId}/
+const getTeamCollectionParams = (pathname) => {
+  const m = pathname.match(/^\/dav\/addressbooks\/([^/]+)\/team-([^/]+)\/?$/);
+  return m ? { userId: m[1], bookId: m[2] } : null;
+};
+const getTeamResourceParams = (pathname) => {
+  const m = pathname.match(/^\/dav\/addressbooks\/([^/]+)\/team-([^/]+)\/([^/]+)$/);
+  if (!m) {
+    return null;
+  }
+  const raw = m[3];
+  const uid = raw.endsWith(".vcf") ? raw.slice(0, -4) : raw;
+  return { userId: m[1], bookId: m[2], uid: decodeURIComponent(uid) };
+};
+const teamResourceHref = (userId, bookId, syncUid) =>
+  `/dav/addressbooks/${userId}/team-${bookId}/${encodeURIComponent(syncUid)}.vcf`;
+
 const escapeVCardValue = (value) =>
   String(value ?? "")
     .replaceAll("\\", "\\\\")
@@ -738,6 +755,105 @@ const emitFamilyDavEvent = async (userId, contactId, eventType) => {
   }
 };
 
+// P14-09: a user's accessible team book (TEAM, not archived, member can VIEW/EDIT).
+const getTeamBookAccess = async (userId, bookId) => {
+  const book = await prisma.groupAddressBook.findFirst({
+    where: { id: bookId, archivedAt: null, group: { type: "TEAM" } },
+    include: { group: { select: { id: true, name: true, ownerId: true } } },
+  });
+  if (!book) {
+    return null;
+  }
+  const member = await prisma.groupMember.findFirst({
+    where: { groupId: book.group.id, userId, inviteStatus: "ACCEPTED" },
+    select: { role: true, addressBookPermissions: true },
+  });
+  if (!member) {
+    return null;
+  }
+  const manager = member.role === "OWNER" || member.role === "ADMIN";
+  const perms = member.addressBookPermissions ?? {};
+  const perm = manager ? "EDIT" : (perms[bookId] ?? "EDIT");
+  if (perm === "NONE") {
+    return null;
+  }
+  return {
+    bookId,
+    name: book.name,
+    teamName: book.group.name,
+    ownerId: book.group.ownerId,
+    canEdit: perm === "EDIT",
+  };
+};
+
+// All team books the user can access (for the home-set listing).
+const getUserTeamBooks = async (userId) => {
+  const members = await prisma.groupMember.findMany({
+    where: { userId, inviteStatus: "ACCEPTED", group: { type: "TEAM" } },
+    include: {
+      group: {
+        select: {
+          name: true,
+          addressBooks: { where: { archivedAt: null }, select: { id: true, name: true } },
+        },
+      },
+    },
+  });
+  const out = [];
+  for (const m of members) {
+    const manager = m.role === "OWNER" || m.role === "ADMIN";
+    const perms = m.addressBookPermissions ?? {};
+    for (const b of m.group.addressBooks) {
+      const perm = manager ? "EDIT" : (perms[b.id] ?? "EDIT");
+      if (perm !== "NONE") {
+        out.push({ bookId: b.id, name: b.name, teamName: m.group.name });
+      }
+    }
+  }
+  return out;
+};
+
+const fetchTeamBookContacts = (bookId) =>
+  prisma.contact.findMany({
+    where: {
+      archivedAt: null,
+      syncTombstoneAt: null,
+      groupContacts: { some: { groupAddressBookId: bookId } },
+    },
+    orderBy: { syncUid: "asc" },
+  });
+
+const computeTeamBookCTag = async (bookId) => {
+  const mostRecent = await prisma.contact.findFirst({
+    where: { groupContacts: { some: { groupAddressBookId: bookId } } },
+    orderBy: { updatedAt: "desc" },
+    select: { updatedAt: true },
+  });
+  return mostRecent?.updatedAt.toISOString() ?? "empty";
+};
+
+const emitTeamDavEvent = async (userId, contactId, eventType, label) => {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { name: true, email: true },
+    });
+    const name = user?.name?.trim() ?? user?.email ?? "A team member";
+    await prisma.activityEvent.create({
+      data: {
+        userId,
+        contactId,
+        eventType,
+        actor: "TEAM_MEMBER",
+        actorDetail: `${name} · ${label} (CardDAV)`,
+        payload: {},
+      },
+    });
+  } catch (error) {
+    console.error("Failed to log team CardDAV event", error);
+  }
+};
+
 // P9-08: record an inbound device-write conflict (stale If-Match on PUT/DELETE).
 // Default resolution is last-write-wins (server is authoritative); the record is
 // kept OPEN for the Phase 10 activity log / review UI. Never throws into the
@@ -927,6 +1043,21 @@ const handleAddressBooks = async (req, res, requestUrl) => {
       responses.push({
         href: `${homeHref}family/`,
         ...splitDavProps(familyProps, requestedNames),
+      });
+    }
+
+    // P14-09: surface each accessible team book as its own collection.
+    const teamBooks = await getUserTeamBooks(user.id);
+    for (const tb of teamBooks) {
+      const teamProps = [
+        { name: "displayname", value: `${tb.teamName} · ${tb.name}` },
+        { name: "resourcetype", types: ["collection", "addressbook"] },
+        { name: "getctag", value: await computeTeamBookCTag(tb.bookId) },
+        { name: "supported-address-data" },
+      ];
+      responses.push({
+        href: `${homeHref}team-${tb.bookId}/`,
+        ...splitDavProps(teamProps, requestedNames),
       });
     }
   }
@@ -1155,6 +1286,213 @@ const handleFamilyResource = async (req, res, requestUrl) => {
     },
   });
   await emitFamilyDavEvent(userId, existing.id, "CONTACT_ARCHIVED");
+  return send(res, 204, null);
+};
+
+const handleTeamCollection = async (req, res, requestUrl) => {
+  const params = getTeamCollectionParams(requestUrl.pathname);
+  if (!params) {
+    return false;
+  }
+  const { userId, bookId } = params;
+  const allow = "OPTIONS, PROPFIND, REPORT";
+  if (req.method === "OPTIONS") {
+    return options(res, allow);
+  }
+  if (req.method !== "PROPFIND" && req.method !== "REPORT") {
+    return methodNotAllowed(res, allow);
+  }
+  const authResult = await requireDavAuth(req, res, userId);
+  if (!authResult) {
+    return true;
+  }
+  const access = await getTeamBookAccess(userId, bookId);
+  if (!access) {
+    return notFound(res);
+  }
+  const collectionHref = `/dav/addressbooks/${userId}/team-${bookId}/`;
+  const label = `${access.teamName} · ${access.name}`;
+
+  if (req.method === "PROPFIND") {
+    const depth = req.headers.depth ?? "0";
+    if (depth === "infinity") {
+      return forbidden(res);
+    }
+    if (depth !== "0" && depth !== "1") {
+      return send(res, 400, "Unsupported Depth", { "Content-Type": "text/plain; charset=utf-8" });
+    }
+    const requestedNames = extractRequestedPropNames(await readRequestBody(req));
+    const collectionProps = [
+      { name: "displayname", value: label },
+      { name: "resourcetype", types: ["collection", "addressbook"] },
+      { name: "getctag", value: await computeTeamBookCTag(bookId) },
+      { name: "supported-address-data" },
+    ];
+    const responses = [
+      { href: collectionHref, ...splitDavProps(collectionProps, requestedNames) },
+    ];
+    if (depth === "1") {
+      const contacts = await fetchTeamBookContacts(bookId);
+      for (const contact of contacts) {
+        responses.push({
+          href: teamResourceHref(userId, bookId, contact.syncUid),
+          ...splitDavProps([{ name: "getetag", value: etagForContact(contact) }], requestedNames),
+        });
+      }
+    }
+    return xmlResponse(res, buildPropfindResponse(responses));
+  }
+
+  await readRequestBody(req);
+  const contacts = await fetchTeamBookContacts(bookId);
+  const responses = contacts.map((contact) => ({
+    href: teamResourceHref(userId, bookId, contact.syncUid),
+    props: [
+      { name: "getetag", value: etagForContact(contact) },
+      { name: "address-data", value: serializeContactToVCard(contact) },
+    ],
+    notFoundProps: [],
+  }));
+  return xmlResponse(res, buildPropfindResponse(responses));
+};
+
+const handleTeamResource = async (req, res, requestUrl) => {
+  const params = getTeamResourceParams(requestUrl.pathname);
+  if (!params) {
+    return false;
+  }
+  const { userId, bookId, uid } = params;
+  const allow = "OPTIONS, GET, PUT, DELETE";
+  if (req.method === "OPTIONS") {
+    return options(res, allow);
+  }
+  if (!["GET", "HEAD", "PUT", "DELETE"].includes(req.method)) {
+    return methodNotAllowed(res, allow);
+  }
+  const authResult = await requireDavAuth(req, res, userId);
+  if (!authResult) {
+    return true;
+  }
+  const access = await getTeamBookAccess(userId, bookId);
+  if (!access) {
+    return notFound(res);
+  }
+  const label = `${access.teamName} · ${access.name}`;
+  const existing = await prisma.contact.findFirst({
+    where: { syncUid: uid, groupContacts: { some: { groupAddressBookId: bookId } } },
+  });
+
+  if (req.method === "GET" || req.method === "HEAD") {
+    if (!existing || existing.archivedAt || existing.syncTombstoneAt) {
+      return notFound(res);
+    }
+    const etag = etagForContact(existing);
+    const ifNoneMatch = req.headers["if-none-match"];
+    if (ifNoneMatch && ifNoneMatch.split(",").map((v) => v.trim()).includes(etag)) {
+      return notModified(res, etag);
+    }
+    return vcardResponse(res, req.method === "HEAD" ? null : serializeContactToVCard(existing), etag);
+  }
+
+  // Writes require EDIT permission on the book.
+  if (!access.canEdit) {
+    return forbidden(res);
+  }
+
+  if (req.method === "PUT") {
+    const body = await readRequestBody(req);
+    if (isGroupVCard(body)) {
+      return unsupportedMediaType(res);
+    }
+    const bodyUid = getVCardUid(body);
+    if (bodyUid && bodyUid !== uid) {
+      return unprocessable(res, "UID in vCard body does not match the resource URL.");
+    }
+    const ifMatch = req.headers["if-match"];
+    const ifNoneMatch = req.headers["if-none-match"];
+    if (ifMatch) {
+      if (!existing || existing.syncTombstoneAt) {
+        return preconditionFailed(res);
+      }
+      if (!ifMatch.split(",").map((v) => v.trim()).includes(etagForContact(existing))) {
+        await logDeviceWriteConflict({
+          contact: existing,
+          appPasswordId: authResult.appPasswordId,
+          clientEtag: ifMatch,
+          incomingVCard: body,
+          conflictType: "VERSION_MISMATCH",
+        });
+        return preconditionFailed(res);
+      }
+    }
+    if (ifNoneMatch === "*" && existing && !existing.syncTombstoneAt) {
+      return preconditionFailed(res);
+    }
+    const fields = parseVCardToContactFields(body);
+    if (!fields.fullName || !fields.fullName.trim()) {
+      const derived = [fields.firstName, fields.lastName].filter(Boolean).join(" ").trim();
+      fields.fullName = derived || fields.company || fields.email || "Unnamed contact";
+    }
+
+    if (!existing) {
+      const created = await prisma.$transaction(async (tx) => {
+        const contact = await tx.contact.create({
+          data: {
+            userId: access.ownerId,
+            syncUid: uid,
+            syncVersion: 1,
+            sourceType: "SYNC_CARDDAV",
+            sourceDetail: label,
+            ...fields,
+          },
+        });
+        await tx.groupContact.create({
+          data: { groupAddressBookId: bookId, contactId: contact.id, addedByUserId: userId },
+        });
+        return contact;
+      });
+      await emitTeamDavEvent(userId, created.id, "CONTACT_CREATED", label);
+      return send(res, 201, null, { ETag: etagForContact(created) });
+    }
+
+    const updated = await prisma.contact.update({
+      where: { id: existing.id },
+      data: {
+        ...fields,
+        syncVersion: (existing.syncVersion ?? 0) + 1,
+        syncTombstoneAt: null,
+        archivedAt: null,
+      },
+    });
+    await emitTeamDavEvent(userId, updated.id, "CONTACT_UPDATED", label);
+    return send(res, 204, null, { ETag: etagForContact(updated) });
+  }
+
+  // DELETE → soft-archive the team contact.
+  if (!existing || existing.syncTombstoneAt) {
+    return notFound(res);
+  }
+  const ifMatch = req.headers["if-match"];
+  if (ifMatch && !ifMatch.split(",").map((v) => v.trim()).includes(etagForContact(existing))) {
+    await logDeviceWriteConflict({
+      contact: existing,
+      appPasswordId: authResult.appPasswordId,
+      clientEtag: ifMatch,
+      incomingVCard: null,
+      conflictType: "DELETE_CONFLICT",
+    });
+    return preconditionFailed(res);
+  }
+  const now = new Date();
+  await prisma.contact.update({
+    where: { id: existing.id },
+    data: {
+      syncTombstoneAt: now,
+      archivedAt: existing.archivedAt ?? now,
+      syncVersion: existing.syncVersion + 1,
+    },
+  });
+  await emitTeamDavEvent(userId, existing.id, "CONTACT_ARCHIVED", label);
   return send(res, 204, null);
 };
 
@@ -1422,6 +1760,14 @@ const handleDavRequest = async (req, res) => {
   }
 
   if (await handleFamilyCollection(req, res, requestUrl)) {
+    return true;
+  }
+
+  if (await handleTeamResource(req, res, requestUrl)) {
+    return true;
+  }
+
+  if (await handleTeamCollection(req, res, requestUrl)) {
     return true;
   }
 
