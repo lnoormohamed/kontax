@@ -23,7 +23,7 @@ Bring Kontax's contacts hub to small teams and organisations. A team can maintai
 | P14-02 | Done | P0 | P14-01 |
 | P14-03 | Done | P0 | P14-01 |
 | P14-04 | Done | P1 | P14-02, P14-03, P10-01, P10-02 |
-| P14-05 | Not Started | P1 | P14-04, P10-01 |
+| P14-05 | Done | P1 | P14-04, P10-01 |
 | P14-06 | Not Started | P1 | P14-04, P5-01, P7-03 |
 | P14-07 | Not Started | P1 | P14-05, P14-06 |
 | P14-08 | Not Started | P2 | P14-07 |
@@ -125,7 +125,8 @@ Bring Kontax's contacts hub to small teams and organisations. A team can maintai
 ---
 
 ## P14-05 — Audit log for team admins
-- Status: `Not Started`
+- Status: `Done`
+- Shipped /settings/teams/audit (admin-only): filter by member/book/event-type/date-range, cursor pagination (100/page), CSV export, unlimited retention (no pruning). Scoped to events on the team's book contacts. Per-address-book tab presentation folds into P14-07.
 - Priority: `P1`
 - Dependencies: `P14-04`, `P10-01`
 - Implementation Notes:

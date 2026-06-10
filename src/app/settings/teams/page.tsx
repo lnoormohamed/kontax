@@ -173,6 +173,13 @@ export default async function TeamSettingsPage() {
             {activeCount} of {ownedTeam.maxMembers} members · {activeBooks.length} address
             book{activeBooks.length === 1 ? "" : "s"}
           </p>
+          <Link
+            className="mt-3 inline-flex items-center gap-1.5 rounded-[9px] border border-[#d8ddd6] bg-white px-3.5 py-1.5 text-[13px] font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+            href="/settings/teams/audit"
+          >
+            <WorkspaceIcon name="clock" size={15} />
+            View audit log
+          </Link>
 
           <div className="mt-4 grid gap-2">
             {ownedTeam.members.map((m) => {
