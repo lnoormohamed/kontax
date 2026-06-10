@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
+import { AppShell } from "~/app/_components/app-shell";
 import { ContactHistory } from "~/app/_components/contact-history";
 import { ContactPhoneticAssistant } from "~/app/_components/contact-phonetic-assistant";
 import { LastUpdatedBy } from "~/app/_components/last-updated-by";
@@ -14,6 +15,7 @@ import {
   updateContact,
 } from "~/app/actions/contacts";
 import { auth } from "~/server/auth";
+import { getUserPlanSummary } from "~/server/billing";
 import { parseContactPostalAddresses, parseContactStringArray } from "~/server/contact-portability";
 import { db } from "~/server/db";
 
@@ -226,6 +228,27 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     notFound();
   }
 
+  const [shellPlan, shellPeople, shellFavorites, shellArchived, shellDuplicates] = await Promise.all(
+    [
+      getUserPlanSummary(session.user.id),
+      db.contact.count({ where: { userId: session.user.id, archivedAt: null } }),
+      db.contact.count({ where: { userId: session.user.id, archivedAt: null, isFavorite: true } }),
+      db.contact.count({ where: { userId: session.user.id, NOT: { archivedAt: null } } }),
+      db.mergeSuggestion.count({ where: { userId: session.user.id, status: "OPEN" } }),
+    ],
+  );
+  const shellAccount = {
+    name: session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax",
+    email: session.user.email ?? "",
+    plan: shellPlan.planLabel,
+  };
+  const shellCounts = {
+    people: shellPeople,
+    favorites: shellFavorites,
+    archived: shellArchived,
+    duplicates: shellDuplicates,
+  };
+
   const syncLinks = await db.syncContactLink.findMany({
     where: {
       contactId: contact.id,
@@ -406,7 +429,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
   ];
 
   return (
-    <main className="min-h-screen bg-[linear-gradient(180deg,#f5efe6_0%,#edf3ef_34%,#f8fafc_100%)] text-slate-900">
+    <AppShell account={shellAccount} counts={shellCounts}>
       <div className="mx-auto flex w-full max-w-[1720px] flex-col gap-6 px-4 py-6 lg:px-6 lg:py-8">
         <section className="overflow-hidden rounded-[2.4rem] border border-[#d8ddd6] bg-[#17352e] text-white shadow-[0_25px_80px_rgba(23,53,46,0.18)]">
           <div className="grid gap-6 px-6 py-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:px-8">
@@ -1344,6 +1367,6 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
           </div>
         </section>
       </div>
-    </main>
+    </AppShell>
   );
 }

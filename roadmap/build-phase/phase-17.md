@@ -17,7 +17,7 @@ Build the two contact data surfaces to their **approved, locked designs** — th
 | Ticket | Status | Priority | Depends On |
 | --- | --- | --- | --- |
 | P17-01 | Done | P1 | P8 (contact model), 03 brief |
-| P17-02 | Not Started | P0 | P10 (source/history), 02 brief; **blocks P12-05** |
+| P17-02 | In Progress | P0 | P10 (source/history), 02 brief; **blocks P12-05** |
 
 ---
 
@@ -50,9 +50,13 @@ Build the two contact data surfaces to their **approved, locked designs** — th
 ---
 
 ## P17-02 — Rebuild the Contact Detail page (`/contacts/[id]`) to locked brief 02
-- Status: `Not Started`
+- Status: `In Progress`
 - Priority: `P0` — **blocks Phase 12 P12-05**
 - Dependencies: P10 (source tracking, per-contact history); design brief `02-contact-detail.md` (LOCKED)
+- Delivered so far (step 1 — chrome):
+  - Wrapped the detail page in the reusable **`AppShell`** (header + sidebar), so `/contacts/[id]` now keeps the global chrome instead of being a standalone page. Fetches account + live counts for the shell.
+- Remaining (step 2 — the locked-02 structure, larger):
+  - Two-pane layout (left rail 320px + right pane), **Details · Sharing · History** tabs (URL-driven via `?tab=`), left-rail badge cluster + metadata (source badge / last-edited already exist), **inline-edit** (auto-save on blur) replacing the current single big `updateContact` form, archive-first header (Share · Archive · ⋯ with Delete in the menu), and restyling the dark-green hero to the light system. The **Sharing tab** lands as a gated placeholder for P12-05 to fill.
 - Implementation Notes:
   - **Master–detail shell**: render inside the persistent global sidebar/header (extract a reusable `AppShell` from the list's `contact-dashboard` chrome); the detail fills the content area. No standalone window.
   - **Left rail (320px):** avatar + favourite, name, title·company, birthday, the governed **badge cluster** (sharing → emergency → source, in that order), quick actions, and the metadata block (Added / Modified / UID / **Last edited by** + **Source badge**, both already built in P10).
