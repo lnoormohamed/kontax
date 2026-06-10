@@ -1,7 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useRef, useState, useTransition } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
   activateSyncAccount,
@@ -291,12 +290,11 @@ function ActionBtn({
       style={base}
       onMouseEnter={(e) => {
         if (disabled) return;
-        (e.currentTarget as HTMLButtonElement).style.background =
+        e.currentTarget.style.background =
           variant === "primary" ? "#3347d8" : danger ? T.redWash : T.wash;
       }}
       onMouseLeave={(e) => {
-        (e.currentTarget as HTMLButtonElement).style.background =
-          variant === "primary" ? T.blue : "#fff";
+        e.currentTarget.style.background = variant === "primary" ? T.blue : "#fff";
       }}
     >
       {children}
@@ -314,11 +312,9 @@ const DIR_BADGE = {
 // ── Conflict row (collapsible inline resolver) ───────────────────────────────
 function ConflictRow({
   cf,
-  accountId,
   redirectTo,
 }: {
   cf: SyncConflictData;
-  accountId: string;
   redirectTo: string;
 }) {
   const [open, setOpen] = useState(false);
@@ -842,8 +838,6 @@ function AccountHeader({
   redirectTo: string;
   onEdit: () => void;
 }) {
-  const router = useRouter();
-  const [, startTransition] = useTransition();
   const [copiedUrl, setCopiedUrl] = useState(false);
   const isPaused = account.status === "PAUSED";
   const dir = DIR_BADGE[account.direction];
@@ -1417,49 +1411,6 @@ function EmptyState({ onAdd }: { onAdd: () => void }) {
   );
 }
 
-// ── Detail skeleton ───────────────────────────────────────────────────────────
-function DetailSkeleton() {
-  const bar = (w: string | number, h: number, mt = 0, r = 4) => (
-    <div
-      style={{
-        width: w,
-        height: h,
-        borderRadius: r,
-        marginTop: mt,
-        background: "linear-gradient(90deg,#eceee9 0%,#f5f6f3 50%,#eceee9 100%)",
-        backgroundSize: "200% 100%",
-        animation: "sy-shimmer 1.3s ease-in-out infinite",
-      }}
-    />
-  );
-  return (
-    <div>
-      <div style={{ display: "flex", gap: 14, alignItems: "center" }}>
-        {bar(30, 30, 0, 999)}
-        {bar(160, 20, 0, 6)}
-      </div>
-      {bar(220, 13, 16)}
-      <div style={{ display: "flex", gap: 10, marginTop: 22 }}>
-        {[88, 70, 130, 100].map((w, i) => (
-          <div
-            key={i}
-            style={{
-              width: w,
-              height: 34,
-              borderRadius: 8,
-              background: "linear-gradient(90deg,#eceee9 0%,#f5f6f3 50%,#eceee9 100%)",
-              backgroundSize: "200% 100%",
-              animation: "sy-shimmer 1.3s ease-in-out infinite",
-            }}
-          />
-        ))}
-      </div>
-      {bar(120, 11, 34)}
-      {[0, 1, 2, 3].map((i) => bar("100%", 18, 16))}
-    </div>
-  );
-}
-
 // ── Main client component ─────────────────────────────────────────────────────
 export type SyncPageClientProps = {
   accounts: SyncAccountData[];
@@ -1469,24 +1420,23 @@ export type SyncPageClientProps = {
 };
 
 export function SyncPageClient({ accounts, initialAccountId, flash: initialFlash }: SyncPageClientProps) {
-  const router = useRouter();
-
   const [selectedId, setSelectedId] = useState<string | null>(
     initialAccountId ?? accounts[0]?.id ?? null,
   );
   const [view, setView] = useState<"detail" | "add">("detail");
   const [editing, setEditing] = useState(false);
   const [mobilePane, setMobilePane] = useState<"list" | "detail">("list");
-  const [syncingId, setSyncingId] = useState<string | null>(null);
+  // syncingId reserved for future optimistic in-progress indicator
+  const syncingId: string | null = null;
   const [toast, setToast] = useState<string | null>(initialFlash);
-  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const detailRef = useRef<HTMLElement>(null);
 
-  const showToast = (msg: string) => {
-    if (toastTimer.current) clearTimeout(toastTimer.current);
-    setToast(msg);
-    toastTimer.current = setTimeout(() => setToast(null), 3200);
-  };
+  // Auto-dismiss flash toast
+  useEffect(() => {
+    if (!toast) return;
+    const t = setTimeout(() => setToast(null), 3200);
+    return () => clearTimeout(t);
+  }, [toast]);
 
   const selectedAccount = accounts.find((a) => a.id === selectedId) ?? accounts[0] ?? null;
 
@@ -1580,7 +1530,7 @@ export function SyncPageClient({ accounts, initialAccountId, flash: initialFlash
             </p>
             <div style={{ borderBottom: `1px solid ${T.line2}` }}>
               {selectedAccount.conflicts.map((cf) => (
-                <ConflictRow key={cf.id} cf={cf} accountId={selectedAccount.id} redirectTo={redirectTo} />
+                <ConflictRow key={cf.id} cf={cf} redirectTo={redirectTo} />
               ))}
             </div>
           </section>
@@ -1657,10 +1607,10 @@ export function SyncPageClient({ accounts, initialAccountId, flash: initialFlash
                   transition: "background .13s ease",
                 }}
                 onMouseEnter={(e) => {
-                  if (!sel) (e.currentTarget as HTMLButtonElement).style.background = T.wash;
+                  if (!sel) e.currentTarget.style.background = T.wash;
                 }}
                 onMouseLeave={(e) => {
-                  if (!sel) (e.currentTarget as HTMLButtonElement).style.background = "transparent";
+                  if (!sel) e.currentTarget.style.background = "transparent";
                 }}
               >
                 <span style={{ flexShrink: 0 }}>

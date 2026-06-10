@@ -191,7 +191,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
   // Serialise to plain data for client component
   const accounts: SyncAccountData[] = rawAccounts.map((acct) => {
     const recentJobs = acct.syncJobs.map((j) => ({
-      status: j.status as "QUEUED" | "RUNNING" | "SUCCEEDED" | "PARTIAL" | "FAILED",
+      status: j.status,
       errorCode: j.errorCode,
     }));
 
@@ -204,7 +204,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
     const jobs: SyncJobRow[] = acct.syncJobs.map((j) => ({
       id: j.id,
       when: formatJobTimestamp(j.completedAt ?? j.startedAt ?? j.createdAt),
-      direction: j.syncDirection as "TWO_WAY" | "IMPORT_ONLY" | "EXPORT_ONLY",
+      direction: j.syncDirection,
       added: j.createdCount,
       modified: j.updatedCount,
       deleted: j.deletedCount,
@@ -224,8 +224,8 @@ export default async function SyncPage({ searchParams }: PageProps) {
       id: acct.id,
       label: acct.label,
       baseUrl: acct.baseUrl,
-      direction: acct.syncDirection as "TWO_WAY" | "IMPORT_ONLY" | "EXPORT_ONLY",
-      status: acct.status as "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR",
+      direction: acct.syncDirection,
+      status: acct.status,
       health,
       lastSyncedAtRelative: formatRelative(acct.lastSyncedAt),
       lastErrorMessage: acct.lastErrorMessage ?? null,
