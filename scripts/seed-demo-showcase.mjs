@@ -372,6 +372,35 @@ const main = async () => {
     }
   }
 
+  // A few contacts in a team book (Orbit Health Team) so team surfacing shows.
+  const teamGroup = await db.group.findFirst({
+    where: { ownerId: user.id, type: "TEAM" },
+    include: { addressBooks: { take: 1, orderBy: { createdAt: "asc" } } },
+  });
+  const teamBookId = teamGroup?.addressBooks[0]?.id;
+  if (teamBookId) {
+    const teamContacts = [
+      { fullName: "Acme Corp (Client)", company: "Acme Corp", email: "hello@acme.example", phone: "+14155551000", jobTitle: "Account" },
+      { fullName: "Beacon Health (Partner)", company: "Beacon Health", email: "partners@beacon.example", phone: "+14155552000" },
+      { fullName: "Caldwell Supplies", company: "Caldwell", email: "orders@caldwell.example", phone: "+14155553000" },
+    ];
+    for (const c of teamContacts) {
+      const created = await db.contact.create({
+        data: {
+          userId: user.id,
+          labels: [SHOWCASE_LABEL],
+          ...c,
+          sourceType: "MANUAL",
+          sourceDetail: `${teamGroup.name} · ${teamGroup.addressBooks[0].name}`,
+          lastMutatedBy: "MANUAL",
+        },
+      });
+      await db.groupContact.create({
+        data: { groupAddressBookId: teamBookId, contactId: created.id, addedByUserId: user.id },
+      });
+    }
+  }
+
   const amaraSnapshot = {
     ownerName,
     fullName: "Amara Okafor",

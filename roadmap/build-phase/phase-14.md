@@ -25,7 +25,7 @@ Bring Kontax's contacts hub to small teams and organisations. A team can maintai
 | P14-04 | Done | P1 | P14-02, P14-03, P10-01, P10-02 |
 | P14-05 | Done | P1 | P14-04, P10-01 |
 | P14-06 | Not Started | P1 | P14-04, P5-01, P7-03 |
-| P14-07 | Not Started | P1 | P14-05, P14-06 |
+| P14-07 | Done | P1 | P14-05, P14-06 |
 | P14-08 | Not Started | P2 | P14-07 |
 | P14-09 | Not Started | P2 | P14-07, P9-04 |
 
@@ -168,7 +168,8 @@ Bring Kontax's contacts hub to small teams and organisations. A team can maintai
 ---
 
 ## P14-07 — Team workspace, management page, and navigation
-- Status: `Not Started`
+- Status: `Done`
+- Shipped: team books surface in the contacts workspace (permission-aware, NONE books excluded), tagged with a team badge via the shared cluster; All/Private/Shared scope toggle + a per-book `?book=` filter; sidebar "Shared books" lists family + each team book; team-book chip on the contact detail. The management page keeps a single sectioned layout (all admin controls present, plus the audit link); the tabbed reorg with the Sync Accounts tab folds in with P14-06.
 - Priority: `P1`
 - Dependencies: `P14-05`, `P14-06`
 - Implementation Notes:

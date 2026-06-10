@@ -30,7 +30,7 @@ type WorkspaceContact = {
   address: string | null;
   isFavorite: boolean;
   isEmergency: boolean;
-  isShared: boolean;
+  sharedKind: "family" | "team" | null;
   notes: string | null;
   archivedAt: Date | null;
   updatedAt: Date;
@@ -132,7 +132,8 @@ function RowBadges({ contact, mode }: { contact: WorkspaceContact; mode: "active
       flags={{
         isFavorite: contact.isFavorite,
         isEmergency: contact.isEmergency,
-        inFamilyBook: contact.isShared,
+        inFamilyBook: contact.sharedKind === "family",
+        inTeamBook: contact.sharedKind === "team",
       }}
       redirectTo={mode === "active" ? "/?tab=people" : "/?tab=archived"}
     />

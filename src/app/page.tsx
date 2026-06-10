@@ -8,6 +8,7 @@ import { auth } from "~/server/auth";
 import { getUserPlanSummary, isActivityLogEnabled } from "~/server/billing";
 import { getOpenMergeSuggestionsForUser, getRecentMergesForUser } from "~/server/contact-merge";
 import { getUserFamilyMembership } from "~/server/family-access";
+import { getAccessibleTeamBooks } from "~/server/team-access";
 import { db } from "~/server/db";
 
 type HomePageProps = {
@@ -386,26 +387,38 @@ export default async function Home({ searchParams }: HomePageProps) {
     updatedAt: true,
   } as const;
 
-  // Family (P13-05): the user's family-book contacts surface alongside private
-  // ones. `scope` (all | private | family) toggles which sets are shown.
-  const familyMembership = await getUserFamilyMembership(session.user.id);
-  const familyBookWhere = familyMembership
-    ? {
-        groupContacts: {
-          some: {
-            groupAddressBook: {
-              group: { members: { some: { userId: session.user.id, inviteStatus: "ACCEPTED" as const } } },
-            },
-          },
-        },
-      }
-    : null;
-  const scopeParam = await getSingleParam(searchParams, "scope");
-  const scope = scopeParam === "private" || scopeParam === "family" ? scopeParam : "all";
-  const includePrivate = scope !== "family";
-  const includeShared = scope !== "private" && Boolean(familyBookWhere);
+  // Shared books (Family P13-05 + Teams P14-07): the user's family book + the
+  // team books they can access (permission != NONE) surface alongside private
+  // contacts. `scope` (all | private | shared) and an optional `book=<id>` drive
+  // which sets are shown; rows are tagged family/team for the row badge.
+  const [familyMembership, accessibleTeamBooks] = await Promise.all([
+    getUserFamilyMembership(session.user.id),
+    getAccessibleTeamBooks(session.user.id),
+  ]);
+  const familyBookId = familyMembership?.bookId ?? null;
+  const teamBookIds = accessibleTeamBooks.map((b) => b.id);
+  const sharedBooks = [
+    ...(familyMembership?.bookId
+      ? [{ id: familyMembership.bookId, name: familyMembership.groupName, kind: "family" as const }]
+      : []),
+    ...accessibleTeamBooks.map((b) => ({ id: b.id, name: b.name, kind: "team" as const })),
+  ];
+  const hasShared = sharedBooks.length > 0;
 
-  const [privateActive, sharedActive, archivedContacts, mergeSuggestions, planSummary] =
+  const bookParam = await getSingleParam(searchParams, "book");
+  const activeBook = bookParam && sharedBooks.some((b) => b.id === bookParam) ? bookParam : null;
+  const scopeParam = await getSingleParam(searchParams, "scope");
+  const scope = scopeParam === "private" || scopeParam === "shared" ? scopeParam : "all";
+
+  const includePrivate = !activeBook && scope !== "shared";
+  const includeShared = scope !== "private";
+  const familyTargetId = activeBook ? (activeBook === familyBookId ? familyBookId : null) : familyBookId;
+  const teamTargetIds = activeBook ? (teamBookIds.includes(activeBook) ? [activeBook] : []) : teamBookIds;
+
+  const sortOrder =
+    selectedSort === "name" ? { isFavorite: "desc" as const } : { updatedAt: "desc" as const };
+
+  const [privateActive, familyActive, teamActive, archivedContacts, mergeSuggestions, planSummary] =
     await Promise.all([
       includePrivate
         ? db.contact.findMany({
@@ -416,15 +429,27 @@ export default async function Home({ searchParams }: HomePageProps) {
               ...searchConditions,
               ...filterConditions,
             },
-            orderBy: selectedSort === "name" ? { isFavorite: "desc" as const } : { updatedAt: "desc" as const },
+            orderBy: sortOrder,
             select: contactListSelect,
           })
         : Promise.resolve([]),
-      includeShared && familyBookWhere
+      includeShared && familyTargetId
         ? db.contact.findMany({
             where: {
               archivedAt: null,
-              ...familyBookWhere,
+              groupContacts: { some: { groupAddressBookId: familyTargetId } },
+              ...searchConditions,
+              ...filterConditions,
+            },
+            orderBy: { updatedAt: "desc" as const },
+            select: contactListSelect,
+          })
+        : Promise.resolve([]),
+      includeShared && teamTargetIds.length > 0
+        ? db.contact.findMany({
+            where: {
+              archivedAt: null,
+              groupContacts: { some: { groupAddressBookId: { in: teamTargetIds } } },
               ...searchConditions,
               ...filterConditions,
             },
@@ -450,15 +475,21 @@ export default async function Home({ searchParams }: HomePageProps) {
     ]);
 
   const activeContacts = [
-    ...privateActive.map((c) => ({ ...c, isShared: false })),
-    ...sharedActive.map((c) => ({ ...c, isShared: true })),
+    ...privateActive.map((c) => ({ ...c, sharedKind: null as "family" | "team" | null })),
+    ...familyActive.map((c) => ({ ...c, sharedKind: "family" as const })),
+    ...teamActive.map((c) => ({ ...c, sharedKind: "team" as const })),
   ];
 
   const [privatePeopleCount, sharedPeopleCount, favoritesCount, emergencyCount, archivedCount, incomingSharesCount] =
     await Promise.all([
     db.contact.count({ where: { userId: session.user.id, archivedAt: null, groupContacts: { none: {} } } }),
-    familyBookWhere
-      ? db.contact.count({ where: { archivedAt: null, ...familyBookWhere } })
+    sharedBooks.length > 0
+      ? db.contact.count({
+          where: {
+            archivedAt: null,
+            groupContacts: { some: { groupAddressBookId: { in: sharedBooks.map((b) => b.id) } } },
+          },
+        })
       : Promise.resolve(0),
     db.contact.count({ where: { userId: session.user.id, archivedAt: null, isFavorite: true } }),
     db.contact.count({ where: { userId: session.user.id, archivedAt: null, isEmergency: true } }),
@@ -480,7 +511,10 @@ export default async function Home({ searchParams }: HomePageProps) {
   const recentMerges =
     selectedTab === "duplicates" ? await getRecentMergesForUser(session.user.id) : [];
 
-  const archivedWithFlag = archivedContacts.map((c) => ({ ...c, isShared: false }));
+  const archivedWithFlag = archivedContacts.map((c) => ({
+    ...c,
+    sharedKind: null as "family" | "team" | null,
+  }));
   const sortedActiveContacts =
     selectedSort === "name"
       ? [...activeContacts].sort(compareWorkspaceContacts)
@@ -572,8 +606,9 @@ export default async function Home({ searchParams }: HomePageProps) {
         query={query}
         viewMode={selectedView}
         currentScope={scope}
-        hasFamily={Boolean(familyMembership)}
-        familyBookName={familyMembership?.groupName ?? null}
+        currentBook={activeBook}
+        hasShared={hasShared}
+        sharedBooks={sharedBooks}
         counts={{
           people: peopleCount,
           favorites: favoritesCount,

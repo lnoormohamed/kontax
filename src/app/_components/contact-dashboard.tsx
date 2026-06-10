@@ -26,7 +26,7 @@ type DashboardContact = {
   address: string | null;
   isFavorite: boolean;
   isEmergency: boolean;
-  isShared: boolean;
+  sharedKind: "family" | "team" | null;
   notes: string | null;
   archivedAt: Date | null;
   updatedAt: Date;
@@ -64,9 +64,10 @@ type ContactDashboardProps = {
   mergeSuggestions: PersistedMergeSuggestion[];
   mergeSuggestionsRefreshed: boolean;
   viewMode: WorkspaceView;
-  currentScope: "all" | "private" | "family";
-  hasFamily: boolean;
-  familyBookName: string | null;
+  currentScope: "all" | "private" | "shared";
+  currentBook: string | null;
+  hasShared: boolean;
+  sharedBooks: { id: string; name: string; kind: "family" | "team" }[];
   counts: {
     people: number;
     favorites: number;
@@ -102,8 +103,9 @@ export function ContactDashboard({
   mergeSuggestionsRefreshed,
   viewMode,
   currentScope,
-  hasFamily,
-  familyBookName,
+  currentBook,
+  hasShared,
+  sharedBooks,
   counts,
   account,
   syncState,
@@ -122,7 +124,8 @@ export function ContactDashboard({
       filter?: WorkspaceFilter;
       sort?: WorkspaceSort;
       view?: WorkspaceView;
-      scope?: "all" | "private" | "family";
+      scope?: "all" | "private" | "shared";
+      book?: string | null;
     },
   ) => {
     const params = new URLSearchParams();
@@ -130,9 +133,15 @@ export function ContactDashboard({
     params.set("filter", overrides?.filter ?? currentFilter);
     params.set("sort", overrides?.sort ?? currentSort);
     params.set("view", overrides?.view ?? viewMode);
-    const scope = overrides?.scope ?? currentScope;
-    if (scope !== "all") {
-      params.set("scope", scope);
+    // book and scope are mutually exclusive (a specific book overrides scope).
+    const book = overrides && "book" in overrides ? overrides.book : currentBook;
+    if (book) {
+      params.set("book", book);
+    } else {
+      const scope = overrides?.scope ?? currentScope;
+      if (scope !== "all") {
+        params.set("scope", scope);
+      }
     }
     if (query) {
       params.set("q", query);
@@ -278,18 +287,21 @@ export function ContactDashboard({
         {navItem(currentTab === "activity", buildHref("activity"), "clock", "Activity", null)}
         {navItem(false, "/shares", "download", "Shared with me", incomingShares ?? null, true)}
 
-        {/* Shared books (P15-04) — membership views live here, not in personal filters */}
-        {hasFamily && familyBookName ? (
+        {/* Shared books (P15-04 family + P14-07 teams) — membership views live
+            here, not mixed into the personal Favorites/Emergency filters */}
+        {hasShared ? (
           <div className="mt-3">
             <div className="px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8b938c]">
               Shared books
             </div>
-            {navItem(
-              currentTab === "people" && currentScope === "family",
-              buildHref("people", { filter: "all", scope: "family" }),
-              "users",
-              familyBookName,
-              null,
+            {sharedBooks.map((b) =>
+              navItem(
+                currentTab === "people" && currentBook === b.id,
+                buildHref("people", { filter: "all", book: b.id }),
+                b.kind === "team" ? "team" : "users",
+                b.name,
+                null,
+              ),
             )}
           </div>
         ) : null}
@@ -381,11 +393,11 @@ export function ContactDashboard({
                 {segment("Compact", viewMode === "compact", buildHref(currentTab, { view: "compact" }))}
                 {segment("Cozy", viewMode === "cozy", buildHref(currentTab, { view: "cozy" }))}
               </div>
-              {hasFamily && currentTab === "people" ? (
+              {hasShared && currentTab === "people" ? (
                 <div className="flex items-center gap-1 rounded-lg bg-[#f2f4f0] p-0.5">
-                  {segment("All", currentScope === "all", buildHref("people", { scope: "all" }))}
-                  {segment("Private", currentScope === "private", buildHref("people", { scope: "private" }))}
-                  {segment("Family", currentScope === "family", buildHref("people", { scope: "family" }))}
+                  {segment("All", currentScope === "all" && !currentBook, buildHref("people", { scope: "all", book: null }))}
+                  {segment("Private", currentScope === "private" && !currentBook, buildHref("people", { scope: "private", book: null }))}
+                  {segment("Shared", currentScope === "shared" && !currentBook, buildHref("people", { scope: "shared", book: null }))}
                 </div>
               ) : null}
             </>

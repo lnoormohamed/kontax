@@ -24,6 +24,7 @@ import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
 import { db } from "~/server/db";
 import { getContactFamilyContext, getUserFamilyMembership } from "~/server/family-access";
+import { getContactTeamContext } from "~/server/team-access";
 
 type ContactDetailPageProps = {
   params: Promise<{
@@ -350,12 +351,15 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
   const isLiveReceived = contact.sourceType === "SHARED_LIVE";
 
   // Family (P13-03): can this private contact be added to the shared family book?
-  const [familyMembership, familyContext] = await Promise.all([
+  const [familyMembership, familyContext, teamContext] = await Promise.all([
     getUserFamilyMembership(session.user.id),
     getContactFamilyContext(contact.id),
+    getContactTeamContext(contact.id),
   ]);
   const isSharedContact = Boolean(familyContext);
-  const canAddToFamily = Boolean(familyMembership?.canEdit) && !isSharedContact;
+  const teamBookLabel = teamContext ? `${teamContext.teamName} · ${teamContext.bookName}` : null;
+  const canAddToFamily =
+    Boolean(familyMembership?.canEdit) && !isSharedContact && !teamContext;
 
   // P15-03: "Shared with your family" panel data (members + last editor).
   const [familyMembers, lastFamilyEvent] = isSharedContact && familyContext
@@ -548,6 +552,12 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 <span className="inline-flex items-center gap-1 rounded-full bg-[#eaf0fb] px-2.5 py-1 text-[11px] font-semibold text-[#3a4ab0]">
                   <WorkspaceIcon name="users" size={12} strokeWidth={1.8} />
                   {familyContext?.groupName ?? "Family book"}
+                </span>
+              ) : null}
+              {teamBookLabel ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#eaf0fb] px-2.5 py-1 text-[11px] font-semibold text-[#3a4ab0]">
+                  <WorkspaceIcon name="team" size={12} strokeWidth={1.8} />
+                  {teamBookLabel}
                 </span>
               ) : null}
               {contact.isEmergency ? (
