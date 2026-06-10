@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
-export function RegisterForm() {
+export function RegisterForm({ next }: { next?: string }) {
   const router = useRouter();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -54,7 +54,7 @@ export function RegisterForm() {
       return;
     }
 
-    router.push("/");
+    router.push(next ?? "/");
     router.refresh();
   };
 
@@ -121,7 +121,10 @@ export function RegisterForm() {
 
       <p className="mt-6 text-sm text-slate-300">
         Already have an account?{" "}
-        <Link className="font-semibold text-cyan-200 hover:text-cyan-100" href="/login">
+        <Link
+          className="font-semibold text-cyan-200 hover:text-cyan-100"
+          href={next ? `/login?next=${encodeURIComponent(next)}` : "/login"}
+        >
           Log in
         </Link>
       </p>

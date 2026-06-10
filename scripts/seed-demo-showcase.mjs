@@ -298,24 +298,44 @@ const main = async () => {
   // Shared books (Family/Team) owned by the user, with the owner + a couple of
   // members each — so the Sharing tab shows configured books.
   for (const book of DEMO_BOOKS) {
+    const now = new Date();
     const group = await db.group.create({
       data: {
         ownerId: user.id,
         type: book.type,
         name: book.name,
+        maxMembers: book.type === "FAMILY" ? 6 : 25,
         members: {
           create: [
-            { userId: user.id, role: "OWNER", inviteStatus: "ACCEPTED" },
+            {
+              userId: user.id,
+              role: "OWNER",
+              inviteStatus: "ACCEPTED",
+              canEdit: true,
+              joinedAt: now,
+            },
             ...book.memberEmails
               .map((em) => byEmail[em])
               .filter(Boolean)
-              .map((u) => ({ userId: u.id, role: "MEMBER", inviteStatus: "ACCEPTED" })),
+              .map((u) => ({
+                userId: u.id,
+                invitedEmail: u.email,
+                role: "MEMBER",
+                inviteStatus: "ACCEPTED",
+                canEdit: true,
+                joinedAt: now,
+                invitedByUserId: user.id,
+              })),
           ],
         },
-        addressBooks: { create: [{ name: book.name }] },
+        addressBooks: { create: [{ name: book.name, isDefault: true }] },
       },
+      include: { addressBooks: true },
     });
-    void group;
+    await db.group.update({
+      where: { id: group.id },
+      data: { defaultAddressBookId: group.addressBooks[0]?.id },
+    });
   }
   const amaraSnapshot = {
     ownerName,

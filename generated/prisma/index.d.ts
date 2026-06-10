@@ -23350,9 +23350,12 @@ export namespace Prisma {
     id: string | null
     groupId: string | null
     userId: string | null
+    invitedEmail: string | null
     role: $Enums.GroupRole | null
     inviteStatus: $Enums.GroupInviteStatus | null
     canEdit: boolean | null
+    inviteToken: string | null
+    inviteExpiresAt: Date | null
     invitedAt: Date | null
     invitedByUserId: string | null
     joinedAt: Date | null
@@ -23363,9 +23366,12 @@ export namespace Prisma {
     id: string | null
     groupId: string | null
     userId: string | null
+    invitedEmail: string | null
     role: $Enums.GroupRole | null
     inviteStatus: $Enums.GroupInviteStatus | null
     canEdit: boolean | null
+    inviteToken: string | null
+    inviteExpiresAt: Date | null
     invitedAt: Date | null
     invitedByUserId: string | null
     joinedAt: Date | null
@@ -23376,9 +23382,12 @@ export namespace Prisma {
     id: number
     groupId: number
     userId: number
+    invitedEmail: number
     role: number
     inviteStatus: number
     canEdit: number
+    inviteToken: number
+    inviteExpiresAt: number
     invitedAt: number
     invitedByUserId: number
     joinedAt: number
@@ -23391,9 +23400,12 @@ export namespace Prisma {
     id?: true
     groupId?: true
     userId?: true
+    invitedEmail?: true
     role?: true
     inviteStatus?: true
     canEdit?: true
+    inviteToken?: true
+    inviteExpiresAt?: true
     invitedAt?: true
     invitedByUserId?: true
     joinedAt?: true
@@ -23404,9 +23416,12 @@ export namespace Prisma {
     id?: true
     groupId?: true
     userId?: true
+    invitedEmail?: true
     role?: true
     inviteStatus?: true
     canEdit?: true
+    inviteToken?: true
+    inviteExpiresAt?: true
     invitedAt?: true
     invitedByUserId?: true
     joinedAt?: true
@@ -23417,9 +23432,12 @@ export namespace Prisma {
     id?: true
     groupId?: true
     userId?: true
+    invitedEmail?: true
     role?: true
     inviteStatus?: true
     canEdit?: true
+    inviteToken?: true
+    inviteExpiresAt?: true
     invitedAt?: true
     invitedByUserId?: true
     joinedAt?: true
@@ -23502,10 +23520,13 @@ export namespace Prisma {
   export type GroupMemberGroupByOutputType = {
     id: string
     groupId: string
-    userId: string
+    userId: string | null
+    invitedEmail: string | null
     role: $Enums.GroupRole
     inviteStatus: $Enums.GroupInviteStatus
     canEdit: boolean
+    inviteToken: string | null
+    inviteExpiresAt: Date | null
     invitedAt: Date
     invitedByUserId: string | null
     joinedAt: Date | null
@@ -23533,87 +23554,102 @@ export namespace Prisma {
     id?: boolean
     groupId?: boolean
     userId?: boolean
+    invitedEmail?: boolean
     role?: boolean
     inviteStatus?: boolean
     canEdit?: boolean
+    inviteToken?: boolean
+    inviteExpiresAt?: boolean
     invitedAt?: boolean
     invitedByUserId?: boolean
     joinedAt?: boolean
     createdAt?: boolean
     group?: boolean | GroupDefaultArgs<ExtArgs>
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | GroupMember$userArgs<ExtArgs>
   }, ExtArgs["result"]["groupMember"]>
 
   export type GroupMemberSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     groupId?: boolean
     userId?: boolean
+    invitedEmail?: boolean
     role?: boolean
     inviteStatus?: boolean
     canEdit?: boolean
+    inviteToken?: boolean
+    inviteExpiresAt?: boolean
     invitedAt?: boolean
     invitedByUserId?: boolean
     joinedAt?: boolean
     createdAt?: boolean
     group?: boolean | GroupDefaultArgs<ExtArgs>
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | GroupMember$userArgs<ExtArgs>
   }, ExtArgs["result"]["groupMember"]>
 
   export type GroupMemberSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     groupId?: boolean
     userId?: boolean
+    invitedEmail?: boolean
     role?: boolean
     inviteStatus?: boolean
     canEdit?: boolean
+    inviteToken?: boolean
+    inviteExpiresAt?: boolean
     invitedAt?: boolean
     invitedByUserId?: boolean
     joinedAt?: boolean
     createdAt?: boolean
     group?: boolean | GroupDefaultArgs<ExtArgs>
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | GroupMember$userArgs<ExtArgs>
   }, ExtArgs["result"]["groupMember"]>
 
   export type GroupMemberSelectScalar = {
     id?: boolean
     groupId?: boolean
     userId?: boolean
+    invitedEmail?: boolean
     role?: boolean
     inviteStatus?: boolean
     canEdit?: boolean
+    inviteToken?: boolean
+    inviteExpiresAt?: boolean
     invitedAt?: boolean
     invitedByUserId?: boolean
     joinedAt?: boolean
     createdAt?: boolean
   }
 
-  export type GroupMemberOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "groupId" | "userId" | "role" | "inviteStatus" | "canEdit" | "invitedAt" | "invitedByUserId" | "joinedAt" | "createdAt", ExtArgs["result"]["groupMember"]>
+  export type GroupMemberOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "groupId" | "userId" | "invitedEmail" | "role" | "inviteStatus" | "canEdit" | "inviteToken" | "inviteExpiresAt" | "invitedAt" | "invitedByUserId" | "joinedAt" | "createdAt", ExtArgs["result"]["groupMember"]>
   export type GroupMemberInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     group?: boolean | GroupDefaultArgs<ExtArgs>
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | GroupMember$userArgs<ExtArgs>
   }
   export type GroupMemberIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     group?: boolean | GroupDefaultArgs<ExtArgs>
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | GroupMember$userArgs<ExtArgs>
   }
   export type GroupMemberIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     group?: boolean | GroupDefaultArgs<ExtArgs>
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | GroupMember$userArgs<ExtArgs>
   }
 
   export type $GroupMemberPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "GroupMember"
     objects: {
       group: Prisma.$GroupPayload<ExtArgs>
-      user: Prisma.$UserPayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       groupId: string
-      userId: string
+      userId: string | null
+      invitedEmail: string | null
       role: $Enums.GroupRole
       inviteStatus: $Enums.GroupInviteStatus
       canEdit: boolean
+      inviteToken: string | null
+      inviteExpiresAt: Date | null
       invitedAt: Date
       invitedByUserId: string | null
       joinedAt: Date | null
@@ -24013,7 +24049,7 @@ export namespace Prisma {
   export interface Prisma__GroupMemberClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     group<T extends GroupDefaultArgs<ExtArgs> = {}>(args?: Subset<T, GroupDefaultArgs<ExtArgs>>): Prisma__GroupClient<$Result.GetResult<Prisma.$GroupPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends GroupMember$userArgs<ExtArgs> = {}>(args?: Subset<T, GroupMember$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -24046,9 +24082,12 @@ export namespace Prisma {
     readonly id: FieldRef<"GroupMember", 'String'>
     readonly groupId: FieldRef<"GroupMember", 'String'>
     readonly userId: FieldRef<"GroupMember", 'String'>
+    readonly invitedEmail: FieldRef<"GroupMember", 'String'>
     readonly role: FieldRef<"GroupMember", 'GroupRole'>
     readonly inviteStatus: FieldRef<"GroupMember", 'GroupInviteStatus'>
     readonly canEdit: FieldRef<"GroupMember", 'Boolean'>
+    readonly inviteToken: FieldRef<"GroupMember", 'String'>
+    readonly inviteExpiresAt: FieldRef<"GroupMember", 'DateTime'>
     readonly invitedAt: FieldRef<"GroupMember", 'DateTime'>
     readonly invitedByUserId: FieldRef<"GroupMember", 'String'>
     readonly joinedAt: FieldRef<"GroupMember", 'DateTime'>
@@ -24446,6 +24485,25 @@ export namespace Prisma {
      * Limit how many GroupMembers to delete.
      */
     limit?: number
+  }
+
+  /**
+   * GroupMember.user
+   */
+  export type GroupMember$userArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
   }
 
   /**
@@ -28373,9 +28431,12 @@ export namespace Prisma {
     id: 'id',
     groupId: 'groupId',
     userId: 'userId',
+    invitedEmail: 'invitedEmail',
     role: 'role',
     inviteStatus: 'inviteStatus',
     canEdit: 'canEdit',
+    inviteToken: 'inviteToken',
+    inviteExpiresAt: 'inviteExpiresAt',
     invitedAt: 'invitedAt',
     invitedByUserId: 'invitedByUserId',
     joinedAt: 'joinedAt',
@@ -30925,25 +30986,31 @@ export namespace Prisma {
     NOT?: GroupMemberWhereInput | GroupMemberWhereInput[]
     id?: StringFilter<"GroupMember"> | string
     groupId?: StringFilter<"GroupMember"> | string
-    userId?: StringFilter<"GroupMember"> | string
+    userId?: StringNullableFilter<"GroupMember"> | string | null
+    invitedEmail?: StringNullableFilter<"GroupMember"> | string | null
     role?: EnumGroupRoleFilter<"GroupMember"> | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFilter<"GroupMember"> | $Enums.GroupInviteStatus
     canEdit?: BoolFilter<"GroupMember"> | boolean
+    inviteToken?: StringNullableFilter<"GroupMember"> | string | null
+    inviteExpiresAt?: DateTimeNullableFilter<"GroupMember"> | Date | string | null
     invitedAt?: DateTimeFilter<"GroupMember"> | Date | string
     invitedByUserId?: StringNullableFilter<"GroupMember"> | string | null
     joinedAt?: DateTimeNullableFilter<"GroupMember"> | Date | string | null
     createdAt?: DateTimeFilter<"GroupMember"> | Date | string
     group?: XOR<GroupScalarRelationFilter, GroupWhereInput>
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
   }
 
   export type GroupMemberOrderByWithRelationInput = {
     id?: SortOrder
     groupId?: SortOrder
-    userId?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    invitedEmail?: SortOrderInput | SortOrder
     role?: SortOrder
     inviteStatus?: SortOrder
     canEdit?: SortOrder
+    inviteToken?: SortOrderInput | SortOrder
+    inviteExpiresAt?: SortOrderInput | SortOrder
     invitedAt?: SortOrder
     invitedByUserId?: SortOrderInput | SortOrder
     joinedAt?: SortOrderInput | SortOrder
@@ -30954,30 +31021,37 @@ export namespace Prisma {
 
   export type GroupMemberWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    inviteToken?: string
     groupId_userId?: GroupMemberGroupIdUserIdCompoundUniqueInput
+    groupId_invitedEmail?: GroupMemberGroupIdInvitedEmailCompoundUniqueInput
     AND?: GroupMemberWhereInput | GroupMemberWhereInput[]
     OR?: GroupMemberWhereInput[]
     NOT?: GroupMemberWhereInput | GroupMemberWhereInput[]
     groupId?: StringFilter<"GroupMember"> | string
-    userId?: StringFilter<"GroupMember"> | string
+    userId?: StringNullableFilter<"GroupMember"> | string | null
+    invitedEmail?: StringNullableFilter<"GroupMember"> | string | null
     role?: EnumGroupRoleFilter<"GroupMember"> | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFilter<"GroupMember"> | $Enums.GroupInviteStatus
     canEdit?: BoolFilter<"GroupMember"> | boolean
+    inviteExpiresAt?: DateTimeNullableFilter<"GroupMember"> | Date | string | null
     invitedAt?: DateTimeFilter<"GroupMember"> | Date | string
     invitedByUserId?: StringNullableFilter<"GroupMember"> | string | null
     joinedAt?: DateTimeNullableFilter<"GroupMember"> | Date | string | null
     createdAt?: DateTimeFilter<"GroupMember"> | Date | string
     group?: XOR<GroupScalarRelationFilter, GroupWhereInput>
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
-  }, "id" | "groupId_userId">
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+  }, "id" | "inviteToken" | "groupId_userId" | "groupId_invitedEmail">
 
   export type GroupMemberOrderByWithAggregationInput = {
     id?: SortOrder
     groupId?: SortOrder
-    userId?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    invitedEmail?: SortOrderInput | SortOrder
     role?: SortOrder
     inviteStatus?: SortOrder
     canEdit?: SortOrder
+    inviteToken?: SortOrderInput | SortOrder
+    inviteExpiresAt?: SortOrderInput | SortOrder
     invitedAt?: SortOrder
     invitedByUserId?: SortOrderInput | SortOrder
     joinedAt?: SortOrderInput | SortOrder
@@ -30993,10 +31067,13 @@ export namespace Prisma {
     NOT?: GroupMemberScalarWhereWithAggregatesInput | GroupMemberScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"GroupMember"> | string
     groupId?: StringWithAggregatesFilter<"GroupMember"> | string
-    userId?: StringWithAggregatesFilter<"GroupMember"> | string
+    userId?: StringNullableWithAggregatesFilter<"GroupMember"> | string | null
+    invitedEmail?: StringNullableWithAggregatesFilter<"GroupMember"> | string | null
     role?: EnumGroupRoleWithAggregatesFilter<"GroupMember"> | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusWithAggregatesFilter<"GroupMember"> | $Enums.GroupInviteStatus
     canEdit?: BoolWithAggregatesFilter<"GroupMember"> | boolean
+    inviteToken?: StringNullableWithAggregatesFilter<"GroupMember"> | string | null
+    inviteExpiresAt?: DateTimeNullableWithAggregatesFilter<"GroupMember"> | Date | string | null
     invitedAt?: DateTimeWithAggregatesFilter<"GroupMember"> | Date | string
     invitedByUserId?: StringNullableWithAggregatesFilter<"GroupMember"> | string | null
     joinedAt?: DateTimeNullableWithAggregatesFilter<"GroupMember"> | Date | string | null
@@ -33562,24 +33639,30 @@ export namespace Prisma {
 
   export type GroupMemberCreateInput = {
     id?: string
+    invitedEmail?: string | null
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    inviteToken?: string | null
+    inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
     invitedByUserId?: string | null
     joinedAt?: Date | string | null
     createdAt?: Date | string
     group: GroupCreateNestedOneWithoutMembersInput
-    user: UserCreateNestedOneWithoutGroupMembershipsInput
+    user?: UserCreateNestedOneWithoutGroupMembershipsInput
   }
 
   export type GroupMemberUncheckedCreateInput = {
     id?: string
     groupId: string
-    userId: string
+    userId?: string | null
+    invitedEmail?: string | null
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    inviteToken?: string | null
+    inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
     invitedByUserId?: string | null
     joinedAt?: Date | string | null
@@ -33588,24 +33671,30 @@ export namespace Prisma {
 
   export type GroupMemberUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    invitedEmail?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
+    inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     invitedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
     joinedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     group?: GroupUpdateOneRequiredWithoutMembersNestedInput
-    user?: UserUpdateOneRequiredWithoutGroupMembershipsNestedInput
+    user?: UserUpdateOneWithoutGroupMembershipsNestedInput
   }
 
   export type GroupMemberUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     groupId?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    invitedEmail?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
+    inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     invitedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
     joinedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -33615,10 +33704,13 @@ export namespace Prisma {
   export type GroupMemberCreateManyInput = {
     id?: string
     groupId: string
-    userId: string
+    userId?: string | null
+    invitedEmail?: string | null
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    inviteToken?: string | null
+    inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
     invitedByUserId?: string | null
     joinedAt?: Date | string | null
@@ -33627,9 +33719,12 @@ export namespace Prisma {
 
   export type GroupMemberUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    invitedEmail?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
+    inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     invitedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
     joinedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -33639,10 +33734,13 @@ export namespace Prisma {
   export type GroupMemberUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
     groupId?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    invitedEmail?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
+    inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     invitedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
     joinedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -35941,18 +36039,31 @@ export namespace Prisma {
     isNot?: GroupWhereInput
   }
 
+  export type UserNullableScalarRelationFilter = {
+    is?: UserWhereInput | null
+    isNot?: UserWhereInput | null
+  }
+
   export type GroupMemberGroupIdUserIdCompoundUniqueInput = {
     groupId: string
     userId: string
+  }
+
+  export type GroupMemberGroupIdInvitedEmailCompoundUniqueInput = {
+    groupId: string
+    invitedEmail: string
   }
 
   export type GroupMemberCountOrderByAggregateInput = {
     id?: SortOrder
     groupId?: SortOrder
     userId?: SortOrder
+    invitedEmail?: SortOrder
     role?: SortOrder
     inviteStatus?: SortOrder
     canEdit?: SortOrder
+    inviteToken?: SortOrder
+    inviteExpiresAt?: SortOrder
     invitedAt?: SortOrder
     invitedByUserId?: SortOrder
     joinedAt?: SortOrder
@@ -35963,9 +36074,12 @@ export namespace Prisma {
     id?: SortOrder
     groupId?: SortOrder
     userId?: SortOrder
+    invitedEmail?: SortOrder
     role?: SortOrder
     inviteStatus?: SortOrder
     canEdit?: SortOrder
+    inviteToken?: SortOrder
+    inviteExpiresAt?: SortOrder
     invitedAt?: SortOrder
     invitedByUserId?: SortOrder
     joinedAt?: SortOrder
@@ -35976,9 +36090,12 @@ export namespace Prisma {
     id?: SortOrder
     groupId?: SortOrder
     userId?: SortOrder
+    invitedEmail?: SortOrder
     role?: SortOrder
     inviteStatus?: SortOrder
     canEdit?: SortOrder
+    inviteToken?: SortOrder
+    inviteExpiresAt?: SortOrder
     invitedAt?: SortOrder
     invitedByUserId?: SortOrder
     joinedAt?: SortOrder
@@ -36084,11 +36201,6 @@ export namespace Prisma {
     in?: $Enums.ShareStatus[] | ListEnumShareStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.ShareStatus[] | ListEnumShareStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumShareStatusFilter<$PrismaModel> | $Enums.ShareStatus
-  }
-
-  export type UserNullableScalarRelationFilter = {
-    is?: UserWhereInput | null
-    isNot?: UserWhereInput | null
   }
 
   export type ContactShareCountOrderByAggregateInput = {
@@ -38142,10 +38254,12 @@ export namespace Prisma {
     update?: XOR<XOR<GroupUpdateToOneWithWhereWithoutMembersInput, GroupUpdateWithoutMembersInput>, GroupUncheckedUpdateWithoutMembersInput>
   }
 
-  export type UserUpdateOneRequiredWithoutGroupMembershipsNestedInput = {
+  export type UserUpdateOneWithoutGroupMembershipsNestedInput = {
     create?: XOR<UserCreateWithoutGroupMembershipsInput, UserUncheckedCreateWithoutGroupMembershipsInput>
     connectOrCreate?: UserCreateOrConnectWithoutGroupMembershipsInput
     upsert?: UserUpsertWithoutGroupMembershipsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutGroupMembershipsInput, UserUpdateWithoutGroupMembershipsInput>, UserUncheckedUpdateWithoutGroupMembershipsInput>
   }
@@ -39637,9 +39751,12 @@ export namespace Prisma {
 
   export type GroupMemberCreateWithoutUserInput = {
     id?: string
+    invitedEmail?: string | null
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    inviteToken?: string | null
+    inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
     invitedByUserId?: string | null
     joinedAt?: Date | string | null
@@ -39650,9 +39767,12 @@ export namespace Prisma {
   export type GroupMemberUncheckedCreateWithoutUserInput = {
     id?: string
     groupId: string
+    invitedEmail?: string | null
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    inviteToken?: string | null
+    inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
     invitedByUserId?: string | null
     joinedAt?: Date | string | null
@@ -40237,10 +40357,13 @@ export namespace Prisma {
     NOT?: GroupMemberScalarWhereInput | GroupMemberScalarWhereInput[]
     id?: StringFilter<"GroupMember"> | string
     groupId?: StringFilter<"GroupMember"> | string
-    userId?: StringFilter<"GroupMember"> | string
+    userId?: StringNullableFilter<"GroupMember"> | string | null
+    invitedEmail?: StringNullableFilter<"GroupMember"> | string | null
     role?: EnumGroupRoleFilter<"GroupMember"> | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFilter<"GroupMember"> | $Enums.GroupInviteStatus
     canEdit?: BoolFilter<"GroupMember"> | boolean
+    inviteToken?: StringNullableFilter<"GroupMember"> | string | null
+    inviteExpiresAt?: DateTimeNullableFilter<"GroupMember"> | Date | string | null
     invitedAt?: DateTimeFilter<"GroupMember"> | Date | string
     invitedByUserId?: StringNullableFilter<"GroupMember"> | string | null
     joinedAt?: DateTimeNullableFilter<"GroupMember"> | Date | string | null
@@ -45274,22 +45397,28 @@ export namespace Prisma {
 
   export type GroupMemberCreateWithoutGroupInput = {
     id?: string
+    invitedEmail?: string | null
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    inviteToken?: string | null
+    inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
     invitedByUserId?: string | null
     joinedAt?: Date | string | null
     createdAt?: Date | string
-    user: UserCreateNestedOneWithoutGroupMembershipsInput
+    user?: UserCreateNestedOneWithoutGroupMembershipsInput
   }
 
   export type GroupMemberUncheckedCreateWithoutGroupInput = {
     id?: string
-    userId: string
+    userId?: string | null
+    invitedEmail?: string | null
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    inviteToken?: string | null
+    inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
     invitedByUserId?: string | null
     joinedAt?: Date | string | null
@@ -47061,9 +47190,12 @@ export namespace Prisma {
   export type GroupMemberCreateManyUserInput = {
     id?: string
     groupId: string
+    invitedEmail?: string | null
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    inviteToken?: string | null
+    inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
     invitedByUserId?: string | null
     joinedAt?: Date | string | null
@@ -47793,9 +47925,12 @@ export namespace Prisma {
 
   export type GroupMemberUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
+    invitedEmail?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
+    inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     invitedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
     joinedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -47806,9 +47941,12 @@ export namespace Prisma {
   export type GroupMemberUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     groupId?: StringFieldUpdateOperationsInput | string
+    invitedEmail?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
+    inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     invitedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
     joinedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -47818,9 +47956,12 @@ export namespace Prisma {
   export type GroupMemberUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     groupId?: StringFieldUpdateOperationsInput | string
+    invitedEmail?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
+    inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     invitedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
     joinedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -49583,10 +49724,13 @@ export namespace Prisma {
 
   export type GroupMemberCreateManyGroupInput = {
     id?: string
-    userId: string
+    userId?: string | null
+    invitedEmail?: string | null
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    inviteToken?: string | null
+    inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
     invitedByUserId?: string | null
     joinedAt?: Date | string | null
@@ -49604,22 +49748,28 @@ export namespace Prisma {
 
   export type GroupMemberUpdateWithoutGroupInput = {
     id?: StringFieldUpdateOperationsInput | string
+    invitedEmail?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
+    inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     invitedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
     joinedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutGroupMembershipsNestedInput
+    user?: UserUpdateOneWithoutGroupMembershipsNestedInput
   }
 
   export type GroupMemberUncheckedUpdateWithoutGroupInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    invitedEmail?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
+    inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     invitedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
     joinedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -49628,10 +49778,13 @@ export namespace Prisma {
 
   export type GroupMemberUncheckedUpdateManyWithoutGroupInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    invitedEmail?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
+    inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     invitedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
     joinedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null

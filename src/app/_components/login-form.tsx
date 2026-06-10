@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, type FormEvent } from "react";
 
-export function LoginForm() {
+export function LoginForm({ next }: { next?: string }) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -34,7 +34,7 @@ export function LoginForm() {
       return;
     }
 
-    router.push("/");
+    router.push(next ?? "/");
     router.refresh();
   };
 
@@ -88,7 +88,10 @@ export function LoginForm() {
 
       <p className="mt-6 text-sm text-slate-300">
         New to Kontax?{" "}
-        <Link className="font-semibold text-cyan-200 hover:text-cyan-100" href="/register">
+        <Link
+          className="font-semibold text-cyan-200 hover:text-cyan-100"
+          href={next ? `/register?next=${encodeURIComponent(next)}` : "/register"}
+        >
           Create an account
         </Link>
       </p>

@@ -3,11 +3,19 @@ import { redirect } from "next/navigation";
 import { RegisterForm } from "~/app/_components/register-form";
 import { auth } from "~/server/auth";
 
-export default async function RegisterPage() {
+export default async function RegisterPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const session = await auth();
+  const params = searchParams ? await searchParams : undefined;
+  const rawNext = params?.next;
+  const nextParam = Array.isArray(rawNext) ? rawNext[0] : rawNext;
+  const next = nextParam?.startsWith("/") ? nextParam : undefined;
 
   if (session?.user) {
-    redirect("/");
+    redirect(next ?? "/");
   }
 
   return (
@@ -23,7 +31,7 @@ export default async function RegisterPage() {
             saved people, and future contact tools.
           </p>
         </section>
-        <RegisterForm />
+        <RegisterForm next={next} />
       </div>
     </main>
   );

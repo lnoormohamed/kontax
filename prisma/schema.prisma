@@ -629,21 +629,28 @@ model Group {
 model GroupMember {
     id           String            @id @default(cuid())
     groupId      String
-    userId       String
+    // userId is null for an invite sent to an email that has no Kontax account
+    // yet; it is linked on accept/registration (mirrors ContactShare).
+    userId       String?
+    invitedEmail String?
     role         GroupRole         @default(MEMBER)
     inviteStatus GroupInviteStatus @default(PENDING)
-    // P13-01: edit permission (admin can set view-only), invite/accept tracking.
+    // P13-01/02: edit permission, invite token (48h), and invite/accept tracking.
     canEdit         Boolean        @default(true)
+    inviteToken     String?        @unique
+    inviteExpiresAt DateTime?
     invitedAt       DateTime       @default(now())
     invitedByUserId String?
     joinedAt        DateTime?
     createdAt    DateTime          @default(now())
     group        Group             @relation(fields: [groupId], references: [id], onDelete: Cascade)
-    user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user         User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@unique([groupId, userId])
+    @@unique([groupId, invitedEmail])
     @@index([userId, inviteStatus])
     @@index([groupId, inviteStatus])
+    @@index([invitedEmail, inviteStatus])
 }
 
 model GroupAddressBook {

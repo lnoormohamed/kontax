@@ -56,5 +56,16 @@ export async function POST(request: NextRequest) {
     data: { recipientUserId: user.id },
   });
 
+  // P13-02: link pending family invites addressed to this email to the new
+  // account so the join link resolves to them after registration.
+  await db.groupMember.updateMany({
+    where: {
+      invitedEmail: parsedBody.data.email,
+      userId: null,
+      inviteStatus: "PENDING",
+    },
+    data: { userId: user.id },
+  });
+
   return NextResponse.json({ ok: true }, { status: 201 });
 }

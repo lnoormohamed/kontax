@@ -3,11 +3,20 @@ import { redirect } from "next/navigation";
 import { LoginForm } from "~/app/_components/login-form";
 import { auth } from "~/server/auth";
 
-export default async function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const session = await auth();
+  const params = searchParams ? await searchParams : undefined;
+  const rawNext = params?.next;
+  const nextParam = Array.isArray(rawNext) ? rawNext[0] : rawNext;
+  // Only allow same-app relative paths as a return target.
+  const next = nextParam?.startsWith("/") ? nextParam : undefined;
 
   if (session?.user) {
-    redirect("/");
+    redirect(next ?? "/");
   }
 
   return (
@@ -23,7 +32,7 @@ export default async function LoginPage() {
             organized, and easy to find.
           </p>
         </section>
-        <LoginForm />
+        <LoginForm next={next} />
       </div>
     </main>
   );

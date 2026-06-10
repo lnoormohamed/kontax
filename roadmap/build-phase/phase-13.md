@@ -20,7 +20,7 @@ Make the Family plan a real product by letting family members share a common add
 | Ticket | Status | Priority | Depends On |
 | --- | --- | --- | --- |
 | P13-01 | Done | P0 | P11-02 |
-| P13-02 | Not Started | P0 | P13-01 |
+| P13-02 | Done | P0 | P13-01 |
 | P13-03 | Not Started | P0 | P13-01, P10-01, P10-02 |
 | P13-04 | Not Started | P1 | P13-02, P13-03, P10-01 |
 | P13-05 | Not Started | P1 | P13-04 |
@@ -69,7 +69,7 @@ Make the Family plan a real product by letting family members share a common add
 ---
 
 ## P13-02 — Family group creation and invite flow
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P0`
 - Dependencies: `P13-01`
 - Implementation Notes:
