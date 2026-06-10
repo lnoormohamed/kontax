@@ -202,7 +202,7 @@ export function CreateContactForm() {
   };
 
   return (
-    <main className="min-h-screen bg-[#f4f6f2] text-[#1d2823]">
+    <div className="text-[#1d2823]">
       <form action={createContact}>
         {Object.entries(hidden).map(([name, value]) => (
           <input key={name} name={name} type="hidden" value={value} />
@@ -397,6 +397,6 @@ export function CreateContactForm() {
           ) : null}
         </div>
       </form>
-    </main>
+    </div>
   );
 }
