@@ -427,6 +427,8 @@ exports.Prisma.GroupScalarFieldEnum = {
   name: 'name',
   subscriptionId: 'subscriptionId',
   memberSlotsLimit: 'memberSlotsLimit',
+  maxMembers: 'maxMembers',
+  defaultAddressBookId: 'defaultAddressBookId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -437,6 +439,10 @@ exports.Prisma.GroupMemberScalarFieldEnum = {
   userId: 'userId',
   role: 'role',
   inviteStatus: 'inviteStatus',
+  canEdit: 'canEdit',
+  invitedAt: 'invitedAt',
+  invitedByUserId: 'invitedByUserId',
+  joinedAt: 'joinedAt',
   createdAt: 'createdAt'
 };
 
@@ -445,6 +451,16 @@ exports.Prisma.GroupAddressBookScalarFieldEnum = {
   groupId: 'groupId',
   name: 'name',
   description: 'description',
+  isDefault: 'isDefault',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.GroupContactScalarFieldEnum = {
+  id: 'id',
+  groupAddressBookId: 'groupAddressBookId',
+  contactId: 'contactId',
+  addedByUserId: 'addedByUserId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -718,6 +734,7 @@ exports.Prisma.ModelName = {
   Group: 'Group',
   GroupMember: 'GroupMember',
   GroupAddressBook: 'GroupAddressBook',
+  GroupContact: 'GroupContact',
   ContactShare: 'ContactShare'
 };
 

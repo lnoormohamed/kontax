@@ -223,6 +223,7 @@ model Contact {
     activityEvents ActivityEvent[]
     sharesFromContact     ContactShare[] @relation("ShareSourceContact")
     sharesAsRecipientCopy ContactShare[] @relation("ShareRecipientContact")
+    groupContacts         GroupContact[]
     mergedIntoContactId String?
     mergedIntoContact Contact? @relation("ContactMergeLineage", fields: [mergedIntoContactId], references: [id], onDelete: SetNull)
     mergedChildren Contact[] @relation("ContactMergeLineage")
@@ -611,6 +612,9 @@ model Group {
     name           String
     subscriptionId String?
     memberSlotsLimit Int?
+    // P13-01: operational fields. Family v1 caps at 6 members (owner + 5).
+    maxMembers     Int                @default(6)
+    defaultAddressBookId String?
     createdAt      DateTime           @default(now())
     updatedAt      DateTime           @updatedAt
     owner          User               @relation("GroupOwner", fields: [ownerId], references: [id], onDelete: Cascade)
@@ -628,12 +632,18 @@ model GroupMember {
     userId       String
     role         GroupRole         @default(MEMBER)
     inviteStatus GroupInviteStatus @default(PENDING)
+    // P13-01: edit permission (admin can set view-only), invite/accept tracking.
+    canEdit         Boolean        @default(true)
+    invitedAt       DateTime       @default(now())
+    invitedByUserId String?
+    joinedAt        DateTime?
     createdAt    DateTime          @default(now())
     group        Group             @relation(fields: [groupId], references: [id], onDelete: Cascade)
     user         User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@unique([groupId, userId])
     @@index([userId, inviteStatus])
+    @@index([groupId, inviteStatus])
 }
 
 model GroupAddressBook {
@@ -641,11 +651,33 @@ model GroupAddressBook {
     groupId     String
     name        String
     description String?
+    // P13-01: Family v1 has a single default book; Teams may have several.
+    isDefault   Boolean  @default(true)
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
     group       Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
+    contacts    GroupContact[]
 
     @@index([groupId])
+}
+
+// P13-01: a contact that lives in a shared address book. The contact is owned
+// by the group (nominally the group owner's userId on the Contact row); access
+// and mutation are gated by GroupMember, not Contact.userId. "Add to family
+// book" creates a new Contact + GroupContact (a copy, not a move).
+model GroupContact {
+    id                 String           @id @default(cuid())
+    groupAddressBookId String
+    contactId          String
+    addedByUserId      String
+    createdAt          DateTime         @default(now())
+    updatedAt          DateTime         @updatedAt
+    groupAddressBook   GroupAddressBook @relation(fields: [groupAddressBookId], references: [id], onDelete: Cascade)
+    contact            Contact          @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+    @@unique([groupAddressBookId, contactId])
+    @@index([groupAddressBookId, updatedAt])
+    @@index([contactId])
 }
 
 // --- Contact sharing (Phase 12) ----------------------------------------------

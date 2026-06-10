@@ -99,6 +99,11 @@ export type GroupMember = $Result.DefaultSelection<Prisma.$GroupMemberPayload>
  */
 export type GroupAddressBook = $Result.DefaultSelection<Prisma.$GroupAddressBookPayload>
 /**
+ * Model GroupContact
+ * 
+ */
+export type GroupContact = $Result.DefaultSelection<Prisma.$GroupContactPayload>
+/**
  * Model ContactShare
  * 
  */
@@ -802,6 +807,16 @@ export class PrismaClient<
   get groupAddressBook(): Prisma.GroupAddressBookDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.groupContact`: Exposes CRUD operations for the **GroupContact** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more GroupContacts
+    * const groupContacts = await prisma.groupContact.findMany()
+    * ```
+    */
+  get groupContact(): Prisma.GroupContactDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.contactShare`: Exposes CRUD operations for the **ContactShare** model.
     * Example usage:
     * ```ts
@@ -1268,6 +1283,7 @@ export namespace Prisma {
     Group: 'Group',
     GroupMember: 'GroupMember',
     GroupAddressBook: 'GroupAddressBook',
+    GroupContact: 'GroupContact',
     ContactShare: 'ContactShare'
   };
 
@@ -1287,7 +1303,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncContactLink" | "syncJob" | "syncConflict" | "activityEvent" | "group" | "groupMember" | "groupAddressBook" | "contactShare"
+      modelProps: "user" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncContactLink" | "syncJob" | "syncConflict" | "activityEvent" | "group" | "groupMember" | "groupAddressBook" | "groupContact" | "contactShare"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2549,6 +2565,80 @@ export namespace Prisma {
           }
         }
       }
+      GroupContact: {
+        payload: Prisma.$GroupContactPayload<ExtArgs>
+        fields: Prisma.GroupContactFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.GroupContactFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GroupContactPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.GroupContactFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GroupContactPayload>
+          }
+          findFirst: {
+            args: Prisma.GroupContactFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GroupContactPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.GroupContactFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GroupContactPayload>
+          }
+          findMany: {
+            args: Prisma.GroupContactFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GroupContactPayload>[]
+          }
+          create: {
+            args: Prisma.GroupContactCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GroupContactPayload>
+          }
+          createMany: {
+            args: Prisma.GroupContactCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.GroupContactCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GroupContactPayload>[]
+          }
+          delete: {
+            args: Prisma.GroupContactDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GroupContactPayload>
+          }
+          update: {
+            args: Prisma.GroupContactUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GroupContactPayload>
+          }
+          deleteMany: {
+            args: Prisma.GroupContactDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.GroupContactUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.GroupContactUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GroupContactPayload>[]
+          }
+          upsert: {
+            args: Prisma.GroupContactUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$GroupContactPayload>
+          }
+          aggregate: {
+            args: Prisma.GroupContactAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateGroupContact>
+          }
+          groupBy: {
+            args: Prisma.GroupContactGroupByArgs<ExtArgs>
+            result: $Utils.Optional<GroupContactGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.GroupContactCountArgs<ExtArgs>
+            result: $Utils.Optional<GroupContactCountAggregateOutputType> | number
+          }
+        }
+      }
       ContactShare: {
         payload: Prisma.$ContactSharePayload<ExtArgs>
         fields: Prisma.ContactShareFieldRefs
@@ -2736,6 +2826,7 @@ export namespace Prisma {
     group?: GroupOmit
     groupMember?: GroupMemberOmit
     groupAddressBook?: GroupAddressBookOmit
+    groupContact?: GroupContactOmit
     contactShare?: ContactShareOmit
   }
 
@@ -2994,6 +3085,7 @@ export namespace Prisma {
     activityEvents: number
     sharesFromContact: number
     sharesAsRecipientCopy: number
+    groupContacts: number
     mergedChildren: number
   }
 
@@ -3005,6 +3097,7 @@ export namespace Prisma {
     activityEvents?: boolean | ContactCountOutputTypeCountActivityEventsArgs
     sharesFromContact?: boolean | ContactCountOutputTypeCountSharesFromContactArgs
     sharesAsRecipientCopy?: boolean | ContactCountOutputTypeCountSharesAsRecipientCopyArgs
+    groupContacts?: boolean | ContactCountOutputTypeCountGroupContactsArgs
     mergedChildren?: boolean | ContactCountOutputTypeCountMergedChildrenArgs
   }
 
@@ -3066,6 +3159,13 @@ export namespace Prisma {
    */
   export type ContactCountOutputTypeCountSharesAsRecipientCopyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ContactShareWhereInput
+  }
+
+  /**
+   * ContactCountOutputType without action
+   */
+  export type ContactCountOutputTypeCountGroupContactsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: GroupContactWhereInput
   }
 
   /**
@@ -3317,6 +3417,37 @@ export namespace Prisma {
    */
   export type GroupCountOutputTypeCountAddressBooksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: GroupAddressBookWhereInput
+  }
+
+
+  /**
+   * Count Type GroupAddressBookCountOutputType
+   */
+
+  export type GroupAddressBookCountOutputType = {
+    contacts: number
+  }
+
+  export type GroupAddressBookCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    contacts?: boolean | GroupAddressBookCountOutputTypeCountContactsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * GroupAddressBookCountOutputType without action
+   */
+  export type GroupAddressBookCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GroupAddressBookCountOutputType
+     */
+    select?: GroupAddressBookCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * GroupAddressBookCountOutputType without action
+   */
+  export type GroupAddressBookCountOutputTypeCountContactsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: GroupContactWhereInput
   }
 
 
@@ -6418,6 +6549,7 @@ export namespace Prisma {
     activityEvents?: boolean | Contact$activityEventsArgs<ExtArgs>
     sharesFromContact?: boolean | Contact$sharesFromContactArgs<ExtArgs>
     sharesAsRecipientCopy?: boolean | Contact$sharesAsRecipientCopyArgs<ExtArgs>
+    groupContacts?: boolean | Contact$groupContactsArgs<ExtArgs>
     mergedIntoContact?: boolean | Contact$mergedIntoContactArgs<ExtArgs>
     mergedChildren?: boolean | Contact$mergedChildrenArgs<ExtArgs>
     _count?: boolean | ContactCountOutputTypeDefaultArgs<ExtArgs>
@@ -6590,6 +6722,7 @@ export namespace Prisma {
     activityEvents?: boolean | Contact$activityEventsArgs<ExtArgs>
     sharesFromContact?: boolean | Contact$sharesFromContactArgs<ExtArgs>
     sharesAsRecipientCopy?: boolean | Contact$sharesAsRecipientCopyArgs<ExtArgs>
+    groupContacts?: boolean | Contact$groupContactsArgs<ExtArgs>
     mergedIntoContact?: boolean | Contact$mergedIntoContactArgs<ExtArgs>
     mergedChildren?: boolean | Contact$mergedChildrenArgs<ExtArgs>
     _count?: boolean | ContactCountOutputTypeDefaultArgs<ExtArgs>
@@ -6617,6 +6750,7 @@ export namespace Prisma {
       activityEvents: Prisma.$ActivityEventPayload<ExtArgs>[]
       sharesFromContact: Prisma.$ContactSharePayload<ExtArgs>[]
       sharesAsRecipientCopy: Prisma.$ContactSharePayload<ExtArgs>[]
+      groupContacts: Prisma.$GroupContactPayload<ExtArgs>[]
       mergedIntoContact: Prisma.$ContactPayload<ExtArgs> | null
       mergedChildren: Prisma.$ContactPayload<ExtArgs>[]
     }
@@ -7071,6 +7205,7 @@ export namespace Prisma {
     activityEvents<T extends Contact$activityEventsArgs<ExtArgs> = {}>(args?: Subset<T, Contact$activityEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActivityEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sharesFromContact<T extends Contact$sharesFromContactArgs<ExtArgs> = {}>(args?: Subset<T, Contact$sharesFromContactArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactSharePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sharesAsRecipientCopy<T extends Contact$sharesAsRecipientCopyArgs<ExtArgs> = {}>(args?: Subset<T, Contact$sharesAsRecipientCopyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactSharePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    groupContacts<T extends Contact$groupContactsArgs<ExtArgs> = {}>(args?: Subset<T, Contact$groupContactsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GroupContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     mergedIntoContact<T extends Contact$mergedIntoContactArgs<ExtArgs> = {}>(args?: Subset<T, Contact$mergedIntoContactArgs<ExtArgs>>): Prisma__ContactClient<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     mergedChildren<T extends Contact$mergedChildrenArgs<ExtArgs> = {}>(args?: Subset<T, Contact$mergedChildrenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
@@ -7729,6 +7864,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ContactShareScalarFieldEnum | ContactShareScalarFieldEnum[]
+  }
+
+  /**
+   * Contact.groupContacts
+   */
+  export type Contact$groupContactsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GroupContact
+     */
+    select?: GroupContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GroupContact
+     */
+    omit?: GroupContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GroupContactInclude<ExtArgs> | null
+    where?: GroupContactWhereInput
+    orderBy?: GroupContactOrderByWithRelationInput | GroupContactOrderByWithRelationInput[]
+    cursor?: GroupContactWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: GroupContactScalarFieldEnum | GroupContactScalarFieldEnum[]
   }
 
   /**
@@ -21945,10 +22104,12 @@ export namespace Prisma {
 
   export type GroupAvgAggregateOutputType = {
     memberSlotsLimit: number | null
+    maxMembers: number | null
   }
 
   export type GroupSumAggregateOutputType = {
     memberSlotsLimit: number | null
+    maxMembers: number | null
   }
 
   export type GroupMinAggregateOutputType = {
@@ -21958,6 +22119,8 @@ export namespace Prisma {
     name: string | null
     subscriptionId: string | null
     memberSlotsLimit: number | null
+    maxMembers: number | null
+    defaultAddressBookId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -21969,6 +22132,8 @@ export namespace Prisma {
     name: string | null
     subscriptionId: string | null
     memberSlotsLimit: number | null
+    maxMembers: number | null
+    defaultAddressBookId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -21980,6 +22145,8 @@ export namespace Prisma {
     name: number
     subscriptionId: number
     memberSlotsLimit: number
+    maxMembers: number
+    defaultAddressBookId: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -21988,10 +22155,12 @@ export namespace Prisma {
 
   export type GroupAvgAggregateInputType = {
     memberSlotsLimit?: true
+    maxMembers?: true
   }
 
   export type GroupSumAggregateInputType = {
     memberSlotsLimit?: true
+    maxMembers?: true
   }
 
   export type GroupMinAggregateInputType = {
@@ -22001,6 +22170,8 @@ export namespace Prisma {
     name?: true
     subscriptionId?: true
     memberSlotsLimit?: true
+    maxMembers?: true
+    defaultAddressBookId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -22012,6 +22183,8 @@ export namespace Prisma {
     name?: true
     subscriptionId?: true
     memberSlotsLimit?: true
+    maxMembers?: true
+    defaultAddressBookId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -22023,6 +22196,8 @@ export namespace Prisma {
     name?: true
     subscriptionId?: true
     memberSlotsLimit?: true
+    maxMembers?: true
+    defaultAddressBookId?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -22121,6 +22296,8 @@ export namespace Prisma {
     name: string
     subscriptionId: string | null
     memberSlotsLimit: number | null
+    maxMembers: number
+    defaultAddressBookId: string | null
     createdAt: Date
     updatedAt: Date
     _count: GroupCountAggregateOutputType | null
@@ -22151,6 +22328,8 @@ export namespace Prisma {
     name?: boolean
     subscriptionId?: boolean
     memberSlotsLimit?: boolean
+    maxMembers?: boolean
+    defaultAddressBookId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     owner?: boolean | UserDefaultArgs<ExtArgs>
@@ -22167,6 +22346,8 @@ export namespace Prisma {
     name?: boolean
     subscriptionId?: boolean
     memberSlotsLimit?: boolean
+    maxMembers?: boolean
+    defaultAddressBookId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     owner?: boolean | UserDefaultArgs<ExtArgs>
@@ -22180,6 +22361,8 @@ export namespace Prisma {
     name?: boolean
     subscriptionId?: boolean
     memberSlotsLimit?: boolean
+    maxMembers?: boolean
+    defaultAddressBookId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     owner?: boolean | UserDefaultArgs<ExtArgs>
@@ -22193,11 +22376,13 @@ export namespace Prisma {
     name?: boolean
     subscriptionId?: boolean
     memberSlotsLimit?: boolean
+    maxMembers?: boolean
+    defaultAddressBookId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type GroupOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerId" | "type" | "name" | "subscriptionId" | "memberSlotsLimit" | "createdAt" | "updatedAt", ExtArgs["result"]["group"]>
+  export type GroupOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerId" | "type" | "name" | "subscriptionId" | "memberSlotsLimit" | "maxMembers" | "defaultAddressBookId" | "createdAt" | "updatedAt", ExtArgs["result"]["group"]>
   export type GroupInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     owner?: boolean | UserDefaultArgs<ExtArgs>
     subscription?: boolean | Group$subscriptionArgs<ExtArgs>
@@ -22229,6 +22414,8 @@ export namespace Prisma {
       name: string
       subscriptionId: string | null
       memberSlotsLimit: number | null
+      maxMembers: number
+      defaultAddressBookId: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["group"]>
@@ -22664,6 +22851,8 @@ export namespace Prisma {
     readonly name: FieldRef<"Group", 'String'>
     readonly subscriptionId: FieldRef<"Group", 'String'>
     readonly memberSlotsLimit: FieldRef<"Group", 'Int'>
+    readonly maxMembers: FieldRef<"Group", 'Int'>
+    readonly defaultAddressBookId: FieldRef<"Group", 'String'>
     readonly createdAt: FieldRef<"Group", 'DateTime'>
     readonly updatedAt: FieldRef<"Group", 'DateTime'>
   }
@@ -23163,6 +23352,10 @@ export namespace Prisma {
     userId: string | null
     role: $Enums.GroupRole | null
     inviteStatus: $Enums.GroupInviteStatus | null
+    canEdit: boolean | null
+    invitedAt: Date | null
+    invitedByUserId: string | null
+    joinedAt: Date | null
     createdAt: Date | null
   }
 
@@ -23172,6 +23365,10 @@ export namespace Prisma {
     userId: string | null
     role: $Enums.GroupRole | null
     inviteStatus: $Enums.GroupInviteStatus | null
+    canEdit: boolean | null
+    invitedAt: Date | null
+    invitedByUserId: string | null
+    joinedAt: Date | null
     createdAt: Date | null
   }
 
@@ -23181,6 +23378,10 @@ export namespace Prisma {
     userId: number
     role: number
     inviteStatus: number
+    canEdit: number
+    invitedAt: number
+    invitedByUserId: number
+    joinedAt: number
     createdAt: number
     _all: number
   }
@@ -23192,6 +23393,10 @@ export namespace Prisma {
     userId?: true
     role?: true
     inviteStatus?: true
+    canEdit?: true
+    invitedAt?: true
+    invitedByUserId?: true
+    joinedAt?: true
     createdAt?: true
   }
 
@@ -23201,6 +23406,10 @@ export namespace Prisma {
     userId?: true
     role?: true
     inviteStatus?: true
+    canEdit?: true
+    invitedAt?: true
+    invitedByUserId?: true
+    joinedAt?: true
     createdAt?: true
   }
 
@@ -23210,6 +23419,10 @@ export namespace Prisma {
     userId?: true
     role?: true
     inviteStatus?: true
+    canEdit?: true
+    invitedAt?: true
+    invitedByUserId?: true
+    joinedAt?: true
     createdAt?: true
     _all?: true
   }
@@ -23292,6 +23505,10 @@ export namespace Prisma {
     userId: string
     role: $Enums.GroupRole
     inviteStatus: $Enums.GroupInviteStatus
+    canEdit: boolean
+    invitedAt: Date
+    invitedByUserId: string | null
+    joinedAt: Date | null
     createdAt: Date
     _count: GroupMemberCountAggregateOutputType | null
     _min: GroupMemberMinAggregateOutputType | null
@@ -23318,6 +23535,10 @@ export namespace Prisma {
     userId?: boolean
     role?: boolean
     inviteStatus?: boolean
+    canEdit?: boolean
+    invitedAt?: boolean
+    invitedByUserId?: boolean
+    joinedAt?: boolean
     createdAt?: boolean
     group?: boolean | GroupDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -23329,6 +23550,10 @@ export namespace Prisma {
     userId?: boolean
     role?: boolean
     inviteStatus?: boolean
+    canEdit?: boolean
+    invitedAt?: boolean
+    invitedByUserId?: boolean
+    joinedAt?: boolean
     createdAt?: boolean
     group?: boolean | GroupDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -23340,6 +23565,10 @@ export namespace Prisma {
     userId?: boolean
     role?: boolean
     inviteStatus?: boolean
+    canEdit?: boolean
+    invitedAt?: boolean
+    invitedByUserId?: boolean
+    joinedAt?: boolean
     createdAt?: boolean
     group?: boolean | GroupDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -23351,10 +23580,14 @@ export namespace Prisma {
     userId?: boolean
     role?: boolean
     inviteStatus?: boolean
+    canEdit?: boolean
+    invitedAt?: boolean
+    invitedByUserId?: boolean
+    joinedAt?: boolean
     createdAt?: boolean
   }
 
-  export type GroupMemberOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "groupId" | "userId" | "role" | "inviteStatus" | "createdAt", ExtArgs["result"]["groupMember"]>
+  export type GroupMemberOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "groupId" | "userId" | "role" | "inviteStatus" | "canEdit" | "invitedAt" | "invitedByUserId" | "joinedAt" | "createdAt", ExtArgs["result"]["groupMember"]>
   export type GroupMemberInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     group?: boolean | GroupDefaultArgs<ExtArgs>
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -23380,6 +23613,10 @@ export namespace Prisma {
       userId: string
       role: $Enums.GroupRole
       inviteStatus: $Enums.GroupInviteStatus
+      canEdit: boolean
+      invitedAt: Date
+      invitedByUserId: string | null
+      joinedAt: Date | null
       createdAt: Date
     }, ExtArgs["result"]["groupMember"]>
     composites: {}
@@ -23811,6 +24048,10 @@ export namespace Prisma {
     readonly userId: FieldRef<"GroupMember", 'String'>
     readonly role: FieldRef<"GroupMember", 'GroupRole'>
     readonly inviteStatus: FieldRef<"GroupMember", 'GroupInviteStatus'>
+    readonly canEdit: FieldRef<"GroupMember", 'Boolean'>
+    readonly invitedAt: FieldRef<"GroupMember", 'DateTime'>
+    readonly invitedByUserId: FieldRef<"GroupMember", 'String'>
+    readonly joinedAt: FieldRef<"GroupMember", 'DateTime'>
     readonly createdAt: FieldRef<"GroupMember", 'DateTime'>
   }
     
@@ -24241,6 +24482,7 @@ export namespace Prisma {
     groupId: string | null
     name: string | null
     description: string | null
+    isDefault: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -24250,6 +24492,7 @@ export namespace Prisma {
     groupId: string | null
     name: string | null
     description: string | null
+    isDefault: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -24259,6 +24502,7 @@ export namespace Prisma {
     groupId: number
     name: number
     description: number
+    isDefault: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -24270,6 +24514,7 @@ export namespace Prisma {
     groupId?: true
     name?: true
     description?: true
+    isDefault?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -24279,6 +24524,7 @@ export namespace Prisma {
     groupId?: true
     name?: true
     description?: true
+    isDefault?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -24288,6 +24534,7 @@ export namespace Prisma {
     groupId?: true
     name?: true
     description?: true
+    isDefault?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -24370,6 +24617,7 @@ export namespace Prisma {
     groupId: string
     name: string
     description: string | null
+    isDefault: boolean
     createdAt: Date
     updatedAt: Date
     _count: GroupAddressBookCountAggregateOutputType | null
@@ -24396,9 +24644,12 @@ export namespace Prisma {
     groupId?: boolean
     name?: boolean
     description?: boolean
+    isDefault?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     group?: boolean | GroupDefaultArgs<ExtArgs>
+    contacts?: boolean | GroupAddressBook$contactsArgs<ExtArgs>
+    _count?: boolean | GroupAddressBookCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["groupAddressBook"]>
 
   export type GroupAddressBookSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -24406,6 +24657,7 @@ export namespace Prisma {
     groupId?: boolean
     name?: boolean
     description?: boolean
+    isDefault?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     group?: boolean | GroupDefaultArgs<ExtArgs>
@@ -24416,6 +24668,7 @@ export namespace Prisma {
     groupId?: boolean
     name?: boolean
     description?: boolean
+    isDefault?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     group?: boolean | GroupDefaultArgs<ExtArgs>
@@ -24426,13 +24679,16 @@ export namespace Prisma {
     groupId?: boolean
     name?: boolean
     description?: boolean
+    isDefault?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type GroupAddressBookOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "groupId" | "name" | "description" | "createdAt" | "updatedAt", ExtArgs["result"]["groupAddressBook"]>
+  export type GroupAddressBookOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "groupId" | "name" | "description" | "isDefault" | "createdAt" | "updatedAt", ExtArgs["result"]["groupAddressBook"]>
   export type GroupAddressBookInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     group?: boolean | GroupDefaultArgs<ExtArgs>
+    contacts?: boolean | GroupAddressBook$contactsArgs<ExtArgs>
+    _count?: boolean | GroupAddressBookCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type GroupAddressBookIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     group?: boolean | GroupDefaultArgs<ExtArgs>
@@ -24445,12 +24701,14 @@ export namespace Prisma {
     name: "GroupAddressBook"
     objects: {
       group: Prisma.$GroupPayload<ExtArgs>
+      contacts: Prisma.$GroupContactPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
       groupId: string
       name: string
       description: string | null
+      isDefault: boolean
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["groupAddressBook"]>
@@ -24848,6 +25106,7 @@ export namespace Prisma {
   export interface Prisma__GroupAddressBookClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     group<T extends GroupDefaultArgs<ExtArgs> = {}>(args?: Subset<T, GroupDefaultArgs<ExtArgs>>): Prisma__GroupClient<$Result.GetResult<Prisma.$GroupPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    contacts<T extends GroupAddressBook$contactsArgs<ExtArgs> = {}>(args?: Subset<T, GroupAddressBook$contactsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GroupContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -24881,6 +25140,7 @@ export namespace Prisma {
     readonly groupId: FieldRef<"GroupAddressBook", 'String'>
     readonly name: FieldRef<"GroupAddressBook", 'String'>
     readonly description: FieldRef<"GroupAddressBook", 'String'>
+    readonly isDefault: FieldRef<"GroupAddressBook", 'Boolean'>
     readonly createdAt: FieldRef<"GroupAddressBook", 'DateTime'>
     readonly updatedAt: FieldRef<"GroupAddressBook", 'DateTime'>
   }
@@ -25279,6 +25539,30 @@ export namespace Prisma {
   }
 
   /**
+   * GroupAddressBook.contacts
+   */
+  export type GroupAddressBook$contactsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GroupContact
+     */
+    select?: GroupContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GroupContact
+     */
+    omit?: GroupContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GroupContactInclude<ExtArgs> | null
+    where?: GroupContactWhereInput
+    orderBy?: GroupContactOrderByWithRelationInput | GroupContactOrderByWithRelationInput[]
+    cursor?: GroupContactWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: GroupContactScalarFieldEnum | GroupContactScalarFieldEnum[]
+  }
+
+  /**
    * GroupAddressBook without action
    */
   export type GroupAddressBookDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -25294,6 +25578,1085 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: GroupAddressBookInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model GroupContact
+   */
+
+  export type AggregateGroupContact = {
+    _count: GroupContactCountAggregateOutputType | null
+    _min: GroupContactMinAggregateOutputType | null
+    _max: GroupContactMaxAggregateOutputType | null
+  }
+
+  export type GroupContactMinAggregateOutputType = {
+    id: string | null
+    groupAddressBookId: string | null
+    contactId: string | null
+    addedByUserId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type GroupContactMaxAggregateOutputType = {
+    id: string | null
+    groupAddressBookId: string | null
+    contactId: string | null
+    addedByUserId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type GroupContactCountAggregateOutputType = {
+    id: number
+    groupAddressBookId: number
+    contactId: number
+    addedByUserId: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type GroupContactMinAggregateInputType = {
+    id?: true
+    groupAddressBookId?: true
+    contactId?: true
+    addedByUserId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type GroupContactMaxAggregateInputType = {
+    id?: true
+    groupAddressBookId?: true
+    contactId?: true
+    addedByUserId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type GroupContactCountAggregateInputType = {
+    id?: true
+    groupAddressBookId?: true
+    contactId?: true
+    addedByUserId?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type GroupContactAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which GroupContact to aggregate.
+     */
+    where?: GroupContactWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GroupContacts to fetch.
+     */
+    orderBy?: GroupContactOrderByWithRelationInput | GroupContactOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: GroupContactWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GroupContacts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GroupContacts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned GroupContacts
+    **/
+    _count?: true | GroupContactCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: GroupContactMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: GroupContactMaxAggregateInputType
+  }
+
+  export type GetGroupContactAggregateType<T extends GroupContactAggregateArgs> = {
+        [P in keyof T & keyof AggregateGroupContact]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateGroupContact[P]>
+      : GetScalarType<T[P], AggregateGroupContact[P]>
+  }
+
+
+
+
+  export type GroupContactGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: GroupContactWhereInput
+    orderBy?: GroupContactOrderByWithAggregationInput | GroupContactOrderByWithAggregationInput[]
+    by: GroupContactScalarFieldEnum[] | GroupContactScalarFieldEnum
+    having?: GroupContactScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: GroupContactCountAggregateInputType | true
+    _min?: GroupContactMinAggregateInputType
+    _max?: GroupContactMaxAggregateInputType
+  }
+
+  export type GroupContactGroupByOutputType = {
+    id: string
+    groupAddressBookId: string
+    contactId: string
+    addedByUserId: string
+    createdAt: Date
+    updatedAt: Date
+    _count: GroupContactCountAggregateOutputType | null
+    _min: GroupContactMinAggregateOutputType | null
+    _max: GroupContactMaxAggregateOutputType | null
+  }
+
+  type GetGroupContactGroupByPayload<T extends GroupContactGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<GroupContactGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof GroupContactGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], GroupContactGroupByOutputType[P]>
+            : GetScalarType<T[P], GroupContactGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type GroupContactSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    groupAddressBookId?: boolean
+    contactId?: boolean
+    addedByUserId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    groupAddressBook?: boolean | GroupAddressBookDefaultArgs<ExtArgs>
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["groupContact"]>
+
+  export type GroupContactSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    groupAddressBookId?: boolean
+    contactId?: boolean
+    addedByUserId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    groupAddressBook?: boolean | GroupAddressBookDefaultArgs<ExtArgs>
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["groupContact"]>
+
+  export type GroupContactSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    groupAddressBookId?: boolean
+    contactId?: boolean
+    addedByUserId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    groupAddressBook?: boolean | GroupAddressBookDefaultArgs<ExtArgs>
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["groupContact"]>
+
+  export type GroupContactSelectScalar = {
+    id?: boolean
+    groupAddressBookId?: boolean
+    contactId?: boolean
+    addedByUserId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type GroupContactOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "groupAddressBookId" | "contactId" | "addedByUserId" | "createdAt" | "updatedAt", ExtArgs["result"]["groupContact"]>
+  export type GroupContactInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    groupAddressBook?: boolean | GroupAddressBookDefaultArgs<ExtArgs>
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+  }
+  export type GroupContactIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    groupAddressBook?: boolean | GroupAddressBookDefaultArgs<ExtArgs>
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+  }
+  export type GroupContactIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    groupAddressBook?: boolean | GroupAddressBookDefaultArgs<ExtArgs>
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+  }
+
+  export type $GroupContactPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "GroupContact"
+    objects: {
+      groupAddressBook: Prisma.$GroupAddressBookPayload<ExtArgs>
+      contact: Prisma.$ContactPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      groupAddressBookId: string
+      contactId: string
+      addedByUserId: string
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["groupContact"]>
+    composites: {}
+  }
+
+  type GroupContactGetPayload<S extends boolean | null | undefined | GroupContactDefaultArgs> = $Result.GetResult<Prisma.$GroupContactPayload, S>
+
+  type GroupContactCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<GroupContactFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: GroupContactCountAggregateInputType | true
+    }
+
+  export interface GroupContactDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['GroupContact'], meta: { name: 'GroupContact' } }
+    /**
+     * Find zero or one GroupContact that matches the filter.
+     * @param {GroupContactFindUniqueArgs} args - Arguments to find a GroupContact
+     * @example
+     * // Get one GroupContact
+     * const groupContact = await prisma.groupContact.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends GroupContactFindUniqueArgs>(args: SelectSubset<T, GroupContactFindUniqueArgs<ExtArgs>>): Prisma__GroupContactClient<$Result.GetResult<Prisma.$GroupContactPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one GroupContact that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {GroupContactFindUniqueOrThrowArgs} args - Arguments to find a GroupContact
+     * @example
+     * // Get one GroupContact
+     * const groupContact = await prisma.groupContact.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends GroupContactFindUniqueOrThrowArgs>(args: SelectSubset<T, GroupContactFindUniqueOrThrowArgs<ExtArgs>>): Prisma__GroupContactClient<$Result.GetResult<Prisma.$GroupContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first GroupContact that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GroupContactFindFirstArgs} args - Arguments to find a GroupContact
+     * @example
+     * // Get one GroupContact
+     * const groupContact = await prisma.groupContact.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends GroupContactFindFirstArgs>(args?: SelectSubset<T, GroupContactFindFirstArgs<ExtArgs>>): Prisma__GroupContactClient<$Result.GetResult<Prisma.$GroupContactPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first GroupContact that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GroupContactFindFirstOrThrowArgs} args - Arguments to find a GroupContact
+     * @example
+     * // Get one GroupContact
+     * const groupContact = await prisma.groupContact.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends GroupContactFindFirstOrThrowArgs>(args?: SelectSubset<T, GroupContactFindFirstOrThrowArgs<ExtArgs>>): Prisma__GroupContactClient<$Result.GetResult<Prisma.$GroupContactPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more GroupContacts that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GroupContactFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all GroupContacts
+     * const groupContacts = await prisma.groupContact.findMany()
+     * 
+     * // Get first 10 GroupContacts
+     * const groupContacts = await prisma.groupContact.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const groupContactWithIdOnly = await prisma.groupContact.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends GroupContactFindManyArgs>(args?: SelectSubset<T, GroupContactFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GroupContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a GroupContact.
+     * @param {GroupContactCreateArgs} args - Arguments to create a GroupContact.
+     * @example
+     * // Create one GroupContact
+     * const GroupContact = await prisma.groupContact.create({
+     *   data: {
+     *     // ... data to create a GroupContact
+     *   }
+     * })
+     * 
+     */
+    create<T extends GroupContactCreateArgs>(args: SelectSubset<T, GroupContactCreateArgs<ExtArgs>>): Prisma__GroupContactClient<$Result.GetResult<Prisma.$GroupContactPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many GroupContacts.
+     * @param {GroupContactCreateManyArgs} args - Arguments to create many GroupContacts.
+     * @example
+     * // Create many GroupContacts
+     * const groupContact = await prisma.groupContact.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends GroupContactCreateManyArgs>(args?: SelectSubset<T, GroupContactCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many GroupContacts and returns the data saved in the database.
+     * @param {GroupContactCreateManyAndReturnArgs} args - Arguments to create many GroupContacts.
+     * @example
+     * // Create many GroupContacts
+     * const groupContact = await prisma.groupContact.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many GroupContacts and only return the `id`
+     * const groupContactWithIdOnly = await prisma.groupContact.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends GroupContactCreateManyAndReturnArgs>(args?: SelectSubset<T, GroupContactCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GroupContactPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a GroupContact.
+     * @param {GroupContactDeleteArgs} args - Arguments to delete one GroupContact.
+     * @example
+     * // Delete one GroupContact
+     * const GroupContact = await prisma.groupContact.delete({
+     *   where: {
+     *     // ... filter to delete one GroupContact
+     *   }
+     * })
+     * 
+     */
+    delete<T extends GroupContactDeleteArgs>(args: SelectSubset<T, GroupContactDeleteArgs<ExtArgs>>): Prisma__GroupContactClient<$Result.GetResult<Prisma.$GroupContactPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one GroupContact.
+     * @param {GroupContactUpdateArgs} args - Arguments to update one GroupContact.
+     * @example
+     * // Update one GroupContact
+     * const groupContact = await prisma.groupContact.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends GroupContactUpdateArgs>(args: SelectSubset<T, GroupContactUpdateArgs<ExtArgs>>): Prisma__GroupContactClient<$Result.GetResult<Prisma.$GroupContactPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more GroupContacts.
+     * @param {GroupContactDeleteManyArgs} args - Arguments to filter GroupContacts to delete.
+     * @example
+     * // Delete a few GroupContacts
+     * const { count } = await prisma.groupContact.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends GroupContactDeleteManyArgs>(args?: SelectSubset<T, GroupContactDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more GroupContacts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GroupContactUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many GroupContacts
+     * const groupContact = await prisma.groupContact.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends GroupContactUpdateManyArgs>(args: SelectSubset<T, GroupContactUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more GroupContacts and returns the data updated in the database.
+     * @param {GroupContactUpdateManyAndReturnArgs} args - Arguments to update many GroupContacts.
+     * @example
+     * // Update many GroupContacts
+     * const groupContact = await prisma.groupContact.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more GroupContacts and only return the `id`
+     * const groupContactWithIdOnly = await prisma.groupContact.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends GroupContactUpdateManyAndReturnArgs>(args: SelectSubset<T, GroupContactUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GroupContactPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one GroupContact.
+     * @param {GroupContactUpsertArgs} args - Arguments to update or create a GroupContact.
+     * @example
+     * // Update or create a GroupContact
+     * const groupContact = await prisma.groupContact.upsert({
+     *   create: {
+     *     // ... data to create a GroupContact
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the GroupContact we want to update
+     *   }
+     * })
+     */
+    upsert<T extends GroupContactUpsertArgs>(args: SelectSubset<T, GroupContactUpsertArgs<ExtArgs>>): Prisma__GroupContactClient<$Result.GetResult<Prisma.$GroupContactPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of GroupContacts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GroupContactCountArgs} args - Arguments to filter GroupContacts to count.
+     * @example
+     * // Count the number of GroupContacts
+     * const count = await prisma.groupContact.count({
+     *   where: {
+     *     // ... the filter for the GroupContacts we want to count
+     *   }
+     * })
+    **/
+    count<T extends GroupContactCountArgs>(
+      args?: Subset<T, GroupContactCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], GroupContactCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a GroupContact.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GroupContactAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends GroupContactAggregateArgs>(args: Subset<T, GroupContactAggregateArgs>): Prisma.PrismaPromise<GetGroupContactAggregateType<T>>
+
+    /**
+     * Group by GroupContact.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {GroupContactGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends GroupContactGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: GroupContactGroupByArgs['orderBy'] }
+        : { orderBy?: GroupContactGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, GroupContactGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetGroupContactGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the GroupContact model
+   */
+  readonly fields: GroupContactFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for GroupContact.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__GroupContactClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    groupAddressBook<T extends GroupAddressBookDefaultArgs<ExtArgs> = {}>(args?: Subset<T, GroupAddressBookDefaultArgs<ExtArgs>>): Prisma__GroupAddressBookClient<$Result.GetResult<Prisma.$GroupAddressBookPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    contact<T extends ContactDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ContactDefaultArgs<ExtArgs>>): Prisma__ContactClient<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the GroupContact model
+   */
+  interface GroupContactFieldRefs {
+    readonly id: FieldRef<"GroupContact", 'String'>
+    readonly groupAddressBookId: FieldRef<"GroupContact", 'String'>
+    readonly contactId: FieldRef<"GroupContact", 'String'>
+    readonly addedByUserId: FieldRef<"GroupContact", 'String'>
+    readonly createdAt: FieldRef<"GroupContact", 'DateTime'>
+    readonly updatedAt: FieldRef<"GroupContact", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * GroupContact findUnique
+   */
+  export type GroupContactFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GroupContact
+     */
+    select?: GroupContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GroupContact
+     */
+    omit?: GroupContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GroupContactInclude<ExtArgs> | null
+    /**
+     * Filter, which GroupContact to fetch.
+     */
+    where: GroupContactWhereUniqueInput
+  }
+
+  /**
+   * GroupContact findUniqueOrThrow
+   */
+  export type GroupContactFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GroupContact
+     */
+    select?: GroupContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GroupContact
+     */
+    omit?: GroupContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GroupContactInclude<ExtArgs> | null
+    /**
+     * Filter, which GroupContact to fetch.
+     */
+    where: GroupContactWhereUniqueInput
+  }
+
+  /**
+   * GroupContact findFirst
+   */
+  export type GroupContactFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GroupContact
+     */
+    select?: GroupContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GroupContact
+     */
+    omit?: GroupContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GroupContactInclude<ExtArgs> | null
+    /**
+     * Filter, which GroupContact to fetch.
+     */
+    where?: GroupContactWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GroupContacts to fetch.
+     */
+    orderBy?: GroupContactOrderByWithRelationInput | GroupContactOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for GroupContacts.
+     */
+    cursor?: GroupContactWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GroupContacts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GroupContacts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of GroupContacts.
+     */
+    distinct?: GroupContactScalarFieldEnum | GroupContactScalarFieldEnum[]
+  }
+
+  /**
+   * GroupContact findFirstOrThrow
+   */
+  export type GroupContactFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GroupContact
+     */
+    select?: GroupContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GroupContact
+     */
+    omit?: GroupContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GroupContactInclude<ExtArgs> | null
+    /**
+     * Filter, which GroupContact to fetch.
+     */
+    where?: GroupContactWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GroupContacts to fetch.
+     */
+    orderBy?: GroupContactOrderByWithRelationInput | GroupContactOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for GroupContacts.
+     */
+    cursor?: GroupContactWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GroupContacts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GroupContacts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of GroupContacts.
+     */
+    distinct?: GroupContactScalarFieldEnum | GroupContactScalarFieldEnum[]
+  }
+
+  /**
+   * GroupContact findMany
+   */
+  export type GroupContactFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GroupContact
+     */
+    select?: GroupContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GroupContact
+     */
+    omit?: GroupContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GroupContactInclude<ExtArgs> | null
+    /**
+     * Filter, which GroupContacts to fetch.
+     */
+    where?: GroupContactWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of GroupContacts to fetch.
+     */
+    orderBy?: GroupContactOrderByWithRelationInput | GroupContactOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing GroupContacts.
+     */
+    cursor?: GroupContactWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` GroupContacts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` GroupContacts.
+     */
+    skip?: number
+    distinct?: GroupContactScalarFieldEnum | GroupContactScalarFieldEnum[]
+  }
+
+  /**
+   * GroupContact create
+   */
+  export type GroupContactCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GroupContact
+     */
+    select?: GroupContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GroupContact
+     */
+    omit?: GroupContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GroupContactInclude<ExtArgs> | null
+    /**
+     * The data needed to create a GroupContact.
+     */
+    data: XOR<GroupContactCreateInput, GroupContactUncheckedCreateInput>
+  }
+
+  /**
+   * GroupContact createMany
+   */
+  export type GroupContactCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many GroupContacts.
+     */
+    data: GroupContactCreateManyInput | GroupContactCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * GroupContact createManyAndReturn
+   */
+  export type GroupContactCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GroupContact
+     */
+    select?: GroupContactSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the GroupContact
+     */
+    omit?: GroupContactOmit<ExtArgs> | null
+    /**
+     * The data used to create many GroupContacts.
+     */
+    data: GroupContactCreateManyInput | GroupContactCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GroupContactIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * GroupContact update
+   */
+  export type GroupContactUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GroupContact
+     */
+    select?: GroupContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GroupContact
+     */
+    omit?: GroupContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GroupContactInclude<ExtArgs> | null
+    /**
+     * The data needed to update a GroupContact.
+     */
+    data: XOR<GroupContactUpdateInput, GroupContactUncheckedUpdateInput>
+    /**
+     * Choose, which GroupContact to update.
+     */
+    where: GroupContactWhereUniqueInput
+  }
+
+  /**
+   * GroupContact updateMany
+   */
+  export type GroupContactUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update GroupContacts.
+     */
+    data: XOR<GroupContactUpdateManyMutationInput, GroupContactUncheckedUpdateManyInput>
+    /**
+     * Filter which GroupContacts to update
+     */
+    where?: GroupContactWhereInput
+    /**
+     * Limit how many GroupContacts to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * GroupContact updateManyAndReturn
+   */
+  export type GroupContactUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GroupContact
+     */
+    select?: GroupContactSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the GroupContact
+     */
+    omit?: GroupContactOmit<ExtArgs> | null
+    /**
+     * The data used to update GroupContacts.
+     */
+    data: XOR<GroupContactUpdateManyMutationInput, GroupContactUncheckedUpdateManyInput>
+    /**
+     * Filter which GroupContacts to update
+     */
+    where?: GroupContactWhereInput
+    /**
+     * Limit how many GroupContacts to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GroupContactIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * GroupContact upsert
+   */
+  export type GroupContactUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GroupContact
+     */
+    select?: GroupContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GroupContact
+     */
+    omit?: GroupContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GroupContactInclude<ExtArgs> | null
+    /**
+     * The filter to search for the GroupContact to update in case it exists.
+     */
+    where: GroupContactWhereUniqueInput
+    /**
+     * In case the GroupContact found by the `where` argument doesn't exist, create a new GroupContact with this data.
+     */
+    create: XOR<GroupContactCreateInput, GroupContactUncheckedCreateInput>
+    /**
+     * In case the GroupContact was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<GroupContactUpdateInput, GroupContactUncheckedUpdateInput>
+  }
+
+  /**
+   * GroupContact delete
+   */
+  export type GroupContactDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GroupContact
+     */
+    select?: GroupContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GroupContact
+     */
+    omit?: GroupContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GroupContactInclude<ExtArgs> | null
+    /**
+     * Filter which GroupContact to delete.
+     */
+    where: GroupContactWhereUniqueInput
+  }
+
+  /**
+   * GroupContact deleteMany
+   */
+  export type GroupContactDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which GroupContacts to delete
+     */
+    where?: GroupContactWhereInput
+    /**
+     * Limit how many GroupContacts to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * GroupContact without action
+   */
+  export type GroupContactDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the GroupContact
+     */
+    select?: GroupContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the GroupContact
+     */
+    omit?: GroupContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GroupContactInclude<ExtArgs> | null
   }
 
 
@@ -26997,6 +28360,8 @@ export namespace Prisma {
     name: 'name',
     subscriptionId: 'subscriptionId',
     memberSlotsLimit: 'memberSlotsLimit',
+    maxMembers: 'maxMembers',
+    defaultAddressBookId: 'defaultAddressBookId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -27010,6 +28375,10 @@ export namespace Prisma {
     userId: 'userId',
     role: 'role',
     inviteStatus: 'inviteStatus',
+    canEdit: 'canEdit',
+    invitedAt: 'invitedAt',
+    invitedByUserId: 'invitedByUserId',
+    joinedAt: 'joinedAt',
     createdAt: 'createdAt'
   };
 
@@ -27021,11 +28390,24 @@ export namespace Prisma {
     groupId: 'groupId',
     name: 'name',
     description: 'description',
+    isDefault: 'isDefault',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
 
   export type GroupAddressBookScalarFieldEnum = (typeof GroupAddressBookScalarFieldEnum)[keyof typeof GroupAddressBookScalarFieldEnum]
+
+
+  export const GroupContactScalarFieldEnum: {
+    id: 'id',
+    groupAddressBookId: 'groupAddressBookId',
+    contactId: 'contactId',
+    addedByUserId: 'addedByUserId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type GroupContactScalarFieldEnum = (typeof GroupContactScalarFieldEnum)[keyof typeof GroupContactScalarFieldEnum]
 
 
   export const ContactShareScalarFieldEnum: {
@@ -27833,6 +29215,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventListRelationFilter
     sharesFromContact?: ContactShareListRelationFilter
     sharesAsRecipientCopy?: ContactShareListRelationFilter
+    groupContacts?: GroupContactListRelationFilter
     mergedIntoContact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
     mergedChildren?: ContactListRelationFilter
   }
@@ -27894,6 +29277,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventOrderByRelationAggregateInput
     sharesFromContact?: ContactShareOrderByRelationAggregateInput
     sharesAsRecipientCopy?: ContactShareOrderByRelationAggregateInput
+    groupContacts?: GroupContactOrderByRelationAggregateInput
     mergedIntoContact?: ContactOrderByWithRelationInput
     mergedChildren?: ContactOrderByRelationAggregateInput
   }
@@ -27958,6 +29342,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventListRelationFilter
     sharesFromContact?: ContactShareListRelationFilter
     sharesAsRecipientCopy?: ContactShareListRelationFilter
+    groupContacts?: GroupContactListRelationFilter
     mergedIntoContact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
     mergedChildren?: ContactListRelationFilter
   }, "id" | "syncUid">
@@ -29453,6 +30838,8 @@ export namespace Prisma {
     name?: StringFilter<"Group"> | string
     subscriptionId?: StringNullableFilter<"Group"> | string | null
     memberSlotsLimit?: IntNullableFilter<"Group"> | number | null
+    maxMembers?: IntFilter<"Group"> | number
+    defaultAddressBookId?: StringNullableFilter<"Group"> | string | null
     createdAt?: DateTimeFilter<"Group"> | Date | string
     updatedAt?: DateTimeFilter<"Group"> | Date | string
     owner?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -29468,6 +30855,8 @@ export namespace Prisma {
     name?: SortOrder
     subscriptionId?: SortOrderInput | SortOrder
     memberSlotsLimit?: SortOrderInput | SortOrder
+    maxMembers?: SortOrder
+    defaultAddressBookId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     owner?: UserOrderByWithRelationInput
@@ -29486,6 +30875,8 @@ export namespace Prisma {
     name?: StringFilter<"Group"> | string
     subscriptionId?: StringNullableFilter<"Group"> | string | null
     memberSlotsLimit?: IntNullableFilter<"Group"> | number | null
+    maxMembers?: IntFilter<"Group"> | number
+    defaultAddressBookId?: StringNullableFilter<"Group"> | string | null
     createdAt?: DateTimeFilter<"Group"> | Date | string
     updatedAt?: DateTimeFilter<"Group"> | Date | string
     owner?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -29501,6 +30892,8 @@ export namespace Prisma {
     name?: SortOrder
     subscriptionId?: SortOrderInput | SortOrder
     memberSlotsLimit?: SortOrderInput | SortOrder
+    maxMembers?: SortOrder
+    defaultAddressBookId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: GroupCountOrderByAggregateInput
@@ -29520,6 +30913,8 @@ export namespace Prisma {
     name?: StringWithAggregatesFilter<"Group"> | string
     subscriptionId?: StringNullableWithAggregatesFilter<"Group"> | string | null
     memberSlotsLimit?: IntNullableWithAggregatesFilter<"Group"> | number | null
+    maxMembers?: IntWithAggregatesFilter<"Group"> | number
+    defaultAddressBookId?: StringNullableWithAggregatesFilter<"Group"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Group"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Group"> | Date | string
   }
@@ -29533,6 +30928,10 @@ export namespace Prisma {
     userId?: StringFilter<"GroupMember"> | string
     role?: EnumGroupRoleFilter<"GroupMember"> | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFilter<"GroupMember"> | $Enums.GroupInviteStatus
+    canEdit?: BoolFilter<"GroupMember"> | boolean
+    invitedAt?: DateTimeFilter<"GroupMember"> | Date | string
+    invitedByUserId?: StringNullableFilter<"GroupMember"> | string | null
+    joinedAt?: DateTimeNullableFilter<"GroupMember"> | Date | string | null
     createdAt?: DateTimeFilter<"GroupMember"> | Date | string
     group?: XOR<GroupScalarRelationFilter, GroupWhereInput>
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -29544,6 +30943,10 @@ export namespace Prisma {
     userId?: SortOrder
     role?: SortOrder
     inviteStatus?: SortOrder
+    canEdit?: SortOrder
+    invitedAt?: SortOrder
+    invitedByUserId?: SortOrderInput | SortOrder
+    joinedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     group?: GroupOrderByWithRelationInput
     user?: UserOrderByWithRelationInput
@@ -29559,6 +30962,10 @@ export namespace Prisma {
     userId?: StringFilter<"GroupMember"> | string
     role?: EnumGroupRoleFilter<"GroupMember"> | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFilter<"GroupMember"> | $Enums.GroupInviteStatus
+    canEdit?: BoolFilter<"GroupMember"> | boolean
+    invitedAt?: DateTimeFilter<"GroupMember"> | Date | string
+    invitedByUserId?: StringNullableFilter<"GroupMember"> | string | null
+    joinedAt?: DateTimeNullableFilter<"GroupMember"> | Date | string | null
     createdAt?: DateTimeFilter<"GroupMember"> | Date | string
     group?: XOR<GroupScalarRelationFilter, GroupWhereInput>
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -29570,6 +30977,10 @@ export namespace Prisma {
     userId?: SortOrder
     role?: SortOrder
     inviteStatus?: SortOrder
+    canEdit?: SortOrder
+    invitedAt?: SortOrder
+    invitedByUserId?: SortOrderInput | SortOrder
+    joinedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     _count?: GroupMemberCountOrderByAggregateInput
     _max?: GroupMemberMaxOrderByAggregateInput
@@ -29585,6 +30996,10 @@ export namespace Prisma {
     userId?: StringWithAggregatesFilter<"GroupMember"> | string
     role?: EnumGroupRoleWithAggregatesFilter<"GroupMember"> | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusWithAggregatesFilter<"GroupMember"> | $Enums.GroupInviteStatus
+    canEdit?: BoolWithAggregatesFilter<"GroupMember"> | boolean
+    invitedAt?: DateTimeWithAggregatesFilter<"GroupMember"> | Date | string
+    invitedByUserId?: StringNullableWithAggregatesFilter<"GroupMember"> | string | null
+    joinedAt?: DateTimeNullableWithAggregatesFilter<"GroupMember"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"GroupMember"> | Date | string
   }
 
@@ -29596,9 +31011,11 @@ export namespace Prisma {
     groupId?: StringFilter<"GroupAddressBook"> | string
     name?: StringFilter<"GroupAddressBook"> | string
     description?: StringNullableFilter<"GroupAddressBook"> | string | null
+    isDefault?: BoolFilter<"GroupAddressBook"> | boolean
     createdAt?: DateTimeFilter<"GroupAddressBook"> | Date | string
     updatedAt?: DateTimeFilter<"GroupAddressBook"> | Date | string
     group?: XOR<GroupScalarRelationFilter, GroupWhereInput>
+    contacts?: GroupContactListRelationFilter
   }
 
   export type GroupAddressBookOrderByWithRelationInput = {
@@ -29606,9 +31023,11 @@ export namespace Prisma {
     groupId?: SortOrder
     name?: SortOrder
     description?: SortOrderInput | SortOrder
+    isDefault?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     group?: GroupOrderByWithRelationInput
+    contacts?: GroupContactOrderByRelationAggregateInput
   }
 
   export type GroupAddressBookWhereUniqueInput = Prisma.AtLeast<{
@@ -29619,9 +31038,11 @@ export namespace Prisma {
     groupId?: StringFilter<"GroupAddressBook"> | string
     name?: StringFilter<"GroupAddressBook"> | string
     description?: StringNullableFilter<"GroupAddressBook"> | string | null
+    isDefault?: BoolFilter<"GroupAddressBook"> | boolean
     createdAt?: DateTimeFilter<"GroupAddressBook"> | Date | string
     updatedAt?: DateTimeFilter<"GroupAddressBook"> | Date | string
     group?: XOR<GroupScalarRelationFilter, GroupWhereInput>
+    contacts?: GroupContactListRelationFilter
   }, "id">
 
   export type GroupAddressBookOrderByWithAggregationInput = {
@@ -29629,6 +31050,7 @@ export namespace Prisma {
     groupId?: SortOrder
     name?: SortOrder
     description?: SortOrderInput | SortOrder
+    isDefault?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: GroupAddressBookCountOrderByAggregateInput
@@ -29644,8 +31066,73 @@ export namespace Prisma {
     groupId?: StringWithAggregatesFilter<"GroupAddressBook"> | string
     name?: StringWithAggregatesFilter<"GroupAddressBook"> | string
     description?: StringNullableWithAggregatesFilter<"GroupAddressBook"> | string | null
+    isDefault?: BoolWithAggregatesFilter<"GroupAddressBook"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"GroupAddressBook"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"GroupAddressBook"> | Date | string
+  }
+
+  export type GroupContactWhereInput = {
+    AND?: GroupContactWhereInput | GroupContactWhereInput[]
+    OR?: GroupContactWhereInput[]
+    NOT?: GroupContactWhereInput | GroupContactWhereInput[]
+    id?: StringFilter<"GroupContact"> | string
+    groupAddressBookId?: StringFilter<"GroupContact"> | string
+    contactId?: StringFilter<"GroupContact"> | string
+    addedByUserId?: StringFilter<"GroupContact"> | string
+    createdAt?: DateTimeFilter<"GroupContact"> | Date | string
+    updatedAt?: DateTimeFilter<"GroupContact"> | Date | string
+    groupAddressBook?: XOR<GroupAddressBookScalarRelationFilter, GroupAddressBookWhereInput>
+    contact?: XOR<ContactScalarRelationFilter, ContactWhereInput>
+  }
+
+  export type GroupContactOrderByWithRelationInput = {
+    id?: SortOrder
+    groupAddressBookId?: SortOrder
+    contactId?: SortOrder
+    addedByUserId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    groupAddressBook?: GroupAddressBookOrderByWithRelationInput
+    contact?: ContactOrderByWithRelationInput
+  }
+
+  export type GroupContactWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    groupAddressBookId_contactId?: GroupContactGroupAddressBookIdContactIdCompoundUniqueInput
+    AND?: GroupContactWhereInput | GroupContactWhereInput[]
+    OR?: GroupContactWhereInput[]
+    NOT?: GroupContactWhereInput | GroupContactWhereInput[]
+    groupAddressBookId?: StringFilter<"GroupContact"> | string
+    contactId?: StringFilter<"GroupContact"> | string
+    addedByUserId?: StringFilter<"GroupContact"> | string
+    createdAt?: DateTimeFilter<"GroupContact"> | Date | string
+    updatedAt?: DateTimeFilter<"GroupContact"> | Date | string
+    groupAddressBook?: XOR<GroupAddressBookScalarRelationFilter, GroupAddressBookWhereInput>
+    contact?: XOR<ContactScalarRelationFilter, ContactWhereInput>
+  }, "id" | "groupAddressBookId_contactId">
+
+  export type GroupContactOrderByWithAggregationInput = {
+    id?: SortOrder
+    groupAddressBookId?: SortOrder
+    contactId?: SortOrder
+    addedByUserId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: GroupContactCountOrderByAggregateInput
+    _max?: GroupContactMaxOrderByAggregateInput
+    _min?: GroupContactMinOrderByAggregateInput
+  }
+
+  export type GroupContactScalarWhereWithAggregatesInput = {
+    AND?: GroupContactScalarWhereWithAggregatesInput | GroupContactScalarWhereWithAggregatesInput[]
+    OR?: GroupContactScalarWhereWithAggregatesInput[]
+    NOT?: GroupContactScalarWhereWithAggregatesInput | GroupContactScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"GroupContact"> | string
+    groupAddressBookId?: StringWithAggregatesFilter<"GroupContact"> | string
+    contactId?: StringWithAggregatesFilter<"GroupContact"> | string
+    addedByUserId?: StringWithAggregatesFilter<"GroupContact"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"GroupContact"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"GroupContact"> | Date | string
   }
 
   export type ContactShareWhereInput = {
@@ -30046,6 +31533,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -30105,6 +31593,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -30162,6 +31651,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -30221,6 +31711,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -31977,6 +33468,8 @@ export namespace Prisma {
     type: $Enums.GroupType
     name: string
     memberSlotsLimit?: number | null
+    maxMembers?: number
+    defaultAddressBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedGroupsInput
@@ -31992,6 +33485,8 @@ export namespace Prisma {
     name: string
     subscriptionId?: string | null
     memberSlotsLimit?: number | null
+    maxMembers?: number
+    defaultAddressBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
@@ -32003,6 +33498,8 @@ export namespace Prisma {
     type?: EnumGroupTypeFieldUpdateOperationsInput | $Enums.GroupType
     name?: StringFieldUpdateOperationsInput | string
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    maxMembers?: IntFieldUpdateOperationsInput | number
+    defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedGroupsNestedInput
@@ -32018,6 +33515,8 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     subscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    maxMembers?: IntFieldUpdateOperationsInput | number
+    defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
@@ -32031,6 +33530,8 @@ export namespace Prisma {
     name: string
     subscriptionId?: string | null
     memberSlotsLimit?: number | null
+    maxMembers?: number
+    defaultAddressBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -32040,6 +33541,8 @@ export namespace Prisma {
     type?: EnumGroupTypeFieldUpdateOperationsInput | $Enums.GroupType
     name?: StringFieldUpdateOperationsInput | string
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    maxMembers?: IntFieldUpdateOperationsInput | number
+    defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -32051,6 +33554,8 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     subscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    maxMembers?: IntFieldUpdateOperationsInput | number
+    defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -32059,6 +33564,10 @@ export namespace Prisma {
     id?: string
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
+    canEdit?: boolean
+    invitedAt?: Date | string
+    invitedByUserId?: string | null
+    joinedAt?: Date | string | null
     createdAt?: Date | string
     group: GroupCreateNestedOneWithoutMembersInput
     user: UserCreateNestedOneWithoutGroupMembershipsInput
@@ -32070,6 +33579,10 @@ export namespace Prisma {
     userId: string
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
+    canEdit?: boolean
+    invitedAt?: Date | string
+    invitedByUserId?: string | null
+    joinedAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -32077,6 +33590,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
+    canEdit?: BoolFieldUpdateOperationsInput | boolean
+    invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    invitedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     group?: GroupUpdateOneRequiredWithoutMembersNestedInput
     user?: UserUpdateOneRequiredWithoutGroupMembershipsNestedInput
@@ -32088,6 +33605,10 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
+    canEdit?: BoolFieldUpdateOperationsInput | boolean
+    invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    invitedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -32097,6 +33618,10 @@ export namespace Prisma {
     userId: string
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
+    canEdit?: boolean
+    invitedAt?: Date | string
+    invitedByUserId?: string | null
+    joinedAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -32104,6 +33629,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
+    canEdit?: BoolFieldUpdateOperationsInput | boolean
+    invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    invitedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -32113,6 +33642,10 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
+    canEdit?: BoolFieldUpdateOperationsInput | boolean
+    invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    invitedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -32120,9 +33653,11 @@ export namespace Prisma {
     id?: string
     name: string
     description?: string | null
+    isDefault?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     group: GroupCreateNestedOneWithoutAddressBooksInput
+    contacts?: GroupContactCreateNestedManyWithoutGroupAddressBookInput
   }
 
   export type GroupAddressBookUncheckedCreateInput = {
@@ -32130,17 +33665,21 @@ export namespace Prisma {
     groupId: string
     name: string
     description?: string | null
+    isDefault?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    contacts?: GroupContactUncheckedCreateNestedManyWithoutGroupAddressBookInput
   }
 
   export type GroupAddressBookUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     group?: GroupUpdateOneRequiredWithoutAddressBooksNestedInput
+    contacts?: GroupContactUpdateManyWithoutGroupAddressBookNestedInput
   }
 
   export type GroupAddressBookUncheckedUpdateInput = {
@@ -32148,8 +33687,10 @@ export namespace Prisma {
     groupId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: GroupContactUncheckedUpdateManyWithoutGroupAddressBookNestedInput
   }
 
   export type GroupAddressBookCreateManyInput = {
@@ -32157,6 +33698,7 @@ export namespace Prisma {
     groupId: string
     name: string
     description?: string | null
+    isDefault?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -32165,6 +33707,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -32174,6 +33717,68 @@ export namespace Prisma {
     groupId?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GroupContactCreateInput = {
+    id?: string
+    addedByUserId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    groupAddressBook: GroupAddressBookCreateNestedOneWithoutContactsInput
+    contact: ContactCreateNestedOneWithoutGroupContactsInput
+  }
+
+  export type GroupContactUncheckedCreateInput = {
+    id?: string
+    groupAddressBookId: string
+    contactId: string
+    addedByUserId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type GroupContactUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    addedByUserId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    groupAddressBook?: GroupAddressBookUpdateOneRequiredWithoutContactsNestedInput
+    contact?: ContactUpdateOneRequiredWithoutGroupContactsNestedInput
+  }
+
+  export type GroupContactUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    groupAddressBookId?: StringFieldUpdateOperationsInput | string
+    contactId?: StringFieldUpdateOperationsInput | string
+    addedByUserId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GroupContactCreateManyInput = {
+    id?: string
+    groupAddressBookId: string
+    contactId: string
+    addedByUserId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type GroupContactUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    addedByUserId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GroupContactUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    groupAddressBookId?: StringFieldUpdateOperationsInput | string
+    contactId?: StringFieldUpdateOperationsInput | string
+    addedByUserId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -32730,12 +34335,22 @@ export namespace Prisma {
     none?: SyncContactLinkWhereInput
   }
 
+  export type GroupContactListRelationFilter = {
+    every?: GroupContactWhereInput
+    some?: GroupContactWhereInput
+    none?: GroupContactWhereInput
+  }
+
   export type ContactNullableScalarRelationFilter = {
     is?: ContactWhereInput | null
     isNot?: ContactWhereInput | null
   }
 
   export type SyncContactLinkOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type GroupContactOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -34255,12 +35870,15 @@ export namespace Prisma {
     name?: SortOrder
     subscriptionId?: SortOrder
     memberSlotsLimit?: SortOrder
+    maxMembers?: SortOrder
+    defaultAddressBookId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type GroupAvgOrderByAggregateInput = {
     memberSlotsLimit?: SortOrder
+    maxMembers?: SortOrder
   }
 
   export type GroupMaxOrderByAggregateInput = {
@@ -34270,6 +35888,8 @@ export namespace Prisma {
     name?: SortOrder
     subscriptionId?: SortOrder
     memberSlotsLimit?: SortOrder
+    maxMembers?: SortOrder
+    defaultAddressBookId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -34281,12 +35901,15 @@ export namespace Prisma {
     name?: SortOrder
     subscriptionId?: SortOrder
     memberSlotsLimit?: SortOrder
+    maxMembers?: SortOrder
+    defaultAddressBookId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type GroupSumOrderByAggregateInput = {
     memberSlotsLimit?: SortOrder
+    maxMembers?: SortOrder
   }
 
   export type EnumGroupTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -34329,6 +35952,10 @@ export namespace Prisma {
     userId?: SortOrder
     role?: SortOrder
     inviteStatus?: SortOrder
+    canEdit?: SortOrder
+    invitedAt?: SortOrder
+    invitedByUserId?: SortOrder
+    joinedAt?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -34338,6 +35965,10 @@ export namespace Prisma {
     userId?: SortOrder
     role?: SortOrder
     inviteStatus?: SortOrder
+    canEdit?: SortOrder
+    invitedAt?: SortOrder
+    invitedByUserId?: SortOrder
+    joinedAt?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -34347,6 +35978,10 @@ export namespace Prisma {
     userId?: SortOrder
     role?: SortOrder
     inviteStatus?: SortOrder
+    canEdit?: SortOrder
+    invitedAt?: SortOrder
+    invitedByUserId?: SortOrder
+    joinedAt?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -34375,6 +36010,7 @@ export namespace Prisma {
     groupId?: SortOrder
     name?: SortOrder
     description?: SortOrder
+    isDefault?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -34384,6 +36020,7 @@ export namespace Prisma {
     groupId?: SortOrder
     name?: SortOrder
     description?: SortOrder
+    isDefault?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -34393,6 +36030,44 @@ export namespace Prisma {
     groupId?: SortOrder
     name?: SortOrder
     description?: SortOrder
+    isDefault?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type GroupAddressBookScalarRelationFilter = {
+    is?: GroupAddressBookWhereInput
+    isNot?: GroupAddressBookWhereInput
+  }
+
+  export type GroupContactGroupAddressBookIdContactIdCompoundUniqueInput = {
+    groupAddressBookId: string
+    contactId: string
+  }
+
+  export type GroupContactCountOrderByAggregateInput = {
+    id?: SortOrder
+    groupAddressBookId?: SortOrder
+    contactId?: SortOrder
+    addedByUserId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type GroupContactMaxOrderByAggregateInput = {
+    id?: SortOrder
+    groupAddressBookId?: SortOrder
+    contactId?: SortOrder
+    addedByUserId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type GroupContactMinOrderByAggregateInput = {
+    id?: SortOrder
+    groupAddressBookId?: SortOrder
+    contactId?: SortOrder
+    addedByUserId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -35224,6 +36899,13 @@ export namespace Prisma {
     connect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
   }
 
+  export type GroupContactCreateNestedManyWithoutContactInput = {
+    create?: XOR<GroupContactCreateWithoutContactInput, GroupContactUncheckedCreateWithoutContactInput> | GroupContactCreateWithoutContactInput[] | GroupContactUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: GroupContactCreateOrConnectWithoutContactInput | GroupContactCreateOrConnectWithoutContactInput[]
+    createMany?: GroupContactCreateManyContactInputEnvelope
+    connect?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
+  }
+
   export type ContactCreateNestedOneWithoutMergedChildrenInput = {
     create?: XOR<ContactCreateWithoutMergedChildrenInput, ContactUncheckedCreateWithoutMergedChildrenInput>
     connectOrCreate?: ContactCreateOrConnectWithoutMergedChildrenInput
@@ -35284,6 +36966,13 @@ export namespace Prisma {
     connectOrCreate?: ContactShareCreateOrConnectWithoutRecipientContactInput | ContactShareCreateOrConnectWithoutRecipientContactInput[]
     createMany?: ContactShareCreateManyRecipientContactInputEnvelope
     connect?: ContactShareWhereUniqueInput | ContactShareWhereUniqueInput[]
+  }
+
+  export type GroupContactUncheckedCreateNestedManyWithoutContactInput = {
+    create?: XOR<GroupContactCreateWithoutContactInput, GroupContactUncheckedCreateWithoutContactInput> | GroupContactCreateWithoutContactInput[] | GroupContactUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: GroupContactCreateOrConnectWithoutContactInput | GroupContactCreateOrConnectWithoutContactInput[]
+    createMany?: GroupContactCreateManyContactInputEnvelope
+    connect?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
   }
 
   export type ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput = {
@@ -35421,6 +37110,20 @@ export namespace Prisma {
     deleteMany?: ContactShareScalarWhereInput | ContactShareScalarWhereInput[]
   }
 
+  export type GroupContactUpdateManyWithoutContactNestedInput = {
+    create?: XOR<GroupContactCreateWithoutContactInput, GroupContactUncheckedCreateWithoutContactInput> | GroupContactCreateWithoutContactInput[] | GroupContactUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: GroupContactCreateOrConnectWithoutContactInput | GroupContactCreateOrConnectWithoutContactInput[]
+    upsert?: GroupContactUpsertWithWhereUniqueWithoutContactInput | GroupContactUpsertWithWhereUniqueWithoutContactInput[]
+    createMany?: GroupContactCreateManyContactInputEnvelope
+    set?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
+    disconnect?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
+    delete?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
+    connect?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
+    update?: GroupContactUpdateWithWhereUniqueWithoutContactInput | GroupContactUpdateWithWhereUniqueWithoutContactInput[]
+    updateMany?: GroupContactUpdateManyWithWhereWithoutContactInput | GroupContactUpdateManyWithWhereWithoutContactInput[]
+    deleteMany?: GroupContactScalarWhereInput | GroupContactScalarWhereInput[]
+  }
+
   export type ContactUpdateOneWithoutMergedChildrenNestedInput = {
     create?: XOR<ContactCreateWithoutMergedChildrenInput, ContactUncheckedCreateWithoutMergedChildrenInput>
     connectOrCreate?: ContactCreateOrConnectWithoutMergedChildrenInput
@@ -35541,6 +37244,20 @@ export namespace Prisma {
     update?: ContactShareUpdateWithWhereUniqueWithoutRecipientContactInput | ContactShareUpdateWithWhereUniqueWithoutRecipientContactInput[]
     updateMany?: ContactShareUpdateManyWithWhereWithoutRecipientContactInput | ContactShareUpdateManyWithWhereWithoutRecipientContactInput[]
     deleteMany?: ContactShareScalarWhereInput | ContactShareScalarWhereInput[]
+  }
+
+  export type GroupContactUncheckedUpdateManyWithoutContactNestedInput = {
+    create?: XOR<GroupContactCreateWithoutContactInput, GroupContactUncheckedCreateWithoutContactInput> | GroupContactCreateWithoutContactInput[] | GroupContactUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: GroupContactCreateOrConnectWithoutContactInput | GroupContactCreateOrConnectWithoutContactInput[]
+    upsert?: GroupContactUpsertWithWhereUniqueWithoutContactInput | GroupContactUpsertWithWhereUniqueWithoutContactInput[]
+    createMany?: GroupContactCreateManyContactInputEnvelope
+    set?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
+    disconnect?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
+    delete?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
+    connect?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
+    update?: GroupContactUpdateWithWhereUniqueWithoutContactInput | GroupContactUpdateWithWhereUniqueWithoutContactInput[]
+    updateMany?: GroupContactUpdateManyWithWhereWithoutContactInput | GroupContactUpdateManyWithWhereWithoutContactInput[]
+    deleteMany?: GroupContactScalarWhereInput | GroupContactScalarWhereInput[]
   }
 
   export type ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput = {
@@ -36439,12 +38156,82 @@ export namespace Prisma {
     connect?: GroupWhereUniqueInput
   }
 
+  export type GroupContactCreateNestedManyWithoutGroupAddressBookInput = {
+    create?: XOR<GroupContactCreateWithoutGroupAddressBookInput, GroupContactUncheckedCreateWithoutGroupAddressBookInput> | GroupContactCreateWithoutGroupAddressBookInput[] | GroupContactUncheckedCreateWithoutGroupAddressBookInput[]
+    connectOrCreate?: GroupContactCreateOrConnectWithoutGroupAddressBookInput | GroupContactCreateOrConnectWithoutGroupAddressBookInput[]
+    createMany?: GroupContactCreateManyGroupAddressBookInputEnvelope
+    connect?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
+  }
+
+  export type GroupContactUncheckedCreateNestedManyWithoutGroupAddressBookInput = {
+    create?: XOR<GroupContactCreateWithoutGroupAddressBookInput, GroupContactUncheckedCreateWithoutGroupAddressBookInput> | GroupContactCreateWithoutGroupAddressBookInput[] | GroupContactUncheckedCreateWithoutGroupAddressBookInput[]
+    connectOrCreate?: GroupContactCreateOrConnectWithoutGroupAddressBookInput | GroupContactCreateOrConnectWithoutGroupAddressBookInput[]
+    createMany?: GroupContactCreateManyGroupAddressBookInputEnvelope
+    connect?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
+  }
+
   export type GroupUpdateOneRequiredWithoutAddressBooksNestedInput = {
     create?: XOR<GroupCreateWithoutAddressBooksInput, GroupUncheckedCreateWithoutAddressBooksInput>
     connectOrCreate?: GroupCreateOrConnectWithoutAddressBooksInput
     upsert?: GroupUpsertWithoutAddressBooksInput
     connect?: GroupWhereUniqueInput
     update?: XOR<XOR<GroupUpdateToOneWithWhereWithoutAddressBooksInput, GroupUpdateWithoutAddressBooksInput>, GroupUncheckedUpdateWithoutAddressBooksInput>
+  }
+
+  export type GroupContactUpdateManyWithoutGroupAddressBookNestedInput = {
+    create?: XOR<GroupContactCreateWithoutGroupAddressBookInput, GroupContactUncheckedCreateWithoutGroupAddressBookInput> | GroupContactCreateWithoutGroupAddressBookInput[] | GroupContactUncheckedCreateWithoutGroupAddressBookInput[]
+    connectOrCreate?: GroupContactCreateOrConnectWithoutGroupAddressBookInput | GroupContactCreateOrConnectWithoutGroupAddressBookInput[]
+    upsert?: GroupContactUpsertWithWhereUniqueWithoutGroupAddressBookInput | GroupContactUpsertWithWhereUniqueWithoutGroupAddressBookInput[]
+    createMany?: GroupContactCreateManyGroupAddressBookInputEnvelope
+    set?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
+    disconnect?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
+    delete?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
+    connect?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
+    update?: GroupContactUpdateWithWhereUniqueWithoutGroupAddressBookInput | GroupContactUpdateWithWhereUniqueWithoutGroupAddressBookInput[]
+    updateMany?: GroupContactUpdateManyWithWhereWithoutGroupAddressBookInput | GroupContactUpdateManyWithWhereWithoutGroupAddressBookInput[]
+    deleteMany?: GroupContactScalarWhereInput | GroupContactScalarWhereInput[]
+  }
+
+  export type GroupContactUncheckedUpdateManyWithoutGroupAddressBookNestedInput = {
+    create?: XOR<GroupContactCreateWithoutGroupAddressBookInput, GroupContactUncheckedCreateWithoutGroupAddressBookInput> | GroupContactCreateWithoutGroupAddressBookInput[] | GroupContactUncheckedCreateWithoutGroupAddressBookInput[]
+    connectOrCreate?: GroupContactCreateOrConnectWithoutGroupAddressBookInput | GroupContactCreateOrConnectWithoutGroupAddressBookInput[]
+    upsert?: GroupContactUpsertWithWhereUniqueWithoutGroupAddressBookInput | GroupContactUpsertWithWhereUniqueWithoutGroupAddressBookInput[]
+    createMany?: GroupContactCreateManyGroupAddressBookInputEnvelope
+    set?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
+    disconnect?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
+    delete?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
+    connect?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
+    update?: GroupContactUpdateWithWhereUniqueWithoutGroupAddressBookInput | GroupContactUpdateWithWhereUniqueWithoutGroupAddressBookInput[]
+    updateMany?: GroupContactUpdateManyWithWhereWithoutGroupAddressBookInput | GroupContactUpdateManyWithWhereWithoutGroupAddressBookInput[]
+    deleteMany?: GroupContactScalarWhereInput | GroupContactScalarWhereInput[]
+  }
+
+  export type GroupAddressBookCreateNestedOneWithoutContactsInput = {
+    create?: XOR<GroupAddressBookCreateWithoutContactsInput, GroupAddressBookUncheckedCreateWithoutContactsInput>
+    connectOrCreate?: GroupAddressBookCreateOrConnectWithoutContactsInput
+    connect?: GroupAddressBookWhereUniqueInput
+  }
+
+  export type ContactCreateNestedOneWithoutGroupContactsInput = {
+    create?: XOR<ContactCreateWithoutGroupContactsInput, ContactUncheckedCreateWithoutGroupContactsInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutGroupContactsInput
+    connect?: ContactWhereUniqueInput
+  }
+
+  export type GroupAddressBookUpdateOneRequiredWithoutContactsNestedInput = {
+    create?: XOR<GroupAddressBookCreateWithoutContactsInput, GroupAddressBookUncheckedCreateWithoutContactsInput>
+    connectOrCreate?: GroupAddressBookCreateOrConnectWithoutContactsInput
+    upsert?: GroupAddressBookUpsertWithoutContactsInput
+    connect?: GroupAddressBookWhereUniqueInput
+    update?: XOR<XOR<GroupAddressBookUpdateToOneWithWhereWithoutContactsInput, GroupAddressBookUpdateWithoutContactsInput>, GroupAddressBookUncheckedUpdateWithoutContactsInput>
+  }
+
+  export type ContactUpdateOneRequiredWithoutGroupContactsNestedInput = {
+    create?: XOR<ContactCreateWithoutGroupContactsInput, ContactUncheckedCreateWithoutGroupContactsInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutGroupContactsInput
+    upsert?: ContactUpsertWithoutGroupContactsInput
+    connect?: ContactWhereUniqueInput
+    update?: XOR<XOR<ContactUpdateToOneWithWhereWithoutGroupContactsInput, ContactUpdateWithoutGroupContactsInput>, ContactUncheckedUpdateWithoutGroupContactsInput>
   }
 
   export type UserCreateNestedOneWithoutContactSharesOwnedInput = {
@@ -37342,6 +39129,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -37400,6 +39188,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -37813,6 +39602,8 @@ export namespace Prisma {
     type: $Enums.GroupType
     name: string
     memberSlotsLimit?: number | null
+    maxMembers?: number
+    defaultAddressBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     subscription?: SubscriptionCreateNestedOneWithoutGroupsInput
@@ -37826,6 +39617,8 @@ export namespace Prisma {
     name: string
     subscriptionId?: string | null
     memberSlotsLimit?: number | null
+    maxMembers?: number
+    defaultAddressBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
@@ -37846,6 +39639,10 @@ export namespace Prisma {
     id?: string
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
+    canEdit?: boolean
+    invitedAt?: Date | string
+    invitedByUserId?: string | null
+    joinedAt?: Date | string | null
     createdAt?: Date | string
     group: GroupCreateNestedOneWithoutMembersInput
   }
@@ -37855,6 +39652,10 @@ export namespace Prisma {
     groupId: string
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
+    canEdit?: boolean
+    invitedAt?: Date | string
+    invitedByUserId?: string | null
+    joinedAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -38408,6 +40209,8 @@ export namespace Prisma {
     name?: StringFilter<"Group"> | string
     subscriptionId?: StringNullableFilter<"Group"> | string | null
     memberSlotsLimit?: IntNullableFilter<"Group"> | number | null
+    maxMembers?: IntFilter<"Group"> | number
+    defaultAddressBookId?: StringNullableFilter<"Group"> | string | null
     createdAt?: DateTimeFilter<"Group"> | Date | string
     updatedAt?: DateTimeFilter<"Group"> | Date | string
   }
@@ -38437,6 +40240,10 @@ export namespace Prisma {
     userId?: StringFilter<"GroupMember"> | string
     role?: EnumGroupRoleFilter<"GroupMember"> | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFilter<"GroupMember"> | $Enums.GroupInviteStatus
+    canEdit?: BoolFilter<"GroupMember"> | boolean
+    invitedAt?: DateTimeFilter<"GroupMember"> | Date | string
+    invitedByUserId?: StringNullableFilter<"GroupMember"> | string | null
+    joinedAt?: DateTimeNullableFilter<"GroupMember"> | Date | string | null
     createdAt?: DateTimeFilter<"GroupMember"> | Date | string
   }
 
@@ -39134,6 +40941,32 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type GroupContactCreateWithoutContactInput = {
+    id?: string
+    addedByUserId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    groupAddressBook: GroupAddressBookCreateNestedOneWithoutContactsInput
+  }
+
+  export type GroupContactUncheckedCreateWithoutContactInput = {
+    id?: string
+    groupAddressBookId: string
+    addedByUserId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type GroupContactCreateOrConnectWithoutContactInput = {
+    where: GroupContactWhereUniqueInput
+    create: XOR<GroupContactCreateWithoutContactInput, GroupContactUncheckedCreateWithoutContactInput>
+  }
+
+  export type GroupContactCreateManyContactInputEnvelope = {
+    data: GroupContactCreateManyContactInput | GroupContactCreateManyContactInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ContactCreateWithoutMergedChildrenInput = {
     id?: string
     syncUid?: string
@@ -39188,6 +41021,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
   }
 
@@ -39246,6 +41080,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
   }
 
   export type ContactCreateOrConnectWithoutMergedChildrenInput = {
@@ -39307,6 +41142,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactCreateNestedManyWithoutContactInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -39364,6 +41200,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -39628,6 +41465,34 @@ export namespace Prisma {
     data: XOR<ContactShareUpdateManyMutationInput, ContactShareUncheckedUpdateManyWithoutRecipientContactInput>
   }
 
+  export type GroupContactUpsertWithWhereUniqueWithoutContactInput = {
+    where: GroupContactWhereUniqueInput
+    update: XOR<GroupContactUpdateWithoutContactInput, GroupContactUncheckedUpdateWithoutContactInput>
+    create: XOR<GroupContactCreateWithoutContactInput, GroupContactUncheckedCreateWithoutContactInput>
+  }
+
+  export type GroupContactUpdateWithWhereUniqueWithoutContactInput = {
+    where: GroupContactWhereUniqueInput
+    data: XOR<GroupContactUpdateWithoutContactInput, GroupContactUncheckedUpdateWithoutContactInput>
+  }
+
+  export type GroupContactUpdateManyWithWhereWithoutContactInput = {
+    where: GroupContactScalarWhereInput
+    data: XOR<GroupContactUpdateManyMutationInput, GroupContactUncheckedUpdateManyWithoutContactInput>
+  }
+
+  export type GroupContactScalarWhereInput = {
+    AND?: GroupContactScalarWhereInput | GroupContactScalarWhereInput[]
+    OR?: GroupContactScalarWhereInput[]
+    NOT?: GroupContactScalarWhereInput | GroupContactScalarWhereInput[]
+    id?: StringFilter<"GroupContact"> | string
+    groupAddressBookId?: StringFilter<"GroupContact"> | string
+    contactId?: StringFilter<"GroupContact"> | string
+    addedByUserId?: StringFilter<"GroupContact"> | string
+    createdAt?: DateTimeFilter<"GroupContact"> | Date | string
+    updatedAt?: DateTimeFilter<"GroupContact"> | Date | string
+  }
+
   export type ContactUpsertWithoutMergedChildrenInput = {
     update: XOR<ContactUpdateWithoutMergedChildrenInput, ContactUncheckedUpdateWithoutMergedChildrenInput>
     create: XOR<ContactCreateWithoutMergedChildrenInput, ContactUncheckedCreateWithoutMergedChildrenInput>
@@ -39693,6 +41558,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
   }
 
@@ -39751,6 +41617,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
   }
 
   export type ContactUpsertWithWhereUniqueWithoutMergedIntoContactInput = {
@@ -40060,6 +41927,8 @@ export namespace Prisma {
     type: $Enums.GroupType
     name: string
     memberSlotsLimit?: number | null
+    maxMembers?: number
+    defaultAddressBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedGroupsInput
@@ -40073,6 +41942,8 @@ export namespace Prisma {
     type: $Enums.GroupType
     name: string
     memberSlotsLimit?: number | null
+    maxMembers?: number
+    defaultAddressBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
@@ -40301,6 +42172,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -40359,6 +42231,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -40665,6 +42538,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -40723,6 +42597,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -40784,6 +42659,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -40842,6 +42718,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -41011,6 +42888,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -41069,6 +42947,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -41136,6 +43015,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -41194,6 +43074,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -41887,6 +43768,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -41945,6 +43827,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -42146,6 +44029,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -42204,6 +44088,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -42526,6 +44411,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -42584,6 +44470,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -42801,6 +44688,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -42859,6 +44747,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -43001,6 +44890,7 @@ export namespace Prisma {
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -43059,6 +44949,7 @@ export namespace Prisma {
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -43190,6 +45081,7 @@ export namespace Prisma {
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -43248,6 +45140,7 @@ export namespace Prisma {
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -43383,6 +45276,10 @@ export namespace Prisma {
     id?: string
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
+    canEdit?: boolean
+    invitedAt?: Date | string
+    invitedByUserId?: string | null
+    joinedAt?: Date | string | null
     createdAt?: Date | string
     user: UserCreateNestedOneWithoutGroupMembershipsInput
   }
@@ -43392,6 +45289,10 @@ export namespace Prisma {
     userId: string
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
+    canEdit?: boolean
+    invitedAt?: Date | string
+    invitedByUserId?: string | null
+    joinedAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -43409,16 +45310,20 @@ export namespace Prisma {
     id?: string
     name: string
     description?: string | null
+    isDefault?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    contacts?: GroupContactCreateNestedManyWithoutGroupAddressBookInput
   }
 
   export type GroupAddressBookUncheckedCreateWithoutGroupInput = {
     id?: string
     name: string
     description?: string | null
+    isDefault?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    contacts?: GroupContactUncheckedCreateNestedManyWithoutGroupAddressBookInput
   }
 
   export type GroupAddressBookCreateOrConnectWithoutGroupInput = {
@@ -43611,6 +45516,7 @@ export namespace Prisma {
     groupId?: StringFilter<"GroupAddressBook"> | string
     name?: StringFilter<"GroupAddressBook"> | string
     description?: StringNullableFilter<"GroupAddressBook"> | string | null
+    isDefault?: BoolFilter<"GroupAddressBook"> | boolean
     createdAt?: DateTimeFilter<"GroupAddressBook"> | Date | string
     updatedAt?: DateTimeFilter<"GroupAddressBook"> | Date | string
   }
@@ -43620,6 +45526,8 @@ export namespace Prisma {
     type: $Enums.GroupType
     name: string
     memberSlotsLimit?: number | null
+    maxMembers?: number
+    defaultAddressBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedGroupsInput
@@ -43634,6 +45542,8 @@ export namespace Prisma {
     name: string
     subscriptionId?: string | null
     memberSlotsLimit?: number | null
+    maxMembers?: number
+    defaultAddressBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     addressBooks?: GroupAddressBookUncheckedCreateNestedManyWithoutGroupInput
@@ -43713,6 +45623,8 @@ export namespace Prisma {
     type?: EnumGroupTypeFieldUpdateOperationsInput | $Enums.GroupType
     name?: StringFieldUpdateOperationsInput | string
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    maxMembers?: IntFieldUpdateOperationsInput | number
+    defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedGroupsNestedInput
@@ -43727,6 +45639,8 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     subscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    maxMembers?: IntFieldUpdateOperationsInput | number
+    defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     addressBooks?: GroupAddressBookUncheckedUpdateManyWithoutGroupNestedInput
@@ -43796,6 +45710,8 @@ export namespace Prisma {
     type: $Enums.GroupType
     name: string
     memberSlotsLimit?: number | null
+    maxMembers?: number
+    defaultAddressBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedGroupsInput
@@ -43810,6 +45726,8 @@ export namespace Prisma {
     name: string
     subscriptionId?: string | null
     memberSlotsLimit?: number | null
+    maxMembers?: number
+    defaultAddressBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
@@ -43818,6 +45736,32 @@ export namespace Prisma {
   export type GroupCreateOrConnectWithoutAddressBooksInput = {
     where: GroupWhereUniqueInput
     create: XOR<GroupCreateWithoutAddressBooksInput, GroupUncheckedCreateWithoutAddressBooksInput>
+  }
+
+  export type GroupContactCreateWithoutGroupAddressBookInput = {
+    id?: string
+    addedByUserId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contact: ContactCreateNestedOneWithoutGroupContactsInput
+  }
+
+  export type GroupContactUncheckedCreateWithoutGroupAddressBookInput = {
+    id?: string
+    contactId: string
+    addedByUserId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type GroupContactCreateOrConnectWithoutGroupAddressBookInput = {
+    where: GroupContactWhereUniqueInput
+    create: XOR<GroupContactCreateWithoutGroupAddressBookInput, GroupContactUncheckedCreateWithoutGroupAddressBookInput>
+  }
+
+  export type GroupContactCreateManyGroupAddressBookInputEnvelope = {
+    data: GroupContactCreateManyGroupAddressBookInput | GroupContactCreateManyGroupAddressBookInput[]
+    skipDuplicates?: boolean
   }
 
   export type GroupUpsertWithoutAddressBooksInput = {
@@ -43836,6 +45780,8 @@ export namespace Prisma {
     type?: EnumGroupTypeFieldUpdateOperationsInput | $Enums.GroupType
     name?: StringFieldUpdateOperationsInput | string
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    maxMembers?: IntFieldUpdateOperationsInput | number
+    defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedGroupsNestedInput
@@ -43850,9 +45796,331 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     subscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    maxMembers?: IntFieldUpdateOperationsInput | number
+    defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
+  }
+
+  export type GroupContactUpsertWithWhereUniqueWithoutGroupAddressBookInput = {
+    where: GroupContactWhereUniqueInput
+    update: XOR<GroupContactUpdateWithoutGroupAddressBookInput, GroupContactUncheckedUpdateWithoutGroupAddressBookInput>
+    create: XOR<GroupContactCreateWithoutGroupAddressBookInput, GroupContactUncheckedCreateWithoutGroupAddressBookInput>
+  }
+
+  export type GroupContactUpdateWithWhereUniqueWithoutGroupAddressBookInput = {
+    where: GroupContactWhereUniqueInput
+    data: XOR<GroupContactUpdateWithoutGroupAddressBookInput, GroupContactUncheckedUpdateWithoutGroupAddressBookInput>
+  }
+
+  export type GroupContactUpdateManyWithWhereWithoutGroupAddressBookInput = {
+    where: GroupContactScalarWhereInput
+    data: XOR<GroupContactUpdateManyMutationInput, GroupContactUncheckedUpdateManyWithoutGroupAddressBookInput>
+  }
+
+  export type GroupAddressBookCreateWithoutContactsInput = {
+    id?: string
+    name: string
+    description?: string | null
+    isDefault?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    group: GroupCreateNestedOneWithoutAddressBooksInput
+  }
+
+  export type GroupAddressBookUncheckedCreateWithoutContactsInput = {
+    id?: string
+    groupId: string
+    name: string
+    description?: string | null
+    isDefault?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type GroupAddressBookCreateOrConnectWithoutContactsInput = {
+    where: GroupAddressBookWhereUniqueInput
+    create: XOR<GroupAddressBookCreateWithoutContactsInput, GroupAddressBookUncheckedCreateWithoutContactsInput>
+  }
+
+  export type ContactCreateWithoutGroupContactsInput = {
+    id?: string
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
+    nickname?: string | null
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    phoneticCompany?: string | null
+    jobTitle?: string | null
+    department?: string | null
+    website?: string | null
+    birthday?: string | null
+    address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    isEmergency?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutContactsInput
+    importJob?: ImportJobCreateNestedOneWithoutContactsInput
+    leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
+    mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
+    mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactUncheckedCreateWithoutGroupContactsInput = {
+    id?: string
+    userId: string
+    importJobId?: string | null
+    mergedIntoContactId?: string | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
+    nickname?: string | null
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    phoneticCompany?: string | null
+    jobTitle?: string | null
+    department?: string | null
+    website?: string | null
+    birthday?: string | null
+    address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    isEmergency?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
+    mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactCreateOrConnectWithoutGroupContactsInput = {
+    where: ContactWhereUniqueInput
+    create: XOR<ContactCreateWithoutGroupContactsInput, ContactUncheckedCreateWithoutGroupContactsInput>
+  }
+
+  export type GroupAddressBookUpsertWithoutContactsInput = {
+    update: XOR<GroupAddressBookUpdateWithoutContactsInput, GroupAddressBookUncheckedUpdateWithoutContactsInput>
+    create: XOR<GroupAddressBookCreateWithoutContactsInput, GroupAddressBookUncheckedCreateWithoutContactsInput>
+    where?: GroupAddressBookWhereInput
+  }
+
+  export type GroupAddressBookUpdateToOneWithWhereWithoutContactsInput = {
+    where?: GroupAddressBookWhereInput
+    data: XOR<GroupAddressBookUpdateWithoutContactsInput, GroupAddressBookUncheckedUpdateWithoutContactsInput>
+  }
+
+  export type GroupAddressBookUpdateWithoutContactsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    group?: GroupUpdateOneRequiredWithoutAddressBooksNestedInput
+  }
+
+  export type GroupAddressBookUncheckedUpdateWithoutContactsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    groupId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactUpsertWithoutGroupContactsInput = {
+    update: XOR<ContactUpdateWithoutGroupContactsInput, ContactUncheckedUpdateWithoutGroupContactsInput>
+    create: XOR<ContactCreateWithoutGroupContactsInput, ContactUncheckedCreateWithoutGroupContactsInput>
+    where?: ContactWhereInput
+  }
+
+  export type ContactUpdateToOneWithWhereWithoutGroupContactsInput = {
+    where?: ContactWhereInput
+    data: XOR<ContactUpdateWithoutGroupContactsInput, ContactUncheckedUpdateWithoutGroupContactsInput>
+  }
+
+  export type ContactUpdateWithoutGroupContactsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
+    nickname?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    birthday?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutContactsNestedInput
+    importJob?: ImportJobUpdateOneWithoutContactsNestedInput
+    leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
+    mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
+    mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+  }
+
+  export type ContactUncheckedUpdateWithoutGroupContactsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
+    nickname?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    birthday?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
+    mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
   export type UserCreateWithoutContactSharesOwnedInput = {
@@ -43961,6 +46229,7 @@ export namespace Prisma {
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -44019,6 +46288,7 @@ export namespace Prisma {
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -44133,6 +46403,7 @@ export namespace Prisma {
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
+    groupContacts?: GroupContactCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -44191,6 +46462,7 @@ export namespace Prisma {
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
+    groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -44322,6 +46594,7 @@ export namespace Prisma {
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -44380,6 +46653,7 @@ export namespace Prisma {
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -44506,6 +46780,7 @@ export namespace Prisma {
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
+    groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -44564,6 +46839,7 @@ export namespace Prisma {
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
+    groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -44776,6 +47052,8 @@ export namespace Prisma {
     name: string
     subscriptionId?: string | null
     memberSlotsLimit?: number | null
+    maxMembers?: number
+    defaultAddressBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -44785,6 +47063,10 @@ export namespace Prisma {
     groupId: string
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
+    canEdit?: boolean
+    invitedAt?: Date | string
+    invitedByUserId?: string | null
+    joinedAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -44913,6 +47195,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -44971,6 +47254,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -45472,6 +47756,8 @@ export namespace Prisma {
     type?: EnumGroupTypeFieldUpdateOperationsInput | $Enums.GroupType
     name?: StringFieldUpdateOperationsInput | string
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    maxMembers?: IntFieldUpdateOperationsInput | number
+    defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     subscription?: SubscriptionUpdateOneWithoutGroupsNestedInput
@@ -45485,6 +47771,8 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     subscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    maxMembers?: IntFieldUpdateOperationsInput | number
+    defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
@@ -45497,6 +47785,8 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     subscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    maxMembers?: IntFieldUpdateOperationsInput | number
+    defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -45505,6 +47795,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
+    canEdit?: BoolFieldUpdateOperationsInput | boolean
+    invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    invitedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     group?: GroupUpdateOneRequiredWithoutMembersNestedInput
   }
@@ -45514,6 +47808,10 @@ export namespace Prisma {
     groupId?: StringFieldUpdateOperationsInput | string
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
+    canEdit?: BoolFieldUpdateOperationsInput | boolean
+    invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    invitedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -45522,6 +47820,10 @@ export namespace Prisma {
     groupId?: StringFieldUpdateOperationsInput | string
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
+    canEdit?: BoolFieldUpdateOperationsInput | boolean
+    invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    invitedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -45852,6 +48154,14 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     downloadCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type GroupContactCreateManyContactInput = {
+    id?: string
+    groupAddressBookId: string
+    addedByUserId: string
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -46280,6 +48590,30 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type GroupContactUpdateWithoutContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    addedByUserId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    groupAddressBook?: GroupAddressBookUpdateOneRequiredWithoutContactsNestedInput
+  }
+
+  export type GroupContactUncheckedUpdateWithoutContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    groupAddressBookId?: StringFieldUpdateOperationsInput | string
+    addedByUserId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GroupContactUncheckedUpdateManyWithoutContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    groupAddressBookId?: StringFieldUpdateOperationsInput | string
+    addedByUserId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type ContactUpdateWithoutMergedIntoContactInput = {
     id?: StringFieldUpdateOperationsInput | string
     syncUid?: StringFieldUpdateOperationsInput | string
@@ -46334,6 +48668,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -46391,6 +48726,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -46587,6 +48923,8 @@ export namespace Prisma {
     type: $Enums.GroupType
     name: string
     memberSlotsLimit?: number | null
+    maxMembers?: number
+    defaultAddressBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -46596,6 +48934,8 @@ export namespace Prisma {
     type?: EnumGroupTypeFieldUpdateOperationsInput | $Enums.GroupType
     name?: StringFieldUpdateOperationsInput | string
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    maxMembers?: IntFieldUpdateOperationsInput | number
+    defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedGroupsNestedInput
@@ -46609,6 +48949,8 @@ export namespace Prisma {
     type?: EnumGroupTypeFieldUpdateOperationsInput | $Enums.GroupType
     name?: StringFieldUpdateOperationsInput | string
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    maxMembers?: IntFieldUpdateOperationsInput | number
+    defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
@@ -46621,6 +48963,8 @@ export namespace Prisma {
     type?: EnumGroupTypeFieldUpdateOperationsInput | $Enums.GroupType
     name?: StringFieldUpdateOperationsInput | string
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    maxMembers?: IntFieldUpdateOperationsInput | number
+    defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -46727,6 +49071,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -46785,6 +49130,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -47240,6 +49586,10 @@ export namespace Prisma {
     userId: string
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
+    canEdit?: boolean
+    invitedAt?: Date | string
+    invitedByUserId?: string | null
+    joinedAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -47247,6 +49597,7 @@ export namespace Prisma {
     id?: string
     name: string
     description?: string | null
+    isDefault?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -47255,6 +49606,10 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
+    canEdit?: BoolFieldUpdateOperationsInput | boolean
+    invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    invitedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutGroupMembershipsNestedInput
   }
@@ -47264,6 +49619,10 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
+    canEdit?: BoolFieldUpdateOperationsInput | boolean
+    invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    invitedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -47272,6 +49631,10 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
+    canEdit?: BoolFieldUpdateOperationsInput | boolean
+    invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    invitedByUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    joinedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -47279,22 +49642,59 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: GroupContactUpdateManyWithoutGroupAddressBookNestedInput
   }
 
   export type GroupAddressBookUncheckedUpdateWithoutGroupInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: GroupContactUncheckedUpdateManyWithoutGroupAddressBookNestedInput
   }
 
   export type GroupAddressBookUncheckedUpdateManyWithoutGroupInput = {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GroupContactCreateManyGroupAddressBookInput = {
+    id?: string
+    contactId: string
+    addedByUserId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type GroupContactUpdateWithoutGroupAddressBookInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    addedByUserId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contact?: ContactUpdateOneRequiredWithoutGroupContactsNestedInput
+  }
+
+  export type GroupContactUncheckedUpdateWithoutGroupAddressBookInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contactId?: StringFieldUpdateOperationsInput | string
+    addedByUserId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type GroupContactUncheckedUpdateManyWithoutGroupAddressBookInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contactId?: StringFieldUpdateOperationsInput | string
+    addedByUserId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
