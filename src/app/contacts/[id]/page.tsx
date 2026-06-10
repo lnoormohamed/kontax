@@ -277,8 +277,12 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
       <div className="bg-white text-[#1d2823]">
         {/* slim sticky sub-header (back · name · Share/Archive/Favorite/⋯) */}
         <div className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-[#d8ddd6] bg-white/95 px-4 backdrop-blur lg:px-6">
-          <Link className="text-sm font-semibold text-[#5c655e] transition hover:text-[#1d2823]" href="/">
-            ← Contacts
+          <Link
+            className="flex items-center gap-1.5 text-sm font-semibold text-[#5c655e] transition hover:text-[#1d2823]"
+            href="/"
+          >
+            <WorkspaceIcon name="back" size={17} />
+            Contacts
           </Link>
           <span className="flex-1 truncate text-center text-[15px] font-semibold text-[#1d2823]">
             {contact.fullName}
@@ -302,7 +306,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
             </form>
             <details className="relative">
               <summary className="grid h-8 w-8 cursor-pointer list-none place-items-center rounded-[0.8rem] border border-[#d8ddd6] bg-white text-[#5c655e] transition hover:bg-[#f2f4f0]">
-                ⋯
+                <WorkspaceIcon name="more" size={18} />
               </summary>
               <div className="absolute right-0 z-10 mt-1 w-56 rounded-[1rem] border border-[#d8ddd6] bg-white p-1.5 shadow-lg">
                 <form action={permanentlyDeleteContact}>
@@ -329,8 +333,8 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
             <div className="relative inline-flex h-[88px] w-[88px] items-center justify-center rounded-full bg-[#e7efe9] text-3xl font-semibold text-[#17352e]">
               {getInitials(contact.fullName)}
               {contact.isFavorite ? (
-                <span className="absolute -bottom-0.5 -right-0.5 grid h-7 w-7 place-items-center rounded-full bg-white text-[15px] text-[#e0a31c] shadow">
-                  ★
+                <span className="absolute -bottom-0.5 -right-0.5 grid h-7 w-7 place-items-center rounded-full bg-white text-[#e0a31c] shadow">
+                  <WorkspaceIcon fill="#e0a31c" name="star" size={14} />
                 </span>
               ) : null}
             </div>
@@ -343,7 +347,10 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               </p>
             ) : null}
             {contact.birthday ? (
-              <p className="mt-1 text-[13px] text-[#8b938c]">🎂 {formatStoredDateValue(contact.birthday)}</p>
+              <p className="mt-1 flex items-center gap-1.5 text-[13px] text-[#8b938c]">
+                <WorkspaceIcon name="gift" size={14} />
+                {formatStoredDateValue(contact.birthday)}
+              </p>
             ) : null}
 
             <div className="mt-3.5 flex flex-wrap gap-2">
@@ -399,6 +406,18 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               >
                 <WorkspaceIcon name="share" size={17} />
               </Link>
+              <form action={contact.archivedAt ? restoreContact : archiveContact}>
+                <input name="contactId" type="hidden" value={contact.id} />
+                <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}`} />
+                <button
+                  aria-label={contact.archivedAt ? "Restore" : "Archive"}
+                  className="grid h-9 w-9 place-items-center rounded-[0.7rem] border border-[#d8ddd6] bg-white text-[#5c655e] transition hover:bg-[#f2f4f0]"
+                  title={contact.archivedAt ? "Restore" : "Archive"}
+                  type="submit"
+                >
+                  <WorkspaceIcon name={contact.archivedAt ? "restore" : "archive"} size={17} />
+                </button>
+              </form>
             </div>
 
             <div className="my-5 h-px bg-[#edf0ea] " />
@@ -451,13 +470,15 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
 
         {/* Details · Sharing · History tabs (P17-02) */}
         <div className="flex items-center gap-1 border-b border-[#d8ddd6]">
-          {[
-            ["details", "Details"],
-            ["sharing", "Sharing"],
-            ["history", "History"],
-          ].map(([key, label]) => (
+          {(
+            [
+              ["details", "Details", "briefcase"],
+              ["sharing", "Sharing", "share"],
+              ["history", "History", "clock"],
+            ] as const
+          ).map(([key, label, icon]) => (
             <Link
-              className={`-mb-px border-b-2 px-4 py-2.5 text-sm font-semibold transition ${
+              className={`-mb-px flex items-center gap-1.5 border-b-2 px-4 py-2.5 text-sm font-semibold transition ${
                 detailTab === key
                   ? "border-[#17352e] text-[#1d2823]"
                   : "border-transparent text-[#8b938c] hover:text-[#5c655e]"
@@ -465,6 +486,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               href={`/contacts/${contact.id}?tab=${key}`}
               key={key}
             >
+              <WorkspaceIcon name={icon} size={16} />
               {label}
             </Link>
           ))}
