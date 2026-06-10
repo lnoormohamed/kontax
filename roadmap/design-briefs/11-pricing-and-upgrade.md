@@ -26,7 +26,7 @@ Four tiers. Feature rows on the pricing page should be **grouped by category** i
 - Sync: **1** CardDAV account, **1** device app password
 - Import: **3 / month** · Export: CSV + vCard
 - Merge: basic suggestions (no bulk accept, no undo)
-- Activity: per-contact history **last 10 events** · source badges · **no** global feed
+- Activity: per-contact history shows the **last 3 events** (10 kept) · source badges · **no** global feed
 - Sharing: vCard link (download, **expires 7 days**) · no Kontax-to-Kontax sharing
 - Support: community
 
@@ -180,7 +180,7 @@ Before confirming any downgrade, show exactly **what will be lost or limited** �
 │  • Contacts over 500 become read-only       │
 │    (you can't add new ones until under)     │
 │  • The activity feed will be locked;        │
-│    history shows only the last 10 events    │
+│    history shows only the last 3 events     │
 │  • Extra sync accounts / app passwords stop │
 │  • Live shares convert to static snapshots  │
 │                                             │

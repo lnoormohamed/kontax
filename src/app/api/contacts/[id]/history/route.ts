@@ -1,6 +1,6 @@
 import { actorIconName, formatActorLabel, formatEventSummary } from "~/lib/activity/formatters";
 import { auth } from "~/server/auth";
-import { getUserBillingContext, isActivityLogEnabled } from "~/server/billing";
+import { getUserBillingContext } from "~/server/billing";
 import { db } from "~/server/db";
 
 const DEFAULT_LIMIT = 30;
@@ -37,13 +37,13 @@ export async function GET(
     ? Math.min(Math.max(rawLimit, 1), MAX_LIMIT)
     : DEFAULT_LIMIT;
 
-  // Free plan caps per-contact history to its floor (last N events) with no
-  // pagination. Paid tiers show all retained events.
+  // Free caps the per-contact History view to its display cap (e.g. 3) with no
+  // pagination — fewer than it physically keeps (10). Paid tiers (null cap) show
+  // all retained events.
   const billing = await getUserBillingContext(userId);
-  const capped = !isActivityLogEnabled(billing.entitlements);
-  const effectiveLimit = capped
-    ? Math.min(limit, billing.entitlements.historyFloorPerContact)
-    : limit;
+  const displayCap = billing.entitlements.historyDisplayCap;
+  const capped = displayCap !== null;
+  const effectiveLimit = capped ? Math.min(limit, displayCap) : limit;
   const cursorDate = capped || !cursor ? null : new Date(cursor);
 
   const rows = await db.activityEvent.findMany({

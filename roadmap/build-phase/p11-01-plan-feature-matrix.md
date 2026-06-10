@@ -38,7 +38,7 @@ The current `billing.ts` PLAN_DEFAULTS map (`FREE`, `PLUS`, `PRO`) and the Prism
 #### Contacts
 - Maximum 500 contacts. This is a hard ceiling enforced at contact create and import time.
 - Contacts are user-owned only. No shared address books.
-- Per-contact history: the last 10 ActivityEvent rows associated with a contact are visible in the contact detail view. This is enforced at query time by applying `take: 10, orderBy: createdAt desc` — not by deleting older events. The rows remain in the database but are never surfaced to Free users.
+- Per-contact history (revised 2026-06-10): Free physically **keeps the last 10** events per contact (the prune job count-caps to 10 — no time window), but the History tab **shows only the last 3** (`historyDisplayCap = 3`) as an upgrade teaser. So Free keeps 10, surfaces 3. (Previously Free kept all rows and showed 10; now storage is bounded and the visible amount is a nudge to upgrade.)
 - Source badges are shown on contacts (which sync account or import job a contact came from). This is a display-only feature requiring no plan gate.
 
 #### Import
@@ -70,7 +70,7 @@ The current `billing.ts` PLAN_DEFAULTS map (`FREE`, `PLUS`, `PRO`) and the Prism
 
 #### Activity Log
 - No global activity log feed. The activity feed page/section is not accessible.
-- Per-contact history is available but limited to the last 10 events at query time (see Contacts section above).
+- Per-contact history is available but shows only the last 3 events (10 kept) — see Contacts section above.
 
 #### Support
 - Community support only (documentation and public forum).
@@ -240,7 +240,8 @@ New fields added in P11-02:
 | `sharedAddressBooksLimit` | 0 | 0 | 1 | null (unlimited) |
 | `memberSlotsLimit` | null | null | 6 | 25 |
 | `activityLogRetentionDays` | 0 | **365** | **90** | null (unlimited) |
-| `historyFloorPerContact` | 10 | 20 | 20 | 20 |
+| `historyFloorPerContact` (kept) | 10 | 20 | 20 | 20 |
+| `historyDisplayCap` (shown) | 3 | null (all) | null (all) | null (all) |
 | `liveShareEnabled` | false | true | true | true |
 | `staticShareEnabled` | false | true | true | true |
 
@@ -251,7 +252,7 @@ Notes on null semantics:
 - `contactsLimit: null` = no ceiling. Enforcement code must check `if (limit !== null && used >= limit)`.
 - `monthlyImportLimit: null` = no ceiling. Same null check.
 - `activityLogRetentionDays: null` = keep forever (Teams). The P11-05 prune job skips these users.
-- `activityLogRetentionDays: 0` = no global feed (Free). **Revised 2026-06-10:** the prune job **skips** Free users — it does **not** delete their events. Free keeps all rows; the global feed is gated and per-contact history is capped to the last 10 at query time. (Deleting Free events would erase per-contact history, which the matrix preserves.)
+- `activityLogRetentionDays: 0` = no global feed (Free). **Revised 2026-06-10:** the prune job applies a **count-based** cap for Free (no time window) — it keeps the last `historyFloorPerContact` (10) events per contact and deletes the rest. The History tab then shows only the last `historyDisplayCap` (3). (Earlier this skipped Free entirely; now Free storage is bounded to 10/contact while the visible amount is a 3-event teaser.)
 - `activityLogRetentionDays > 0` (**Pro 365 / Family 90**): the prune job physically deletes that user's `ActivityEvent` rows older than the window, **except the last `historyFloorPerContact` (20) events per contact**, which are always kept. This bounds both the global feed and per-contact history. **Personal vs shared-book note:** this field governs *personal* activity. Shared-book & team-audit retentions (Family/Teams) apply to `GroupAddressBook` activity, which does not exist until Phases 13–14; revisit when shared books ship.
 - `sharedAddressBooksLimit: null` = unlimited books (Teams only).
 - `memberSlotsLimit: null` = single-user plans, group features not applicable.

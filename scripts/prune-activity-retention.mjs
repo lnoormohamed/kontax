@@ -5,8 +5,8 @@
  * EXCEPT it always keeps the most recent N events per contact (the floor), so
  * recent history is never lost even past the window. Windows + floor come from
  * the frozen P11-01 matrix:
- *   Free   — retention 0  → skipped (never pruned; feed gated, history capped at
- *            the last 10 per contact at query time)
+ *   Free   — no time window; keep only the last 10 per contact (count-based
+ *            prune), and the History tab shows just the last 3 (display cap)
  *   Pro    — 365 days, floor 20 per contact
  *   Family — 90 days,  floor 20 per contact
  *   Teams  — unlimited → skipped (never pruned)
@@ -88,13 +88,17 @@ try {
     const plan = user.subscriptions[0]?.plan ?? "FREE";
     const { days, floor } = PLAN_RETENTION[plan] ?? PLAN_RETENTION.FREE;
 
-    // Free (0) and unlimited (null) tiers are never physically pruned.
-    if (days === null || days <= 0) {
+    // Teams (unlimited / null) is never pruned.
+    if (days === null) {
       usersSkipped += 1;
       continue;
     }
 
-    const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
+    // Free (days === 0): no time window — the floor alone caps storage (keep the
+    // last `floor` per contact). Using cutoff = now means every event is "older
+    // than the window", so only the per-contact floor survives. Paid tiers use a
+    // real time window.
+    const cutoff = days === 0 ? new Date() : new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
     if (DRY_RUN) {
       const rows = await prisma.$queryRawUnsafe(COUNT_SQL, user.id, cutoff, floor);

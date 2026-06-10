@@ -17,9 +17,12 @@ type PlanEntitlements = {
   sharedAddressBooksLimit: number | null;
   memberSlotsLimit: number | null;
   activityLogRetentionDays: number | null;
-  // Floor: the N most recent events per contact are always kept, even beyond the
-  // retention window (P11-05). Also the per-contact history display cap on Free.
+  // Floor: the N most recent events per contact that are always KEPT (survive
+  // pruning), even beyond the retention window (P11-05). Free keeps 10.
   historyFloorPerContact: number;
+  // Per-contact History tab display cap. null = show all retained events (paid).
+  // Free SHOWS fewer than it keeps (keeps 10, shows 3) as an upgrade teaser.
+  historyDisplayCap: number | null;
   liveShareEnabled: boolean;
   staticShareEnabled: boolean;
 };
@@ -127,6 +130,7 @@ const PRO_PERSONAL = {
   premiumExportEnabled: true,
   cardDavSyncEnabled: true,
   historyFloorPerContact: 20,
+  historyDisplayCap: null,
   liveShareEnabled: true,
   staticShareEnabled: true,
 } as const;
@@ -146,6 +150,7 @@ const PLAN_DEFAULTS: Record<SubscriptionPlan, PlanEntitlements> = {
     memberSlotsLimit: null,
     activityLogRetentionDays: 0,
     historyFloorPerContact: 10,
+    historyDisplayCap: 3,
     liveShareEnabled: false,
     staticShareEnabled: false,
   },
