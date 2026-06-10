@@ -71,7 +71,9 @@ function IconTile({ icon }: { icon: string }) {
   );
 }
 
-// A clean action row that expands an inline panel on click (chevron rotates).
+// Expanding action row. Trailing slot follows the design rule: when collapsed
+// the trailing icon is check (active) or chevronRight (inactive); when expanded
+// it is always a rotated chevron so users can collapse the panel.
 function ActionRow({
   icon,
   title,
@@ -88,6 +90,18 @@ function ActionRow({
   children: React.ReactNode;
 }) {
   const [open, setOpen] = useState(Boolean(defaultOpen));
+  const trailing = open ? (
+    <WorkspaceIcon
+      className="shrink-0 rotate-90 text-[#aeb4ac] transition-transform"
+      name="chevronRight"
+      size={16}
+      strokeWidth={1.9}
+    />
+  ) : active ? (
+    <WorkspaceIcon className="shrink-0 text-[#1f8a5b]" name="check" size={16} strokeWidth={2} />
+  ) : (
+    <WorkspaceIcon className="shrink-0 text-[#aeb4ac]" name="chevronRight" size={16} strokeWidth={1.9} />
+  );
   return (
     <div className="rounded-[10px] transition hover:bg-[#f6f7f4]">
       <button
@@ -101,15 +115,7 @@ function ActionRow({
           <span className="block text-sm font-semibold text-[#1d2823]">{title}</span>
           <span className="mt-px block text-xs leading-[1.45] text-[#8b938c]">{subtitle}</span>
         </span>
-        {active ? (
-          <WorkspaceIcon className="text-[#1f8a5b]" name="check" size={16} strokeWidth={2} />
-        ) : null}
-        <WorkspaceIcon
-          className={`shrink-0 text-[#aeb4ac] transition-transform ${open ? "rotate-90" : ""}`}
-          name="chevronRight"
-          size={16}
-          strokeWidth={1.9}
-        />
+        {trailing}
       </button>
       {open ? <div className="px-3 pb-3 pl-[60px]">{children}</div> : null}
     </div>
@@ -363,6 +369,7 @@ export function ContactSharing({
 
         <ActionRow
           active={hasStatic}
+          defaultOpen={hasStatic}
           icon="send"
           subtitle="A snapshot — recipient's edits stay separate"
           title="Send a copy"
@@ -378,6 +385,7 @@ export function ContactSharing({
         {!isLiveReceived ? (
           <ActionRow
             active={hasLive}
+            defaultOpen={hasLive}
             icon="live"
             subtitle="A read-only mirror — they see your updates"
             title="Share a live link"
@@ -402,6 +410,7 @@ export function ContactSharing({
         />
         <ActionRow
           active={vcardLinks.length > 0}
+          defaultOpen={vcardLinks.length > 0}
           icon="link"
           subtitle={
             isFree
