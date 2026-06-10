@@ -10,7 +10,7 @@ One brief per page or major surface. Each brief describes the purpose, layout, v
 | [02 — Contact Detail](./02-contact-detail.md) | `/contacts/[id]` | P0 |
 | [03 — Create Contact](./03-create-edit-contact.md) | `/contacts/new` (editing is inline on the detail page — see 02) | P0 — **LOCKED** |
 | [04 — Login & Register](./04-login-register.md) | `/login`, `/register` | P0 — **LOCKED** |
-| [05 — Public Landing](./05-public-landing.md) | `/` (logged out) | P1 |
+| [05 — Public Landing](./05-public-landing.md) | `/` (logged out) | P1 — light system, ready to send |
 | [06 — Settings](./06-settings.md) | `/settings` | P1 |
 | [07 — Sync & Connections](./07-sync-connections.md) | `/sync` | P1 |
 | [08 — Import & Export](./08-import-export.md) | `/import-export` | P1 |
