@@ -24,7 +24,7 @@ Make the Family plan a real product by letting family members share a common add
 | P13-03 | Done | P0 | P13-01, P10-01, P10-02 |
 | P13-04 | Done | P1 | P13-02, P13-03, P10-01 |
 | P13-05 | Done | P1 | P13-04 |
-| P13-06 | Not Started | P1 | P13-04 |
+| P13-06 | Done | P1 | P13-04 |
 | P13-07 | Not Started | P1 | P13-05, P13-06 |
 | P13-08 | Not Started | P2 | P13-07, P9-04 |
 
@@ -156,7 +156,8 @@ Make the Family plan a real product by letting family members share a common add
 ---
 
 ## P13-06 — Family group management page
-- Status: `Not Started`
+- Status: `Done`
+- **Owner transfer deferred:** the subscription is anchored to a single userId, so transferring ownership has billing implications that need confirming with the billing integration first (per the ticket's risk note). Shipped: edit-permission toggle, resend/revoke invite, remove member, leave group, and delete group (removes shared contacts). Owner transfer tracked as a follow-up.
 - Priority: `P1`
 - Dependencies: `P13-04`
 - Implementation Notes:

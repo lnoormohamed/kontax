@@ -372,6 +372,79 @@ export const addContactToFamilyBook = async (formData: FormData) => {
   revalidatePath(`/contacts/${contactId}`);
 };
 
+// --- Owner management: permissions, resend, delete (P13-06) -----------------
+export const setMemberCanEdit = async (formData: FormData) => {
+  const userId = await requireUserId();
+  const memberId = str(formData, "memberId");
+  const canEdit = str(formData, "canEdit") === "true";
+  const member = await requireOwnedMember(userId, memberId);
+  if (member.role === "OWNER") {
+    throw new Error("The owner always has edit access.");
+  }
+  await db.groupMember.update({ where: { id: member.id }, data: { canEdit } });
+  revalidatePath("/settings/family");
+};
+
+export const resendFamilyInvite = async (formData: FormData) => {
+  const userId = await requireUserId();
+  const memberId = str(formData, "memberId");
+  const member = await requireOwnedMember(userId, memberId);
+  if (member.inviteStatus !== "PENDING" || !member.invitedEmail) {
+    throw new Error("That invite can't be resent.");
+  }
+  const group = await db.group.findUnique({
+    where: { id: member.groupId },
+    include: { owner: { select: { name: true, email: true } } },
+  });
+  if (!group) throw new Error("Group not found.");
+
+  const token = randomBytes(24).toString("base64url");
+  await db.groupMember.update({
+    where: { id: member.id },
+    data: { inviteToken: token, inviteExpiresAt: new Date(Date.now() + INVITE_TTL_MS) },
+  });
+  const recipient = await db.user.findUnique({
+    where: { email: member.invitedEmail },
+    select: { id: true },
+  });
+  await sendInviteEmail({
+    email: member.invitedEmail,
+    groupName: group.name,
+    ownerName: group.owner.name?.trim() ?? group.owner.email ?? "A Kontax user",
+    token,
+    recipientExists: Boolean(recipient),
+  });
+  revalidatePath("/settings/family");
+};
+
+// Delete the family group. Owner only. Permanently deletes the shared contacts
+// (they live in the book, not a member's private library) and all membership.
+export const deleteFamilyGroup = async (formData: FormData) => {
+  const userId = await requireUserId();
+  const groupId = str(formData, "groupId");
+  const group = await db.group.findFirst({
+    where: { id: groupId, ownerId: userId, type: "FAMILY" },
+    include: { addressBooks: { include: { contacts: { select: { contactId: true } } } } },
+  });
+  if (!group) {
+    throw new Error("Family group not found.");
+  }
+  const contactIds = group.addressBooks.flatMap((b) => b.contacts.map((c) => c.contactId));
+
+  await db.$transaction(async (tx) => {
+    if (contactIds.length > 0) {
+      // Deleting the Contact rows cascades their GroupContact links.
+      await tx.contact.deleteMany({ where: { id: { in: contactIds } } });
+    }
+    // Deleting the group cascades members + address books.
+    await tx.group.delete({ where: { id: group.id } });
+  });
+
+  revalidatePath("/");
+  revalidatePath("/settings");
+  redirect("/settings");
+};
+
 export const leaveFamilyGroup = async (formData: FormData) => {
   const userId = await requireUserId();
   const groupId = str(formData, "groupId");

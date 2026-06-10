@@ -3,9 +3,12 @@ import { redirect } from "next/navigation";
 
 import {
   createFamilyGroup,
+  deleteFamilyGroup,
   inviteFamilyMember,
   leaveFamilyGroup,
   removeFamilyMember,
+  resendFamilyInvite,
+  setMemberCanEdit,
 } from "~/app/actions/family";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
@@ -181,6 +184,23 @@ export default async function FamilySettingsPage() {
                   </span>
                   <span className="flex shrink-0 items-center gap-3">
                     <span className="text-[#8b938c]">{statusLabel}</span>
+                    {m.role !== "OWNER" && m.inviteStatus === "ACCEPTED" ? (
+                      <form action={setMemberCanEdit}>
+                        <input name="memberId" type="hidden" value={m.id} />
+                        <input name="canEdit" type="hidden" value={m.canEdit ? "false" : "true"} />
+                        <button className="font-semibold text-[#4158f4]" type="submit">
+                          {m.canEdit ? "Make view-only" : "Allow editing"}
+                        </button>
+                      </form>
+                    ) : null}
+                    {m.role !== "OWNER" && m.inviteStatus === "PENDING" ? (
+                      <form action={resendFamilyInvite}>
+                        <input name="memberId" type="hidden" value={m.id} />
+                        <button className="font-semibold text-[#4158f4]" type="submit">
+                          Resend
+                        </button>
+                      </form>
+                    ) : null}
                     {m.role !== "OWNER" ? (
                       <form action={removeFamilyMember}>
                         <input name="memberId" type="hidden" value={m.id} />
@@ -222,6 +242,28 @@ export default async function FamilySettingsPage() {
               </button>
             </form>
           )}
+        </section>
+
+        <section className="rounded-[14px] border border-[#f0d8ce] bg-white p-5">
+          <p className="text-sm font-semibold text-[#b5472f]">Delete family book</p>
+          <p className="mt-1 text-[13px] text-[#8b938c]">
+            Permanently deletes the shared book and its {ownedGroup.members.length > 0 ? "" : ""}
+            contacts for everyone. Members keep their own private contacts. This can&rsquo;t be undone.
+          </p>
+          <details className="mt-3">
+            <summary className="inline-flex cursor-pointer list-none rounded-[9px] border border-[#f0d8ce] px-3.5 py-2 text-sm font-semibold text-[#b5472f] transition hover:bg-[#fbeae6]">
+              Delete family book…
+            </summary>
+            <form action={deleteFamilyGroup} className="mt-3">
+              <input name="groupId" type="hidden" value={ownedGroup.id} />
+              <button
+                className="rounded-[9px] bg-[#b5472f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#9c3c28]"
+                type="submit"
+              >
+                Yes, permanently delete &ldquo;{ownedGroup.name}&rdquo;
+              </button>
+            </form>
+          </details>
         </section>
       </div>
     </Shell>
