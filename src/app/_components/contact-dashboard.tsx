@@ -66,6 +66,7 @@ type ContactDashboardProps = {
   viewMode: WorkspaceView;
   currentScope: "all" | "private" | "family";
   hasFamily: boolean;
+  familyBookName: string | null;
   counts: {
     people: number;
     favorites: number;
@@ -102,6 +103,7 @@ export function ContactDashboard({
   viewMode,
   currentScope,
   hasFamily,
+  familyBookName,
   counts,
   account,
   syncState,
@@ -275,6 +277,22 @@ export function ContactDashboard({
         )}
         {navItem(currentTab === "activity", buildHref("activity"), "clock", "Activity", null)}
         {navItem(false, "/shares", "download", "Shared with me", incomingShares ?? null, true)}
+
+        {/* Shared books (P15-04) — membership views live here, not in personal filters */}
+        {hasFamily && familyBookName ? (
+          <div className="mt-3">
+            <div className="px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8b938c]">
+              Shared books
+            </div>
+            {navItem(
+              currentTab === "people" && currentScope === "family",
+              buildHref("people", { filter: "all", scope: "family" }),
+              "users",
+              familyBookName,
+              null,
+            )}
+          </div>
+        ) : null}
 
         {/* Labels (placeholder until the labels feature ships) */}
         <div className="mt-3">

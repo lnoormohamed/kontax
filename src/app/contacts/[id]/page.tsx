@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 
 import { AppShell } from "~/app/_components/app-shell";
 import { ContactHistory } from "~/app/_components/contact-history";
+import { ContactFamilyPanel } from "~/app/_components/contact-family-panel";
 import { ContactInlineEditor } from "~/app/_components/contact-inline-editor";
 import { ContactSharing } from "~/app/_components/contact-sharing";
 import { CopyMonoRow } from "~/app/_components/copy-field";
@@ -356,6 +357,32 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
   const isSharedContact = Boolean(familyContext);
   const canAddToFamily = Boolean(familyMembership?.canEdit) && !isSharedContact;
 
+  // P15-03: "Shared with your family" panel data (members + last editor).
+  const [familyMembers, lastFamilyEvent] = isSharedContact && familyContext
+    ? await Promise.all([
+        db.groupMember.findMany({
+          where: { groupId: familyContext.groupId, inviteStatus: "ACCEPTED" },
+          orderBy: [{ role: "asc" }, { createdAt: "asc" }],
+          select: { userId: true, role: true, canEdit: true, user: { select: { name: true, email: true } } },
+        }),
+        db.activityEvent.findFirst({
+          where: { contactId: contact.id, eventType: { in: ["CONTACT_UPDATED", "CONTACT_CREATED"] } },
+          orderBy: { createdAt: "desc" },
+          select: { actor: true, actorDetail: true, createdAt: true },
+        }),
+      ])
+    : [[], null];
+  const familyPanelMembers = familyMembers.map((m) => ({
+    name: m.user?.name?.trim() ?? m.user?.email ?? "Member",
+    access: m.role === "OWNER" ? ("owner" as const) : m.canEdit ? ("edit" as const) : ("view" as const),
+    you: m.userId === session.user.id,
+  }));
+  const lastEditedBy = lastFamilyEvent
+    ? (lastFamilyEvent.actorDetail?.replace(/ \(CardDAV\)$/, "") ??
+       (lastFamilyEvent.actor === "FAMILY_MEMBER" ? "a family member" : "you"))
+    : null;
+  const lastEditedAt = lastFamilyEvent ? formatMetaDate(lastFamilyEvent.createdAt) : null;
+
   // Shared books the user owns/belongs to (for the "Add to a shared book"
   // section of the Sharing tab). Adding a contact to a book lands in Phase 13.
   const sharedBooks = await db.group.findMany({
@@ -690,6 +717,15 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
 
         {detailTab === "details" ? (
           <div className="grid gap-4">
+            {isSharedContact && familyContext ? (
+              <ContactFamilyPanel
+                groupName={familyContext.groupName}
+                lastEditedAt={lastEditedAt}
+                lastEditedBy={lastEditedBy}
+                members={familyPanelMembers}
+                viewerCanEdit={Boolean(familyMembership?.canEdit)}
+              />
+            ) : null}
             <ContactInlineEditor
               contact={{
                 id: contact.id,

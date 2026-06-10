@@ -573,6 +573,7 @@ export default async function Home({ searchParams }: HomePageProps) {
         viewMode={selectedView}
         currentScope={scope}
         hasFamily={Boolean(familyMembership)}
+        familyBookName={familyMembership?.groupName ?? null}
         counts={{
           people: peopleCount,
           favorites: favoritesCount,
