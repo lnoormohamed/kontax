@@ -394,7 +394,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
 
   return (
     <AppShell account={shellAccount} counts={shellCounts}>
-      <div className="bg-white text-[#1d2823]">
+      <div className="min-h-full bg-white text-[#1d2823]">
         {/* slim sticky sub-header (back · name · Share/Archive/Favorite/⋯) */}
         <div className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-[#d8ddd6] bg-white/95 px-4 backdrop-blur lg:px-6">
           <Link
@@ -446,7 +446,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
           </div>
         </div>
 
-        <div className="flex">
+        <div className="flex bg-white">
           {/* left rail (sticky) */}
           <aside
             className="hidden w-[320px] shrink-0 self-start border-r border-[#d8ddd6] bg-white p-6 lg:block"
@@ -577,7 +577,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
           </aside>
 
           {/* right pane */}
-          <main className="min-w-0 flex-1 px-4 py-5 lg:px-8 lg:py-6">
+          <main className="min-w-0 flex-1 bg-white px-4 py-5 lg:px-8 lg:py-6">
             <div className="mx-auto flex w-full max-w-[820px] flex-col gap-5">
 
         {wasSaved ? (
