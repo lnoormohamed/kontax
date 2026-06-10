@@ -16,6 +16,7 @@ One brief per page or major surface. Each brief describes the purpose, layout, v
 | [08 — Import & Export](./08-import-export.md) | `/import-export` | P1 |
 | [09 — Merge & Duplicates](./09-merge-duplicates.md) | `/merge-suggestions/[id]`, `/merge/manual` | P2 |
 | [10 — Activity Log & Source](./10-activity-log-and-source.md) | `/contacts/[id]` (source/history), `/?tab=activity`, `/?tab=duplicates` | P2 |
+| [11 — Pricing & Upgrade Flows](./11-pricing-and-upgrade.md) | `/pricing` + upgrade prompts / comparison modal / downgrade warning | P1 |
 
 ## Design Principles
 

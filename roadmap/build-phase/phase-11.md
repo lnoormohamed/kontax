@@ -21,7 +21,7 @@ Restructure the subscription model around four tiers that reflect how people act
 | P11-01 | Done | P0 | P2-02 |
 | P11-02 | Done | P0 | P11-01 |
 | P11-03 | Done | P0 | P11-01 |
-| P11-04 | Not Started | P1 | P11-02, P11-03 |
+| P11-04 | Done | P1 | P11-02, P11-03 |
 | P11-05 | Not Started | P1 | P11-01, P10-01 |
 | P11-06 | Not Started | P2 | P11-05 |
 
@@ -169,9 +169,12 @@ Restructure the subscription model around four tiers that reflect how people act
 ---
 
 ## P11-04 — Design brief: pricing page and upgrade flows
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P11-02`, `P11-03`
+- Delivered:
+  - Wrote `roadmap/design-briefs/11-pricing-and-upgrade.md` (indexed in the briefs README). Covers the **pricing page** (`/pricing`, 4-tier comparison grouped by category from the frozen matrix, recommended-Pro highlight, monthly/annual toggle, state-aware CTAs incl. logged-in vs logged-out and Teams "Contact sales"), the **contextual upgrade prompt** (inline banner + blocking locked-card, with per-gate copy mapped to the real `billing.ts` errors and shared-books → Family/Teams), the **plan comparison modal** (current-vs-suggested delta), the **family invite** entry point (overview; detail deferred to Phase 13), and the **downgrade warning** (affected-features list per current→target delta, group-plan consequences, "no data deleted" reassurance from P11-03).
+  - Locked light design language enforced (no new hues); pricing numbers left as placeholders per scope; tone guidance (transparent, no dark patterns) included.
 - Implementation Notes:
   - Produce a design brief covering:
     - **Pricing page**: four-column plan comparison (Free, Pro, Family, Teams). Feature rows grouped by category (Contacts, Sync, Sharing, Collaboration, Support). Recommended plan highlight. Monthly/annual toggle.
