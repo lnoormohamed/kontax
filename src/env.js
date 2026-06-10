@@ -11,6 +11,11 @@ export const env = createEnv({
     DATABASE_URL: z.string().url(),
     SYNC_CREDENTIAL_ENCRYPTION_KEY: z.string().min(32).optional(),
     SYNC_CREDENTIAL_ENCRYPTION_KEY_ID: z.string().optional(),
+    // Transactional email via AWS SES (P12-06). All optional — when unset, email
+    // is skipped and the app falls back to in-app notifications only.
+    AWS_REGION: z.string().optional(),
+    SES_FROM_ADDRESS: z.string().email().optional(),
+    APP_URL: z.string().url().optional(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
@@ -34,6 +39,9 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     SYNC_CREDENTIAL_ENCRYPTION_KEY: process.env.SYNC_CREDENTIAL_ENCRYPTION_KEY,
     SYNC_CREDENTIAL_ENCRYPTION_KEY_ID: process.env.SYNC_CREDENTIAL_ENCRYPTION_KEY_ID,
+    AWS_REGION: process.env.AWS_REGION,
+    SES_FROM_ADDRESS: process.env.SES_FROM_ADDRESS,
+    APP_URL: process.env.APP_URL,
     NODE_ENV: process.env.NODE_ENV,
   },
   /**

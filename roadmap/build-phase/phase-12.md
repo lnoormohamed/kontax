@@ -186,16 +186,16 @@ Let users share individual contacts with people inside and outside of Kontax, in
 ---
 
 ## P12-06 — Incoming share notifications and accept/decline flow
-- Status: `In Progress`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P12-03`
-- Delivered (in-app — everything except email):
-  - **Header bell indicator**: both the AppShell header (detail/create/shares pages) and the home workspace header show a pending-shares **count badge** on the bell, linking to `/shares`. Plus the sidebar "Shared with me" badge from P12-05.
-  - **Pending shares view** (`/shares`): lists incoming shares with sender name, contact name, type (Static/Live), and Accept/Decline.
-  - **Accept → navigates to the new contact**: `acceptStaticShare`/`acceptLiveShare` now redirect to `/contacts/{newId}` after creating the copy; the contact appears in the list immediately (revalidated).
-  - **Invite-to-register linking**: `POST /api/register` links any pending shares addressed to the new account's email (`recipientUserId` set), so a share sent before signup appears in "Shared with me" on first login. Verified end-to-end.
-- Remaining — **email (needs a provider decision)**:
-  - Transactional email to the recipient when a share is sent (with an accept link), and the invite email for non-account recipients. No email/transactional provider is wired in the app yet (same open infra decision as the P11-05 cron). The data model is ready (`recipientEmail` stored); plug a provider (Resend/Postmark/SES) into a small `sendEmail` boundary and call it from `createStaticShare`/`createLiveShare`. Until then, in-app delivery covers existing users; non-account recipients are linked on registration.
+- Delivered:
+  - **Header bell indicator**: AppShell header (detail/create/shares) and the home workspace header show a pending-shares **count badge** on the bell → `/shares`. Plus the sidebar "Shared with me" badge from P12-05.
+  - **Pending shares view** (`/shares`): incoming shares with sender name, contact name, type (Static/Live), Accept/Decline.
+  - **Accept → navigates to the new contact**: `acceptStaticShare`/`acceptLiveShare` redirect to `/contacts/{newId}`; the contact appears immediately.
+  - **Invite-to-register linking**: `POST /api/register` links pending shares addressed to the new account's email so pre-signup shares appear on first login. Verified end-to-end.
+  - **Email via AWS SES** (provider chosen: SES): a `sendEmail()` boundary (`src/server/email.ts`, `@aws-sdk/client-sesv2`) is called from `createStaticShare`/`createLiveShare` to notify the recipient (existing users → link to `/shares`; non-account recipients → invite to `/register`). HTML is escaped. **Graceful no-op when SES isn't configured** (no `AWS_REGION`/`SES_FROM_ADDRESS`) and never throws, so a share is never blocked by email. Env: `AWS_REGION`, `SES_FROM_ADDRESS`, `APP_URL` (+ AWS creds via the default provider chain / IAM role; sender must be SES-verified).
+  - tsc + lint + build green; no-op path verified.
 - Implementation Notes:
   - In-app: show a notification in the workspace header (badge count) when the user has pending incoming shares.
   - Dedicated pending shares view: list of incoming shares with sender name, contact name, share type (Static/Live), and accept/decline actions.

@@ -12,6 +12,35 @@ import {
   getUserBillingContext,
 } from "~/server/billing";
 import { db } from "~/server/db";
+import { appUrl, sendEmail } from "~/server/email";
+
+const escapeHtml = (value: string) =>
+  value
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+
+// Notify the recipient by email (P12-06). No-op when SES isn't configured.
+const sendShareInviteEmail = async (opts: {
+  recipientEmail: string;
+  ownerName: string;
+  contactName: string;
+  recipientExists: boolean;
+  live: boolean;
+}) => {
+  const dest = opts.recipientExists ? `${appUrl()}/shares` : `${appUrl()}/register`;
+  const kind = opts.live ? "a live-synced contact" : "a contact";
+  const cta = opts.recipientExists
+    ? "Review it in Kontax"
+    : "Create your free Kontax account to accept";
+  const subject = `${opts.ownerName} shared a contact with you on Kontax`;
+  const text = `${opts.ownerName} shared ${kind} (${opts.contactName}) with you on Kontax.\n\n${cta}: ${dest}`;
+  const html =
+    `<p>${escapeHtml(opts.ownerName)} shared ${kind} — <strong>${escapeHtml(opts.contactName)}</strong> — with you on Kontax.</p>` +
+    `<p><a href="${dest}">${cta}</a></p>`;
+  await sendEmail({ to: opts.recipientEmail, subject, html, text });
+};
 
 const FREE_LINK_TTL_MS = 7 * 24 * 60 * 60 * 1000;
 
@@ -170,9 +199,13 @@ export const createStaticShare = async (formData: FormData) => {
     },
   });
 
-  // NOTE: email delivery (in-app + invite-to-register for non-account
-  // recipients) is wired in P12-06 once an email service is configured. For now
-  // an existing recipient sees the pending share in their "Shared with me" inbox.
+  await sendShareInviteEmail({
+    recipientEmail,
+    ownerName,
+    contactName: contact.fullName ?? "a contact",
+    recipientExists: Boolean(recipient?.id),
+    live: false,
+  });
 
   revalidatePath(`/contacts/${contactId}`);
 };
@@ -353,6 +386,14 @@ export const createLiveShare = async (formData: FormData) => {
       recipientEmail,
       snapshot: { ...snapshotFields, ownerName },
     },
+  });
+
+  await sendShareInviteEmail({
+    recipientEmail,
+    ownerName,
+    contactName: snapshotFields.fullName ?? "a contact",
+    recipientExists: Boolean(recipient?.id),
+    live: true,
   });
 
   revalidatePath(`/contacts/${contactId}`);
