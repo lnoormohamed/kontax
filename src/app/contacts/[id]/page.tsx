@@ -335,6 +335,19 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
   // This contact is a live copy the current user received (recipient side).
   const isLiveReceived = contact.sourceType === "SHARED_LIVE";
 
+  // Shared books the user owns/belongs to (for the "Add to a shared book"
+  // section of the Sharing tab). Adding a contact to a book lands in Phase 13.
+  const sharedBooks = await db.group.findMany({
+    where: {
+      OR: [
+        { ownerId: session.user.id },
+        { members: { some: { userId: session.user.id, inviteStatus: "ACCEPTED" } } },
+      ],
+    },
+    orderBy: { createdAt: "asc" },
+    select: { id: true, name: true, type: true, _count: { select: { members: true } } },
+  });
+
   const syncLinks = await db.syncContactLink.findMany({
     where: {
       contactId: contact.id,
@@ -708,6 +721,12 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
 
         {detailTab === "sharing" ? (
           <ContactSharing
+            books={sharedBooks.map((b) => ({
+              id: b.id,
+              name: b.name,
+              type: b.type,
+              memberCount: b._count.members,
+            }))}
             contactId={contact.id}
             isFree={shellPlan.plan === "FREE"}
             isLiveReceived={isLiveReceived}

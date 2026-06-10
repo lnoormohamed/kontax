@@ -36,6 +36,13 @@ const DEMO_ACCOUNTS = [
   { email: "chidi@okafor.health", name: "Chidi Okafor" },
 ];
 
+// Shared books (Family/Team) so the Sharing tab's "Add to a shared book"
+// section shows configured books instead of the empty state.
+const DEMO_BOOKS = [
+  { name: "Okafor Family", type: "FAMILY", memberEmails: ["ngozi@family.example", "chidi@okafor.health"] },
+  { name: "Orbit Health Team", type: "TEAM", memberEmails: ["tunde@orbit.health"] },
+];
+
 const upsertDemoUser = async ({ email, name }) => {
   const password = await bcrypt.hash(DEMO_PASSWORD, 12);
   return db.user.upsert({
@@ -100,8 +107,12 @@ const main = async () => {
     const removedUsers = await db.user.deleteMany({
       where: { email: { in: DEMO_ACCOUNTS.map((a) => a.email) } },
     });
+    // Shared books owned by this user (cascades members + address books).
+    const removedBooks = await db.group.deleteMany({
+      where: { ownerId: user.id, name: { in: DEMO_BOOKS.map((b) => b.name) } },
+    });
     console.log(
-      `Reset: removed ${ids.length} prior showcase contact(s) and ${removedUsers.count} demo account(s).`,
+      `Reset: removed ${ids.length} prior showcase contact(s), ${removedUsers.count} demo account(s), ${removedBooks.count} book(s).`,
     );
   }
 
@@ -281,6 +292,30 @@ const main = async () => {
   // --- Recipient accounts + linked shares ----------------------------------
   const ownerName = user.name?.trim() || user.email;
   const [ngozi, tunde, chidi] = await Promise.all(DEMO_ACCOUNTS.map(upsertDemoUser));
+  const byEmail = { [ngozi.email]: ngozi, [tunde.email]: tunde, [chidi.email]: chidi };
+
+  // Shared books (Family/Team) owned by the user, with the owner + a couple of
+  // members each — so the Sharing tab shows configured books.
+  for (const book of DEMO_BOOKS) {
+    const group = await db.group.create({
+      data: {
+        ownerId: user.id,
+        type: book.type,
+        name: book.name,
+        members: {
+          create: [
+            { userId: user.id, role: "OWNER", inviteStatus: "ACCEPTED" },
+            ...book.memberEmails
+              .map((em) => byEmail[em])
+              .filter(Boolean)
+              .map((u) => ({ userId: u.id, role: "MEMBER", inviteStatus: "ACCEPTED" })),
+          ],
+        },
+        addressBooks: { create: [{ name: book.name }] },
+      },
+    });
+    void group;
+  }
   const amaraSnapshot = {
     ownerName,
     fullName: "Amara Okafor",
@@ -529,6 +564,8 @@ const main = async () => {
   console.log(`  • ${chidi.email} — static copy PENDING`);
   console.log(`  • ${tunde.email} — live share, last synced 20h ago`);
   console.log(`  • Incoming "Shared with me" for ${user.email}: Bola Adeyemi from ${ngozi.name}`);
+  console.log(`\nShared books (Sharing tab → "Add to a shared book"):`);
+  for (const b of DEMO_BOOKS) console.log(`  • ${b.name} (${b.type}) — ${b.memberEmails.length + 1} members`);
   console.log(`\nDemo accounts (sign in to see the recipient side) — password: ${DEMO_PASSWORD}`);
   for (const a of DEMO_ACCOUNTS) console.log(`  • ${a.email}`);
   console.log(`\nOpen the flagship contact to see Details / History / Sharing populated.`);

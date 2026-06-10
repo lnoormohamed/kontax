@@ -29,6 +29,13 @@ export type VcardLinkItem = {
   expiresAt: string | null;
 };
 
+export type SharedBook = {
+  id: string;
+  name: string;
+  type: "FAMILY" | "TEAM";
+  memberCount: number;
+};
+
 type Props = {
   contactId: string;
   shareOrigin: string;
@@ -40,6 +47,7 @@ type Props = {
   vcardLinks: VcardLinkItem[];
   staticShares: ShareItem[];
   liveShares: ShareItem[];
+  books: SharedBook[];
 };
 
 const formatDate = (iso: string) =>
@@ -135,6 +143,36 @@ function LinkRow({
       </span>
       <WorkspaceIcon className="shrink-0 text-[#aeb4ac]" name="chevronRight" size={16} strokeWidth={1.9} />
     </a>
+  );
+}
+
+// A configured shared book in the "Add to a shared book" group.
+function BookRow({ book }: { book: SharedBook }) {
+  const isFamily = book.type === "FAMILY";
+  return (
+    <div className="flex items-center gap-3 rounded-[10px] px-3 py-2.5">
+      <IconTile icon={isFamily ? "users" : "team"} />
+      <span className="min-w-0 flex-1">
+        <span className="flex items-center gap-2">
+          <span className="truncate text-sm font-semibold text-[#1d2823]">{book.name}</span>
+          <span className="shrink-0 rounded-[5px] bg-[#f2f4f0] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.06em] text-[#5c655e]">
+            {book.type}
+          </span>
+        </span>
+        <span className="mt-px block text-xs text-[#8b938c]">
+          {book.memberCount} {book.memberCount === 1 ? "member" : "members"} ·{" "}
+          {isFamily ? "anyone in the family can view & edit" : "members get edit or view access"}
+        </span>
+      </span>
+      <button
+        className="shrink-0 cursor-not-allowed rounded-[8px] border border-[#d8ddd6] bg-white px-3 py-1.5 text-[13px] font-semibold text-[#aeb4ac]"
+        disabled
+        title="Adding contacts to a book arrives with Family & Team (Phase 13)"
+        type="button"
+      >
+        Add
+      </button>
+    </div>
   );
 }
 
@@ -253,6 +291,7 @@ export function ContactSharing({
   vcardLinks,
   staticShares,
   liveShares,
+  books,
 }: Props) {
   const hasStatic = staticShares.some((s) => s.status === "ACTIVE");
   const hasLive = liveShares.some((s) => s.status === "ACTIVE");
@@ -280,15 +319,20 @@ export function ContactSharing({
           </div>
         ) : null}
 
-        {/* Add to a shared book — Family/Team books arrive in a later phase */}
+        {/* Add to a shared book — books are configured; adding a contact to a
+            book lands with Family & Team (Phase 13). */}
         <GroupLabel>Add to a shared book</GroupLabel>
-        <div className="mx-3 my-1 rounded-[12px] border border-dashed border-[#d8ddd6] px-4 py-4 text-center">
-          <p className="text-[13.5px] font-semibold text-[#1d2823]">No shared books yet</p>
-          <p className="mx-auto mt-0.5 max-w-sm text-[12.5px] text-[#8b938c]">
-            Family &amp; team books are coming soon — everyone in a book can help keep shared
-            contacts up to date.
-          </p>
-        </div>
+        {books.length > 0 ? (
+          books.map((book) => <BookRow book={book} key={book.id} />)
+        ) : (
+          <div className="mx-3 my-1 rounded-[12px] border border-dashed border-[#d8ddd6] px-4 py-4 text-center">
+            <p className="text-[13.5px] font-semibold text-[#1d2823]">No shared books yet</p>
+            <p className="mx-auto mt-0.5 max-w-sm text-[12.5px] text-[#8b938c]">
+              Family &amp; team books are coming soon — everyone in a book can help keep shared
+              contacts up to date.
+            </p>
+          </div>
+        )}
 
         {/* Share with a Kontax user */}
         <GroupLabel>Share with a Kontax user</GroupLabel>
