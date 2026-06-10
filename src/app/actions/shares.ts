@@ -2,6 +2,7 @@
 
 import { randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 import { emitEvent } from "~/lib/activity";
 import { auth } from "~/server/auth";
@@ -212,6 +213,7 @@ type ShareSnapshot = {
 export const acceptStaticShare = async (formData: FormData) => {
   const userId = await requireUserId();
   const shareId = str(formData, "shareId");
+  let newContactId = "";
 
   await db.$transaction(async (tx) => {
     const share = await tx.contactShare.findFirst({
@@ -284,10 +286,15 @@ export const acceptStaticShare = async (formData: FormData) => {
       actorDetail: ownerName ?? null,
       payload: { recipientHint: ownerName ?? undefined },
     });
+
+    newContactId = created.id;
   });
 
   revalidatePath("/shares");
   revalidatePath("/");
+  if (newContactId) {
+    redirect(`/contacts/${newContactId}`);
+  }
 };
 
 export const declineStaticShare = async (formData: FormData) => {
@@ -363,6 +370,7 @@ export const acceptLiveShare = async (formData: FormData) => {
   } catch {
     recipientPaid = false;
   }
+  let newContactId = "";
 
   await db.$transaction(async (tx) => {
     const share = await tx.contactShare.findFirst({
@@ -441,10 +449,15 @@ export const acceptLiveShare = async (formData: FormData) => {
       actorDetail: ownerName ?? null,
       payload: { recipientHint: ownerName ?? undefined },
     });
+
+    newContactId = created.id;
   });
 
   revalidatePath("/shares");
   revalidatePath("/");
+  if (newContactId) {
+    redirect(`/contacts/${newContactId}`);
+  }
 };
 
 // Recipient unlinks a live contact: the share is revoked and their copy freezes

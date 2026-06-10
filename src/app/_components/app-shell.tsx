@@ -84,13 +84,20 @@ export async function AppShell({
               <WorkspaceIcon name="plus" size={18} strokeWidth={2} />
               <span className="hidden sm:inline">Create contact</span>
             </Link>
-            <button
-              aria-label="Notifications"
-              className="hidden h-10 w-10 items-center justify-center rounded-full border border-[#d8ddd6] bg-white text-[#5c655e] transition hover:bg-[#f2f4f0] sm:inline-flex"
-              type="button"
+            <Link
+              aria-label={
+                incomingShares > 0 ? `${incomingShares} pending shares` : "Notifications"
+              }
+              className="relative hidden h-10 w-10 items-center justify-center rounded-full border border-[#d8ddd6] bg-white text-[#5c655e] transition hover:bg-[#f2f4f0] sm:inline-flex"
+              href="/shares"
             >
               <WorkspaceIcon name="bell" size={18} />
-            </button>
+              {incomingShares > 0 ? (
+                <span className="absolute -right-0.5 -top-0.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[#bf8526] px-1 text-[10px] font-bold text-white">
+                  {incomingShares}
+                </span>
+              ) : null}
+            </Link>
             <UserMenu email={account.email} initials={getInitials(account.name)} name={account.name} />
           </div>
         </div>

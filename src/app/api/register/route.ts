@@ -36,12 +36,24 @@ export async function POST(request: NextRequest) {
 
   const passwordHash = await bcrypt.hash(parsedBody.data.password, 12);
 
-  await db.user.create({
+  const user = await db.user.create({
     data: {
       email: parsedBody.data.email,
       name: parsedBody.data.name,
       password: passwordHash,
     },
+    select: { id: true },
+  });
+
+  // P12-06: link any pending shares sent to this email before the recipient had
+  // an account, so they appear in "Shared with me" on first login.
+  await db.contactShare.updateMany({
+    where: {
+      recipientEmail: parsedBody.data.email,
+      recipientUserId: null,
+      status: "ACTIVE",
+    },
+    data: { recipientUserId: user.id },
   });
 
   return NextResponse.json({ ok: true }, { status: 201 });
