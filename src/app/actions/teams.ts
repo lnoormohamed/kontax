@@ -4,10 +4,12 @@ import { randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { emitEvent } from "~/lib/activity";
 import { auth } from "~/server/auth";
 import { getUserBillingContext } from "~/server/billing";
 import { db } from "~/server/db";
 import { appUrl, sendEmail } from "~/server/email";
+import { canEditTeamBook } from "~/server/team-access";
 
 const INVITE_TTL_MS = 48 * 60 * 60 * 1000;
 
@@ -386,6 +388,112 @@ export const setMemberBookPermission = async (formData: FormData) => {
     data: { addressBookPermissions: next },
   });
   revalidatePath("/settings/teams");
+};
+
+// "Add to team book": copy a private contact into a team book (copy, not move).
+const TEAM_COPY_SELECT = {
+  fullName: true,
+  firstName: true,
+  middleName: true,
+  lastName: true,
+  phoneticFirstName: true,
+  phoneticLastName: true,
+  namePrefix: true,
+  nameSuffix: true,
+  nickname: true,
+  email: true,
+  emailEntries: true,
+  phone: true,
+  phoneEntries: true,
+  company: true,
+  phoneticCompany: true,
+  jobTitle: true,
+  department: true,
+  website: true,
+  websiteEntries: true,
+  birthday: true,
+  address: true,
+  addressEntries: true,
+  significantDates: true,
+  relatedPeople: true,
+  customFields: true,
+  notes: true,
+} as const;
+
+export const addContactToTeamBook = async (formData: FormData) => {
+  const userId = await requireUserId();
+  const contactId = str(formData, "contactId");
+  const bookId = str(formData, "bookId");
+
+  if (!(await canEditTeamBook(userId, bookId))) {
+    throw new Error("You don't have edit access to that team book.");
+  }
+  const book = await db.groupAddressBook.findUnique({
+    where: { id: bookId },
+    select: { name: true, group: { select: { ownerId: true, name: true } } },
+  });
+  if (!book) {
+    throw new Error("Team book not found.");
+  }
+  const source = await db.contact.findFirst({
+    where: { id: contactId, userId },
+    select: TEAM_COPY_SELECT,
+  });
+  if (!source) {
+    throw new Error("Contact not found.");
+  }
+  const jsonOrUndef = (v: unknown) => (v == null ? undefined : (v as never));
+
+  await db.$transaction(async (tx) => {
+    const copy = await tx.contact.create({
+      data: {
+        userId: book.group.ownerId,
+        fullName: source.fullName,
+        firstName: source.firstName,
+        middleName: source.middleName,
+        lastName: source.lastName,
+        phoneticFirstName: source.phoneticFirstName,
+        phoneticLastName: source.phoneticLastName,
+        namePrefix: source.namePrefix,
+        nameSuffix: source.nameSuffix,
+        nickname: source.nickname,
+        email: source.email,
+        emailEntries: jsonOrUndef(source.emailEntries),
+        phone: source.phone,
+        phoneEntries: jsonOrUndef(source.phoneEntries),
+        company: source.company,
+        phoneticCompany: source.phoneticCompany,
+        jobTitle: source.jobTitle,
+        department: source.department,
+        website: source.website,
+        websiteEntries: jsonOrUndef(source.websiteEntries),
+        birthday: source.birthday,
+        address: source.address,
+        addressEntries: jsonOrUndef(source.addressEntries),
+        significantDates: jsonOrUndef(source.significantDates),
+        relatedPeople: jsonOrUndef(source.relatedPeople),
+        customFields: jsonOrUndef(source.customFields),
+        notes: source.notes,
+        sourceType: "MANUAL",
+        sourceDetail: `${book.group.name} · ${book.name}`,
+        lastMutatedBy: "MANUAL",
+      },
+      select: { id: true },
+    });
+    await tx.groupContact.create({
+      data: { groupAddressBookId: bookId, contactId: copy.id, addedByUserId: userId },
+    });
+    await emitEvent(tx, {
+      userId,
+      contactId: copy.id,
+      eventType: "CONTACT_CREATED",
+      actor: "USER",
+      payload: { teamBook: `${book.group.name} · ${book.name}` },
+    });
+  });
+
+  revalidatePath("/");
+  revalidatePath(`/contacts/${contactId}`);
 };
 
 export const leaveTeam = async (formData: FormData) => {

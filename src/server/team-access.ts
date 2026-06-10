@@ -78,6 +78,24 @@ export const canEditTeamBook = async (userId: string, bookId: string): Promise<b
   return resolveBookPermission(membership, bookId) === "EDIT";
 };
 
+// The team-book context for a contact, if it lives in a TEAM book.
+export const getContactTeamContext = async (contactId: string) => {
+  const gc = await db.groupContact.findFirst({
+    where: { contactId, groupAddressBook: { group: { type: "TEAM" } } },
+    include: {
+      groupAddressBook: { include: { group: { select: { id: true, name: true } } } },
+    },
+  });
+  if (!gc) return null;
+  return {
+    bookId: gc.groupAddressBookId,
+    bookName: gc.groupAddressBook.name,
+    archived: Boolean(gc.groupAddressBook.archivedAt),
+    groupId: gc.groupAddressBook.group.id,
+    teamName: gc.groupAddressBook.group.name,
+  };
+};
+
 // The manageable team (owner/admin) for management actions.
 export const getManageableTeam = async (userId: string) => {
   const member = await db.groupMember.findFirst({

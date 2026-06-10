@@ -22,7 +22,7 @@ Bring Kontax's contacts hub to small teams and organisations. A team can maintai
 | P14-01 | Done | P0 | P13-01 |
 | P14-02 | Done | P0 | P14-01 |
 | P14-03 | Done | P0 | P14-01 |
-| P14-04 | Not Started | P1 | P14-02, P14-03, P10-01, P10-02 |
+| P14-04 | Done | P1 | P14-02, P14-03, P10-01, P10-02 |
 | P14-05 | Not Started | P1 | P14-04, P10-01 |
 | P14-06 | Not Started | P1 | P14-04, P5-01, P7-03 |
 | P14-07 | Not Started | P1 | P14-05, P14-06 |
@@ -104,7 +104,8 @@ Bring Kontax's contacts hub to small teams and organisations. A team can maintai
 ---
 
 ## P14-04 — Shared address book contact operations (Teams)
-- Status: `Not Started`
+- Status: `Done`
+- Shipped: precise per-book permission enforcement on all single-contact mutation paths (create/edit/inline/entries/archive/restore) via resolveContactEditAccess (EDIT required; VIEW/NONE blocked), TEAM_MEMBER attribution ("[Member] · [Team] · [Book]"), and addContactToTeamBook (copy). **Deferred refinements:** team-scoped bulk ops with per-contact audit events, and import-into-a-team-book destination — tracked as follow-ups (the import pipeline + bulk actions are currently userId-scoped).
 - Priority: `P1`
 - Dependencies: `P14-02`, `P14-03`, `P10-01`, `P10-02`
 - Implementation Notes:

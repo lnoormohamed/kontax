@@ -14,11 +14,8 @@ import {
 } from "~/server/contact-merge";
 import { propagateLiveShares } from "~/server/contact-shares";
 import { db } from "~/server/db";
-import {
-  editableContactWhere,
-  getSharedEditAttribution,
-  getUserFamilyMembership,
-} from "~/server/family-access";
+import { editableContactWhere, getUserFamilyMembership } from "~/server/family-access";
+import { resolveContactEditAccess } from "~/server/shared-access";
 import { canEditTeamBook } from "~/server/team-access";
 import { emitEvent } from "~/lib/activity";
 import { computeContactDiff } from "~/lib/activity/diff";
@@ -663,7 +660,10 @@ export const updateContactField = async (contactId: string, field: string, rawVa
   const newValue =
     field === "email" ? trimmed.toLowerCase() || null : trimmed.length > 0 ? trimmed : null;
 
-  const sharedAttr = await getSharedEditAttribution(userId, contactId);
+  const access = await resolveContactEditAccess(userId, contactId);
+  if (access.shared && !access.allowed) {
+    throw new Error("You don't have edit access to this contact.");
+  }
 
   await db.$transaction(async (tx) => {
     const before = await tx.contact.findFirst({ where: editableContactWhere(userId, contactId) });
@@ -688,8 +688,8 @@ export const updateContactField = async (contactId: string, field: string, rawVa
         userId,
         contactId,
         eventType: "CONTACT_UPDATED",
-        actor: sharedAttr?.actor ?? "USER",
-        actorDetail: sharedAttr?.actorDetail,
+        actor: access.attribution?.actor ?? "USER",
+        actorDetail: access.attribution?.actorDetail,
         payload: { diffs },
       });
     }
@@ -773,7 +773,10 @@ export const updateContactEntries = async (
     scalarValue = entries[0]?.value ?? null;
   }
 
-  const sharedAttr = await getSharedEditAttribution(userId, contactId);
+  const access = await resolveContactEditAccess(userId, contactId);
+  if (access.shared && !access.allowed) {
+    throw new Error("You don't have edit access to this contact.");
+  }
 
   await db.$transaction(async (tx) => {
     const before = await tx.contact.findFirst({ where: editableContactWhere(userId, contactId) });
@@ -796,8 +799,8 @@ export const updateContactEntries = async (
         userId,
         contactId,
         eventType: "CONTACT_UPDATED",
-        actor: sharedAttr?.actor ?? "USER",
-        actorDetail: sharedAttr?.actorDetail,
+        actor: access.attribution?.actor ?? "USER",
+        actorDetail: access.attribution?.actorDetail,
         payload: { diffs },
       });
     }
@@ -884,7 +887,10 @@ export const toggleEmergencyContact = async (formData: FormData) => {
 export const archiveContact = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const contactId = parseContactId(formData);
-  const sharedAttr = await getSharedEditAttribution(userId, contactId);
+  const access = await resolveContactEditAccess(userId, contactId);
+  if (access.shared && !access.allowed) {
+    throw new Error("You don't have edit access to this contact.");
+  }
 
   await db.$transaction(async (tx) => {
     const result = await tx.contact.updateMany({
@@ -902,8 +908,8 @@ export const archiveContact = async (formData: FormData) => {
         userId,
         contactId,
         eventType: "CONTACT_ARCHIVED",
-        actor: sharedAttr?.actor ?? "USER",
-        actorDetail: sharedAttr?.actorDetail,
+        actor: access.attribution?.actor ?? "USER",
+        actorDetail: access.attribution?.actorDetail,
         payload: {},
       });
     }
@@ -961,7 +967,10 @@ export const archiveContactsBulk = async (formData: FormData) => {
 export const restoreContact = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const contactId = parseContactId(formData);
-  const sharedAttr = await getSharedEditAttribution(userId, contactId);
+  const access = await resolveContactEditAccess(userId, contactId);
+  if (access.shared && !access.allowed) {
+    throw new Error("You don't have edit access to this contact.");
+  }
 
   await db.$transaction(async (tx) => {
     const result = await tx.contact.updateMany({
@@ -979,8 +988,8 @@ export const restoreContact = async (formData: FormData) => {
         userId,
         contactId,
         eventType: "CONTACT_RESTORED",
-        actor: sharedAttr?.actor ?? "USER",
-        actorDetail: sharedAttr?.actorDetail,
+        actor: access.attribution?.actor ?? "USER",
+        actorDetail: access.attribution?.actorDetail,
         payload: {},
       });
     }

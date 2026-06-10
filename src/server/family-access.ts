@@ -45,12 +45,29 @@ export const editableContactWhere = (
   id: contactId,
   OR: [
     { userId },
+    // Family book: member with canEdit.
     {
       groupContacts: {
         some: {
           groupAddressBook: {
             group: {
+              type: "FAMILY",
               members: { some: { userId, inviteStatus: "ACCEPTED", canEdit: true } },
+            },
+          },
+        },
+      },
+    },
+    // Team book: any accepted member (coarse DB scope). Per-book EDIT/VIEW/NONE
+    // is enforced precisely in resolveContactEditAccess (JSON permission map).
+    {
+      groupContacts: {
+        some: {
+          groupAddressBook: {
+            archivedAt: null,
+            group: {
+              type: "TEAM",
+              members: { some: { userId, inviteStatus: "ACCEPTED" } },
             },
           },
         },
