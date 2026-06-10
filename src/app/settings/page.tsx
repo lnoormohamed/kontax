@@ -350,6 +350,13 @@ export default async function SettingsPage() {
                     >
                       {groupMembership?.group ? "Manage family book" : "Set up family book"}
                     </Link>
+                  ) : planSummary.plan === "TEAMS" ? (
+                    <Link
+                      className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-[#4158f4] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#3248db]"
+                      href="/settings/teams"
+                    >
+                      {groupMembership?.group ? "Manage team" : "Set up team"}
+                    </Link>
                   ) : (
                     <span className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-[#f2f4f0] px-3 py-1.5 text-xs font-semibold text-[#8b938c]">
                       Manage group · coming soon

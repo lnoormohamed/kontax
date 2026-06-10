@@ -20,7 +20,7 @@ Bring Kontax's contacts hub to small teams and organisations. A team can maintai
 | Ticket | Status | Priority | Depends On |
 | --- | --- | --- | --- |
 | P14-01 | Done | P0 | P13-01 |
-| P14-02 | Not Started | P0 | P14-01 |
+| P14-02 | Done | P0 | P14-01 |
 | P14-03 | Not Started | P0 | P14-01 |
 | P14-04 | Not Started | P1 | P14-02, P14-03, P10-01, P10-02 |
 | P14-05 | Not Started | P1 | P14-04, P10-01 |
@@ -56,7 +56,8 @@ Bring Kontax's contacts hub to small teams and organisations. A team can maintai
 ---
 
 ## P14-02 — Team creation, invite, and role management
-- Status: `Not Started`
+- Status: `Done`
+- Owner transfer deferred (subscription is userId-anchored — billing sign-off needed, same as Family). Grace-period-on-cancel flow also deferred to billing. Shipped: create, invite (token+SES, 25-seat limit), accept/decline, promote/demote (only owner→ADMIN; owner+admin manage), remove, leave, delete team.
 - Priority: `P0`
 - Dependencies: `P14-01`
 - Implementation Notes:
