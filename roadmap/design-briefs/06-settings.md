@@ -3,6 +3,8 @@
 **Route:** `/settings`
 **Priority:** P1 — reached from the sidebar avatar/name link and from the header. Not a daily-use screen but critical for trust: it is where users verify their plan, manage data, and control app behaviour.
 
+> **Freshness (2026-06-10) — ready to send (plans+billing batch).** The **"Plan and limits"** section was rebuilt in **P11-06** for the four tiers (Free/Pro/Family/Teams): current-plan name + per-tier feature summary, live **usage bars** (contacts / imports / sync accounts / device passwords, with "Unlimited" + amber/red thresholds), an **Upgrade / View plans** link to `/pricing`, and a **group-membership** block for Family/Teams with a "Manage group · coming soon" placeholder (groups arrive in Phases 13–14). Pairs with **brief 11 — Pricing & Upgrade Flows**; send the two together. Design language: the locked light system (ink `#1d2823`, green `#17352e`, blue `#4158f4`, hairline `#d8ddd6`, Geist) — align any remaining sub-sections that still read older/darker.
+
 ---
 
 ## Purpose

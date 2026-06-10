@@ -23,7 +23,7 @@ Restructure the subscription model around four tiers that reflect how people act
 | P11-03 | Done | P0 | P11-01 |
 | P11-04 | Done | P1 | P11-02, P11-03 |
 | P11-05 | Done | P1 | P11-01, P10-01 |
-| P11-06 | Not Started | P2 | P11-05 |
+| P11-06 | Done | P2 | P11-05 |
 
 ---
 
@@ -220,9 +220,14 @@ Restructure the subscription model around four tiers that reflect how people act
 ---
 
 ## P11-06 — Update settings page to reflect new plan tiers
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P2`
 - Dependencies: `P11-05`
+- Delivered:
+  - Rebuilt the "Plan and limits" section (`/settings`): shows the **current plan name** + a per-tier **feature summary** line (Free/Pro/Family/Teams) and an **Upgrade / View plans** button → `/pricing`.
+  - **Live usage bars** for the four limits — Contacts, Imports this month, Sync accounts, Device passwords — each `used / limit` with a progress bar; `null` limit renders **"Unlimited"** (full faint bar); bar turns amber at ≥80% and red at/over the limit. All values are live (counts queried per request: `syncAccount.count`, `canCreateAppPassword`, plan summary).
+  - **Group membership** block for Family/Teams: shows "Owner/Member of [group] · N/limit members" when a group exists, else a "not set up yet" line; with a **"Manage group · coming soon"** placeholder (no dead link — groups land in Phases 13/14). Hidden for Free/Pro.
+  - Kept within the existing light palette; tsc + lint + build green; new queries smoke-tested against the DB.
 - Implementation Notes:
   - Update the settings page plan section to display the correct plan name and feature summary for all four tiers.
   - Show usage against limits: contacts used / limit, imports this month / limit, sync accounts used / limit, app passwords used / limit.

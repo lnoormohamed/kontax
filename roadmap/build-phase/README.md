@@ -129,7 +129,7 @@ This roadmap is the implementation source of truth for phases 1–16. Each phase
 | P11-03 | 11 | Done | P0 | P11-01 | Unassigned | Tier-driven entitlements (matrix), null=unlimited, activity gate→all paid + per-tier retention, Free history cap 10, sharing/book gate stubs, graceful downgrade |
 | P11-04 | 11 | Done | P1 | P11-02, P11-03 | Unassigned | Brief 11-pricing-and-upgrade.md: 4-tier pricing page, contextual upgrade prompts (matrix gates), comparison modal, family invite overview, downgrade warning |
 | P11-05 | 11 | Done | P1 | P11-01, P10-01 | Unassigned | scripts/prune-activity-retention.mjs (per-user, idempotent, --dry-run): Pro 90d/Family 365d pruned, Free+Teams skipped; run nightly via scheduler |
-| P11-06 | 11 | Not Started | P2 | P11-05 | Unassigned | Settings page shows correct plan, usage against limits, and group membership |
+| P11-06 | 11 | Done | P2 | P11-05 | Unassigned | Settings plan section: tier name + feature summary, live usage bars (contacts/imports/sync/devices), /pricing link, group membership + coming-soon placeholder |
 
 ### Phase 12 — Contact Sharing
 

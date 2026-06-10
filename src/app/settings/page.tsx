@@ -42,6 +42,13 @@ const getLifecycleTone = (label: string) => {
   return "border-rose-200 bg-rose-50 text-rose-700";
 };
 
+const PLAN_SUMMARY: Record<string, string> = {
+  Free: "500 contacts · 1 sync account · 1 device · per-contact history (last 3) · no activity feed",
+  Pro: "Unlimited contacts · 5 sync accounts · 5 devices · activity log (365 days) · live & static sharing",
+  Family: "Everything in Pro for up to 6 members · 1 shared family book · 90-day history",
+  Teams: "Everything in Pro for up to 25 members · multiple shared books · unlimited audit log",
+};
+
 export default async function SettingsPage() {
   const session = await auth();
 
@@ -50,11 +57,29 @@ export default async function SettingsPage() {
   }
 
   const planSummary = await getUserPlanSummary(session.user.id);
-  const [appPasswords, appPasswordAllowance, publicOrigin] = await Promise.all([
-    listUserAppPasswords(session.user.id),
-    canCreateAppPassword(session.user.id),
-    getPublicOrigin(),
-  ]);
+  const [appPasswords, appPasswordAllowance, publicOrigin, syncAccountsUsed, groupMembership] =
+    await Promise.all([
+      listUserAppPasswords(session.user.id),
+      canCreateAppPassword(session.user.id),
+      getPublicOrigin(),
+      db.syncAccount.count({ where: { userId: session.user.id } }),
+      // Group membership (Family/Teams) — scaffolding only until Phases 13/14, so
+      // this is typically empty; the UI shows a "coming soon" placeholder.
+      db.groupMember.findFirst({
+        where: { userId: session.user.id, inviteStatus: "ACCEPTED" },
+        select: {
+          role: true,
+          group: {
+            select: {
+              name: true,
+              type: true,
+              memberSlotsLimit: true,
+              _count: { select: { members: true } },
+            },
+          },
+        },
+      }),
+    ]);
   const carddavServerUrl = publicOrigin;
   const userSettings = await db.user.findUnique({
     where: {
@@ -65,6 +90,23 @@ export default async function SettingsPage() {
     },
   });
   const userLabel = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
+
+  const planFeatureSummary = PLAN_SUMMARY[planSummary.planLabel] ?? "";
+  const isGroupPlan = planSummary.plan === "FAMILY" || planSummary.plan === "TEAMS";
+  const usageRows: Array<{ label: string; used: number; limit: number | null }> = [
+    { label: "Contacts", used: planSummary.contactsUsed, limit: planSummary.entitlements.contactsLimit },
+    {
+      label: "Imports this month",
+      used: planSummary.importedThisMonth,
+      limit: planSummary.entitlements.monthlyImportLimit,
+    },
+    { label: "Sync accounts", used: syncAccountsUsed, limit: planSummary.entitlements.syncAccountsLimit },
+    {
+      label: "Device passwords",
+      used: appPasswordAllowance.current,
+      limit: appPasswordAllowance.limit ?? null,
+    },
+  ];
 
   const handleSignOut = async () => {
     "use server";
@@ -227,40 +269,85 @@ export default async function SettingsPage() {
                 </span>
               </div>
 
-              <div className="mt-5 grid gap-3 md:grid-cols-2">
-                <div className="rounded-[1.4rem] border border-[#d8ddd6] bg-[#f8faf8] p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                    Contacts used
+              {/* current plan + feature summary */}
+              <div className="mt-5 flex flex-wrap items-center justify-between gap-3 rounded-[1.4rem] border border-[#d8ddd6] bg-[#f6f7f4] p-4">
+                <div className="min-w-0">
+                  <p className="flex items-center gap-2">
+                    <span className="text-xl font-semibold text-slate-900">{planSummary.planLabel}</span>
+                    <span className="rounded-full bg-[#e7efe9] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#17352e]">
+                      Current plan
+                    </span>
                   </p>
-                  <p className="mt-2 text-2xl font-semibold text-slate-900">
-                    {planSummary.contactsUsed} / {planSummary.entitlements.contactsLimit ?? "Unlimited"}
-                  </p>
+                  {planFeatureSummary ? (
+                    <p className="mt-1 text-[13px] leading-5 text-slate-500">{planFeatureSummary}</p>
+                  ) : null}
                 </div>
-                <div className="rounded-[1.4rem] border border-[#d8ddd6] bg-[#f7f8ff] p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                    Monthly imports
-                  </p>
-                  <p className="mt-2 text-2xl font-semibold text-slate-900">
-                    {planSummary.importedThisMonth} / {planSummary.entitlements.monthlyImportLimit ?? "Unlimited"}
-                  </p>
-                </div>
-                <div className="rounded-[1.4rem] border border-[#d8ddd6] bg-[#fbfcf8] p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                    Export access
-                  </p>
-                  <p className="mt-2 text-lg font-semibold text-slate-900">
-                    {planSummary.lifecyclePolicy.canUseBasicExport ? "Available" : "Restricted"}
-                  </p>
-                </div>
-                <div className="rounded-[1.4rem] border border-[#d8ddd6] bg-[#fdf9f1] p-4">
-                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
-                    Sync accounts
-                  </p>
-                  <p className="mt-2 text-lg font-semibold text-slate-900">
-                    {planSummary.entitlements.syncAccountsLimit} available on plan
-                  </p>
-                </div>
+                <Link
+                  className="shrink-0 rounded-[1.1rem] bg-[#4158f4] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3248db]"
+                  href="/pricing"
+                >
+                  {planSummary.plan === "FREE" ? "Upgrade" : "View plans"}
+                </Link>
               </div>
+
+              {/* live usage bars */}
+              <div className="mt-4 grid gap-3.5">
+                {usageRows.map((row) => {
+                  const limit = row.limit;
+                  const unlimited = limit === null;
+                  const pct =
+                    limit === null || limit === 0
+                      ? 0
+                      : Math.min(Math.round((row.used / limit) * 100), 100);
+                  const over = limit !== null && row.used >= limit;
+                  const near = limit !== null && row.used >= limit * 0.8;
+                  const barColor = over ? "#b5472f" : near ? "#bf8526" : "#17352e";
+                  return (
+                    <div key={row.label}>
+                      <div className="flex items-baseline justify-between text-[13px]">
+                        <span className="font-medium text-slate-700">{row.label}</span>
+                        <span className="text-slate-500">
+                          {row.used} / {limit ?? "Unlimited"}
+                        </span>
+                      </div>
+                      <div className="mt-1.5 h-2 overflow-hidden rounded-full bg-[#e9ece7]">
+                        <div
+                          className="h-full rounded-full transition-all"
+                          style={{
+                            width: unlimited ? "100%" : `${pct}%`,
+                            background: unlimited ? "#d8ddd6" : barColor,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {/* group membership (Family / Teams) */}
+              {isGroupPlan ? (
+                <div className="mt-4 rounded-[1.4rem] border border-[#d8ddd6] bg-white p-4">
+                  <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">
+                    {planSummary.plan === "FAMILY" ? "Family group" : "Team"}
+                  </p>
+                  {groupMembership?.group ? (
+                    <p className="mt-1.5 text-sm text-slate-700">
+                      {groupMembership.role === "OWNER" ? "Owner of" : "Member of"}{" "}
+                      <span className="font-semibold text-slate-900">{groupMembership.group.name}</span>
+                      {groupMembership.group.memberSlotsLimit
+                        ? ` · ${groupMembership.group._count.members}/${groupMembership.group.memberSlotsLimit} members`
+                        : ` · ${groupMembership.group._count.members} members`}
+                    </p>
+                  ) : (
+                    <p className="mt-1.5 text-sm text-slate-500">
+                      Your {planSummary.plan === "FAMILY" ? "family" : "team"} group isn&apos;t set up yet.
+                    </p>
+                  )}
+                  <span className="mt-2 inline-flex items-center gap-1.5 rounded-lg bg-[#f2f4f0] px-3 py-1.5 text-xs font-semibold text-[#8b938c]">
+                    Manage group · coming soon
+                  </span>
+                </div>
+              ) : null}
 
               <p className="mt-5 text-sm leading-6 text-slate-500">
                 {planSummary.lifecyclePolicy.description}
