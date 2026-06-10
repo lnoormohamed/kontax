@@ -67,20 +67,20 @@ export function CopyField({
   };
 
   return (
-    <div className="rounded-[1.4rem] border border-[#d8ddd6] bg-[#f8faf8] p-4">
-      <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{label}</p>
+    <div className="rounded-[12px] border border-[#e9ece7] bg-[#f6f7f4] p-4">
+      <p className="text-[10.5px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">{label}</p>
       <div className="mt-2 flex items-center gap-3">
-        <p className="min-w-0 flex-1 break-all font-mono text-sm text-slate-900">{value}</p>
+        <p className="min-w-0 flex-1 break-all font-mono text-sm text-[#1d2823]">{value}</p>
         <button
           aria-label={`Copy ${label.toLowerCase()}`}
-          className="shrink-0 rounded-[1rem] border border-[#d8ddd6] bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:border-[#c9d0c9] hover:bg-slate-50"
+          className="shrink-0 rounded-[9px] border border-[#d8ddd6] bg-white px-3 py-1.5 text-xs font-semibold text-[#5c655e] transition hover:border-[#c9d0c9] hover:bg-[#f2f4f0]"
           onClick={handleCopy}
           type="button"
         >
           {copied ? "Copied" : "Copy"}
         </button>
       </div>
-      {helper ? <p className="mt-2 text-xs leading-5 text-slate-500">{helper}</p> : null}
+      {helper ? <p className="mt-2 text-xs leading-5 text-[#8b938c]">{helper}</p> : null}
     </div>
   );
 }

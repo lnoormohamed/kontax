@@ -752,59 +752,6 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
             <div className="mt-3.5 h-px bg-[#e9ece7]" />
 
             <div className="mt-1 grid gap-0.5">
-              {/* ── Export as vCard (all plans) ────────────────────────────── */}
-              <ShareGroupLabel>Export as vCard</ShareGroupLabel>
-              <ShareRow
-                active={vcardLinks.length > 0}
-                icon="link"
-                subtitle={
-                  <>
-                    Anyone with the link can download this contact as a .vcf file.
-                    {shellPlan.plan === "FREE" ? " Free links expire after 7 days." : ""}
-                  </>
-                }
-                title="vCard link"
-                trailing={
-                  <form action={createVcardShareLink}>
-                    <input name="contactId" type="hidden" value={contact.id} />
-                    <button
-                      className="rounded-[0.8rem] bg-[#4158f4] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3248db]"
-                      type="submit"
-                    >
-                      Create share link
-                    </button>
-                  </form>
-                }
-              >
-                {vcardLinks.length > 0 ? (
-                  <div className="grid gap-3">
-                    {vcardLinks.map((link) => (
-                      <div key={link.id}>
-                        <CopyField
-                          helper={`${link.downloadCount} download${link.downloadCount === 1 ? "" : "s"}${
-                            link.expiresAt
-                              ? ` · expires ${formatTimestamp(link.expiresAt)}`
-                              : " · no expiry"
-                          }`}
-                          label="Share link"
-                          value={`${shareOrigin}/share/${link.token}`}
-                        />
-                        <form action={revokeShare}>
-                          <input name="shareId" type="hidden" value={link.id} />
-                          <input name="contactId" type="hidden" value={contact.id} />
-                          <button
-                            className="mt-1.5 text-[13px] font-semibold text-[#b5472f]"
-                            type="submit"
-                          >
-                            Revoke link
-                          </button>
-                        </form>
-                      </div>
-                    ))}
-                  </div>
-                ) : null}
-              </ShareRow>
-
               {/* ── Share with a Kontax user (Pro and above) ───────────────── */}
               <ShareGroupLabel>Share with a Kontax user</ShareGroupLabel>
 
@@ -981,6 +928,59 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                   ) : null}
                 </ShareRow>
               )}
+
+              {/* ── Export as vCard (all plans) ────────────────────────────── */}
+              <ShareGroupLabel>Export as vCard</ShareGroupLabel>
+              <ShareRow
+                active={vcardLinks.length > 0}
+                icon="link"
+                subtitle={
+                  <>
+                    Anyone with the link can download this contact as a .vcf file.
+                    {shellPlan.plan === "FREE" ? " Free links expire after 7 days." : ""}
+                  </>
+                }
+                title="vCard link"
+                trailing={
+                  <form action={createVcardShareLink}>
+                    <input name="contactId" type="hidden" value={contact.id} />
+                    <button
+                      className="rounded-[0.8rem] bg-[#4158f4] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3248db]"
+                      type="submit"
+                    >
+                      Create share link
+                    </button>
+                  </form>
+                }
+              >
+                {vcardLinks.length > 0 ? (
+                  <div className="grid gap-3">
+                    {vcardLinks.map((link) => (
+                      <div key={link.id}>
+                        <CopyField
+                          helper={`${link.downloadCount} download${link.downloadCount === 1 ? "" : "s"}${
+                            link.expiresAt
+                              ? ` · expires ${formatTimestamp(link.expiresAt)}`
+                              : " · no expiry"
+                          }`}
+                          label="Share link"
+                          value={`${shareOrigin}/share/${link.token}`}
+                        />
+                        <form action={revokeShare}>
+                          <input name="shareId" type="hidden" value={link.id} />
+                          <input name="contactId" type="hidden" value={contact.id} />
+                          <button
+                            className="mt-1.5 text-[13px] font-semibold text-[#b5472f]"
+                            type="submit"
+                          >
+                            Revoke link
+                          </button>
+                        </form>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </ShareRow>
             </div>
           </section>
         ) : null}
