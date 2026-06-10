@@ -2,6 +2,49 @@
 
 import { useState } from "react";
 
+import { WorkspaceIcon } from "~/app/_components/workspace-icons";
+
+// Compact read-only metadata row (label · monospace value · copy button that
+// flashes a check). Used for CardDAV sync identifiers — ETag / UID.
+export function CopyMonoRow({ label, value }: { label: string; value: string }) {
+  const [copied, setCopied] = useState(false);
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1400);
+    } catch {
+      setCopied(false);
+    }
+  };
+  const shown = value.length > 22 ? `${value.slice(0, 22)}…` : value;
+  return (
+    <div className="flex items-center gap-3 px-2 py-1.5">
+      <span className="w-[50px] shrink-0 text-[12.5px] text-[#5c655e]">{label}</span>
+      <span
+        className="min-w-0 flex-1 truncate font-mono text-[12.5px] text-[#1d2823]"
+        title={value}
+      >
+        {shown}
+      </span>
+      <button
+        aria-label={`Copy ${label}`}
+        className="grid h-7 w-7 shrink-0 place-items-center rounded-[7px] text-[#8b938c] transition hover:bg-[#f2f4f0]"
+        onClick={handleCopy}
+        title={`Copy ${label}`}
+        type="button"
+      >
+        <WorkspaceIcon
+          fill="none"
+          name={copied ? "check" : "copy"}
+          size={15}
+          strokeWidth={copied ? 2 : 1.7}
+        />
+      </button>
+    </div>
+  );
+}
+
 export function CopyField({
   label,
   value,

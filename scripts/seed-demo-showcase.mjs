@@ -213,6 +213,43 @@ const main = async () => {
     ],
   });
 
+  // Sync card for the flagship contact — a linked CardDAV account + per-contact
+  // link carrying a remote ETag/UID so the Sync section shows real values.
+  const syncAccount = await db.syncAccount.upsert({
+    where: {
+      userId_baseUrl_label: {
+        userId: user.id,
+        baseUrl: "https://contacts.icloud.com",
+        label: "iCloud · Personal",
+      },
+    },
+    update: { status: "ACTIVE", lastSyncedAt: hoursAgo(0.1) },
+    create: {
+      userId: user.id,
+      provider: "CARDDAV",
+      status: "ACTIVE",
+      label: "iCloud · Personal",
+      baseUrl: "https://contacts.icloud.com",
+      addressBookDisplayName: "Personal",
+      lastSyncedAt: hoursAgo(0.1),
+      lastSucceededAt: hoursAgo(0.1),
+    },
+  });
+  await db.syncContactLink.upsert({
+    where: {
+      syncAccountId_contactId: { syncAccountId: syncAccount.id, contactId: flagship.id },
+    },
+    update: {},
+    create: {
+      syncAccountId: syncAccount.id,
+      contactId: flagship.id,
+      remoteHref: `/Personal/${flagship.id}.vcf`,
+      remoteUid: flagship.id,
+      remoteETag: '"a1b2c3d4e5f6g7h8i9j0"',
+      lastSyncedAt: hoursAgo(0.1),
+    },
+  });
+
   // Sharing tab for the flagship contact
   await db.contactShare.createMany({
     data: [

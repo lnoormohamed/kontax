@@ -1,3 +1,4 @@
+import type { ReactNode } from "react";
 import Link from "next/link";
 import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
@@ -5,7 +6,7 @@ import { notFound, redirect } from "next/navigation";
 import { AppShell } from "~/app/_components/app-shell";
 import { ContactHistory } from "~/app/_components/contact-history";
 import { ContactInlineEditor } from "~/app/_components/contact-inline-editor";
-import { CopyField } from "~/app/_components/copy-field";
+import { CopyField, CopyMonoRow } from "~/app/_components/copy-field";
 import {
   createLiveShare,
   createStaticShare,
@@ -40,7 +41,6 @@ const formatTimestamp = (value: Date) =>
     year: "numeric",
   }).format(value);
 
-const formatNullableTimestamp = (value: Date | null) => (value ? formatTimestamp(value) : "Not yet");
 
 const formatStoredDateValue = (value: string | null | undefined) => {
   if (!value) {
@@ -93,6 +93,27 @@ const getSyncLinkStatusLabel = (link: {
   return "Linked, waiting for first sync";
 };
 
+// Short status word + palette colours for the Sync card account badge,
+// mirroring the design's StatusBadge (Linked / Conflict / Error / Syncing).
+const getSyncBadge = (link: {
+  lastSyncedAt: Date | null;
+  tombstonedAt: Date | null;
+  remoteDeletedAt: Date | null;
+  lastErrorCode: string | null;
+  conflicts: number;
+}): { label: string; className: string } => {
+  if (link.conflicts > 0) {
+    return { label: "Conflict", className: "bg-[#f6edd9] text-[#7a5a1a]" };
+  }
+  if (link.lastErrorCode || link.tombstonedAt || link.remoteDeletedAt) {
+    return { label: "Needs review", className: "bg-[#f3e1da] text-[#b5472f]" };
+  }
+  if (link.lastSyncedAt) {
+    return { label: "Linked", className: "bg-[#e3efe7] text-[#1c6b48]" };
+  }
+  return { label: "Syncing", className: "bg-[#f2f4f0] text-[#5c655e]" };
+};
+
 const getInitials = (value: string) =>
   value
     .split(" ")
@@ -104,6 +125,67 @@ const getInitials = (value: string) =>
 
 const sectionCardClassName =
   "rounded-[14px] border border-[#d8ddd6] bg-white p-5 sm:p-6";
+
+// ── Sharing tab presentational pieces (locked design: single card, ShareRows) ──
+// Small uppercase heading that groups a set of share actions.
+function ShareGroupLabel({ children }: { children: ReactNode }) {
+  return (
+    <p className="px-3 pt-3.5 pb-1 text-[10.5px] font-bold uppercase tracking-[0.1em] text-[#8b938c]">
+      {children}
+    </p>
+  );
+}
+
+// 36px rounded icon tile used at the left of every ShareRow.
+function ShareIconTile({ icon }: { icon: string }) {
+  return (
+    <span className="grid size-9 shrink-0 place-items-center rounded-[9px] border border-[#e9ece7] bg-[#f2f4f0] text-[#5c655e]">
+      <WorkspaceIcon name={icon} size={18} strokeWidth={1.6} />
+    </span>
+  );
+}
+
+// A compact share action row: icon tile + title + subtitle, an optional trailing
+// slot (action button / status check), and optional expanded sub-content beneath.
+function ShareRow({
+  icon,
+  title,
+  subtitle,
+  trailing,
+  active,
+  children,
+}: {
+  icon: string;
+  title: string;
+  subtitle: ReactNode;
+  trailing?: ReactNode;
+  active?: boolean;
+  children?: ReactNode;
+}) {
+  return (
+    <div className="rounded-[10px] px-3 py-2.5 transition hover:bg-[#f2f4f0]">
+      <div className="flex items-center gap-3">
+        <ShareIconTile icon={icon} />
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-[#1d2823]">{title}</p>
+          <p className="mt-px text-xs leading-[1.45] text-[#8b938c]">{subtitle}</p>
+        </div>
+        <span className="flex shrink-0 items-center gap-2.5">
+          {active ? (
+            <WorkspaceIcon
+              className="text-[#1f8a5b]"
+              name="check"
+              size={16}
+              strokeWidth={2}
+            />
+          ) : null}
+          {trailing}
+        </span>
+      </div>
+      {children ? <div className="mt-3 pl-12">{children}</div> : null}
+    </div>
+  );
+}
 
 // Normalise the contact's Json entry columns into the shapes the inline editor
 // expects. Tolerates legacy shapes ({relationship,name}, {date}, CardDAV postal
@@ -205,6 +287,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     },
     select: {
       id: true,
+      syncUid: true,
       fullName: true,
       firstName: true,
       middleName: true,
@@ -597,33 +680,65 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               editableShared={!isLiveReceived}
             />
 
-            <section className="rounded-[1.2rem] border border-[#d8ddd6] bg-white p-4">
-              <h3 className="mb-2 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8b938c]">
+            <section className="overflow-hidden rounded-[14px] border border-[#d8ddd6] bg-white">
+              <h3 className="px-5 pt-3.5 text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">
                 Sync
               </h3>
+              <div className="mt-3 h-px bg-[#e9ece7]" />
               {syncLinks.length === 0 ? (
-                <p className="text-[13px] text-[#8b938c]">
-                  Not linked to any CardDAV account yet. Connect an account to keep this contact in
+                <p className="px-5 py-4 text-[13.5px] italic text-[#aeb4ac]">
+                  Not linked to any account yet. Connect a CardDAV account to keep this contact in
                   sync.
                 </p>
               ) : (
-                <ul className="grid gap-2">
-                  {syncLinks.map((link) => (
-                    <li
-                      className="flex items-center justify-between gap-3 border-b border-[#edf0ea] pb-2 text-[13px] last:border-b-0"
-                      key={link.id}
-                    >
-                      <span className="text-[#1d2823]">
-                        {link.syncAccount.label ??
-                          link.syncAccount.addressBookDisplayName ??
-                          "CardDAV account"}
-                      </span>
-                      <span className="text-[#8b938c]">
-                        {getSyncLinkStatusLabel(link)} · {formatNullableTimestamp(link.lastSyncedAt)}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+                <div className="px-3 pb-3 pt-1">
+                  {syncLinks.map((link) => {
+                    const badge = getSyncBadge({
+                      lastSyncedAt: link.lastSyncedAt,
+                      tombstonedAt: link.tombstonedAt,
+                      remoteDeletedAt: link.remoteDeletedAt,
+                      lastErrorCode: link.lastErrorCode,
+                      conflicts: link._count.syncConflicts,
+                    });
+                    return (
+                      <div
+                        className="flex items-center gap-3 border-b border-[#e9ece7] px-2 py-2.5 last:border-b-0"
+                        key={link.id}
+                      >
+                        <WorkspaceIcon className="shrink-0 text-[#5c655e]" name="cloud" size={18} />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate text-[13.5px] font-semibold text-[#1d2823]">
+                            {link.syncAccount.label ??
+                              link.syncAccount.addressBookDisplayName ??
+                              "CardDAV account"}
+                            <span className="font-normal text-[12.5px] text-[#8b938c]">
+                              {" · CardDAV"}
+                            </span>
+                          </p>
+                          <p className="mt-px text-[12px] text-[#8b938c]">
+                            {getSyncLinkStatusLabel(link)} ·{" "}
+                            {link.lastSyncedAt
+                              ? `last synced ${formatTimestamp(link.lastSyncedAt)}`
+                              : "not yet synced"}
+                          </p>
+                        </div>
+                        <span
+                          className={`shrink-0 rounded-full px-2 py-0.5 text-[11px] font-semibold ${badge.className}`}
+                        >
+                          {badge.label}
+                        </span>
+                      </div>
+                    );
+                  })}
+
+                  {/* CardDAV sync identifiers (P-parity): per-contact UID + the
+                      primary link's remote ETag, read-only with copy. */}
+                  <div className="my-1.5 h-px bg-[#e9ece7]" />
+                  {syncLinks[0]?.remoteETag ? (
+                    <CopyMonoRow label="ETag" value={syncLinks[0].remoteETag} />
+                  ) : null}
+                  <CopyMonoRow label="UID" value={contact.syncUid} />
+                </div>
               )}
             </section>
           </div>
@@ -631,154 +746,77 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
 
         {detailTab === "sharing" ? (
           <section className={sectionCardClassName} id="contact-sharing">
-            <p className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">Sharing</p>
-            <h2 className="mt-1 text-[17px] font-semibold text-[#1d2823]">Share this contact</h2>
+            <p className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">
+              Share this contact
+            </p>
+            <div className="mt-3.5 h-px bg-[#e9ece7]" />
 
-            {/* vCard share link (all plans) */}
-            <div className="mt-5 rounded-[1.4rem] border border-[#d8ddd6] bg-white p-5">
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div>
-                  <p className="text-sm font-semibold text-[#1d2823]">vCard link</p>
-                  <p className="mt-0.5 text-[13px] text-[#5c655e]">
+            <div className="mt-1 grid gap-0.5">
+              {/* ── Export as vCard (all plans) ────────────────────────────── */}
+              <ShareGroupLabel>Export as vCard</ShareGroupLabel>
+              <ShareRow
+                active={vcardLinks.length > 0}
+                icon="link"
+                subtitle={
+                  <>
                     Anyone with the link can download this contact as a .vcf file.
                     {shellPlan.plan === "FREE" ? " Free links expire after 7 days." : ""}
-                  </p>
-                </div>
-                <form action={createVcardShareLink}>
-                  <input name="contactId" type="hidden" value={contact.id} />
-                  <button
-                    className="rounded-[0.8rem] bg-[#4158f4] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3248db]"
-                    type="submit"
-                  >
-                    Create share link
-                  </button>
-                </form>
-              </div>
-
-              {vcardLinks.length > 0 ? (
-                <div className="mt-4 grid gap-3">
-                  {vcardLinks.map((link) => (
-                    <div key={link.id}>
-                      <CopyField
-                        helper={`${link.downloadCount} download${link.downloadCount === 1 ? "" : "s"}${
-                          link.expiresAt
-                            ? ` · expires ${formatTimestamp(link.expiresAt)}`
-                            : " · no expiry"
-                        }`}
-                        label="Share link"
-                        value={`${shareOrigin}/share/${link.token}`}
-                      />
-                      <form action={revokeShare}>
-                        <input name="shareId" type="hidden" value={link.id} />
-                        <input name="contactId" type="hidden" value={contact.id} />
-                        <button
-                          className="mt-1.5 text-[13px] font-semibold text-[#b5472f]"
-                          type="submit"
-                        >
-                          Revoke link
-                        </button>
-                      </form>
-                    </div>
-                  ))}
-                </div>
-              ) : null}
-            </div>
-
-            {/* static Kontax-to-Kontax share (Pro and above) */}
-            <div className="mt-4 rounded-[1.4rem] border border-[#d8ddd6] bg-white p-5">
-              <p className="text-sm font-semibold text-[#1d2823]">Share with a Kontax user</p>
-              <p className="mt-0.5 text-[13px] text-[#5c655e]">
-                Send a one-time copy to another Kontax account. Their copy is independent of yours.
-              </p>
-              {staticShareEnabled ? (
-                <form action={createStaticShare} className="mt-3 flex flex-wrap items-center gap-2">
-                  <input name="contactId" type="hidden" value={contact.id} />
-                  <input
-                    className="min-w-[220px] flex-1 rounded-[0.7rem] border border-[#d8ddd6] bg-white px-3 py-2 text-sm text-[#1d2823] outline-none focus:border-[#4158f4]"
-                    name="recipientEmail"
-                    placeholder="name@email.com"
-                    required
-                    type="email"
-                  />
-                  <button
-                    className="rounded-[0.8rem] bg-[#4158f4] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3248db]"
-                    type="submit"
-                  >
-                    Send copy
-                  </button>
-                </form>
-              ) : (
-                <div className="mt-3 flex items-center justify-between gap-3 rounded-[0.9rem] bg-[#f6edd9] px-4 py-3 text-[13px] text-[#7a5a1a]">
-                  <span>Sharing with another Kontax user is a Pro feature.</span>
-                  <Link className="shrink-0 font-semibold underline" href="/pricing">
-                    Upgrade
-                  </Link>
-                </div>
-              )}
-
-              {staticShares.length > 0 ? (
-                <ul className="mt-4 grid gap-2">
-                  {staticShares.map((share) => (
-                    <li
-                      className="flex items-center justify-between gap-3 border-b border-[#edf0ea] pb-2 text-[13px] last:border-b-0"
-                      key={share.id}
+                  </>
+                }
+                title="vCard link"
+                trailing={
+                  <form action={createVcardShareLink}>
+                    <input name="contactId" type="hidden" value={contact.id} />
+                    <button
+                      className="rounded-[0.8rem] bg-[#4158f4] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3248db]"
+                      type="submit"
                     >
-                      <span className="min-w-0 truncate text-[#1d2823]">{share.recipientEmail}</span>
-                      <span className="flex shrink-0 items-center gap-3">
-                        <span className="text-[#8b938c]">
-                          {share.status === "DECLINED"
-                            ? "Declined"
-                            : share.status === "REVOKED"
-                              ? "Revoked"
-                              : share.recipientContactId
-                                ? "Accepted"
-                                : "Pending"}
-                        </span>
-                        {share.status === "ACTIVE" && !share.recipientContactId ? (
-                          <form action={revokeShare}>
-                            <input name="shareId" type="hidden" value={share.id} />
-                            <input name="contactId" type="hidden" value={contact.id} />
-                            <button className="font-semibold text-[#b5472f]" type="submit">
-                              Revoke
-                            </button>
-                          </form>
-                        ) : null}
-                      </span>
-                    </li>
-                  ))}
-                </ul>
-              ) : null}
-            </div>
+                      Create share link
+                    </button>
+                  </form>
+                }
+              >
+                {vcardLinks.length > 0 ? (
+                  <div className="grid gap-3">
+                    {vcardLinks.map((link) => (
+                      <div key={link.id}>
+                        <CopyField
+                          helper={`${link.downloadCount} download${link.downloadCount === 1 ? "" : "s"}${
+                            link.expiresAt
+                              ? ` · expires ${formatTimestamp(link.expiresAt)}`
+                              : " · no expiry"
+                          }`}
+                          label="Share link"
+                          value={`${shareOrigin}/share/${link.token}`}
+                        />
+                        <form action={revokeShare}>
+                          <input name="shareId" type="hidden" value={link.id} />
+                          <input name="contactId" type="hidden" value={contact.id} />
+                          <button
+                            className="mt-1.5 text-[13px] font-semibold text-[#b5472f]"
+                            type="submit"
+                          >
+                            Revoke link
+                          </button>
+                        </form>
+                      </div>
+                    ))}
+                  </div>
+                ) : null}
+              </ShareRow>
 
-            {/* live Kontax-to-Kontax share (Pro and above, both parties) */}
-            {isLiveReceived ? (
-              <div className="mt-4 rounded-[1.4rem] border border-[#cfe0d2] bg-[#eef5ef] p-5">
-                <p className="text-sm font-semibold text-[#17352e]">
-                  Live from {contact.sourceDetail ?? "another Kontax user"}
-                </p>
-                <p className="mt-0.5 text-[13px] text-[#3f5a50]">
-                  This contact stays in sync with its owner — shared fields are read-only. Your notes
-                  stay private. Unlink to keep a frozen copy you can edit.
-                </p>
-                <form action={unlinkLiveShare} className="mt-3">
-                  <input name="contactId" type="hidden" value={contact.id} />
-                  <button
-                    className="rounded-[0.8rem] border border-[#d8ddd6] bg-white px-3.5 py-2 text-sm font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
-                    type="submit"
-                  >
-                    Unlink (keep a static copy)
-                  </button>
-                </form>
-              </div>
-            ) : (
-              <div className="mt-4 rounded-[1.4rem] border border-[#d8ddd6] bg-white p-5">
-                <p className="text-sm font-semibold text-[#1d2823]">Share live — keeps in sync</p>
-                <p className="mt-0.5 text-[13px] text-[#5c655e]">
-                  The recipient gets a linked copy that updates whenever you edit this contact. Both
-                  of you must be on a paid plan.
-                </p>
-                {liveShareEnabled ? (
-                  <form action={createLiveShare} className="mt-3 flex flex-wrap items-center gap-2">
+              {/* ── Share with a Kontax user (Pro and above) ───────────────── */}
+              <ShareGroupLabel>Share with a Kontax user</ShareGroupLabel>
+
+              {/* static one-time copy */}
+              <ShareRow
+                active={staticShares.some((share) => share.status === "ACTIVE")}
+                icon="send"
+                subtitle="Send a one-time copy to another Kontax account. Their copy is independent of yours."
+                title="Send a copy"
+              >
+                {staticShareEnabled ? (
+                  <form action={createStaticShare} className="flex flex-wrap items-center gap-2">
                     <input name="contactId" type="hidden" value={contact.id} />
                     <input
                       className="min-w-[220px] flex-1 rounded-[0.7rem] border border-[#d8ddd6] bg-white px-3 py-2 text-sm text-[#1d2823] outline-none focus:border-[#4158f4]"
@@ -791,54 +829,39 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                       className="rounded-[0.8rem] bg-[#4158f4] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3248db]"
                       type="submit"
                     >
-                      Share live
+                      Send copy
                     </button>
                   </form>
                 ) : (
-                  <div className="mt-3 flex items-center justify-between gap-3 rounded-[0.9rem] bg-[#f6edd9] px-4 py-3 text-[13px] text-[#7a5a1a]">
-                    <span>Live sharing is a Pro feature.</span>
+                  <div className="flex items-center justify-between gap-3 rounded-[0.9rem] bg-[#f6edd9] px-4 py-3 text-[13px] text-[#7a5a1a]">
+                    <span>Sharing with another Kontax user is a Pro feature.</span>
                     <Link className="shrink-0 font-semibold underline" href="/pricing">
                       Upgrade
                     </Link>
                   </div>
                 )}
 
-                {liveShares.length > 0 ? (
-                  <ul className="mt-4 grid gap-2">
-                    {liveShares.map((share) => (
+                {staticShares.length > 0 ? (
+                  <ul className="mt-3 grid gap-2">
+                    {staticShares.map((share) => (
                       <li
-                        className="flex items-center justify-between gap-3 border-b border-[#edf0ea] pb-2 text-[13px] last:border-b-0"
+                        className="flex items-center justify-between gap-3 border-b border-[#e9ece7] pb-2 text-[13px] last:border-b-0"
                         key={share.id}
                       >
-                        <span className="min-w-0">
-                          <span className="block truncate text-[#1d2823]">{share.recipientEmail}</span>
-                          {share.status === "ACTIVE" && share.recipientContactId ? (
-                            share.lastErrorCode === "RECIPIENT_LOCKED" ? (
-                              <span className="block text-[12px] text-[#bf8526]">
-                                Sync paused — recipient account issue
-                              </span>
-                            ) : share.lastErrorCode ? (
-                              <span className="block text-[12px] text-[#bf8526]">
-                                Sync error — will retry
-                              </span>
-                            ) : share.lastPushedAt ? (
-                              <span className="block text-[12px] text-[#8b938c]">
-                                Last synced {formatTimestamp(share.lastPushedAt)}
-                              </span>
-                            ) : null
-                          ) : null}
+                        <span className="min-w-0 truncate text-[#1d2823]">
+                          {share.recipientEmail}
                         </span>
                         <span className="flex shrink-0 items-center gap-3">
                           <span className="text-[#8b938c]">
-                            {share.status === "REVOKED"
-                              ? "Revoked"
-                              : share.status === "DECLINED"
-                                ? "Declined"
+                            {share.status === "DECLINED"
+                              ? "Declined"
+                              : share.status === "REVOKED"
+                                ? "Revoked"
                                 : share.recipientContactId
-                                  ? "Live"
+                                  ? "Accepted"
                                   : "Pending"}
                           </span>
-                          {share.status === "ACTIVE" ? (
+                          {share.status === "ACTIVE" && !share.recipientContactId ? (
                             <form action={revokeShare}>
                               <input name="shareId" type="hidden" value={share.id} />
                               <input name="contactId" type="hidden" value={contact.id} />
@@ -852,8 +875,113 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                     ))}
                   </ul>
                 ) : null}
-              </div>
-            )}
+              </ShareRow>
+
+              {/* live linked copy — owner side, or the received-live variant */}
+              {isLiveReceived ? (
+                <ShareRow
+                  active
+                  icon="live"
+                  subtitle="This contact stays in sync with its owner — shared fields are read-only. Your notes stay private. Unlink to keep a frozen copy you can edit."
+                  title={`Live from ${contact.sourceDetail ?? "another Kontax user"}`}
+                >
+                  <form action={unlinkLiveShare}>
+                    <input name="contactId" type="hidden" value={contact.id} />
+                    <button
+                      className="rounded-[0.8rem] border border-[#d8ddd6] bg-white px-3.5 py-2 text-sm font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+                      type="submit"
+                    >
+                      Unlink (keep a static copy)
+                    </button>
+                  </form>
+                </ShareRow>
+              ) : (
+                <ShareRow
+                  active={liveShares.some((share) => share.status === "ACTIVE")}
+                  icon="live"
+                  subtitle="The recipient gets a linked copy that updates whenever you edit this contact. Both of you must be on a paid plan."
+                  title="Share live — keeps in sync"
+                >
+                  {liveShareEnabled ? (
+                    <form action={createLiveShare} className="flex flex-wrap items-center gap-2">
+                      <input name="contactId" type="hidden" value={contact.id} />
+                      <input
+                        className="min-w-[220px] flex-1 rounded-[0.7rem] border border-[#d8ddd6] bg-white px-3 py-2 text-sm text-[#1d2823] outline-none focus:border-[#4158f4]"
+                        name="recipientEmail"
+                        placeholder="name@email.com"
+                        required
+                        type="email"
+                      />
+                      <button
+                        className="rounded-[0.8rem] bg-[#4158f4] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3248db]"
+                        type="submit"
+                      >
+                        Share live
+                      </button>
+                    </form>
+                  ) : (
+                    <div className="flex items-center justify-between gap-3 rounded-[0.9rem] bg-[#f6edd9] px-4 py-3 text-[13px] text-[#7a5a1a]">
+                      <span>Live sharing is a Pro feature.</span>
+                      <Link className="shrink-0 font-semibold underline" href="/pricing">
+                        Upgrade
+                      </Link>
+                    </div>
+                  )}
+
+                  {liveShares.length > 0 ? (
+                    <ul className="mt-3 grid gap-2">
+                      {liveShares.map((share) => (
+                        <li
+                          className="flex items-center justify-between gap-3 border-b border-[#e9ece7] pb-2 text-[13px] last:border-b-0"
+                          key={share.id}
+                        >
+                          <span className="min-w-0">
+                            <span className="block truncate text-[#1d2823]">
+                              {share.recipientEmail}
+                            </span>
+                            {share.status === "ACTIVE" && share.recipientContactId ? (
+                              share.lastErrorCode === "RECIPIENT_LOCKED" ? (
+                                <span className="block text-[12px] text-[#bf8526]">
+                                  Sync paused — recipient account issue
+                                </span>
+                              ) : share.lastErrorCode ? (
+                                <span className="block text-[12px] text-[#bf8526]">
+                                  Sync error — will retry
+                                </span>
+                              ) : share.lastPushedAt ? (
+                                <span className="block text-[12px] text-[#8b938c]">
+                                  Last synced {formatTimestamp(share.lastPushedAt)}
+                                </span>
+                              ) : null
+                            ) : null}
+                          </span>
+                          <span className="flex shrink-0 items-center gap-3">
+                            <span className="text-[#8b938c]">
+                              {share.status === "REVOKED"
+                                ? "Revoked"
+                                : share.status === "DECLINED"
+                                  ? "Declined"
+                                  : share.recipientContactId
+                                    ? "Live"
+                                    : "Pending"}
+                            </span>
+                            {share.status === "ACTIVE" ? (
+                              <form action={revokeShare}>
+                                <input name="shareId" type="hidden" value={share.id} />
+                                <input name="contactId" type="hidden" value={contact.id} />
+                                <button className="font-semibold text-[#b5472f]" type="submit">
+                                  Revoke
+                                </button>
+                              </form>
+                            ) : null}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </ShareRow>
+              )}
+            </div>
           </section>
         ) : null}
 
