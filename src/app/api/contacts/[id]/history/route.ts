@@ -5,9 +5,6 @@ import { db } from "~/server/db";
 
 const DEFAULT_LIMIT = 30;
 const MAX_LIMIT = 100;
-// Free plan: per-contact history shows only the most recent N events (P11-01),
-// enforced at query time — older events are kept in the DB, just not surfaced.
-const FREE_HISTORY_CAP = 10;
 
 export async function GET(
   request: Request,
@@ -40,10 +37,13 @@ export async function GET(
     ? Math.min(Math.max(rawLimit, 1), MAX_LIMIT)
     : DEFAULT_LIMIT;
 
-  // Free plan caps per-contact history to the last N events with no pagination.
+  // Free plan caps per-contact history to its floor (last N events) with no
+  // pagination. Paid tiers show all retained events.
   const billing = await getUserBillingContext(userId);
   const capped = !isActivityLogEnabled(billing.entitlements);
-  const effectiveLimit = capped ? Math.min(limit, FREE_HISTORY_CAP) : limit;
+  const effectiveLimit = capped
+    ? Math.min(limit, billing.entitlements.historyFloorPerContact)
+    : limit;
   const cursorDate = capped || !cursor ? null : new Date(cursor);
 
   const rows = await db.activityEvent.findMany({

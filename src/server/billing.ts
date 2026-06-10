@@ -17,6 +17,9 @@ type PlanEntitlements = {
   sharedAddressBooksLimit: number | null;
   memberSlotsLimit: number | null;
   activityLogRetentionDays: number | null;
+  // Floor: the N most recent events per contact are always kept, even beyond the
+  // retention window (P11-05). Also the per-contact history display cap on Free.
+  historyFloorPerContact: number;
   liveShareEnabled: boolean;
   staticShareEnabled: boolean;
 };
@@ -123,6 +126,7 @@ const PRO_PERSONAL = {
   advancedMergeEnabled: true,
   premiumExportEnabled: true,
   cardDavSyncEnabled: true,
+  historyFloorPerContact: 20,
   liveShareEnabled: true,
   staticShareEnabled: true,
 } as const;
@@ -141,6 +145,7 @@ const PLAN_DEFAULTS: Record<SubscriptionPlan, PlanEntitlements> = {
     sharedAddressBooksLimit: 0,
     memberSlotsLimit: null,
     activityLogRetentionDays: 0,
+    historyFloorPerContact: 10,
     liveShareEnabled: false,
     staticShareEnabled: false,
   },
@@ -150,7 +155,7 @@ const PLAN_DEFAULTS: Record<SubscriptionPlan, PlanEntitlements> = {
     teamsEnabled: false,
     sharedAddressBooksLimit: 0,
     memberSlotsLimit: null,
-    activityLogRetentionDays: 90,
+    activityLogRetentionDays: 365,
   },
   FAMILY: {
     ...PRO_PERSONAL,
@@ -158,7 +163,11 @@ const PLAN_DEFAULTS: Record<SubscriptionPlan, PlanEntitlements> = {
     teamsEnabled: false,
     sharedAddressBooksLimit: 1,
     memberSlotsLimit: 6,
-    activityLogRetentionDays: 365,
+    // Retention is the one exception to "everything in Pro per member": Family
+    // personal history is 90d vs Pro's 365d (per-seat economics). Family's value
+    // is seats + the shared book, not retention depth. The last-20-per-contact
+    // floor (PRO_PERSONAL) still applies, so recent history is never lost.
+    activityLogRetentionDays: 90,
   },
   TEAMS: {
     ...PRO_PERSONAL,

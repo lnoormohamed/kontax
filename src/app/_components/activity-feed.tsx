@@ -319,7 +319,7 @@ export function ActivityLocked({ planLabel }: { planLabel: string }) {
         <h2 className="mt-4 text-lg font-semibold text-[#1d2823]">Activity log is a Pro feature</h2>
         <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#5c655e]">
           See every edit, sync, import, merge, and share across all your contacts in one timeline —
-          with 90 days of history and filters. You&apos;re on the {planLabel} plan.
+          with a year of history and filters. You&apos;re on the {planLabel} plan.
         </p>
         <Link
           className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#4158f4] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#3248db]"

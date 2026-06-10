@@ -165,20 +165,20 @@ Same row as the History tab **plus the contact name as a prefix**, linked to tha
 
 ### States (mock all of them)
 - **Loading:** shimmer rows.
-- **Empty (no activity at all):** "No activity yet" + "Edits, syncs, imports, merges, and shares from the last 90 days show up here."
+- **Empty (no activity at all):** "No activity yet" + "Edits, syncs, imports, merges, and shares from the last [retention] show up here." (retention reflects the tier — Pro 365 days, etc.)
 - **Empty per filter combination:** "No activity matches these filters" + "Try a different category or actor." (distinct from the no-activity-at-all state — the filter chips stay visible so the user can clear them).
 - **Error:** "Couldn't load activity." + Retry.
-- **End of list:** "— Showing the last 90 days —" (retention boundary; see below).
+- **End of list:** "— Showing the last [retention] —" (tier window, e.g. 365 days for Pro; "Showing all activity" for Teams).
 - **Pagination:** cursor-based "Load more".
 
 ### Pro-gated / locked state (Free users)
 Free users never see the feed — they see a **locked upsell** in the Activity tab content area:
-- Centered card: clock icon in a green-wash circle, heading **"Activity log is a Pro feature"**, body explaining the value ("See every edit, sync, import, merge, and share across all your contacts in one timeline — with 90 days of history and filters."), and a primary **"Upgrade to Pro"** button (blue) → `/settings`.
+- Centered card: clock icon in a green-wash circle, heading **"Activity log is a Pro feature"**, body explaining the value ("See every edit, sync, import, merge, and share across all your contacts in one timeline — with a year of history and filters."), and a primary **"Upgrade to Pro"** button (blue) → `/settings`.
 - Mention the user's current plan ("You're on the Free plan.").
 - **Important:** locked state, *not* an empty feed. The tab is always visible in the nav; the gate is on the content.
 
 ### Retention
-- **90 days** for Pro. The feed only shows events within the trailing 90-day window; the footer states this. (Design can note that higher future tiers may extend retention, but mock 90 days.)
+- Retention is per tier (revised 2026-06-10): **Pro 365 days · Family 90 days · Teams unlimited** (Free has no feed). A floor of the **last 20 events per contact** is always kept beyond the window. The feed shows events within the tier's window and its footer states it ("Showing the last 365 days" / "Showing all activity" for Teams). Mock **Pro = 365 days** as the default.
 
 ---
 

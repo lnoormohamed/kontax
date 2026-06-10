@@ -34,7 +34,7 @@ Four tiers. Feature rows on the pricing page should be **grouped by category** i
 - Contacts: **unlimited** · Import: **unlimited**
 - Sync: **5** CardDAV accounts, **5** device app passwords
 - Merge: **advanced** — field-level, bulk accept, 30-day undo
-- Activity: **global feed (90-day retention)** · unlimited per-contact history
+- Activity: **global feed (365-day retention)** · per-contact history 365 days (+ last 20 per contact kept beyond)
 - Sharing: vCard link (no expiry, revocable) · **static + live** Kontax-to-Kontax sharing
 - Support: priority
 
@@ -42,7 +42,7 @@ Four tiers. Feature rows on the pricing page should be **grouped by category** i
 - Everything in Pro, **per member**
 - **1 shared family address book** — everyone can view/edit, changes live-sync to all
 - Family admin controls (add/remove members, set who can edit)
-- Shared activity log for the family book · retention **1 year**
+- Personal activity feed retention **90 days** (+ last 20 per contact kept beyond) · shared family-book activity log retention **1 year** (shared book is Phase 13)
 - Each member keeps their own private library
 
 **Teams** · up to **25 members**
@@ -139,7 +139,7 @@ Launched from an upgrade prompt. Shows **only the two relevant tiers** — the u
 │                                             │
 │   Free (current)        Pro                 │
 │   500 contacts          Unlimited           │
-│   No activity feed   →  90-day feed         │
+│   No activity feed   →  365-day feed        │
 │   1 sync account        5 sync accounts     │
 │   …the few rows that differ…                │
 │                                             │

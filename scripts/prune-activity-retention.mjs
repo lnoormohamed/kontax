@@ -1,20 +1,22 @@
 /**
  * P11-05 — Activity log retention prune job.
  *
- * Deletes ActivityEvent rows older than each user's plan retention window. The
- * window comes from the plan's `activityLogRetentionDays` (the frozen P11-01
- * matrix): Free = 0 (skipped — kept for the query-time last-10 history), Pro =
- * 90, Family = 365, Teams = null (unlimited — skipped).
+ * Deletes ActivityEvent rows older than each user's plan retention window —
+ * EXCEPT it always keeps the most recent N events per contact (the floor), so
+ * recent history is never lost even past the window. Windows + floor come from
+ * the frozen P11-01 matrix:
+ *   Free   — retention 0  → skipped (never pruned; feed gated, history capped at
+ *            the last 10 per contact at query time)
+ *   Pro    — 365 days, floor 20 per contact
+ *   Family — 90 days,  floor 20 per contact
+ *   Teams  — unlimited → skipped (never pruned)
  *
- * Retention bounds BOTH the global feed and per-contact history (one set of
- * rows backs both). Free is never physically pruned; Teams is never pruned.
- *
- * Runs per-user (not one bulk delete) so a single account can be skipped without
- * affecting others, and re-running is safe (idempotent — only deletes rows that
- * are now outside the window). The per-run summary is written to stdout for the
- * scheduler's logs (see note: a dedicated SYSTEM ActivityEvent is intentionally
- * not written — there is no suitable EventType enum value and such a marker
- * would itself be subject to pruning).
+ * Retention bounds BOTH the global feed and per-contact history (one set of rows
+ * backs both). Contact-less events (deleted contacts) get the window with no
+ * floor. Runs per-user (not one bulk delete); re-running is safe (idempotent).
+ * The run summary is written to stdout for the scheduler's logs (a dedicated
+ * SYSTEM ActivityEvent is intentionally not written — there is no suitable
+ * EventType enum value and such a marker would itself be pruned).
  *
  * Run nightly via an external scheduler (Coolify scheduled task / cron):
  *   node scripts/prune-activity-retention.mjs
@@ -26,17 +28,42 @@ import { PrismaClient } from "../generated/prisma/index.js";
 const prisma = new PrismaClient();
 const DRY_RUN = process.argv.includes("--dry-run");
 
-// Personal-activity retention per plan, in days. 0 and null are never pruned.
-const RETENTION_DAYS_BY_PLAN = {
-  FREE: 0, // keep all rows; global feed gated, per-contact history capped at query time
-  PRO: 90,
-  FAMILY: 365,
-  TEAMS: null, // unlimited
+// Per-plan retention window (days) + per-contact floor. Kept in sync with
+// PLAN_DEFAULTS in src/server/billing.ts. days 0/null = never pruned.
+const PLAN_RETENTION = {
+  FREE: { days: 0, floor: 10 },
+  PRO: { days: 365, floor: 20 },
+  FAMILY: { days: 90, floor: 20 },
+  TEAMS: { days: null, floor: 20 },
 };
 
 const ACTIVE_SUB_STATUSES = ["ACTIVE", "TRIALING", "PAST_DUE"];
 
 const log = (...args) => console.log(`[prune-activity ${new Date().toISOString()}]`, ...args);
+
+// Delete events older than `cutoff`, keeping the `floor` most recent per contact.
+// Contact-less events (contactId IS NULL) get the window with no floor.
+const PRUNE_SQL = `
+  DELETE FROM "ActivityEvent" ae
+  WHERE ae."userId" = $1
+    AND ae."createdAt" < $2
+    AND (
+      ae."contactId" IS NULL
+      OR ae.id NOT IN (
+        SELECT id FROM (
+          SELECT id, ROW_NUMBER() OVER (
+            PARTITION BY "contactId" ORDER BY "createdAt" DESC
+          ) AS rn
+          FROM "ActivityEvent"
+          WHERE "userId" = $1 AND "contactId" IS NOT NULL
+        ) ranked
+        WHERE ranked.rn <= $3
+      )
+    )
+`;
+
+// Same predicate as a COUNT, for --dry-run.
+const COUNT_SQL = PRUNE_SQL.replace('DELETE FROM "ActivityEvent" ae', 'SELECT COUNT(*)::int AS n FROM "ActivityEvent" ae');
 
 try {
   log(DRY_RUN ? "DRY RUN — no rows will be deleted." : "Starting retention prune.");
@@ -59,32 +86,32 @@ try {
 
   for (const user of users) {
     const plan = user.subscriptions[0]?.plan ?? "FREE";
-    const retentionDays = RETENTION_DAYS_BY_PLAN[plan] ?? null;
+    const { days, floor } = PLAN_RETENTION[plan] ?? PLAN_RETENTION.FREE;
 
     // Free (0) and unlimited (null) tiers are never physically pruned.
-    if (retentionDays === null || retentionDays <= 0) {
+    if (days === null || days <= 0) {
       usersSkipped += 1;
       continue;
     }
 
-    const cutoff = new Date(Date.now() - retentionDays * 24 * 60 * 60 * 1000);
-    const where = { userId: user.id, createdAt: { lt: cutoff } };
+    const cutoff = new Date(Date.now() - days * 24 * 60 * 60 * 1000);
 
     if (DRY_RUN) {
-      const count = await prisma.activityEvent.count({ where });
+      const rows = await prisma.$queryRawUnsafe(COUNT_SQL, user.id, cutoff, floor);
+      const count = Number(rows?.[0]?.n ?? 0);
       if (count > 0) {
         usersPruned += 1;
         totalDeleted += count;
-        log(`user ${user.id} (${plan}, ${retentionDays}d): would delete ${count} events`);
+        log(`user ${user.id} (${plan}, ${days}d, floor ${floor}): would delete ${count} events`);
       }
       continue;
     }
 
-    const { count } = await prisma.activityEvent.deleteMany({ where });
+    const count = await prisma.$executeRawUnsafe(PRUNE_SQL, user.id, cutoff, floor);
     if (count > 0) {
       usersPruned += 1;
       totalDeleted += count;
-      log(`user ${user.id} (${plan}, ${retentionDays}d): deleted ${count} events`);
+      log(`user ${user.id} (${plan}, ${days}d, floor ${floor}): deleted ${count} events`);
     }
   }
 
