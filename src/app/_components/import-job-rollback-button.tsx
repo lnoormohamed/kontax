@@ -34,16 +34,15 @@ export function ImportJobRollbackButton({ jobId }: ImportJobRollbackButtonProps)
   };
 
   return (
-    <div className="mt-3 grid gap-2">
-      <button
-        className="rounded-full border border-amber-300/30 px-4 py-2 text-sm font-semibold text-amber-100 transition hover:border-amber-200 hover:text-white disabled:cursor-not-allowed disabled:opacity-70"
-        disabled={isRollingBack}
-        onClick={handleRollback}
-        type="button"
-      >
-        {isRollingBack ? "Archiving imported contacts..." : "Archive imported contacts"}
-      </button>
-      {error ? <p className="text-sm text-rose-200">{error}</p> : null}
-    </div>
+    <button
+      aria-label="Undo this import (archives its contacts)"
+      className="text-[13px] font-semibold text-[#5c655e] transition hover:text-[#b5472f] disabled:opacity-50"
+      disabled={isRollingBack}
+      onClick={handleRollback}
+      title={error || "Undo this import (archives its contacts)"}
+      type="button"
+    >
+      {isRollingBack ? "Archiving…" : "Undo"}
+    </button>
   );
 }
