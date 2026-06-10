@@ -454,162 +454,100 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
   const enrichedFieldCount = structuredCoverage.filter((item) => item.count > 0).length;
   const phoneticSummary = getPhoneticSummary(contact);
 
-  const detailStats = [
-    {
-      label: "Email",
-      value: formatDisplayValue(contact.email),
-    },
-    {
-      label: "Phone",
-      value: formatDisplayValue(contact.phone),
-    },
-    {
-      label: "Company",
-      value: formatDisplayValue(contact.company, "Independent"),
-    },
-    {
-      label: "Birthday",
-      value: formatStoredDateValue(contact.birthday),
-    },
-  ];
-
   return (
     <AppShell account={shellAccount} counts={shellCounts}>
       <div className="mx-auto flex w-full max-w-[1720px] flex-col gap-6 px-4 py-6 lg:px-6 lg:py-8">
-        <section className="overflow-hidden rounded-[2.4rem] border border-[#d8ddd6] bg-[#17352e] text-white shadow-[0_25px_80px_rgba(23,53,46,0.18)]">
-          <div className="grid gap-6 px-6 py-6 lg:grid-cols-[minmax(0,1fr)_320px] lg:px-8">
-            <div>
-              <Link className="text-sm font-semibold text-[#9fd6c6] hover:text-white" href="/">
-                ← Back to contacts
-              </Link>
+        <Link className="text-sm font-semibold text-[#4158f4]" href="/">
+          ← Back to contacts
+        </Link>
 
-              <div className="mt-5 flex flex-col gap-5 sm:flex-row sm:items-start">
-                <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[1.8rem] bg-[#dcefe8] text-2xl font-semibold text-[#145c4f]">
-                  {getInitials(contact.fullName)}
-                </div>
-
-                <div className="min-w-0">
-                  <div className="flex flex-wrap items-center gap-3">
-                    <h1 className="text-4xl font-semibold tracking-tight text-white">{contact.fullName}</h1>
-                    {contact.archivedAt ? (
-                      <span className="rounded-full border border-amber-300/30 bg-amber-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-amber-200">
-                        Archived
-                      </span>
-                    ) : (
-                      <span className="rounded-full border border-emerald-300/30 bg-emerald-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-emerald-200">
-                        Active
-                      </span>
-                    )}
-                    {contact.isFavorite ? (
-                      <span className="rounded-full border border-cyan-300/30 bg-cyan-300/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-cyan-100">
-                        Favorite
-                      </span>
-                    ) : null}
-                  </div>
-
-                  <div className="mt-3 flex flex-wrap items-center gap-2">
-                    <SourceBadge sourceType={contact.sourceType} sourceDetail={contact.sourceDetail} />
-                  </div>
-                  <div className="mt-2">
-                    <LastUpdatedBy
-                      lastMutatedBy={contact.lastMutatedBy}
-                      lastMutatedByDetail={contact.lastMutatedByDetail}
-                      updatedAt={contact.updatedAt.toISOString()}
-                    />
-                  </div>
-
-                  {phoneticSummary.nameReading || phoneticSummary.companyReading ? (
-                    <div className="mt-3 flex flex-wrap gap-2 text-sm text-[#d6e6df]">
-                      {phoneticSummary.nameReading ? (
-                        <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
-                          Phonetic name: {phoneticSummary.nameReading}
-                        </span>
-                      ) : null}
-                      {phoneticSummary.companyReading ? (
-                        <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1.5">
-                          Phonetic company: {phoneticSummary.companyReading}
-                        </span>
-                      ) : null}
-                    </div>
+        {/* Identity header (locked light system) + archive-first actions */}
+        <section className="rounded-[1.6rem] border border-[#d8ddd6] bg-white p-6">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+            <div className="flex min-w-0 gap-4">
+              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[1.4rem] bg-[#e7efe9] text-2xl font-semibold text-[#17352e]">
+                {getInitials(contact.fullName)}
+              </div>
+              <div className="min-w-0">
+                <div className="flex flex-wrap items-center gap-2.5">
+                  <h1 className="text-3xl font-semibold tracking-tight text-[#1d2823]">
+                    {contact.fullName}
+                  </h1>
+                  {contact.archivedAt ? (
+                    <span className="rounded-full bg-[#f6edd9] px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#7a5a1a]">
+                      Archived
+                    </span>
                   ) : null}
-
-                  <p className="mt-3 max-w-3xl text-sm leading-6 text-[#d6e6df]">
-                    Edit this contact in grouped sections so everyday updates stay light, while the
-                    richer metadata Kontax needs for import quality, merge confidence, and future
-                    CardDAV parity stays close at hand.
-                  </p>
-
-                  <div className="mt-5 grid gap-3 sm:grid-cols-3">
-                    {detailStats.map((item) => (
-                      <div
-                        className="rounded-[1.4rem] border border-white/10 bg-white/5 px-4 py-3"
-                        key={item.label}
-                      >
-                        <p className="text-xs uppercase tracking-[0.18em] text-[#9fd6c6]">{item.label}</p>
-                        <p className="mt-2 truncate text-sm font-medium text-white">{item.value}</p>
-                      </div>
-                    ))}
-                  </div>
-
-                  <div className="mt-5 flex flex-wrap gap-2">
-                    <form action={toggleFavoriteContact}>
-                      <input name="contactId" type="hidden" value={contact.id} />
-                      <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}`} />
-                      <button
-                        className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-                          contact.isFavorite
-                            ? "border border-cyan-300/40 bg-cyan-300/10 text-cyan-100 hover:bg-cyan-300/20"
-                            : "border border-white/15 bg-white/5 text-white hover:bg-white/10"
-                        }`}
-                        type="submit"
-                      >
-                        {contact.isFavorite ? "Unstar favorite" : "Star favorite"}
-                      </button>
-                    </form>
-                    <a
-                      className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
-                      href="#contact-snapshot"
-                    >
-                      View snapshot
-                    </a>
-                    <a
-                      className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
-                      href="#contact-editor"
-                    >
-                      Edit details
-                    </a>
-                    <a
-                      className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
-                      href="#contact-sync-origin"
-                    >
-                      Sync links
-                    </a>
-                  </div>
+                  {contact.isFavorite ? <span aria-label="Favorite" className="text-[#e0a31c]">★</span> : null}
                 </div>
+                {contact.company || contact.jobTitle ? (
+                  <p className="mt-1 text-sm text-[#5c655e]">
+                    {[contact.jobTitle, contact.company].filter(Boolean).join(" · ")}
+                  </p>
+                ) : null}
+                <div className="mt-3 flex flex-wrap items-center gap-2">
+                  <SourceBadge sourceType={contact.sourceType} sourceDetail={contact.sourceDetail} />
+                </div>
+                <div className="mt-2 text-[13px] text-[#5c655e]">
+                  <LastUpdatedBy
+                    lastMutatedBy={contact.lastMutatedBy}
+                    lastMutatedByDetail={contact.lastMutatedByDetail}
+                    updatedAt={contact.updatedAt.toISOString()}
+                  />
+                </div>
+                <p className="mt-2 text-[12px] text-[#8b938c]">
+                  Added {formatTimestamp(contact.createdAt)} · Updated {formatTimestamp(contact.updatedAt)}
+                  {syncLinks.length > 0 ? ` · ${syncLinks.length} linked source${syncLinks.length === 1 ? "" : "s"}` : ""}
+                </p>
               </div>
             </div>
 
-            <div className="grid gap-3 rounded-[1.8rem] border border-white/10 bg-white/5 p-5 text-sm text-[#d6e6df]">
-              <div className="flex items-center justify-between gap-3 border-b border-white/10 pb-3">
-                <span className="uppercase tracking-[0.18em] text-[#9fd6c6]">Record health</span>
-                <span className="text-white">{syncLinks.length > 0 ? "Synced" : "Local only"}</span>
-              </div>
-              <p>
-                <span className="text-[#9fd6c6]">Created:</span> {formatTimestamp(contact.createdAt)}
-              </p>
-              <p>
-                <span className="text-[#9fd6c6]">Updated:</span> {formatTimestamp(contact.updatedAt)}
-              </p>
-              <p>
-                <span className="text-[#9fd6c6]">Linked sources:</span> {syncLinks.length}
-              </p>
-              <p>
-                <span className="text-[#9fd6c6]">Labels:</span> {labelsValue || "None yet"}
-              </p>
-              <p>
-                <span className="text-[#9fd6c6]">Structured coverage:</span> {enrichedFieldCount} /{" "}
-                {structuredCoverage.length} areas
-              </p>
+            {/* Archive-first actions: Share · Archive/Restore · Favorite · ⋯ (Delete) */}
+            <div className="flex shrink-0 flex-wrap items-center gap-2">
+              <Link
+                className="inline-flex items-center gap-1.5 rounded-[0.8rem] border border-[#d8ddd6] bg-white px-3.5 py-2 text-sm font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+                href={`/contacts/${contact.id}?tab=sharing`}
+              >
+                Share
+              </Link>
+              <form action={contact.archivedAt ? restoreContact : archiveContact}>
+                <input name="contactId" type="hidden" value={contact.id} />
+                <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}`} />
+                <button
+                  className="rounded-[0.8rem] border border-[#d8ddd6] bg-white px-3.5 py-2 text-sm font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+                  type="submit"
+                >
+                  {contact.archivedAt ? "Restore" : "Archive"}
+                </button>
+              </form>
+              <form action={toggleFavoriteContact}>
+                <input name="contactId" type="hidden" value={contact.id} />
+                <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}`} />
+                <button
+                  aria-label={contact.isFavorite ? "Unfavorite" : "Favorite"}
+                  className="grid h-9 w-9 place-items-center rounded-[0.8rem] border border-[#d8ddd6] bg-white text-[#e0a31c] transition hover:bg-[#f2f4f0]"
+                  type="submit"
+                >
+                  {contact.isFavorite ? "★" : "☆"}
+                </button>
+              </form>
+              <details className="relative">
+                <summary className="grid h-9 w-9 cursor-pointer list-none place-items-center rounded-[0.8rem] border border-[#d8ddd6] bg-white text-[#5c655e] transition hover:bg-[#f2f4f0]">
+                  ⋯
+                </summary>
+                <div className="absolute right-0 z-10 mt-1 w-56 rounded-[1rem] border border-[#d8ddd6] bg-white p-1.5 shadow-lg">
+                  <form action={permanentlyDeleteContact}>
+                    <input name="contactId" type="hidden" value={contact.id} />
+                    <input name="redirectTo" type="hidden" value="/" />
+                    <button
+                      className="w-full rounded-[0.7rem] px-3 py-2 text-left text-sm font-semibold text-[#b5472f] transition hover:bg-[#fbeae6]"
+                      type="submit"
+                    >
+                      Delete permanently
+                    </button>
+                  </form>
+                </div>
+              </details>
             </div>
           </div>
         </section>
