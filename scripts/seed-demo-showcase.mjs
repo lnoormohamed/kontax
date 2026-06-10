@@ -19,11 +19,31 @@
 //   node scripts/seed-demo-showcase.mjs --user=me@x.com # specific user
 //   node scripts/seed-demo-showcase.mjs --reset         # wipe showcase data first
 
+import bcrypt from "bcryptjs";
+
 import { PrismaClient } from "../generated/prisma/index.js";
 
 const db = new PrismaClient();
 
 const SHOWCASE_LABEL = "demo-showcase";
+const DEMO_PASSWORD = "demo1234";
+
+// Recipient accounts so the Sharing tab shows real recipients (accepted /
+// pending / live) and the owner gets an incoming "Shared with me" item.
+const DEMO_ACCOUNTS = [
+  { email: "ngozi@family.example", name: "Ngozi Eze" },
+  { email: "tunde@orbit.health", name: "Tunde Bello" },
+  { email: "chidi@okafor.health", name: "Chidi Okafor" },
+];
+
+const upsertDemoUser = async ({ email, name }) => {
+  const password = await bcrypt.hash(DEMO_PASSWORD, 12);
+  return db.user.upsert({
+    where: { email },
+    update: { name },
+    create: { email, name, password },
+  });
+};
 
 const getArg = (name, fallback) => {
   const pref = `--${name}=`;
@@ -74,7 +94,15 @@ const main = async () => {
       });
       await db.contact.deleteMany({ where: { id: { in: ids } } });
     }
-    console.log(`Reset: removed ${ids.length} prior showcase contact(s).`);
+    // Demo recipient accounts: deleting them cascades their contacts, owned
+    // shares (incl. the incoming "Shared with me" item) and nulls received-share
+    // links — a clean slate for re-seeding.
+    const removedUsers = await db.user.deleteMany({
+      where: { email: { in: DEMO_ACCOUNTS.map((a) => a.email) } },
+    });
+    console.log(
+      `Reset: removed ${ids.length} prior showcase contact(s) and ${removedUsers.count} demo account(s).`,
+    );
   }
 
   const base = (overrides) => ({
@@ -250,7 +278,57 @@ const main = async () => {
     },
   });
 
-  // Sharing tab for the flagship contact
+  // --- Recipient accounts + linked shares ----------------------------------
+  const ownerName = user.name?.trim() || user.email;
+  const [ngozi, tunde, chidi] = await Promise.all(DEMO_ACCOUNTS.map(upsertDemoUser));
+  const amaraSnapshot = {
+    ownerName,
+    fullName: "Amara Okafor",
+    firstName: "Amara",
+    lastName: "Okafor",
+    email: "amara@okafor.health",
+    phone: "+2348031234567",
+    company: "Orbit Health",
+    jobTitle: "Chief Medical Officer",
+  };
+
+  // Accepted static copy: Ngozi has her own independent copy of Amara.
+  const ngoziCopy = await db.contact.create({
+    data: {
+      userId: ngozi.id,
+      fullName: "Amara Okafor",
+      firstName: "Amara",
+      lastName: "Okafor",
+      email: "amara@okafor.health",
+      phone: "+2348031234567",
+      company: "Orbit Health",
+      jobTitle: "Chief Medical Officer",
+      sourceType: "SHARED_STATIC",
+      sourceDetail: ownerName,
+      lastMutatedBy: "SHARED_STATIC",
+      lastMutatedByDetail: ownerName,
+    },
+  });
+
+  // Accepted live copy: Tunde has a linked, read-only mirror of Amara.
+  const tundeCopy = await db.contact.create({
+    data: {
+      userId: tunde.id,
+      fullName: "Amara Okafor",
+      firstName: "Amara",
+      lastName: "Okafor",
+      email: "amara@okafor.health",
+      phone: "+2348031234567",
+      company: "Orbit Health",
+      jobTitle: "Chief Medical Officer",
+      sourceType: "SHARED_LIVE",
+      sourceDetail: ownerName,
+      lastMutatedBy: "SHARED_LIVE",
+      lastMutatedByDetail: ownerName,
+    },
+  });
+
+  // Sharing tab for the flagship contact — every recipient state represented.
   await db.contactShare.createMany({
     data: [
       {
@@ -264,24 +342,76 @@ const main = async () => {
         createdAt: daysAgo(6),
       },
       {
+        // accepted static copy → Ngozi
         ownerUserId: user.id,
         contactId: flagship.id,
         shareType: "STATIC_COPY",
         status: "ACTIVE",
-        recipientEmail: "ngozi@family.example",
-        snapshot: { fullName: "Amara Okafor", email: "amara@okafor.health" },
+        recipientUserId: ngozi.id,
+        recipientEmail: ngozi.email,
+        recipientContactId: ngoziCopy.id,
+        snapshot: amaraSnapshot,
         createdAt: daysAgo(4),
       },
       {
+        // pending static copy → Chidi (not accepted yet)
+        ownerUserId: user.id,
+        contactId: flagship.id,
+        shareType: "STATIC_COPY",
+        status: "ACTIVE",
+        recipientUserId: chidi.id,
+        recipientEmail: chidi.email,
+        snapshot: amaraSnapshot,
+        createdAt: daysAgo(1),
+      },
+      {
+        // live, accepted → Tunde (last synced recently)
         ownerUserId: user.id,
         contactId: flagship.id,
         shareType: "LIVE_SYNC",
         status: "ACTIVE",
-        recipientEmail: "tunde@orbit.health",
+        recipientUserId: tunde.id,
+        recipientEmail: tunde.email,
+        recipientContactId: tundeCopy.id,
         lastPushedAt: hoursAgo(20),
         createdAt: daysAgo(3),
       },
     ],
+  });
+
+  // Incoming "Shared with me" for the owner: Ngozi shares a contact back.
+  const ngoziOwned = await db.contact.create({
+    data: {
+      userId: ngozi.id,
+      fullName: "Bola Adeyemi",
+      firstName: "Bola",
+      lastName: "Adeyemi",
+      email: "bola@adeyemi.example",
+      phone: "+2348022002200",
+      company: "Lagdev Partners",
+      jobTitle: "Programme Director",
+      sourceType: "MANUAL",
+      lastMutatedBy: "MANUAL",
+    },
+  });
+  await db.contactShare.create({
+    data: {
+      ownerUserId: ngozi.id,
+      contactId: ngoziOwned.id,
+      shareType: "STATIC_COPY",
+      status: "ACTIVE",
+      recipientUserId: user.id,
+      recipientEmail: user.email,
+      snapshot: {
+        ownerName: ngozi.name,
+        fullName: "Bola Adeyemi",
+        email: "bola@adeyemi.example",
+        phone: "+2348022002200",
+        company: "Lagdev Partners",
+        jobTitle: "Programme Director",
+      },
+      createdAt: hoursAgo(5),
+    },
   });
 
   // --- 2. One contact per source type (SourceBadge variants) ---------------
@@ -394,6 +524,13 @@ const main = async () => {
   console.log(`  • SourceBadge variants: ${sourceShowcase.map((c) => c.fullName).join(", ")}`);
   console.log(`  • 1 archived contact, 1 duplicate pair (OPEN merge suggestion)`);
   console.log(`  • ${total} total contacts tagged "${SHOWCASE_LABEL}"`);
+  console.log(`\nSharing recipients (Amara Okafor → Sharing tab):`);
+  console.log(`  • ${ngozi.email} — static copy ACCEPTED`);
+  console.log(`  • ${chidi.email} — static copy PENDING`);
+  console.log(`  • ${tunde.email} — live share, last synced 20h ago`);
+  console.log(`  • Incoming "Shared with me" for ${user.email}: Bola Adeyemi from ${ngozi.name}`);
+  console.log(`\nDemo accounts (sign in to see the recipient side) — password: ${DEMO_PASSWORD}`);
+  for (const a of DEMO_ACCOUNTS) console.log(`  • ${a.email}`);
   console.log(`\nOpen the flagship contact to see Details / History / Sharing populated.`);
 };
 
