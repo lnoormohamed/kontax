@@ -6,7 +6,7 @@ import { AppShell } from "~/app/_components/app-shell";
 import { ContactHistory } from "~/app/_components/contact-history";
 import { ContactFamilyPanel } from "~/app/_components/contact-family-panel";
 import {
-  ContactEditActions,
+  ContactDetailHeaderBar,
   ContactEditProvider,
   ContactInlineEditor,
 } from "~/app/_components/contact-inline-editor";
@@ -484,18 +484,10 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
         a wrapper div the CSS sticky is released as that wrapper's bottom edge
         passes the threshold — moving it here removes that constraint entirely.
       */}
-      <div className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-[#d8ddd6] bg-white/95 px-4 backdrop-blur lg:px-6">
-          <Link
-            className="flex items-center gap-1.5 text-sm font-semibold text-[#5c655e] transition hover:text-[#1d2823]"
-            href="/"
-          >
-            <WorkspaceIcon name="back" size={17} />
-            Contacts
-          </Link>
-          <span className="flex-1 truncate text-center text-[15px] font-semibold text-[#1d2823]">
-            {contact.fullName}
-          </span>
-          <div className="flex shrink-0 items-center gap-2">
+      <ContactDetailHeaderBar
+        contactName={contact.fullName}
+        readActions={
+          <>
             <Link
               className="flex h-[34px] items-center gap-1.5 rounded-[8px] border border-transparent px-3 text-[13px] font-semibold text-[#5c655e] transition hover:border-[#d8ddd6] hover:bg-[#f2f4f0]"
               href={`/contacts/${contact.id}?tab=sharing`}
@@ -514,7 +506,6 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 {contact.archivedAt ? "Restore" : "Archive"}
               </button>
             </form>
-            <ContactEditActions />
             <MoreMenu>
               {canAddToFamily ? (
                 <form action={addContactToFamilyBook}>
@@ -545,8 +536,9 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 </button>
               </form>
             </MoreMenu>
-          </div>
-        </div>
+          </>
+        }
+      />
 
       {/* Page body — min-h-screen gives white background on short pages */}
       <div className="min-h-screen bg-white text-[#1d2823]">

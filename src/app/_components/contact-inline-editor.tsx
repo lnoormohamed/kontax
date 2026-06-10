@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createContext, useContext, useEffect, useState } from "react";
 
@@ -10,6 +11,7 @@ import {
   type AddressEntry,
   type SimpleEntry,
 } from "~/app/_components/contact-multi-value";
+import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 
 export type InlineEditorContact = {
   id: string;
@@ -595,45 +597,98 @@ export function ContactEditProvider({
   );
 }
 
-/** Edit / Cancel / Save controls — rendered in the detail page header. */
-export function ContactEditActions() {
+/**
+ * The detail page's sticky sub-header. In read mode it shows the back link +
+ * the read actions (Share / Archive / More) + Edit. In edit mode it transforms:
+ * tinted background, an "Editing" pill in place of the back label, and only
+ * Cancel / Save on the right.
+ */
+export function ContactDetailHeaderBar({
+  contactName,
+  backHref = "/",
+  readActions,
+}: {
+  contactName: string;
+  backHref?: string;
+  readActions: React.ReactNode;
+}) {
   const { mode, saving, enterEdit, cancel, save } = useContactEdit();
-  if (mode === "read") {
-    return (
-      <button
-        className="flex h-[34px] items-center gap-1.5 rounded-[8px] bg-[#17352e] px-3 text-[13px] font-semibold text-white transition hover:bg-[#20443b]"
-        onClick={enterEdit}
-        type="button"
-      >
-        <PencilIcon />
-        Edit
-      </button>
-    );
-  }
+  const editing = mode === "edit";
+
   return (
-    <>
-      <button
-        className="flex h-[34px] items-center rounded-[8px] border border-[#d8ddd6] bg-white px-3 text-[13px] font-semibold text-[#5c655e] transition hover:bg-[#f2f4f0] disabled:opacity-50"
-        disabled={saving}
-        onClick={cancel}
-        type="button"
-      >
-        Cancel
-      </button>
-      <button
-        className="flex h-[34px] items-center gap-1.5 rounded-[8px] bg-[#17352e] px-3 text-[13px] font-semibold text-white transition hover:bg-[#20443b] disabled:cursor-not-allowed disabled:opacity-60"
-        disabled={saving}
-        onClick={save}
-        type="button"
-      >
-        {saving ? (
-          <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+    <div
+      className={`sticky top-0 z-20 flex h-[60px] shrink-0 items-center gap-3 border-b px-4 backdrop-blur transition-colors lg:px-[18px] ${
+        editing ? "border-[rgba(65,88,244,0.28)] bg-[#f3f5ff]" : "border-[#d8ddd6] bg-white/95"
+      }`}
+    >
+      {editing ? (
+        <div className="flex items-center gap-2">
+          <Link
+            aria-label="Back to contacts"
+            className="flex items-center text-[#5c655e] transition hover:text-[#1d2823]"
+            href={backHref}
+          >
+            <WorkspaceIcon name="back" size={17} />
+          </Link>
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-[#c7d0f5] bg-white px-3 py-1 text-[13px] font-semibold text-[#4158f4]">
+            <PencilIcon />
+            Editing
+          </span>
+        </div>
+      ) : (
+        <Link
+          className="flex items-center gap-1.5 text-sm font-semibold text-[#5c655e] transition hover:text-[#1d2823]"
+          href={backHref}
+        >
+          <WorkspaceIcon name="back" size={17} />
+          Contacts
+        </Link>
+      )}
+
+      <span className="flex-1 truncate text-center text-[15px] font-semibold text-[#1d2823]">
+        {contactName}
+      </span>
+
+      <div className="flex shrink-0 items-center gap-2">
+        {editing ? (
+          <>
+            <button
+              className="rounded-[8px] px-3 py-1.5 text-[13px] font-semibold text-[#5c655e] transition hover:bg-white/70 hover:text-[#1d2823] disabled:opacity-50"
+              disabled={saving}
+              onClick={cancel}
+              type="button"
+            >
+              Cancel
+            </button>
+            <button
+              className="flex h-[34px] items-center gap-1.5 rounded-[8px] bg-[#17352e] px-3.5 text-[13px] font-semibold text-white transition hover:bg-[#20443b] disabled:cursor-not-allowed disabled:opacity-60"
+              disabled={saving}
+              onClick={save}
+              type="button"
+            >
+              {saving ? (
+                <span className="inline-block h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/40 border-t-white" />
+              ) : (
+                <CheckIcon />
+              )}
+              {saving ? "Saving…" : "Save"}
+            </button>
+          </>
         ) : (
-          <CheckIcon />
+          <>
+            {readActions}
+            <button
+              className="flex h-[34px] items-center gap-1.5 rounded-[8px] bg-[#17352e] px-3 text-[13px] font-semibold text-white transition hover:bg-[#20443b]"
+              onClick={enterEdit}
+              type="button"
+            >
+              <PencilIcon />
+              Edit
+            </button>
+          </>
         )}
-        {saving ? "Saving…" : "Save"}
-      </button>
-    </>
+      </div>
+    </div>
   );
 }
 
