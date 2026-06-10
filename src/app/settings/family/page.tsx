@@ -1,6 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { ConfirmAction } from "~/app/_components/confirm-action";
+import { SectionLabel, SettingsCard, SettingsPageHead } from "~/app/_components/settings-ui";
+import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import {
   createFamilyGroup,
   deleteFamilyGroup,
@@ -10,17 +13,43 @@ import {
   resendFamilyInvite,
   setMemberCanEdit,
 } from "~/app/actions/family";
-import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
 import { getUserBillingContext } from "~/server/billing";
 import { db } from "~/server/db";
 
 const fmtDate = (value: Date | null) =>
   value
-    ? new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(
-        value,
-      )
+    ? new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(value)
     : "—";
+
+const getInitials = (value: string) =>
+  value
+    .split(/\s+/)
+    .map((part) => part.trim()[0])
+    .filter(Boolean)
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
+
+function Avatar({ label }: { label: string }) {
+  return (
+    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#e7efe9] text-[12px] font-semibold text-[#17352e]">
+      {getInitials(label)}
+    </span>
+  );
+}
+
+function Tag({ children, green }: { children: React.ReactNode; green?: boolean }) {
+  return (
+    <span
+      className={`inline-flex h-[22px] items-center rounded-md px-2 text-[11.5px] font-semibold ${
+        green ? "bg-[#e7efe9] text-[#17352e]" : "bg-[#f2f4f0] text-[#5c655e]"
+      }`}
+    >
+      {children}
+    </span>
+  );
+}
 
 export default async function FamilySettingsPage() {
   const session = await auth();
@@ -46,226 +75,340 @@ export default async function FamilySettingsPage() {
     : await db.groupMember.findFirst({
         where: { userId, inviteStatus: "ACCEPTED", group: { type: "FAMILY" } },
         include: {
-          group: { include: { owner: { select: { name: true, email: true } } } },
+          group: {
+            include: {
+              owner: { select: { name: true, email: true } },
+              members: {
+                where: { inviteStatus: "ACCEPTED" },
+                orderBy: [{ role: "asc" }, { createdAt: "asc" }],
+                include: { user: { select: { name: true, email: true } } },
+              },
+            },
+          },
         },
       });
 
-  const Shell = ({ children }: { children: React.ReactNode }) => (
-    <div className="mx-auto max-w-2xl px-5 py-8 text-[#1d2823]">
-      <Link
-        className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[#5c655e] transition hover:text-[#1d2823]"
-        href="/settings"
-      >
-        <WorkspaceIcon name="back" size={16} />
-        Settings
-      </Link>
-      <h1 className="text-[22px] font-semibold tracking-[-0.01em]">Family</h1>
-      <div className="mt-5">{children}</div>
-    </div>
-  );
-
-  // Member (non-owner) view
+  // ── Member (non-owner) view ──
   if (memberOf) {
     const ownerName = memberOf.group.owner.name?.trim() ?? memberOf.group.owner.email ?? "the owner";
     return (
-      <Shell>
-        <div className="rounded-[14px] border border-[#d8ddd6] bg-white p-5">
-          <p className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">
-            Your family book
-          </p>
-          <h2 className="mt-1 text-[17px] font-semibold">{memberOf.group.name}</h2>
-          <p className="mt-1 text-[13px] text-[#5c655e]">
-            Shared by {ownerName}. You can {memberOf.canEdit ? "view and edit" : "view"} the family
-            contacts. Your private contacts stay private.
-          </p>
-          <form action={leaveFamilyGroup} className="mt-4">
-            <input name="groupId" type="hidden" value={memberOf.groupId} />
-            <button
-              className="rounded-[9px] border border-[#d8ddd6] bg-white px-3.5 py-2 text-sm font-semibold text-[#b5472f] transition hover:bg-[#fbeae6]"
-              type="submit"
-            >
-              Leave family book
-            </button>
-          </form>
+      <>
+        <SettingsPageHead
+          title="Family"
+          sub={`You're a member of ${memberOf.group.name}.`}
+          right={
+            <span className="rounded-full border border-[#d8ddd6] bg-[#f6f7f4] px-3 py-1 text-[12px] font-semibold text-[#5c655e]">
+              {memberOf.group.members.length} members
+            </span>
+          }
+        />
+        <div className="grid gap-[18px]">
+          <SettingsCard className="flex flex-wrap items-center gap-4">
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[#e7efe9] text-[#17352e]">
+              <WorkspaceIcon name="users" size={24} />
+            </span>
+            <div className="min-w-0 flex-1">
+              <div className="text-[17px] font-semibold text-[#1d2823]">{memberOf.group.name}</div>
+              <div className="mt-0.5 text-[13.5px] text-[#5c655e]">
+                Shared by {ownerName}. You can {memberOf.canEdit ? "view and edit" : "view"} the family book.
+                Your private contacts stay private.
+              </div>
+            </div>
+          </SettingsCard>
+
+          <div>
+            <SectionLabel>Family members</SectionLabel>
+            <SettingsCard className="!p-0">
+              <div className="divide-y divide-[#e9ece7]">
+                {memberOf.group.members.map((m) => {
+                  const label = m.user?.name?.trim() ?? m.user?.email ?? m.invitedEmail ?? "Member";
+                  const you = m.userId === userId;
+                  return (
+                    <div className="flex items-center justify-between gap-3 px-5 py-3" key={m.id}>
+                      <span className="flex min-w-0 items-center gap-3">
+                        <Avatar label={label} />
+                        <span className="min-w-0">
+                          <span className="block truncate text-[14px] font-semibold text-[#1d2823]">
+                            {label}
+                            {you ? " (you)" : ""}
+                          </span>
+                          <span className="block truncate text-[12.5px] text-[#5c655e]">
+                            {m.user?.email ?? m.invitedEmail}
+                          </span>
+                        </span>
+                      </span>
+                      <Tag green={m.role === "OWNER"}>{m.role === "OWNER" ? "Owner" : "Member"}</Tag>
+                    </div>
+                  );
+                })}
+              </div>
+            </SettingsCard>
+          </div>
+
+          <SettingsCard className="flex flex-wrap items-center justify-between gap-4">
+            <div className="min-w-0">
+              <div className="text-[14.5px] font-semibold text-[#1d2823]">Leave this family</div>
+              <p className="mt-1 max-w-[440px] text-[13.5px] text-[#5c655e]">
+                You&apos;ll lose access to the shared family book. The owner can invite you again later.
+              </p>
+            </div>
+            <ConfirmAction
+              action={leaveFamilyGroup}
+              body="You'll immediately lose access to the shared family book. The owner can re-invite you."
+              confirmLabel="Leave family"
+              danger
+              fields={{ groupId: memberOf.groupId }}
+              title={`Leave ${memberOf.group.name}?`}
+              trigger="Leave family"
+              triggerClassName="rounded-xl bg-[#b5472f] px-4 py-2.5 text-[14px] font-semibold text-white transition hover:bg-[#9a3a23]"
+            />
+          </SettingsCard>
         </div>
-      </Shell>
+      </>
     );
   }
 
-  // No group yet
+  // ── No group yet ──
   if (!ownedGroup) {
     if (!billing.entitlements.familyGroupEnabled) {
       return (
-        <Shell>
-          <div className="rounded-[14px] border border-[#d8ddd6] bg-white p-6 text-center">
-            <p className="text-sm font-semibold text-[#1d2823]">Family books are a Family plan feature</p>
-            <p className="mx-auto mt-1 max-w-sm text-[13px] text-[#8b938c]">
-              Upgrade to the Family plan to create a shared contact book for up to 6 people.
+        <>
+          <SettingsPageHead title="Family management" sub="Share one family address book with up to 6 people." />
+          <SettingsCard className="text-center">
+            <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl bg-[#e7efe9] text-[#17352e]">
+              <WorkspaceIcon name="users" size={28} />
+            </span>
+            <h2 className="mt-4 text-[20px] font-semibold text-[#1d2823]">
+              Family books are part of the Family plan
+            </h2>
+            <p className="mx-auto mt-2 max-w-[440px] text-[14.5px] leading-6 text-[#5c655e]">
+              Invite up to 6 family members, share a single family address book, and control who can edit.
+              Upgrade to set up your family group.
             </p>
             <Link
-              className="mt-4 inline-flex rounded-[9px] bg-[#4158f4] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3248db]"
+              className="mt-5 inline-flex rounded-xl bg-[#4158f4] px-5 py-2.5 text-[14px] font-semibold text-white transition hover:bg-[#3248db]"
               href="/pricing"
             >
-              View plans
+              See the Family plan
             </Link>
-          </div>
-        </Shell>
+          </SettingsCard>
+        </>
       );
     }
     return (
-      <Shell>
-        <form
-          action={createFamilyGroup}
-          className="rounded-[14px] border border-[#d8ddd6] bg-white p-6"
-        >
-          <p className="text-sm font-semibold text-[#1d2823]">Create your family book</p>
-          <p className="mt-1 text-[13px] text-[#8b938c]">
-            One shared contact book everyone in your family can view and edit. You can invite up to
-            5 people.
+      <>
+        <SettingsPageHead title="Family management" sub="One shared address book for up to 6 people." />
+        <SettingsCard>
+          <p className="text-[15px] font-semibold text-[#1d2823]">Create your family book</p>
+          <p className="mt-1 text-[14px] text-[#5c655e]">
+            One shared contact book everyone in your family can view and edit. You can invite up to 5 people.
           </p>
-          <div className="mt-4 flex flex-wrap items-center gap-2">
+          <form action={createFamilyGroup} className="mt-4 flex flex-wrap items-center gap-2">
             <input
-              className="min-w-[220px] flex-1 rounded-[9px] border border-[#d8ddd6] bg-white px-3 py-2 text-sm outline-none focus:border-[#4158f4]"
-              defaultValue=""
+              className="min-w-[220px] flex-1 rounded-xl border border-[#d8ddd6] bg-white px-4 py-2.5 text-[14px] outline-none transition focus:border-[#4158f4] focus:shadow-[0_0_0_3px_#edf0fe]"
               name="name"
               placeholder="Family name (e.g. Okafor Family)"
             />
             <button
-              className="rounded-[9px] bg-[#4158f4] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3248db]"
+              className="rounded-xl bg-[#17352e] px-4 py-2.5 text-[14px] font-semibold text-white transition hover:bg-[#20443b]"
               type="submit"
             >
               Create family book
             </button>
-          </div>
-        </form>
-      </Shell>
+          </form>
+        </SettingsCard>
+      </>
     );
   }
 
-  // Owner view — manage members + invites
+  // ── Owner view ──
+  const accepted = ownedGroup.members.filter((m) => m.role === "OWNER" || m.inviteStatus === "ACCEPTED");
+  const pending = ownedGroup.members.filter((m) => m.role !== "OWNER" && m.inviteStatus !== "ACCEPTED");
   const activeCount = ownedGroup.members.filter((m) => m.inviteStatus !== "DECLINED").length;
   const full = activeCount >= ownedGroup.maxMembers;
 
   return (
-    <Shell>
-      <div className="grid gap-4">
-        <section className="rounded-[14px] border border-[#d8ddd6] bg-white p-5">
-          <p className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">
-            Family book
-          </p>
-          <h2 className="mt-1 text-[17px] font-semibold">{ownedGroup.name}</h2>
-          <p className="mt-1 text-[13px] text-[#5c655e]">
-            {activeCount} of {ownedGroup.maxMembers} members
-          </p>
+    <>
+      <SettingsPageHead
+        title="Family management"
+        sub="Invite family, control who can edit, and manage your shared book."
+        right={
+          <span className="rounded-full border border-[#d8ddd6] bg-[#f6f7f4] px-3 py-1 text-[12px] font-semibold text-[#5c655e]">
+            {activeCount} / {ownedGroup.maxMembers} members
+          </span>
+        }
+      />
 
-          <div className="mt-4 grid gap-2">
-            {ownedGroup.members.map((m) => {
-              const label = m.user?.name?.trim() ?? m.user?.email ?? m.invitedEmail ?? "Invited";
-              const statusLabel =
-                m.role === "OWNER"
-                  ? "Owner"
-                  : m.inviteStatus === "ACCEPTED"
-                    ? m.canEdit
-                      ? "Can edit"
-                      : "View only"
-                    : m.inviteStatus === "DECLINED"
-                      ? "Declined"
-                      : "Pending";
-              return (
-                <div
-                  className="flex items-center justify-between gap-3 border-b border-[#e9ece7] pb-2 text-[13px] last:border-b-0"
-                  key={m.id}
-                >
-                  <span className="min-w-0">
-                    <span className="block truncate text-[#1d2823]">{label}</span>
-                    {m.inviteStatus === "ACCEPTED" && m.role !== "OWNER" ? (
-                      <span className="text-[12px] text-[#8b938c]">Joined {fmtDate(m.joinedAt)}</span>
-                    ) : null}
-                  </span>
-                  <span className="flex shrink-0 items-center gap-3">
-                    <span className="text-[#8b938c]">{statusLabel}</span>
-                    {m.role !== "OWNER" && m.inviteStatus === "ACCEPTED" ? (
-                      <form action={setMemberCanEdit}>
-                        <input name="memberId" type="hidden" value={m.id} />
-                        <input name="canEdit" type="hidden" value={m.canEdit ? "false" : "true"} />
-                        <button className="font-semibold text-[#4158f4]" type="submit">
-                          {m.canEdit ? "Make view-only" : "Allow editing"}
-                        </button>
-                      </form>
-                    ) : null}
-                    {m.role !== "OWNER" && m.inviteStatus === "PENDING" ? (
-                      <form action={resendFamilyInvite}>
-                        <input name="memberId" type="hidden" value={m.id} />
-                        <button className="font-semibold text-[#4158f4]" type="submit">
-                          Resend
-                        </button>
-                      </form>
-                    ) : null}
-                    {m.role !== "OWNER" ? (
-                      <form action={removeFamilyMember}>
-                        <input name="memberId" type="hidden" value={m.id} />
-                        <button className="font-semibold text-[#b5472f]" type="submit">
-                          {m.inviteStatus === "PENDING" ? "Revoke" : "Remove"}
-                        </button>
-                      </form>
-                    ) : null}
-                  </span>
-                </div>
-              );
-            })}
+      <div className="grid gap-[18px]">
+        <SettingsCard className="flex flex-wrap items-center gap-4">
+          <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[#e7efe9] text-[#17352e]">
+            <WorkspaceIcon name="users" size={24} />
+          </span>
+          <div className="min-w-0 flex-1">
+            <div className="text-[17px] font-semibold text-[#1d2823]">{ownedGroup.name}</div>
+            <div className="mt-0.5 text-[13.5px] text-[#5c655e]">One shared family book · 90-day history</div>
           </div>
-        </section>
+          <ConfirmAction
+            action={deleteFamilyGroup}
+            confirmLabel="Delete group"
+            danger
+            fields={{ groupId: ownedGroup.id }}
+            title={`Delete ${ownedGroup.name}?`}
+            body="The shared family book and all member access are removed. Personal contacts owned by each member are not affected. This can't be undone."
+            trigger="Delete group"
+            triggerClassName="rounded-xl border border-[#dcae9f] px-4 py-2.5 text-[14px] font-semibold text-[#b5472f] transition hover:bg-[#f3e1da]"
+          />
+        </SettingsCard>
 
-        <section className="rounded-[14px] border border-[#d8ddd6] bg-white p-5">
-          <p className="text-sm font-semibold text-[#1d2823]">Invite a family member</p>
-          <p className="mt-1 text-[13px] text-[#8b938c]">
-            They get an email with a link to join. They keep their own private contacts.
+        {/* members */}
+        <div>
+          <SectionLabel>Members</SectionLabel>
+          <SettingsCard className="!p-0">
+            <div className="hidden grid-cols-[1fr_auto_auto_auto] items-center gap-4 border-b border-[#e9ece7] px-5 py-2.5 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8b938c] sm:grid">
+              <span>Member</span>
+              <span>Role</span>
+              <span className="text-center">Can edit</span>
+              <span />
+            </div>
+            <div className="divide-y divide-[#e9ece7]">
+              {accepted.map((m) => {
+                const label = m.user?.name?.trim() ?? m.user?.email ?? m.invitedEmail ?? "Member";
+                const isOwner = m.role === "OWNER";
+                return (
+                  <div
+                    className="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-2 px-5 py-3 sm:grid-cols-[1fr_auto_auto_auto]"
+                    key={m.id}
+                  >
+                    <span className="flex min-w-0 items-center gap-3">
+                      <Avatar label={label} />
+                      <span className="min-w-0">
+                        <span className="block truncate text-[14px] font-semibold text-[#1d2823]">
+                          {label}
+                          {m.userId === userId ? " (you)" : ""}
+                        </span>
+                        <span className="block truncate text-[12.5px] text-[#5c655e]">
+                          {m.user?.email ?? m.invitedEmail}
+                          {!isOwner ? ` · joined ${fmtDate(m.joinedAt)}` : ""}
+                        </span>
+                      </span>
+                    </span>
+                    <span className="sm:justify-self-start">
+                      <Tag green={isOwner}>{isOwner ? "Owner" : "Member"}</Tag>
+                    </span>
+                    <span className="justify-self-center">
+                      {isOwner ? (
+                        <span className="text-[12.5px] text-[#8b938c]">Always</span>
+                      ) : (
+                        <form action={setMemberCanEdit}>
+                          <input name="memberId" type="hidden" value={m.id} />
+                          <input name="canEdit" type="hidden" value={m.canEdit ? "false" : "true"} />
+                          <button
+                            aria-label={m.canEdit ? "Disable editing" : "Allow editing"}
+                            aria-pressed={m.canEdit}
+                            className={`relative inline-flex h-[22px] w-[38px] items-center rounded-full transition ${
+                              m.canEdit ? "bg-[#17352e]" : "bg-[#d8ddd6]"
+                            }`}
+                            type="submit"
+                          >
+                            <span
+                              className={`inline-block h-[16px] w-[16px] rounded-full bg-white transition-transform ${
+                                m.canEdit ? "translate-x-[19px]" : "translate-x-[3px]"
+                              }`}
+                            />
+                          </button>
+                        </form>
+                      )}
+                    </span>
+                    <span className="justify-self-end">
+                      {isOwner ? null : (
+                        <ConfirmAction
+                          action={removeFamilyMember}
+                          body={`${label} will lose access to the shared family book. You can invite them again later.`}
+                          confirmLabel="Remove member"
+                          danger
+                          fields={{ memberId: m.id }}
+                          title={`Remove ${label}?`}
+                          trigger="Remove"
+                        />
+                      )}
+                    </span>
+                  </div>
+                );
+              })}
+            </div>
+          </SettingsCard>
+        </div>
+
+        {/* pending invites */}
+        {pending.length > 0 ? (
+          <div>
+            <SectionLabel>Pending invites</SectionLabel>
+            <SettingsCard className="!p-0">
+              <div className="divide-y divide-[#e9ece7]">
+                {pending.map((m) => {
+                  const label = m.user?.email ?? m.invitedEmail ?? "Invited";
+                  const declined = m.inviteStatus === "DECLINED";
+                  return (
+                    <div className="flex items-center justify-between gap-3 px-5 py-3" key={m.id}>
+                      <span className="min-w-0">
+                        <span className="block truncate text-[14px] font-medium text-[#1d2823]">{label}</span>
+                        <span className="block text-[12.5px] text-[#5c655e]">
+                          {declined ? "Declined" : "Invited"}
+                        </span>
+                      </span>
+                      <span className="flex shrink-0 items-center gap-3">
+                        {!declined ? (
+                          <form action={resendFamilyInvite}>
+                            <input name="memberId" type="hidden" value={m.id} />
+                            <button className="text-[13px] font-semibold text-[#4158f4]" type="submit">
+                              Resend
+                            </button>
+                          </form>
+                        ) : null}
+                        <form action={removeFamilyMember}>
+                          <input name="memberId" type="hidden" value={m.id} />
+                          <button className="text-[13px] font-semibold text-[#b5472f]" type="submit">
+                            {declined ? "Remove" : "Cancel"}
+                          </button>
+                        </form>
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            </SettingsCard>
+          </div>
+        ) : null}
+
+        {/* invite */}
+        <SettingsCard>
+          <p className="text-[14.5px] font-semibold text-[#1d2823]">Invite a family member</p>
+          <p className="mt-1 text-[13.5px] text-[#5c655e]">
+            They get an email with a link to join {ownedGroup.name}. They keep their own private contacts.
           </p>
           {full ? (
-            <p className="mt-3 rounded-[9px] bg-[#f6edd9] px-3.5 py-2.5 text-[13px] text-[#7a5a1a]">
-              Your family book is full ({ownedGroup.maxMembers} members).
+            <p className="mt-3 rounded-xl bg-[#f6edd9] px-3.5 py-2.5 text-[13.5px] text-[#7c5511]">
+              Your family is full ({ownedGroup.maxMembers} members). Remove someone to invite another.
             </p>
           ) : (
             <form action={inviteFamilyMember} className="mt-3 flex flex-wrap items-center gap-2">
               <input
-                className="min-w-[220px] flex-1 rounded-[9px] border border-[#d8ddd6] bg-white px-3 py-2 text-sm outline-none focus:border-[#4158f4]"
+                className="min-w-[220px] flex-1 rounded-xl border border-[#d8ddd6] bg-white px-4 py-2.5 text-[14px] outline-none transition focus:border-[#4158f4] focus:shadow-[0_0_0_3px_#edf0fe]"
                 name="email"
                 placeholder="name@email.com"
                 required
                 type="email"
               />
               <button
-                className="rounded-[9px] bg-[#4158f4] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3248db]"
+                className="rounded-xl bg-[#17352e] px-4 py-2.5 text-[14px] font-semibold text-white transition hover:bg-[#20443b]"
                 type="submit"
               >
                 Send invite
               </button>
             </form>
           )}
-        </section>
-
-        <section className="rounded-[14px] border border-[#f0d8ce] bg-white p-5">
-          <p className="text-sm font-semibold text-[#b5472f]">Delete family book</p>
-          <p className="mt-1 text-[13px] text-[#8b938c]">
-            Permanently deletes the shared book and its {ownedGroup.members.length > 0 ? "" : ""}
-            contacts for everyone. Members keep their own private contacts. This can&rsquo;t be undone.
-          </p>
-          <details className="mt-3">
-            <summary className="inline-flex cursor-pointer list-none rounded-[9px] border border-[#f0d8ce] px-3.5 py-2 text-sm font-semibold text-[#b5472f] transition hover:bg-[#fbeae6]">
-              Delete family book…
-            </summary>
-            <form action={deleteFamilyGroup} className="mt-3">
-              <input name="groupId" type="hidden" value={ownedGroup.id} />
-              <button
-                className="rounded-[9px] bg-[#b5472f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#9c3c28]"
-                type="submit"
-              >
-                Yes, permanently delete &ldquo;{ownedGroup.name}&rdquo;
-              </button>
-            </form>
-          </details>
-        </section>
+        </SettingsCard>
       </div>
-    </Shell>
+    </>
   );
 }

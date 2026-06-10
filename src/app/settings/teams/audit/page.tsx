@@ -54,11 +54,11 @@ export default async function TeamAuditPage({
 
   if (!data) {
     return (
-      <div className="mx-auto max-w-2xl px-5 py-8 text-[#1d2823]">
+      <div className="text-[#1d2823]">
         <Link className="text-sm font-semibold text-[#5c655e]" href="/settings/teams">
           ← Team
         </Link>
-        <p className="mt-6 rounded-[14px] border border-[#d8ddd6] bg-white p-6 text-center text-sm text-[#8b938c]">
+        <p className="mt-6 rounded-2xl border border-[#d8ddd6] bg-white p-6 text-center text-sm text-[#8b938c]">
           Only the team owner or an admin can view the audit log.
         </p>
       </div>
@@ -73,7 +73,7 @@ export default async function TeamAuditPage({
   if (filters.to) exportQuery.set("to", filters.to);
 
   return (
-    <div className="mx-auto max-w-4xl px-5 py-8 text-[#1d2823]">
+    <div className="text-[#1d2823]">
       <Link
         className="mb-4 inline-flex items-center gap-1.5 text-sm font-semibold text-[#5c655e] transition hover:text-[#1d2823]"
         href="/settings/teams"
