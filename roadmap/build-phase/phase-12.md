@@ -159,9 +159,16 @@ Let users share individual contacts with people inside and outside of Kontax, in
 ---
 
 ## P12-05 — Share management UI on contact detail
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P1`
 - Dependencies: `P12-03`, `P12-04`
+- Delivered:
+  - Contact-detail **Sharing tab** is the share-management surface: active vCard links (copyable URL, download count, expiry, **Revoke**), and account shares — static + live — with recipient email, type, **status (Pending/Accepted/Live/Declined/Revoked)**, **last-synced timestamp** (live), and **Revoke** on active shares.
+  - Three share paths present and **plan-gated**: vCard link (all plans), "Share with a Kontax user" (Static, Pro+), "Share live — keeps in sync" (Live, Pro+). Free sees the section with clear **Upgrade** prompts (no broken/hidden UI).
+  - Recipient side: a **"Live from [owner]"** panel on linked contacts with last-synced context and an **Unlink** action.
+  - **Incoming-shares indicator:** a count badge on the "Shared with me" nav item in both the AppShell sidebar (detail/create/shares) and the home workspace sidebar (`contact-dashboard`).
+  - tsc + lint + build green.
+- Deviations (deliberate): the three options live **inline in the Sharing tab** (matching the locked brief-02 tab) rather than a pop-up share sheet; vCard links use a copyable full-URL field (you need the full URL to use it) rather than a truncated token preview.
 - Implementation Notes:
   - Add a "Sharing" section to the contact detail page showing:
     - Active vCard share links: token preview (not full token), created date, expiry, download count, revoke button.

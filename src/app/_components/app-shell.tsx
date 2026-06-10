@@ -3,6 +3,8 @@ import Link from "next/link";
 import { SearchInput } from "~/app/_components/search-input";
 import { UserMenu } from "~/app/_components/user-menu";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
+import { auth } from "~/server/auth";
+import { db } from "~/server/db";
 
 type AppShellAccount = { name: string; email: string; plan: string };
 type AppShellCounts = { people: number; favorites: number; archived: number; duplicates: number };
@@ -22,7 +24,7 @@ const getInitials = (value: string) =>
  * fully-wired shell in contact-dashboard; this shares the same look so navigating
  * to /contacts/new never drops the user out of the app.
  */
-export function AppShell({
+export async function AppShell({
   account,
   counts,
   children,
@@ -31,6 +33,18 @@ export function AppShell({
   counts?: AppShellCounts;
   children: React.ReactNode;
 }) {
+  // Pending incoming shares → badge on "Shared with me" (P12-05 indicator).
+  const session = await auth();
+  const incomingShares = session?.user?.id
+    ? await db.contactShare.count({
+        where: {
+          recipientUserId: session.user.id,
+          shareType: { in: ["STATIC_COPY", "LIVE_SYNC"] },
+          status: "ACTIVE",
+          recipientContactId: null,
+        },
+      })
+    : 0;
   const navItem = (href: string, icon: string, label: string, count?: number, badge?: boolean) => (
     <Link
       className="flex h-9 items-center gap-3 rounded-lg px-2.5 text-[13.5px] font-medium text-[#5c655e] transition hover:bg-[#f2f4f0]"
@@ -106,7 +120,7 @@ export function AppShell({
           {navItem("/?tab=archived&filter=all", "archive", "Archived", counts?.archived)}
           {navItem("/?tab=duplicates&filter=all", "people", "Duplicates", counts?.duplicates, true)}
           {navItem("/?tab=activity", "clock", "Activity")}
-          {navItem("/shares", "download", "Shared with me")}
+          {navItem("/shares", "download", "Shared with me", incomingShares || undefined, true)}
 
           <div className="mt-auto border-t border-[#e9ece7] pt-2">
             {(

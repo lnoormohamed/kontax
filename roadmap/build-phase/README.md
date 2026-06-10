@@ -139,7 +139,7 @@ This roadmap is the implementation source of truth for phases 1–16. Each phase
 | P12-02 | 12 | Done | P0 | P12-01 | Unassigned | vCard share link: token + /share/[token] serves .vcf (410 revoked/404 expired), Free 7d expiry, revoke + download count |
 | P12-03 | 12 | Done | P1 | P12-01, P11-03 | Unassigned | Static Kontax→Kontax share (Pro+): snapshot, /shares accept/decline → independent SHARED_STATIC copy (email invite deferred to P12-06) |
 | P12-04 | 12 | Done | P1 | P12-01, P11-03, P10-01 | Unassigned | Live Kontax→Kontax share (Pro+ both parties): linked SHARED_LIVE copy, mutation-triggered propagation (keeps recipient notes), Free fallback/downgrade→static, revoke/unlink |
-| P12-05 | 12 | Not Started | P1 | P12-03, P12-04 | Unassigned | All active shares visible and manageable from contact detail page |
+| P12-05 | 12 | Done | P1 | P12-03, P12-04 | Unassigned | Sharing tab manages all shares (vCard/static/live): status, last-synced, revoke; plan-gated; "Shared with me" badge in sidebars |
 | P12-06 | 12 | Not Started | P1 | P12-03 | Unassigned | Recipient notified in-app and email; accept and decline update share status correctly |
 | P12-07 | 12 | Not Started | P2 | P12-05, P12-06 | Unassigned | Design brief covers owner and recipient perspectives and all plan-gate states |
 | P12-08 | 12 | Not Started | P2 | P12-07 | Unassigned | Propagation errors are caught, logged, surfaced, and retried automatically |

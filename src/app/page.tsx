@@ -439,10 +439,18 @@ export default async function Home({ searchParams }: HomePageProps) {
     getUserPlanSummary(session.user.id),
   ]);
 
-  const [peopleCount, favoritesCount, archivedCount] = await Promise.all([
+  const [peopleCount, favoritesCount, archivedCount, incomingSharesCount] = await Promise.all([
     db.contact.count({ where: { userId: session.user.id, archivedAt: null } }),
     db.contact.count({ where: { userId: session.user.id, archivedAt: null, isFavorite: true } }),
     db.contact.count({ where: { userId: session.user.id, NOT: { archivedAt: null } } }),
+    db.contactShare.count({
+      where: {
+        recipientUserId: session.user.id,
+        shareType: { in: ["STATIC_COPY", "LIVE_SYNC"] },
+        status: "ACTIVE",
+        recipientContactId: null,
+      },
+    }),
   ]);
 
   const highConfidenceCount = mergeSuggestions.filter(
@@ -544,6 +552,7 @@ export default async function Home({ searchParams }: HomePageProps) {
         syncState="ok"
         highConfidenceCount={highConfidenceCount}
         recentMerges={recentMerges}
+        incomingShares={incomingSharesCount || undefined}
       />
     </main>
   );

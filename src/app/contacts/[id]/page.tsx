@@ -281,6 +281,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
       downloadCount: true,
       recipientEmail: true,
       recipientContactId: true,
+      lastPushedAt: true,
     },
   });
   const vcardLinks = contactShares.filter(
@@ -1519,13 +1520,26 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                       className="flex items-center justify-between gap-3 border-b border-[#edf0ea] pb-2 text-[13px] last:border-b-0"
                       key={share.id}
                     >
-                      <span className="text-[#1d2823]">{share.recipientEmail}</span>
-                      <span className="text-[#8b938c]">
-                        {share.status === "DECLINED"
-                          ? "Declined"
-                          : share.recipientContactId
-                            ? "Accepted"
-                            : "Pending"}
+                      <span className="min-w-0 truncate text-[#1d2823]">{share.recipientEmail}</span>
+                      <span className="flex shrink-0 items-center gap-3">
+                        <span className="text-[#8b938c]">
+                          {share.status === "DECLINED"
+                            ? "Declined"
+                            : share.status === "REVOKED"
+                              ? "Revoked"
+                              : share.recipientContactId
+                                ? "Accepted"
+                                : "Pending"}
+                        </span>
+                        {share.status === "ACTIVE" && !share.recipientContactId ? (
+                          <form action={revokeShare}>
+                            <input name="shareId" type="hidden" value={share.id} />
+                            <input name="contactId" type="hidden" value={contact.id} />
+                            <button className="font-semibold text-[#b5472f]" type="submit">
+                              Revoke
+                            </button>
+                          </form>
+                        ) : null}
                       </span>
                     </li>
                   ))}
@@ -1593,15 +1607,33 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                         className="flex items-center justify-between gap-3 border-b border-[#edf0ea] pb-2 text-[13px] last:border-b-0"
                         key={share.id}
                       >
-                        <span className="text-[#1d2823]">{share.recipientEmail}</span>
-                        <span className="text-[#8b938c]">
-                          {share.status === "REVOKED"
-                            ? "Revoked"
-                            : share.status === "DECLINED"
-                              ? "Declined"
-                              : share.recipientContactId
-                                ? "Live"
-                                : "Pending"}
+                        <span className="min-w-0">
+                          <span className="block truncate text-[#1d2823]">{share.recipientEmail}</span>
+                          {share.status === "ACTIVE" && share.recipientContactId && share.lastPushedAt ? (
+                            <span className="block text-[12px] text-[#8b938c]">
+                              Last synced {formatTimestamp(share.lastPushedAt)}
+                            </span>
+                          ) : null}
+                        </span>
+                        <span className="flex shrink-0 items-center gap-3">
+                          <span className="text-[#8b938c]">
+                            {share.status === "REVOKED"
+                              ? "Revoked"
+                              : share.status === "DECLINED"
+                                ? "Declined"
+                                : share.recipientContactId
+                                  ? "Live"
+                                  : "Pending"}
+                          </span>
+                          {share.status === "ACTIVE" ? (
+                            <form action={revokeShare}>
+                              <input name="shareId" type="hidden" value={share.id} />
+                              <input name="contactId" type="hidden" value={contact.id} />
+                              <button className="font-semibold text-[#b5472f]" type="submit">
+                                Revoke
+                              </button>
+                            </form>
+                          ) : null}
                         </span>
                       </li>
                     ))}

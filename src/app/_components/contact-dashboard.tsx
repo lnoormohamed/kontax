@@ -63,6 +63,7 @@ type ContactDashboardProps = {
   mergeSuggestionsRefreshed: boolean;
   viewMode: WorkspaceView;
   counts: { people: number; favorites: number; archived: number; duplicates: number };
+  incomingShares?: number;
   account: { name: string; email: string };
   syncState: "ok" | "warning" | "error";
   highConfidenceCount: number;
@@ -94,6 +95,7 @@ export function ContactDashboard({
   syncState,
   highConfidenceCount,
   recentMerges,
+  incomingShares,
 }: ContactDashboardProps) {
   const mergeDateFormatter = new Intl.DateTimeFormat("en-GB", {
     day: "2-digit",
@@ -249,6 +251,7 @@ export function ContactDashboard({
           true,
         )}
         {navItem(currentTab === "activity", buildHref("activity"), "clock", "Activity", null)}
+        {navItem(false, "/shares", "download", "Shared with me", incomingShares ?? null, true)}
 
         {/* Labels (placeholder until the labels feature ships) */}
         <div className="mt-3">
