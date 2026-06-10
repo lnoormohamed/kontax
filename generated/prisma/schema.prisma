@@ -462,6 +462,7 @@ model SyncAccount {
   syncLinks                 SyncContactLink[]
   syncJobs                  SyncJob[]
   syncConflicts             SyncConflict[]
+  teamLink                  TeamSyncAccount?
 
   @@unique([userId, baseUrl, label])
   @@index([userId, status, updatedAt])
@@ -621,30 +622,35 @@ model Group {
   subscription         Subscription?      @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
   members              GroupMember[]
   addressBooks         GroupAddressBook[]
+  teamSyncAccounts     TeamSyncAccount[]
 
   @@index([ownerId])
   @@index([subscriptionId])
 }
 
 model GroupMember {
-  id              String            @id @default(cuid())
-  groupId         String
+  id                     String            @id @default(cuid())
+  groupId                String
   // userId is null for an invite sent to an email that has no Kontax account
   // yet; it is linked on accept/registration (mirrors ContactShare).
-  userId          String?
-  invitedEmail    String?
-  role            GroupRole         @default(MEMBER)
-  inviteStatus    GroupInviteStatus @default(PENDING)
+  userId                 String?
+  invitedEmail           String?
+  role                   GroupRole         @default(MEMBER)
+  inviteStatus           GroupInviteStatus @default(PENDING)
   // P13-01/02: edit permission, invite token (48h), and invite/accept tracking.
-  canEdit         Boolean           @default(true)
-  inviteToken     String?           @unique
-  inviteExpiresAt DateTime?
-  invitedAt       DateTime          @default(now())
-  invitedByUserId String?
-  joinedAt        DateTime?
-  createdAt       DateTime          @default(now())
-  group           Group             @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  user            User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  canEdit                Boolean           @default(true)
+  // P14-01 (Teams): per-book permission map { [addressBookId]: "EDIT"|"VIEW"|"NONE" }.
+  // JSON for flexibility; if book-level permission queries get hot, normalise
+  // into a GroupMemberAddressBookPermission join table (documented tradeoff).
+  addressBookPermissions Json?
+  inviteToken            String?           @unique
+  inviteExpiresAt        DateTime?
+  invitedAt              DateTime          @default(now())
+  invitedByUserId        String?
+  joinedAt               DateTime?
+  createdAt              DateTime          @default(now())
+  group                  Group             @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  user                   User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([groupId, userId])
   @@unique([groupId, invitedEmail])
@@ -654,18 +660,41 @@ model GroupMember {
 }
 
 model GroupAddressBook {
-  id          String         @id @default(cuid())
-  groupId     String
-  name        String
-  description String?
-  // P13-01: Family v1 has a single default book; Teams may have several.
-  isDefault   Boolean        @default(true)
-  createdAt   DateTime       @default(now())
-  updatedAt   DateTime       @updatedAt
-  group       Group          @relation(fields: [groupId], references: [id], onDelete: Cascade)
-  contacts    GroupContact[]
+  id               String            @id @default(cuid())
+  groupId          String
+  name             String
+  description      String?
+  // P13-01: Family v1 has a single default book; Teams may have several
+  // (created with isDefault=false).
+  isDefault        Boolean           @default(true)
+  // P14-01 (Teams): archived books are read-only + hidden from default views.
+  archivedAt       DateTime?
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  group            Group             @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  contacts         GroupContact[]
+  teamSyncAccounts TeamSyncAccount[]
 
   @@index([groupId])
+}
+
+// P14-01 (Teams): links an existing personal SyncAccount to a team address book
+// so the team's contacts sync to an external CardDAV provider (Google Workspace,
+// Nextcloud, …). Owned by the team, configured by an admin.
+model TeamSyncAccount {
+  id            String           @id @default(cuid())
+  groupId       String
+  syncAccountId String
+  addressBookId String
+  addedByUserId String
+  createdAt     DateTime         @default(now())
+  group         Group            @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  syncAccount   SyncAccount      @relation(fields: [syncAccountId], references: [id], onDelete: Cascade)
+  addressBook   GroupAddressBook @relation(fields: [addressBookId], references: [id], onDelete: Cascade)
+
+  @@unique([syncAccountId])
+  @@index([groupId])
+  @@index([addressBookId])
 }
 
 // P13-01: a contact that lives in a shared address book. The contact is owned

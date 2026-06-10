@@ -19,7 +19,7 @@ Bring Kontax's contacts hub to small teams and organisations. A team can maintai
 ## Phase Tracker
 | Ticket | Status | Priority | Depends On |
 | --- | --- | --- | --- |
-| P14-01 | Not Started | P0 | P13-01 |
+| P14-01 | Done | P0 | P13-01 |
 | P14-02 | Not Started | P0 | P14-01 |
 | P14-03 | Not Started | P0 | P14-01 |
 | P14-04 | Not Started | P1 | P14-02, P14-03, P10-01, P10-02 |
@@ -32,7 +32,8 @@ Bring Kontax's contacts hub to small teams and organisations. A team can maintai
 ---
 
 ## P14-01 — Extend Group schema for Teams
-- Status: `Not Started`
+- Status: `Done`
+- **Tradeoff (documented):** per-book permissions stored as `GroupMember.addressBookPermissions` JSON ({bookId: EDIT|VIEW|NONE}) for flexibility; normalise into a join table if book-permission queries get hot. Shipped: `GroupMember.addressBookPermissions`, `GroupAddressBook.archivedAt` (isDefault/description already present from P13), new `TeamSyncAccount` model linking a SyncAccount→team book, and Group/SyncAccount back-relations. Teams set isDefault=false + maxMembers=25 at creation (schema defaults unchanged). Pushed clean; build green.
 - Priority: `P0`
 - Dependencies: `P13-01`
 - Implementation Notes:

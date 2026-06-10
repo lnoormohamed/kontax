@@ -99,6 +99,11 @@ export type GroupMember = $Result.DefaultSelection<Prisma.$GroupMemberPayload>
  */
 export type GroupAddressBook = $Result.DefaultSelection<Prisma.$GroupAddressBookPayload>
 /**
+ * Model TeamSyncAccount
+ * 
+ */
+export type TeamSyncAccount = $Result.DefaultSelection<Prisma.$TeamSyncAccountPayload>
+/**
  * Model GroupContact
  * 
  */
@@ -807,6 +812,16 @@ export class PrismaClient<
   get groupAddressBook(): Prisma.GroupAddressBookDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.teamSyncAccount`: Exposes CRUD operations for the **TeamSyncAccount** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more TeamSyncAccounts
+    * const teamSyncAccounts = await prisma.teamSyncAccount.findMany()
+    * ```
+    */
+  get teamSyncAccount(): Prisma.TeamSyncAccountDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.groupContact`: Exposes CRUD operations for the **GroupContact** model.
     * Example usage:
     * ```ts
@@ -1283,6 +1298,7 @@ export namespace Prisma {
     Group: 'Group',
     GroupMember: 'GroupMember',
     GroupAddressBook: 'GroupAddressBook',
+    TeamSyncAccount: 'TeamSyncAccount',
     GroupContact: 'GroupContact',
     ContactShare: 'ContactShare'
   };
@@ -1303,7 +1319,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncContactLink" | "syncJob" | "syncConflict" | "activityEvent" | "group" | "groupMember" | "groupAddressBook" | "groupContact" | "contactShare"
+      modelProps: "user" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncContactLink" | "syncJob" | "syncConflict" | "activityEvent" | "group" | "groupMember" | "groupAddressBook" | "teamSyncAccount" | "groupContact" | "contactShare"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2565,6 +2581,80 @@ export namespace Prisma {
           }
         }
       }
+      TeamSyncAccount: {
+        payload: Prisma.$TeamSyncAccountPayload<ExtArgs>
+        fields: Prisma.TeamSyncAccountFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TeamSyncAccountFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TeamSyncAccountPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TeamSyncAccountFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TeamSyncAccountPayload>
+          }
+          findFirst: {
+            args: Prisma.TeamSyncAccountFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TeamSyncAccountPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TeamSyncAccountFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TeamSyncAccountPayload>
+          }
+          findMany: {
+            args: Prisma.TeamSyncAccountFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TeamSyncAccountPayload>[]
+          }
+          create: {
+            args: Prisma.TeamSyncAccountCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TeamSyncAccountPayload>
+          }
+          createMany: {
+            args: Prisma.TeamSyncAccountCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.TeamSyncAccountCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TeamSyncAccountPayload>[]
+          }
+          delete: {
+            args: Prisma.TeamSyncAccountDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TeamSyncAccountPayload>
+          }
+          update: {
+            args: Prisma.TeamSyncAccountUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TeamSyncAccountPayload>
+          }
+          deleteMany: {
+            args: Prisma.TeamSyncAccountDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TeamSyncAccountUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.TeamSyncAccountUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TeamSyncAccountPayload>[]
+          }
+          upsert: {
+            args: Prisma.TeamSyncAccountUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TeamSyncAccountPayload>
+          }
+          aggregate: {
+            args: Prisma.TeamSyncAccountAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTeamSyncAccount>
+          }
+          groupBy: {
+            args: Prisma.TeamSyncAccountGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TeamSyncAccountGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TeamSyncAccountCountArgs<ExtArgs>
+            result: $Utils.Optional<TeamSyncAccountCountAggregateOutputType> | number
+          }
+        }
+      }
       GroupContact: {
         payload: Prisma.$GroupContactPayload<ExtArgs>
         fields: Prisma.GroupContactFieldRefs
@@ -2826,6 +2916,7 @@ export namespace Prisma {
     group?: GroupOmit
     groupMember?: GroupMemberOmit
     groupAddressBook?: GroupAddressBookOmit
+    teamSyncAccount?: TeamSyncAccountOmit
     groupContact?: GroupContactOmit
     contactShare?: ContactShareOmit
   }
@@ -3387,11 +3478,13 @@ export namespace Prisma {
   export type GroupCountOutputType = {
     members: number
     addressBooks: number
+    teamSyncAccounts: number
   }
 
   export type GroupCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     members?: boolean | GroupCountOutputTypeCountMembersArgs
     addressBooks?: boolean | GroupCountOutputTypeCountAddressBooksArgs
+    teamSyncAccounts?: boolean | GroupCountOutputTypeCountTeamSyncAccountsArgs
   }
 
   // Custom InputTypes
@@ -3419,6 +3512,13 @@ export namespace Prisma {
     where?: GroupAddressBookWhereInput
   }
 
+  /**
+   * GroupCountOutputType without action
+   */
+  export type GroupCountOutputTypeCountTeamSyncAccountsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TeamSyncAccountWhereInput
+  }
+
 
   /**
    * Count Type GroupAddressBookCountOutputType
@@ -3426,10 +3526,12 @@ export namespace Prisma {
 
   export type GroupAddressBookCountOutputType = {
     contacts: number
+    teamSyncAccounts: number
   }
 
   export type GroupAddressBookCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     contacts?: boolean | GroupAddressBookCountOutputTypeCountContactsArgs
+    teamSyncAccounts?: boolean | GroupAddressBookCountOutputTypeCountTeamSyncAccountsArgs
   }
 
   // Custom InputTypes
@@ -3448,6 +3550,13 @@ export namespace Prisma {
    */
   export type GroupAddressBookCountOutputTypeCountContactsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: GroupContactWhereInput
+  }
+
+  /**
+   * GroupAddressBookCountOutputType without action
+   */
+  export type GroupAddressBookCountOutputTypeCountTeamSyncAccountsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TeamSyncAccountWhereInput
   }
 
 
@@ -15942,6 +16051,7 @@ export namespace Prisma {
     syncLinks?: boolean | SyncAccount$syncLinksArgs<ExtArgs>
     syncJobs?: boolean | SyncAccount$syncJobsArgs<ExtArgs>
     syncConflicts?: boolean | SyncAccount$syncConflictsArgs<ExtArgs>
+    teamLink?: boolean | SyncAccount$teamLinkArgs<ExtArgs>
     _count?: boolean | SyncAccountCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["syncAccount"]>
 
@@ -16043,6 +16153,7 @@ export namespace Prisma {
     syncLinks?: boolean | SyncAccount$syncLinksArgs<ExtArgs>
     syncJobs?: boolean | SyncAccount$syncJobsArgs<ExtArgs>
     syncConflicts?: boolean | SyncAccount$syncConflictsArgs<ExtArgs>
+    teamLink?: boolean | SyncAccount$teamLinkArgs<ExtArgs>
     _count?: boolean | SyncAccountCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type SyncAccountIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -16059,6 +16170,7 @@ export namespace Prisma {
       syncLinks: Prisma.$SyncContactLinkPayload<ExtArgs>[]
       syncJobs: Prisma.$SyncJobPayload<ExtArgs>[]
       syncConflicts: Prisma.$SyncConflictPayload<ExtArgs>[]
+      teamLink: Prisma.$TeamSyncAccountPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -16486,6 +16598,7 @@ export namespace Prisma {
     syncLinks<T extends SyncAccount$syncLinksArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccount$syncLinksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncContactLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     syncJobs<T extends SyncAccount$syncJobsArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccount$syncJobsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     syncConflicts<T extends SyncAccount$syncConflictsArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccount$syncConflictsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncConflictPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    teamLink<T extends SyncAccount$teamLinkArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccount$teamLinkArgs<ExtArgs>>): Prisma__TeamSyncAccountClient<$Result.GetResult<Prisma.$TeamSyncAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -17007,6 +17120,25 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: SyncConflictScalarFieldEnum | SyncConflictScalarFieldEnum[]
+  }
+
+  /**
+   * SyncAccount.teamLink
+   */
+  export type SyncAccount$teamLinkArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamSyncAccount
+     */
+    select?: TeamSyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TeamSyncAccount
+     */
+    omit?: TeamSyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TeamSyncAccountInclude<ExtArgs> | null
+    where?: TeamSyncAccountWhereInput
   }
 
   /**
@@ -22336,6 +22468,7 @@ export namespace Prisma {
     subscription?: boolean | Group$subscriptionArgs<ExtArgs>
     members?: boolean | Group$membersArgs<ExtArgs>
     addressBooks?: boolean | Group$addressBooksArgs<ExtArgs>
+    teamSyncAccounts?: boolean | Group$teamSyncAccountsArgs<ExtArgs>
     _count?: boolean | GroupCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["group"]>
 
@@ -22388,6 +22521,7 @@ export namespace Prisma {
     subscription?: boolean | Group$subscriptionArgs<ExtArgs>
     members?: boolean | Group$membersArgs<ExtArgs>
     addressBooks?: boolean | Group$addressBooksArgs<ExtArgs>
+    teamSyncAccounts?: boolean | Group$teamSyncAccountsArgs<ExtArgs>
     _count?: boolean | GroupCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type GroupIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -22406,6 +22540,7 @@ export namespace Prisma {
       subscription: Prisma.$SubscriptionPayload<ExtArgs> | null
       members: Prisma.$GroupMemberPayload<ExtArgs>[]
       addressBooks: Prisma.$GroupAddressBookPayload<ExtArgs>[]
+      teamSyncAccounts: Prisma.$TeamSyncAccountPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -22816,6 +22951,7 @@ export namespace Prisma {
     subscription<T extends Group$subscriptionArgs<ExtArgs> = {}>(args?: Subset<T, Group$subscriptionArgs<ExtArgs>>): Prisma__SubscriptionClient<$Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     members<T extends Group$membersArgs<ExtArgs> = {}>(args?: Subset<T, Group$membersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GroupMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     addressBooks<T extends Group$addressBooksArgs<ExtArgs> = {}>(args?: Subset<T, Group$addressBooksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GroupAddressBookPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    teamSyncAccounts<T extends Group$teamSyncAccountsArgs<ExtArgs> = {}>(args?: Subset<T, Group$teamSyncAccountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TeamSyncAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -23318,6 +23454,30 @@ export namespace Prisma {
   }
 
   /**
+   * Group.teamSyncAccounts
+   */
+  export type Group$teamSyncAccountsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamSyncAccount
+     */
+    select?: TeamSyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TeamSyncAccount
+     */
+    omit?: TeamSyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TeamSyncAccountInclude<ExtArgs> | null
+    where?: TeamSyncAccountWhereInput
+    orderBy?: TeamSyncAccountOrderByWithRelationInput | TeamSyncAccountOrderByWithRelationInput[]
+    cursor?: TeamSyncAccountWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TeamSyncAccountScalarFieldEnum | TeamSyncAccountScalarFieldEnum[]
+  }
+
+  /**
    * Group without action
    */
   export type GroupDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -23386,6 +23546,7 @@ export namespace Prisma {
     role: number
     inviteStatus: number
     canEdit: number
+    addressBookPermissions: number
     inviteToken: number
     inviteExpiresAt: number
     invitedAt: number
@@ -23436,6 +23597,7 @@ export namespace Prisma {
     role?: true
     inviteStatus?: true
     canEdit?: true
+    addressBookPermissions?: true
     inviteToken?: true
     inviteExpiresAt?: true
     invitedAt?: true
@@ -23525,6 +23687,7 @@ export namespace Prisma {
     role: $Enums.GroupRole
     inviteStatus: $Enums.GroupInviteStatus
     canEdit: boolean
+    addressBookPermissions: JsonValue | null
     inviteToken: string | null
     inviteExpiresAt: Date | null
     invitedAt: Date
@@ -23558,6 +23721,7 @@ export namespace Prisma {
     role?: boolean
     inviteStatus?: boolean
     canEdit?: boolean
+    addressBookPermissions?: boolean
     inviteToken?: boolean
     inviteExpiresAt?: boolean
     invitedAt?: boolean
@@ -23576,6 +23740,7 @@ export namespace Prisma {
     role?: boolean
     inviteStatus?: boolean
     canEdit?: boolean
+    addressBookPermissions?: boolean
     inviteToken?: boolean
     inviteExpiresAt?: boolean
     invitedAt?: boolean
@@ -23594,6 +23759,7 @@ export namespace Prisma {
     role?: boolean
     inviteStatus?: boolean
     canEdit?: boolean
+    addressBookPermissions?: boolean
     inviteToken?: boolean
     inviteExpiresAt?: boolean
     invitedAt?: boolean
@@ -23612,6 +23778,7 @@ export namespace Prisma {
     role?: boolean
     inviteStatus?: boolean
     canEdit?: boolean
+    addressBookPermissions?: boolean
     inviteToken?: boolean
     inviteExpiresAt?: boolean
     invitedAt?: boolean
@@ -23620,7 +23787,7 @@ export namespace Prisma {
     createdAt?: boolean
   }
 
-  export type GroupMemberOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "groupId" | "userId" | "invitedEmail" | "role" | "inviteStatus" | "canEdit" | "inviteToken" | "inviteExpiresAt" | "invitedAt" | "invitedByUserId" | "joinedAt" | "createdAt", ExtArgs["result"]["groupMember"]>
+  export type GroupMemberOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "groupId" | "userId" | "invitedEmail" | "role" | "inviteStatus" | "canEdit" | "addressBookPermissions" | "inviteToken" | "inviteExpiresAt" | "invitedAt" | "invitedByUserId" | "joinedAt" | "createdAt", ExtArgs["result"]["groupMember"]>
   export type GroupMemberInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     group?: boolean | GroupDefaultArgs<ExtArgs>
     user?: boolean | GroupMember$userArgs<ExtArgs>
@@ -23648,6 +23815,7 @@ export namespace Prisma {
       role: $Enums.GroupRole
       inviteStatus: $Enums.GroupInviteStatus
       canEdit: boolean
+      addressBookPermissions: Prisma.JsonValue | null
       inviteToken: string | null
       inviteExpiresAt: Date | null
       invitedAt: Date
@@ -24086,6 +24254,7 @@ export namespace Prisma {
     readonly role: FieldRef<"GroupMember", 'GroupRole'>
     readonly inviteStatus: FieldRef<"GroupMember", 'GroupInviteStatus'>
     readonly canEdit: FieldRef<"GroupMember", 'Boolean'>
+    readonly addressBookPermissions: FieldRef<"GroupMember", 'Json'>
     readonly inviteToken: FieldRef<"GroupMember", 'String'>
     readonly inviteExpiresAt: FieldRef<"GroupMember", 'DateTime'>
     readonly invitedAt: FieldRef<"GroupMember", 'DateTime'>
@@ -24541,6 +24710,7 @@ export namespace Prisma {
     name: string | null
     description: string | null
     isDefault: boolean | null
+    archivedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -24551,6 +24721,7 @@ export namespace Prisma {
     name: string | null
     description: string | null
     isDefault: boolean | null
+    archivedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -24561,6 +24732,7 @@ export namespace Prisma {
     name: number
     description: number
     isDefault: number
+    archivedAt: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -24573,6 +24745,7 @@ export namespace Prisma {
     name?: true
     description?: true
     isDefault?: true
+    archivedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -24583,6 +24756,7 @@ export namespace Prisma {
     name?: true
     description?: true
     isDefault?: true
+    archivedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -24593,6 +24767,7 @@ export namespace Prisma {
     name?: true
     description?: true
     isDefault?: true
+    archivedAt?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -24676,6 +24851,7 @@ export namespace Prisma {
     name: string
     description: string | null
     isDefault: boolean
+    archivedAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: GroupAddressBookCountAggregateOutputType | null
@@ -24703,10 +24879,12 @@ export namespace Prisma {
     name?: boolean
     description?: boolean
     isDefault?: boolean
+    archivedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     group?: boolean | GroupDefaultArgs<ExtArgs>
     contacts?: boolean | GroupAddressBook$contactsArgs<ExtArgs>
+    teamSyncAccounts?: boolean | GroupAddressBook$teamSyncAccountsArgs<ExtArgs>
     _count?: boolean | GroupAddressBookCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["groupAddressBook"]>
 
@@ -24716,6 +24894,7 @@ export namespace Prisma {
     name?: boolean
     description?: boolean
     isDefault?: boolean
+    archivedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     group?: boolean | GroupDefaultArgs<ExtArgs>
@@ -24727,6 +24906,7 @@ export namespace Prisma {
     name?: boolean
     description?: boolean
     isDefault?: boolean
+    archivedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     group?: boolean | GroupDefaultArgs<ExtArgs>
@@ -24738,14 +24918,16 @@ export namespace Prisma {
     name?: boolean
     description?: boolean
     isDefault?: boolean
+    archivedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type GroupAddressBookOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "groupId" | "name" | "description" | "isDefault" | "createdAt" | "updatedAt", ExtArgs["result"]["groupAddressBook"]>
+  export type GroupAddressBookOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "groupId" | "name" | "description" | "isDefault" | "archivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["groupAddressBook"]>
   export type GroupAddressBookInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     group?: boolean | GroupDefaultArgs<ExtArgs>
     contacts?: boolean | GroupAddressBook$contactsArgs<ExtArgs>
+    teamSyncAccounts?: boolean | GroupAddressBook$teamSyncAccountsArgs<ExtArgs>
     _count?: boolean | GroupAddressBookCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type GroupAddressBookIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -24760,6 +24942,7 @@ export namespace Prisma {
     objects: {
       group: Prisma.$GroupPayload<ExtArgs>
       contacts: Prisma.$GroupContactPayload<ExtArgs>[]
+      teamSyncAccounts: Prisma.$TeamSyncAccountPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -24767,6 +24950,7 @@ export namespace Prisma {
       name: string
       description: string | null
       isDefault: boolean
+      archivedAt: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["groupAddressBook"]>
@@ -25165,6 +25349,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     group<T extends GroupDefaultArgs<ExtArgs> = {}>(args?: Subset<T, GroupDefaultArgs<ExtArgs>>): Prisma__GroupClient<$Result.GetResult<Prisma.$GroupPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     contacts<T extends GroupAddressBook$contactsArgs<ExtArgs> = {}>(args?: Subset<T, GroupAddressBook$contactsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GroupContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    teamSyncAccounts<T extends GroupAddressBook$teamSyncAccountsArgs<ExtArgs> = {}>(args?: Subset<T, GroupAddressBook$teamSyncAccountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TeamSyncAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -25199,6 +25384,7 @@ export namespace Prisma {
     readonly name: FieldRef<"GroupAddressBook", 'String'>
     readonly description: FieldRef<"GroupAddressBook", 'String'>
     readonly isDefault: FieldRef<"GroupAddressBook", 'Boolean'>
+    readonly archivedAt: FieldRef<"GroupAddressBook", 'DateTime'>
     readonly createdAt: FieldRef<"GroupAddressBook", 'DateTime'>
     readonly updatedAt: FieldRef<"GroupAddressBook", 'DateTime'>
   }
@@ -25621,6 +25807,30 @@ export namespace Prisma {
   }
 
   /**
+   * GroupAddressBook.teamSyncAccounts
+   */
+  export type GroupAddressBook$teamSyncAccountsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamSyncAccount
+     */
+    select?: TeamSyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TeamSyncAccount
+     */
+    omit?: TeamSyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TeamSyncAccountInclude<ExtArgs> | null
+    where?: TeamSyncAccountWhereInput
+    orderBy?: TeamSyncAccountOrderByWithRelationInput | TeamSyncAccountOrderByWithRelationInput[]
+    cursor?: TeamSyncAccountWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TeamSyncAccountScalarFieldEnum | TeamSyncAccountScalarFieldEnum[]
+  }
+
+  /**
    * GroupAddressBook without action
    */
   export type GroupAddressBookDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -25636,6 +25846,1093 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: GroupAddressBookInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model TeamSyncAccount
+   */
+
+  export type AggregateTeamSyncAccount = {
+    _count: TeamSyncAccountCountAggregateOutputType | null
+    _min: TeamSyncAccountMinAggregateOutputType | null
+    _max: TeamSyncAccountMaxAggregateOutputType | null
+  }
+
+  export type TeamSyncAccountMinAggregateOutputType = {
+    id: string | null
+    groupId: string | null
+    syncAccountId: string | null
+    addressBookId: string | null
+    addedByUserId: string | null
+    createdAt: Date | null
+  }
+
+  export type TeamSyncAccountMaxAggregateOutputType = {
+    id: string | null
+    groupId: string | null
+    syncAccountId: string | null
+    addressBookId: string | null
+    addedByUserId: string | null
+    createdAt: Date | null
+  }
+
+  export type TeamSyncAccountCountAggregateOutputType = {
+    id: number
+    groupId: number
+    syncAccountId: number
+    addressBookId: number
+    addedByUserId: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type TeamSyncAccountMinAggregateInputType = {
+    id?: true
+    groupId?: true
+    syncAccountId?: true
+    addressBookId?: true
+    addedByUserId?: true
+    createdAt?: true
+  }
+
+  export type TeamSyncAccountMaxAggregateInputType = {
+    id?: true
+    groupId?: true
+    syncAccountId?: true
+    addressBookId?: true
+    addedByUserId?: true
+    createdAt?: true
+  }
+
+  export type TeamSyncAccountCountAggregateInputType = {
+    id?: true
+    groupId?: true
+    syncAccountId?: true
+    addressBookId?: true
+    addedByUserId?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type TeamSyncAccountAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TeamSyncAccount to aggregate.
+     */
+    where?: TeamSyncAccountWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TeamSyncAccounts to fetch.
+     */
+    orderBy?: TeamSyncAccountOrderByWithRelationInput | TeamSyncAccountOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: TeamSyncAccountWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TeamSyncAccounts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TeamSyncAccounts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned TeamSyncAccounts
+    **/
+    _count?: true | TeamSyncAccountCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: TeamSyncAccountMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: TeamSyncAccountMaxAggregateInputType
+  }
+
+  export type GetTeamSyncAccountAggregateType<T extends TeamSyncAccountAggregateArgs> = {
+        [P in keyof T & keyof AggregateTeamSyncAccount]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTeamSyncAccount[P]>
+      : GetScalarType<T[P], AggregateTeamSyncAccount[P]>
+  }
+
+
+
+
+  export type TeamSyncAccountGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TeamSyncAccountWhereInput
+    orderBy?: TeamSyncAccountOrderByWithAggregationInput | TeamSyncAccountOrderByWithAggregationInput[]
+    by: TeamSyncAccountScalarFieldEnum[] | TeamSyncAccountScalarFieldEnum
+    having?: TeamSyncAccountScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TeamSyncAccountCountAggregateInputType | true
+    _min?: TeamSyncAccountMinAggregateInputType
+    _max?: TeamSyncAccountMaxAggregateInputType
+  }
+
+  export type TeamSyncAccountGroupByOutputType = {
+    id: string
+    groupId: string
+    syncAccountId: string
+    addressBookId: string
+    addedByUserId: string
+    createdAt: Date
+    _count: TeamSyncAccountCountAggregateOutputType | null
+    _min: TeamSyncAccountMinAggregateOutputType | null
+    _max: TeamSyncAccountMaxAggregateOutputType | null
+  }
+
+  type GetTeamSyncAccountGroupByPayload<T extends TeamSyncAccountGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TeamSyncAccountGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TeamSyncAccountGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TeamSyncAccountGroupByOutputType[P]>
+            : GetScalarType<T[P], TeamSyncAccountGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TeamSyncAccountSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    groupId?: boolean
+    syncAccountId?: boolean
+    addressBookId?: boolean
+    addedByUserId?: boolean
+    createdAt?: boolean
+    group?: boolean | GroupDefaultArgs<ExtArgs>
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    addressBook?: boolean | GroupAddressBookDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["teamSyncAccount"]>
+
+  export type TeamSyncAccountSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    groupId?: boolean
+    syncAccountId?: boolean
+    addressBookId?: boolean
+    addedByUserId?: boolean
+    createdAt?: boolean
+    group?: boolean | GroupDefaultArgs<ExtArgs>
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    addressBook?: boolean | GroupAddressBookDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["teamSyncAccount"]>
+
+  export type TeamSyncAccountSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    groupId?: boolean
+    syncAccountId?: boolean
+    addressBookId?: boolean
+    addedByUserId?: boolean
+    createdAt?: boolean
+    group?: boolean | GroupDefaultArgs<ExtArgs>
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    addressBook?: boolean | GroupAddressBookDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["teamSyncAccount"]>
+
+  export type TeamSyncAccountSelectScalar = {
+    id?: boolean
+    groupId?: boolean
+    syncAccountId?: boolean
+    addressBookId?: boolean
+    addedByUserId?: boolean
+    createdAt?: boolean
+  }
+
+  export type TeamSyncAccountOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "groupId" | "syncAccountId" | "addressBookId" | "addedByUserId" | "createdAt", ExtArgs["result"]["teamSyncAccount"]>
+  export type TeamSyncAccountInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    group?: boolean | GroupDefaultArgs<ExtArgs>
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    addressBook?: boolean | GroupAddressBookDefaultArgs<ExtArgs>
+  }
+  export type TeamSyncAccountIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    group?: boolean | GroupDefaultArgs<ExtArgs>
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    addressBook?: boolean | GroupAddressBookDefaultArgs<ExtArgs>
+  }
+  export type TeamSyncAccountIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    group?: boolean | GroupDefaultArgs<ExtArgs>
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    addressBook?: boolean | GroupAddressBookDefaultArgs<ExtArgs>
+  }
+
+  export type $TeamSyncAccountPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "TeamSyncAccount"
+    objects: {
+      group: Prisma.$GroupPayload<ExtArgs>
+      syncAccount: Prisma.$SyncAccountPayload<ExtArgs>
+      addressBook: Prisma.$GroupAddressBookPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      groupId: string
+      syncAccountId: string
+      addressBookId: string
+      addedByUserId: string
+      createdAt: Date
+    }, ExtArgs["result"]["teamSyncAccount"]>
+    composites: {}
+  }
+
+  type TeamSyncAccountGetPayload<S extends boolean | null | undefined | TeamSyncAccountDefaultArgs> = $Result.GetResult<Prisma.$TeamSyncAccountPayload, S>
+
+  type TeamSyncAccountCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<TeamSyncAccountFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: TeamSyncAccountCountAggregateInputType | true
+    }
+
+  export interface TeamSyncAccountDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['TeamSyncAccount'], meta: { name: 'TeamSyncAccount' } }
+    /**
+     * Find zero or one TeamSyncAccount that matches the filter.
+     * @param {TeamSyncAccountFindUniqueArgs} args - Arguments to find a TeamSyncAccount
+     * @example
+     * // Get one TeamSyncAccount
+     * const teamSyncAccount = await prisma.teamSyncAccount.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TeamSyncAccountFindUniqueArgs>(args: SelectSubset<T, TeamSyncAccountFindUniqueArgs<ExtArgs>>): Prisma__TeamSyncAccountClient<$Result.GetResult<Prisma.$TeamSyncAccountPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one TeamSyncAccount that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {TeamSyncAccountFindUniqueOrThrowArgs} args - Arguments to find a TeamSyncAccount
+     * @example
+     * // Get one TeamSyncAccount
+     * const teamSyncAccount = await prisma.teamSyncAccount.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TeamSyncAccountFindUniqueOrThrowArgs>(args: SelectSubset<T, TeamSyncAccountFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TeamSyncAccountClient<$Result.GetResult<Prisma.$TeamSyncAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TeamSyncAccount that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TeamSyncAccountFindFirstArgs} args - Arguments to find a TeamSyncAccount
+     * @example
+     * // Get one TeamSyncAccount
+     * const teamSyncAccount = await prisma.teamSyncAccount.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TeamSyncAccountFindFirstArgs>(args?: SelectSubset<T, TeamSyncAccountFindFirstArgs<ExtArgs>>): Prisma__TeamSyncAccountClient<$Result.GetResult<Prisma.$TeamSyncAccountPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TeamSyncAccount that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TeamSyncAccountFindFirstOrThrowArgs} args - Arguments to find a TeamSyncAccount
+     * @example
+     * // Get one TeamSyncAccount
+     * const teamSyncAccount = await prisma.teamSyncAccount.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TeamSyncAccountFindFirstOrThrowArgs>(args?: SelectSubset<T, TeamSyncAccountFindFirstOrThrowArgs<ExtArgs>>): Prisma__TeamSyncAccountClient<$Result.GetResult<Prisma.$TeamSyncAccountPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more TeamSyncAccounts that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TeamSyncAccountFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all TeamSyncAccounts
+     * const teamSyncAccounts = await prisma.teamSyncAccount.findMany()
+     * 
+     * // Get first 10 TeamSyncAccounts
+     * const teamSyncAccounts = await prisma.teamSyncAccount.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const teamSyncAccountWithIdOnly = await prisma.teamSyncAccount.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends TeamSyncAccountFindManyArgs>(args?: SelectSubset<T, TeamSyncAccountFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TeamSyncAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a TeamSyncAccount.
+     * @param {TeamSyncAccountCreateArgs} args - Arguments to create a TeamSyncAccount.
+     * @example
+     * // Create one TeamSyncAccount
+     * const TeamSyncAccount = await prisma.teamSyncAccount.create({
+     *   data: {
+     *     // ... data to create a TeamSyncAccount
+     *   }
+     * })
+     * 
+     */
+    create<T extends TeamSyncAccountCreateArgs>(args: SelectSubset<T, TeamSyncAccountCreateArgs<ExtArgs>>): Prisma__TeamSyncAccountClient<$Result.GetResult<Prisma.$TeamSyncAccountPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many TeamSyncAccounts.
+     * @param {TeamSyncAccountCreateManyArgs} args - Arguments to create many TeamSyncAccounts.
+     * @example
+     * // Create many TeamSyncAccounts
+     * const teamSyncAccount = await prisma.teamSyncAccount.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends TeamSyncAccountCreateManyArgs>(args?: SelectSubset<T, TeamSyncAccountCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many TeamSyncAccounts and returns the data saved in the database.
+     * @param {TeamSyncAccountCreateManyAndReturnArgs} args - Arguments to create many TeamSyncAccounts.
+     * @example
+     * // Create many TeamSyncAccounts
+     * const teamSyncAccount = await prisma.teamSyncAccount.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many TeamSyncAccounts and only return the `id`
+     * const teamSyncAccountWithIdOnly = await prisma.teamSyncAccount.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends TeamSyncAccountCreateManyAndReturnArgs>(args?: SelectSubset<T, TeamSyncAccountCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TeamSyncAccountPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a TeamSyncAccount.
+     * @param {TeamSyncAccountDeleteArgs} args - Arguments to delete one TeamSyncAccount.
+     * @example
+     * // Delete one TeamSyncAccount
+     * const TeamSyncAccount = await prisma.teamSyncAccount.delete({
+     *   where: {
+     *     // ... filter to delete one TeamSyncAccount
+     *   }
+     * })
+     * 
+     */
+    delete<T extends TeamSyncAccountDeleteArgs>(args: SelectSubset<T, TeamSyncAccountDeleteArgs<ExtArgs>>): Prisma__TeamSyncAccountClient<$Result.GetResult<Prisma.$TeamSyncAccountPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one TeamSyncAccount.
+     * @param {TeamSyncAccountUpdateArgs} args - Arguments to update one TeamSyncAccount.
+     * @example
+     * // Update one TeamSyncAccount
+     * const teamSyncAccount = await prisma.teamSyncAccount.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends TeamSyncAccountUpdateArgs>(args: SelectSubset<T, TeamSyncAccountUpdateArgs<ExtArgs>>): Prisma__TeamSyncAccountClient<$Result.GetResult<Prisma.$TeamSyncAccountPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more TeamSyncAccounts.
+     * @param {TeamSyncAccountDeleteManyArgs} args - Arguments to filter TeamSyncAccounts to delete.
+     * @example
+     * // Delete a few TeamSyncAccounts
+     * const { count } = await prisma.teamSyncAccount.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends TeamSyncAccountDeleteManyArgs>(args?: SelectSubset<T, TeamSyncAccountDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TeamSyncAccounts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TeamSyncAccountUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many TeamSyncAccounts
+     * const teamSyncAccount = await prisma.teamSyncAccount.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends TeamSyncAccountUpdateManyArgs>(args: SelectSubset<T, TeamSyncAccountUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TeamSyncAccounts and returns the data updated in the database.
+     * @param {TeamSyncAccountUpdateManyAndReturnArgs} args - Arguments to update many TeamSyncAccounts.
+     * @example
+     * // Update many TeamSyncAccounts
+     * const teamSyncAccount = await prisma.teamSyncAccount.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more TeamSyncAccounts and only return the `id`
+     * const teamSyncAccountWithIdOnly = await prisma.teamSyncAccount.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends TeamSyncAccountUpdateManyAndReturnArgs>(args: SelectSubset<T, TeamSyncAccountUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TeamSyncAccountPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one TeamSyncAccount.
+     * @param {TeamSyncAccountUpsertArgs} args - Arguments to update or create a TeamSyncAccount.
+     * @example
+     * // Update or create a TeamSyncAccount
+     * const teamSyncAccount = await prisma.teamSyncAccount.upsert({
+     *   create: {
+     *     // ... data to create a TeamSyncAccount
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the TeamSyncAccount we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TeamSyncAccountUpsertArgs>(args: SelectSubset<T, TeamSyncAccountUpsertArgs<ExtArgs>>): Prisma__TeamSyncAccountClient<$Result.GetResult<Prisma.$TeamSyncAccountPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of TeamSyncAccounts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TeamSyncAccountCountArgs} args - Arguments to filter TeamSyncAccounts to count.
+     * @example
+     * // Count the number of TeamSyncAccounts
+     * const count = await prisma.teamSyncAccount.count({
+     *   where: {
+     *     // ... the filter for the TeamSyncAccounts we want to count
+     *   }
+     * })
+    **/
+    count<T extends TeamSyncAccountCountArgs>(
+      args?: Subset<T, TeamSyncAccountCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TeamSyncAccountCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a TeamSyncAccount.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TeamSyncAccountAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TeamSyncAccountAggregateArgs>(args: Subset<T, TeamSyncAccountAggregateArgs>): Prisma.PrismaPromise<GetTeamSyncAccountAggregateType<T>>
+
+    /**
+     * Group by TeamSyncAccount.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TeamSyncAccountGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TeamSyncAccountGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TeamSyncAccountGroupByArgs['orderBy'] }
+        : { orderBy?: TeamSyncAccountGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TeamSyncAccountGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTeamSyncAccountGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the TeamSyncAccount model
+   */
+  readonly fields: TeamSyncAccountFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for TeamSyncAccount.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TeamSyncAccountClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    group<T extends GroupDefaultArgs<ExtArgs> = {}>(args?: Subset<T, GroupDefaultArgs<ExtArgs>>): Prisma__GroupClient<$Result.GetResult<Prisma.$GroupPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    syncAccount<T extends SyncAccountDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccountDefaultArgs<ExtArgs>>): Prisma__SyncAccountClient<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    addressBook<T extends GroupAddressBookDefaultArgs<ExtArgs> = {}>(args?: Subset<T, GroupAddressBookDefaultArgs<ExtArgs>>): Prisma__GroupAddressBookClient<$Result.GetResult<Prisma.$GroupAddressBookPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the TeamSyncAccount model
+   */
+  interface TeamSyncAccountFieldRefs {
+    readonly id: FieldRef<"TeamSyncAccount", 'String'>
+    readonly groupId: FieldRef<"TeamSyncAccount", 'String'>
+    readonly syncAccountId: FieldRef<"TeamSyncAccount", 'String'>
+    readonly addressBookId: FieldRef<"TeamSyncAccount", 'String'>
+    readonly addedByUserId: FieldRef<"TeamSyncAccount", 'String'>
+    readonly createdAt: FieldRef<"TeamSyncAccount", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * TeamSyncAccount findUnique
+   */
+  export type TeamSyncAccountFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamSyncAccount
+     */
+    select?: TeamSyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TeamSyncAccount
+     */
+    omit?: TeamSyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TeamSyncAccountInclude<ExtArgs> | null
+    /**
+     * Filter, which TeamSyncAccount to fetch.
+     */
+    where: TeamSyncAccountWhereUniqueInput
+  }
+
+  /**
+   * TeamSyncAccount findUniqueOrThrow
+   */
+  export type TeamSyncAccountFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamSyncAccount
+     */
+    select?: TeamSyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TeamSyncAccount
+     */
+    omit?: TeamSyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TeamSyncAccountInclude<ExtArgs> | null
+    /**
+     * Filter, which TeamSyncAccount to fetch.
+     */
+    where: TeamSyncAccountWhereUniqueInput
+  }
+
+  /**
+   * TeamSyncAccount findFirst
+   */
+  export type TeamSyncAccountFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamSyncAccount
+     */
+    select?: TeamSyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TeamSyncAccount
+     */
+    omit?: TeamSyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TeamSyncAccountInclude<ExtArgs> | null
+    /**
+     * Filter, which TeamSyncAccount to fetch.
+     */
+    where?: TeamSyncAccountWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TeamSyncAccounts to fetch.
+     */
+    orderBy?: TeamSyncAccountOrderByWithRelationInput | TeamSyncAccountOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TeamSyncAccounts.
+     */
+    cursor?: TeamSyncAccountWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TeamSyncAccounts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TeamSyncAccounts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TeamSyncAccounts.
+     */
+    distinct?: TeamSyncAccountScalarFieldEnum | TeamSyncAccountScalarFieldEnum[]
+  }
+
+  /**
+   * TeamSyncAccount findFirstOrThrow
+   */
+  export type TeamSyncAccountFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamSyncAccount
+     */
+    select?: TeamSyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TeamSyncAccount
+     */
+    omit?: TeamSyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TeamSyncAccountInclude<ExtArgs> | null
+    /**
+     * Filter, which TeamSyncAccount to fetch.
+     */
+    where?: TeamSyncAccountWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TeamSyncAccounts to fetch.
+     */
+    orderBy?: TeamSyncAccountOrderByWithRelationInput | TeamSyncAccountOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TeamSyncAccounts.
+     */
+    cursor?: TeamSyncAccountWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TeamSyncAccounts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TeamSyncAccounts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TeamSyncAccounts.
+     */
+    distinct?: TeamSyncAccountScalarFieldEnum | TeamSyncAccountScalarFieldEnum[]
+  }
+
+  /**
+   * TeamSyncAccount findMany
+   */
+  export type TeamSyncAccountFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamSyncAccount
+     */
+    select?: TeamSyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TeamSyncAccount
+     */
+    omit?: TeamSyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TeamSyncAccountInclude<ExtArgs> | null
+    /**
+     * Filter, which TeamSyncAccounts to fetch.
+     */
+    where?: TeamSyncAccountWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TeamSyncAccounts to fetch.
+     */
+    orderBy?: TeamSyncAccountOrderByWithRelationInput | TeamSyncAccountOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing TeamSyncAccounts.
+     */
+    cursor?: TeamSyncAccountWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TeamSyncAccounts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TeamSyncAccounts.
+     */
+    skip?: number
+    distinct?: TeamSyncAccountScalarFieldEnum | TeamSyncAccountScalarFieldEnum[]
+  }
+
+  /**
+   * TeamSyncAccount create
+   */
+  export type TeamSyncAccountCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamSyncAccount
+     */
+    select?: TeamSyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TeamSyncAccount
+     */
+    omit?: TeamSyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TeamSyncAccountInclude<ExtArgs> | null
+    /**
+     * The data needed to create a TeamSyncAccount.
+     */
+    data: XOR<TeamSyncAccountCreateInput, TeamSyncAccountUncheckedCreateInput>
+  }
+
+  /**
+   * TeamSyncAccount createMany
+   */
+  export type TeamSyncAccountCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many TeamSyncAccounts.
+     */
+    data: TeamSyncAccountCreateManyInput | TeamSyncAccountCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TeamSyncAccount createManyAndReturn
+   */
+  export type TeamSyncAccountCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamSyncAccount
+     */
+    select?: TeamSyncAccountSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TeamSyncAccount
+     */
+    omit?: TeamSyncAccountOmit<ExtArgs> | null
+    /**
+     * The data used to create many TeamSyncAccounts.
+     */
+    data: TeamSyncAccountCreateManyInput | TeamSyncAccountCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TeamSyncAccountIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * TeamSyncAccount update
+   */
+  export type TeamSyncAccountUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamSyncAccount
+     */
+    select?: TeamSyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TeamSyncAccount
+     */
+    omit?: TeamSyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TeamSyncAccountInclude<ExtArgs> | null
+    /**
+     * The data needed to update a TeamSyncAccount.
+     */
+    data: XOR<TeamSyncAccountUpdateInput, TeamSyncAccountUncheckedUpdateInput>
+    /**
+     * Choose, which TeamSyncAccount to update.
+     */
+    where: TeamSyncAccountWhereUniqueInput
+  }
+
+  /**
+   * TeamSyncAccount updateMany
+   */
+  export type TeamSyncAccountUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update TeamSyncAccounts.
+     */
+    data: XOR<TeamSyncAccountUpdateManyMutationInput, TeamSyncAccountUncheckedUpdateManyInput>
+    /**
+     * Filter which TeamSyncAccounts to update
+     */
+    where?: TeamSyncAccountWhereInput
+    /**
+     * Limit how many TeamSyncAccounts to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * TeamSyncAccount updateManyAndReturn
+   */
+  export type TeamSyncAccountUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamSyncAccount
+     */
+    select?: TeamSyncAccountSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TeamSyncAccount
+     */
+    omit?: TeamSyncAccountOmit<ExtArgs> | null
+    /**
+     * The data used to update TeamSyncAccounts.
+     */
+    data: XOR<TeamSyncAccountUpdateManyMutationInput, TeamSyncAccountUncheckedUpdateManyInput>
+    /**
+     * Filter which TeamSyncAccounts to update
+     */
+    where?: TeamSyncAccountWhereInput
+    /**
+     * Limit how many TeamSyncAccounts to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TeamSyncAccountIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * TeamSyncAccount upsert
+   */
+  export type TeamSyncAccountUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamSyncAccount
+     */
+    select?: TeamSyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TeamSyncAccount
+     */
+    omit?: TeamSyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TeamSyncAccountInclude<ExtArgs> | null
+    /**
+     * The filter to search for the TeamSyncAccount to update in case it exists.
+     */
+    where: TeamSyncAccountWhereUniqueInput
+    /**
+     * In case the TeamSyncAccount found by the `where` argument doesn't exist, create a new TeamSyncAccount with this data.
+     */
+    create: XOR<TeamSyncAccountCreateInput, TeamSyncAccountUncheckedCreateInput>
+    /**
+     * In case the TeamSyncAccount was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TeamSyncAccountUpdateInput, TeamSyncAccountUncheckedUpdateInput>
+  }
+
+  /**
+   * TeamSyncAccount delete
+   */
+  export type TeamSyncAccountDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamSyncAccount
+     */
+    select?: TeamSyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TeamSyncAccount
+     */
+    omit?: TeamSyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TeamSyncAccountInclude<ExtArgs> | null
+    /**
+     * Filter which TeamSyncAccount to delete.
+     */
+    where: TeamSyncAccountWhereUniqueInput
+  }
+
+  /**
+   * TeamSyncAccount deleteMany
+   */
+  export type TeamSyncAccountDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TeamSyncAccounts to delete
+     */
+    where?: TeamSyncAccountWhereInput
+    /**
+     * Limit how many TeamSyncAccounts to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * TeamSyncAccount without action
+   */
+  export type TeamSyncAccountDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TeamSyncAccount
+     */
+    select?: TeamSyncAccountSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TeamSyncAccount
+     */
+    omit?: TeamSyncAccountOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TeamSyncAccountInclude<ExtArgs> | null
   }
 
 
@@ -28435,6 +29732,7 @@ export namespace Prisma {
     role: 'role',
     inviteStatus: 'inviteStatus',
     canEdit: 'canEdit',
+    addressBookPermissions: 'addressBookPermissions',
     inviteToken: 'inviteToken',
     inviteExpiresAt: 'inviteExpiresAt',
     invitedAt: 'invitedAt',
@@ -28452,11 +29750,24 @@ export namespace Prisma {
     name: 'name',
     description: 'description',
     isDefault: 'isDefault',
+    archivedAt: 'archivedAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
 
   export type GroupAddressBookScalarFieldEnum = (typeof GroupAddressBookScalarFieldEnum)[keyof typeof GroupAddressBookScalarFieldEnum]
+
+
+  export const TeamSyncAccountScalarFieldEnum: {
+    id: 'id',
+    groupId: 'groupId',
+    syncAccountId: 'syncAccountId',
+    addressBookId: 'addressBookId',
+    addedByUserId: 'addedByUserId',
+    createdAt: 'createdAt'
+  };
+
+  export type TeamSyncAccountScalarFieldEnum = (typeof TeamSyncAccountScalarFieldEnum)[keyof typeof TeamSyncAccountScalarFieldEnum]
 
 
   export const GroupContactScalarFieldEnum: {
@@ -30276,6 +31587,7 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkListRelationFilter
     syncJobs?: SyncJobListRelationFilter
     syncConflicts?: SyncConflictListRelationFilter
+    teamLink?: XOR<TeamSyncAccountNullableScalarRelationFilter, TeamSyncAccountWhereInput> | null
   }
 
   export type SyncAccountOrderByWithRelationInput = {
@@ -30310,6 +31622,7 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkOrderByRelationAggregateInput
     syncJobs?: SyncJobOrderByRelationAggregateInput
     syncConflicts?: SyncConflictOrderByRelationAggregateInput
+    teamLink?: TeamSyncAccountOrderByWithRelationInput
   }
 
   export type SyncAccountWhereUniqueInput = Prisma.AtLeast<{
@@ -30348,6 +31661,7 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkListRelationFilter
     syncJobs?: SyncJobListRelationFilter
     syncConflicts?: SyncConflictListRelationFilter
+    teamLink?: XOR<TeamSyncAccountNullableScalarRelationFilter, TeamSyncAccountWhereInput> | null
   }, "id" | "userId_baseUrl_label">
 
   export type SyncAccountOrderByWithAggregationInput = {
@@ -30907,6 +32221,7 @@ export namespace Prisma {
     subscription?: XOR<SubscriptionNullableScalarRelationFilter, SubscriptionWhereInput> | null
     members?: GroupMemberListRelationFilter
     addressBooks?: GroupAddressBookListRelationFilter
+    teamSyncAccounts?: TeamSyncAccountListRelationFilter
   }
 
   export type GroupOrderByWithRelationInput = {
@@ -30924,6 +32239,7 @@ export namespace Prisma {
     subscription?: SubscriptionOrderByWithRelationInput
     members?: GroupMemberOrderByRelationAggregateInput
     addressBooks?: GroupAddressBookOrderByRelationAggregateInput
+    teamSyncAccounts?: TeamSyncAccountOrderByRelationAggregateInput
   }
 
   export type GroupWhereUniqueInput = Prisma.AtLeast<{
@@ -30944,6 +32260,7 @@ export namespace Prisma {
     subscription?: XOR<SubscriptionNullableScalarRelationFilter, SubscriptionWhereInput> | null
     members?: GroupMemberListRelationFilter
     addressBooks?: GroupAddressBookListRelationFilter
+    teamSyncAccounts?: TeamSyncAccountListRelationFilter
   }, "id">
 
   export type GroupOrderByWithAggregationInput = {
@@ -30991,6 +32308,7 @@ export namespace Prisma {
     role?: EnumGroupRoleFilter<"GroupMember"> | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFilter<"GroupMember"> | $Enums.GroupInviteStatus
     canEdit?: BoolFilter<"GroupMember"> | boolean
+    addressBookPermissions?: JsonNullableFilter<"GroupMember">
     inviteToken?: StringNullableFilter<"GroupMember"> | string | null
     inviteExpiresAt?: DateTimeNullableFilter<"GroupMember"> | Date | string | null
     invitedAt?: DateTimeFilter<"GroupMember"> | Date | string
@@ -31009,6 +32327,7 @@ export namespace Prisma {
     role?: SortOrder
     inviteStatus?: SortOrder
     canEdit?: SortOrder
+    addressBookPermissions?: SortOrderInput | SortOrder
     inviteToken?: SortOrderInput | SortOrder
     inviteExpiresAt?: SortOrderInput | SortOrder
     invitedAt?: SortOrder
@@ -31033,6 +32352,7 @@ export namespace Prisma {
     role?: EnumGroupRoleFilter<"GroupMember"> | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFilter<"GroupMember"> | $Enums.GroupInviteStatus
     canEdit?: BoolFilter<"GroupMember"> | boolean
+    addressBookPermissions?: JsonNullableFilter<"GroupMember">
     inviteExpiresAt?: DateTimeNullableFilter<"GroupMember"> | Date | string | null
     invitedAt?: DateTimeFilter<"GroupMember"> | Date | string
     invitedByUserId?: StringNullableFilter<"GroupMember"> | string | null
@@ -31050,6 +32370,7 @@ export namespace Prisma {
     role?: SortOrder
     inviteStatus?: SortOrder
     canEdit?: SortOrder
+    addressBookPermissions?: SortOrderInput | SortOrder
     inviteToken?: SortOrderInput | SortOrder
     inviteExpiresAt?: SortOrderInput | SortOrder
     invitedAt?: SortOrder
@@ -31072,6 +32393,7 @@ export namespace Prisma {
     role?: EnumGroupRoleWithAggregatesFilter<"GroupMember"> | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusWithAggregatesFilter<"GroupMember"> | $Enums.GroupInviteStatus
     canEdit?: BoolWithAggregatesFilter<"GroupMember"> | boolean
+    addressBookPermissions?: JsonNullableWithAggregatesFilter<"GroupMember">
     inviteToken?: StringNullableWithAggregatesFilter<"GroupMember"> | string | null
     inviteExpiresAt?: DateTimeNullableWithAggregatesFilter<"GroupMember"> | Date | string | null
     invitedAt?: DateTimeWithAggregatesFilter<"GroupMember"> | Date | string
@@ -31089,10 +32411,12 @@ export namespace Prisma {
     name?: StringFilter<"GroupAddressBook"> | string
     description?: StringNullableFilter<"GroupAddressBook"> | string | null
     isDefault?: BoolFilter<"GroupAddressBook"> | boolean
+    archivedAt?: DateTimeNullableFilter<"GroupAddressBook"> | Date | string | null
     createdAt?: DateTimeFilter<"GroupAddressBook"> | Date | string
     updatedAt?: DateTimeFilter<"GroupAddressBook"> | Date | string
     group?: XOR<GroupScalarRelationFilter, GroupWhereInput>
     contacts?: GroupContactListRelationFilter
+    teamSyncAccounts?: TeamSyncAccountListRelationFilter
   }
 
   export type GroupAddressBookOrderByWithRelationInput = {
@@ -31101,10 +32425,12 @@ export namespace Prisma {
     name?: SortOrder
     description?: SortOrderInput | SortOrder
     isDefault?: SortOrder
+    archivedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     group?: GroupOrderByWithRelationInput
     contacts?: GroupContactOrderByRelationAggregateInput
+    teamSyncAccounts?: TeamSyncAccountOrderByRelationAggregateInput
   }
 
   export type GroupAddressBookWhereUniqueInput = Prisma.AtLeast<{
@@ -31116,10 +32442,12 @@ export namespace Prisma {
     name?: StringFilter<"GroupAddressBook"> | string
     description?: StringNullableFilter<"GroupAddressBook"> | string | null
     isDefault?: BoolFilter<"GroupAddressBook"> | boolean
+    archivedAt?: DateTimeNullableFilter<"GroupAddressBook"> | Date | string | null
     createdAt?: DateTimeFilter<"GroupAddressBook"> | Date | string
     updatedAt?: DateTimeFilter<"GroupAddressBook"> | Date | string
     group?: XOR<GroupScalarRelationFilter, GroupWhereInput>
     contacts?: GroupContactListRelationFilter
+    teamSyncAccounts?: TeamSyncAccountListRelationFilter
   }, "id">
 
   export type GroupAddressBookOrderByWithAggregationInput = {
@@ -31128,6 +32456,7 @@ export namespace Prisma {
     name?: SortOrder
     description?: SortOrderInput | SortOrder
     isDefault?: SortOrder
+    archivedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: GroupAddressBookCountOrderByAggregateInput
@@ -31144,8 +32473,75 @@ export namespace Prisma {
     name?: StringWithAggregatesFilter<"GroupAddressBook"> | string
     description?: StringNullableWithAggregatesFilter<"GroupAddressBook"> | string | null
     isDefault?: BoolWithAggregatesFilter<"GroupAddressBook"> | boolean
+    archivedAt?: DateTimeNullableWithAggregatesFilter<"GroupAddressBook"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"GroupAddressBook"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"GroupAddressBook"> | Date | string
+  }
+
+  export type TeamSyncAccountWhereInput = {
+    AND?: TeamSyncAccountWhereInput | TeamSyncAccountWhereInput[]
+    OR?: TeamSyncAccountWhereInput[]
+    NOT?: TeamSyncAccountWhereInput | TeamSyncAccountWhereInput[]
+    id?: StringFilter<"TeamSyncAccount"> | string
+    groupId?: StringFilter<"TeamSyncAccount"> | string
+    syncAccountId?: StringFilter<"TeamSyncAccount"> | string
+    addressBookId?: StringFilter<"TeamSyncAccount"> | string
+    addedByUserId?: StringFilter<"TeamSyncAccount"> | string
+    createdAt?: DateTimeFilter<"TeamSyncAccount"> | Date | string
+    group?: XOR<GroupScalarRelationFilter, GroupWhereInput>
+    syncAccount?: XOR<SyncAccountScalarRelationFilter, SyncAccountWhereInput>
+    addressBook?: XOR<GroupAddressBookScalarRelationFilter, GroupAddressBookWhereInput>
+  }
+
+  export type TeamSyncAccountOrderByWithRelationInput = {
+    id?: SortOrder
+    groupId?: SortOrder
+    syncAccountId?: SortOrder
+    addressBookId?: SortOrder
+    addedByUserId?: SortOrder
+    createdAt?: SortOrder
+    group?: GroupOrderByWithRelationInput
+    syncAccount?: SyncAccountOrderByWithRelationInput
+    addressBook?: GroupAddressBookOrderByWithRelationInput
+  }
+
+  export type TeamSyncAccountWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    syncAccountId?: string
+    AND?: TeamSyncAccountWhereInput | TeamSyncAccountWhereInput[]
+    OR?: TeamSyncAccountWhereInput[]
+    NOT?: TeamSyncAccountWhereInput | TeamSyncAccountWhereInput[]
+    groupId?: StringFilter<"TeamSyncAccount"> | string
+    addressBookId?: StringFilter<"TeamSyncAccount"> | string
+    addedByUserId?: StringFilter<"TeamSyncAccount"> | string
+    createdAt?: DateTimeFilter<"TeamSyncAccount"> | Date | string
+    group?: XOR<GroupScalarRelationFilter, GroupWhereInput>
+    syncAccount?: XOR<SyncAccountScalarRelationFilter, SyncAccountWhereInput>
+    addressBook?: XOR<GroupAddressBookScalarRelationFilter, GroupAddressBookWhereInput>
+  }, "id" | "syncAccountId">
+
+  export type TeamSyncAccountOrderByWithAggregationInput = {
+    id?: SortOrder
+    groupId?: SortOrder
+    syncAccountId?: SortOrder
+    addressBookId?: SortOrder
+    addedByUserId?: SortOrder
+    createdAt?: SortOrder
+    _count?: TeamSyncAccountCountOrderByAggregateInput
+    _max?: TeamSyncAccountMaxOrderByAggregateInput
+    _min?: TeamSyncAccountMinOrderByAggregateInput
+  }
+
+  export type TeamSyncAccountScalarWhereWithAggregatesInput = {
+    AND?: TeamSyncAccountScalarWhereWithAggregatesInput | TeamSyncAccountScalarWhereWithAggregatesInput[]
+    OR?: TeamSyncAccountScalarWhereWithAggregatesInput[]
+    NOT?: TeamSyncAccountScalarWhereWithAggregatesInput | TeamSyncAccountScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"TeamSyncAccount"> | string
+    groupId?: StringWithAggregatesFilter<"TeamSyncAccount"> | string
+    syncAccountId?: StringWithAggregatesFilter<"TeamSyncAccount"> | string
+    addressBookId?: StringWithAggregatesFilter<"TeamSyncAccount"> | string
+    addedByUserId?: StringWithAggregatesFilter<"TeamSyncAccount"> | string
+    createdAt?: DateTimeWithAggregatesFilter<"TeamSyncAccount"> | Date | string
   }
 
   export type GroupContactWhereInput = {
@@ -32816,6 +34212,7 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
     syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
+    teamLink?: TeamSyncAccountCreateNestedOneWithoutSyncAccountInput
   }
 
   export type SyncAccountUncheckedCreateInput = {
@@ -32849,6 +34246,7 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
     syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
+    teamLink?: TeamSyncAccountUncheckedCreateNestedOneWithoutSyncAccountInput
   }
 
   export type SyncAccountUpdateInput = {
@@ -32882,6 +34280,7 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
     syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
+    teamLink?: TeamSyncAccountUpdateOneWithoutSyncAccountNestedInput
   }
 
   export type SyncAccountUncheckedUpdateInput = {
@@ -32915,6 +34314,7 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
+    teamLink?: TeamSyncAccountUncheckedUpdateOneWithoutSyncAccountNestedInput
   }
 
   export type SyncAccountCreateManyInput = {
@@ -33553,6 +34953,7 @@ export namespace Prisma {
     subscription?: SubscriptionCreateNestedOneWithoutGroupsInput
     members?: GroupMemberCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookCreateNestedManyWithoutGroupInput
+    teamSyncAccounts?: TeamSyncAccountCreateNestedManyWithoutGroupInput
   }
 
   export type GroupUncheckedCreateInput = {
@@ -33568,6 +34969,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookUncheckedCreateNestedManyWithoutGroupInput
+    teamSyncAccounts?: TeamSyncAccountUncheckedCreateNestedManyWithoutGroupInput
   }
 
   export type GroupUpdateInput = {
@@ -33583,6 +34985,7 @@ export namespace Prisma {
     subscription?: SubscriptionUpdateOneWithoutGroupsNestedInput
     members?: GroupMemberUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUpdateManyWithoutGroupNestedInput
+    teamSyncAccounts?: TeamSyncAccountUpdateManyWithoutGroupNestedInput
   }
 
   export type GroupUncheckedUpdateInput = {
@@ -33598,6 +35001,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUncheckedUpdateManyWithoutGroupNestedInput
+    teamSyncAccounts?: TeamSyncAccountUncheckedUpdateManyWithoutGroupNestedInput
   }
 
   export type GroupCreateManyInput = {
@@ -33643,6 +35047,7 @@ export namespace Prisma {
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
@@ -33661,6 +35066,7 @@ export namespace Prisma {
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
@@ -33675,6 +35081,7 @@ export namespace Prisma {
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33693,6 +35100,7 @@ export namespace Prisma {
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33709,6 +35117,7 @@ export namespace Prisma {
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
@@ -33723,6 +35132,7 @@ export namespace Prisma {
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33739,6 +35149,7 @@ export namespace Prisma {
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -33752,10 +35163,12 @@ export namespace Prisma {
     name: string
     description?: string | null
     isDefault?: boolean
+    archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     group: GroupCreateNestedOneWithoutAddressBooksInput
     contacts?: GroupContactCreateNestedManyWithoutGroupAddressBookInput
+    teamSyncAccounts?: TeamSyncAccountCreateNestedManyWithoutAddressBookInput
   }
 
   export type GroupAddressBookUncheckedCreateInput = {
@@ -33764,9 +35177,11 @@ export namespace Prisma {
     name: string
     description?: string | null
     isDefault?: boolean
+    archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: GroupContactUncheckedCreateNestedManyWithoutGroupAddressBookInput
+    teamSyncAccounts?: TeamSyncAccountUncheckedCreateNestedManyWithoutAddressBookInput
   }
 
   export type GroupAddressBookUpdateInput = {
@@ -33774,10 +35189,12 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     group?: GroupUpdateOneRequiredWithoutAddressBooksNestedInput
     contacts?: GroupContactUpdateManyWithoutGroupAddressBookNestedInput
+    teamSyncAccounts?: TeamSyncAccountUpdateManyWithoutAddressBookNestedInput
   }
 
   export type GroupAddressBookUncheckedUpdateInput = {
@@ -33786,9 +35203,11 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: GroupContactUncheckedUpdateManyWithoutGroupAddressBookNestedInput
+    teamSyncAccounts?: TeamSyncAccountUncheckedUpdateManyWithoutAddressBookNestedInput
   }
 
   export type GroupAddressBookCreateManyInput = {
@@ -33797,6 +35216,7 @@ export namespace Prisma {
     name: string
     description?: string | null
     isDefault?: boolean
+    archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -33806,6 +35226,7 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -33816,8 +35237,69 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TeamSyncAccountCreateInput = {
+    id?: string
+    addedByUserId: string
+    createdAt?: Date | string
+    group: GroupCreateNestedOneWithoutTeamSyncAccountsInput
+    syncAccount: SyncAccountCreateNestedOneWithoutTeamLinkInput
+    addressBook: GroupAddressBookCreateNestedOneWithoutTeamSyncAccountsInput
+  }
+
+  export type TeamSyncAccountUncheckedCreateInput = {
+    id?: string
+    groupId: string
+    syncAccountId: string
+    addressBookId: string
+    addedByUserId: string
+    createdAt?: Date | string
+  }
+
+  export type TeamSyncAccountUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    addedByUserId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    group?: GroupUpdateOneRequiredWithoutTeamSyncAccountsNestedInput
+    syncAccount?: SyncAccountUpdateOneRequiredWithoutTeamLinkNestedInput
+    addressBook?: GroupAddressBookUpdateOneRequiredWithoutTeamSyncAccountsNestedInput
+  }
+
+  export type TeamSyncAccountUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    groupId?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: StringFieldUpdateOperationsInput | string
+    addressBookId?: StringFieldUpdateOperationsInput | string
+    addedByUserId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TeamSyncAccountCreateManyInput = {
+    id?: string
+    groupId: string
+    syncAccountId: string
+    addressBookId: string
+    addedByUserId: string
+    createdAt?: Date | string
+  }
+
+  export type TeamSyncAccountUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    addedByUserId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TeamSyncAccountUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    groupId?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: StringFieldUpdateOperationsInput | string
+    addressBookId?: StringFieldUpdateOperationsInput | string
+    addedByUserId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type GroupContactCreateInput = {
@@ -35372,6 +36854,11 @@ export namespace Prisma {
     none?: SyncJobWhereInput
   }
 
+  export type TeamSyncAccountNullableScalarRelationFilter = {
+    is?: TeamSyncAccountWhereInput | null
+    isNot?: TeamSyncAccountWhereInput | null
+  }
+
   export type SyncJobOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -35957,7 +37444,17 @@ export namespace Prisma {
     none?: GroupAddressBookWhereInput
   }
 
+  export type TeamSyncAccountListRelationFilter = {
+    every?: TeamSyncAccountWhereInput
+    some?: TeamSyncAccountWhereInput
+    none?: TeamSyncAccountWhereInput
+  }
+
   export type GroupAddressBookOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type TeamSyncAccountOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -36062,6 +37559,7 @@ export namespace Prisma {
     role?: SortOrder
     inviteStatus?: SortOrder
     canEdit?: SortOrder
+    addressBookPermissions?: SortOrder
     inviteToken?: SortOrder
     inviteExpiresAt?: SortOrder
     invitedAt?: SortOrder
@@ -36128,6 +37626,7 @@ export namespace Prisma {
     name?: SortOrder
     description?: SortOrder
     isDefault?: SortOrder
+    archivedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -36138,6 +37637,7 @@ export namespace Prisma {
     name?: SortOrder
     description?: SortOrder
     isDefault?: SortOrder
+    archivedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -36148,6 +37648,7 @@ export namespace Prisma {
     name?: SortOrder
     description?: SortOrder
     isDefault?: SortOrder
+    archivedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -36155,6 +37656,33 @@ export namespace Prisma {
   export type GroupAddressBookScalarRelationFilter = {
     is?: GroupAddressBookWhereInput
     isNot?: GroupAddressBookWhereInput
+  }
+
+  export type TeamSyncAccountCountOrderByAggregateInput = {
+    id?: SortOrder
+    groupId?: SortOrder
+    syncAccountId?: SortOrder
+    addressBookId?: SortOrder
+    addedByUserId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type TeamSyncAccountMaxOrderByAggregateInput = {
+    id?: SortOrder
+    groupId?: SortOrder
+    syncAccountId?: SortOrder
+    addressBookId?: SortOrder
+    addedByUserId?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type TeamSyncAccountMinOrderByAggregateInput = {
+    id?: SortOrder
+    groupId?: SortOrder
+    syncAccountId?: SortOrder
+    addressBookId?: SortOrder
+    addedByUserId?: SortOrder
+    createdAt?: SortOrder
   }
 
   export type GroupContactGroupAddressBookIdContactIdCompoundUniqueInput = {
@@ -37773,6 +39301,12 @@ export namespace Prisma {
     connect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
   }
 
+  export type TeamSyncAccountCreateNestedOneWithoutSyncAccountInput = {
+    create?: XOR<TeamSyncAccountCreateWithoutSyncAccountInput, TeamSyncAccountUncheckedCreateWithoutSyncAccountInput>
+    connectOrCreate?: TeamSyncAccountCreateOrConnectWithoutSyncAccountInput
+    connect?: TeamSyncAccountWhereUniqueInput
+  }
+
   export type SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput = {
     create?: XOR<SyncContactLinkCreateWithoutSyncAccountInput, SyncContactLinkUncheckedCreateWithoutSyncAccountInput> | SyncContactLinkCreateWithoutSyncAccountInput[] | SyncContactLinkUncheckedCreateWithoutSyncAccountInput[]
     connectOrCreate?: SyncContactLinkCreateOrConnectWithoutSyncAccountInput | SyncContactLinkCreateOrConnectWithoutSyncAccountInput[]
@@ -37792,6 +39326,12 @@ export namespace Prisma {
     connectOrCreate?: SyncConflictCreateOrConnectWithoutSyncAccountInput | SyncConflictCreateOrConnectWithoutSyncAccountInput[]
     createMany?: SyncConflictCreateManySyncAccountInputEnvelope
     connect?: SyncConflictWhereUniqueInput | SyncConflictWhereUniqueInput[]
+  }
+
+  export type TeamSyncAccountUncheckedCreateNestedOneWithoutSyncAccountInput = {
+    create?: XOR<TeamSyncAccountCreateWithoutSyncAccountInput, TeamSyncAccountUncheckedCreateWithoutSyncAccountInput>
+    connectOrCreate?: TeamSyncAccountCreateOrConnectWithoutSyncAccountInput
+    connect?: TeamSyncAccountWhereUniqueInput
   }
 
   export type EnumSyncProviderFieldUpdateOperationsInput = {
@@ -37856,6 +39396,16 @@ export namespace Prisma {
     deleteMany?: SyncConflictScalarWhereInput | SyncConflictScalarWhereInput[]
   }
 
+  export type TeamSyncAccountUpdateOneWithoutSyncAccountNestedInput = {
+    create?: XOR<TeamSyncAccountCreateWithoutSyncAccountInput, TeamSyncAccountUncheckedCreateWithoutSyncAccountInput>
+    connectOrCreate?: TeamSyncAccountCreateOrConnectWithoutSyncAccountInput
+    upsert?: TeamSyncAccountUpsertWithoutSyncAccountInput
+    disconnect?: TeamSyncAccountWhereInput | boolean
+    delete?: TeamSyncAccountWhereInput | boolean
+    connect?: TeamSyncAccountWhereUniqueInput
+    update?: XOR<XOR<TeamSyncAccountUpdateToOneWithWhereWithoutSyncAccountInput, TeamSyncAccountUpdateWithoutSyncAccountInput>, TeamSyncAccountUncheckedUpdateWithoutSyncAccountInput>
+  }
+
   export type SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput = {
     create?: XOR<SyncContactLinkCreateWithoutSyncAccountInput, SyncContactLinkUncheckedCreateWithoutSyncAccountInput> | SyncContactLinkCreateWithoutSyncAccountInput[] | SyncContactLinkUncheckedCreateWithoutSyncAccountInput[]
     connectOrCreate?: SyncContactLinkCreateOrConnectWithoutSyncAccountInput | SyncContactLinkCreateOrConnectWithoutSyncAccountInput[]
@@ -37896,6 +39446,16 @@ export namespace Prisma {
     update?: SyncConflictUpdateWithWhereUniqueWithoutSyncAccountInput | SyncConflictUpdateWithWhereUniqueWithoutSyncAccountInput[]
     updateMany?: SyncConflictUpdateManyWithWhereWithoutSyncAccountInput | SyncConflictUpdateManyWithWhereWithoutSyncAccountInput[]
     deleteMany?: SyncConflictScalarWhereInput | SyncConflictScalarWhereInput[]
+  }
+
+  export type TeamSyncAccountUncheckedUpdateOneWithoutSyncAccountNestedInput = {
+    create?: XOR<TeamSyncAccountCreateWithoutSyncAccountInput, TeamSyncAccountUncheckedCreateWithoutSyncAccountInput>
+    connectOrCreate?: TeamSyncAccountCreateOrConnectWithoutSyncAccountInput
+    upsert?: TeamSyncAccountUpsertWithoutSyncAccountInput
+    disconnect?: TeamSyncAccountWhereInput | boolean
+    delete?: TeamSyncAccountWhereInput | boolean
+    connect?: TeamSyncAccountWhereUniqueInput
+    update?: XOR<XOR<TeamSyncAccountUpdateToOneWithWhereWithoutSyncAccountInput, TeamSyncAccountUpdateWithoutSyncAccountInput>, TeamSyncAccountUncheckedUpdateWithoutSyncAccountInput>
   }
 
   export type SyncAccountCreateNestedOneWithoutSyncLinksInput = {
@@ -38134,6 +39694,13 @@ export namespace Prisma {
     connect?: GroupAddressBookWhereUniqueInput | GroupAddressBookWhereUniqueInput[]
   }
 
+  export type TeamSyncAccountCreateNestedManyWithoutGroupInput = {
+    create?: XOR<TeamSyncAccountCreateWithoutGroupInput, TeamSyncAccountUncheckedCreateWithoutGroupInput> | TeamSyncAccountCreateWithoutGroupInput[] | TeamSyncAccountUncheckedCreateWithoutGroupInput[]
+    connectOrCreate?: TeamSyncAccountCreateOrConnectWithoutGroupInput | TeamSyncAccountCreateOrConnectWithoutGroupInput[]
+    createMany?: TeamSyncAccountCreateManyGroupInputEnvelope
+    connect?: TeamSyncAccountWhereUniqueInput | TeamSyncAccountWhereUniqueInput[]
+  }
+
   export type GroupMemberUncheckedCreateNestedManyWithoutGroupInput = {
     create?: XOR<GroupMemberCreateWithoutGroupInput, GroupMemberUncheckedCreateWithoutGroupInput> | GroupMemberCreateWithoutGroupInput[] | GroupMemberUncheckedCreateWithoutGroupInput[]
     connectOrCreate?: GroupMemberCreateOrConnectWithoutGroupInput | GroupMemberCreateOrConnectWithoutGroupInput[]
@@ -38146,6 +39713,13 @@ export namespace Prisma {
     connectOrCreate?: GroupAddressBookCreateOrConnectWithoutGroupInput | GroupAddressBookCreateOrConnectWithoutGroupInput[]
     createMany?: GroupAddressBookCreateManyGroupInputEnvelope
     connect?: GroupAddressBookWhereUniqueInput | GroupAddressBookWhereUniqueInput[]
+  }
+
+  export type TeamSyncAccountUncheckedCreateNestedManyWithoutGroupInput = {
+    create?: XOR<TeamSyncAccountCreateWithoutGroupInput, TeamSyncAccountUncheckedCreateWithoutGroupInput> | TeamSyncAccountCreateWithoutGroupInput[] | TeamSyncAccountUncheckedCreateWithoutGroupInput[]
+    connectOrCreate?: TeamSyncAccountCreateOrConnectWithoutGroupInput | TeamSyncAccountCreateOrConnectWithoutGroupInput[]
+    createMany?: TeamSyncAccountCreateManyGroupInputEnvelope
+    connect?: TeamSyncAccountWhereUniqueInput | TeamSyncAccountWhereUniqueInput[]
   }
 
   export type EnumGroupTypeFieldUpdateOperationsInput = {
@@ -38198,6 +39772,20 @@ export namespace Prisma {
     deleteMany?: GroupAddressBookScalarWhereInput | GroupAddressBookScalarWhereInput[]
   }
 
+  export type TeamSyncAccountUpdateManyWithoutGroupNestedInput = {
+    create?: XOR<TeamSyncAccountCreateWithoutGroupInput, TeamSyncAccountUncheckedCreateWithoutGroupInput> | TeamSyncAccountCreateWithoutGroupInput[] | TeamSyncAccountUncheckedCreateWithoutGroupInput[]
+    connectOrCreate?: TeamSyncAccountCreateOrConnectWithoutGroupInput | TeamSyncAccountCreateOrConnectWithoutGroupInput[]
+    upsert?: TeamSyncAccountUpsertWithWhereUniqueWithoutGroupInput | TeamSyncAccountUpsertWithWhereUniqueWithoutGroupInput[]
+    createMany?: TeamSyncAccountCreateManyGroupInputEnvelope
+    set?: TeamSyncAccountWhereUniqueInput | TeamSyncAccountWhereUniqueInput[]
+    disconnect?: TeamSyncAccountWhereUniqueInput | TeamSyncAccountWhereUniqueInput[]
+    delete?: TeamSyncAccountWhereUniqueInput | TeamSyncAccountWhereUniqueInput[]
+    connect?: TeamSyncAccountWhereUniqueInput | TeamSyncAccountWhereUniqueInput[]
+    update?: TeamSyncAccountUpdateWithWhereUniqueWithoutGroupInput | TeamSyncAccountUpdateWithWhereUniqueWithoutGroupInput[]
+    updateMany?: TeamSyncAccountUpdateManyWithWhereWithoutGroupInput | TeamSyncAccountUpdateManyWithWhereWithoutGroupInput[]
+    deleteMany?: TeamSyncAccountScalarWhereInput | TeamSyncAccountScalarWhereInput[]
+  }
+
   export type GroupMemberUncheckedUpdateManyWithoutGroupNestedInput = {
     create?: XOR<GroupMemberCreateWithoutGroupInput, GroupMemberUncheckedCreateWithoutGroupInput> | GroupMemberCreateWithoutGroupInput[] | GroupMemberUncheckedCreateWithoutGroupInput[]
     connectOrCreate?: GroupMemberCreateOrConnectWithoutGroupInput | GroupMemberCreateOrConnectWithoutGroupInput[]
@@ -38224,6 +39812,20 @@ export namespace Prisma {
     update?: GroupAddressBookUpdateWithWhereUniqueWithoutGroupInput | GroupAddressBookUpdateWithWhereUniqueWithoutGroupInput[]
     updateMany?: GroupAddressBookUpdateManyWithWhereWithoutGroupInput | GroupAddressBookUpdateManyWithWhereWithoutGroupInput[]
     deleteMany?: GroupAddressBookScalarWhereInput | GroupAddressBookScalarWhereInput[]
+  }
+
+  export type TeamSyncAccountUncheckedUpdateManyWithoutGroupNestedInput = {
+    create?: XOR<TeamSyncAccountCreateWithoutGroupInput, TeamSyncAccountUncheckedCreateWithoutGroupInput> | TeamSyncAccountCreateWithoutGroupInput[] | TeamSyncAccountUncheckedCreateWithoutGroupInput[]
+    connectOrCreate?: TeamSyncAccountCreateOrConnectWithoutGroupInput | TeamSyncAccountCreateOrConnectWithoutGroupInput[]
+    upsert?: TeamSyncAccountUpsertWithWhereUniqueWithoutGroupInput | TeamSyncAccountUpsertWithWhereUniqueWithoutGroupInput[]
+    createMany?: TeamSyncAccountCreateManyGroupInputEnvelope
+    set?: TeamSyncAccountWhereUniqueInput | TeamSyncAccountWhereUniqueInput[]
+    disconnect?: TeamSyncAccountWhereUniqueInput | TeamSyncAccountWhereUniqueInput[]
+    delete?: TeamSyncAccountWhereUniqueInput | TeamSyncAccountWhereUniqueInput[]
+    connect?: TeamSyncAccountWhereUniqueInput | TeamSyncAccountWhereUniqueInput[]
+    update?: TeamSyncAccountUpdateWithWhereUniqueWithoutGroupInput | TeamSyncAccountUpdateWithWhereUniqueWithoutGroupInput[]
+    updateMany?: TeamSyncAccountUpdateManyWithWhereWithoutGroupInput | TeamSyncAccountUpdateManyWithWhereWithoutGroupInput[]
+    deleteMany?: TeamSyncAccountScalarWhereInput | TeamSyncAccountScalarWhereInput[]
   }
 
   export type GroupCreateNestedOneWithoutMembersInput = {
@@ -38277,11 +39879,25 @@ export namespace Prisma {
     connect?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
   }
 
+  export type TeamSyncAccountCreateNestedManyWithoutAddressBookInput = {
+    create?: XOR<TeamSyncAccountCreateWithoutAddressBookInput, TeamSyncAccountUncheckedCreateWithoutAddressBookInput> | TeamSyncAccountCreateWithoutAddressBookInput[] | TeamSyncAccountUncheckedCreateWithoutAddressBookInput[]
+    connectOrCreate?: TeamSyncAccountCreateOrConnectWithoutAddressBookInput | TeamSyncAccountCreateOrConnectWithoutAddressBookInput[]
+    createMany?: TeamSyncAccountCreateManyAddressBookInputEnvelope
+    connect?: TeamSyncAccountWhereUniqueInput | TeamSyncAccountWhereUniqueInput[]
+  }
+
   export type GroupContactUncheckedCreateNestedManyWithoutGroupAddressBookInput = {
     create?: XOR<GroupContactCreateWithoutGroupAddressBookInput, GroupContactUncheckedCreateWithoutGroupAddressBookInput> | GroupContactCreateWithoutGroupAddressBookInput[] | GroupContactUncheckedCreateWithoutGroupAddressBookInput[]
     connectOrCreate?: GroupContactCreateOrConnectWithoutGroupAddressBookInput | GroupContactCreateOrConnectWithoutGroupAddressBookInput[]
     createMany?: GroupContactCreateManyGroupAddressBookInputEnvelope
     connect?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
+  }
+
+  export type TeamSyncAccountUncheckedCreateNestedManyWithoutAddressBookInput = {
+    create?: XOR<TeamSyncAccountCreateWithoutAddressBookInput, TeamSyncAccountUncheckedCreateWithoutAddressBookInput> | TeamSyncAccountCreateWithoutAddressBookInput[] | TeamSyncAccountUncheckedCreateWithoutAddressBookInput[]
+    connectOrCreate?: TeamSyncAccountCreateOrConnectWithoutAddressBookInput | TeamSyncAccountCreateOrConnectWithoutAddressBookInput[]
+    createMany?: TeamSyncAccountCreateManyAddressBookInputEnvelope
+    connect?: TeamSyncAccountWhereUniqueInput | TeamSyncAccountWhereUniqueInput[]
   }
 
   export type GroupUpdateOneRequiredWithoutAddressBooksNestedInput = {
@@ -38306,6 +39922,20 @@ export namespace Prisma {
     deleteMany?: GroupContactScalarWhereInput | GroupContactScalarWhereInput[]
   }
 
+  export type TeamSyncAccountUpdateManyWithoutAddressBookNestedInput = {
+    create?: XOR<TeamSyncAccountCreateWithoutAddressBookInput, TeamSyncAccountUncheckedCreateWithoutAddressBookInput> | TeamSyncAccountCreateWithoutAddressBookInput[] | TeamSyncAccountUncheckedCreateWithoutAddressBookInput[]
+    connectOrCreate?: TeamSyncAccountCreateOrConnectWithoutAddressBookInput | TeamSyncAccountCreateOrConnectWithoutAddressBookInput[]
+    upsert?: TeamSyncAccountUpsertWithWhereUniqueWithoutAddressBookInput | TeamSyncAccountUpsertWithWhereUniqueWithoutAddressBookInput[]
+    createMany?: TeamSyncAccountCreateManyAddressBookInputEnvelope
+    set?: TeamSyncAccountWhereUniqueInput | TeamSyncAccountWhereUniqueInput[]
+    disconnect?: TeamSyncAccountWhereUniqueInput | TeamSyncAccountWhereUniqueInput[]
+    delete?: TeamSyncAccountWhereUniqueInput | TeamSyncAccountWhereUniqueInput[]
+    connect?: TeamSyncAccountWhereUniqueInput | TeamSyncAccountWhereUniqueInput[]
+    update?: TeamSyncAccountUpdateWithWhereUniqueWithoutAddressBookInput | TeamSyncAccountUpdateWithWhereUniqueWithoutAddressBookInput[]
+    updateMany?: TeamSyncAccountUpdateManyWithWhereWithoutAddressBookInput | TeamSyncAccountUpdateManyWithWhereWithoutAddressBookInput[]
+    deleteMany?: TeamSyncAccountScalarWhereInput | TeamSyncAccountScalarWhereInput[]
+  }
+
   export type GroupContactUncheckedUpdateManyWithoutGroupAddressBookNestedInput = {
     create?: XOR<GroupContactCreateWithoutGroupAddressBookInput, GroupContactUncheckedCreateWithoutGroupAddressBookInput> | GroupContactCreateWithoutGroupAddressBookInput[] | GroupContactUncheckedCreateWithoutGroupAddressBookInput[]
     connectOrCreate?: GroupContactCreateOrConnectWithoutGroupAddressBookInput | GroupContactCreateOrConnectWithoutGroupAddressBookInput[]
@@ -38318,6 +39948,62 @@ export namespace Prisma {
     update?: GroupContactUpdateWithWhereUniqueWithoutGroupAddressBookInput | GroupContactUpdateWithWhereUniqueWithoutGroupAddressBookInput[]
     updateMany?: GroupContactUpdateManyWithWhereWithoutGroupAddressBookInput | GroupContactUpdateManyWithWhereWithoutGroupAddressBookInput[]
     deleteMany?: GroupContactScalarWhereInput | GroupContactScalarWhereInput[]
+  }
+
+  export type TeamSyncAccountUncheckedUpdateManyWithoutAddressBookNestedInput = {
+    create?: XOR<TeamSyncAccountCreateWithoutAddressBookInput, TeamSyncAccountUncheckedCreateWithoutAddressBookInput> | TeamSyncAccountCreateWithoutAddressBookInput[] | TeamSyncAccountUncheckedCreateWithoutAddressBookInput[]
+    connectOrCreate?: TeamSyncAccountCreateOrConnectWithoutAddressBookInput | TeamSyncAccountCreateOrConnectWithoutAddressBookInput[]
+    upsert?: TeamSyncAccountUpsertWithWhereUniqueWithoutAddressBookInput | TeamSyncAccountUpsertWithWhereUniqueWithoutAddressBookInput[]
+    createMany?: TeamSyncAccountCreateManyAddressBookInputEnvelope
+    set?: TeamSyncAccountWhereUniqueInput | TeamSyncAccountWhereUniqueInput[]
+    disconnect?: TeamSyncAccountWhereUniqueInput | TeamSyncAccountWhereUniqueInput[]
+    delete?: TeamSyncAccountWhereUniqueInput | TeamSyncAccountWhereUniqueInput[]
+    connect?: TeamSyncAccountWhereUniqueInput | TeamSyncAccountWhereUniqueInput[]
+    update?: TeamSyncAccountUpdateWithWhereUniqueWithoutAddressBookInput | TeamSyncAccountUpdateWithWhereUniqueWithoutAddressBookInput[]
+    updateMany?: TeamSyncAccountUpdateManyWithWhereWithoutAddressBookInput | TeamSyncAccountUpdateManyWithWhereWithoutAddressBookInput[]
+    deleteMany?: TeamSyncAccountScalarWhereInput | TeamSyncAccountScalarWhereInput[]
+  }
+
+  export type GroupCreateNestedOneWithoutTeamSyncAccountsInput = {
+    create?: XOR<GroupCreateWithoutTeamSyncAccountsInput, GroupUncheckedCreateWithoutTeamSyncAccountsInput>
+    connectOrCreate?: GroupCreateOrConnectWithoutTeamSyncAccountsInput
+    connect?: GroupWhereUniqueInput
+  }
+
+  export type SyncAccountCreateNestedOneWithoutTeamLinkInput = {
+    create?: XOR<SyncAccountCreateWithoutTeamLinkInput, SyncAccountUncheckedCreateWithoutTeamLinkInput>
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutTeamLinkInput
+    connect?: SyncAccountWhereUniqueInput
+  }
+
+  export type GroupAddressBookCreateNestedOneWithoutTeamSyncAccountsInput = {
+    create?: XOR<GroupAddressBookCreateWithoutTeamSyncAccountsInput, GroupAddressBookUncheckedCreateWithoutTeamSyncAccountsInput>
+    connectOrCreate?: GroupAddressBookCreateOrConnectWithoutTeamSyncAccountsInput
+    connect?: GroupAddressBookWhereUniqueInput
+  }
+
+  export type GroupUpdateOneRequiredWithoutTeamSyncAccountsNestedInput = {
+    create?: XOR<GroupCreateWithoutTeamSyncAccountsInput, GroupUncheckedCreateWithoutTeamSyncAccountsInput>
+    connectOrCreate?: GroupCreateOrConnectWithoutTeamSyncAccountsInput
+    upsert?: GroupUpsertWithoutTeamSyncAccountsInput
+    connect?: GroupWhereUniqueInput
+    update?: XOR<XOR<GroupUpdateToOneWithWhereWithoutTeamSyncAccountsInput, GroupUpdateWithoutTeamSyncAccountsInput>, GroupUncheckedUpdateWithoutTeamSyncAccountsInput>
+  }
+
+  export type SyncAccountUpdateOneRequiredWithoutTeamLinkNestedInput = {
+    create?: XOR<SyncAccountCreateWithoutTeamLinkInput, SyncAccountUncheckedCreateWithoutTeamLinkInput>
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutTeamLinkInput
+    upsert?: SyncAccountUpsertWithoutTeamLinkInput
+    connect?: SyncAccountWhereUniqueInput
+    update?: XOR<XOR<SyncAccountUpdateToOneWithWhereWithoutTeamLinkInput, SyncAccountUpdateWithoutTeamLinkInput>, SyncAccountUncheckedUpdateWithoutTeamLinkInput>
+  }
+
+  export type GroupAddressBookUpdateOneRequiredWithoutTeamSyncAccountsNestedInput = {
+    create?: XOR<GroupAddressBookCreateWithoutTeamSyncAccountsInput, GroupAddressBookUncheckedCreateWithoutTeamSyncAccountsInput>
+    connectOrCreate?: GroupAddressBookCreateOrConnectWithoutTeamSyncAccountsInput
+    upsert?: GroupAddressBookUpsertWithoutTeamSyncAccountsInput
+    connect?: GroupAddressBookWhereUniqueInput
+    update?: XOR<XOR<GroupAddressBookUpdateToOneWithWhereWithoutTeamSyncAccountsInput, GroupAddressBookUpdateWithoutTeamSyncAccountsInput>, GroupAddressBookUncheckedUpdateWithoutTeamSyncAccountsInput>
   }
 
   export type GroupAddressBookCreateNestedOneWithoutContactsInput = {
@@ -39532,6 +41218,7 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
     syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
+    teamLink?: TeamSyncAccountCreateNestedOneWithoutSyncAccountInput
   }
 
   export type SyncAccountUncheckedCreateWithoutUserInput = {
@@ -39564,6 +41251,7 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
     syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
+    teamLink?: TeamSyncAccountUncheckedCreateNestedOneWithoutSyncAccountInput
   }
 
   export type SyncAccountCreateOrConnectWithoutUserInput = {
@@ -39723,6 +41411,7 @@ export namespace Prisma {
     subscription?: SubscriptionCreateNestedOneWithoutGroupsInput
     members?: GroupMemberCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookCreateNestedManyWithoutGroupInput
+    teamSyncAccounts?: TeamSyncAccountCreateNestedManyWithoutGroupInput
   }
 
   export type GroupUncheckedCreateWithoutOwnerInput = {
@@ -39737,6 +41426,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookUncheckedCreateNestedManyWithoutGroupInput
+    teamSyncAccounts?: TeamSyncAccountUncheckedCreateNestedManyWithoutGroupInput
   }
 
   export type GroupCreateOrConnectWithoutOwnerInput = {
@@ -39755,6 +41445,7 @@ export namespace Prisma {
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
@@ -39771,6 +41462,7 @@ export namespace Prisma {
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
@@ -40362,6 +42054,7 @@ export namespace Prisma {
     role?: EnumGroupRoleFilter<"GroupMember"> | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFilter<"GroupMember"> | $Enums.GroupInviteStatus
     canEdit?: BoolFilter<"GroupMember"> | boolean
+    addressBookPermissions?: JsonNullableFilter<"GroupMember">
     inviteToken?: StringNullableFilter<"GroupMember"> | string | null
     inviteExpiresAt?: DateTimeNullableFilter<"GroupMember"> | Date | string | null
     invitedAt?: DateTimeFilter<"GroupMember"> | Date | string
@@ -42057,6 +43750,7 @@ export namespace Prisma {
     owner: UserCreateNestedOneWithoutOwnedGroupsInput
     members?: GroupMemberCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookCreateNestedManyWithoutGroupInput
+    teamSyncAccounts?: TeamSyncAccountCreateNestedManyWithoutGroupInput
   }
 
   export type GroupUncheckedCreateWithoutSubscriptionInput = {
@@ -42071,6 +43765,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookUncheckedCreateNestedManyWithoutGroupInput
+    teamSyncAccounts?: TeamSyncAccountUncheckedCreateNestedManyWithoutGroupInput
   }
 
   export type GroupCreateOrConnectWithoutSubscriptionInput = {
@@ -43632,6 +45327,27 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type TeamSyncAccountCreateWithoutSyncAccountInput = {
+    id?: string
+    addedByUserId: string
+    createdAt?: Date | string
+    group: GroupCreateNestedOneWithoutTeamSyncAccountsInput
+    addressBook: GroupAddressBookCreateNestedOneWithoutTeamSyncAccountsInput
+  }
+
+  export type TeamSyncAccountUncheckedCreateWithoutSyncAccountInput = {
+    id?: string
+    groupId: string
+    addressBookId: string
+    addedByUserId: string
+    createdAt?: Date | string
+  }
+
+  export type TeamSyncAccountCreateOrConnectWithoutSyncAccountInput = {
+    where: TeamSyncAccountWhereUniqueInput
+    create: XOR<TeamSyncAccountCreateWithoutSyncAccountInput, TeamSyncAccountUncheckedCreateWithoutSyncAccountInput>
+  }
+
   export type UserUpsertWithoutSyncAccountsInput = {
     update: XOR<UserUpdateWithoutSyncAccountsInput, UserUncheckedUpdateWithoutSyncAccountsInput>
     create: XOR<UserCreateWithoutSyncAccountsInput, UserUncheckedCreateWithoutSyncAccountsInput>
@@ -43769,6 +45485,33 @@ export namespace Prisma {
     data: XOR<SyncConflictUpdateManyMutationInput, SyncConflictUncheckedUpdateManyWithoutSyncAccountInput>
   }
 
+  export type TeamSyncAccountUpsertWithoutSyncAccountInput = {
+    update: XOR<TeamSyncAccountUpdateWithoutSyncAccountInput, TeamSyncAccountUncheckedUpdateWithoutSyncAccountInput>
+    create: XOR<TeamSyncAccountCreateWithoutSyncAccountInput, TeamSyncAccountUncheckedCreateWithoutSyncAccountInput>
+    where?: TeamSyncAccountWhereInput
+  }
+
+  export type TeamSyncAccountUpdateToOneWithWhereWithoutSyncAccountInput = {
+    where?: TeamSyncAccountWhereInput
+    data: XOR<TeamSyncAccountUpdateWithoutSyncAccountInput, TeamSyncAccountUncheckedUpdateWithoutSyncAccountInput>
+  }
+
+  export type TeamSyncAccountUpdateWithoutSyncAccountInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    addedByUserId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    group?: GroupUpdateOneRequiredWithoutTeamSyncAccountsNestedInput
+    addressBook?: GroupAddressBookUpdateOneRequiredWithoutTeamSyncAccountsNestedInput
+  }
+
+  export type TeamSyncAccountUncheckedUpdateWithoutSyncAccountInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    groupId?: StringFieldUpdateOperationsInput | string
+    addressBookId?: StringFieldUpdateOperationsInput | string
+    addedByUserId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type SyncAccountCreateWithoutSyncLinksInput = {
     id?: string
     provider?: $Enums.SyncProvider
@@ -43799,6 +45542,7 @@ export namespace Prisma {
     user: UserCreateNestedOneWithoutSyncAccountsInput
     syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
+    teamLink?: TeamSyncAccountCreateNestedOneWithoutSyncAccountInput
   }
 
   export type SyncAccountUncheckedCreateWithoutSyncLinksInput = {
@@ -43831,6 +45575,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
+    teamLink?: TeamSyncAccountUncheckedCreateNestedOneWithoutSyncAccountInput
   }
 
   export type SyncAccountCreateOrConnectWithoutSyncLinksInput = {
@@ -44054,6 +45799,7 @@ export namespace Prisma {
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
     syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
+    teamLink?: TeamSyncAccountUpdateOneWithoutSyncAccountNestedInput
   }
 
   export type SyncAccountUncheckedUpdateWithoutSyncLinksInput = {
@@ -44086,6 +45832,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
+    teamLink?: TeamSyncAccountUncheckedUpdateOneWithoutSyncAccountNestedInput
   }
 
   export type ContactUpsertWithoutSyncLinksInput = {
@@ -44261,6 +46008,7 @@ export namespace Prisma {
     user: UserCreateNestedOneWithoutSyncAccountsInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
+    teamLink?: TeamSyncAccountCreateNestedOneWithoutSyncAccountInput
   }
 
   export type SyncAccountUncheckedCreateWithoutSyncJobsInput = {
@@ -44293,6 +46041,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
+    teamLink?: TeamSyncAccountUncheckedCreateNestedOneWithoutSyncAccountInput
   }
 
   export type SyncAccountCreateOrConnectWithoutSyncJobsInput = {
@@ -44341,6 +46090,7 @@ export namespace Prisma {
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
+    teamLink?: TeamSyncAccountUpdateOneWithoutSyncAccountNestedInput
   }
 
   export type SyncAccountUncheckedUpdateWithoutSyncJobsInput = {
@@ -44373,6 +46123,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
+    teamLink?: TeamSyncAccountUncheckedUpdateOneWithoutSyncAccountNestedInput
   }
 
   export type SyncAccountCreateWithoutSyncConflictsInput = {
@@ -44405,6 +46156,7 @@ export namespace Prisma {
     user: UserCreateNestedOneWithoutSyncAccountsInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
     syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
+    teamLink?: TeamSyncAccountCreateNestedOneWithoutSyncAccountInput
   }
 
   export type SyncAccountUncheckedCreateWithoutSyncConflictsInput = {
@@ -44437,6 +46189,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
     syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
+    teamLink?: TeamSyncAccountUncheckedCreateNestedOneWithoutSyncAccountInput
   }
 
   export type SyncAccountCreateOrConnectWithoutSyncConflictsInput = {
@@ -44670,6 +46423,7 @@ export namespace Prisma {
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
     syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
+    teamLink?: TeamSyncAccountUpdateOneWithoutSyncAccountNestedInput
   }
 
   export type SyncAccountUncheckedUpdateWithoutSyncConflictsInput = {
@@ -44702,6 +46456,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
+    teamLink?: TeamSyncAccountUncheckedUpdateOneWithoutSyncAccountNestedInput
   }
 
   export type SyncContactLinkUpsertWithoutSyncConflictsInput = {
@@ -45401,6 +47156,7 @@ export namespace Prisma {
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
@@ -45417,6 +47173,7 @@ export namespace Prisma {
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
@@ -45440,9 +47197,11 @@ export namespace Prisma {
     name: string
     description?: string | null
     isDefault?: boolean
+    archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: GroupContactCreateNestedManyWithoutGroupAddressBookInput
+    teamSyncAccounts?: TeamSyncAccountCreateNestedManyWithoutAddressBookInput
   }
 
   export type GroupAddressBookUncheckedCreateWithoutGroupInput = {
@@ -45450,9 +47209,11 @@ export namespace Prisma {
     name: string
     description?: string | null
     isDefault?: boolean
+    archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: GroupContactUncheckedCreateNestedManyWithoutGroupAddressBookInput
+    teamSyncAccounts?: TeamSyncAccountUncheckedCreateNestedManyWithoutAddressBookInput
   }
 
   export type GroupAddressBookCreateOrConnectWithoutGroupInput = {
@@ -45462,6 +47223,32 @@ export namespace Prisma {
 
   export type GroupAddressBookCreateManyGroupInputEnvelope = {
     data: GroupAddressBookCreateManyGroupInput | GroupAddressBookCreateManyGroupInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type TeamSyncAccountCreateWithoutGroupInput = {
+    id?: string
+    addedByUserId: string
+    createdAt?: Date | string
+    syncAccount: SyncAccountCreateNestedOneWithoutTeamLinkInput
+    addressBook: GroupAddressBookCreateNestedOneWithoutTeamSyncAccountsInput
+  }
+
+  export type TeamSyncAccountUncheckedCreateWithoutGroupInput = {
+    id?: string
+    syncAccountId: string
+    addressBookId: string
+    addedByUserId: string
+    createdAt?: Date | string
+  }
+
+  export type TeamSyncAccountCreateOrConnectWithoutGroupInput = {
+    where: TeamSyncAccountWhereUniqueInput
+    create: XOR<TeamSyncAccountCreateWithoutGroupInput, TeamSyncAccountUncheckedCreateWithoutGroupInput>
+  }
+
+  export type TeamSyncAccountCreateManyGroupInputEnvelope = {
+    data: TeamSyncAccountCreateManyGroupInput | TeamSyncAccountCreateManyGroupInput[]
     skipDuplicates?: boolean
   }
 
@@ -45646,8 +47433,37 @@ export namespace Prisma {
     name?: StringFilter<"GroupAddressBook"> | string
     description?: StringNullableFilter<"GroupAddressBook"> | string | null
     isDefault?: BoolFilter<"GroupAddressBook"> | boolean
+    archivedAt?: DateTimeNullableFilter<"GroupAddressBook"> | Date | string | null
     createdAt?: DateTimeFilter<"GroupAddressBook"> | Date | string
     updatedAt?: DateTimeFilter<"GroupAddressBook"> | Date | string
+  }
+
+  export type TeamSyncAccountUpsertWithWhereUniqueWithoutGroupInput = {
+    where: TeamSyncAccountWhereUniqueInput
+    update: XOR<TeamSyncAccountUpdateWithoutGroupInput, TeamSyncAccountUncheckedUpdateWithoutGroupInput>
+    create: XOR<TeamSyncAccountCreateWithoutGroupInput, TeamSyncAccountUncheckedCreateWithoutGroupInput>
+  }
+
+  export type TeamSyncAccountUpdateWithWhereUniqueWithoutGroupInput = {
+    where: TeamSyncAccountWhereUniqueInput
+    data: XOR<TeamSyncAccountUpdateWithoutGroupInput, TeamSyncAccountUncheckedUpdateWithoutGroupInput>
+  }
+
+  export type TeamSyncAccountUpdateManyWithWhereWithoutGroupInput = {
+    where: TeamSyncAccountScalarWhereInput
+    data: XOR<TeamSyncAccountUpdateManyMutationInput, TeamSyncAccountUncheckedUpdateManyWithoutGroupInput>
+  }
+
+  export type TeamSyncAccountScalarWhereInput = {
+    AND?: TeamSyncAccountScalarWhereInput | TeamSyncAccountScalarWhereInput[]
+    OR?: TeamSyncAccountScalarWhereInput[]
+    NOT?: TeamSyncAccountScalarWhereInput | TeamSyncAccountScalarWhereInput[]
+    id?: StringFilter<"TeamSyncAccount"> | string
+    groupId?: StringFilter<"TeamSyncAccount"> | string
+    syncAccountId?: StringFilter<"TeamSyncAccount"> | string
+    addressBookId?: StringFilter<"TeamSyncAccount"> | string
+    addedByUserId?: StringFilter<"TeamSyncAccount"> | string
+    createdAt?: DateTimeFilter<"TeamSyncAccount"> | Date | string
   }
 
   export type GroupCreateWithoutMembersInput = {
@@ -45662,6 +47478,7 @@ export namespace Prisma {
     owner: UserCreateNestedOneWithoutOwnedGroupsInput
     subscription?: SubscriptionCreateNestedOneWithoutGroupsInput
     addressBooks?: GroupAddressBookCreateNestedManyWithoutGroupInput
+    teamSyncAccounts?: TeamSyncAccountCreateNestedManyWithoutGroupInput
   }
 
   export type GroupUncheckedCreateWithoutMembersInput = {
@@ -45676,6 +47493,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     addressBooks?: GroupAddressBookUncheckedCreateNestedManyWithoutGroupInput
+    teamSyncAccounts?: TeamSyncAccountUncheckedCreateNestedManyWithoutGroupInput
   }
 
   export type GroupCreateOrConnectWithoutMembersInput = {
@@ -45759,6 +47577,7 @@ export namespace Prisma {
     owner?: UserUpdateOneRequiredWithoutOwnedGroupsNestedInput
     subscription?: SubscriptionUpdateOneWithoutGroupsNestedInput
     addressBooks?: GroupAddressBookUpdateManyWithoutGroupNestedInput
+    teamSyncAccounts?: TeamSyncAccountUpdateManyWithoutGroupNestedInput
   }
 
   export type GroupUncheckedUpdateWithoutMembersInput = {
@@ -45773,6 +47592,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     addressBooks?: GroupAddressBookUncheckedUpdateManyWithoutGroupNestedInput
+    teamSyncAccounts?: TeamSyncAccountUncheckedUpdateManyWithoutGroupNestedInput
   }
 
   export type UserUpsertWithoutGroupMembershipsInput = {
@@ -45846,6 +47666,7 @@ export namespace Prisma {
     owner: UserCreateNestedOneWithoutOwnedGroupsInput
     subscription?: SubscriptionCreateNestedOneWithoutGroupsInput
     members?: GroupMemberCreateNestedManyWithoutGroupInput
+    teamSyncAccounts?: TeamSyncAccountCreateNestedManyWithoutGroupInput
   }
 
   export type GroupUncheckedCreateWithoutAddressBooksInput = {
@@ -45860,6 +47681,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
+    teamSyncAccounts?: TeamSyncAccountUncheckedCreateNestedManyWithoutGroupInput
   }
 
   export type GroupCreateOrConnectWithoutAddressBooksInput = {
@@ -45893,6 +47715,32 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type TeamSyncAccountCreateWithoutAddressBookInput = {
+    id?: string
+    addedByUserId: string
+    createdAt?: Date | string
+    group: GroupCreateNestedOneWithoutTeamSyncAccountsInput
+    syncAccount: SyncAccountCreateNestedOneWithoutTeamLinkInput
+  }
+
+  export type TeamSyncAccountUncheckedCreateWithoutAddressBookInput = {
+    id?: string
+    groupId: string
+    syncAccountId: string
+    addedByUserId: string
+    createdAt?: Date | string
+  }
+
+  export type TeamSyncAccountCreateOrConnectWithoutAddressBookInput = {
+    where: TeamSyncAccountWhereUniqueInput
+    create: XOR<TeamSyncAccountCreateWithoutAddressBookInput, TeamSyncAccountUncheckedCreateWithoutAddressBookInput>
+  }
+
+  export type TeamSyncAccountCreateManyAddressBookInputEnvelope = {
+    data: TeamSyncAccountCreateManyAddressBookInput | TeamSyncAccountCreateManyAddressBookInput[]
+    skipDuplicates?: boolean
+  }
+
   export type GroupUpsertWithoutAddressBooksInput = {
     update: XOR<GroupUpdateWithoutAddressBooksInput, GroupUncheckedUpdateWithoutAddressBooksInput>
     create: XOR<GroupCreateWithoutAddressBooksInput, GroupUncheckedCreateWithoutAddressBooksInput>
@@ -45916,6 +47764,7 @@ export namespace Prisma {
     owner?: UserUpdateOneRequiredWithoutOwnedGroupsNestedInput
     subscription?: SubscriptionUpdateOneWithoutGroupsNestedInput
     members?: GroupMemberUpdateManyWithoutGroupNestedInput
+    teamSyncAccounts?: TeamSyncAccountUpdateManyWithoutGroupNestedInput
   }
 
   export type GroupUncheckedUpdateWithoutAddressBooksInput = {
@@ -45930,6 +47779,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
+    teamSyncAccounts?: TeamSyncAccountUncheckedUpdateManyWithoutGroupNestedInput
   }
 
   export type GroupContactUpsertWithWhereUniqueWithoutGroupAddressBookInput = {
@@ -45948,14 +47798,320 @@ export namespace Prisma {
     data: XOR<GroupContactUpdateManyMutationInput, GroupContactUncheckedUpdateManyWithoutGroupAddressBookInput>
   }
 
+  export type TeamSyncAccountUpsertWithWhereUniqueWithoutAddressBookInput = {
+    where: TeamSyncAccountWhereUniqueInput
+    update: XOR<TeamSyncAccountUpdateWithoutAddressBookInput, TeamSyncAccountUncheckedUpdateWithoutAddressBookInput>
+    create: XOR<TeamSyncAccountCreateWithoutAddressBookInput, TeamSyncAccountUncheckedCreateWithoutAddressBookInput>
+  }
+
+  export type TeamSyncAccountUpdateWithWhereUniqueWithoutAddressBookInput = {
+    where: TeamSyncAccountWhereUniqueInput
+    data: XOR<TeamSyncAccountUpdateWithoutAddressBookInput, TeamSyncAccountUncheckedUpdateWithoutAddressBookInput>
+  }
+
+  export type TeamSyncAccountUpdateManyWithWhereWithoutAddressBookInput = {
+    where: TeamSyncAccountScalarWhereInput
+    data: XOR<TeamSyncAccountUpdateManyMutationInput, TeamSyncAccountUncheckedUpdateManyWithoutAddressBookInput>
+  }
+
+  export type GroupCreateWithoutTeamSyncAccountsInput = {
+    id?: string
+    type: $Enums.GroupType
+    name: string
+    memberSlotsLimit?: number | null
+    maxMembers?: number
+    defaultAddressBookId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    owner: UserCreateNestedOneWithoutOwnedGroupsInput
+    subscription?: SubscriptionCreateNestedOneWithoutGroupsInput
+    members?: GroupMemberCreateNestedManyWithoutGroupInput
+    addressBooks?: GroupAddressBookCreateNestedManyWithoutGroupInput
+  }
+
+  export type GroupUncheckedCreateWithoutTeamSyncAccountsInput = {
+    id?: string
+    ownerId: string
+    type: $Enums.GroupType
+    name: string
+    subscriptionId?: string | null
+    memberSlotsLimit?: number | null
+    maxMembers?: number
+    defaultAddressBookId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
+    addressBooks?: GroupAddressBookUncheckedCreateNestedManyWithoutGroupInput
+  }
+
+  export type GroupCreateOrConnectWithoutTeamSyncAccountsInput = {
+    where: GroupWhereUniqueInput
+    create: XOR<GroupCreateWithoutTeamSyncAccountsInput, GroupUncheckedCreateWithoutTeamSyncAccountsInput>
+  }
+
+  export type SyncAccountCreateWithoutTeamLinkInput = {
+    id?: string
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutSyncAccountsInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
+    syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
+  }
+
+  export type SyncAccountUncheckedCreateWithoutTeamLinkInput = {
+    id?: string
+    userId: string
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
+    syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
+  }
+
+  export type SyncAccountCreateOrConnectWithoutTeamLinkInput = {
+    where: SyncAccountWhereUniqueInput
+    create: XOR<SyncAccountCreateWithoutTeamLinkInput, SyncAccountUncheckedCreateWithoutTeamLinkInput>
+  }
+
+  export type GroupAddressBookCreateWithoutTeamSyncAccountsInput = {
+    id?: string
+    name: string
+    description?: string | null
+    isDefault?: boolean
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    group: GroupCreateNestedOneWithoutAddressBooksInput
+    contacts?: GroupContactCreateNestedManyWithoutGroupAddressBookInput
+  }
+
+  export type GroupAddressBookUncheckedCreateWithoutTeamSyncAccountsInput = {
+    id?: string
+    groupId: string
+    name: string
+    description?: string | null
+    isDefault?: boolean
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contacts?: GroupContactUncheckedCreateNestedManyWithoutGroupAddressBookInput
+  }
+
+  export type GroupAddressBookCreateOrConnectWithoutTeamSyncAccountsInput = {
+    where: GroupAddressBookWhereUniqueInput
+    create: XOR<GroupAddressBookCreateWithoutTeamSyncAccountsInput, GroupAddressBookUncheckedCreateWithoutTeamSyncAccountsInput>
+  }
+
+  export type GroupUpsertWithoutTeamSyncAccountsInput = {
+    update: XOR<GroupUpdateWithoutTeamSyncAccountsInput, GroupUncheckedUpdateWithoutTeamSyncAccountsInput>
+    create: XOR<GroupCreateWithoutTeamSyncAccountsInput, GroupUncheckedCreateWithoutTeamSyncAccountsInput>
+    where?: GroupWhereInput
+  }
+
+  export type GroupUpdateToOneWithWhereWithoutTeamSyncAccountsInput = {
+    where?: GroupWhereInput
+    data: XOR<GroupUpdateWithoutTeamSyncAccountsInput, GroupUncheckedUpdateWithoutTeamSyncAccountsInput>
+  }
+
+  export type GroupUpdateWithoutTeamSyncAccountsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumGroupTypeFieldUpdateOperationsInput | $Enums.GroupType
+    name?: StringFieldUpdateOperationsInput | string
+    memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    maxMembers?: IntFieldUpdateOperationsInput | number
+    defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    owner?: UserUpdateOneRequiredWithoutOwnedGroupsNestedInput
+    subscription?: SubscriptionUpdateOneWithoutGroupsNestedInput
+    members?: GroupMemberUpdateManyWithoutGroupNestedInput
+    addressBooks?: GroupAddressBookUpdateManyWithoutGroupNestedInput
+  }
+
+  export type GroupUncheckedUpdateWithoutTeamSyncAccountsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ownerId?: StringFieldUpdateOperationsInput | string
+    type?: EnumGroupTypeFieldUpdateOperationsInput | $Enums.GroupType
+    name?: StringFieldUpdateOperationsInput | string
+    subscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    maxMembers?: IntFieldUpdateOperationsInput | number
+    defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
+    addressBooks?: GroupAddressBookUncheckedUpdateManyWithoutGroupNestedInput
+  }
+
+  export type SyncAccountUpsertWithoutTeamLinkInput = {
+    update: XOR<SyncAccountUpdateWithoutTeamLinkInput, SyncAccountUncheckedUpdateWithoutTeamLinkInput>
+    create: XOR<SyncAccountCreateWithoutTeamLinkInput, SyncAccountUncheckedCreateWithoutTeamLinkInput>
+    where?: SyncAccountWhereInput
+  }
+
+  export type SyncAccountUpdateToOneWithWhereWithoutTeamLinkInput = {
+    where?: SyncAccountWhereInput
+    data: XOR<SyncAccountUpdateWithoutTeamLinkInput, SyncAccountUncheckedUpdateWithoutTeamLinkInput>
+  }
+
+  export type SyncAccountUpdateWithoutTeamLinkInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
+    syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
+  }
+
+  export type SyncAccountUncheckedUpdateWithoutTeamLinkInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
+    syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
+  }
+
+  export type GroupAddressBookUpsertWithoutTeamSyncAccountsInput = {
+    update: XOR<GroupAddressBookUpdateWithoutTeamSyncAccountsInput, GroupAddressBookUncheckedUpdateWithoutTeamSyncAccountsInput>
+    create: XOR<GroupAddressBookCreateWithoutTeamSyncAccountsInput, GroupAddressBookUncheckedCreateWithoutTeamSyncAccountsInput>
+    where?: GroupAddressBookWhereInput
+  }
+
+  export type GroupAddressBookUpdateToOneWithWhereWithoutTeamSyncAccountsInput = {
+    where?: GroupAddressBookWhereInput
+    data: XOR<GroupAddressBookUpdateWithoutTeamSyncAccountsInput, GroupAddressBookUncheckedUpdateWithoutTeamSyncAccountsInput>
+  }
+
+  export type GroupAddressBookUpdateWithoutTeamSyncAccountsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    group?: GroupUpdateOneRequiredWithoutAddressBooksNestedInput
+    contacts?: GroupContactUpdateManyWithoutGroupAddressBookNestedInput
+  }
+
+  export type GroupAddressBookUncheckedUpdateWithoutTeamSyncAccountsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    groupId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: GroupContactUncheckedUpdateManyWithoutGroupAddressBookNestedInput
+  }
+
   export type GroupAddressBookCreateWithoutContactsInput = {
     id?: string
     name: string
     description?: string | null
     isDefault?: boolean
+    archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     group: GroupCreateNestedOneWithoutAddressBooksInput
+    teamSyncAccounts?: TeamSyncAccountCreateNestedManyWithoutAddressBookInput
   }
 
   export type GroupAddressBookUncheckedCreateWithoutContactsInput = {
@@ -45964,8 +48120,10 @@ export namespace Prisma {
     name: string
     description?: string | null
     isDefault?: boolean
+    archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    teamSyncAccounts?: TeamSyncAccountUncheckedCreateNestedManyWithoutAddressBookInput
   }
 
   export type GroupAddressBookCreateOrConnectWithoutContactsInput = {
@@ -46110,9 +48268,11 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     group?: GroupUpdateOneRequiredWithoutAddressBooksNestedInput
+    teamSyncAccounts?: TeamSyncAccountUpdateManyWithoutAddressBookNestedInput
   }
 
   export type GroupAddressBookUncheckedUpdateWithoutContactsInput = {
@@ -46121,8 +48281,10 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    teamSyncAccounts?: TeamSyncAccountUncheckedUpdateManyWithoutAddressBookNestedInput
   }
 
   export type ContactUpsertWithoutGroupContactsInput = {
@@ -47194,6 +49356,7 @@ export namespace Prisma {
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
@@ -47686,6 +49849,7 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
     syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
+    teamLink?: TeamSyncAccountUpdateOneWithoutSyncAccountNestedInput
   }
 
   export type SyncAccountUncheckedUpdateWithoutUserInput = {
@@ -47718,6 +49882,7 @@ export namespace Prisma {
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
+    teamLink?: TeamSyncAccountUncheckedUpdateOneWithoutSyncAccountNestedInput
   }
 
   export type SyncAccountUncheckedUpdateManyWithoutUserInput = {
@@ -47895,6 +50060,7 @@ export namespace Prisma {
     subscription?: SubscriptionUpdateOneWithoutGroupsNestedInput
     members?: GroupMemberUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUpdateManyWithoutGroupNestedInput
+    teamSyncAccounts?: TeamSyncAccountUpdateManyWithoutGroupNestedInput
   }
 
   export type GroupUncheckedUpdateWithoutOwnerInput = {
@@ -47909,6 +50075,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUncheckedUpdateManyWithoutGroupNestedInput
+    teamSyncAccounts?: TeamSyncAccountUncheckedUpdateManyWithoutGroupNestedInput
   }
 
   export type GroupUncheckedUpdateManyWithoutOwnerInput = {
@@ -47929,6 +50096,7 @@ export namespace Prisma {
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -47945,6 +50113,7 @@ export namespace Prisma {
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -47960,6 +50129,7 @@ export namespace Prisma {
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -49082,6 +51252,7 @@ export namespace Prisma {
     owner?: UserUpdateOneRequiredWithoutOwnedGroupsNestedInput
     members?: GroupMemberUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUpdateManyWithoutGroupNestedInput
+    teamSyncAccounts?: TeamSyncAccountUpdateManyWithoutGroupNestedInput
   }
 
   export type GroupUncheckedUpdateWithoutSubscriptionInput = {
@@ -49096,6 +51267,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUncheckedUpdateManyWithoutGroupNestedInput
+    teamSyncAccounts?: TeamSyncAccountUncheckedUpdateManyWithoutGroupNestedInput
   }
 
   export type GroupUncheckedUpdateManyWithoutSubscriptionInput = {
@@ -49729,6 +51901,7 @@ export namespace Prisma {
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
     invitedAt?: Date | string
@@ -49742,8 +51915,17 @@ export namespace Prisma {
     name: string
     description?: string | null
     isDefault?: boolean
+    archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+  }
+
+  export type TeamSyncAccountCreateManyGroupInput = {
+    id?: string
+    syncAccountId: string
+    addressBookId: string
+    addedByUserId: string
+    createdAt?: Date | string
   }
 
   export type GroupMemberUpdateWithoutGroupInput = {
@@ -49752,6 +51934,7 @@ export namespace Prisma {
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -49768,6 +51951,7 @@ export namespace Prisma {
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -49783,6 +51967,7 @@ export namespace Prisma {
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     invitedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -49796,9 +51981,11 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: GroupContactUpdateManyWithoutGroupAddressBookNestedInput
+    teamSyncAccounts?: TeamSyncAccountUpdateManyWithoutAddressBookNestedInput
   }
 
   export type GroupAddressBookUncheckedUpdateWithoutGroupInput = {
@@ -49806,9 +51993,11 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: GroupContactUncheckedUpdateManyWithoutGroupAddressBookNestedInput
+    teamSyncAccounts?: TeamSyncAccountUncheckedUpdateManyWithoutAddressBookNestedInput
   }
 
   export type GroupAddressBookUncheckedUpdateManyWithoutGroupInput = {
@@ -49816,8 +52005,33 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TeamSyncAccountUpdateWithoutGroupInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    addedByUserId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncAccount?: SyncAccountUpdateOneRequiredWithoutTeamLinkNestedInput
+    addressBook?: GroupAddressBookUpdateOneRequiredWithoutTeamSyncAccountsNestedInput
+  }
+
+  export type TeamSyncAccountUncheckedUpdateWithoutGroupInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: StringFieldUpdateOperationsInput | string
+    addressBookId?: StringFieldUpdateOperationsInput | string
+    addedByUserId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TeamSyncAccountUncheckedUpdateManyWithoutGroupInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: StringFieldUpdateOperationsInput | string
+    addressBookId?: StringFieldUpdateOperationsInput | string
+    addedByUserId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type GroupContactCreateManyGroupAddressBookInput = {
@@ -49826,6 +52040,14 @@ export namespace Prisma {
     addedByUserId: string
     createdAt?: Date | string
     updatedAt?: Date | string
+  }
+
+  export type TeamSyncAccountCreateManyAddressBookInput = {
+    id?: string
+    groupId: string
+    syncAccountId: string
+    addedByUserId: string
+    createdAt?: Date | string
   }
 
   export type GroupContactUpdateWithoutGroupAddressBookInput = {
@@ -49850,6 +52072,30 @@ export namespace Prisma {
     addedByUserId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TeamSyncAccountUpdateWithoutAddressBookInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    addedByUserId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    group?: GroupUpdateOneRequiredWithoutTeamSyncAccountsNestedInput
+    syncAccount?: SyncAccountUpdateOneRequiredWithoutTeamLinkNestedInput
+  }
+
+  export type TeamSyncAccountUncheckedUpdateWithoutAddressBookInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    groupId?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: StringFieldUpdateOperationsInput | string
+    addedByUserId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TeamSyncAccountUncheckedUpdateManyWithoutAddressBookInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    groupId?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: StringFieldUpdateOperationsInput | string
+    addedByUserId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 
