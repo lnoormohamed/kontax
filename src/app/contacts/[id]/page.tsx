@@ -15,6 +15,7 @@ import {
 } from "~/app/actions/shares";
 import { LastUpdatedBy } from "~/app/_components/last-updated-by";
 import { SourceBadge } from "~/app/_components/source-badge";
+import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import {
   archiveContact,
   permanentlyDeleteContact,
@@ -345,33 +346,47 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
             <div className="my-5 h-px bg-[#edf0ea]" />
 
             {/* quick actions */}
-            <div className="flex flex-wrap items-center gap-2">
+            <div className="flex items-center gap-1.5">
               {contact.phone ? (
                 <a
-                  className="rounded-[0.7rem] border border-[#d8ddd6] bg-white px-3 py-1.5 text-[13px] font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+                  aria-label="Call"
+                  className="grid h-9 w-9 place-items-center rounded-[0.7rem] border border-[#d8ddd6] bg-white text-[#5c655e] transition hover:bg-[#f2f4f0]"
                   href={`tel:${contact.phone}`}
+                  title="Call"
                 >
-                  Call
+                  <WorkspaceIcon name="phone" size={17} />
                 </a>
               ) : null}
               {contact.email ? (
                 <a
-                  className="rounded-[0.7rem] border border-[#d8ddd6] bg-white px-3 py-1.5 text-[13px] font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+                  aria-label="Email"
+                  className="grid h-9 w-9 place-items-center rounded-[0.7rem] border border-[#d8ddd6] bg-white text-[#5c655e] transition hover:bg-[#f2f4f0]"
                   href={`mailto:${contact.email}`}
+                  title="Email"
                 >
-                  Email
+                  <WorkspaceIcon name="mail" size={17} />
                 </a>
               ) : null}
               <form action={toggleFavoriteContact}>
                 <input name="contactId" type="hidden" value={contact.id} />
                 <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}`} />
                 <button
-                  className="rounded-[0.7rem] border border-[#d8ddd6] bg-white px-3 py-1.5 text-[13px] font-semibold text-[#e0a31c] transition hover:bg-[#f2f4f0]"
+                  aria-label={contact.isFavorite ? "Unfavorite" : "Favorite"}
+                  className="grid h-9 w-9 place-items-center rounded-[0.7rem] border border-[#d8ddd6] bg-white text-[#e0a31c] transition hover:bg-[#f2f4f0]"
+                  title="Favourite"
                   type="submit"
                 >
-                  {contact.isFavorite ? "★ Favorited" : "☆ Favorite"}
+                  <WorkspaceIcon fill={contact.isFavorite ? "#e0a31c" : "none"} name="star" size={17} />
                 </button>
               </form>
+              <Link
+                aria-label="Share"
+                className="grid h-9 w-9 place-items-center rounded-[0.7rem] border border-[#d8ddd6] bg-white text-[#5c655e] transition hover:bg-[#f2f4f0]"
+                href={`/contacts/${contact.id}?tab=sharing`}
+                title="Share"
+              >
+                <WorkspaceIcon name="share" size={17} />
+              </Link>
             </div>
 
             <div className="my-5 h-px bg-[#edf0ea] " />

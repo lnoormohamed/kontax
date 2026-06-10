@@ -122,16 +122,30 @@ function InlineField({
 
   const isArea = field.type === "area";
   const has = value.trim().length > 0;
+  const leftBorder = editing
+    ? "border-[#4158f4]"
+    : status === "saved"
+      ? "border-[#1f8a5b]"
+      : "border-transparent";
 
   return (
-    <div className="grid grid-cols-[120px_1fr] items-start gap-3 border-b border-[#edf0ea] px-1 py-2.5 last:border-b-0">
-      <span className="pt-1.5 text-[12px] font-medium text-[#8b938c]">{field.label}</span>
-      <div className="min-w-0">
+    <div
+      className={`gap-4 rounded-r-[6px] border-l-2 px-3 py-2 transition-colors ${leftBorder} ${
+        editing ? "bg-[#4158f4]/[0.045]" : ""
+      } ${isArea ? "block" : "flex items-start"}`}
+    >
+      <span
+        className={`shrink-0 text-[12.5px] text-[#5c655e] ${isArea ? "mb-1.5 block" : "w-[118px] pt-1.5"}`}
+      >
+        {field.label}
+        {!editable ? <span className="text-[11px] text-[#aeb4ac]"> · read-only</span> : null}
+      </span>
+      <div className="min-w-0 flex-1">
         {editing ? (
           isArea ? (
             <textarea
               autoFocus
-              className="w-full resize-y rounded-[0.6rem] border border-[#4158f4] bg-white px-2.5 py-1.5 text-sm text-[#1d2823] outline-none"
+              className="w-full resize-y rounded-[0.5rem] border border-[#4158f4] bg-white px-2.5 py-1.5 text-sm text-[#1d2823] outline-none"
               onBlur={() => void commit()}
               onChange={(e) => setDraft(e.target.value)}
               rows={4}
@@ -140,7 +154,7 @@ function InlineField({
           ) : (
             <input
               autoFocus
-              className="w-full rounded-[0.6rem] border border-[#4158f4] bg-white px-2.5 py-1.5 text-sm text-[#1d2823] outline-none"
+              className="w-full rounded-[0.5rem] border border-[#4158f4] bg-white px-2.5 py-1.5 text-sm text-[#1d2823] outline-none"
               onBlur={() => void commit()}
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={(e) => {
@@ -158,19 +172,17 @@ function InlineField({
           )
         ) : (
           <button
-            className={`w-full whitespace-pre-wrap break-words rounded-[0.6rem] px-2.5 py-1.5 text-left text-sm transition ${
-              editable ? "cursor-text hover:bg-[#f2f4f0]" : "cursor-default"
+            className={`-mx-1 w-[calc(100%+0.5rem)] whitespace-pre-wrap break-words rounded-[0.4rem] px-1 py-0.5 text-left text-sm transition ${
+              editable ? "cursor-text hover:bg-[#f6f7f4]" : "cursor-default"
             } ${has ? "text-[#1d2823]" : "italic text-[#aeb4ac]"}`}
             onClick={begin}
             type="button"
           >
-            {has ? value : editable ? "Add…" : "—"}
+            {has ? value : editable ? "Not added" : "—"}
           </button>
         )}
         {status === "saving" ? (
           <span className="ml-1 text-[11px] text-[#8b938c]">Saving…</span>
-        ) : status === "saved" ? (
-          <span className="ml-1 text-[11px] text-[#2f7d5b]">Saved ✓</span>
         ) : status === "error" ? (
           <span className="ml-1 text-[11px] text-[#b5472f]">Couldn&apos;t save</span>
         ) : null}
@@ -197,21 +209,24 @@ export function ContactInlineEditor({
       ) : null}
       {SECTIONS.map((section) => (
         <section
-          className="rounded-[1.2rem] border border-[#d8ddd6] bg-white p-4"
+          className="overflow-hidden rounded-[14px] border border-[#d8ddd6] bg-white"
           key={section.id}
         >
-          <h3 className="mb-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[#8b938c]">
+          <h3 className="px-5 pt-3.5 text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">
             {section.title}
           </h3>
-          {section.fields.map((field) => (
-            <InlineField
-              contactId={contact.id}
-              editable={editableShared || field.key === "notes"}
-              field={field}
-              initialValue={contact[field.key] ?? ""}
-              key={field.key}
-            />
-          ))}
+          <div className="mt-3 h-px bg-[#e9ece7]" />
+          <div className="px-2 pb-2.5 pt-1.5">
+            {section.fields.map((field) => (
+              <InlineField
+                contactId={contact.id}
+                editable={editableShared || field.key === "notes"}
+                field={field}
+                initialValue={contact[field.key] ?? ""}
+                key={field.key}
+              />
+            ))}
+          </div>
         </section>
       ))}
     </div>
