@@ -53,10 +53,11 @@ Build the two contact data surfaces to their **approved, locked designs** — th
 - Status: `In Progress`
 - Priority: `P0` — **blocks Phase 12 P12-05**
 - Dependencies: P10 (source tracking, per-contact history); design brief `02-contact-detail.md` (LOCKED)
-- Delivered so far (step 1 — chrome):
-  - Wrapped the detail page in the reusable **`AppShell`** (header + sidebar), so `/contacts/[id]` now keeps the global chrome instead of being a standalone page. Fetches account + live counts for the shell.
-- Remaining (step 2 — the locked-02 structure, larger):
-  - Two-pane layout (left rail 320px + right pane), **Details · Sharing · History** tabs (URL-driven via `?tab=`), left-rail badge cluster + metadata (source badge / last-edited already exist), **inline-edit** (auto-save on blur) replacing the current single big `updateContact` form, archive-first header (Share · Archive · ⋯ with Delete in the menu), and restyling the dark-green hero to the light system. The **Sharing tab** lands as a gated placeholder for P12-05 to fill.
+- Delivered so far:
+  - **Step 1 (chrome):** wrapped the detail page in the reusable **`AppShell`** (header + sidebar) with account + live counts — no longer a standalone page.
+  - **Step 2 (tabs + Sharing placeholder):** added **Details · Sharing · History** tabs (URL-driven via `?tab=`) below the persistent identity header. Details = the existing snapshot/edit/sync content; History = the `ContactHistory` feed; **Sharing = a gated "coming soon" placeholder** — the surface **P12-05** fills. This unblocks Phase 12's share-management-on-detail.
+- Remaining (step 3 — fuller locked-02 polish, lower urgency):
+  - True 320px left-rail two-pane (move identity/badges/metadata into a sticky rail), **inline-edit** (auto-save on blur) replacing the single big `updateContact` form, archive-first header (Share · Archive · ⋯ with Delete in the menu), and restyling the dark-green hero to the light system. Inline-edit is the heaviest piece and is best done as its own focused follow-up.
 - Implementation Notes:
   - **Master–detail shell**: render inside the persistent global sidebar/header (extract a reusable `AppShell` from the list's `contact-dashboard` chrome); the detail fills the content area. No standalone window.
   - **Left rail (320px):** avatar + favourite, name, title·company, birthday, the governed **badge cluster** (sharing → emergency → source, in that order), quick actions, and the metadata block (Added / Modified / UID / **Last edited by** + **Source badge**, both already built in P10).

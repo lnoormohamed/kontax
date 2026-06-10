@@ -167,6 +167,10 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
   const wasMergeUndone = mergeUndoneState === "1";
   const decisionParam = resolvedSearchParams?.decisionId;
   const decisionId = Array.isArray(decisionParam) ? decisionParam[0] : decisionParam;
+  const tabParam = resolvedSearchParams?.tab;
+  const tabValue = Array.isArray(tabParam) ? tabParam[0] : tabParam;
+  const detailTab: "details" | "sharing" | "history" =
+    tabValue === "sharing" || tabValue === "history" ? tabValue : "details";
   const userSettings = await db.user.findUnique({
     where: {
       id: session.user.id,
@@ -587,6 +591,30 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
           </div>
         ) : null}
 
+        {/* Details · Sharing · History tabs (P17-02) */}
+        <div className="flex items-center gap-1 border-b border-[#d8ddd6]">
+          {(
+            [
+              ["details", "Details"],
+              ["sharing", "Sharing"],
+              ["history", "History"],
+            ] as const
+          ).map(([key, label]) => (
+            <Link
+              className={`-mb-px border-b-2 px-4 py-2.5 text-sm font-semibold transition ${
+                detailTab === key
+                  ? "border-[#17352e] text-[#1d2823]"
+                  : "border-transparent text-[#8b938c] hover:text-[#5c655e]"
+              }`}
+              href={`/contacts/${contact.id}?tab=${key}`}
+              key={key}
+            >
+              {label}
+            </Link>
+          ))}
+        </div>
+
+        {detailTab === "details" ? (
         <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_360px]">
           <div className="grid gap-6">
             <section className={sectionCardClassName} id="contact-snapshot">
@@ -1355,7 +1383,23 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
             </div>
           </aside>
         </section>
+        ) : null}
 
+        {detailTab === "sharing" ? (
+          <section className={sectionCardClassName} id="contact-sharing">
+            <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">Sharing</p>
+            <h2 className="mt-1 text-lg font-semibold text-slate-900">Share this contact</h2>
+            <div className="mt-4 rounded-[1.4rem] border border-dashed border-[#d8ddd6] bg-[#f6f7f4] px-6 py-10 text-center">
+              <p className="text-sm font-semibold text-[#1d2823]">Sharing is coming soon</p>
+              <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#5c655e]">
+                You&apos;ll be able to add this contact to a family or team book, send a copy, or share
+                a live link that stays in sync. Until then, use Export to share a vCard.
+              </p>
+            </div>
+          </section>
+        ) : null}
+
+        {detailTab === "history" ? (
         <section className={sectionCardClassName} id="contact-history">
           <p className="text-xs font-semibold uppercase tracking-[0.24em] text-slate-400">History</p>
           <h2 className="mt-1 text-lg font-semibold text-slate-900">Activity</h2>
@@ -1366,6 +1410,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
             <ContactHistory contactId={contact.id} />
           </div>
         </section>
+        ) : null}
       </div>
     </AppShell>
   );
