@@ -26,7 +26,7 @@ Bring Kontax's contacts hub to small teams and organisations. A team can maintai
 | P14-05 | Done | P1 | P14-04, P10-01 |
 | P14-06 | Done | P1 | P14-04, P5-01, P7-03 |
 | P14-07 | Done | P1 | P14-05, P14-06 |
-| P14-08 | Not Started | P2 | P14-07 |
+| P14-08 | Done | P2 | P14-07 |
 | P14-09 | Not Started | P2 | P14-07, P9-04 |
 
 ---
@@ -190,7 +190,8 @@ Bring Kontax's contacts hub to small teams and organisations. A team can maintai
 ---
 
 ## P14-08 — Design brief: Teams plan surfaces
-- Status: `Not Started`
+- Status: `Done`
+- Shipped as-built brief `roadmap/design-briefs/14-teams-plan-surfaces.md` (admin vs member, management tabs, per-book permission matrix, audit log, workspace surfacing incl. the combined Family+Team four-scope case, professional tone, open questions).
 - Priority: `P2`
 - Dependencies: `P14-07`
 - Implementation Notes:
