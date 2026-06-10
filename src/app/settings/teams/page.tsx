@@ -2,12 +2,16 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import {
+  archiveTeamBook,
   createTeam,
+  createTeamBook,
   deleteTeam,
+  deleteTeamBook,
   inviteTeamMember,
   leaveTeam,
   removeTeamMember,
   resendTeamInvite,
+  setMemberBookPermission,
   setTeamMemberRole,
 } from "~/app/actions/teams";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
@@ -37,7 +41,10 @@ export default async function TeamSettingsPage() {
         orderBy: [{ role: "asc" }, { createdAt: "asc" }],
         include: { user: { select: { name: true, email: true } } },
       },
-      addressBooks: { where: { archivedAt: null }, select: { id: true, name: true } },
+      addressBooks: {
+        orderBy: { createdAt: "asc" },
+        select: { id: true, name: true, description: true, archivedAt: true },
+      },
     },
   });
 
@@ -144,6 +151,17 @@ export default async function TeamSettingsPage() {
   // Owner view — manage members + roles + invites
   const activeCount = ownedTeam.members.filter((m) => m.inviteStatus !== "DECLINED").length;
   const full = activeCount >= ownedTeam.maxMembers;
+  const activeBooks = ownedTeam.addressBooks.filter((b) => !b.archivedAt);
+  const regularMembers = ownedTeam.members.filter(
+    (m) => m.role === "MEMBER" && m.inviteStatus === "ACCEPTED",
+  );
+  const memberPerm = (m: (typeof ownedTeam.members)[number], bookId: string): string => {
+    const perms =
+      m.addressBookPermissions && typeof m.addressBookPermissions === "object"
+        ? (m.addressBookPermissions as Record<string, string>)
+        : {};
+    return perms[bookId] ?? "EDIT";
+  };
 
   return (
     <Shell>
@@ -152,8 +170,8 @@ export default async function TeamSettingsPage() {
           <p className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">Team</p>
           <h2 className="mt-1 text-[17px] font-semibold">{ownedTeam.name}</h2>
           <p className="mt-1 text-[13px] text-[#5c655e]">
-            {activeCount} of {ownedTeam.maxMembers} members · {ownedTeam.addressBooks.length} address
-            book{ownedTeam.addressBooks.length === 1 ? "" : "s"}
+            {activeCount} of {ownedTeam.maxMembers} members · {activeBooks.length} address
+            book{activeBooks.length === 1 ? "" : "s"}
           </p>
 
           <div className="mt-4 grid gap-2">
@@ -222,6 +240,112 @@ export default async function TeamSettingsPage() {
             })}
           </div>
         </section>
+
+        {/* Address books */}
+        <section className="rounded-[14px] border border-[#d8ddd6] bg-white p-5">
+          <p className="text-sm font-semibold text-[#1d2823]">Address books</p>
+          <p className="mt-1 text-[13px] text-[#8b938c]">
+            Organise team contacts into named books (e.g. Clients, Partners). Archived books are
+            read-only.
+          </p>
+          <div className="mt-3 grid gap-2">
+            {ownedTeam.addressBooks.map((b) => (
+              <div
+                className="flex items-center justify-between gap-3 border-b border-[#e9ece7] pb-2 text-[13px] last:border-b-0"
+                key={b.id}
+              >
+                <span className="min-w-0">
+                  <span className="text-[#1d2823]">{b.name}</span>
+                  {b.archivedAt ? <span className="text-[#8b938c]"> · archived</span> : null}
+                  {b.description ? (
+                    <span className="block text-[12px] text-[#8b938c]">{b.description}</span>
+                  ) : null}
+                </span>
+                <span className="flex shrink-0 items-center gap-3">
+                  <form action={archiveTeamBook}>
+                    <input name="bookId" type="hidden" value={b.id} />
+                    <button className="font-semibold text-[#4158f4]" type="submit">
+                      {b.archivedAt ? "Restore" : "Archive"}
+                    </button>
+                  </form>
+                  <form action={deleteTeamBook}>
+                    <input name="bookId" type="hidden" value={b.id} />
+                    <button className="font-semibold text-[#b5472f]" type="submit">
+                      Delete
+                    </button>
+                  </form>
+                </span>
+              </div>
+            ))}
+          </div>
+          <form action={createTeamBook} className="mt-3 flex flex-wrap items-center gap-2">
+            <input
+              className="min-w-[160px] flex-1 rounded-[9px] border border-[#d8ddd6] bg-white px-3 py-2 text-sm outline-none focus:border-[#4158f4]"
+              name="name"
+              placeholder="New book name"
+              required
+            />
+            <input
+              className="min-w-[160px] flex-1 rounded-[9px] border border-[#d8ddd6] bg-white px-3 py-2 text-sm outline-none focus:border-[#4158f4]"
+              name="description"
+              placeholder="Description (optional)"
+            />
+            <button
+              className="rounded-[9px] bg-[#4158f4] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3248db]"
+              type="submit"
+            >
+              Add book
+            </button>
+          </form>
+        </section>
+
+        {/* Per-book permissions (members only; owner/admin always full) */}
+        {regularMembers.length > 0 && activeBooks.length > 0 ? (
+          <section className="rounded-[14px] border border-[#d8ddd6] bg-white p-5">
+            <p className="text-sm font-semibold text-[#1d2823]">Book permissions</p>
+            <p className="mt-1 text-[13px] text-[#8b938c]">
+              Set what each member can do per book. Owners and admins always have full access.
+            </p>
+            <div className="mt-3 grid gap-4">
+              {regularMembers.map((m) => (
+                <div key={m.id}>
+                  <p className="text-[13px] font-semibold text-[#1d2823]">
+                    {m.user?.name?.trim() ?? m.user?.email ?? "Member"}
+                  </p>
+                  <div className="mt-1.5 grid gap-1.5">
+                    {activeBooks.map((b) => {
+                      const cur = memberPerm(m, b.id);
+                      return (
+                        <div className="flex items-center justify-between gap-3 text-[13px]" key={b.id}>
+                          <span className="min-w-0 truncate text-[#5c655e]">{b.name}</span>
+                          <span className="flex shrink-0 items-center gap-1">
+                            {(["EDIT", "VIEW", "NONE"] as const).map((perm) => (
+                              <form action={setMemberBookPermission} key={perm}>
+                                <input name="memberId" type="hidden" value={m.id} />
+                                <input name="bookId" type="hidden" value={b.id} />
+                                <input name="permission" type="hidden" value={perm} />
+                                <button
+                                  className={`rounded-[6px] px-2 py-1 text-[12px] font-semibold transition ${
+                                    cur === perm
+                                      ? "bg-[#17352e] text-white"
+                                      : "bg-[#f2f4f0] text-[#5c655e] hover:bg-[#e6e9e3]"
+                                  }`}
+                                  type="submit"
+                                >
+                                  {perm === "EDIT" ? "Edit" : perm === "VIEW" ? "View" : "None"}
+                                </button>
+                              </form>
+                            ))}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         <section className="rounded-[14px] border border-[#d8ddd6] bg-white p-5">
           <p className="text-sm font-semibold text-[#1d2823]">Invite a team member</p>

@@ -284,6 +284,110 @@ export const resendTeamInvite = async (formData: FormData) => {
   revalidatePath("/settings/teams");
 };
 
+// --- Address books (P14-03) -------------------------------------------------
+const requireManagedBook = async (userId: string, bookId: string) => {
+  const manageable = await getManageableTeam(userId);
+  if (!manageable) {
+    throw new Error("Only the team owner or an admin can manage address books.");
+  }
+  const book = await db.groupAddressBook.findFirst({
+    where: { id: bookId, groupId: manageable.team.id },
+  });
+  if (!book) {
+    throw new Error("Address book not found.");
+  }
+  return { book, team: manageable.team };
+};
+
+export const createTeamBook = async (formData: FormData) => {
+  const userId = await requireUserId();
+  const name = str(formData, "name");
+  const description = str(formData, "description") || null;
+  if (!name) {
+    throw new Error("Give the address book a name.");
+  }
+  const manageable = await getManageableTeam(userId);
+  if (!manageable) {
+    throw new Error("Only the team owner or an admin can create address books.");
+  }
+  await db.groupAddressBook.create({
+    data: { groupId: manageable.team.id, name, description, isDefault: false },
+  });
+  revalidatePath("/settings/teams");
+};
+
+export const renameTeamBook = async (formData: FormData) => {
+  const userId = await requireUserId();
+  const bookId = str(formData, "bookId");
+  const name = str(formData, "name");
+  const description = str(formData, "description") || null;
+  if (!name) {
+    throw new Error("Give the address book a name.");
+  }
+  await requireManagedBook(userId, bookId);
+  await db.groupAddressBook.update({ where: { id: bookId }, data: { name, description } });
+  revalidatePath("/settings/teams");
+};
+
+export const archiveTeamBook = async (formData: FormData) => {
+  const userId = await requireUserId();
+  const bookId = str(formData, "bookId");
+  const { book } = await requireManagedBook(userId, bookId);
+  await db.groupAddressBook.update({
+    where: { id: bookId },
+    data: { archivedAt: book.archivedAt ? null : new Date() },
+  });
+  revalidatePath("/settings/teams");
+};
+
+// Delete a book: soft-archive its contacts (audit trail) then drop the book.
+export const deleteTeamBook = async (formData: FormData) => {
+  const userId = await requireUserId();
+  const bookId = str(formData, "bookId");
+  await requireManagedBook(userId, bookId);
+  const links = await db.groupContact.findMany({
+    where: { groupAddressBookId: bookId },
+    select: { contactId: true },
+  });
+  const contactIds = links.map((l) => l.contactId);
+  await db.$transaction(async (tx) => {
+    if (contactIds.length > 0) {
+      await tx.contact.updateMany({
+        where: { id: { in: contactIds } },
+        data: { archivedAt: new Date(), syncTombstoneAt: new Date() },
+      });
+    }
+    await tx.groupAddressBook.delete({ where: { id: bookId } });
+  });
+  revalidatePath("/settings/teams");
+};
+
+// Set a member's permission (EDIT | VIEW | NONE) for one book.
+export const setMemberBookPermission = async (formData: FormData) => {
+  const userId = await requireUserId();
+  const memberId = str(formData, "memberId");
+  const bookId = str(formData, "bookId");
+  const permission = str(formData, "permission");
+  if (!["EDIT", "VIEW", "NONE"].includes(permission)) {
+    throw new Error("Unknown permission.");
+  }
+  const { member } = await requireManagedMember(userId, memberId);
+  await requireManagedBook(userId, bookId);
+  if (member.role !== "MEMBER") {
+    throw new Error("Owners and admins always have full access.");
+  }
+  const current =
+    member.addressBookPermissions && typeof member.addressBookPermissions === "object"
+      ? (member.addressBookPermissions as Record<string, string>)
+      : {};
+  const next = { ...current, [bookId]: permission };
+  await db.groupMember.update({
+    where: { id: member.id },
+    data: { addressBookPermissions: next },
+  });
+  revalidatePath("/settings/teams");
+};
+
 export const leaveTeam = async (formData: FormData) => {
   const userId = await requireUserId();
   const groupId = str(formData, "groupId");

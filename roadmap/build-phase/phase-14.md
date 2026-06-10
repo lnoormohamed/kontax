@@ -21,7 +21,7 @@ Bring Kontax's contacts hub to small teams and organisations. A team can maintai
 | --- | --- | --- | --- |
 | P14-01 | Done | P0 | P13-01 |
 | P14-02 | Done | P0 | P14-01 |
-| P14-03 | Not Started | P0 | P14-01 |
+| P14-03 | Done | P0 | P14-01 |
 | P14-04 | Not Started | P1 | P14-02, P14-03, P10-01, P10-02 |
 | P14-05 | Not Started | P1 | P14-04, P10-01 |
 | P14-06 | Not Started | P1 | P14-04, P5-01, P7-03 |
@@ -81,7 +81,8 @@ Bring Kontax's contacts hub to small teams and organisations. A team can maintai
 ---
 
 ## P14-03 — Multiple shared address books
-- Status: `Not Started`
+- Status: `Done`
+- Workspace tab/section presentation of multiple books is handled in P14-07; this ticket ships the books CRUD, per-book permissions, and the create-contact book selector.
 - Priority: `P0`
 - Dependencies: `P14-01`
 - Implementation Notes:

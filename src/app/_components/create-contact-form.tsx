@@ -115,10 +115,16 @@ function MultiValue({
   );
 }
 
-export function CreateContactForm({ familyBookName }: { familyBookName?: string | null }) {
+export function CreateContactForm({
+  familyBookName,
+  teamBooks = [],
+}: {
+  familyBookName?: string | null;
+  teamBooks?: { id: string; name: string }[];
+}) {
   const [mode, setMode] = useState<"person" | "org">("person");
   const [showMore, setShowMore] = useState(false);
-  const [target, setTarget] = useState<"private" | "family">("private");
+  const [target, setTarget] = useState<string>("private");
 
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
@@ -228,17 +234,16 @@ export function CreateContactForm({ familyBookName }: { familyBookName?: string 
         </div>
 
         <div className="mx-auto grid w-full max-w-[600px] gap-5 px-4 py-7 lg:px-0">
-          {/* save-to target (Family plan members only) */}
-          {familyBookName ? (
-            <div className="flex items-center justify-center gap-2 text-[13px]">
+          {/* save-to target (Family / Team members) */}
+          {familyBookName || teamBooks.length > 0 ? (
+            <div className="flex flex-wrap items-center justify-center gap-2 text-[13px]">
               <span className="text-[#8b938c]">Save to</span>
-              <div className="inline-flex rounded-[0.7rem] bg-[#f2f4f0] p-0.5 font-semibold">
-                {(
-                  [
-                    ["private", "Private"],
-                    ["family", familyBookName],
-                  ] as const
-                ).map(([key, label]) => (
+              <div className="inline-flex flex-wrap rounded-[0.7rem] bg-[#f2f4f0] p-0.5 font-semibold">
+                {[
+                  { key: "private", label: "Private" },
+                  ...(familyBookName ? [{ key: "family", label: familyBookName }] : []),
+                  ...teamBooks.map((b) => ({ key: `team:${b.id}`, label: b.name })),
+                ].map(({ key, label }) => (
                   <button
                     className={`rounded-[0.55rem] px-3 py-1 transition ${
                       target === key ? "bg-white text-[#1d2823] shadow-sm" : "text-[#8b938c]"

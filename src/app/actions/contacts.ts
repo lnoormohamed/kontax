@@ -19,6 +19,7 @@ import {
   getSharedEditAttribution,
   getUserFamilyMembership,
 } from "~/server/family-access";
+import { canEditTeamBook } from "~/server/team-access";
 import { emitEvent } from "~/lib/activity";
 import { computeContactDiff } from "~/lib/activity/diff";
 import { applyAutoFilledPhoneticFields } from "~/server/phonetics";
@@ -492,40 +493,56 @@ export const createContact = async (formData: FormData) => {
   });
   const phoneticFields = applyAutoFilledPhoneticFields(input, userSettings?.autoFillPhoneticNames ?? false);
 
-  // Family (P13-05): "Save to → Family" creates the contact in the shared book.
-  // A shared contact is owned (nominally) by the group owner; the creating
-  // member must have canEdit. Falls back to a private contact otherwise.
-  const targetFamily = (formData.get("target") === "family");
-  const familyTarget = targetFamily ? await getUserFamilyMembership(userId) : null;
-  const useFamily = Boolean(familyTarget?.canEdit && familyTarget?.bookId);
+  // Shared-book target (P13-05 family + P14-03 teams): "Save to → {book}" creates
+  // the contact in a shared book. A shared contact is owned (nominally) by the
+  // group owner; the creating member must have edit rights. Falls back to a
+  // private contact otherwise. target = "private" | "family" | "team:<bookId>".
+  const targetRaw = formData.get("target");
+  const target = typeof targetRaw === "string" ? targetRaw : "private";
+  let bookTarget: { bookId: string; ownerId: string; label: string } | null = null;
+  if (target === "family") {
+    const fam = await getUserFamilyMembership(userId);
+    if (fam?.canEdit && fam.bookId) {
+      const group = await db.group.findUnique({
+        where: { id: fam.groupId },
+        select: { ownerId: true },
+      });
+      if (group) bookTarget = { bookId: fam.bookId, ownerId: group.ownerId, label: `${fam.groupName} (family book)` };
+    }
+  } else if (target.startsWith("team:")) {
+    const bookId = target.slice(5);
+    if (await canEditTeamBook(userId, bookId)) {
+      const book = await db.groupAddressBook.findUnique({
+        where: { id: bookId },
+        select: { name: true, group: { select: { ownerId: true, name: true } } },
+      });
+      if (book) {
+        bookTarget = {
+          bookId,
+          ownerId: book.group.ownerId,
+          label: `${book.group.name} · ${book.name}`,
+        };
+      }
+    }
+  }
 
-  if (!useFamily) {
+  if (!bookTarget) {
     await assertCanCreateContacts(userId);
   }
 
   const createdContact = await db.$transaction(async (tx) => {
-    let ownerId = userId;
-    if (useFamily && familyTarget) {
-      const group = await tx.group.findUnique({
-        where: { id: familyTarget.groupId },
-        select: { ownerId: true },
-      });
-      ownerId = group?.ownerId ?? userId;
-    }
     const contact = await tx.contact.create({
       data: {
-        userId: ownerId,
+        userId: bookTarget?.ownerId ?? userId,
         ...input,
         ...phoneticFields,
-        ...(useFamily && familyTarget
-          ? { sourceDetail: `${familyTarget.groupName} (family book)` }
-          : {}),
+        ...(bookTarget ? { sourceDetail: bookTarget.label } : {}),
       },
     });
-    if (useFamily && familyTarget?.bookId) {
+    if (bookTarget) {
       await tx.groupContact.create({
         data: {
-          groupAddressBookId: familyTarget.bookId,
+          groupAddressBookId: bookTarget.bookId,
           contactId: contact.id,
           addedByUserId: userId,
         },
@@ -536,7 +553,7 @@ export const createContact = async (formData: FormData) => {
       contactId: contact.id,
       eventType: "CONTACT_CREATED",
       actor: "USER",
-      payload: useFamily && familyTarget ? { familyBook: familyTarget.groupName } : {},
+      payload: bookTarget ? { sharedBook: bookTarget.label } : {},
     });
     return contact;
   });

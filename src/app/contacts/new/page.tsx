@@ -6,6 +6,7 @@ import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
 import { db } from "~/server/db";
 import { getUserFamilyMembership } from "~/server/family-access";
+import { getAccessibleTeamBooks } from "~/server/team-access";
 
 export default async function NewContactPage() {
   const session = await auth();
@@ -24,9 +25,15 @@ export default async function NewContactPage() {
       db.mergeSuggestion.count({ where: { userId, status: "OPEN" } }),
     ]);
 
-  const familyMembership = await getUserFamilyMembership(userId);
+  const [familyMembership, teamBooks] = await Promise.all([
+    getUserFamilyMembership(userId),
+    getAccessibleTeamBooks(userId),
+  ]);
   const familyTarget =
     familyMembership?.canEdit && familyMembership.bookId ? familyMembership.groupName : null;
+  const editableTeamBooks = teamBooks
+    .filter((b) => b.permission === "EDIT")
+    .map((b) => ({ id: b.id, name: b.name }));
 
   const name = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
 
@@ -40,7 +47,7 @@ export default async function NewContactPage() {
         duplicates: duplicatesCount,
       }}
     >
-      <CreateContactForm familyBookName={familyTarget} />
+      <CreateContactForm familyBookName={familyTarget} teamBooks={editableTeamBooks} />
     </AppShell>
   );
 }
