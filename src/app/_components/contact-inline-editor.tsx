@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { updateContactField } from "~/app/actions/contacts";
@@ -229,6 +230,140 @@ function GroupLabel({ children }: { children: React.ReactNode }) {
 
 const groupDivider = <div className="mx-[11px] my-0.5 h-px bg-[#e9ece7]" />;
 
+// ── Read-mode presentational pieces ─────────────────────────────────────────
+const nonEmpty = (v: string | null | undefined) => (v ?? "").trim().length > 0;
+
+const formatAddress = (a: AddressEntry) =>
+  [a.street, [a.city, a.state].filter(Boolean).join(", "), a.postcode, a.country]
+    .filter((x) => x.trim().length > 0)
+    .join("\n");
+
+function ReadRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div className="flex items-start gap-4 py-[9px] pl-[11px] pr-3">
+      <span className="w-[118px] shrink-0 pt-px text-[12.5px] leading-[1.45] text-[#5c655e]">{label}</span>
+      <div className="min-w-0 flex-1 whitespace-pre-wrap break-words text-sm leading-[1.45] text-[#1d2823]">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/** Read-only view of the contact — empty fields, groups, and sections are hidden. */
+function ContactReadView({
+  contact,
+  entries,
+}: {
+  contact: InlineEditorContact;
+  entries: ContactEntries;
+}) {
+  const identityRows = IDENTITY_FIELDS.filter((f) => nonEmpty(contact[f.key]));
+  const workRows = WORK_FIELDS.filter((f) => nonEmpty(contact[f.key]));
+  const emails = entries.emails.filter((e) => nonEmpty(e.value));
+  const phones = entries.phones.filter((e) => nonEmpty(e.value));
+  const websites = entries.websites.filter((e) => nonEmpty(e.value));
+  const dates = entries.dates.filter((e) => nonEmpty(e.value));
+  const related = entries.related.filter((e) => nonEmpty(e.value));
+  const addresses = entries.addresses.filter((a) => formatAddress(a).trim().length > 0);
+  const hasMethods = emails.length + phones.length + websites.length > 0;
+  const hasPersonal = nonEmpty(contact.birthday) || addresses.length + related.length + dates.length > 0;
+
+  const simpleRows = (items: SimpleEntry[]) =>
+    items.map((e, i) => (
+      <ReadRow key={`${e.label}-${i}`} label={e.label}>
+        {e.value}
+      </ReadRow>
+    ));
+
+  return (
+    <div className="grid gap-4">
+      <SectionCard title="Identity">
+        {identityRows.map((f) => (
+          <ReadRow key={f.key} label={f.label}>
+            {f.display === "date" ? formatDateDisplay(contact[f.key] ?? "") : contact[f.key]}
+          </ReadRow>
+        ))}
+      </SectionCard>
+
+      {hasMethods ? (
+        <SectionCard title="Contact methods">
+          {simpleRows(emails)}
+          {phones.length > 0 && emails.length > 0 ? groupDivider : null}
+          {simpleRows(phones)}
+          {websites.length > 0 && emails.length + phones.length > 0 ? groupDivider : null}
+          {simpleRows(websites)}
+        </SectionCard>
+      ) : null}
+
+      {workRows.length > 0 ? (
+        <SectionCard title="Work">
+          {workRows.map((f) => (
+            <ReadRow key={f.key} label={f.label}>
+              {contact[f.key]}
+            </ReadRow>
+          ))}
+        </SectionCard>
+      ) : null}
+
+      {hasPersonal ? (
+        <SectionCard title="Personal">
+          {nonEmpty(contact.birthday) ? (
+            <ReadRow label="Birthday">{formatDateDisplay(contact.birthday ?? "")}</ReadRow>
+          ) : null}
+          {addresses.length > 0 ? (
+            <>
+              <GroupLabel>Addresses</GroupLabel>
+              {addresses.map((a, i) => (
+                <ReadRow key={`addr-${i}`} label={a.label || "Address"}>
+                  {formatAddress(a)}
+                </ReadRow>
+              ))}
+            </>
+          ) : null}
+          {related.length > 0 ? (
+            <>
+              <GroupLabel>Related people</GroupLabel>
+              {simpleRows(related)}
+            </>
+          ) : null}
+          {dates.length > 0 ? (
+            <>
+              <GroupLabel>Significant dates</GroupLabel>
+              {dates.map((e, i) => (
+                <ReadRow key={`date-${i}`} label={e.label}>
+                  {formatDateDisplay(e.value)}
+                </ReadRow>
+              ))}
+            </>
+          ) : null}
+        </SectionCard>
+      ) : null}
+
+      {nonEmpty(contact.notes) ? (
+        <SectionCard title="Notes">
+          <ReadRow label="">{contact.notes}</ReadRow>
+        </SectionCard>
+      ) : null}
+    </div>
+  );
+}
+
+function PencilIcon() {
+  return (
+    <svg fill="none" height={15} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.8} viewBox="0 0 24 24" width={15}>
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z" />
+    </svg>
+  );
+}
+function CheckIcon() {
+  return (
+    <svg fill="none" height={15} stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} viewBox="0 0 24 24" width={15}>
+      <path d="M20 6 9 17l-5-5" />
+    </svg>
+  );
+}
+
 export type ContactEntries = {
   emails: SimpleEntry[];
   phones: SimpleEntry[];
@@ -249,6 +384,13 @@ export function ContactInlineEditor({
   editableShared: boolean;
 }) {
   const editable = editableShared;
+  const router = useRouter();
+  const [mode, setMode] = useState<"read" | "edit">("read");
+  const done = () => {
+    setMode("read");
+    router.refresh();
+  };
+
   return (
     <div className="grid gap-4">
       {!editableShared ? (
@@ -258,7 +400,37 @@ export function ContactInlineEditor({
         </p>
       ) : null}
 
-      <SectionCard title="Identity">
+      {/* read / edit toggle */}
+      <div className="flex items-center justify-between">
+        <span className="text-[13px] font-semibold text-[#5c655e]">
+          {mode === "read" ? "Contact details" : "Editing details"}
+        </span>
+        {mode === "read" ? (
+          <button
+            className="inline-flex items-center gap-1.5 rounded-lg border border-[#d8ddd6] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#1d2823] transition hover:bg-[#f6f7f4]"
+            onClick={() => setMode("edit")}
+            type="button"
+          >
+            <PencilIcon />
+            Edit
+          </button>
+        ) : (
+          <button
+            className="inline-flex items-center gap-1.5 rounded-lg bg-[#17352e] px-3.5 py-2 text-[13px] font-semibold text-white transition hover:bg-[#20443b]"
+            onClick={done}
+            type="button"
+          >
+            <CheckIcon />
+            Done
+          </button>
+        )}
+      </div>
+
+      {mode === "read" ? (
+        <ContactReadView contact={contact} entries={entries} />
+      ) : (
+        <div className="grid gap-4">
+          <SectionCard title="Identity">
         {IDENTITY_FIELDS.map((field) => (
           <InlineField
             contactId={contact.id}
@@ -347,14 +519,16 @@ export function ContactInlineEditor({
         />
       </SectionCard>
 
-      <SectionCard title="Notes">
-        <InlineField
-          contactId={contact.id}
-          editable
-          field={{ key: "notes", label: "Notes", type: "area" }}
-          initialValue={contact.notes ?? ""}
-        />
-      </SectionCard>
+          <SectionCard title="Notes">
+            <InlineField
+              contactId={contact.id}
+              editable
+              field={{ key: "notes", label: "Notes", type: "area" }}
+              initialValue={contact.notes ?? ""}
+            />
+          </SectionCard>
+        </div>
+      )}
     </div>
   );
 }
