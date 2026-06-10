@@ -192,6 +192,15 @@ This roadmap is the implementation source of truth for phases 1–16. Each phase
 | P16-06 | 16 | Done | P1 | P16-02 | Unassigned | Duplicates pair cards + Archived restore/delete in new shell |
 | P16-07 | 16 | Done | P1 | P16-02 | Unassigned | Mobile cozy fallback + bottom nav; tablet drops Company column |
 
+### Phase 17 — Contact Detail & Create Rebuild (locked 02 / 03) — P17-02 before Phase 12 P12-05
+
+| Ticket | Phase | Status | Priority | Depends On | Owner | Acceptance |
+| --- | --- | --- | --- | --- | --- | --- |
+| P17-01 | 17 | Done | P1 | P8, brief 03 | Unassigned | `/contacts/new` rebuilt to brief 03 (flat icon-column form, person/org, show-more, sticky bar, locked palette); create flow intact |
+| P17-02 | 17 | Not Started | P0 | P10, brief 02; **blocks P12-05** | Unassigned | `/contacts/[id]` rebuilt to locked 02 (master-detail shell, left rail, Details·Sharing·History tabs, inline edit, archive-first header); Sharing tab a gated placeholder |
+
+> **Build-order note:** P17-02 (detail rebuild) is sequenced **before Phase 12's P12-05** (share-management-UI-on-detail) for the same reason Phase 16 precedes 10–15 — P12-05 layers the Sharing tab onto the detail. P17-01 (create) is dependency-free; build anytime.
+
 ## Dependency Map
 
 **Phases 1–8 (foundation)**
