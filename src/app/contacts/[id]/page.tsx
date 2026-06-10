@@ -986,16 +986,9 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
         ) : null}
 
         {detailTab === "history" ? (
-        <section className={sectionCardClassName} id="contact-history">
-          <p className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">History</p>
-          <h2 className="mt-1 text-[17px] font-semibold text-[#1d2823]">Activity</h2>
-          <p className="mt-1 text-sm text-[#5c655e]">
-            Every change to this contact — edits, imports, merges, and sync — in reverse order.
-          </p>
-          <div className="mt-4 overflow-hidden rounded-[1.4rem] border border-[#e9ece7] bg-white">
+          <div id="contact-history">
             <ContactHistory contactId={contact.id} />
           </div>
-        </section>
         ) : null}
             </div>
           </main>
