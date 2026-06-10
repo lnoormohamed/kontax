@@ -591,6 +591,7 @@ const INLINE_EDITABLE_FIELDS = new Set<string>([
   "phoneticCompany",
   "company",
   "jobTitle",
+  "department",
   "email",
   "phone",
   "website",

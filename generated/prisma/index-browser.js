@@ -165,6 +165,7 @@ exports.Prisma.ContactScalarFieldEnum = {
   company: 'company',
   phoneticCompany: 'phoneticCompany',
   jobTitle: 'jobTitle',
+  department: 'department',
   website: 'website',
   birthday: 'birthday',
   address: 'address',

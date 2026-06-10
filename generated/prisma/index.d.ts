@@ -5961,6 +5961,7 @@ export namespace Prisma {
     company: string | null
     phoneticCompany: string | null
     jobTitle: string | null
+    department: string | null
     website: string | null
     birthday: string | null
     address: string | null
@@ -5998,6 +5999,7 @@ export namespace Prisma {
     company: string | null
     phoneticCompany: string | null
     jobTitle: string | null
+    department: string | null
     website: string | null
     birthday: string | null
     address: string | null
@@ -6035,6 +6037,7 @@ export namespace Prisma {
     company: number
     phoneticCompany: number
     jobTitle: number
+    department: number
     website: number
     birthday: number
     address: number
@@ -6093,6 +6096,7 @@ export namespace Prisma {
     company?: true
     phoneticCompany?: true
     jobTitle?: true
+    department?: true
     website?: true
     birthday?: true
     address?: true
@@ -6130,6 +6134,7 @@ export namespace Prisma {
     company?: true
     phoneticCompany?: true
     jobTitle?: true
+    department?: true
     website?: true
     birthday?: true
     address?: true
@@ -6167,6 +6172,7 @@ export namespace Prisma {
     company?: true
     phoneticCompany?: true
     jobTitle?: true
+    department?: true
     website?: true
     birthday?: true
     address?: true
@@ -6302,6 +6308,7 @@ export namespace Prisma {
     company: string | null
     phoneticCompany: string | null
     jobTitle: string | null
+    department: string | null
     website: string | null
     birthday: string | null
     address: string | null
@@ -6369,6 +6376,7 @@ export namespace Prisma {
     company?: boolean
     phoneticCompany?: boolean
     jobTitle?: boolean
+    department?: boolean
     website?: boolean
     birthday?: boolean
     address?: boolean
@@ -6429,6 +6437,7 @@ export namespace Prisma {
     company?: boolean
     phoneticCompany?: boolean
     jobTitle?: boolean
+    department?: boolean
     website?: boolean
     birthday?: boolean
     address?: boolean
@@ -6480,6 +6489,7 @@ export namespace Prisma {
     company?: boolean
     phoneticCompany?: boolean
     jobTitle?: boolean
+    department?: boolean
     website?: boolean
     birthday?: boolean
     address?: boolean
@@ -6531,6 +6541,7 @@ export namespace Prisma {
     company?: boolean
     phoneticCompany?: boolean
     jobTitle?: boolean
+    department?: boolean
     website?: boolean
     birthday?: boolean
     address?: boolean
@@ -6557,7 +6568,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ContactOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "importJobId" | "mergedIntoContactId" | "syncUid" | "syncVersion" | "syncTombstoneAt" | "fullName" | "firstName" | "middleName" | "lastName" | "phoneticFirstName" | "phoneticLastName" | "namePrefix" | "nameSuffix" | "nickname" | "email" | "phone" | "company" | "phoneticCompany" | "jobTitle" | "website" | "birthday" | "address" | "avatarUrl" | "isFavorite" | "labels" | "websiteEntries" | "emailAddresses" | "phoneNumbers" | "postalAddresses" | "emailEntries" | "phoneEntries" | "addressEntries" | "significantDates" | "relatedPeople" | "customFields" | "notes" | "sourceType" | "sourceDetail" | "lastMutatedBy" | "lastMutatedByDetail" | "archivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["contact"]>
+  export type ContactOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "importJobId" | "mergedIntoContactId" | "syncUid" | "syncVersion" | "syncTombstoneAt" | "fullName" | "firstName" | "middleName" | "lastName" | "phoneticFirstName" | "phoneticLastName" | "namePrefix" | "nameSuffix" | "nickname" | "email" | "phone" | "company" | "phoneticCompany" | "jobTitle" | "department" | "website" | "birthday" | "address" | "avatarUrl" | "isFavorite" | "labels" | "websiteEntries" | "emailAddresses" | "phoneNumbers" | "postalAddresses" | "emailEntries" | "phoneEntries" | "addressEntries" | "significantDates" | "relatedPeople" | "customFields" | "notes" | "sourceType" | "sourceDetail" | "lastMutatedBy" | "lastMutatedByDetail" | "archivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["contact"]>
   export type ContactInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     importJob?: boolean | Contact$importJobArgs<ExtArgs>
@@ -6620,6 +6631,7 @@ export namespace Prisma {
       company: string | null
       phoneticCompany: string | null
       jobTitle: string | null
+      department: string | null
       website: string | null
       birthday: string | null
       address: string | null
@@ -7099,6 +7111,7 @@ export namespace Prisma {
     readonly company: FieldRef<"Contact", 'String'>
     readonly phoneticCompany: FieldRef<"Contact", 'String'>
     readonly jobTitle: FieldRef<"Contact", 'String'>
+    readonly department: FieldRef<"Contact", 'String'>
     readonly website: FieldRef<"Contact", 'String'>
     readonly birthday: FieldRef<"Contact", 'String'>
     readonly address: FieldRef<"Contact", 'String'>
@@ -26673,6 +26686,7 @@ export namespace Prisma {
     company: 'company',
     phoneticCompany: 'phoneticCompany',
     jobTitle: 'jobTitle',
+    department: 'department',
     website: 'website',
     birthday: 'birthday',
     address: 'address',
@@ -27770,6 +27784,7 @@ export namespace Prisma {
     company?: StringNullableFilter<"Contact"> | string | null
     phoneticCompany?: StringNullableFilter<"Contact"> | string | null
     jobTitle?: StringNullableFilter<"Contact"> | string | null
+    department?: StringNullableFilter<"Contact"> | string | null
     website?: StringNullableFilter<"Contact"> | string | null
     birthday?: StringNullableFilter<"Contact"> | string | null
     address?: StringNullableFilter<"Contact"> | string | null
@@ -27829,6 +27844,7 @@ export namespace Prisma {
     company?: SortOrderInput | SortOrder
     phoneticCompany?: SortOrderInput | SortOrder
     jobTitle?: SortOrderInput | SortOrder
+    department?: SortOrderInput | SortOrder
     website?: SortOrderInput | SortOrder
     birthday?: SortOrderInput | SortOrder
     address?: SortOrderInput | SortOrder
@@ -27891,6 +27907,7 @@ export namespace Prisma {
     company?: StringNullableFilter<"Contact"> | string | null
     phoneticCompany?: StringNullableFilter<"Contact"> | string | null
     jobTitle?: StringNullableFilter<"Contact"> | string | null
+    department?: StringNullableFilter<"Contact"> | string | null
     website?: StringNullableFilter<"Contact"> | string | null
     birthday?: StringNullableFilter<"Contact"> | string | null
     address?: StringNullableFilter<"Contact"> | string | null
@@ -27950,6 +27967,7 @@ export namespace Prisma {
     company?: SortOrderInput | SortOrder
     phoneticCompany?: SortOrderInput | SortOrder
     jobTitle?: SortOrderInput | SortOrder
+    department?: SortOrderInput | SortOrder
     website?: SortOrderInput | SortOrder
     birthday?: SortOrderInput | SortOrder
     address?: SortOrderInput | SortOrder
@@ -28006,6 +28024,7 @@ export namespace Prisma {
     company?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     phoneticCompany?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     jobTitle?: StringNullableWithAggregatesFilter<"Contact"> | string | null
+    department?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     website?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     birthday?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     address?: StringNullableWithAggregatesFilter<"Contact"> | string | null
@@ -29973,6 +29992,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -30032,6 +30052,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -30085,6 +30106,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30144,6 +30166,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30200,6 +30223,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -30245,6 +30269,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30293,6 +30318,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -32709,6 +32735,7 @@ export namespace Prisma {
     company?: SortOrder
     phoneticCompany?: SortOrder
     jobTitle?: SortOrder
+    department?: SortOrder
     website?: SortOrder
     birthday?: SortOrder
     address?: SortOrder
@@ -32761,6 +32788,7 @@ export namespace Prisma {
     company?: SortOrder
     phoneticCompany?: SortOrder
     jobTitle?: SortOrder
+    department?: SortOrder
     website?: SortOrder
     birthday?: SortOrder
     address?: SortOrder
@@ -32798,6 +32826,7 @@ export namespace Prisma {
     company?: SortOrder
     phoneticCompany?: SortOrder
     jobTitle?: SortOrder
+    department?: SortOrder
     website?: SortOrder
     birthday?: SortOrder
     address?: SortOrder
@@ -37250,6 +37279,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -37307,6 +37337,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -37977,6 +38008,7 @@ export namespace Prisma {
     company?: StringNullableFilter<"Contact"> | string | null
     phoneticCompany?: StringNullableFilter<"Contact"> | string | null
     jobTitle?: StringNullableFilter<"Contact"> | string | null
+    department?: StringNullableFilter<"Contact"> | string | null
     website?: StringNullableFilter<"Contact"> | string | null
     birthday?: StringNullableFilter<"Contact"> | string | null
     address?: StringNullableFilter<"Contact"> | string | null
@@ -39089,6 +39121,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -39147,6 +39180,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -39204,6 +39238,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -39261,6 +39296,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -39586,6 +39622,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -39644,6 +39681,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40191,6 +40229,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -40248,6 +40287,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -40551,6 +40591,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -40609,6 +40650,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -40666,6 +40708,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -40724,6 +40767,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -40889,6 +40933,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40947,6 +40992,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -41010,6 +41056,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -41068,6 +41115,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -41757,6 +41805,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -41815,6 +41864,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -42012,6 +42062,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -42070,6 +42121,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -42388,6 +42440,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -42446,6 +42499,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -42659,6 +42713,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -42717,6 +42772,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -42855,6 +42911,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -42913,6 +42970,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -43040,6 +43098,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -43098,6 +43157,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -43807,6 +43867,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -43865,6 +43926,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -43975,6 +44037,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -44033,6 +44096,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -44160,6 +44224,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -44218,6 +44283,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -44340,6 +44406,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -44398,6 +44465,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -44462,6 +44530,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -44741,6 +44810,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -44798,6 +44868,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -44853,6 +44924,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -45733,6 +45805,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -46153,6 +46226,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -46210,6 +46284,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -46265,6 +46340,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -46494,6 +46570,7 @@ export namespace Prisma {
     company?: string | null
     phoneticCompany?: string | null
     jobTitle?: string | null
+    department?: string | null
     website?: string | null
     birthday?: string | null
     address?: string | null
@@ -46539,6 +46616,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -46596,6 +46674,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null
@@ -46651,6 +46730,7 @@ export namespace Prisma {
     company?: NullableStringFieldUpdateOperationsInput | string | null
     phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
     jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
     website?: NullableStringFieldUpdateOperationsInput | string | null
     birthday?: NullableStringFieldUpdateOperationsInput | string | null
     address?: NullableStringFieldUpdateOperationsInput | string | null

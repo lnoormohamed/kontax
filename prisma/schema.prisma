@@ -243,6 +243,7 @@ model Contact {
     company     String?
     phoneticCompany String?
     jobTitle    String?
+    department  String?
     website     String?
     birthday    String?
     address     String?

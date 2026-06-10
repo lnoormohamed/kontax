@@ -24,6 +24,7 @@ export type InlineEditorContact = {
   phoneticCompany: string | null;
   company: string | null;
   jobTitle: string | null;
+  department: string | null;
   email: string | null;
   phone: string | null;
   website: string | null;
@@ -71,15 +72,16 @@ const IDENTITY_FIELDS: FieldDef[] = [
   { key: "lastName", label: "Last name" },
   { key: "namePrefix", label: "Prefix" },
   { key: "nameSuffix", label: "Suffix" },
-  { key: "nickname", label: "Nickname" },
   { key: "phoneticFirstName", label: "Phonetic first" },
   { key: "phoneticLastName", label: "Phonetic last" },
+  { key: "nickname", label: "Nickname" },
 ];
 
 const WORK_FIELDS: FieldDef[] = [
   { key: "company", label: "Company" },
-  { key: "jobTitle", label: "Job title" },
   { key: "phoneticCompany", label: "Phonetic company" },
+  { key: "jobTitle", label: "Job title" },
+  { key: "department", label: "Department" },
 ];
 
 function InlineField({

@@ -110,6 +110,7 @@ const main = async () => {
       company: "Orbit Health",
       phoneticCompany: "OR-bit",
       jobTitle: "Chief Medical Officer",
+      department: "Clinical Leadership",
       website: "https://orbit.health/team/amara",
       websiteEntries: [
         { label: "Company", value: "https://orbit.health/team/amara" },
