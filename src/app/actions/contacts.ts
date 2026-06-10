@@ -573,6 +573,74 @@ export const updateContact = async (formData: FormData) => {
   redirect(redirectTo ?? `/contacts/${contactId}?saved=1`);
 };
 
+// Inline single-field edit with auto-save (P17-02 step 3c). Whitelisted scalar
+// fields only; updates one field, logs the diff, and propagates live shares.
+const INLINE_EDITABLE_FIELDS = new Set<string>([
+  "fullName",
+  "firstName",
+  "middleName",
+  "lastName",
+  "namePrefix",
+  "nameSuffix",
+  "nickname",
+  "phoneticFirstName",
+  "phoneticLastName",
+  "phoneticCompany",
+  "company",
+  "jobTitle",
+  "email",
+  "phone",
+  "website",
+  "birthday",
+  "address",
+  "notes",
+]);
+
+export const updateContactField = async (contactId: string, field: string, rawValue: string) => {
+  const userId = await getRequiredUserId();
+  if (!INLINE_EDITABLE_FIELDS.has(field)) {
+    throw new Error("That field can't be edited inline.");
+  }
+  const trimmed = rawValue.trim();
+  if (field === "fullName" && trimmed.length === 0) {
+    throw new Error("Name can't be empty.");
+  }
+  const newValue =
+    field === "email" ? trimmed.toLowerCase() || null : trimmed.length > 0 ? trimmed : null;
+
+  await db.$transaction(async (tx) => {
+    const before = await tx.contact.findFirst({ where: { id: contactId, userId } });
+    if (!before) {
+      throw new Error("Contact not found.");
+    }
+    if ((before as Record<string, unknown>)[field] === newValue) {
+      return;
+    }
+    const after = await tx.contact.update({
+      where: { id: contactId },
+      data: {
+        [field]: field === "fullName" ? trimmed : newValue,
+        lastMutatedBy: "MANUAL",
+        lastMutatedByDetail: null,
+        syncVersion: { increment: 1 },
+      },
+    });
+    const diffs = computeContactDiff(before, after);
+    if (diffs.length > 0) {
+      await emitEvent(tx, {
+        userId,
+        contactId,
+        eventType: "CONTACT_UPDATED",
+        actor: "USER",
+        payload: { diffs },
+      });
+    }
+    await propagateLiveShares(tx, userId, contactId);
+  });
+
+  revalidateContactViews(contactId);
+};
+
 export const toggleFavoriteContact = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const contactId = parseContactId(formData);

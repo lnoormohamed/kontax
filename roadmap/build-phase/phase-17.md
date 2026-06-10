@@ -17,7 +17,7 @@ Build the two contact data surfaces to their **approved, locked designs** — th
 | Ticket | Status | Priority | Depends On |
 | --- | --- | --- | --- |
 | P17-01 | Done | P1 | P8 (contact model), 03 brief |
-| P17-02 | In Progress | P0 | P10 (source/history), 02 brief; **blocks P12-05** |
+| P17-02 | Done | P0 | P10 (source/history), 02 brief; **blocks P12-05** |
 
 ---
 
@@ -50,7 +50,7 @@ Build the two contact data surfaces to their **approved, locked designs** — th
 ---
 
 ## P17-02 — Rebuild the Contact Detail page (`/contacts/[id]`) to locked brief 02
-- Status: `In Progress`
+- Status: `Done`
 - Priority: `P0` — **blocks Phase 12 P12-05**
 - Dependencies: P10 (source tracking, per-contact history); design brief `02-contact-detail.md` (LOCKED)
 - Delivered so far:
@@ -58,8 +58,8 @@ Build the two contact data surfaces to their **approved, locked designs** — th
   - **Step 2 (tabs + Sharing placeholder):** added **Details · Sharing · History** tabs (URL-driven via `?tab=`). Details = existing snapshot/edit/sync; History = `ContactHistory`; Sharing = filled by P12-05. (Now hosts the full vCard/static/live share management.)
   - **Step 3a (light restyle + archive-first header):** replaced the dark-green hero with a light identity treatment and archive-first actions.
   - **Step 3b (two-pane layout — matches the locked mock):** restructured to the locked design — a **slim sticky sub-header** (← Contacts · centered name · Share · Archive/Restore · ⋯ with Delete), a **sticky 320px left rail** (88px avatar + favourite star, name, job·company, birthday, source badge + Archived chip, quick actions Call/Email/Favourite, and the Added/Modified/UID/Last-edited metadata block), and a **right pane** (max-w-820) holding the Details · Sharing · History tabs + content. White canvas, locked palette.
-- Remaining (step 3c — inline edit, own follow-up):
-  - **Inline-edit** (click-to-edit, auto-save on blur) replacing the single big `updateContact` Save-button form in the Details tab — the largest interaction rewrite. The Save-button edit form remains until then; the layout/structure now matches the mock.
+  - **Step 3c (inline edit):** replaced the big Save-button `updateContact` form with the locked **click-to-edit, auto-save-on-blur** model — new `ContactInlineEditor` client component (grouped Identity / Contact methods / Work / Personal / Notes section cards; each field click→input, save on blur/Enter, cancel on Escape, with Saving/Saved status). Backed by a focused `updateContactField` server action (whitelisted scalar fields, logs the diff, propagates live shares). Live-received contacts show shared fields **read-only** with **notes still editable**. The Details tab also keeps a compact read-only **Sync** card. Removed ~750 lines of dead edit-form code (the `/contacts/[id]` bundle dropped 198 kB → 6 kB). tsc + lint + build clean.
+- **P17-02 complete.** (A future nicety: inline multi-value editing for emails/phones/addresses lists — currently the primary scalar values are inline-editable; the multi-value arrays display via the rest of the app. Not in the locked-02 critical path.)
 - Implementation Notes:
   - **Master–detail shell**: render inside the persistent global sidebar/header (extract a reusable `AppShell` from the list's `contact-dashboard` chrome); the detail fills the content area. No standalone window.
   - **Left rail (320px):** avatar + favourite, name, title·company, birthday, the governed **badge cluster** (sharing → emergency → source, in that order), quick actions, and the metadata block (Added / Modified / UID / **Last edited by** + **Source badge**, both already built in P10).
