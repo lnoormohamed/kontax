@@ -407,7 +407,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
 
   return (
     <AppShell account={shellAccount} counts={shellCounts}>
-      <div className="min-h-full bg-white text-[#1d2823]">
+      <div className="min-h-screen bg-white text-[#1d2823]">
         {/* slim sticky sub-header (back · name · Share/Archive/Favorite/⋯) */}
         <div className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-[#d8ddd6] bg-white/95 px-4 backdrop-blur lg:px-6">
           <Link
