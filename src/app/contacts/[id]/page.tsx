@@ -14,6 +14,7 @@ import {
   archiveContact,
   permanentlyDeleteContact,
   restoreContact,
+  toggleEmergencyContact,
   toggleFavoriteContact,
 } from "~/app/actions/contacts";
 import { auth } from "~/server/auth";
@@ -270,6 +271,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
       addressEntries: true,
       avatarUrl: true,
       isFavorite: true,
+      isEmergency: true,
       labels: true,
       significantDates: true,
       relatedPeople: true,
@@ -449,7 +451,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
         <div className="flex bg-white">
           {/* left rail (sticky) */}
           <aside
-            className="hidden w-[320px] shrink-0 self-start border-r border-[#d8ddd6] bg-white p-6 lg:block"
+            className="hidden w-[320px] shrink-0 self-start bg-white p-6 lg:block"
             style={{ position: "sticky", top: 56 }}
           >
             {(() => {
@@ -485,6 +487,12 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
 
             <div className="mt-3.5 flex flex-wrap gap-2">
               <SourceBadge sourceType={contact.sourceType} sourceDetail={contact.sourceDetail} />
+              {contact.isEmergency ? (
+                <span className="inline-flex items-center gap-1 rounded-full bg-[#f3e1da] px-2.5 py-1 text-[11px] font-semibold text-[#b5472f]">
+                  <WorkspaceIcon name="emergency" size={12} strokeWidth={1.8} />
+                  Emergency
+                </span>
+              ) : null}
               {contact.archivedAt ? (
                 <span className="rounded-full bg-[#f6edd9] px-2.5 py-1 text-[11px] font-semibold text-[#7a5a1a]">
                   Archived
@@ -526,6 +534,25 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                   type="submit"
                 >
                   <WorkspaceIcon fill={contact.isFavorite ? "#e0a31c" : "none"} name="star" size={17} />
+                </button>
+              </form>
+              <form action={toggleEmergencyContact}>
+                <input name="contactId" type="hidden" value={contact.id} />
+                <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}`} />
+                <button
+                  aria-label={contact.isEmergency ? "Remove emergency contact" : "Mark as emergency contact"}
+                  aria-pressed={contact.isEmergency}
+                  className={`grid h-9 w-9 place-items-center rounded-[9px] transition hover:bg-[#f2f4f0] ${
+                    contact.isEmergency ? "text-[#b5472f]" : "text-[#5c655e]"
+                  }`}
+                  title={contact.isEmergency ? "Emergency contact" : "Mark as emergency"}
+                  type="submit"
+                >
+                  <WorkspaceIcon
+                    fill={contact.isEmergency ? "#b5472f" : "none"}
+                    name="emergency"
+                    size={17}
+                  />
                 </button>
               </form>
               <Link
@@ -575,6 +602,8 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               />
             </dl>
           </aside>
+          {/* full-height divider — standalone so it stretches regardless of aside content length */}
+          <div className="hidden w-px shrink-0 bg-[#d8ddd6] lg:block" />
 
           {/* right pane */}
           <main className="min-w-0 flex-1 bg-white px-4 py-5 lg:px-8 lg:py-6">
