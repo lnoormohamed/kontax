@@ -150,7 +150,7 @@ function InlineField({
         }`}
       >
         {field.label}
-        {!editable ? <span className="text-[11px] text-[#aeb4ac]"> · read-only</span> : null}
+        {!editable ? <span className="text-[11px] text-[#b9c0b8]"> · read-only</span> : null}
       </span>
       <div className="min-w-0 flex-1">
         {editing ? (
@@ -185,7 +185,7 @@ function InlineField({
         ) : (
           <span
             className={`block whitespace-pre-wrap break-words text-sm leading-[1.45] ${
-              has ? "text-[#1d2823]" : "italic text-[#aeb4ac]"
+              has ? "text-[#1d2823]" : "italic text-[#b9c0b8]"
             }`}
           >
             {has

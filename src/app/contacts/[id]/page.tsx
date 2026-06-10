@@ -116,6 +116,23 @@ const getInitials = (value: string) =>
     .join("")
     .toUpperCase();
 
+// 8-pair name-hash tints matching the locked design kit (same set as contacts list rows).
+const AVATAR_TINTS: [string, string][] = [
+  ["#e6ece4", "#3f6b53"],
+  ["#e9e7f4", "#5a55a6"],
+  ["#f3e7df", "#9a623a"],
+  ["#e2edf2", "#3d6f8a"],
+  ["#f2e6ea", "#9a4a63"],
+  ["#e8efe0", "#5f7a3a"],
+  ["#efe9df", "#85703f"],
+  ["#e3eef0", "#3f7d7a"],
+];
+const tintForName = (value: string): [string, string] => {
+  let hash = 0;
+  for (let i = 0; i < value.length; i++) hash = ((hash * 31 + value.charCodeAt(i)) >>> 0);
+  return AVATAR_TINTS[hash % AVATAR_TINTS.length]!;
+};
+
 
 // Normalise the contact's Json entry columns into the shapes the inline editor
 // expects. Tolerates legacy shapes ({relationship,name}, {date}, CardDAV postal
@@ -412,15 +429,23 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
             className="hidden w-[320px] shrink-0 self-start border-r border-[#d8ddd6] bg-white p-6 lg:block"
             style={{ position: "sticky", top: 56 }}
           >
-            <div className="relative inline-flex h-[88px] w-[88px] items-center justify-center rounded-full bg-[#e7efe9] text-3xl font-semibold text-[#17352e]">
-              {getInitials(contact.fullName)}
-              {contact.isFavorite ? (
-                <span className="absolute -bottom-0.5 -right-0.5 grid h-7 w-7 place-items-center rounded-full bg-white text-[#e0a31c] shadow">
-                  <WorkspaceIcon fill="#e0a31c" name="star" size={14} />
-                </span>
-              ) : null}
-            </div>
-            <h1 className="mt-4 text-[21px] font-semibold leading-tight tracking-[-0.01em] text-[#1d2823]">
+            {(() => {
+              const [avatarBg, avatarFg] = tintForName(contact.fullName);
+              return (
+                <div
+                  className="relative inline-flex h-[88px] w-[88px] items-center justify-center rounded-full text-3xl font-bold"
+                  style={{ background: avatarBg, color: avatarFg }}
+                >
+                  {getInitials(contact.fullName)}
+                  {contact.isFavorite ? (
+                    <span className="absolute -bottom-0.5 -right-0.5 grid h-7 w-7 place-items-center rounded-full bg-white text-[#e0a31c] shadow">
+                      <WorkspaceIcon fill="#e0a31c" name="star" size={14} />
+                    </span>
+                  ) : null}
+                </div>
+              );
+            })()}
+            <h1 className="mt-4 text-[21px] font-bold leading-tight tracking-[-0.01em] text-[#1d2823]">
               {contact.fullName}
             </h1>
             {contact.company || contact.jobTitle ? (
@@ -446,12 +471,12 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
 
             <div className="my-5 h-px bg-[#edf0ea]" />
 
-            {/* quick actions */}
-            <div className="flex items-center gap-1.5">
+            {/* quick actions — borderless icon buttons, hover fills surface */}
+            <div className="flex items-center gap-0.5">
               {contact.phone ? (
                 <a
                   aria-label="Call"
-                  className="grid h-9 w-9 place-items-center rounded-[0.7rem] border border-[#d8ddd6] bg-white text-[#5c655e] transition hover:bg-[#f2f4f0]"
+                  className="grid h-9 w-9 place-items-center rounded-[9px] text-[#5c655e] transition hover:bg-[#f2f4f0]"
                   href={`tel:${contact.phone}`}
                   title="Call"
                 >
@@ -461,7 +486,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               {contact.email ? (
                 <a
                   aria-label="Email"
-                  className="grid h-9 w-9 place-items-center rounded-[0.7rem] border border-[#d8ddd6] bg-white text-[#5c655e] transition hover:bg-[#f2f4f0]"
+                  className="grid h-9 w-9 place-items-center rounded-[9px] text-[#5c655e] transition hover:bg-[#f2f4f0]"
                   href={`mailto:${contact.email}`}
                   title="Email"
                 >
@@ -473,7 +498,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}`} />
                 <button
                   aria-label={contact.isFavorite ? "Unfavorite" : "Favorite"}
-                  className="grid h-9 w-9 place-items-center rounded-[0.7rem] border border-[#d8ddd6] bg-white text-[#e0a31c] transition hover:bg-[#f2f4f0]"
+                  className="grid h-9 w-9 place-items-center rounded-[9px] text-[#e0a31c] transition hover:bg-[#f2f4f0]"
                   title="Favourite"
                   type="submit"
                 >
@@ -482,7 +507,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               </form>
               <Link
                 aria-label="Share"
-                className="grid h-9 w-9 place-items-center rounded-[0.7rem] border border-[#d8ddd6] bg-white text-[#5c655e] transition hover:bg-[#f2f4f0]"
+                className="grid h-9 w-9 place-items-center rounded-[9px] text-[#5c655e] transition hover:bg-[#f2f4f0]"
                 href={`/contacts/${contact.id}?tab=sharing`}
                 title="Share"
               >
@@ -493,7 +518,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}`} />
                 <button
                   aria-label={contact.archivedAt ? "Restore" : "Archive"}
-                  className="grid h-9 w-9 place-items-center rounded-[0.7rem] border border-[#d8ddd6] bg-white text-[#5c655e] transition hover:bg-[#f2f4f0]"
+                  className="grid h-9 w-9 place-items-center rounded-[9px] text-[#5c655e] transition hover:bg-[#f2f4f0]"
                   title={contact.archivedAt ? "Restore" : "Archive"}
                   type="submit"
                 >
@@ -533,25 +558,32 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
             <div className="mx-auto flex w-full max-w-[820px] flex-col gap-5">
 
         {wasSaved ? (
-          <div className="rounded-[1.6rem] border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700 shadow-sm">
-            Contact changes saved successfully.
+          <div className="flex items-center gap-2.5 rounded-[12px] bg-[#e3efe7] px-4 py-2.5 text-[13px] text-[#1c6b48]">
+            <WorkspaceIcon name="check" size={15} strokeWidth={2} />
+            Contact saved successfully.
           </div>
         ) : null}
         {wasMerged ? (
-          <div className="rounded-[1.6rem] border border-cyan-200 bg-cyan-50 p-4 text-sm text-cyan-700 shadow-sm">
-            Merge completed successfully. You can still undo the latest merge from the action rail
-            while this contact remains in the reversible merge model.
+          <div className="flex items-center gap-2.5 rounded-[12px] bg-[#e3efe7] px-4 py-2.5 text-[13px] text-[#1c6b48]">
+            <WorkspaceIcon name="check" size={15} strokeWidth={2} />
+            Merge completed. You can undo the latest merge from the action rail.
           </div>
         ) : null}
         {wasMergeUndone ? (
-          <div className="rounded-[1.6rem] border border-amber-200 bg-amber-50 p-4 text-sm text-amber-700 shadow-sm">
-            Merge undo completed. The archived secondary contact has been restored and the primary
-            contact has been rolled back to its pre-merge state.
+          <div className="flex items-center gap-2.5 rounded-[12px] bg-[#f6edd9] px-4 py-2.5 text-[13px] text-[#7a5a1a]">
+            <WorkspaceIcon name="restore" size={15} strokeWidth={2} />
+            Merge undone. Secondary contact restored and primary rolled back.
+          </div>
+        ) : null}
+        {contact.archivedAt && detailTab === "details" ? (
+          <div className="flex items-center gap-2.5 rounded-[12px] bg-[#f6edd9] px-4 py-2.5 text-[13px] text-[#7a5a1a]">
+            <WorkspaceIcon name="archive" size={15} strokeWidth={2} />
+            This contact is archived — it won&apos;t appear in your main list.
           </div>
         ) : null}
 
-        {/* Details · Sharing · History tabs (P17-02) */}
-        <div className="flex items-center gap-1 border-b border-[#d8ddd6]">
+        {/* Details · Sharing · History tabs */}
+        <div className="flex items-center gap-1 border-b border-[#e9ece7]">
           {(
             [
               ["details", "Details", "briefcase"],
@@ -560,10 +592,10 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
             ] as const
           ).map(([key, label, icon]) => (
             <Link
-              className={`-mb-px flex items-center gap-1.5 border-b-2 px-4 py-2.5 text-sm font-semibold transition ${
+              className={`-mb-px flex items-center gap-1.5 border-b-2 px-4 py-2.5 text-[14px] transition ${
                 detailTab === key
-                  ? "border-[#17352e] text-[#1d2823]"
-                  : "border-transparent text-[#8b938c] hover:text-[#5c655e]"
+                  ? "border-[#17352e] font-bold text-[#1d2823]"
+                  : "border-transparent font-medium text-[#8b938c] hover:text-[#5c655e]"
               }`}
               href={`/contacts/${contact.id}?tab=${key}`}
               key={key}
@@ -616,7 +648,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               </h3>
               <div className="mt-3 h-px bg-[#e9ece7]" />
               {syncLinks.length === 0 ? (
-                <p className="px-5 py-4 text-[13.5px] italic text-[#aeb4ac]">
+                <p className="px-5 py-4 text-[13.5px] italic text-[#b9c0b8]">
                   Not linked to any account yet. Connect a CardDAV account to keep this contact in
                   sync.
                 </p>

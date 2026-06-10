@@ -180,7 +180,7 @@ function MultiRow({
         ) : (
           <span
             className={`block break-words text-sm leading-[1.45] ${
-              has ? "text-[#1d2823]" : "italic text-[#aeb4ac]"
+              has ? "text-[#1d2823]" : "italic text-[#b9c0b8]"
             }`}
           >
             {has ? display : "Empty — click to add"}
@@ -258,7 +258,7 @@ export function MultiValueGroup({
   return (
     <div>
       {items.length === 0 ? (
-        <div className="px-3 py-2 text-[13px] italic text-[#aeb4ac]">Not added</div>
+        <div className="px-3 py-2 text-[13px] italic text-[#b9c0b8]">Not added</div>
       ) : (
         items.map((item, index) => (
           <MultiRow
@@ -340,7 +340,7 @@ function AddressBlock({
         {!editing ? (
           <button
             className={`min-w-0 flex-1 break-words text-left text-sm leading-[1.45] ${
-              formatted ? "text-[#1d2823]" : "italic text-[#aeb4ac]"
+              formatted ? "text-[#1d2823]" : "italic text-[#b9c0b8]"
             } ${editable ? "cursor-text" : ""}`}
             onClick={() => {
               if (editable) {
