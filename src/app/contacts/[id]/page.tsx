@@ -8,6 +8,7 @@ import { ContactInlineEditor } from "~/app/_components/contact-inline-editor";
 import { ContactSharing } from "~/app/_components/contact-sharing";
 import { CopyMonoRow } from "~/app/_components/copy-field";
 import { LastUpdatedBy } from "~/app/_components/last-updated-by";
+import { MoreMenu } from "~/app/_components/more-menu";
 import { SourceBadge } from "~/app/_components/source-badge";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import {
@@ -438,41 +439,36 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 {contact.archivedAt ? "Restore" : "Archive"}
               </button>
             </form>
-            <details className="relative">
-              <summary className="grid size-[34px] cursor-pointer list-none place-items-center rounded-[8px] border border-transparent text-[#5c655e] transition hover:border-[#d8ddd6] hover:bg-[#f2f4f0]">
-                <WorkspaceIcon name="more" size={18} />
-              </summary>
-              <div className="absolute right-0 z-10 mt-1 w-56 rounded-[1rem] border border-[#d8ddd6] bg-white p-1.5 shadow-lg">
-                {canAddToFamily ? (
-                  <form action={addContactToFamilyBook}>
-                    <input name="contactId" type="hidden" value={contact.id} />
-                    <button
-                      className="flex w-full items-center gap-2 rounded-[0.7rem] px-3 py-2 text-left text-sm font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
-                      type="submit"
-                    >
-                      <WorkspaceIcon name="users" size={15} />
-                      Add to {familyMembership?.groupName ?? "family book"}
-                    </button>
-                  </form>
-                ) : null}
-                {isSharedContact ? (
-                  <p className="flex items-center gap-2 px-3 py-2 text-[12px] text-[#8b938c]">
-                    <WorkspaceIcon name="users" size={14} />
-                    In {familyContext?.groupName ?? "a family book"}
-                  </p>
-                ) : null}
-                <form action={permanentlyDeleteContact}>
+            <MoreMenu>
+              {canAddToFamily ? (
+                <form action={addContactToFamilyBook}>
                   <input name="contactId" type="hidden" value={contact.id} />
-                  <input name="redirectTo" type="hidden" value="/" />
                   <button
-                    className="w-full rounded-[0.7rem] px-3 py-2 text-left text-sm font-semibold text-[#b5472f] transition hover:bg-[#fbeae6]"
+                    className="flex w-full items-center gap-2 rounded-[0.7rem] px-3 py-2 text-left text-sm font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
                     type="submit"
                   >
-                    Delete permanently
+                    <WorkspaceIcon name="users" size={15} />
+                    Add to {familyMembership?.groupName ?? "family book"}
                   </button>
                 </form>
-              </div>
-            </details>
+              ) : null}
+              {isSharedContact ? (
+                <p className="flex items-center gap-2 px-3 py-2 text-[12px] text-[#8b938c]">
+                  <WorkspaceIcon name="users" size={14} />
+                  In {familyContext?.groupName ?? "a family book"}
+                </p>
+              ) : null}
+              <form action={permanentlyDeleteContact}>
+                <input name="contactId" type="hidden" value={contact.id} />
+                <input name="redirectTo" type="hidden" value="/" />
+                <button
+                  className="w-full rounded-[0.7rem] px-3 py-2 text-left text-sm font-semibold text-[#b5472f] transition hover:bg-[#fbeae6]"
+                  type="submit"
+                >
+                  Delete permanently
+                </button>
+              </form>
+            </MoreMenu>
           </div>
         </div>
 
