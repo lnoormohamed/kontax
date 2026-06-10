@@ -52,6 +52,18 @@ The tone is calm, clean, and confident — the same tone as the product itself. 
 
 ---
 
+## Tablet Layout (768–1279px)
+
+The two-column hero **stays two-column** down to 768px but the proportions shift:
+- Left column narrows; right column (preview) shrinks proportionally.
+- Preview panel: reduce width to ~380px and allow it to clip at the right edge if needed, rather than shrinking to illegibility.
+- Below ~960px, the hero **stacks**: text+CTAs on top, preview panel below (full-width, no tilt). Same as mobile but with more breathing room — `padding: 48px 32px` and the preview height caps at 480px.
+- Nav stays the same (both buttons visible).
+- Feature cards: 2-column grid at all tablet widths.
+- Footer: same as desktop.
+
+---
+
 ## Navigation Bar
 
 Sticky, white, `border-bottom: 1px solid #d8ddd6`. Height: 60px. Matches the in-app header visual weight.
@@ -59,7 +71,7 @@ Sticky, white, `border-bottom: 1px solid #d8ddd6`. Height: 60px. Matches the in-
 - **Left:** Kontax brand mark — "K" tile (`34×34px`, `border-radius: 10px`, `background: #17352e`, `color: #dff0e7`, `font-size: 19px`, `font-weight: 700`) + wordmark (`font-size: 20px`, `font-weight: 600`, `letter-spacing: -0.018em`, `color: #17352e`). Same as the auth card brand mark, same proportions.
 - **Right:** Two buttons:
   - **"Log in"** — text link style: `color: #5c655e`, `font-size: 14px`, `font-weight: 500`, hover `color: #1d2823`. Links to `/login`.
-  - **"Get started"** — filled primary: `height: 34px`, `padding: 0 14px`, `border-radius: 8px`, `background: #4158f4`, `color: #fff`, `font-size: 13px`, `font-weight: 600`. Hover: `background: #3347d8`. Links to `/register`.
+  - **"Get started free"** — filled primary: `height: 34px`, `padding: 0 14px`, `border-radius: 8px`, `background: #4158f4`, `color: #fff`, `font-size: 13px`, `font-weight: 600`. Hover: `background: #3347d8`. Links to `/register`.
 - Horizontal padding: 24px each side on desktop.
 - `z-index` high enough to sit above the hero on scroll (`z-index: 10`).
 
@@ -85,20 +97,20 @@ Two columns, 50/50 split, both vertically centred. Gap: 64px. `padding: 64px 48p
 **Eyebrow** (above headline, optional):
 `font-size: 12px`, `font-weight: 600`, `letter-spacing: 0.1em`, `text-transform: uppercase`, `color: #5c655e`. E.g. *"Contact management, reimagined"*.
 
-**Headline:**
+**Headline (locked copy):**
 ```
 Your contacts,
 synced everywhere.
 ```
 - `font-size: 56–64px`, `font-weight: 700`, `line-height: 1.1`, `letter-spacing: -0.02em`, `color: #1d2823`.
-- The line break after "contacts," is intentional — preserve it with `<br>` or constrained container width.
+- The line break after "contacts," is intentional — preserve it with `<br>` or constrained container width. Do not reflow into a single line.
 
-**Subtext:**
-One or two sentences, max 180 characters. Proposed copy: *"One address book, always up to date — across all your devices, apps, and the people you share with."*
+**Subtext (locked copy):**
+*"One address book, always up to date — across all your devices, apps, and the people you share with."*
 - `font-size: 18–20px`, `font-weight: 400`, `line-height: 1.55`, `color: #5c655e`, `margin-top: 20px`.
 
 **CTA Buttons:** horizontal row (stacked on mobile).
-- **Primary — "Get started free":** `height: 48px`, `padding: 0 24px`, `border-radius: 12px`, `background: #4158f4`, `color: #fff`, `font-size: 15px`, `font-weight: 600`. Hover: `background: #3347d8`.
+- **Primary — "Get started free":** `height: 48px`, `padding: 0 24px`, `border-radius: 12px`, `background: #4158f4`, `color: #fff`, `font-size: 15px`, `font-weight: 600`. Hover: `background: #3347d8`. Same label as the nav button — consistent throughout the page.
 - **Secondary — "Log in":** `height: 48px`, `padding: 0 24px`, `border-radius: 12px`, `border: 1px solid #d8ddd6`, `background: transparent`, `color: #1d2823`, `font-size: 15px`, `font-weight: 500`. Hover: `background: #f2f4f0`. Arrow icon `→` after label.
 - Gap: 12px. `margin-top: 32px` from subtext.
 
@@ -136,7 +148,18 @@ The panel looks like a real screenshot of the Kontax contacts list — the same 
 
 - **Browser chrome bar:** `background: #e5e7e0`, height 28px. Traffic-light dots (red/amber/green, 10px each), URL bar showing `kontax.app` with padlock. Matches the browser chrome used elsewhere in the design system.
 - **App content:** white background `#ffffff`, exactly matching the real app. App header: `background: #fff`, `border-bottom: 1px solid #d8ddd6`. Search bar: white, rounded, `border: 1px solid #d8ddd6`.
-- **Contact rows:** same style as the real contacts list rows. Avatar circles use the name-hash tint system (8 colour pairs).
+- **Contact rows:** same style as the real contacts list rows. Avatar colours are computed from the name-hash tint system — use the exact values below so the preview matches the live app:
+
+| Contact | Initials | Avatar bg | Avatar text |
+|---|---|---|---|
+| Amara Okafor | AO | `#efe9df` | `#85703f` |
+| Alex Chen | AC | `#e9e7f4` | `#5a55a6` |
+| Alexandra Wong | AW | `#f2e6ea` | `#9a4a63` |
+| Ben Nakamura | BN | `#e6ece4` | `#3f6b53` |
+| Beth Okafor | BO | `#e8efe0` | `#5f7a3a` |
+| Carlos Rivera | CR | `#e3eef0` | `#3f7d7a` |
+| Clara Dubois | CD | `#f3e7df` | `#9a623a` |
+
 - **Section headers** (A, B, C): `font-size: 11px`, `font-weight: 700`, `letter-spacing: 0.1em`, `text-transform: uppercase`, `color: #8b938c`.
 - **Bottom fade:** `linear-gradient(to bottom, transparent, #ffffff)` over the last ~60px of the panel — implies the list continues.
 
@@ -167,12 +190,17 @@ Four cards in a 4-column grid (2-col tablet, 1-col mobile).
 
 **Four cards:**
 
-| Icon | Title | Body |
-|---|---|---|
-| sync | Sync to any device | CardDAV keeps your contacts live in Apple Contacts, Google, and any CalDAV client. |
-| users | Family & team sharing | A shared address book for your household or small team — everyone stays current. |
-| clock | Activity history | See every change, merge, and import across all your contacts, forever. |
-| download | Import from anywhere | One-click import from CSV or vCard — Google, Apple, Outlook. No data left behind. |
+| Icon | Title | Body | Status |
+|---|---|---|---|
+| sync | Sync to any device | CardDAV keeps your contacts live in Apple Contacts, Google, and any CalDAV client. | Live |
+| clock | Activity history | See every change, merge, and import across all your contacts, forever. | Live |
+| download | Import from anywhere | One-click import from CSV or vCard — Google, Apple, Outlook. No data left behind. | Live |
+| users | Family & team sharing | A shared address book for your household or small team — everyone stays current. | Coming soon |
+
+**"Coming soon" treatment for Family & team sharing:** this feature ships in Phase 13 and is not yet live. The card renders in full (same layout, same icon) but with:
+- A small `[Coming soon]` chip in the card header area — `background: #f2f4f0`, `color: #8b938c`, `font-size: 10px`, `font-weight: 700`, `border-radius: 4px`, `padding: 2px 7px`.
+- Card opacity: `0.75` and `cursor: default` (not hoverable).
+- Body copy adjusted: *"A shared address book for your household or small team — arriving soon."*
 
 No CTA buttons on the feature cards. Primary CTAs remain in the hero.
 
