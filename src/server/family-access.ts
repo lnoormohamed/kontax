@@ -80,6 +80,27 @@ export const readableContactWhere = (
   ],
 });
 
+// Activity attribution for a shared-contact change (P13-04). When the contact
+// lives in a family book, the event is attributed to the acting member so every
+// member's history reads "[Member] via Family Book". Returns null for private
+// contacts (caller falls back to actor USER).
+export const getSharedEditAttribution = async (
+  userId: string,
+  contactId: string,
+): Promise<{ actor: "FAMILY_MEMBER"; actorDetail: string } | null> => {
+  const shared = await db.groupContact.findFirst({
+    where: { contactId },
+    select: { id: true },
+  });
+  if (!shared) return null;
+  const user = await db.user.findUnique({
+    where: { id: userId },
+    select: { name: true, email: true },
+  });
+  const name = user?.name?.trim() ?? user?.email ?? "A family member";
+  return { actor: "FAMILY_MEMBER", actorDetail: `${name} via Family Book` };
+};
+
 // Is this contact a shared (family-book) contact? Returns its book/group context.
 export const getContactFamilyContext = async (contactId: string) => {
   const gc = await db.groupContact.findFirst({

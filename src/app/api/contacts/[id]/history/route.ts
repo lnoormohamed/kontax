@@ -2,6 +2,7 @@ import { actorIconName, formatActorLabel, formatEventSummary } from "~/lib/activ
 import { auth } from "~/server/auth";
 import { getUserBillingContext } from "~/server/billing";
 import { db } from "~/server/db";
+import { readableContactWhere } from "~/server/family-access";
 
 const DEFAULT_LIMIT = 30;
 const MAX_LIMIT = 100;
@@ -19,10 +20,10 @@ export async function GET(
 
   const { id: contactId } = await params;
 
-  // Ownership: the contact must belong to the requester. (Events for a
-  // hard-deleted contact have contactId=null and are not reachable here.)
+  // Access: the requester must own the contact OR be a family member of a book
+  // it lives in (P13-04 — members see the full shared change history).
   const contact = await db.contact.findFirst({
-    where: { id: contactId, userId },
+    where: readableContactWhere(userId, contactId),
     select: { id: true },
   });
 
@@ -46,10 +47,11 @@ export async function GET(
   const effectiveLimit = capped ? Math.min(limit, displayCap) : limit;
   const cursorDate = capped || !cursor ? null : new Date(cursor);
 
+  // Events are keyed by contactId only — for a shared contact this surfaces
+  // every member's change (with attribution), not just the requester's.
   const rows = await db.activityEvent.findMany({
     where: {
       contactId,
-      userId,
       ...(cursorDate && !Number.isNaN(cursorDate.getTime())
         ? { createdAt: { lt: cursorDate } }
         : {}),

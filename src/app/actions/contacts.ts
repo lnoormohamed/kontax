@@ -14,7 +14,11 @@ import {
 } from "~/server/contact-merge";
 import { propagateLiveShares } from "~/server/contact-shares";
 import { db } from "~/server/db";
-import { editableContactWhere, getUserFamilyMembership } from "~/server/family-access";
+import {
+  editableContactWhere,
+  getSharedEditAttribution,
+  getUserFamilyMembership,
+} from "~/server/family-access";
 import { emitEvent } from "~/lib/activity";
 import { computeContactDiff } from "~/lib/activity/diff";
 import { applyAutoFilledPhoneticFields } from "~/server/phonetics";
@@ -642,6 +646,8 @@ export const updateContactField = async (contactId: string, field: string, rawVa
   const newValue =
     field === "email" ? trimmed.toLowerCase() || null : trimmed.length > 0 ? trimmed : null;
 
+  const sharedAttr = await getSharedEditAttribution(userId, contactId);
+
   await db.$transaction(async (tx) => {
     const before = await tx.contact.findFirst({ where: editableContactWhere(userId, contactId) });
     if (!before) {
@@ -665,7 +671,8 @@ export const updateContactField = async (contactId: string, field: string, rawVa
         userId,
         contactId,
         eventType: "CONTACT_UPDATED",
-        actor: "USER",
+        actor: sharedAttr?.actor ?? "USER",
+        actorDetail: sharedAttr?.actorDetail,
         payload: { diffs },
       });
     }
@@ -749,6 +756,8 @@ export const updateContactEntries = async (
     scalarValue = entries[0]?.value ?? null;
   }
 
+  const sharedAttr = await getSharedEditAttribution(userId, contactId);
+
   await db.$transaction(async (tx) => {
     const before = await tx.contact.findFirst({ where: editableContactWhere(userId, contactId) });
     if (!before) {
@@ -770,7 +779,8 @@ export const updateContactEntries = async (
         userId,
         contactId,
         eventType: "CONTACT_UPDATED",
-        actor: "USER",
+        actor: sharedAttr?.actor ?? "USER",
+        actorDetail: sharedAttr?.actorDetail,
         payload: { diffs },
       });
     }
@@ -857,6 +867,7 @@ export const toggleEmergencyContact = async (formData: FormData) => {
 export const archiveContact = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const contactId = parseContactId(formData);
+  const sharedAttr = await getSharedEditAttribution(userId, contactId);
 
   await db.$transaction(async (tx) => {
     const result = await tx.contact.updateMany({
@@ -874,7 +885,8 @@ export const archiveContact = async (formData: FormData) => {
         userId,
         contactId,
         eventType: "CONTACT_ARCHIVED",
-        actor: "USER",
+        actor: sharedAttr?.actor ?? "USER",
+        actorDetail: sharedAttr?.actorDetail,
         payload: {},
       });
     }
@@ -932,6 +944,7 @@ export const archiveContactsBulk = async (formData: FormData) => {
 export const restoreContact = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const contactId = parseContactId(formData);
+  const sharedAttr = await getSharedEditAttribution(userId, contactId);
 
   await db.$transaction(async (tx) => {
     const result = await tx.contact.updateMany({
@@ -949,7 +962,8 @@ export const restoreContact = async (formData: FormData) => {
         userId,
         contactId,
         eventType: "CONTACT_RESTORED",
-        actor: "USER",
+        actor: sharedAttr?.actor ?? "USER",
+        actorDetail: sharedAttr?.actorDetail,
         payload: {},
       });
     }

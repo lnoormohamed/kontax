@@ -22,7 +22,7 @@ Make the Family plan a real product by letting family members share a common add
 | P13-01 | Done | P0 | P11-02 |
 | P13-02 | Done | P0 | P13-01 |
 | P13-03 | Done | P0 | P13-01, P10-01, P10-02 |
-| P13-04 | Not Started | P1 | P13-02, P13-03, P10-01 |
+| P13-04 | Done | P1 | P13-02, P13-03, P10-01 |
 | P13-05 | Done | P1 | P13-04 |
 | P13-06 | Not Started | P1 | P13-04 |
 | P13-07 | Not Started | P1 | P13-05, P13-06 |
@@ -117,7 +117,8 @@ Make the Family plan a real product by letting family members share a common add
 ---
 
 ## P13-04 — Change propagation across family members
-- Status: `Not Started`
+- Status: `Done`
+- **v1 approach (documented):** next-load propagation — the workspace shared-contact query reads live data, so members see changes on their next load/refresh (no WebSocket infra). The per-contact History now surfaces every member's change keyed by contactId (read-access gated), and shared-contact mutations are attributed to the acting member (actor FAMILY_MEMBER · "[Member] via Family Book"). Real-time push (SSE) and per-member global-feed fan-out are noted as a follow-up.
 - Priority: `P1`
 - Dependencies: `P13-02`, `P13-03`, `P10-01`
 - Implementation Notes:
