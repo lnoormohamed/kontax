@@ -1,4 +1,3 @@
-import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { AppPasswordManager } from "~/app/_components/app-password-manager";
@@ -7,15 +6,7 @@ import { CopyField } from "~/app/_components/copy-field";
 import { SettingsCard, SettingsPageHead } from "~/app/_components/settings-ui";
 import { canCreateAppPassword, listUserAppPasswords } from "~/server/app-passwords";
 import { auth } from "~/server/auth";
-
-const getPublicOrigin = async () => {
-  const headerList = await headers();
-  const forwardedHost = headerList.get("x-forwarded-host") ?? headerList.get("host");
-  const forwardedProto = headerList.get("x-forwarded-proto")?.split(",")[0]?.trim();
-  const host = forwardedHost ?? "localhost:3000";
-  const proto = forwardedProto ?? (host.startsWith("localhost") ? "http" : "https");
-  return `${proto}://${host}`;
-};
+import { getPublicOrigin } from "~/lib/public-origin";
 
 export default async function SettingsDevicesPage() {
   const session = await auth();

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 
 import { AppShell } from "~/app/_components/app-shell";
@@ -29,6 +28,7 @@ import { getUserPlanSummary } from "~/server/billing";
 import { db } from "~/server/db";
 import { getContactFamilyContext, getUserFamilyMembership } from "~/server/family-access";
 import { getContactTeamContext } from "~/server/team-access";
+import { getPublicOrigin } from "~/lib/public-origin";
 
 type ContactDetailPageProps = {
   params: Promise<{
@@ -322,12 +322,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
   };
 
   // Sharing (Phase 12): owner-side shares for this contact + the public origin.
-  const headerList = await headers();
-  const shareHost = headerList.get("x-forwarded-host") ?? headerList.get("host") ?? "localhost:3000";
-  const shareProto =
-    headerList.get("x-forwarded-proto")?.split(",")[0]?.trim() ??
-    (shareHost.startsWith("localhost") ? "http" : "https");
-  const shareOrigin = `${shareProto}://${shareHost}`;
+  const shareOrigin = await getPublicOrigin();
   const contactShares = await db.contactShare.findMany({
     where: { contactId: contact.id, ownerUserId: session.user.id },
     orderBy: { createdAt: "desc" },
