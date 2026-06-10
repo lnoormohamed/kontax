@@ -4,6 +4,8 @@
 **Phase:** P0 core surface
 **Last updated:** 2026-06-10
 
+> **Design status: LOCKED.** The final mock is approved and the form is built to spec.
+
 > **Scope: CREATE only.** This brief covers the net-new contact form at `/contacts/new`. **Editing an existing contact is *not* a separate form** — it happens inline on the contact detail page (see brief **02 — Contact Detail**, which is LOCKED on an inline-edit, auto-save-on-blur model with no separate edit route). There is intentionally no `/contacts/[id]/edit`. Anything in earlier drafts about "edit mode", a pre-populated form, or a delete action on this form is superseded by brief 02 — deletion/archiving lives on the detail page, not here.
 
 > **Design language:** follow the locked Kontax system used in briefs 01/02 — ink `#1d2823`, secondary `#5c655e`, muted `#8b938c`, hairline `#d8ddd6`, brand green `#17352e`, blue CTA `#4158f4`, red `#b5472f`, Geist. Where this brief still shows generic Tailwind tokens (`slate-*`, `border-red-400`, `bg-slate-100`), treat them as placeholders and map to the locked palette (e.g. error border → `#b5472f`, label-pill surface → `#f2f4f0`).
