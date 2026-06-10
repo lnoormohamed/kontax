@@ -434,9 +434,13 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
 
   return (
     <AppShell account={shellAccount} counts={shellCounts}>
-      <div className="min-h-screen bg-white text-[#1d2823]">
-        {/* slim sticky sub-header (back · name · Share/Archive/Favorite/⋯) */}
-        <div className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-[#d8ddd6] bg-white/95 px-4 backdrop-blur lg:px-6">
+      {/*
+        Sub-header is a DIRECT child of the AppShell scroll container so that
+        `sticky top-0` sticks for the entire scroll range. When it lives inside
+        a wrapper div the CSS sticky is released as that wrapper's bottom edge
+        passes the threshold — moving it here removes that constraint entirely.
+      */}
+      <div className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-[#d8ddd6] bg-white/95 px-4 backdrop-blur lg:px-6">
           <Link
             className="flex items-center gap-1.5 text-sm font-semibold text-[#5c655e] transition hover:text-[#1d2823]"
             href="/"
@@ -499,6 +503,8 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
           </div>
         </div>
 
+      {/* Page body — min-h-screen gives white background on short pages */}
+      <div className="min-h-screen bg-white text-[#1d2823]">
         <div className="flex bg-white">
           {/* left rail (sticky) */}
           <aside
