@@ -14,6 +14,7 @@ import {
 } from "~/server/contact-merge";
 import { propagateLiveShares } from "~/server/contact-shares";
 import { db } from "~/server/db";
+import { editableContactWhere } from "~/server/family-access";
 import { emitEvent } from "~/lib/activity";
 import { computeContactDiff } from "~/lib/activity/diff";
 import { applyAutoFilledPhoneticFields } from "~/server/phonetics";
@@ -613,7 +614,7 @@ export const updateContactField = async (contactId: string, field: string, rawVa
     field === "email" ? trimmed.toLowerCase() || null : trimmed.length > 0 ? trimmed : null;
 
   await db.$transaction(async (tx) => {
-    const before = await tx.contact.findFirst({ where: { id: contactId, userId } });
+    const before = await tx.contact.findFirst({ where: editableContactWhere(userId, contactId) });
     if (!before) {
       throw new Error("Contact not found.");
     }
@@ -720,7 +721,7 @@ export const updateContactEntries = async (
   }
 
   await db.$transaction(async (tx) => {
-    const before = await tx.contact.findFirst({ where: { id: contactId, userId } });
+    const before = await tx.contact.findFirst({ where: editableContactWhere(userId, contactId) });
     if (!before) {
       throw new Error("Contact not found.");
     }
@@ -830,7 +831,7 @@ export const archiveContact = async (formData: FormData) => {
 
   await db.$transaction(async (tx) => {
     const result = await tx.contact.updateMany({
-      where: { id: contactId, userId, archivedAt: null },
+      where: { AND: [editableContactWhere(userId, contactId), { archivedAt: null }] },
       data: {
         archivedAt: new Date(),
         syncTombstoneAt: new Date(),
@@ -905,7 +906,7 @@ export const restoreContact = async (formData: FormData) => {
 
   await db.$transaction(async (tx) => {
     const result = await tx.contact.updateMany({
-      where: { id: contactId, userId, NOT: { archivedAt: null } },
+      where: { AND: [editableContactWhere(userId, contactId), { NOT: { archivedAt: null } }] },
       data: {
         archivedAt: null,
         syncTombstoneAt: null,

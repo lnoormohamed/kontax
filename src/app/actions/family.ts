@@ -4,10 +4,12 @@ import { randomBytes } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { emitEvent } from "~/lib/activity";
 import { auth } from "~/server/auth";
 import { getUserBillingContext } from "~/server/billing";
 import { db } from "~/server/db";
 import { appUrl, sendEmail } from "~/server/email";
+import { getUserFamilyMembership } from "~/server/family-access";
 
 const INVITE_TTL_MS = 48 * 60 * 60 * 1000; // 48h signed-token expiry
 
@@ -232,6 +234,142 @@ export const removeFamilyMember = async (formData: FormData) => {
   // Removing a member only revokes shared-book access; private contacts untouched.
   await db.groupMember.delete({ where: { id: member.id } });
   revalidatePath("/settings/family");
+};
+
+// --- Shared contact operations (P13-03) -------------------------------------
+// Portable fields copied when adding a private contact to the family book.
+const COPY_SELECT = {
+  fullName: true,
+  firstName: true,
+  middleName: true,
+  lastName: true,
+  phoneticFirstName: true,
+  phoneticLastName: true,
+  namePrefix: true,
+  nameSuffix: true,
+  nickname: true,
+  email: true,
+  emailEntries: true,
+  phone: true,
+  phoneEntries: true,
+  company: true,
+  phoneticCompany: true,
+  jobTitle: true,
+  department: true,
+  website: true,
+  websiteEntries: true,
+  birthday: true,
+  address: true,
+  addressEntries: true,
+  significantDates: true,
+  relatedPeople: true,
+  customFields: true,
+  notes: true,
+} as const;
+
+const jsonOrUndef = (v: unknown) => (v == null ? undefined : (v as never));
+
+// "Add to family book": copy one of the user's private contacts into the shared
+// book (a copy, not a move — the original is untouched). Creates a new Contact
+// owned (nominally) by the group owner + a GroupContact link.
+export const addContactToFamilyBook = async (formData: FormData) => {
+  const userId = await requireUserId();
+  const contactId = str(formData, "contactId");
+
+  const membership = await getUserFamilyMembership(userId);
+  if (!membership) {
+    throw new Error("Join or create a family book first.");
+  }
+  if (!membership.canEdit) {
+    throw new Error("You have view-only access to the family book.");
+  }
+  if (!membership.bookId) {
+    throw new Error("This family group has no shared book.");
+  }
+
+  // Must be a private contact the user owns.
+  const source = await db.contact.findFirst({
+    where: { id: contactId, userId },
+    select: COPY_SELECT,
+  });
+  if (!source) {
+    throw new Error("Contact not found.");
+  }
+
+  const group = await db.group.findUnique({
+    where: { id: membership.groupId },
+    select: { ownerId: true, name: true },
+  });
+  if (!group) {
+    throw new Error("Family group not found.");
+  }
+
+  // Already in the book?
+  const dupe = await db.groupContact.findFirst({
+    where: {
+      groupAddressBookId: membership.bookId,
+      contact: { fullName: source.fullName, email: source.email },
+    },
+    select: { id: true },
+  });
+  if (dupe) {
+    throw new Error("A contact with that name is already in the family book.");
+  }
+
+  await db.$transaction(async (tx) => {
+    const copy = await tx.contact.create({
+      data: {
+        userId: group.ownerId, // group owns the shared contact (nominal owner)
+        fullName: source.fullName,
+        firstName: source.firstName,
+        middleName: source.middleName,
+        lastName: source.lastName,
+        phoneticFirstName: source.phoneticFirstName,
+        phoneticLastName: source.phoneticLastName,
+        namePrefix: source.namePrefix,
+        nameSuffix: source.nameSuffix,
+        nickname: source.nickname,
+        email: source.email,
+        emailEntries: jsonOrUndef(source.emailEntries),
+        phone: source.phone,
+        phoneEntries: jsonOrUndef(source.phoneEntries),
+        company: source.company,
+        phoneticCompany: source.phoneticCompany,
+        jobTitle: source.jobTitle,
+        department: source.department,
+        website: source.website,
+        websiteEntries: jsonOrUndef(source.websiteEntries),
+        birthday: source.birthday,
+        address: source.address,
+        addressEntries: jsonOrUndef(source.addressEntries),
+        significantDates: jsonOrUndef(source.significantDates),
+        relatedPeople: jsonOrUndef(source.relatedPeople),
+        customFields: jsonOrUndef(source.customFields),
+        notes: source.notes,
+        sourceType: "MANUAL",
+        sourceDetail: `${membership.groupName} (family book)`,
+        lastMutatedBy: "MANUAL",
+      },
+      select: { id: true },
+    });
+    await tx.groupContact.create({
+      data: {
+        groupAddressBookId: membership.bookId!,
+        contactId: copy.id,
+        addedByUserId: userId,
+      },
+    });
+    await emitEvent(tx, {
+      userId,
+      contactId: copy.id,
+      eventType: "CONTACT_CREATED",
+      actor: "USER",
+      payload: { familyBook: membership.groupName },
+    });
+  });
+
+  revalidatePath("/");
+  revalidatePath(`/contacts/${contactId}`);
 };
 
 export const leaveFamilyGroup = async (formData: FormData) => {

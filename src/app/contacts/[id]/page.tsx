@@ -17,9 +17,11 @@ import {
   toggleEmergencyContact,
   toggleFavoriteContact,
 } from "~/app/actions/contacts";
+import { addContactToFamilyBook } from "~/app/actions/family";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
 import { db } from "~/server/db";
+import { getContactFamilyContext, getUserFamilyMembership } from "~/server/family-access";
 
 type ContactDetailPageProps = {
   params: Promise<{
@@ -345,6 +347,14 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
   // This contact is a live copy the current user received (recipient side).
   const isLiveReceived = contact.sourceType === "SHARED_LIVE";
 
+  // Family (P13-03): can this private contact be added to the shared family book?
+  const [familyMembership, familyContext] = await Promise.all([
+    getUserFamilyMembership(session.user.id),
+    getContactFamilyContext(contact.id),
+  ]);
+  const isSharedContact = Boolean(familyContext);
+  const canAddToFamily = Boolean(familyMembership?.canEdit) && !isSharedContact;
+
   // Shared books the user owns/belongs to (for the "Add to a shared book"
   // section of the Sharing tab). Adding a contact to a book lands in Phase 13.
   const sharedBooks = await db.group.findMany({
@@ -433,6 +443,24 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                 <WorkspaceIcon name="more" size={18} />
               </summary>
               <div className="absolute right-0 z-10 mt-1 w-56 rounded-[1rem] border border-[#d8ddd6] bg-white p-1.5 shadow-lg">
+                {canAddToFamily ? (
+                  <form action={addContactToFamilyBook}>
+                    <input name="contactId" type="hidden" value={contact.id} />
+                    <button
+                      className="flex w-full items-center gap-2 rounded-[0.7rem] px-3 py-2 text-left text-sm font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+                      type="submit"
+                    >
+                      <WorkspaceIcon name="users" size={15} />
+                      Add to {familyMembership?.groupName ?? "family book"}
+                    </button>
+                  </form>
+                ) : null}
+                {isSharedContact ? (
+                  <p className="flex items-center gap-2 px-3 py-2 text-[12px] text-[#8b938c]">
+                    <WorkspaceIcon name="users" size={14} />
+                    In {familyContext?.groupName ?? "a family book"}
+                  </p>
+                ) : null}
                 <form action={permanentlyDeleteContact}>
                   <input name="contactId" type="hidden" value={contact.id} />
                   <input name="redirectTo" type="hidden" value="/" />
