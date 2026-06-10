@@ -28,7 +28,35 @@ export type InlineEditorContact = {
 
 type FieldKey = keyof Omit<InlineEditorContact, "id">;
 
-type FieldDef = { key: FieldKey; label: string; type?: "text" | "email" | "tel" | "url" | "area" };
+type FieldDef = {
+  key: FieldKey;
+  label: string;
+  type?: "text" | "email" | "tel" | "url" | "area";
+  display?: "date";
+};
+
+// Friendly read-mode rendering for stored date values (vCard basic YYYYMMDD,
+// extended YYYY-MM-DD, or year-less --MMDD). Falls back to the raw string.
+const formatDateDisplay = (value: string): string => {
+  const noYear = /^--(\d{2})-?(\d{2})$/.exec(value);
+  if (noYear) {
+    const [, month, day] = noYear;
+    return new Intl.DateTimeFormat("en-GB", {
+      day: "2-digit",
+      month: "long",
+      timeZone: "UTC",
+    }).format(new Date(Date.UTC(2000, Number(month) - 1, Number(day))));
+  }
+  const full = /^(\d{4})-?(\d{2})-?(\d{2})$/.exec(value);
+  if (!full) return value;
+  const [, year, month, day] = full;
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(Date.UTC(Number(year), Number(month) - 1, Number(day))));
+};
 
 const SECTIONS: Array<{ id: string; title: string; fields: FieldDef[] }> = [
   {
@@ -68,7 +96,7 @@ const SECTIONS: Array<{ id: string; title: string; fields: FieldDef[] }> = [
     id: "personal",
     title: "Personal",
     fields: [
-      { key: "birthday", label: "Birthday" },
+      { key: "birthday", label: "Birthday", display: "date" },
       { key: "address", label: "Address", type: "area" },
     ],
   },
@@ -130,12 +158,15 @@ function InlineField({
 
   return (
     <div
-      className={`gap-4 rounded-r-[6px] border-l-2 px-3 py-2 transition-colors ${leftBorder} ${
-        editing ? "bg-[#4158f4]/[0.045]" : ""
-      } ${isArea ? "block" : "flex items-start"}`}
+      className={`gap-4 rounded-r-[6px] border-l-2 py-[9px] pl-[11px] pr-3 transition-colors ${leftBorder} ${
+        editing ? "bg-[#4158f4]/[0.05]" : ""
+      } ${isArea ? "block" : "flex items-start"} ${editable && !editing ? "cursor-text" : ""}`}
+      onClick={editing ? undefined : begin}
     >
       <span
-        className={`shrink-0 text-[12.5px] text-[#5c655e] ${isArea ? "mb-1.5 block" : "w-[118px] pt-1.5"}`}
+        className={`shrink-0 text-[12.5px] leading-[1.45] text-[#5c655e] ${
+          isArea ? "mb-1.5 block" : "w-[118px] pt-px"
+        }`}
       >
         {field.label}
         {!editable ? <span className="text-[11px] text-[#aeb4ac]"> · read-only</span> : null}
@@ -145,7 +176,7 @@ function InlineField({
           isArea ? (
             <textarea
               autoFocus
-              className="w-full resize-y rounded-[0.5rem] border border-[#4158f4] bg-white px-2.5 py-1.5 text-sm text-[#1d2823] outline-none"
+              className="w-full resize-y border-none bg-transparent p-0 text-sm leading-[1.45] text-[#1d2823] outline-none"
               onBlur={() => void commit()}
               onChange={(e) => setDraft(e.target.value)}
               rows={4}
@@ -154,7 +185,7 @@ function InlineField({
           ) : (
             <input
               autoFocus
-              className="w-full rounded-[0.5rem] border border-[#4158f4] bg-white px-2.5 py-1.5 text-sm text-[#1d2823] outline-none"
+              className="w-full border-none bg-transparent p-0 text-sm leading-[1.45] text-[#1d2823] outline-none"
               onBlur={() => void commit()}
               onChange={(e) => setDraft(e.target.value)}
               onKeyDown={(e) => {
@@ -171,15 +202,19 @@ function InlineField({
             />
           )
         ) : (
-          <button
-            className={`-mx-1 w-[calc(100%+0.5rem)] whitespace-pre-wrap break-words rounded-[0.4rem] px-1 py-0.5 text-left text-sm transition ${
-              editable ? "cursor-text hover:bg-[#f6f7f4]" : "cursor-default"
-            } ${has ? "text-[#1d2823]" : "italic text-[#aeb4ac]"}`}
-            onClick={begin}
-            type="button"
+          <span
+            className={`block whitespace-pre-wrap break-words text-sm leading-[1.45] ${
+              has ? "text-[#1d2823]" : "italic text-[#aeb4ac]"
+            }`}
           >
-            {has ? value : editable ? "Not added" : "—"}
-          </button>
+            {has
+              ? field.display === "date"
+                ? formatDateDisplay(value)
+                : value
+              : editable
+                ? "Not added"
+                : "—"}
+          </span>
         )}
         {status === "saving" ? (
           <span className="ml-1 text-[11px] text-[#8b938c]">Saving…</span>
