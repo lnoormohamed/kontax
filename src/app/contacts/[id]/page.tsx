@@ -456,101 +456,148 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
 
   return (
     <AppShell account={shellAccount} counts={shellCounts}>
-      <div className="mx-auto flex w-full max-w-[1720px] flex-col gap-6 px-4 py-6 lg:px-6 lg:py-8">
-        <Link className="text-sm font-semibold text-[#4158f4]" href="/">
-          ← Back to contacts
-        </Link>
+      <div className="bg-white text-[#1d2823]">
+        {/* slim sticky sub-header (back · name · Share/Archive/Favorite/⋯) */}
+        <div className="sticky top-0 z-20 flex h-14 items-center gap-3 border-b border-[#d8ddd6] bg-white/95 px-4 backdrop-blur lg:px-6">
+          <Link className="text-sm font-semibold text-[#5c655e] transition hover:text-[#1d2823]" href="/">
+            ← Contacts
+          </Link>
+          <span className="flex-1 truncate text-center text-[15px] font-semibold text-[#1d2823]">
+            {contact.fullName}
+          </span>
+          <div className="flex shrink-0 items-center gap-2">
+            <Link
+              className="rounded-[0.8rem] border border-[#d8ddd6] bg-white px-3.5 py-1.5 text-sm font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+              href={`/contacts/${contact.id}?tab=sharing`}
+            >
+              Share
+            </Link>
+            <form action={contact.archivedAt ? restoreContact : archiveContact}>
+              <input name="contactId" type="hidden" value={contact.id} />
+              <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}`} />
+              <button
+                className="rounded-[0.8rem] border border-[#d8ddd6] bg-white px-3.5 py-1.5 text-sm font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+                type="submit"
+              >
+                {contact.archivedAt ? "Restore" : "Archive"}
+              </button>
+            </form>
+            <details className="relative">
+              <summary className="grid h-8 w-8 cursor-pointer list-none place-items-center rounded-[0.8rem] border border-[#d8ddd6] bg-white text-[#5c655e] transition hover:bg-[#f2f4f0]">
+                ⋯
+              </summary>
+              <div className="absolute right-0 z-10 mt-1 w-56 rounded-[1rem] border border-[#d8ddd6] bg-white p-1.5 shadow-lg">
+                <form action={permanentlyDeleteContact}>
+                  <input name="contactId" type="hidden" value={contact.id} />
+                  <input name="redirectTo" type="hidden" value="/" />
+                  <button
+                    className="w-full rounded-[0.7rem] px-3 py-2 text-left text-sm font-semibold text-[#b5472f] transition hover:bg-[#fbeae6]"
+                    type="submit"
+                  >
+                    Delete permanently
+                  </button>
+                </form>
+              </div>
+            </details>
+          </div>
+        </div>
 
-        {/* Identity header (locked light system) + archive-first actions */}
-        <section className="rounded-[1.6rem] border border-[#d8ddd6] bg-white p-6">
-          <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
-            <div className="flex min-w-0 gap-4">
-              <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-[1.4rem] bg-[#e7efe9] text-2xl font-semibold text-[#17352e]">
-                {getInitials(contact.fullName)}
-              </div>
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2.5">
-                  <h1 className="text-3xl font-semibold tracking-tight text-[#1d2823]">
-                    {contact.fullName}
-                  </h1>
-                  {contact.archivedAt ? (
-                    <span className="rounded-full bg-[#f6edd9] px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#7a5a1a]">
-                      Archived
-                    </span>
-                  ) : null}
-                  {contact.isFavorite ? <span aria-label="Favorite" className="text-[#e0a31c]">★</span> : null}
-                </div>
-                {contact.company || contact.jobTitle ? (
-                  <p className="mt-1 text-sm text-[#5c655e]">
-                    {[contact.jobTitle, contact.company].filter(Boolean).join(" · ")}
-                  </p>
-                ) : null}
-                <div className="mt-3 flex flex-wrap items-center gap-2">
-                  <SourceBadge sourceType={contact.sourceType} sourceDetail={contact.sourceDetail} />
-                </div>
-                <div className="mt-2 text-[13px] text-[#5c655e]">
-                  <LastUpdatedBy
-                    lastMutatedBy={contact.lastMutatedBy}
-                    lastMutatedByDetail={contact.lastMutatedByDetail}
-                    updatedAt={contact.updatedAt.toISOString()}
-                  />
-                </div>
-                <p className="mt-2 text-[12px] text-[#8b938c]">
-                  Added {formatTimestamp(contact.createdAt)} · Updated {formatTimestamp(contact.updatedAt)}
-                  {syncLinks.length > 0 ? ` · ${syncLinks.length} linked source${syncLinks.length === 1 ? "" : "s"}` : ""}
-                </p>
-              </div>
+        <div className="flex">
+          {/* left rail (sticky) */}
+          <aside
+            className="hidden w-[320px] shrink-0 self-start border-r border-[#d8ddd6] bg-white p-6 lg:block"
+            style={{ position: "sticky", top: 56 }}
+          >
+            <div className="relative inline-flex h-[88px] w-[88px] items-center justify-center rounded-full bg-[#e7efe9] text-3xl font-semibold text-[#17352e]">
+              {getInitials(contact.fullName)}
+              {contact.isFavorite ? (
+                <span className="absolute -bottom-0.5 -right-0.5 grid h-7 w-7 place-items-center rounded-full bg-white text-[15px] text-[#e0a31c] shadow">
+                  ★
+                </span>
+              ) : null}
+            </div>
+            <h1 className="mt-4 text-[21px] font-semibold leading-tight tracking-[-0.01em] text-[#1d2823]">
+              {contact.fullName}
+            </h1>
+            {contact.company || contact.jobTitle ? (
+              <p className="mt-1 text-[13.5px] text-[#5c655e]">
+                {[contact.jobTitle, contact.company].filter(Boolean).join(" · ")}
+              </p>
+            ) : null}
+            {contact.birthday ? (
+              <p className="mt-1 text-[13px] text-[#8b938c]">🎂 {formatStoredDateValue(contact.birthday)}</p>
+            ) : null}
+
+            <div className="mt-3.5 flex flex-wrap gap-2">
+              <SourceBadge sourceType={contact.sourceType} sourceDetail={contact.sourceDetail} />
+              {contact.archivedAt ? (
+                <span className="rounded-full bg-[#f6edd9] px-2.5 py-1 text-[11px] font-semibold text-[#7a5a1a]">
+                  Archived
+                </span>
+              ) : null}
             </div>
 
-            {/* Archive-first actions: Share · Archive/Restore · Favorite · ⋯ (Delete) */}
-            <div className="flex shrink-0 flex-wrap items-center gap-2">
-              <Link
-                className="inline-flex items-center gap-1.5 rounded-[0.8rem] border border-[#d8ddd6] bg-white px-3.5 py-2 text-sm font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
-                href={`/contacts/${contact.id}?tab=sharing`}
-              >
-                Share
-              </Link>
-              <form action={contact.archivedAt ? restoreContact : archiveContact}>
-                <input name="contactId" type="hidden" value={contact.id} />
-                <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}`} />
-                <button
-                  className="rounded-[0.8rem] border border-[#d8ddd6] bg-white px-3.5 py-2 text-sm font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
-                  type="submit"
+            <div className="my-5 h-px bg-[#edf0ea]" />
+
+            {/* quick actions */}
+            <div className="flex flex-wrap items-center gap-2">
+              {contact.phone ? (
+                <a
+                  className="rounded-[0.7rem] border border-[#d8ddd6] bg-white px-3 py-1.5 text-[13px] font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+                  href={`tel:${contact.phone}`}
                 >
-                  {contact.archivedAt ? "Restore" : "Archive"}
-                </button>
-              </form>
+                  Call
+                </a>
+              ) : null}
+              {contact.email ? (
+                <a
+                  className="rounded-[0.7rem] border border-[#d8ddd6] bg-white px-3 py-1.5 text-[13px] font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+                  href={`mailto:${contact.email}`}
+                >
+                  Email
+                </a>
+              ) : null}
               <form action={toggleFavoriteContact}>
                 <input name="contactId" type="hidden" value={contact.id} />
                 <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}`} />
                 <button
-                  aria-label={contact.isFavorite ? "Unfavorite" : "Favorite"}
-                  className="grid h-9 w-9 place-items-center rounded-[0.8rem] border border-[#d8ddd6] bg-white text-[#e0a31c] transition hover:bg-[#f2f4f0]"
+                  className="rounded-[0.7rem] border border-[#d8ddd6] bg-white px-3 py-1.5 text-[13px] font-semibold text-[#e0a31c] transition hover:bg-[#f2f4f0]"
                   type="submit"
                 >
-                  {contact.isFavorite ? "★" : "☆"}
+                  {contact.isFavorite ? "★ Favorited" : "☆ Favorite"}
                 </button>
               </form>
-              <details className="relative">
-                <summary className="grid h-9 w-9 cursor-pointer list-none place-items-center rounded-[0.8rem] border border-[#d8ddd6] bg-white text-[#5c655e] transition hover:bg-[#f2f4f0]">
-                  ⋯
-                </summary>
-                <div className="absolute right-0 z-10 mt-1 w-56 rounded-[1rem] border border-[#d8ddd6] bg-white p-1.5 shadow-lg">
-                  <form action={permanentlyDeleteContact}>
-                    <input name="contactId" type="hidden" value={contact.id} />
-                    <input name="redirectTo" type="hidden" value="/" />
-                    <button
-                      className="w-full rounded-[0.7rem] px-3 py-2 text-left text-sm font-semibold text-[#b5472f] transition hover:bg-[#fbeae6]"
-                      type="submit"
-                    >
-                      Delete permanently
-                    </button>
-                  </form>
-                </div>
-              </details>
             </div>
-          </div>
-        </section>
+
+            <div className="my-5 h-px bg-[#edf0ea] " />
+
+            {/* metadata */}
+            <dl className="grid gap-2 text-[12px]">
+              <div className="flex justify-between gap-3">
+                <dt className="text-[#8b938c]">Added</dt>
+                <dd className="text-right text-[#5c655e]">{formatTimestamp(contact.createdAt)}</dd>
+              </div>
+              <div className="flex justify-between gap-3">
+                <dt className="text-[#8b938c]">Modified</dt>
+                <dd className="text-right text-[#5c655e]">{formatTimestamp(contact.updatedAt)}</dd>
+              </div>
+              <div className="flex justify-between gap-3">
+                <dt className="text-[#8b938c]">UID</dt>
+                <dd className="text-right font-mono text-[#5c655e]">{contact.id.slice(0, 8)}…</dd>
+              </div>
+              <div className="text-[#5c655e]">
+                <LastUpdatedBy
+                  lastMutatedBy={contact.lastMutatedBy}
+                  lastMutatedByDetail={contact.lastMutatedByDetail}
+                  updatedAt={contact.updatedAt.toISOString()}
+                />
+              </div>
+            </dl>
+          </aside>
+
+          {/* right pane */}
+          <main className="min-w-0 flex-1 px-4 py-5 lg:px-8 lg:py-6">
+            <div className="mx-auto flex w-full max-w-[820px] flex-col gap-5">
 
         {wasSaved ? (
           <div className="rounded-[1.6rem] border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-700 shadow-sm">
@@ -1594,6 +1641,9 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
           </div>
         </section>
         ) : null}
+            </div>
+          </main>
+        </div>
       </div>
     </AppShell>
   );
