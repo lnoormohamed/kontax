@@ -25304,6 +25304,8 @@ export namespace Prisma {
     expiresAt: Date | null
     revokedAt: Date | null
     lastPushedAt: Date | null
+    lastErrorAt: Date | null
+    lastErrorCode: string | null
     downloadCount: number | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -25322,6 +25324,8 @@ export namespace Prisma {
     expiresAt: Date | null
     revokedAt: Date | null
     lastPushedAt: Date | null
+    lastErrorAt: Date | null
+    lastErrorCode: string | null
     downloadCount: number | null
     createdAt: Date | null
     updatedAt: Date | null
@@ -25341,6 +25345,8 @@ export namespace Prisma {
     expiresAt: number
     revokedAt: number
     lastPushedAt: number
+    lastErrorAt: number
+    lastErrorCode: number
     downloadCount: number
     createdAt: number
     updatedAt: number
@@ -25369,6 +25375,8 @@ export namespace Prisma {
     expiresAt?: true
     revokedAt?: true
     lastPushedAt?: true
+    lastErrorAt?: true
+    lastErrorCode?: true
     downloadCount?: true
     createdAt?: true
     updatedAt?: true
@@ -25387,6 +25395,8 @@ export namespace Prisma {
     expiresAt?: true
     revokedAt?: true
     lastPushedAt?: true
+    lastErrorAt?: true
+    lastErrorCode?: true
     downloadCount?: true
     createdAt?: true
     updatedAt?: true
@@ -25406,6 +25416,8 @@ export namespace Prisma {
     expiresAt?: true
     revokedAt?: true
     lastPushedAt?: true
+    lastErrorAt?: true
+    lastErrorCode?: true
     downloadCount?: true
     createdAt?: true
     updatedAt?: true
@@ -25512,6 +25524,8 @@ export namespace Prisma {
     expiresAt: Date | null
     revokedAt: Date | null
     lastPushedAt: Date | null
+    lastErrorAt: Date | null
+    lastErrorCode: string | null
     downloadCount: number
     createdAt: Date
     updatedAt: Date
@@ -25550,6 +25564,8 @@ export namespace Prisma {
     expiresAt?: boolean
     revokedAt?: boolean
     lastPushedAt?: boolean
+    lastErrorAt?: boolean
+    lastErrorCode?: boolean
     downloadCount?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -25573,6 +25589,8 @@ export namespace Prisma {
     expiresAt?: boolean
     revokedAt?: boolean
     lastPushedAt?: boolean
+    lastErrorAt?: boolean
+    lastErrorCode?: boolean
     downloadCount?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -25596,6 +25614,8 @@ export namespace Prisma {
     expiresAt?: boolean
     revokedAt?: boolean
     lastPushedAt?: boolean
+    lastErrorAt?: boolean
+    lastErrorCode?: boolean
     downloadCount?: boolean
     createdAt?: boolean
     updatedAt?: boolean
@@ -25619,12 +25639,14 @@ export namespace Prisma {
     expiresAt?: boolean
     revokedAt?: boolean
     lastPushedAt?: boolean
+    lastErrorAt?: boolean
+    lastErrorCode?: boolean
     downloadCount?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ContactShareOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerUserId" | "contactId" | "shareType" | "token" | "recipientUserId" | "recipientEmail" | "recipientContactId" | "status" | "snapshot" | "expiresAt" | "revokedAt" | "lastPushedAt" | "downloadCount" | "createdAt" | "updatedAt", ExtArgs["result"]["contactShare"]>
+  export type ContactShareOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerUserId" | "contactId" | "shareType" | "token" | "recipientUserId" | "recipientEmail" | "recipientContactId" | "status" | "snapshot" | "expiresAt" | "revokedAt" | "lastPushedAt" | "lastErrorAt" | "lastErrorCode" | "downloadCount" | "createdAt" | "updatedAt", ExtArgs["result"]["contactShare"]>
   export type ContactShareInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     owner?: boolean | UserDefaultArgs<ExtArgs>
     contact?: boolean | ContactShare$contactArgs<ExtArgs>
@@ -25666,6 +25688,8 @@ export namespace Prisma {
       expiresAt: Date | null
       revokedAt: Date | null
       lastPushedAt: Date | null
+      lastErrorAt: Date | null
+      lastErrorCode: string | null
       downloadCount: number
       createdAt: Date
       updatedAt: Date
@@ -26109,6 +26133,8 @@ export namespace Prisma {
     readonly expiresAt: FieldRef<"ContactShare", 'DateTime'>
     readonly revokedAt: FieldRef<"ContactShare", 'DateTime'>
     readonly lastPushedAt: FieldRef<"ContactShare", 'DateTime'>
+    readonly lastErrorAt: FieldRef<"ContactShare", 'DateTime'>
+    readonly lastErrorCode: FieldRef<"ContactShare", 'String'>
     readonly downloadCount: FieldRef<"ContactShare", 'Int'>
     readonly createdAt: FieldRef<"ContactShare", 'DateTime'>
     readonly updatedAt: FieldRef<"ContactShare", 'DateTime'>
@@ -26988,6 +27014,8 @@ export namespace Prisma {
     expiresAt: 'expiresAt',
     revokedAt: 'revokedAt',
     lastPushedAt: 'lastPushedAt',
+    lastErrorAt: 'lastErrorAt',
+    lastErrorCode: 'lastErrorCode',
     downloadCount: 'downloadCount',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
@@ -29599,6 +29627,8 @@ export namespace Prisma {
     expiresAt?: DateTimeNullableFilter<"ContactShare"> | Date | string | null
     revokedAt?: DateTimeNullableFilter<"ContactShare"> | Date | string | null
     lastPushedAt?: DateTimeNullableFilter<"ContactShare"> | Date | string | null
+    lastErrorAt?: DateTimeNullableFilter<"ContactShare"> | Date | string | null
+    lastErrorCode?: StringNullableFilter<"ContactShare"> | string | null
     downloadCount?: IntFilter<"ContactShare"> | number
     createdAt?: DateTimeFilter<"ContactShare"> | Date | string
     updatedAt?: DateTimeFilter<"ContactShare"> | Date | string
@@ -29622,6 +29652,8 @@ export namespace Prisma {
     expiresAt?: SortOrderInput | SortOrder
     revokedAt?: SortOrderInput | SortOrder
     lastPushedAt?: SortOrderInput | SortOrder
+    lastErrorAt?: SortOrderInput | SortOrder
+    lastErrorCode?: SortOrderInput | SortOrder
     downloadCount?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -29648,6 +29680,8 @@ export namespace Prisma {
     expiresAt?: DateTimeNullableFilter<"ContactShare"> | Date | string | null
     revokedAt?: DateTimeNullableFilter<"ContactShare"> | Date | string | null
     lastPushedAt?: DateTimeNullableFilter<"ContactShare"> | Date | string | null
+    lastErrorAt?: DateTimeNullableFilter<"ContactShare"> | Date | string | null
+    lastErrorCode?: StringNullableFilter<"ContactShare"> | string | null
     downloadCount?: IntFilter<"ContactShare"> | number
     createdAt?: DateTimeFilter<"ContactShare"> | Date | string
     updatedAt?: DateTimeFilter<"ContactShare"> | Date | string
@@ -29671,6 +29705,8 @@ export namespace Prisma {
     expiresAt?: SortOrderInput | SortOrder
     revokedAt?: SortOrderInput | SortOrder
     lastPushedAt?: SortOrderInput | SortOrder
+    lastErrorAt?: SortOrderInput | SortOrder
+    lastErrorCode?: SortOrderInput | SortOrder
     downloadCount?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -29698,6 +29734,8 @@ export namespace Prisma {
     expiresAt?: DateTimeNullableWithAggregatesFilter<"ContactShare"> | Date | string | null
     revokedAt?: DateTimeNullableWithAggregatesFilter<"ContactShare"> | Date | string | null
     lastPushedAt?: DateTimeNullableWithAggregatesFilter<"ContactShare"> | Date | string | null
+    lastErrorAt?: DateTimeNullableWithAggregatesFilter<"ContactShare"> | Date | string | null
+    lastErrorCode?: StringNullableWithAggregatesFilter<"ContactShare"> | string | null
     downloadCount?: IntWithAggregatesFilter<"ContactShare"> | number
     createdAt?: DateTimeWithAggregatesFilter<"ContactShare"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"ContactShare"> | Date | string
@@ -32098,6 +32136,8 @@ export namespace Prisma {
     expiresAt?: Date | string | null
     revokedAt?: Date | string | null
     lastPushedAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     downloadCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -32121,6 +32161,8 @@ export namespace Prisma {
     expiresAt?: Date | string | null
     revokedAt?: Date | string | null
     lastPushedAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     downloadCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -32136,6 +32178,8 @@ export namespace Prisma {
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32159,6 +32203,8 @@ export namespace Prisma {
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32178,6 +32224,8 @@ export namespace Prisma {
     expiresAt?: Date | string | null
     revokedAt?: Date | string | null
     lastPushedAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     downloadCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -32193,6 +32241,8 @@ export namespace Prisma {
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -32212,6 +32262,8 @@ export namespace Prisma {
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -34320,6 +34372,8 @@ export namespace Prisma {
     expiresAt?: SortOrder
     revokedAt?: SortOrder
     lastPushedAt?: SortOrder
+    lastErrorAt?: SortOrder
+    lastErrorCode?: SortOrder
     downloadCount?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -34342,6 +34396,8 @@ export namespace Prisma {
     expiresAt?: SortOrder
     revokedAt?: SortOrder
     lastPushedAt?: SortOrder
+    lastErrorAt?: SortOrder
+    lastErrorCode?: SortOrder
     downloadCount?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -34360,6 +34416,8 @@ export namespace Prisma {
     expiresAt?: SortOrder
     revokedAt?: SortOrder
     lastPushedAt?: SortOrder
+    lastErrorAt?: SortOrder
+    lastErrorCode?: SortOrder
     downloadCount?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -37758,6 +37816,8 @@ export namespace Prisma {
     expiresAt?: Date | string | null
     revokedAt?: Date | string | null
     lastPushedAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     downloadCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -37779,6 +37839,8 @@ export namespace Prisma {
     expiresAt?: Date | string | null
     revokedAt?: Date | string | null
     lastPushedAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     downloadCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -37804,6 +37866,8 @@ export namespace Prisma {
     expiresAt?: Date | string | null
     revokedAt?: Date | string | null
     lastPushedAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     downloadCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -37825,6 +37889,8 @@ export namespace Prisma {
     expiresAt?: Date | string | null
     revokedAt?: Date | string | null
     lastPushedAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     downloadCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -38343,6 +38409,8 @@ export namespace Prisma {
     expiresAt?: DateTimeNullableFilter<"ContactShare"> | Date | string | null
     revokedAt?: DateTimeNullableFilter<"ContactShare"> | Date | string | null
     lastPushedAt?: DateTimeNullableFilter<"ContactShare"> | Date | string | null
+    lastErrorAt?: DateTimeNullableFilter<"ContactShare"> | Date | string | null
+    lastErrorCode?: StringNullableFilter<"ContactShare"> | string | null
     downloadCount?: IntFilter<"ContactShare"> | number
     createdAt?: DateTimeFilter<"ContactShare"> | Date | string
     updatedAt?: DateTimeFilter<"ContactShare"> | Date | string
@@ -38912,6 +38980,8 @@ export namespace Prisma {
     expiresAt?: Date | string | null
     revokedAt?: Date | string | null
     lastPushedAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     downloadCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -38933,6 +39003,8 @@ export namespace Prisma {
     expiresAt?: Date | string | null
     revokedAt?: Date | string | null
     lastPushedAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     downloadCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -38958,6 +39030,8 @@ export namespace Prisma {
     expiresAt?: Date | string | null
     revokedAt?: Date | string | null
     lastPushedAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     downloadCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -38979,6 +39053,8 @@ export namespace Prisma {
     expiresAt?: Date | string | null
     revokedAt?: Date | string | null
     lastPushedAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     downloadCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -44587,6 +44663,8 @@ export namespace Prisma {
     expiresAt?: Date | string | null
     revokedAt?: Date | string | null
     lastPushedAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     downloadCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -44605,6 +44683,8 @@ export namespace Prisma {
     expiresAt?: Date | string | null
     revokedAt?: Date | string | null
     lastPushedAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     downloadCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -45311,6 +45391,8 @@ export namespace Prisma {
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -45332,6 +45414,8 @@ export namespace Prisma {
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -45350,6 +45434,8 @@ export namespace Prisma {
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -45365,6 +45451,8 @@ export namespace Prisma {
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -45386,6 +45474,8 @@ export namespace Prisma {
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -45404,6 +45494,8 @@ export namespace Prisma {
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -45593,6 +45685,8 @@ export namespace Prisma {
     expiresAt?: Date | string | null
     revokedAt?: Date | string | null
     lastPushedAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     downloadCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -45611,6 +45705,8 @@ export namespace Prisma {
     expiresAt?: Date | string | null
     revokedAt?: Date | string | null
     lastPushedAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
     downloadCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
@@ -45928,6 +46024,8 @@ export namespace Prisma {
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -45949,6 +46047,8 @@ export namespace Prisma {
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -45967,6 +46067,8 @@ export namespace Prisma {
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -45982,6 +46084,8 @@ export namespace Prisma {
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -46003,6 +46107,8 @@ export namespace Prisma {
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -46021,6 +46127,8 @@ export namespace Prisma {
     expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastPushedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string

@@ -210,6 +210,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
       recipientEmail: true,
       recipientContactId: true,
       lastPushedAt: true,
+      lastErrorCode: true,
     },
   });
   const vcardLinks = contactShares.filter(
@@ -684,10 +685,20 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                       >
                         <span className="min-w-0">
                           <span className="block truncate text-[#1d2823]">{share.recipientEmail}</span>
-                          {share.status === "ACTIVE" && share.recipientContactId && share.lastPushedAt ? (
-                            <span className="block text-[12px] text-[#8b938c]">
-                              Last synced {formatTimestamp(share.lastPushedAt)}
-                            </span>
+                          {share.status === "ACTIVE" && share.recipientContactId ? (
+                            share.lastErrorCode === "RECIPIENT_LOCKED" ? (
+                              <span className="block text-[12px] text-[#bf8526]">
+                                Sync paused — recipient account issue
+                              </span>
+                            ) : share.lastErrorCode ? (
+                              <span className="block text-[12px] text-[#bf8526]">
+                                Sync error — will retry
+                              </span>
+                            ) : share.lastPushedAt ? (
+                              <span className="block text-[12px] text-[#8b938c]">
+                                Last synced {formatTimestamp(share.lastPushedAt)}
+                              </span>
+                            ) : null
                           ) : null}
                         </span>
                         <span className="flex shrink-0 items-center gap-3">

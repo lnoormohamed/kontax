@@ -461,6 +461,8 @@ exports.Prisma.ContactShareScalarFieldEnum = {
   expiresAt: 'expiresAt',
   revokedAt: 'revokedAt',
   lastPushedAt: 'lastPushedAt',
+  lastErrorAt: 'lastErrorAt',
+  lastErrorCode: 'lastErrorCode',
   downloadCount: 'downloadCount',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'

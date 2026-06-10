@@ -142,7 +142,7 @@ This roadmap is the implementation source of truth for phases 1–16. Each phase
 | P12-05 | 12 | Done | P1 | P12-03, P12-04 | Unassigned | Sharing tab manages all shares (vCard/static/live): status, last-synced, revoke; plan-gated; "Shared with me" badge in sidebars |
 | P12-06 | 12 | Done | P1 | P12-03 | Unassigned | Header/sidebar badges, /shares accept(→navigate)/decline, invite-to-register linking, AWS SES email (graceful no-op if unconfigured) |
 | P12-07 | 12 | Done | P2 | P12-05, P12-06 | Unassigned | Brief 12-sharing-ui.md: owner Sharing tab + recipient /shares/badges/Live-from panel, plan gates, empty states, live-vs-sync badge distinction |
-| P12-08 | 12 | Not Started | P2 | P12-07 | Unassigned | Propagation errors are caught, logged, surfaced, and retried automatically |
+| P12-08 | 12 | Done | P2 | P12-07 | Unassigned | Live propagation after-commit + isolated per-recipient; wired to update/restore/merge (survivor inherits shares); lastError state + lock/retry; UI status |
 
 ### Phase 13 — Family Plan: Shared Contact Books
 

@@ -237,9 +237,16 @@ Let users share individual contacts with people inside and outside of Kontax, in
 ---
 
 ## P12-08 — Live share propagation reliability and error handling
-- Status: `Not Started`
+- Status: `Done`
 - Priority: `P2`
 - Dependencies: `P12-07`
+- Delivered:
+  - **Propagation runs after commit, not inside the owner's transaction** — refactored `propagateLiveShares(ownerUserId, contactId)` to use its own per-recipient isolated transactions, so a recipient-side failure can never roll back the owner's edit.
+  - **Wired into all the right events:** `CONTACT_UPDATED` (updateContact + updateContactField), `CONTACT_RESTORED` (restoreContact), and `CONTACT_MERGED` (mergeContactsForUser). On merge the **survivor inherits the absorbed contact's active shares** (reassigned `contactId`) and the merged record is pushed to recipients.
+  - **Error handling + state:** added `lastErrorAt`/`lastErrorCode` to `ContactShare`. A **locked/canceled recipient** pauses that share (`RECIPIENT_LOCKED`) and is skipped; a failed push is captured (`PUSH_FAILED`). Both **retry on the next propagation** and **clear on success**. Errors are logged and never thrown — propagation does not silently fail and never blocks the owner.
+  - **UI:** the owner's live-shares list shows "Sync paused — recipient account issue" / "Sync error — will retry" / "Last synced …".
+  - Verified end-to-end against the DB: merge inheritance, paid push, locked→paused (copy frozen), reactivate→cleared+synced.
+  - **Lag / debounce:** propagation is synchronous-in-request (well within a best-effort ~5-minute target at current scale). The 30s debounce / queue for high-frequency edits with many recipients is noted as future hardening, not needed now.
 - Implementation Notes:
   - Live share propagation is triggered by `ActivityEvent` emission on the owner's contact. Wire the propagation job to fire after `CONTACT_UPDATED`, `CONTACT_MERGED`, and `CONTACT_RESTORED` events for contacts with active `LIVE_SYNC` shares.
   - Handle propagation failures: if the recipient's account is locked or suspended, pause propagation and set an error state on the share. Retry when the account becomes active again.

@@ -1,5 +1,6 @@
 import { Prisma } from "../../generated/prisma";
 import { emitEvent } from "~/lib/activity";
+import { propagateLiveShares } from "~/server/contact-shares";
 import {
   emailDomain,
   getFamilyName as getFamilyNameKey,
@@ -1703,7 +1704,7 @@ export const mergeContactsForUser = async ({
     throw new Error("Choose two different contacts before merging.");
   }
 
-  return db.$transaction(async (tx) => {
+  const mergeResult = await db.$transaction(async (tx) => {
     const contacts = await tx.contact.findMany({
       where: {
         userId,
@@ -1905,6 +1906,13 @@ export const mergeContactsForUser = async ({
       payload: {},
     });
 
+    // P12-08: the survivor inherits the absorbed contact's active shares (so live
+    // recipients keep their link, pointed at the merged record).
+    await tx.contactShare.updateMany({
+      where: { contactId: secondaryContact.id, status: "ACTIVE" },
+      data: { contactId: primaryContact.id },
+    });
+
     let acceptedDecisionId: string | undefined;
 
     if (persistedSuggestionId) {
@@ -2076,6 +2084,12 @@ export const mergeContactsForUser = async ({
       decisionId: acceptedDecisionId,
     };
   });
+
+  // P12-08: after the merge commits, push the merged record to any live
+  // recipients (incl. shares just inherited from the absorbed contact).
+  await propagateLiveShares(userId, mergeResult.survivingContactId);
+
+  return mergeResult;
 };
 
 export const undoMergedContactsForUser = async ({

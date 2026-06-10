@@ -564,9 +564,11 @@ export const updateContact = async (formData: FormData) => {
       });
     }
 
-    // Live sharing (P12-04): push this edit to any active live recipient copies.
-    await propagateLiveShares(tx, userId, contactId);
   });
+
+  // Live sharing (P12-04/08): push this edit to active live recipient copies —
+  // after commit, so a recipient-side failure can't roll back the owner's edit.
+  await propagateLiveShares(userId, contactId);
 
   revalidateContactViews(contactId);
 
@@ -635,9 +637,9 @@ export const updateContactField = async (contactId: string, field: string, rawVa
         payload: { diffs },
       });
     }
-    await propagateLiveShares(tx, userId, contactId);
   });
 
+  await propagateLiveShares(userId, contactId);
   revalidateContactViews(contactId);
 };
 
@@ -783,6 +785,8 @@ export const restoreContact = async (formData: FormData) => {
     }
   });
 
+  // P12-08: re-sync any live recipients after a restore.
+  await propagateLiveShares(userId, contactId);
   revalidateContactViews(contactId);
 
   const redirectTo = getRedirectTarget(formData);

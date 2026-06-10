@@ -678,6 +678,10 @@ model ContactShare {
     expiresAt          DateTime?
     revokedAt          DateTime?
     lastPushedAt       DateTime?
+    // Live-sync propagation error state (P12-08): set when a push to the recipient
+    // is paused (e.g. recipient account locked); cleared on the next success.
+    lastErrorAt        DateTime?
+    lastErrorCode      String?
     downloadCount      Int         @default(0)
     createdAt          DateTime    @default(now())
     updatedAt          DateTime    @updatedAt
