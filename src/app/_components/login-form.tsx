@@ -22,20 +22,20 @@ export function LoginForm({ next }: { next?: string }) {
     setError("");
     setIsPending(true);
 
-    const result = await signIn("credentials", {
-      email,
-      password,
-      redirect: false,
-    });
+    try {
+      await signIn("credentials", {
+        email,
+        password,
+        redirect: false,
+      });
 
-    if (result?.error) {
+      router.push(next ?? "/");
+      router.refresh();
+    } catch {
+      // NextAuth v5 throws on failed credentials (CredentialsSignin)
       setError("We couldn't sign you in with those details.");
       setIsPending(false);
-      return;
     }
-
-    router.push(next ?? "/");
-    router.refresh();
   };
 
   return (

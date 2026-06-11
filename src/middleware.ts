@@ -38,7 +38,7 @@ export default auth((req: NextRequest & { auth: { user?: { id?: string }; pendin
   // No session → redirect to login, preserving the intended destination
   if (!session?.user?.id) {
     const loginUrl = new URL("/login", req.url);
-    loginUrl.searchParams.set("callbackUrl", pathname);
+    loginUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(loginUrl);
   }
 
