@@ -527,6 +527,10 @@ export const createContact = async (formData: FormData) => {
     await assertCanCreateContacts(userId);
   }
 
+  // P18-11: resolve the user's default personal book for new private contacts
+  const { getUserDefaultBook } = await import("~/server/address-books");
+  const defaultBook = !bookTarget ? await getUserDefaultBook(userId) : null;
+
   const createdContact = await db.$transaction(async (tx) => {
     const contact = await tx.contact.create({
       data: {
@@ -534,6 +538,8 @@ export const createContact = async (formData: FormData) => {
         ...input,
         ...phoneticFields,
         ...(bookTarget ? { sourceDetail: bookTarget.label } : {}),
+        // Assign to default book for private contacts (P18-11)
+        ...(!bookTarget && defaultBook ? { bookId: defaultBook.id } : {}),
       },
     });
     if (bookTarget) {

@@ -189,6 +189,8 @@ model User {
     totpEnabled                   Boolean   @default(false)
     totpSecret                    String?   // AES-256-GCM encrypted
     totpVerifiedAt                DateTime?
+    // P18-09: scheduled hard-delete (30-day grace period after user confirms deletion)
+    scheduledDeleteAt             DateTime?
     appPasswords          AppPassword[]
     contacts              Contact[]
     importJobs            ImportJob[]
@@ -207,8 +209,11 @@ model User {
     passwordResetTokens     PasswordResetToken[]
     sessions                UserSession[]
     totpRecoveryCodes       TotpRecoveryCode[]
+    addressBooks            AddressBook[]
     createdAt             DateTime                @default(now())
     updatedAt             DateTime                @updatedAt
+
+    @@index([scheduledDeleteAt])
 }
 
 model AppPassword {
@@ -285,6 +290,9 @@ model Contact {
     lastMutatedBy       SourceType @default(MANUAL)
     lastMutatedByDetail String?
     archivedAt  DateTime?
+    // P18-11: address book grouping (nullable for safe migration; backfilled to default book)
+    bookId      String?
+    book        AddressBook? @relation(fields: [bookId], references: [id], onDelete: SetNull)
     createdAt   DateTime  @default(now())
     updatedAt   DateTime  @updatedAt
 
@@ -295,6 +303,7 @@ model Contact {
     @@index([userId, importJobId])
     @@index([userId, syncUid])
     @@index([userId, mergedIntoContactId])
+    @@index([bookId, archivedAt, fullName])
 }
 
 model SubscriptionCustomer {
@@ -754,6 +763,9 @@ model GroupAddressBook {
     isDefault   Boolean  @default(true)
     // P14-01 (Teams): archived books are read-only + hidden from default views.
     archivedAt  DateTime?
+    // P18-11: AddressBook.id of the personal book created for the owner when this group book dissolves.
+    // Not a FK — stored as plain string to survive group book archival (Phase 13 writes this).
+    dissolvedToBookId String?
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
     group       Group    @relation(fields: [groupId], references: [id], onDelete: Cascade)
@@ -761,6 +773,28 @@ model GroupAddressBook {
     teamSyncAccounts TeamSyncAccount[]
 
     @@index([groupId])
+}
+
+// P18-11: personal address book (one default per user; model supports multiple for Phase 28+)
+model AddressBook {
+    id                String    @id @default(cuid())
+    userId            String
+    name              String
+    slug              String    // URL-safe, used in CardDAV paths (e.g. "default")
+    description       String?
+    isDefault         Boolean   @default(false)
+    // Preserved so re-subscription can locate former shared-book contacts (Phase 13)
+    sourceGroupBookId String?
+    archivedAt        DateTime?
+    createdAt         DateTime  @default(now())
+    updatedAt         DateTime  @updatedAt
+
+    user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    contacts Contact[]
+
+    @@unique([userId, slug])
+    @@index([userId, isDefault])
+    @@index([userId, archivedAt])
 }
 
 // P14-01 (Teams): links an existing personal SyncAccount to a team address book

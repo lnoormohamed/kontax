@@ -119,6 +119,11 @@ export type GroupMember = $Result.DefaultSelection<Prisma.$GroupMemberPayload>
  */
 export type GroupAddressBook = $Result.DefaultSelection<Prisma.$GroupAddressBookPayload>
 /**
+ * Model AddressBook
+ * 
+ */
+export type AddressBook = $Result.DefaultSelection<Prisma.$AddressBookPayload>
+/**
  * Model TeamSyncAccount
  * 
  */
@@ -885,6 +890,16 @@ export class PrismaClient<
   get groupAddressBook(): Prisma.GroupAddressBookDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.addressBook`: Exposes CRUD operations for the **AddressBook** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AddressBooks
+    * const addressBooks = await prisma.addressBook.findMany()
+    * ```
+    */
+  get addressBook(): Prisma.AddressBookDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.teamSyncAccount`: Exposes CRUD operations for the **TeamSyncAccount** model.
     * Example usage:
     * ```ts
@@ -1375,6 +1390,7 @@ export namespace Prisma {
     Group: 'Group',
     GroupMember: 'GroupMember',
     GroupAddressBook: 'GroupAddressBook',
+    AddressBook: 'AddressBook',
     TeamSyncAccount: 'TeamSyncAccount',
     GroupContact: 'GroupContact',
     ContactShare: 'ContactShare'
@@ -1396,7 +1412,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "group" | "groupMember" | "groupAddressBook" | "teamSyncAccount" | "groupContact" | "contactShare"
+      modelProps: "user" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "teamSyncAccount" | "groupContact" | "contactShare"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2954,6 +2970,80 @@ export namespace Prisma {
           }
         }
       }
+      AddressBook: {
+        payload: Prisma.$AddressBookPayload<ExtArgs>
+        fields: Prisma.AddressBookFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AddressBookFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AddressBookPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AddressBookFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AddressBookPayload>
+          }
+          findFirst: {
+            args: Prisma.AddressBookFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AddressBookPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AddressBookFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AddressBookPayload>
+          }
+          findMany: {
+            args: Prisma.AddressBookFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AddressBookPayload>[]
+          }
+          create: {
+            args: Prisma.AddressBookCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AddressBookPayload>
+          }
+          createMany: {
+            args: Prisma.AddressBookCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AddressBookCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AddressBookPayload>[]
+          }
+          delete: {
+            args: Prisma.AddressBookDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AddressBookPayload>
+          }
+          update: {
+            args: Prisma.AddressBookUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AddressBookPayload>
+          }
+          deleteMany: {
+            args: Prisma.AddressBookDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AddressBookUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.AddressBookUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AddressBookPayload>[]
+          }
+          upsert: {
+            args: Prisma.AddressBookUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AddressBookPayload>
+          }
+          aggregate: {
+            args: Prisma.AddressBookAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAddressBook>
+          }
+          groupBy: {
+            args: Prisma.AddressBookGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AddressBookGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AddressBookCountArgs<ExtArgs>
+            result: $Utils.Optional<AddressBookCountAggregateOutputType> | number
+          }
+        }
+      }
       TeamSyncAccount: {
         payload: Prisma.$TeamSyncAccountPayload<ExtArgs>
         fields: Prisma.TeamSyncAccountFieldRefs
@@ -3293,6 +3383,7 @@ export namespace Prisma {
     group?: GroupOmit
     groupMember?: GroupMemberOmit
     groupAddressBook?: GroupAddressBookOmit
+    addressBook?: AddressBookOmit
     teamSyncAccount?: TeamSyncAccountOmit
     groupContact?: GroupContactOmit
     contactShare?: ContactShareOmit
@@ -3393,6 +3484,7 @@ export namespace Prisma {
     passwordResetTokens: number
     sessions: number
     totpRecoveryCodes: number
+    addressBooks: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3413,6 +3505,7 @@ export namespace Prisma {
     passwordResetTokens?: boolean | UserCountOutputTypeCountPasswordResetTokensArgs
     sessions?: boolean | UserCountOutputTypeCountSessionsArgs
     totpRecoveryCodes?: boolean | UserCountOutputTypeCountTotpRecoveryCodesArgs
+    addressBooks?: boolean | UserCountOutputTypeCountAddressBooksArgs
   }
 
   // Custom InputTypes
@@ -3543,6 +3636,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountTotpRecoveryCodesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: TotpRecoveryCodeWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountAddressBooksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AddressBookWhereInput
   }
 
 
@@ -3974,6 +4074,37 @@ export namespace Prisma {
 
 
   /**
+   * Count Type AddressBookCountOutputType
+   */
+
+  export type AddressBookCountOutputType = {
+    contacts: number
+  }
+
+  export type AddressBookCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    contacts?: boolean | AddressBookCountOutputTypeCountContactsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * AddressBookCountOutputType without action
+   */
+  export type AddressBookCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AddressBookCountOutputType
+     */
+    select?: AddressBookCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * AddressBookCountOutputType without action
+   */
+  export type AddressBookCountOutputTypeCountContactsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ContactWhereInput
+  }
+
+
+  /**
    * Models
    */
 
@@ -4012,6 +4143,7 @@ export namespace Prisma {
     totpEnabled: boolean | null
     totpSecret: string | null
     totpVerifiedAt: Date | null
+    scheduledDeleteAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4031,6 +4163,7 @@ export namespace Prisma {
     totpEnabled: boolean | null
     totpSecret: string | null
     totpVerifiedAt: Date | null
+    scheduledDeleteAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4050,6 +4183,7 @@ export namespace Prisma {
     totpEnabled: number
     totpSecret: number
     totpVerifiedAt: number
+    scheduledDeleteAt: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -4079,6 +4213,7 @@ export namespace Prisma {
     totpEnabled?: true
     totpSecret?: true
     totpVerifiedAt?: true
+    scheduledDeleteAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4098,6 +4233,7 @@ export namespace Prisma {
     totpEnabled?: true
     totpSecret?: true
     totpVerifiedAt?: true
+    scheduledDeleteAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4117,6 +4253,7 @@ export namespace Prisma {
     totpEnabled?: true
     totpSecret?: true
     totpVerifiedAt?: true
+    scheduledDeleteAt?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -4223,6 +4360,7 @@ export namespace Prisma {
     totpEnabled: boolean
     totpSecret: string | null
     totpVerifiedAt: Date | null
+    scheduledDeleteAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
@@ -4261,6 +4399,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: boolean
     totpVerifiedAt?: boolean
+    scheduledDeleteAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     appPasswords?: boolean | User$appPasswordsArgs<ExtArgs>
@@ -4281,6 +4420,7 @@ export namespace Prisma {
     passwordResetTokens?: boolean | User$passwordResetTokensArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     totpRecoveryCodes?: boolean | User$totpRecoveryCodesArgs<ExtArgs>
+    addressBooks?: boolean | User$addressBooksArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -4299,6 +4439,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: boolean
     totpVerifiedAt?: boolean
+    scheduledDeleteAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -4318,6 +4459,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: boolean
     totpVerifiedAt?: boolean
+    scheduledDeleteAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -4337,11 +4479,12 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: boolean
     totpVerifiedAt?: boolean
+    scheduledDeleteAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "password" | "lifecycleState" | "autoFillPhoneticNames" | "sessionVersion" | "avatarUrl" | "emailVerified" | "emailPendingChange" | "emailPendingChangeRequestedAt" | "totpEnabled" | "totpSecret" | "totpVerifiedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "password" | "lifecycleState" | "autoFillPhoneticNames" | "sessionVersion" | "avatarUrl" | "emailVerified" | "emailPendingChange" | "emailPendingChangeRequestedAt" | "totpEnabled" | "totpSecret" | "totpVerifiedAt" | "scheduledDeleteAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     appPasswords?: boolean | User$appPasswordsArgs<ExtArgs>
     contacts?: boolean | User$contactsArgs<ExtArgs>
@@ -4361,6 +4504,7 @@ export namespace Prisma {
     passwordResetTokens?: boolean | User$passwordResetTokensArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     totpRecoveryCodes?: boolean | User$totpRecoveryCodesArgs<ExtArgs>
+    addressBooks?: boolean | User$addressBooksArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -4387,6 +4531,7 @@ export namespace Prisma {
       passwordResetTokens: Prisma.$PasswordResetTokenPayload<ExtArgs>[]
       sessions: Prisma.$UserSessionPayload<ExtArgs>[]
       totpRecoveryCodes: Prisma.$TotpRecoveryCodePayload<ExtArgs>[]
+      addressBooks: Prisma.$AddressBookPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4403,6 +4548,7 @@ export namespace Prisma {
       totpEnabled: boolean
       totpSecret: string | null
       totpVerifiedAt: Date | null
+      scheduledDeleteAt: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -4817,6 +4963,7 @@ export namespace Prisma {
     passwordResetTokens<T extends User$passwordResetTokensArgs<ExtArgs> = {}>(args?: Subset<T, User$passwordResetTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sessions<T extends User$sessionsArgs<ExtArgs> = {}>(args?: Subset<T, User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     totpRecoveryCodes<T extends User$totpRecoveryCodesArgs<ExtArgs> = {}>(args?: Subset<T, User$totpRecoveryCodesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TotpRecoveryCodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    addressBooks<T extends User$addressBooksArgs<ExtArgs> = {}>(args?: Subset<T, User$addressBooksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AddressBookPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4860,6 +5007,7 @@ export namespace Prisma {
     readonly totpEnabled: FieldRef<"User", 'Boolean'>
     readonly totpSecret: FieldRef<"User", 'String'>
     readonly totpVerifiedAt: FieldRef<"User", 'DateTime'>
+    readonly scheduledDeleteAt: FieldRef<"User", 'DateTime'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
   }
@@ -5674,6 +5822,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: TotpRecoveryCodeScalarFieldEnum | TotpRecoveryCodeScalarFieldEnum[]
+  }
+
+  /**
+   * User.addressBooks
+   */
+  export type User$addressBooksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AddressBook
+     */
+    select?: AddressBookSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AddressBook
+     */
+    omit?: AddressBookOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AddressBookInclude<ExtArgs> | null
+    where?: AddressBookWhereInput
+    orderBy?: AddressBookOrderByWithRelationInput | AddressBookOrderByWithRelationInput[]
+    cursor?: AddressBookWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AddressBookScalarFieldEnum | AddressBookScalarFieldEnum[]
   }
 
   /**
@@ -6877,6 +7049,7 @@ export namespace Prisma {
     lastMutatedBy: $Enums.SourceType | null
     lastMutatedByDetail: string | null
     archivedAt: Date | null
+    bookId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -6916,6 +7089,7 @@ export namespace Prisma {
     lastMutatedBy: $Enums.SourceType | null
     lastMutatedByDetail: string | null
     archivedAt: Date | null
+    bookId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -6966,6 +7140,7 @@ export namespace Prisma {
     lastMutatedBy: number
     lastMutatedByDetail: number
     archivedAt: number
+    bookId: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -7015,6 +7190,7 @@ export namespace Prisma {
     lastMutatedBy?: true
     lastMutatedByDetail?: true
     archivedAt?: true
+    bookId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -7054,6 +7230,7 @@ export namespace Prisma {
     lastMutatedBy?: true
     lastMutatedByDetail?: true
     archivedAt?: true
+    bookId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -7104,6 +7281,7 @@ export namespace Prisma {
     lastMutatedBy?: true
     lastMutatedByDetail?: true
     archivedAt?: true
+    bookId?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -7241,6 +7419,7 @@ export namespace Prisma {
     lastMutatedBy: $Enums.SourceType
     lastMutatedByDetail: string | null
     archivedAt: Date | null
+    bookId: string | null
     createdAt: Date
     updatedAt: Date
     _count: ContactCountAggregateOutputType | null
@@ -7310,6 +7489,7 @@ export namespace Prisma {
     lastMutatedBy?: boolean
     lastMutatedByDetail?: boolean
     archivedAt?: boolean
+    bookId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -7324,6 +7504,7 @@ export namespace Prisma {
     groupContacts?: boolean | Contact$groupContactsArgs<ExtArgs>
     mergedIntoContact?: boolean | Contact$mergedIntoContactArgs<ExtArgs>
     mergedChildren?: boolean | Contact$mergedChildrenArgs<ExtArgs>
+    book?: boolean | Contact$bookArgs<ExtArgs>
     _count?: boolean | ContactCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["contact"]>
 
@@ -7373,11 +7554,13 @@ export namespace Prisma {
     lastMutatedBy?: boolean
     lastMutatedByDetail?: boolean
     archivedAt?: boolean
+    bookId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     importJob?: boolean | Contact$importJobArgs<ExtArgs>
     mergedIntoContact?: boolean | Contact$mergedIntoContactArgs<ExtArgs>
+    book?: boolean | Contact$bookArgs<ExtArgs>
   }, ExtArgs["result"]["contact"]>
 
   export type ContactSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -7426,11 +7609,13 @@ export namespace Prisma {
     lastMutatedBy?: boolean
     lastMutatedByDetail?: boolean
     archivedAt?: boolean
+    bookId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
     importJob?: boolean | Contact$importJobArgs<ExtArgs>
     mergedIntoContact?: boolean | Contact$mergedIntoContactArgs<ExtArgs>
+    book?: boolean | Contact$bookArgs<ExtArgs>
   }, ExtArgs["result"]["contact"]>
 
   export type ContactSelectScalar = {
@@ -7479,11 +7664,12 @@ export namespace Prisma {
     lastMutatedBy?: boolean
     lastMutatedByDetail?: boolean
     archivedAt?: boolean
+    bookId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ContactOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "importJobId" | "mergedIntoContactId" | "syncUid" | "syncVersion" | "syncTombstoneAt" | "fullName" | "firstName" | "middleName" | "lastName" | "phoneticFirstName" | "phoneticLastName" | "namePrefix" | "nameSuffix" | "nickname" | "email" | "phone" | "company" | "phoneticCompany" | "jobTitle" | "department" | "website" | "birthday" | "address" | "avatarUrl" | "isFavorite" | "isEmergency" | "labels" | "websiteEntries" | "emailAddresses" | "phoneNumbers" | "postalAddresses" | "emailEntries" | "phoneEntries" | "addressEntries" | "significantDates" | "relatedPeople" | "customFields" | "notes" | "sourceType" | "sourceDetail" | "lastMutatedBy" | "lastMutatedByDetail" | "archivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["contact"]>
+  export type ContactOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "importJobId" | "mergedIntoContactId" | "syncUid" | "syncVersion" | "syncTombstoneAt" | "fullName" | "firstName" | "middleName" | "lastName" | "phoneticFirstName" | "phoneticLastName" | "namePrefix" | "nameSuffix" | "nickname" | "email" | "phone" | "company" | "phoneticCompany" | "jobTitle" | "department" | "website" | "birthday" | "address" | "avatarUrl" | "isFavorite" | "isEmergency" | "labels" | "websiteEntries" | "emailAddresses" | "phoneNumbers" | "postalAddresses" | "emailEntries" | "phoneEntries" | "addressEntries" | "significantDates" | "relatedPeople" | "customFields" | "notes" | "sourceType" | "sourceDetail" | "lastMutatedBy" | "lastMutatedByDetail" | "archivedAt" | "bookId" | "createdAt" | "updatedAt", ExtArgs["result"]["contact"]>
   export type ContactInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     importJob?: boolean | Contact$importJobArgs<ExtArgs>
@@ -7497,17 +7683,20 @@ export namespace Prisma {
     groupContacts?: boolean | Contact$groupContactsArgs<ExtArgs>
     mergedIntoContact?: boolean | Contact$mergedIntoContactArgs<ExtArgs>
     mergedChildren?: boolean | Contact$mergedChildrenArgs<ExtArgs>
+    book?: boolean | Contact$bookArgs<ExtArgs>
     _count?: boolean | ContactCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type ContactIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     importJob?: boolean | Contact$importJobArgs<ExtArgs>
     mergedIntoContact?: boolean | Contact$mergedIntoContactArgs<ExtArgs>
+    book?: boolean | Contact$bookArgs<ExtArgs>
   }
   export type ContactIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     importJob?: boolean | Contact$importJobArgs<ExtArgs>
     mergedIntoContact?: boolean | Contact$mergedIntoContactArgs<ExtArgs>
+    book?: boolean | Contact$bookArgs<ExtArgs>
   }
 
   export type $ContactPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7525,6 +7714,7 @@ export namespace Prisma {
       groupContacts: Prisma.$GroupContactPayload<ExtArgs>[]
       mergedIntoContact: Prisma.$ContactPayload<ExtArgs> | null
       mergedChildren: Prisma.$ContactPayload<ExtArgs>[]
+      book: Prisma.$AddressBookPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -7572,6 +7762,7 @@ export namespace Prisma {
       lastMutatedBy: $Enums.SourceType
       lastMutatedByDetail: string | null
       archivedAt: Date | null
+      bookId: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["contact"]>
@@ -7980,6 +8171,7 @@ export namespace Prisma {
     groupContacts<T extends Contact$groupContactsArgs<ExtArgs> = {}>(args?: Subset<T, Contact$groupContactsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GroupContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     mergedIntoContact<T extends Contact$mergedIntoContactArgs<ExtArgs> = {}>(args?: Subset<T, Contact$mergedIntoContactArgs<ExtArgs>>): Prisma__ContactClient<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     mergedChildren<T extends Contact$mergedChildrenArgs<ExtArgs> = {}>(args?: Subset<T, Contact$mergedChildrenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    book<T extends Contact$bookArgs<ExtArgs> = {}>(args?: Subset<T, Contact$bookArgs<ExtArgs>>): Prisma__AddressBookClient<$Result.GetResult<Prisma.$AddressBookPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -8054,6 +8246,7 @@ export namespace Prisma {
     readonly lastMutatedBy: FieldRef<"Contact", 'SourceType'>
     readonly lastMutatedByDetail: FieldRef<"Contact", 'String'>
     readonly archivedAt: FieldRef<"Contact", 'DateTime'>
+    readonly bookId: FieldRef<"Contact", 'String'>
     readonly createdAt: FieldRef<"Contact", 'DateTime'>
     readonly updatedAt: FieldRef<"Contact", 'DateTime'>
   }
@@ -8703,6 +8896,25 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ContactScalarFieldEnum | ContactScalarFieldEnum[]
+  }
+
+  /**
+   * Contact.book
+   */
+  export type Contact$bookArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AddressBook
+     */
+    select?: AddressBookSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AddressBook
+     */
+    omit?: AddressBookOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AddressBookInclude<ExtArgs> | null
+    where?: AddressBookWhereInput
   }
 
   /**
@@ -29736,6 +29948,7 @@ export namespace Prisma {
     description: string | null
     isDefault: boolean | null
     archivedAt: Date | null
+    dissolvedToBookId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -29747,6 +29960,7 @@ export namespace Prisma {
     description: string | null
     isDefault: boolean | null
     archivedAt: Date | null
+    dissolvedToBookId: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -29758,6 +29972,7 @@ export namespace Prisma {
     description: number
     isDefault: number
     archivedAt: number
+    dissolvedToBookId: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -29771,6 +29986,7 @@ export namespace Prisma {
     description?: true
     isDefault?: true
     archivedAt?: true
+    dissolvedToBookId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -29782,6 +29998,7 @@ export namespace Prisma {
     description?: true
     isDefault?: true
     archivedAt?: true
+    dissolvedToBookId?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -29793,6 +30010,7 @@ export namespace Prisma {
     description?: true
     isDefault?: true
     archivedAt?: true
+    dissolvedToBookId?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -29877,6 +30095,7 @@ export namespace Prisma {
     description: string | null
     isDefault: boolean
     archivedAt: Date | null
+    dissolvedToBookId: string | null
     createdAt: Date
     updatedAt: Date
     _count: GroupAddressBookCountAggregateOutputType | null
@@ -29905,6 +30124,7 @@ export namespace Prisma {
     description?: boolean
     isDefault?: boolean
     archivedAt?: boolean
+    dissolvedToBookId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     group?: boolean | GroupDefaultArgs<ExtArgs>
@@ -29920,6 +30140,7 @@ export namespace Prisma {
     description?: boolean
     isDefault?: boolean
     archivedAt?: boolean
+    dissolvedToBookId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     group?: boolean | GroupDefaultArgs<ExtArgs>
@@ -29932,6 +30153,7 @@ export namespace Prisma {
     description?: boolean
     isDefault?: boolean
     archivedAt?: boolean
+    dissolvedToBookId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     group?: boolean | GroupDefaultArgs<ExtArgs>
@@ -29944,11 +30166,12 @@ export namespace Prisma {
     description?: boolean
     isDefault?: boolean
     archivedAt?: boolean
+    dissolvedToBookId?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type GroupAddressBookOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "groupId" | "name" | "description" | "isDefault" | "archivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["groupAddressBook"]>
+  export type GroupAddressBookOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "groupId" | "name" | "description" | "isDefault" | "archivedAt" | "dissolvedToBookId" | "createdAt" | "updatedAt", ExtArgs["result"]["groupAddressBook"]>
   export type GroupAddressBookInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     group?: boolean | GroupDefaultArgs<ExtArgs>
     contacts?: boolean | GroupAddressBook$contactsArgs<ExtArgs>
@@ -29976,6 +30199,7 @@ export namespace Prisma {
       description: string | null
       isDefault: boolean
       archivedAt: Date | null
+      dissolvedToBookId: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["groupAddressBook"]>
@@ -30410,6 +30634,7 @@ export namespace Prisma {
     readonly description: FieldRef<"GroupAddressBook", 'String'>
     readonly isDefault: FieldRef<"GroupAddressBook", 'Boolean'>
     readonly archivedAt: FieldRef<"GroupAddressBook", 'DateTime'>
+    readonly dissolvedToBookId: FieldRef<"GroupAddressBook", 'String'>
     readonly createdAt: FieldRef<"GroupAddressBook", 'DateTime'>
     readonly updatedAt: FieldRef<"GroupAddressBook", 'DateTime'>
   }
@@ -30871,6 +31096,1159 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: GroupAddressBookInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model AddressBook
+   */
+
+  export type AggregateAddressBook = {
+    _count: AddressBookCountAggregateOutputType | null
+    _min: AddressBookMinAggregateOutputType | null
+    _max: AddressBookMaxAggregateOutputType | null
+  }
+
+  export type AddressBookMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    name: string | null
+    slug: string | null
+    description: string | null
+    isDefault: boolean | null
+    sourceGroupBookId: string | null
+    archivedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AddressBookMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    name: string | null
+    slug: string | null
+    description: string | null
+    isDefault: boolean | null
+    sourceGroupBookId: string | null
+    archivedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type AddressBookCountAggregateOutputType = {
+    id: number
+    userId: number
+    name: number
+    slug: number
+    description: number
+    isDefault: number
+    sourceGroupBookId: number
+    archivedAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type AddressBookMinAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    slug?: true
+    description?: true
+    isDefault?: true
+    sourceGroupBookId?: true
+    archivedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AddressBookMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    slug?: true
+    description?: true
+    isDefault?: true
+    sourceGroupBookId?: true
+    archivedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type AddressBookCountAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    slug?: true
+    description?: true
+    isDefault?: true
+    sourceGroupBookId?: true
+    archivedAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type AddressBookAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AddressBook to aggregate.
+     */
+    where?: AddressBookWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AddressBooks to fetch.
+     */
+    orderBy?: AddressBookOrderByWithRelationInput | AddressBookOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AddressBookWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AddressBooks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AddressBooks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AddressBooks
+    **/
+    _count?: true | AddressBookCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AddressBookMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AddressBookMaxAggregateInputType
+  }
+
+  export type GetAddressBookAggregateType<T extends AddressBookAggregateArgs> = {
+        [P in keyof T & keyof AggregateAddressBook]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAddressBook[P]>
+      : GetScalarType<T[P], AggregateAddressBook[P]>
+  }
+
+
+
+
+  export type AddressBookGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AddressBookWhereInput
+    orderBy?: AddressBookOrderByWithAggregationInput | AddressBookOrderByWithAggregationInput[]
+    by: AddressBookScalarFieldEnum[] | AddressBookScalarFieldEnum
+    having?: AddressBookScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AddressBookCountAggregateInputType | true
+    _min?: AddressBookMinAggregateInputType
+    _max?: AddressBookMaxAggregateInputType
+  }
+
+  export type AddressBookGroupByOutputType = {
+    id: string
+    userId: string
+    name: string
+    slug: string
+    description: string | null
+    isDefault: boolean
+    sourceGroupBookId: string | null
+    archivedAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: AddressBookCountAggregateOutputType | null
+    _min: AddressBookMinAggregateOutputType | null
+    _max: AddressBookMaxAggregateOutputType | null
+  }
+
+  type GetAddressBookGroupByPayload<T extends AddressBookGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AddressBookGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AddressBookGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AddressBookGroupByOutputType[P]>
+            : GetScalarType<T[P], AddressBookGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AddressBookSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    slug?: boolean
+    description?: boolean
+    isDefault?: boolean
+    sourceGroupBookId?: boolean
+    archivedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    contacts?: boolean | AddressBook$contactsArgs<ExtArgs>
+    _count?: boolean | AddressBookCountOutputTypeDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["addressBook"]>
+
+  export type AddressBookSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    slug?: boolean
+    description?: boolean
+    isDefault?: boolean
+    sourceGroupBookId?: boolean
+    archivedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["addressBook"]>
+
+  export type AddressBookSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    slug?: boolean
+    description?: boolean
+    isDefault?: boolean
+    sourceGroupBookId?: boolean
+    archivedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["addressBook"]>
+
+  export type AddressBookSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    slug?: boolean
+    description?: boolean
+    isDefault?: boolean
+    sourceGroupBookId?: boolean
+    archivedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type AddressBookOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "name" | "slug" | "description" | "isDefault" | "sourceGroupBookId" | "archivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["addressBook"]>
+  export type AddressBookInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    contacts?: boolean | AddressBook$contactsArgs<ExtArgs>
+    _count?: boolean | AddressBookCountOutputTypeDefaultArgs<ExtArgs>
+  }
+  export type AddressBookIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type AddressBookIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $AddressBookPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AddressBook"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+      contacts: Prisma.$ContactPayload<ExtArgs>[]
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      name: string
+      slug: string
+      description: string | null
+      isDefault: boolean
+      sourceGroupBookId: string | null
+      archivedAt: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["addressBook"]>
+    composites: {}
+  }
+
+  type AddressBookGetPayload<S extends boolean | null | undefined | AddressBookDefaultArgs> = $Result.GetResult<Prisma.$AddressBookPayload, S>
+
+  type AddressBookCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<AddressBookFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: AddressBookCountAggregateInputType | true
+    }
+
+  export interface AddressBookDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AddressBook'], meta: { name: 'AddressBook' } }
+    /**
+     * Find zero or one AddressBook that matches the filter.
+     * @param {AddressBookFindUniqueArgs} args - Arguments to find a AddressBook
+     * @example
+     * // Get one AddressBook
+     * const addressBook = await prisma.addressBook.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AddressBookFindUniqueArgs>(args: SelectSubset<T, AddressBookFindUniqueArgs<ExtArgs>>): Prisma__AddressBookClient<$Result.GetResult<Prisma.$AddressBookPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one AddressBook that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {AddressBookFindUniqueOrThrowArgs} args - Arguments to find a AddressBook
+     * @example
+     * // Get one AddressBook
+     * const addressBook = await prisma.addressBook.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AddressBookFindUniqueOrThrowArgs>(args: SelectSubset<T, AddressBookFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AddressBookClient<$Result.GetResult<Prisma.$AddressBookPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AddressBook that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AddressBookFindFirstArgs} args - Arguments to find a AddressBook
+     * @example
+     * // Get one AddressBook
+     * const addressBook = await prisma.addressBook.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AddressBookFindFirstArgs>(args?: SelectSubset<T, AddressBookFindFirstArgs<ExtArgs>>): Prisma__AddressBookClient<$Result.GetResult<Prisma.$AddressBookPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AddressBook that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AddressBookFindFirstOrThrowArgs} args - Arguments to find a AddressBook
+     * @example
+     * // Get one AddressBook
+     * const addressBook = await prisma.addressBook.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AddressBookFindFirstOrThrowArgs>(args?: SelectSubset<T, AddressBookFindFirstOrThrowArgs<ExtArgs>>): Prisma__AddressBookClient<$Result.GetResult<Prisma.$AddressBookPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more AddressBooks that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AddressBookFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AddressBooks
+     * const addressBooks = await prisma.addressBook.findMany()
+     * 
+     * // Get first 10 AddressBooks
+     * const addressBooks = await prisma.addressBook.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const addressBookWithIdOnly = await prisma.addressBook.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AddressBookFindManyArgs>(args?: SelectSubset<T, AddressBookFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AddressBookPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a AddressBook.
+     * @param {AddressBookCreateArgs} args - Arguments to create a AddressBook.
+     * @example
+     * // Create one AddressBook
+     * const AddressBook = await prisma.addressBook.create({
+     *   data: {
+     *     // ... data to create a AddressBook
+     *   }
+     * })
+     * 
+     */
+    create<T extends AddressBookCreateArgs>(args: SelectSubset<T, AddressBookCreateArgs<ExtArgs>>): Prisma__AddressBookClient<$Result.GetResult<Prisma.$AddressBookPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many AddressBooks.
+     * @param {AddressBookCreateManyArgs} args - Arguments to create many AddressBooks.
+     * @example
+     * // Create many AddressBooks
+     * const addressBook = await prisma.addressBook.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AddressBookCreateManyArgs>(args?: SelectSubset<T, AddressBookCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AddressBooks and returns the data saved in the database.
+     * @param {AddressBookCreateManyAndReturnArgs} args - Arguments to create many AddressBooks.
+     * @example
+     * // Create many AddressBooks
+     * const addressBook = await prisma.addressBook.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AddressBooks and only return the `id`
+     * const addressBookWithIdOnly = await prisma.addressBook.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AddressBookCreateManyAndReturnArgs>(args?: SelectSubset<T, AddressBookCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AddressBookPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a AddressBook.
+     * @param {AddressBookDeleteArgs} args - Arguments to delete one AddressBook.
+     * @example
+     * // Delete one AddressBook
+     * const AddressBook = await prisma.addressBook.delete({
+     *   where: {
+     *     // ... filter to delete one AddressBook
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AddressBookDeleteArgs>(args: SelectSubset<T, AddressBookDeleteArgs<ExtArgs>>): Prisma__AddressBookClient<$Result.GetResult<Prisma.$AddressBookPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one AddressBook.
+     * @param {AddressBookUpdateArgs} args - Arguments to update one AddressBook.
+     * @example
+     * // Update one AddressBook
+     * const addressBook = await prisma.addressBook.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AddressBookUpdateArgs>(args: SelectSubset<T, AddressBookUpdateArgs<ExtArgs>>): Prisma__AddressBookClient<$Result.GetResult<Prisma.$AddressBookPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more AddressBooks.
+     * @param {AddressBookDeleteManyArgs} args - Arguments to filter AddressBooks to delete.
+     * @example
+     * // Delete a few AddressBooks
+     * const { count } = await prisma.addressBook.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AddressBookDeleteManyArgs>(args?: SelectSubset<T, AddressBookDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AddressBooks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AddressBookUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AddressBooks
+     * const addressBook = await prisma.addressBook.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AddressBookUpdateManyArgs>(args: SelectSubset<T, AddressBookUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AddressBooks and returns the data updated in the database.
+     * @param {AddressBookUpdateManyAndReturnArgs} args - Arguments to update many AddressBooks.
+     * @example
+     * // Update many AddressBooks
+     * const addressBook = await prisma.addressBook.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more AddressBooks and only return the `id`
+     * const addressBookWithIdOnly = await prisma.addressBook.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends AddressBookUpdateManyAndReturnArgs>(args: SelectSubset<T, AddressBookUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AddressBookPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one AddressBook.
+     * @param {AddressBookUpsertArgs} args - Arguments to update or create a AddressBook.
+     * @example
+     * // Update or create a AddressBook
+     * const addressBook = await prisma.addressBook.upsert({
+     *   create: {
+     *     // ... data to create a AddressBook
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AddressBook we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AddressBookUpsertArgs>(args: SelectSubset<T, AddressBookUpsertArgs<ExtArgs>>): Prisma__AddressBookClient<$Result.GetResult<Prisma.$AddressBookPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of AddressBooks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AddressBookCountArgs} args - Arguments to filter AddressBooks to count.
+     * @example
+     * // Count the number of AddressBooks
+     * const count = await prisma.addressBook.count({
+     *   where: {
+     *     // ... the filter for the AddressBooks we want to count
+     *   }
+     * })
+    **/
+    count<T extends AddressBookCountArgs>(
+      args?: Subset<T, AddressBookCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AddressBookCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AddressBook.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AddressBookAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AddressBookAggregateArgs>(args: Subset<T, AddressBookAggregateArgs>): Prisma.PrismaPromise<GetAddressBookAggregateType<T>>
+
+    /**
+     * Group by AddressBook.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AddressBookGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AddressBookGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AddressBookGroupByArgs['orderBy'] }
+        : { orderBy?: AddressBookGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AddressBookGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAddressBookGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AddressBook model
+   */
+  readonly fields: AddressBookFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AddressBook.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AddressBookClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    contacts<T extends AddressBook$contactsArgs<ExtArgs> = {}>(args?: Subset<T, AddressBook$contactsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AddressBook model
+   */
+  interface AddressBookFieldRefs {
+    readonly id: FieldRef<"AddressBook", 'String'>
+    readonly userId: FieldRef<"AddressBook", 'String'>
+    readonly name: FieldRef<"AddressBook", 'String'>
+    readonly slug: FieldRef<"AddressBook", 'String'>
+    readonly description: FieldRef<"AddressBook", 'String'>
+    readonly isDefault: FieldRef<"AddressBook", 'Boolean'>
+    readonly sourceGroupBookId: FieldRef<"AddressBook", 'String'>
+    readonly archivedAt: FieldRef<"AddressBook", 'DateTime'>
+    readonly createdAt: FieldRef<"AddressBook", 'DateTime'>
+    readonly updatedAt: FieldRef<"AddressBook", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AddressBook findUnique
+   */
+  export type AddressBookFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AddressBook
+     */
+    select?: AddressBookSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AddressBook
+     */
+    omit?: AddressBookOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AddressBookInclude<ExtArgs> | null
+    /**
+     * Filter, which AddressBook to fetch.
+     */
+    where: AddressBookWhereUniqueInput
+  }
+
+  /**
+   * AddressBook findUniqueOrThrow
+   */
+  export type AddressBookFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AddressBook
+     */
+    select?: AddressBookSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AddressBook
+     */
+    omit?: AddressBookOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AddressBookInclude<ExtArgs> | null
+    /**
+     * Filter, which AddressBook to fetch.
+     */
+    where: AddressBookWhereUniqueInput
+  }
+
+  /**
+   * AddressBook findFirst
+   */
+  export type AddressBookFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AddressBook
+     */
+    select?: AddressBookSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AddressBook
+     */
+    omit?: AddressBookOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AddressBookInclude<ExtArgs> | null
+    /**
+     * Filter, which AddressBook to fetch.
+     */
+    where?: AddressBookWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AddressBooks to fetch.
+     */
+    orderBy?: AddressBookOrderByWithRelationInput | AddressBookOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AddressBooks.
+     */
+    cursor?: AddressBookWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AddressBooks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AddressBooks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AddressBooks.
+     */
+    distinct?: AddressBookScalarFieldEnum | AddressBookScalarFieldEnum[]
+  }
+
+  /**
+   * AddressBook findFirstOrThrow
+   */
+  export type AddressBookFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AddressBook
+     */
+    select?: AddressBookSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AddressBook
+     */
+    omit?: AddressBookOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AddressBookInclude<ExtArgs> | null
+    /**
+     * Filter, which AddressBook to fetch.
+     */
+    where?: AddressBookWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AddressBooks to fetch.
+     */
+    orderBy?: AddressBookOrderByWithRelationInput | AddressBookOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AddressBooks.
+     */
+    cursor?: AddressBookWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AddressBooks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AddressBooks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AddressBooks.
+     */
+    distinct?: AddressBookScalarFieldEnum | AddressBookScalarFieldEnum[]
+  }
+
+  /**
+   * AddressBook findMany
+   */
+  export type AddressBookFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AddressBook
+     */
+    select?: AddressBookSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AddressBook
+     */
+    omit?: AddressBookOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AddressBookInclude<ExtArgs> | null
+    /**
+     * Filter, which AddressBooks to fetch.
+     */
+    where?: AddressBookWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AddressBooks to fetch.
+     */
+    orderBy?: AddressBookOrderByWithRelationInput | AddressBookOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AddressBooks.
+     */
+    cursor?: AddressBookWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AddressBooks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AddressBooks.
+     */
+    skip?: number
+    distinct?: AddressBookScalarFieldEnum | AddressBookScalarFieldEnum[]
+  }
+
+  /**
+   * AddressBook create
+   */
+  export type AddressBookCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AddressBook
+     */
+    select?: AddressBookSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AddressBook
+     */
+    omit?: AddressBookOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AddressBookInclude<ExtArgs> | null
+    /**
+     * The data needed to create a AddressBook.
+     */
+    data: XOR<AddressBookCreateInput, AddressBookUncheckedCreateInput>
+  }
+
+  /**
+   * AddressBook createMany
+   */
+  export type AddressBookCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AddressBooks.
+     */
+    data: AddressBookCreateManyInput | AddressBookCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AddressBook createManyAndReturn
+   */
+  export type AddressBookCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AddressBook
+     */
+    select?: AddressBookSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AddressBook
+     */
+    omit?: AddressBookOmit<ExtArgs> | null
+    /**
+     * The data used to create many AddressBooks.
+     */
+    data: AddressBookCreateManyInput | AddressBookCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AddressBookIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AddressBook update
+   */
+  export type AddressBookUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AddressBook
+     */
+    select?: AddressBookSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AddressBook
+     */
+    omit?: AddressBookOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AddressBookInclude<ExtArgs> | null
+    /**
+     * The data needed to update a AddressBook.
+     */
+    data: XOR<AddressBookUpdateInput, AddressBookUncheckedUpdateInput>
+    /**
+     * Choose, which AddressBook to update.
+     */
+    where: AddressBookWhereUniqueInput
+  }
+
+  /**
+   * AddressBook updateMany
+   */
+  export type AddressBookUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AddressBooks.
+     */
+    data: XOR<AddressBookUpdateManyMutationInput, AddressBookUncheckedUpdateManyInput>
+    /**
+     * Filter which AddressBooks to update
+     */
+    where?: AddressBookWhereInput
+    /**
+     * Limit how many AddressBooks to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * AddressBook updateManyAndReturn
+   */
+  export type AddressBookUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AddressBook
+     */
+    select?: AddressBookSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AddressBook
+     */
+    omit?: AddressBookOmit<ExtArgs> | null
+    /**
+     * The data used to update AddressBooks.
+     */
+    data: XOR<AddressBookUpdateManyMutationInput, AddressBookUncheckedUpdateManyInput>
+    /**
+     * Filter which AddressBooks to update
+     */
+    where?: AddressBookWhereInput
+    /**
+     * Limit how many AddressBooks to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AddressBookIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AddressBook upsert
+   */
+  export type AddressBookUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AddressBook
+     */
+    select?: AddressBookSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AddressBook
+     */
+    omit?: AddressBookOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AddressBookInclude<ExtArgs> | null
+    /**
+     * The filter to search for the AddressBook to update in case it exists.
+     */
+    where: AddressBookWhereUniqueInput
+    /**
+     * In case the AddressBook found by the `where` argument doesn't exist, create a new AddressBook with this data.
+     */
+    create: XOR<AddressBookCreateInput, AddressBookUncheckedCreateInput>
+    /**
+     * In case the AddressBook was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AddressBookUpdateInput, AddressBookUncheckedUpdateInput>
+  }
+
+  /**
+   * AddressBook delete
+   */
+  export type AddressBookDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AddressBook
+     */
+    select?: AddressBookSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AddressBook
+     */
+    omit?: AddressBookOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AddressBookInclude<ExtArgs> | null
+    /**
+     * Filter which AddressBook to delete.
+     */
+    where: AddressBookWhereUniqueInput
+  }
+
+  /**
+   * AddressBook deleteMany
+   */
+  export type AddressBookDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AddressBooks to delete
+     */
+    where?: AddressBookWhereInput
+    /**
+     * Limit how many AddressBooks to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * AddressBook.contacts
+   */
+  export type AddressBook$contactsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Contact
+     */
+    select?: ContactSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Contact
+     */
+    omit?: ContactOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ContactInclude<ExtArgs> | null
+    where?: ContactWhereInput
+    orderBy?: ContactOrderByWithRelationInput | ContactOrderByWithRelationInput[]
+    cursor?: ContactWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ContactScalarFieldEnum | ContactScalarFieldEnum[]
+  }
+
+  /**
+   * AddressBook without action
+   */
+  export type AddressBookDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AddressBook
+     */
+    select?: AddressBookSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AddressBook
+     */
+    omit?: AddressBookOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AddressBookInclude<ExtArgs> | null
   }
 
 
@@ -34407,6 +35785,7 @@ export namespace Prisma {
     totpEnabled: 'totpEnabled',
     totpSecret: 'totpSecret',
     totpVerifiedAt: 'totpVerifiedAt',
+    scheduledDeleteAt: 'scheduledDeleteAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -34474,6 +35853,7 @@ export namespace Prisma {
     lastMutatedBy: 'lastMutatedBy',
     lastMutatedByDetail: 'lastMutatedByDetail',
     archivedAt: 'archivedAt',
+    bookId: 'bookId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -34838,11 +36218,28 @@ export namespace Prisma {
     description: 'description',
     isDefault: 'isDefault',
     archivedAt: 'archivedAt',
+    dissolvedToBookId: 'dissolvedToBookId',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
 
   export type GroupAddressBookScalarFieldEnum = (typeof GroupAddressBookScalarFieldEnum)[keyof typeof GroupAddressBookScalarFieldEnum]
+
+
+  export const AddressBookScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    name: 'name',
+    slug: 'slug',
+    description: 'description',
+    isDefault: 'isDefault',
+    sourceGroupBookId: 'sourceGroupBookId',
+    archivedAt: 'archivedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type AddressBookScalarFieldEnum = (typeof AddressBookScalarFieldEnum)[keyof typeof AddressBookScalarFieldEnum]
 
 
   export const TeamSyncAccountScalarFieldEnum: {
@@ -35464,6 +36861,7 @@ export namespace Prisma {
     totpEnabled?: BoolFilter<"User"> | boolean
     totpSecret?: StringNullableFilter<"User"> | string | null
     totpVerifiedAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    scheduledDeleteAt?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     appPasswords?: AppPasswordListRelationFilter
@@ -35484,6 +36882,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenListRelationFilter
     sessions?: UserSessionListRelationFilter
     totpRecoveryCodes?: TotpRecoveryCodeListRelationFilter
+    addressBooks?: AddressBookListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -35501,6 +36900,7 @@ export namespace Prisma {
     totpEnabled?: SortOrder
     totpSecret?: SortOrderInput | SortOrder
     totpVerifiedAt?: SortOrderInput | SortOrder
+    scheduledDeleteAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     appPasswords?: AppPasswordOrderByRelationAggregateInput
@@ -35521,6 +36921,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenOrderByRelationAggregateInput
     sessions?: UserSessionOrderByRelationAggregateInput
     totpRecoveryCodes?: TotpRecoveryCodeOrderByRelationAggregateInput
+    addressBooks?: AddressBookOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -35541,6 +36942,7 @@ export namespace Prisma {
     totpEnabled?: BoolFilter<"User"> | boolean
     totpSecret?: StringNullableFilter<"User"> | string | null
     totpVerifiedAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    scheduledDeleteAt?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     appPasswords?: AppPasswordListRelationFilter
@@ -35561,6 +36963,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenListRelationFilter
     sessions?: UserSessionListRelationFilter
     totpRecoveryCodes?: TotpRecoveryCodeListRelationFilter
+    addressBooks?: AddressBookListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -35578,6 +36981,7 @@ export namespace Prisma {
     totpEnabled?: SortOrder
     totpSecret?: SortOrderInput | SortOrder
     totpVerifiedAt?: SortOrderInput | SortOrder
+    scheduledDeleteAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -35605,6 +37009,7 @@ export namespace Prisma {
     totpEnabled?: BoolWithAggregatesFilter<"User"> | boolean
     totpSecret?: StringNullableWithAggregatesFilter<"User"> | string | null
     totpVerifiedAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+    scheduledDeleteAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
@@ -35731,6 +37136,7 @@ export namespace Prisma {
     lastMutatedBy?: EnumSourceTypeFilter<"Contact"> | $Enums.SourceType
     lastMutatedByDetail?: StringNullableFilter<"Contact"> | string | null
     archivedAt?: DateTimeNullableFilter<"Contact"> | Date | string | null
+    bookId?: StringNullableFilter<"Contact"> | string | null
     createdAt?: DateTimeFilter<"Contact"> | Date | string
     updatedAt?: DateTimeFilter<"Contact"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -35745,6 +37151,7 @@ export namespace Prisma {
     groupContacts?: GroupContactListRelationFilter
     mergedIntoContact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
     mergedChildren?: ContactListRelationFilter
+    book?: XOR<AddressBookNullableScalarRelationFilter, AddressBookWhereInput> | null
   }
 
   export type ContactOrderByWithRelationInput = {
@@ -35793,6 +37200,7 @@ export namespace Prisma {
     lastMutatedBy?: SortOrder
     lastMutatedByDetail?: SortOrderInput | SortOrder
     archivedAt?: SortOrderInput | SortOrder
+    bookId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -35807,6 +37215,7 @@ export namespace Prisma {
     groupContacts?: GroupContactOrderByRelationAggregateInput
     mergedIntoContact?: ContactOrderByWithRelationInput
     mergedChildren?: ContactOrderByRelationAggregateInput
+    book?: AddressBookOrderByWithRelationInput
   }
 
   export type ContactWhereUniqueInput = Prisma.AtLeast<{
@@ -35858,6 +37267,7 @@ export namespace Prisma {
     lastMutatedBy?: EnumSourceTypeFilter<"Contact"> | $Enums.SourceType
     lastMutatedByDetail?: StringNullableFilter<"Contact"> | string | null
     archivedAt?: DateTimeNullableFilter<"Contact"> | Date | string | null
+    bookId?: StringNullableFilter<"Contact"> | string | null
     createdAt?: DateTimeFilter<"Contact"> | Date | string
     updatedAt?: DateTimeFilter<"Contact"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -35872,6 +37282,7 @@ export namespace Prisma {
     groupContacts?: GroupContactListRelationFilter
     mergedIntoContact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
     mergedChildren?: ContactListRelationFilter
+    book?: XOR<AddressBookNullableScalarRelationFilter, AddressBookWhereInput> | null
   }, "id" | "syncUid">
 
   export type ContactOrderByWithAggregationInput = {
@@ -35920,6 +37331,7 @@ export namespace Prisma {
     lastMutatedBy?: SortOrder
     lastMutatedByDetail?: SortOrderInput | SortOrder
     archivedAt?: SortOrderInput | SortOrder
+    bookId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ContactCountOrderByAggregateInput
@@ -35978,6 +37390,7 @@ export namespace Prisma {
     lastMutatedBy?: EnumSourceTypeWithAggregatesFilter<"Contact"> | $Enums.SourceType
     lastMutatedByDetail?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     archivedAt?: DateTimeNullableWithAggregatesFilter<"Contact"> | Date | string | null
+    bookId?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Contact"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Contact"> | Date | string
   }
@@ -37837,6 +39250,7 @@ export namespace Prisma {
     description?: StringNullableFilter<"GroupAddressBook"> | string | null
     isDefault?: BoolFilter<"GroupAddressBook"> | boolean
     archivedAt?: DateTimeNullableFilter<"GroupAddressBook"> | Date | string | null
+    dissolvedToBookId?: StringNullableFilter<"GroupAddressBook"> | string | null
     createdAt?: DateTimeFilter<"GroupAddressBook"> | Date | string
     updatedAt?: DateTimeFilter<"GroupAddressBook"> | Date | string
     group?: XOR<GroupScalarRelationFilter, GroupWhereInput>
@@ -37851,6 +39265,7 @@ export namespace Prisma {
     description?: SortOrderInput | SortOrder
     isDefault?: SortOrder
     archivedAt?: SortOrderInput | SortOrder
+    dissolvedToBookId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     group?: GroupOrderByWithRelationInput
@@ -37868,6 +39283,7 @@ export namespace Prisma {
     description?: StringNullableFilter<"GroupAddressBook"> | string | null
     isDefault?: BoolFilter<"GroupAddressBook"> | boolean
     archivedAt?: DateTimeNullableFilter<"GroupAddressBook"> | Date | string | null
+    dissolvedToBookId?: StringNullableFilter<"GroupAddressBook"> | string | null
     createdAt?: DateTimeFilter<"GroupAddressBook"> | Date | string
     updatedAt?: DateTimeFilter<"GroupAddressBook"> | Date | string
     group?: XOR<GroupScalarRelationFilter, GroupWhereInput>
@@ -37882,6 +39298,7 @@ export namespace Prisma {
     description?: SortOrderInput | SortOrder
     isDefault?: SortOrder
     archivedAt?: SortOrderInput | SortOrder
+    dissolvedToBookId?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: GroupAddressBookCountOrderByAggregateInput
@@ -37899,8 +39316,93 @@ export namespace Prisma {
     description?: StringNullableWithAggregatesFilter<"GroupAddressBook"> | string | null
     isDefault?: BoolWithAggregatesFilter<"GroupAddressBook"> | boolean
     archivedAt?: DateTimeNullableWithAggregatesFilter<"GroupAddressBook"> | Date | string | null
+    dissolvedToBookId?: StringNullableWithAggregatesFilter<"GroupAddressBook"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"GroupAddressBook"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"GroupAddressBook"> | Date | string
+  }
+
+  export type AddressBookWhereInput = {
+    AND?: AddressBookWhereInput | AddressBookWhereInput[]
+    OR?: AddressBookWhereInput[]
+    NOT?: AddressBookWhereInput | AddressBookWhereInput[]
+    id?: StringFilter<"AddressBook"> | string
+    userId?: StringFilter<"AddressBook"> | string
+    name?: StringFilter<"AddressBook"> | string
+    slug?: StringFilter<"AddressBook"> | string
+    description?: StringNullableFilter<"AddressBook"> | string | null
+    isDefault?: BoolFilter<"AddressBook"> | boolean
+    sourceGroupBookId?: StringNullableFilter<"AddressBook"> | string | null
+    archivedAt?: DateTimeNullableFilter<"AddressBook"> | Date | string | null
+    createdAt?: DateTimeFilter<"AddressBook"> | Date | string
+    updatedAt?: DateTimeFilter<"AddressBook"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    contacts?: ContactListRelationFilter
+  }
+
+  export type AddressBookOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    slug?: SortOrder
+    description?: SortOrderInput | SortOrder
+    isDefault?: SortOrder
+    sourceGroupBookId?: SortOrderInput | SortOrder
+    archivedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+    contacts?: ContactOrderByRelationAggregateInput
+  }
+
+  export type AddressBookWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId_slug?: AddressBookUserIdSlugCompoundUniqueInput
+    AND?: AddressBookWhereInput | AddressBookWhereInput[]
+    OR?: AddressBookWhereInput[]
+    NOT?: AddressBookWhereInput | AddressBookWhereInput[]
+    userId?: StringFilter<"AddressBook"> | string
+    name?: StringFilter<"AddressBook"> | string
+    slug?: StringFilter<"AddressBook"> | string
+    description?: StringNullableFilter<"AddressBook"> | string | null
+    isDefault?: BoolFilter<"AddressBook"> | boolean
+    sourceGroupBookId?: StringNullableFilter<"AddressBook"> | string | null
+    archivedAt?: DateTimeNullableFilter<"AddressBook"> | Date | string | null
+    createdAt?: DateTimeFilter<"AddressBook"> | Date | string
+    updatedAt?: DateTimeFilter<"AddressBook"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    contacts?: ContactListRelationFilter
+  }, "id" | "userId_slug">
+
+  export type AddressBookOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    slug?: SortOrder
+    description?: SortOrderInput | SortOrder
+    isDefault?: SortOrder
+    sourceGroupBookId?: SortOrderInput | SortOrder
+    archivedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: AddressBookCountOrderByAggregateInput
+    _max?: AddressBookMaxOrderByAggregateInput
+    _min?: AddressBookMinOrderByAggregateInput
+  }
+
+  export type AddressBookScalarWhereWithAggregatesInput = {
+    AND?: AddressBookScalarWhereWithAggregatesInput | AddressBookScalarWhereWithAggregatesInput[]
+    OR?: AddressBookScalarWhereWithAggregatesInput[]
+    NOT?: AddressBookScalarWhereWithAggregatesInput | AddressBookScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"AddressBook"> | string
+    userId?: StringWithAggregatesFilter<"AddressBook"> | string
+    name?: StringWithAggregatesFilter<"AddressBook"> | string
+    slug?: StringWithAggregatesFilter<"AddressBook"> | string
+    description?: StringNullableWithAggregatesFilter<"AddressBook"> | string | null
+    isDefault?: BoolWithAggregatesFilter<"AddressBook"> | boolean
+    sourceGroupBookId?: StringNullableWithAggregatesFilter<"AddressBook"> | string | null
+    archivedAt?: DateTimeNullableWithAggregatesFilter<"AddressBook"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"AddressBook"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"AddressBook"> | Date | string
   }
 
   export type TeamSyncAccountWhereInput = {
@@ -38179,6 +39681,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -38199,6 +39702,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -38216,6 +39720,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -38236,6 +39741,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -38253,6 +39759,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -38273,6 +39780,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -38290,6 +39798,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -38310,6 +39819,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -38327,6 +39837,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -38346,6 +39857,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -38365,6 +39877,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -38506,6 +40019,7 @@ export namespace Prisma {
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+    book?: AddressBookCreateNestedOneWithoutContactsInput
   }
 
   export type ContactUncheckedCreateInput = {
@@ -38554,6 +40068,7 @@ export namespace Prisma {
     lastMutatedBy?: $Enums.SourceType
     lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
+    bookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
@@ -38624,6 +40139,7 @@ export namespace Prisma {
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+    book?: AddressBookUpdateOneWithoutContactsNestedInput
   }
 
   export type ContactUncheckedUpdateInput = {
@@ -38672,6 +40188,7 @@ export namespace Prisma {
     lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
     lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
@@ -38731,6 +40248,7 @@ export namespace Prisma {
     lastMutatedBy?: $Enums.SourceType
     lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
+    bookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -38828,6 +40346,7 @@ export namespace Prisma {
     lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
     lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -40951,6 +42470,7 @@ export namespace Prisma {
     description?: string | null
     isDefault?: boolean
     archivedAt?: Date | string | null
+    dissolvedToBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     group: GroupCreateNestedOneWithoutAddressBooksInput
@@ -40965,6 +42485,7 @@ export namespace Prisma {
     description?: string | null
     isDefault?: boolean
     archivedAt?: Date | string | null
+    dissolvedToBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: GroupContactUncheckedCreateNestedManyWithoutGroupAddressBookInput
@@ -40977,6 +42498,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dissolvedToBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     group?: GroupUpdateOneRequiredWithoutAddressBooksNestedInput
@@ -40991,6 +42513,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dissolvedToBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: GroupContactUncheckedUpdateManyWithoutGroupAddressBookNestedInput
@@ -41004,6 +42527,7 @@ export namespace Prisma {
     description?: string | null
     isDefault?: boolean
     archivedAt?: Date | string | null
+    dissolvedToBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -41014,6 +42538,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dissolvedToBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -41024,6 +42549,101 @@ export namespace Prisma {
     name?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dissolvedToBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AddressBookCreateInput = {
+    id?: string
+    name: string
+    slug: string
+    description?: string | null
+    isDefault?: boolean
+    sourceGroupBookId?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutAddressBooksInput
+    contacts?: ContactCreateNestedManyWithoutBookInput
+  }
+
+  export type AddressBookUncheckedCreateInput = {
+    id?: string
+    userId: string
+    name: string
+    slug: string
+    description?: string | null
+    isDefault?: boolean
+    sourceGroupBookId?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contacts?: ContactUncheckedCreateNestedManyWithoutBookInput
+  }
+
+  export type AddressBookUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    sourceGroupBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutAddressBooksNestedInput
+    contacts?: ContactUpdateManyWithoutBookNestedInput
+  }
+
+  export type AddressBookUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    sourceGroupBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: ContactUncheckedUpdateManyWithoutBookNestedInput
+  }
+
+  export type AddressBookCreateManyInput = {
+    id?: string
+    userId: string
+    name: string
+    slug: string
+    description?: string | null
+    isDefault?: boolean
+    sourceGroupBookId?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AddressBookUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    sourceGroupBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AddressBookUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    sourceGroupBookId?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -41469,6 +43089,12 @@ export namespace Prisma {
     none?: TotpRecoveryCodeWhereInput
   }
 
+  export type AddressBookListRelationFilter = {
+    every?: AddressBookWhereInput
+    some?: AddressBookWhereInput
+    none?: AddressBookWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -41538,6 +43164,10 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type AddressBookOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
@@ -41553,6 +43183,7 @@ export namespace Prisma {
     totpEnabled?: SortOrder
     totpSecret?: SortOrder
     totpVerifiedAt?: SortOrder
+    scheduledDeleteAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -41576,6 +43207,7 @@ export namespace Prisma {
     totpEnabled?: SortOrder
     totpSecret?: SortOrder
     totpVerifiedAt?: SortOrder
+    scheduledDeleteAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -41595,6 +43227,7 @@ export namespace Prisma {
     totpEnabled?: SortOrder
     totpSecret?: SortOrder
     totpVerifiedAt?: SortOrder
+    scheduledDeleteAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -41801,6 +43434,11 @@ export namespace Prisma {
     isNot?: ContactWhereInput | null
   }
 
+  export type AddressBookNullableScalarRelationFilter = {
+    is?: AddressBookWhereInput | null
+    isNot?: AddressBookWhereInput | null
+  }
+
   export type SyncContactLinkOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -41855,6 +43493,7 @@ export namespace Prisma {
     lastMutatedBy?: SortOrder
     lastMutatedByDetail?: SortOrder
     archivedAt?: SortOrder
+    bookId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -41898,6 +43537,7 @@ export namespace Prisma {
     lastMutatedBy?: SortOrder
     lastMutatedByDetail?: SortOrder
     archivedAt?: SortOrder
+    bookId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -41937,6 +43577,7 @@ export namespace Prisma {
     lastMutatedBy?: SortOrder
     lastMutatedByDetail?: SortOrder
     archivedAt?: SortOrder
+    bookId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -43629,6 +45270,7 @@ export namespace Prisma {
     description?: SortOrder
     isDefault?: SortOrder
     archivedAt?: SortOrder
+    dissolvedToBookId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -43640,6 +45282,7 @@ export namespace Prisma {
     description?: SortOrder
     isDefault?: SortOrder
     archivedAt?: SortOrder
+    dissolvedToBookId?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -43650,6 +45293,51 @@ export namespace Prisma {
     name?: SortOrder
     description?: SortOrder
     isDefault?: SortOrder
+    archivedAt?: SortOrder
+    dissolvedToBookId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AddressBookUserIdSlugCompoundUniqueInput = {
+    userId: string
+    slug: string
+  }
+
+  export type AddressBookCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    slug?: SortOrder
+    description?: SortOrder
+    isDefault?: SortOrder
+    sourceGroupBookId?: SortOrder
+    archivedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AddressBookMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    slug?: SortOrder
+    description?: SortOrder
+    isDefault?: SortOrder
+    sourceGroupBookId?: SortOrder
+    archivedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type AddressBookMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    slug?: SortOrder
+    description?: SortOrder
+    isDefault?: SortOrder
+    sourceGroupBookId?: SortOrder
     archivedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
@@ -43947,6 +45635,13 @@ export namespace Prisma {
     connect?: TotpRecoveryCodeWhereUniqueInput | TotpRecoveryCodeWhereUniqueInput[]
   }
 
+  export type AddressBookCreateNestedManyWithoutUserInput = {
+    create?: XOR<AddressBookCreateWithoutUserInput, AddressBookUncheckedCreateWithoutUserInput> | AddressBookCreateWithoutUserInput[] | AddressBookUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AddressBookCreateOrConnectWithoutUserInput | AddressBookCreateOrConnectWithoutUserInput[]
+    createMany?: AddressBookCreateManyUserInputEnvelope
+    connect?: AddressBookWhereUniqueInput | AddressBookWhereUniqueInput[]
+  }
+
   export type AppPasswordUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
@@ -44070,6 +45765,13 @@ export namespace Prisma {
     connectOrCreate?: TotpRecoveryCodeCreateOrConnectWithoutUserInput | TotpRecoveryCodeCreateOrConnectWithoutUserInput[]
     createMany?: TotpRecoveryCodeCreateManyUserInputEnvelope
     connect?: TotpRecoveryCodeWhereUniqueInput | TotpRecoveryCodeWhereUniqueInput[]
+  }
+
+  export type AddressBookUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<AddressBookCreateWithoutUserInput, AddressBookUncheckedCreateWithoutUserInput> | AddressBookCreateWithoutUserInput[] | AddressBookUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AddressBookCreateOrConnectWithoutUserInput | AddressBookCreateOrConnectWithoutUserInput[]
+    createMany?: AddressBookCreateManyUserInputEnvelope
+    connect?: AddressBookWhereUniqueInput | AddressBookWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -44352,6 +46054,20 @@ export namespace Prisma {
     deleteMany?: TotpRecoveryCodeScalarWhereInput | TotpRecoveryCodeScalarWhereInput[]
   }
 
+  export type AddressBookUpdateManyWithoutUserNestedInput = {
+    create?: XOR<AddressBookCreateWithoutUserInput, AddressBookUncheckedCreateWithoutUserInput> | AddressBookCreateWithoutUserInput[] | AddressBookUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AddressBookCreateOrConnectWithoutUserInput | AddressBookCreateOrConnectWithoutUserInput[]
+    upsert?: AddressBookUpsertWithWhereUniqueWithoutUserInput | AddressBookUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: AddressBookCreateManyUserInputEnvelope
+    set?: AddressBookWhereUniqueInput | AddressBookWhereUniqueInput[]
+    disconnect?: AddressBookWhereUniqueInput | AddressBookWhereUniqueInput[]
+    delete?: AddressBookWhereUniqueInput | AddressBookWhereUniqueInput[]
+    connect?: AddressBookWhereUniqueInput | AddressBookWhereUniqueInput[]
+    update?: AddressBookUpdateWithWhereUniqueWithoutUserInput | AddressBookUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: AddressBookUpdateManyWithWhereWithoutUserInput | AddressBookUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: AddressBookScalarWhereInput | AddressBookScalarWhereInput[]
+  }
+
   export type AppPasswordUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
@@ -44600,6 +46316,20 @@ export namespace Prisma {
     deleteMany?: TotpRecoveryCodeScalarWhereInput | TotpRecoveryCodeScalarWhereInput[]
   }
 
+  export type AddressBookUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<AddressBookCreateWithoutUserInput, AddressBookUncheckedCreateWithoutUserInput> | AddressBookCreateWithoutUserInput[] | AddressBookUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: AddressBookCreateOrConnectWithoutUserInput | AddressBookCreateOrConnectWithoutUserInput[]
+    upsert?: AddressBookUpsertWithWhereUniqueWithoutUserInput | AddressBookUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: AddressBookCreateManyUserInputEnvelope
+    set?: AddressBookWhereUniqueInput | AddressBookWhereUniqueInput[]
+    disconnect?: AddressBookWhereUniqueInput | AddressBookWhereUniqueInput[]
+    delete?: AddressBookWhereUniqueInput | AddressBookWhereUniqueInput[]
+    connect?: AddressBookWhereUniqueInput | AddressBookWhereUniqueInput[]
+    update?: AddressBookUpdateWithWhereUniqueWithoutUserInput | AddressBookUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: AddressBookUpdateManyWithWhereWithoutUserInput | AddressBookUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: AddressBookScalarWhereInput | AddressBookScalarWhereInput[]
+  }
+
   export type UserCreateNestedOneWithoutAppPasswordsInput = {
     create?: XOR<UserCreateWithoutAppPasswordsInput, UserUncheckedCreateWithoutAppPasswordsInput>
     connectOrCreate?: UserCreateOrConnectWithoutAppPasswordsInput
@@ -44735,6 +46465,12 @@ export namespace Prisma {
     connectOrCreate?: ContactCreateOrConnectWithoutMergedIntoContactInput | ContactCreateOrConnectWithoutMergedIntoContactInput[]
     createMany?: ContactCreateManyMergedIntoContactInputEnvelope
     connect?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+  }
+
+  export type AddressBookCreateNestedOneWithoutContactsInput = {
+    create?: XOR<AddressBookCreateWithoutContactsInput, AddressBookUncheckedCreateWithoutContactsInput>
+    connectOrCreate?: AddressBookCreateOrConnectWithoutContactsInput
+    connect?: AddressBookWhereUniqueInput
   }
 
   export type MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput = {
@@ -44956,6 +46692,16 @@ export namespace Prisma {
     update?: ContactUpdateWithWhereUniqueWithoutMergedIntoContactInput | ContactUpdateWithWhereUniqueWithoutMergedIntoContactInput[]
     updateMany?: ContactUpdateManyWithWhereWithoutMergedIntoContactInput | ContactUpdateManyWithWhereWithoutMergedIntoContactInput[]
     deleteMany?: ContactScalarWhereInput | ContactScalarWhereInput[]
+  }
+
+  export type AddressBookUpdateOneWithoutContactsNestedInput = {
+    create?: XOR<AddressBookCreateWithoutContactsInput, AddressBookUncheckedCreateWithoutContactsInput>
+    connectOrCreate?: AddressBookCreateOrConnectWithoutContactsInput
+    upsert?: AddressBookUpsertWithoutContactsInput
+    disconnect?: AddressBookWhereInput | boolean
+    delete?: AddressBookWhereInput | boolean
+    connect?: AddressBookWhereUniqueInput
+    update?: XOR<XOR<AddressBookUpdateToOneWithWhereWithoutContactsInput, AddressBookUpdateWithoutContactsInput>, AddressBookUncheckedUpdateWithoutContactsInput>
   }
 
   export type MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput = {
@@ -46194,6 +47940,62 @@ export namespace Prisma {
     deleteMany?: TeamSyncAccountScalarWhereInput | TeamSyncAccountScalarWhereInput[]
   }
 
+  export type UserCreateNestedOneWithoutAddressBooksInput = {
+    create?: XOR<UserCreateWithoutAddressBooksInput, UserUncheckedCreateWithoutAddressBooksInput>
+    connectOrCreate?: UserCreateOrConnectWithoutAddressBooksInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type ContactCreateNestedManyWithoutBookInput = {
+    create?: XOR<ContactCreateWithoutBookInput, ContactUncheckedCreateWithoutBookInput> | ContactCreateWithoutBookInput[] | ContactUncheckedCreateWithoutBookInput[]
+    connectOrCreate?: ContactCreateOrConnectWithoutBookInput | ContactCreateOrConnectWithoutBookInput[]
+    createMany?: ContactCreateManyBookInputEnvelope
+    connect?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+  }
+
+  export type ContactUncheckedCreateNestedManyWithoutBookInput = {
+    create?: XOR<ContactCreateWithoutBookInput, ContactUncheckedCreateWithoutBookInput> | ContactCreateWithoutBookInput[] | ContactUncheckedCreateWithoutBookInput[]
+    connectOrCreate?: ContactCreateOrConnectWithoutBookInput | ContactCreateOrConnectWithoutBookInput[]
+    createMany?: ContactCreateManyBookInputEnvelope
+    connect?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+  }
+
+  export type UserUpdateOneRequiredWithoutAddressBooksNestedInput = {
+    create?: XOR<UserCreateWithoutAddressBooksInput, UserUncheckedCreateWithoutAddressBooksInput>
+    connectOrCreate?: UserCreateOrConnectWithoutAddressBooksInput
+    upsert?: UserUpsertWithoutAddressBooksInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutAddressBooksInput, UserUpdateWithoutAddressBooksInput>, UserUncheckedUpdateWithoutAddressBooksInput>
+  }
+
+  export type ContactUpdateManyWithoutBookNestedInput = {
+    create?: XOR<ContactCreateWithoutBookInput, ContactUncheckedCreateWithoutBookInput> | ContactCreateWithoutBookInput[] | ContactUncheckedCreateWithoutBookInput[]
+    connectOrCreate?: ContactCreateOrConnectWithoutBookInput | ContactCreateOrConnectWithoutBookInput[]
+    upsert?: ContactUpsertWithWhereUniqueWithoutBookInput | ContactUpsertWithWhereUniqueWithoutBookInput[]
+    createMany?: ContactCreateManyBookInputEnvelope
+    set?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+    disconnect?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+    delete?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+    connect?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+    update?: ContactUpdateWithWhereUniqueWithoutBookInput | ContactUpdateWithWhereUniqueWithoutBookInput[]
+    updateMany?: ContactUpdateManyWithWhereWithoutBookInput | ContactUpdateManyWithWhereWithoutBookInput[]
+    deleteMany?: ContactScalarWhereInput | ContactScalarWhereInput[]
+  }
+
+  export type ContactUncheckedUpdateManyWithoutBookNestedInput = {
+    create?: XOR<ContactCreateWithoutBookInput, ContactUncheckedCreateWithoutBookInput> | ContactCreateWithoutBookInput[] | ContactUncheckedCreateWithoutBookInput[]
+    connectOrCreate?: ContactCreateOrConnectWithoutBookInput | ContactCreateOrConnectWithoutBookInput[]
+    upsert?: ContactUpsertWithWhereUniqueWithoutBookInput | ContactUpsertWithWhereUniqueWithoutBookInput[]
+    createMany?: ContactCreateManyBookInputEnvelope
+    set?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+    disconnect?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+    delete?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+    connect?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+    update?: ContactUpdateWithWhereUniqueWithoutBookInput | ContactUpdateWithWhereUniqueWithoutBookInput[]
+    updateMany?: ContactUpdateManyWithWhereWithoutBookInput | ContactUpdateManyWithWhereWithoutBookInput[]
+    deleteMany?: ContactScalarWhereInput | ContactScalarWhereInput[]
+  }
+
   export type GroupCreateNestedOneWithoutTeamSyncAccountsInput = {
     create?: XOR<GroupCreateWithoutTeamSyncAccountsInput, GroupUncheckedCreateWithoutTeamSyncAccountsInput>
     connectOrCreate?: GroupCreateOrConnectWithoutTeamSyncAccountsInput
@@ -47179,6 +48981,7 @@ export namespace Prisma {
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+    book?: AddressBookCreateNestedOneWithoutContactsInput
   }
 
   export type ContactUncheckedCreateWithoutUserInput = {
@@ -47226,6 +49029,7 @@ export namespace Prisma {
     lastMutatedBy?: $Enums.SourceType
     lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
+    bookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
@@ -47944,6 +49748,42 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type AddressBookCreateWithoutUserInput = {
+    id?: string
+    name: string
+    slug: string
+    description?: string | null
+    isDefault?: boolean
+    sourceGroupBookId?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contacts?: ContactCreateNestedManyWithoutBookInput
+  }
+
+  export type AddressBookUncheckedCreateWithoutUserInput = {
+    id?: string
+    name: string
+    slug: string
+    description?: string | null
+    isDefault?: boolean
+    sourceGroupBookId?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    contacts?: ContactUncheckedCreateNestedManyWithoutBookInput
+  }
+
+  export type AddressBookCreateOrConnectWithoutUserInput = {
+    where: AddressBookWhereUniqueInput
+    create: XOR<AddressBookCreateWithoutUserInput, AddressBookUncheckedCreateWithoutUserInput>
+  }
+
+  export type AddressBookCreateManyUserInputEnvelope = {
+    data: AddressBookCreateManyUserInput | AddressBookCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AppPasswordUpsertWithWhereUniqueWithoutUserInput = {
     where: AppPasswordWhereUniqueInput
     update: XOR<AppPasswordUpdateWithoutUserInput, AppPasswordUncheckedUpdateWithoutUserInput>
@@ -48039,6 +49879,7 @@ export namespace Prisma {
     lastMutatedBy?: EnumSourceTypeFilter<"Contact"> | $Enums.SourceType
     lastMutatedByDetail?: StringNullableFilter<"Contact"> | string | null
     archivedAt?: DateTimeNullableFilter<"Contact"> | Date | string | null
+    bookId?: StringNullableFilter<"Contact"> | string | null
     createdAt?: DateTimeFilter<"Contact"> | Date | string
     updatedAt?: DateTimeFilter<"Contact"> | Date | string
   }
@@ -48600,6 +50441,38 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"TotpRecoveryCode"> | Date | string
   }
 
+  export type AddressBookUpsertWithWhereUniqueWithoutUserInput = {
+    where: AddressBookWhereUniqueInput
+    update: XOR<AddressBookUpdateWithoutUserInput, AddressBookUncheckedUpdateWithoutUserInput>
+    create: XOR<AddressBookCreateWithoutUserInput, AddressBookUncheckedCreateWithoutUserInput>
+  }
+
+  export type AddressBookUpdateWithWhereUniqueWithoutUserInput = {
+    where: AddressBookWhereUniqueInput
+    data: XOR<AddressBookUpdateWithoutUserInput, AddressBookUncheckedUpdateWithoutUserInput>
+  }
+
+  export type AddressBookUpdateManyWithWhereWithoutUserInput = {
+    where: AddressBookScalarWhereInput
+    data: XOR<AddressBookUpdateManyMutationInput, AddressBookUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type AddressBookScalarWhereInput = {
+    AND?: AddressBookScalarWhereInput | AddressBookScalarWhereInput[]
+    OR?: AddressBookScalarWhereInput[]
+    NOT?: AddressBookScalarWhereInput | AddressBookScalarWhereInput[]
+    id?: StringFilter<"AddressBook"> | string
+    userId?: StringFilter<"AddressBook"> | string
+    name?: StringFilter<"AddressBook"> | string
+    slug?: StringFilter<"AddressBook"> | string
+    description?: StringNullableFilter<"AddressBook"> | string | null
+    isDefault?: BoolFilter<"AddressBook"> | boolean
+    sourceGroupBookId?: StringNullableFilter<"AddressBook"> | string | null
+    archivedAt?: DateTimeNullableFilter<"AddressBook"> | Date | string | null
+    createdAt?: DateTimeFilter<"AddressBook"> | Date | string
+    updatedAt?: DateTimeFilter<"AddressBook"> | Date | string
+  }
+
   export type UserCreateWithoutAppPasswordsInput = {
     id?: string
     name?: string | null
@@ -48615,6 +50488,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -48634,6 +50508,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAppPasswordsInput = {
@@ -48651,6 +50526,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -48670,6 +50546,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAppPasswordsInput = {
@@ -48757,6 +50634,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -48776,6 +50654,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAppPasswordsInput = {
@@ -48793,6 +50672,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -48812,6 +50692,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SyncConflictUpsertWithWhereUniqueWithoutAppPasswordInput = {
@@ -48871,6 +50752,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -48890,6 +50772,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutContactsInput = {
@@ -48907,6 +50790,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -48926,6 +50810,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutContactsInput = {
@@ -49392,6 +51277,7 @@ export namespace Prisma {
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
+    book?: AddressBookCreateNestedOneWithoutContactsInput
   }
 
   export type ContactUncheckedCreateWithoutMergedChildrenInput = {
@@ -49440,6 +51326,7 @@ export namespace Prisma {
     lastMutatedBy?: $Enums.SourceType
     lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
+    bookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
@@ -49513,6 +51400,7 @@ export namespace Prisma {
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+    book?: AddressBookCreateNestedOneWithoutContactsInput
   }
 
   export type ContactUncheckedCreateWithoutMergedIntoContactInput = {
@@ -49560,6 +51448,7 @@ export namespace Prisma {
     lastMutatedBy?: $Enums.SourceType
     lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
+    bookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
@@ -49581,6 +51470,37 @@ export namespace Prisma {
   export type ContactCreateManyMergedIntoContactInputEnvelope = {
     data: ContactCreateManyMergedIntoContactInput | ContactCreateManyMergedIntoContactInput[]
     skipDuplicates?: boolean
+  }
+
+  export type AddressBookCreateWithoutContactsInput = {
+    id?: string
+    name: string
+    slug: string
+    description?: string | null
+    isDefault?: boolean
+    sourceGroupBookId?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutAddressBooksInput
+  }
+
+  export type AddressBookUncheckedCreateWithoutContactsInput = {
+    id?: string
+    userId: string
+    name: string
+    slug: string
+    description?: string | null
+    isDefault?: boolean
+    sourceGroupBookId?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type AddressBookCreateOrConnectWithoutContactsInput = {
+    where: AddressBookWhereUniqueInput
+    create: XOR<AddressBookCreateWithoutContactsInput, AddressBookUncheckedCreateWithoutContactsInput>
   }
 
   export type UserUpsertWithoutContactsInput = {
@@ -49609,6 +51529,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -49628,6 +51549,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutContactsInput = {
@@ -49645,6 +51567,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -49664,6 +51587,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ImportJobUpsertWithoutContactsInput = {
@@ -49953,6 +51877,7 @@ export namespace Prisma {
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
+    book?: AddressBookUpdateOneWithoutContactsNestedInput
   }
 
   export type ContactUncheckedUpdateWithoutMergedChildrenInput = {
@@ -50001,6 +51926,7 @@ export namespace Prisma {
     lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
     lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
@@ -50029,6 +51955,43 @@ export namespace Prisma {
     data: XOR<ContactUpdateManyMutationInput, ContactUncheckedUpdateManyWithoutMergedIntoContactInput>
   }
 
+  export type AddressBookUpsertWithoutContactsInput = {
+    update: XOR<AddressBookUpdateWithoutContactsInput, AddressBookUncheckedUpdateWithoutContactsInput>
+    create: XOR<AddressBookCreateWithoutContactsInput, AddressBookUncheckedCreateWithoutContactsInput>
+    where?: AddressBookWhereInput
+  }
+
+  export type AddressBookUpdateToOneWithWhereWithoutContactsInput = {
+    where?: AddressBookWhereInput
+    data: XOR<AddressBookUpdateWithoutContactsInput, AddressBookUncheckedUpdateWithoutContactsInput>
+  }
+
+  export type AddressBookUpdateWithoutContactsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    sourceGroupBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutAddressBooksNestedInput
+  }
+
+  export type AddressBookUncheckedUpdateWithoutContactsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    sourceGroupBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type UserCreateWithoutSubscriptionCustomerInput = {
     id?: string
     name?: string | null
@@ -50044,6 +52007,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -50063,6 +52027,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSubscriptionCustomerInput = {
@@ -50080,6 +52045,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -50099,6 +52065,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSubscriptionCustomerInput = {
@@ -50212,6 +52179,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -50231,6 +52199,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSubscriptionCustomerInput = {
@@ -50248,6 +52217,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -50267,6 +52237,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SubscriptionUpsertWithWhereUniqueWithoutSubscriptionCustomerInput = {
@@ -50300,6 +52271,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -50319,6 +52291,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSubscriptionsInput = {
@@ -50336,6 +52309,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -50355,6 +52329,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSubscriptionsInput = {
@@ -50453,6 +52428,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -50472,6 +52448,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSubscriptionsInput = {
@@ -50489,6 +52466,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -50508,6 +52486,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SubscriptionCustomerUpsertWithoutSubscriptionsInput = {
@@ -50572,6 +52551,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -50591,6 +52571,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutImportJobsInput = {
@@ -50608,6 +52589,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -50627,6 +52609,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutImportJobsInput = {
@@ -50690,6 +52673,7 @@ export namespace Prisma {
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+    book?: AddressBookCreateNestedOneWithoutContactsInput
   }
 
   export type ContactUncheckedCreateWithoutImportJobInput = {
@@ -50737,6 +52721,7 @@ export namespace Prisma {
     lastMutatedBy?: $Enums.SourceType
     lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
+    bookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
@@ -50786,6 +52771,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -50805,6 +52791,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutImportJobsInput = {
@@ -50822,6 +52809,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -50841,6 +52829,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ContactUpsertWithWhereUniqueWithoutImportJobInput = {
@@ -50874,6 +52863,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -50893,6 +52883,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutExportJobsInput = {
@@ -50910,6 +52901,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -50929,6 +52921,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutExportJobsInput = {
@@ -50962,6 +52955,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -50981,6 +52975,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutExportJobsInput = {
@@ -50998,6 +52993,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -51017,6 +53013,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutMergeSuggestionsInput = {
@@ -51034,6 +53031,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -51053,6 +53051,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutMergeSuggestionsInput = {
@@ -51070,6 +53069,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -51089,6 +53089,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutMergeSuggestionsInput = {
@@ -51152,6 +53153,7 @@ export namespace Prisma {
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+    book?: AddressBookCreateNestedOneWithoutContactsInput
   }
 
   export type ContactUncheckedCreateWithoutLeftMergeSuggestionsInput = {
@@ -51200,6 +53202,7 @@ export namespace Prisma {
     lastMutatedBy?: $Enums.SourceType
     lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
+    bookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
@@ -51273,6 +53276,7 @@ export namespace Prisma {
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+    book?: AddressBookCreateNestedOneWithoutContactsInput
   }
 
   export type ContactUncheckedCreateWithoutRightMergeSuggestionsInput = {
@@ -51321,6 +53325,7 @@ export namespace Prisma {
     lastMutatedBy?: $Enums.SourceType
     lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
+    bookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
@@ -51402,6 +53407,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -51421,6 +53427,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMergeSuggestionsInput = {
@@ -51438,6 +53445,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -51457,6 +53465,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ContactUpsertWithoutLeftMergeSuggestionsInput = {
@@ -51526,6 +53535,7 @@ export namespace Prisma {
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+    book?: AddressBookUpdateOneWithoutContactsNestedInput
   }
 
   export type ContactUncheckedUpdateWithoutLeftMergeSuggestionsInput = {
@@ -51574,6 +53584,7 @@ export namespace Prisma {
     lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
     lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
@@ -51653,6 +53664,7 @@ export namespace Prisma {
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+    book?: AddressBookUpdateOneWithoutContactsNestedInput
   }
 
   export type ContactUncheckedUpdateWithoutRightMergeSuggestionsInput = {
@@ -51701,6 +53713,7 @@ export namespace Prisma {
     lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
     lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
@@ -51787,6 +53800,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -51806,6 +53820,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutMergeDecisionsInput = {
@@ -51823,6 +53838,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -51842,6 +53858,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutMergeDecisionsInput = {
@@ -51924,6 +53941,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -51943,6 +53961,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMergeDecisionsInput = {
@@ -51960,6 +53979,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -51979,6 +53999,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutSyncAccountsInput = {
@@ -51996,6 +54017,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -52015,6 +54037,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSyncAccountsInput = {
@@ -52032,6 +54055,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -52051,6 +54075,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSyncAccountsInput = {
@@ -52263,6 +54288,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -52282,6 +54308,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSyncAccountsInput = {
@@ -52299,6 +54326,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -52318,6 +54346,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SyncContactLinkUpsertWithWhereUniqueWithoutSyncAccountInput = {
@@ -52552,6 +54581,7 @@ export namespace Prisma {
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+    book?: AddressBookCreateNestedOneWithoutContactsInput
   }
 
   export type ContactUncheckedCreateWithoutSyncLinksInput = {
@@ -52600,6 +54630,7 @@ export namespace Prisma {
     lastMutatedBy?: $Enums.SourceType
     lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
+    bookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
@@ -52815,6 +54846,7 @@ export namespace Prisma {
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+    book?: AddressBookUpdateOneWithoutContactsNestedInput
   }
 
   export type ContactUncheckedUpdateWithoutSyncLinksInput = {
@@ -52863,6 +54895,7 @@ export namespace Prisma {
     lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
     lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
@@ -53203,6 +55236,7 @@ export namespace Prisma {
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+    book?: AddressBookCreateNestedOneWithoutContactsInput
   }
 
   export type ContactUncheckedCreateWithoutSyncConflictsInput = {
@@ -53251,6 +55285,7 @@ export namespace Prisma {
     lastMutatedBy?: $Enums.SourceType
     lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
+    bookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
@@ -53482,6 +55517,7 @@ export namespace Prisma {
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+    book?: AddressBookUpdateOneWithoutContactsNestedInput
   }
 
   export type ContactUncheckedUpdateWithoutSyncConflictsInput = {
@@ -53530,6 +55566,7 @@ export namespace Prisma {
     lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
     lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
@@ -53590,6 +55627,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -53609,6 +55647,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutEmailVerificationTokensInput = {
@@ -53626,6 +55665,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -53645,6 +55685,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutEmailVerificationTokensInput = {
@@ -53678,6 +55719,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -53697,6 +55739,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEmailVerificationTokensInput = {
@@ -53714,6 +55757,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -53733,6 +55777,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutPasswordResetTokensInput = {
@@ -53750,6 +55795,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -53769,6 +55815,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
@@ -53786,6 +55833,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -53805,6 +55853,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutPasswordResetTokensInput = {
@@ -53838,6 +55887,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -53857,6 +55907,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
@@ -53874,6 +55925,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -53893,6 +55945,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutSessionsInput = {
@@ -53910,6 +55963,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -53929,6 +55983,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -53946,6 +56001,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -53965,6 +56021,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -53998,6 +56055,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -54017,6 +56075,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -54034,6 +56093,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -54053,6 +56113,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutTotpRecoveryCodesInput = {
@@ -54070,6 +56131,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -54089,6 +56151,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutTotpRecoveryCodesInput = {
@@ -54106,6 +56169,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -54125,6 +56189,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutTotpRecoveryCodesInput = {
@@ -54158,6 +56223,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -54177,6 +56243,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutTotpRecoveryCodesInput = {
@@ -54194,6 +56261,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -54213,6 +56281,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutActivityEventsInput = {
@@ -54230,6 +56299,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -54249,6 +56319,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutActivityEventsInput = {
@@ -54266,6 +56337,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -54285,6 +56357,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutActivityEventsInput = {
@@ -54348,6 +56421,7 @@ export namespace Prisma {
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+    book?: AddressBookCreateNestedOneWithoutContactsInput
   }
 
   export type ContactUncheckedCreateWithoutActivityEventsInput = {
@@ -54396,6 +56470,7 @@ export namespace Prisma {
     lastMutatedBy?: $Enums.SourceType
     lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
+    bookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
@@ -54439,6 +56514,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -54458,6 +56534,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutActivityEventsInput = {
@@ -54475,6 +56552,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -54494,6 +56572,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ContactUpsertWithoutActivityEventsInput = {
@@ -54563,6 +56642,7 @@ export namespace Prisma {
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+    book?: AddressBookUpdateOneWithoutContactsNestedInput
   }
 
   export type ContactUncheckedUpdateWithoutActivityEventsInput = {
@@ -54611,6 +56691,7 @@ export namespace Prisma {
     lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
     lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
@@ -54638,6 +56719,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -54657,6 +56739,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutOwnedGroupsInput = {
@@ -54674,6 +56757,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -54693,6 +56777,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutOwnedGroupsInput = {
@@ -54823,6 +56908,7 @@ export namespace Prisma {
     description?: string | null
     isDefault?: boolean
     archivedAt?: Date | string | null
+    dissolvedToBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: GroupContactCreateNestedManyWithoutGroupAddressBookInput
@@ -54835,6 +56921,7 @@ export namespace Prisma {
     description?: string | null
     isDefault?: boolean
     archivedAt?: Date | string | null
+    dissolvedToBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: GroupContactUncheckedCreateNestedManyWithoutGroupAddressBookInput
@@ -54903,6 +56990,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -54922,6 +57010,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOwnedGroupsInput = {
@@ -54939,6 +57028,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -54958,6 +57048,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SubscriptionUpsertWithoutGroupsInput = {
@@ -55083,6 +57174,7 @@ export namespace Prisma {
     description?: StringNullableFilter<"GroupAddressBook"> | string | null
     isDefault?: BoolFilter<"GroupAddressBook"> | boolean
     archivedAt?: DateTimeNullableFilter<"GroupAddressBook"> | Date | string | null
+    dissolvedToBookId?: StringNullableFilter<"GroupAddressBook"> | string | null
     createdAt?: DateTimeFilter<"GroupAddressBook"> | Date | string
     updatedAt?: DateTimeFilter<"GroupAddressBook"> | Date | string
   }
@@ -55165,6 +57257,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -55184,6 +57277,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutGroupMembershipsInput = {
@@ -55201,6 +57295,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -55220,6 +57315,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutGroupMembershipsInput = {
@@ -55294,6 +57390,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -55313,6 +57410,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutGroupMembershipsInput = {
@@ -55330,6 +57428,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -55349,6 +57448,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type GroupCreateWithoutAddressBooksInput = {
@@ -55511,6 +57611,318 @@ export namespace Prisma {
     data: XOR<TeamSyncAccountUpdateManyMutationInput, TeamSyncAccountUncheckedUpdateManyWithoutAddressBookInput>
   }
 
+  export type UserCreateWithoutAddressBooksInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutAddressBooksInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutAddressBooksInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutAddressBooksInput, UserUncheckedCreateWithoutAddressBooksInput>
+  }
+
+  export type ContactCreateWithoutBookInput = {
+    id?: string
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
+    nickname?: string | null
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    phoneticCompany?: string | null
+    jobTitle?: string | null
+    department?: string | null
+    website?: string | null
+    birthday?: string | null
+    address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    isEmergency?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutContactsInput
+    importJob?: ImportJobCreateNestedOneWithoutContactsInput
+    leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
+    mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactUncheckedCreateWithoutBookInput = {
+    id?: string
+    userId: string
+    importJobId?: string | null
+    mergedIntoContactId?: string | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
+    nickname?: string | null
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    phoneticCompany?: string | null
+    jobTitle?: string | null
+    department?: string | null
+    website?: string | null
+    birthday?: string | null
+    address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    isEmergency?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactCreateOrConnectWithoutBookInput = {
+    where: ContactWhereUniqueInput
+    create: XOR<ContactCreateWithoutBookInput, ContactUncheckedCreateWithoutBookInput>
+  }
+
+  export type ContactCreateManyBookInputEnvelope = {
+    data: ContactCreateManyBookInput | ContactCreateManyBookInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type UserUpsertWithoutAddressBooksInput = {
+    update: XOR<UserUpdateWithoutAddressBooksInput, UserUncheckedUpdateWithoutAddressBooksInput>
+    create: XOR<UserCreateWithoutAddressBooksInput, UserUncheckedCreateWithoutAddressBooksInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutAddressBooksInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutAddressBooksInput, UserUncheckedUpdateWithoutAddressBooksInput>
+  }
+
+  export type UserUpdateWithoutAddressBooksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutAddressBooksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type ContactUpsertWithWhereUniqueWithoutBookInput = {
+    where: ContactWhereUniqueInput
+    update: XOR<ContactUpdateWithoutBookInput, ContactUncheckedUpdateWithoutBookInput>
+    create: XOR<ContactCreateWithoutBookInput, ContactUncheckedCreateWithoutBookInput>
+  }
+
+  export type ContactUpdateWithWhereUniqueWithoutBookInput = {
+    where: ContactWhereUniqueInput
+    data: XOR<ContactUpdateWithoutBookInput, ContactUncheckedUpdateWithoutBookInput>
+  }
+
+  export type ContactUpdateManyWithWhereWithoutBookInput = {
+    where: ContactScalarWhereInput
+    data: XOR<ContactUpdateManyMutationInput, ContactUncheckedUpdateManyWithoutBookInput>
+  }
+
   export type GroupCreateWithoutTeamSyncAccountsInput = {
     id?: string
     type: $Enums.GroupType
@@ -55623,6 +58035,7 @@ export namespace Prisma {
     description?: string | null
     isDefault?: boolean
     archivedAt?: Date | string | null
+    dissolvedToBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     group: GroupCreateNestedOneWithoutAddressBooksInput
@@ -55636,6 +58049,7 @@ export namespace Prisma {
     description?: string | null
     isDefault?: boolean
     archivedAt?: Date | string | null
+    dissolvedToBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: GroupContactUncheckedCreateNestedManyWithoutGroupAddressBookInput
@@ -55781,6 +58195,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dissolvedToBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     group?: GroupUpdateOneRequiredWithoutAddressBooksNestedInput
@@ -55794,6 +58209,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dissolvedToBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: GroupContactUncheckedUpdateManyWithoutGroupAddressBookNestedInput
@@ -55805,6 +58221,7 @@ export namespace Prisma {
     description?: string | null
     isDefault?: boolean
     archivedAt?: Date | string | null
+    dissolvedToBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     group: GroupCreateNestedOneWithoutAddressBooksInput
@@ -55818,6 +58235,7 @@ export namespace Prisma {
     description?: string | null
     isDefault?: boolean
     archivedAt?: Date | string | null
+    dissolvedToBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     teamSyncAccounts?: TeamSyncAccountUncheckedCreateNestedManyWithoutAddressBookInput
@@ -55884,6 +58302,7 @@ export namespace Prisma {
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+    book?: AddressBookCreateNestedOneWithoutContactsInput
   }
 
   export type ContactUncheckedCreateWithoutGroupContactsInput = {
@@ -55932,6 +58351,7 @@ export namespace Prisma {
     lastMutatedBy?: $Enums.SourceType
     lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
+    bookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
@@ -55966,6 +58386,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dissolvedToBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     group?: GroupUpdateOneRequiredWithoutAddressBooksNestedInput
@@ -55979,6 +58400,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dissolvedToBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     teamSyncAccounts?: TeamSyncAccountUncheckedUpdateManyWithoutAddressBookNestedInput
@@ -56051,6 +58473,7 @@ export namespace Prisma {
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+    book?: AddressBookUpdateOneWithoutContactsNestedInput
   }
 
   export type ContactUncheckedUpdateWithoutGroupContactsInput = {
@@ -56099,6 +58522,7 @@ export namespace Prisma {
     lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
     lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
@@ -56126,6 +58550,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -56145,6 +58570,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutContactSharesOwnedInput = {
@@ -56162,6 +58588,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -56181,6 +58608,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutContactSharesOwnedInput = {
@@ -56244,6 +58672,7 @@ export namespace Prisma {
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+    book?: AddressBookCreateNestedOneWithoutContactsInput
   }
 
   export type ContactUncheckedCreateWithoutSharesFromContactInput = {
@@ -56292,6 +58721,7 @@ export namespace Prisma {
     lastMutatedBy?: $Enums.SourceType
     lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
+    bookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
@@ -56324,6 +58754,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -56343,6 +58774,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutContactSharesReceivedInput = {
@@ -56360,6 +58792,7 @@ export namespace Prisma {
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -56379,6 +58812,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutContactSharesReceivedInput = {
@@ -56442,6 +58876,7 @@ export namespace Prisma {
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+    book?: AddressBookCreateNestedOneWithoutContactsInput
   }
 
   export type ContactUncheckedCreateWithoutSharesAsRecipientCopyInput = {
@@ -56490,6 +58925,7 @@ export namespace Prisma {
     lastMutatedBy?: $Enums.SourceType
     lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
+    bookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
@@ -56533,6 +58969,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -56552,6 +58989,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutContactSharesOwnedInput = {
@@ -56569,6 +59007,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -56588,6 +59027,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ContactUpsertWithoutSharesFromContactInput = {
@@ -56657,6 +59097,7 @@ export namespace Prisma {
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+    book?: AddressBookUpdateOneWithoutContactsNestedInput
   }
 
   export type ContactUncheckedUpdateWithoutSharesFromContactInput = {
@@ -56705,6 +59146,7 @@ export namespace Prisma {
     lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
     lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
@@ -56743,6 +59185,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -56762,6 +59205,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutContactSharesReceivedInput = {
@@ -56779,6 +59223,7 @@ export namespace Prisma {
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -56798,6 +59243,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ContactUpsertWithoutSharesAsRecipientCopyInput = {
@@ -56867,6 +59313,7 @@ export namespace Prisma {
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+    book?: AddressBookUpdateOneWithoutContactsNestedInput
   }
 
   export type ContactUncheckedUpdateWithoutSharesAsRecipientCopyInput = {
@@ -56915,6 +59362,7 @@ export namespace Prisma {
     lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
     lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
@@ -56982,6 +59430,7 @@ export namespace Prisma {
     lastMutatedBy?: $Enums.SourceType
     lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
+    bookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -57236,6 +59685,18 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type AddressBookCreateManyUserInput = {
+    id?: string
+    name: string
+    slug: string
+    description?: string | null
+    isDefault?: boolean
+    sourceGroupBookId?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type AppPasswordUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     label?: StringFieldUpdateOperationsInput | string
@@ -57324,6 +59785,7 @@ export namespace Prisma {
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+    book?: AddressBookUpdateOneWithoutContactsNestedInput
   }
 
   export type ContactUncheckedUpdateWithoutUserInput = {
@@ -57371,6 +59833,7 @@ export namespace Prisma {
     lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
     lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
@@ -57429,6 +59892,7 @@ export namespace Prisma {
     lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
     lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -58203,6 +60667,44 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type AddressBookUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    sourceGroupBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: ContactUpdateManyWithoutBookNestedInput
+  }
+
+  export type AddressBookUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    sourceGroupBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contacts?: ContactUncheckedUpdateManyWithoutBookNestedInput
+  }
+
+  export type AddressBookUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    slug?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    isDefault?: BoolFieldUpdateOperationsInput | boolean
+    sourceGroupBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type SyncConflictCreateManyAppPasswordInput = {
     id?: string
     syncAccountId?: string | null
@@ -58467,6 +60969,7 @@ export namespace Prisma {
     lastMutatedBy?: $Enums.SourceType
     lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
+    bookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -58926,6 +61429,7 @@ export namespace Prisma {
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+    book?: AddressBookUpdateOneWithoutContactsNestedInput
   }
 
   export type ContactUncheckedUpdateWithoutMergedIntoContactInput = {
@@ -58973,6 +61477,7 @@ export namespace Prisma {
     lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
     lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
@@ -59031,6 +61536,7 @@ export namespace Prisma {
     lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
     lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -59272,6 +61778,7 @@ export namespace Prisma {
     lastMutatedBy?: $Enums.SourceType
     lastMutatedByDetail?: string | null
     archivedAt?: Date | string | null
+    bookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -59332,6 +61839,7 @@ export namespace Prisma {
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+    book?: AddressBookUpdateOneWithoutContactsNestedInput
   }
 
   export type ContactUncheckedUpdateWithoutImportJobInput = {
@@ -59379,6 +61887,7 @@ export namespace Prisma {
     lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
     lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
@@ -59437,6 +61946,7 @@ export namespace Prisma {
     lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
     lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -59861,6 +62371,7 @@ export namespace Prisma {
     description?: string | null
     isDefault?: boolean
     archivedAt?: Date | string | null
+    dissolvedToBookId?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -59927,6 +62438,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dissolvedToBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: GroupContactUpdateManyWithoutGroupAddressBookNestedInput
@@ -59939,6 +62451,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dissolvedToBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: GroupContactUncheckedUpdateManyWithoutGroupAddressBookNestedInput
@@ -59951,6 +62464,7 @@ export namespace Prisma {
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dissolvedToBookId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -60041,6 +62555,224 @@ export namespace Prisma {
     syncAccountId?: StringFieldUpdateOperationsInput | string
     addedByUserId?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ContactCreateManyBookInput = {
+    id?: string
+    userId: string
+    importJobId?: string | null
+    mergedIntoContactId?: string | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
+    nickname?: string | null
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    phoneticCompany?: string | null
+    jobTitle?: string | null
+    department?: string | null
+    website?: string | null
+    birthday?: string | null
+    address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    isEmergency?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ContactUpdateWithoutBookInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
+    nickname?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    birthday?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutContactsNestedInput
+    importJob?: ImportJobUpdateOneWithoutContactsNestedInput
+    leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
+    mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+  }
+
+  export type ContactUncheckedUpdateWithoutBookInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
+    nickname?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    birthday?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
+  }
+
+  export type ContactUncheckedUpdateManyWithoutBookInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
+    nickname?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    birthday?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
 

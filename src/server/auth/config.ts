@@ -96,6 +96,8 @@ export const authConfig = {
           _ua: ua,
           // P18-07: flag pending TOTP challenge if user has 2FA enabled
           _pendingTotp: user.totpEnabled,
+          // P18-09: flag pending deletion grace period
+          _pendingDeletion: !!user.scheduledDeleteAt,
         };
       },
     }),
@@ -134,6 +136,10 @@ export const authConfig = {
         // P18-07: embed pendingTotp if credentials verified but TOTP not yet confirmed
         if ((user as { _pendingTotp?: boolean })._pendingTotp) {
           token.pendingTotp = true;
+        }
+        // P18-09: embed pendingDeletion if account is in 30-day grace period
+        if ((user as { _pendingDeletion?: boolean })._pendingDeletion) {
+          token.pendingDeletion = true;
         }
 
       } else if (token.sub && token.jti) {
@@ -208,6 +214,8 @@ export const authConfig = {
           : null,
       },
       jti: token.jti,
+      pendingTotp: token.pendingTotp as boolean | undefined,
+      pendingDeletion: token.pendingDeletion as boolean | undefined,
     }),
   },
 } satisfies NextAuthConfig;

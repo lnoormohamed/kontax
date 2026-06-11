@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { SettingsPageHead, StSecLabel } from "~/app/_components/settings-ui";
+import { DeleteAccountSection } from "./delete-account-section";
 import { SessionsSection } from "./sessions-section";
 import { TwoFactorSection } from "./two-factor-section";
 
@@ -82,6 +83,9 @@ export default function SettingsSecurityPage() {
           ))}
         </div>
       </section>
+
+      <StSecLabel>Danger zone</StSecLabel>
+      <DeleteAccountSection />
 
       {toast && <Toast message={toast} />}
     </>

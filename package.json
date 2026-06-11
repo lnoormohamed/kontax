@@ -17,6 +17,7 @@
     "lint": "next lint",
     "lint:fix": "next lint --fix",
     "preview": "next build && next start",
+    "migrate:books": "node scripts/migrate-default-address-books.mjs",
     "prune:activity": "node scripts/prune-activity-retention.mjs",
     "seed:demo": "node scripts/seed-demo-showcase.mjs",
     "start": "node server.mjs",

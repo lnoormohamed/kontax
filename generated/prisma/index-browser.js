@@ -136,6 +136,7 @@ exports.Prisma.UserScalarFieldEnum = {
   totpEnabled: 'totpEnabled',
   totpSecret: 'totpSecret',
   totpVerifiedAt: 'totpVerifiedAt',
+  scheduledDeleteAt: 'scheduledDeleteAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -197,6 +198,7 @@ exports.Prisma.ContactScalarFieldEnum = {
   lastMutatedBy: 'lastMutatedBy',
   lastMutatedByDetail: 'lastMutatedByDetail',
   archivedAt: 'archivedAt',
+  bookId: 'bookId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -507,6 +509,20 @@ exports.Prisma.GroupAddressBookScalarFieldEnum = {
   description: 'description',
   isDefault: 'isDefault',
   archivedAt: 'archivedAt',
+  dissolvedToBookId: 'dissolvedToBookId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.AddressBookScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  slug: 'slug',
+  description: 'description',
+  isDefault: 'isDefault',
+  sourceGroupBookId: 'sourceGroupBookId',
+  archivedAt: 'archivedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -808,6 +824,7 @@ exports.Prisma.ModelName = {
   Group: 'Group',
   GroupMember: 'GroupMember',
   GroupAddressBook: 'GroupAddressBook',
+  AddressBook: 'AddressBook',
   TeamSyncAccount: 'TeamSyncAccount',
   GroupContact: 'GroupContact',
   ContactShare: 'ContactShare'

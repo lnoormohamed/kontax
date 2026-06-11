@@ -9,9 +9,10 @@ const { auth } = NextAuth(authConfigEdge);
 const PUBLIC_PATHS = [
   "/login",
   "/register",
-  "/forgot-password",  // P18-05
-  "/reset-password",   // P18-05
+  "/forgot-password",          // P18-05
+  "/reset-password",           // P18-05
   "/verify-email",
+  "/account-deleted",          // P18-09
   "/share",         // vCard share public links (P12-02)
   "/api/auth",      // NextAuth endpoints
   "/api/register",  // Account creation

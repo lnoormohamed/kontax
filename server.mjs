@@ -324,45 +324,68 @@ const buildPropfindResponse = (responses) => {
   return `<?xml version="1.0" encoding="utf-8"?><d:multistatus xmlns:d="DAV:" xmlns:card="urn:ietf:params:xml:ns:carddav" xmlns:cs="http://calendarserver.org/ns/">${body}</d:multistatus>`;
 };
 
-const computeAddressBookCTag = async (userId) => {
+// P18-11: CTag is now per-book (was per-user)
+const computeAddressBookCTag = async (userId, bookId) => {
+  const where = bookId
+    ? { bookId }
+    : { userId };
   const mostRecent = await prisma.contact.findFirst({
-    where: {
-      userId,
-    },
-    orderBy: {
-      updatedAt: "desc",
-    },
-    select: {
-      updatedAt: true,
-    },
+    where,
+    orderBy: { updatedAt: "desc" },
+    select: { updatedAt: true },
   });
-
   return mostRecent?.updatedAt.toISOString() ?? "empty";
 };
 
 const getPrincipalUserId = (pathname) => pathname.match(/^\/dav\/principals\/([^/]+)\/?$/)?.[1];
 const getAddressBookUserId = (pathname) => pathname.match(/^\/dav\/addressbooks\/([^/]+)\/?$/)?.[1];
-const getCollectionUserId = (pathname) =>
-  pathname.match(/^\/dav\/addressbooks\/([^/]+)\/default\/?$/)?.[1];
+
+// P18-11: dynamic bookSlug (was hardcoded "default"; slug "default" preserved for device compat)
+const getCollectionParams = (pathname) => {
+  // Exclude known non-personal slugs (family, team-*)
+  const match = pathname.match(/^\/dav\/addressbooks\/([^/]+)\/([^/]+)\/?$/);
+  if (!match) return null;
+  const slug = match[2];
+  if (slug === 'family' || slug?.startsWith('team-')) return null;
+  return { userId: match[1], bookSlug: slug };
+};
+// Legacy compat — keep for callers that only need userId
+const getCollectionUserId = (pathname) => getCollectionParams(pathname)?.userId ?? null;
+
 const getResourceParams = (pathname) => {
-  const match = pathname.match(/^\/dav\/addressbooks\/([^/]+)\/default\/([^/]+)$/);
-
-  if (!match) {
-    return null;
-  }
-
-  const rawUid = match[2];
+  const match = pathname.match(/^\/dav\/addressbooks\/([^/]+)\/([^/]+)\/([^/]+)$/);
+  if (!match) return null;
+  const slug = match[2];
+  if (slug === 'family' || slug?.startsWith('team-')) return null;
+  const rawUid = match[3];
   const uid = rawUid.endsWith(".vcf") ? rawUid.slice(0, -4) : rawUid;
+  return { userId: match[1], bookSlug: slug, uid: decodeURIComponent(uid) };
+};
 
-  return { userId: match[1], uid: decodeURIComponent(uid) };
+// P18-11: resolve AddressBook row by userId + slug (creates default if missing)
+const resolveAddressBook = async (userId, slug) => {
+  const book = await prisma.addressBook.findUnique({
+    where: { userId_slug: { userId, slug } },
+  });
+  if (book && !book.archivedAt) return book;
+  // Auto-create default book on first CardDAV access if migration hasn't run yet
+  if (slug === 'default') {
+    return prisma.addressBook.upsert({
+      where: { userId_slug: { userId, slug: 'default' } },
+      update: {},
+      create: { userId, name: 'All Contacts', slug: 'default', isDefault: true },
+    });
+  }
+  return null;
 };
 
 // --- vCard serialization / parsing (self-contained for the Node DAV adapter) ---
 
 const etagForContact = (contact) => `"v${contact.syncVersion}"`;
 
-const contactResourceHref = (userId, syncUid) =>
-  `/dav/addressbooks/${userId}/default/${encodeURIComponent(syncUid)}.vcf`;
+// P18-11: use dynamic slug in URLs
+const contactResourceHref = (userId, syncUid, bookSlug = 'default') =>
+  `/dav/addressbooks/${userId}/${bookSlug}/${encodeURIComponent(syncUid)}.vcf`;
 
 // P13-08: family shared book exposed as a second collection per member.
 const getFamilyCollectionUserId = (pathname) =>
@@ -684,13 +707,12 @@ const parseVCardToContactFields = (text) => {
   return fields;
 };
 
-const fetchActiveContacts = (userId) =>
+// P18-11: filter by bookId when available; fall back to userId for migration safety
+const fetchActiveContacts = (userId, bookId) =>
   prisma.contact.findMany({
-    where: {
-      userId,
-      archivedAt: null,
-      syncTombstoneAt: null,
-    },
+    where: bookId
+      ? { bookId, archivedAt: null, syncTombstoneAt: null }
+      : { userId, archivedAt: null, syncTombstoneAt: null },
     orderBy: { syncUid: "asc" },
   });
 
@@ -1019,17 +1041,33 @@ const handleAddressBooks = async (req, res, requestUrl) => {
   ];
 
   if (depth === "1") {
-    const defaultProps = [
-      { name: "displayname", value: "Kontax" },
-      { name: "resourcetype", types: ["collection", "addressbook"] },
-      { name: "getctag", value: await computeAddressBookCTag(user.id) },
-      { name: "supported-address-data" },
-    ];
-
-    responses.push({
-      href: `${homeHref}default/`,
-      ...splitDavProps(defaultProps, requestedNames),
+    // P18-11: list all non-archived personal books dynamically
+    const personalBooks = await prisma.addressBook.findMany({
+      where: { userId: user.id, archivedAt: null },
+      orderBy: [{ isDefault: 'desc' }, { createdAt: 'asc' }],
     });
+    for (const pb of personalBooks) {
+      const bookProps = [
+        { name: "displayname", value: pb.name },
+        { name: "resourcetype", types: ["collection", "addressbook"] },
+        { name: "getctag", value: await computeAddressBookCTag(user.id, pb.id) },
+        { name: "supported-address-data" },
+      ];
+      responses.push({
+        href: `${homeHref}${pb.slug}/`,
+        ...splitDavProps(bookProps, requestedNames),
+      });
+    }
+    // If no books yet (pre-migration), surface the legacy default
+    if (personalBooks.length === 0) {
+      const defaultProps = [
+        { name: "displayname", value: "All Contacts" },
+        { name: "resourcetype", types: ["collection", "addressbook"] },
+        { name: "getctag", value: await computeAddressBookCTag(user.id, null) },
+        { name: "supported-address-data" },
+      ];
+      responses.push({ href: `${homeHref}default/`, ...splitDavProps(defaultProps, requestedNames) });
+    }
 
     // P13-08: surface the shared family book as a second collection.
     const familyBook = await getFamilyBookForUser(user.id);
@@ -1497,92 +1535,62 @@ const handleTeamResource = async (req, res, requestUrl) => {
 };
 
 const handleAddressBookCollection = async (req, res, requestUrl) => {
-  const userId = getCollectionUserId(requestUrl.pathname);
-
-  if (!userId) {
-    return false;
-  }
+  // P18-11: dynamic bookSlug instead of hardcoded "default"
+  const params = getCollectionParams(requestUrl.pathname);
+  if (!params) return false;
+  const { userId, bookSlug } = params;
 
   const allow = "OPTIONS, PROPFIND, REPORT";
-
-  if (req.method === "OPTIONS") {
-    return options(res, allow);
-  }
-
-  if (req.method !== "PROPFIND" && req.method !== "REPORT") {
-    return methodNotAllowed(res, allow);
-  }
+  if (req.method === "OPTIONS") return options(res, allow);
+  if (req.method !== "PROPFIND" && req.method !== "REPORT") return methodNotAllowed(res, allow);
 
   const authResult = await requireDavAuth(req, res, userId);
+  if (!authResult) return true;
 
-  if (!authResult) {
-    return true;
-  }
+  // Resolve the AddressBook by slug (auto-creates default if missing)
+  const book = await resolveAddressBook(userId, bookSlug);
+  if (!book) return notFound(res);
 
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { id: true },
-  });
-
-  if (!user) {
-    return notFound(res);
-  }
-
-  const collectionHref = `/dav/addressbooks/${userId}/default/`;
+  const collectionHref = `/dav/addressbooks/${userId}/${bookSlug}/`;
 
   if (req.method === "PROPFIND") {
     const depth = req.headers.depth ?? "0";
-
-    if (depth === "infinity") {
-      return forbidden(res);
-    }
-
+    if (depth === "infinity") return forbidden(res);
     if (depth !== "0" && depth !== "1") {
       return send(res, 400, "Unsupported Depth", { "Content-Type": "text/plain; charset=utf-8" });
     }
-
     const requestedNames = extractRequestedPropNames(await readRequestBody(req));
     const collectionProps = [
-      { name: "displayname", value: "Kontax" },
+      { name: "displayname", value: book.name },
       { name: "resourcetype", types: ["collection", "addressbook"] },
-      { name: "getctag", value: await computeAddressBookCTag(userId) },
+      { name: "getctag", value: await computeAddressBookCTag(userId, book.id) },
       { name: "supported-address-data" },
     ];
-    const responses = [
-      {
-        href: collectionHref,
-        ...splitDavProps(collectionProps, requestedNames),
-      },
-    ];
+    const responses = [{ href: collectionHref, ...splitDavProps(collectionProps, requestedNames) }];
 
     if (depth === "1") {
-      const contacts = await fetchActiveContacts(userId);
-
+      const contacts = await fetchActiveContacts(userId, book.id);
       for (const contact of contacts) {
-        const props = [{ name: "getetag", value: etagForContact(contact) }];
         responses.push({
-          href: contactResourceHref(userId, contact.syncUid),
-          ...splitDavProps(props, requestedNames),
+          href: contactResourceHref(userId, contact.syncUid, bookSlug),
+          ...splitDavProps([{ name: "getetag", value: etagForContact(contact) }], requestedNames),
         });
       }
     }
-
     return xmlResponse(res, buildPropfindResponse(responses));
   }
 
-  // REPORT (addressbook-query): return every active contact with getetag + address-data.
-  // The request-body filter is treated as a hint and ignored in v1.
+  // REPORT
   await readRequestBody(req);
-  const contacts = await fetchActiveContacts(userId);
+  const contacts = await fetchActiveContacts(userId, book.id);
   const responses = contacts.map((contact) => ({
-    href: contactResourceHref(userId, contact.syncUid),
+    href: contactResourceHref(userId, contact.syncUid, bookSlug),
     props: [
       { name: "getetag", value: etagForContact(contact) },
       { name: "address-data", value: serializeContactToVCard(contact) },
     ],
     notFoundProps: [],
   }));
-
   return xmlResponse(res, buildPropfindResponse(responses));
 };
 
@@ -1593,7 +1601,7 @@ const handleContactResource = async (req, res, requestUrl) => {
     return false;
   }
 
-  const { userId, uid } = params;
+  const { userId, bookSlug, uid } = params;
   const allow = "OPTIONS, GET, PUT, DELETE";
 
   if (req.method === "OPTIONS") {
@@ -1609,6 +1617,10 @@ const handleContactResource = async (req, res, requestUrl) => {
   if (!authResult) {
     return true;
   }
+
+  // P18-11: resolve book for scoping contact queries
+  const book = await resolveAddressBook(userId, bookSlug ?? 'default');
+  if (!book) return notFound(res);
 
   const existing = await prisma.contact.findFirst({
     where: { userId, syncUid: uid },
@@ -1680,6 +1692,7 @@ const handleContactResource = async (req, res, requestUrl) => {
           userId,
           syncUid: uid,
           syncVersion: 1,
+          bookId: book.id, // P18-11
           ...fields,
         },
       });
