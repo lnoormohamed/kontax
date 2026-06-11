@@ -132,7 +132,10 @@ export const authConfig = {
         ]);
 
         token.sub = user.id;
-        token.jti = jti;
+        // Store the UserSession id under `sid`, NOT `jti`: `jti` is a reserved JWT
+        // claim that Auth.js overwrites with its own UUID during encoding, so a
+        // value written to token.jti never survives to be matched against the DB.
+        token.sid = jti;
         token.sv = dbUser?.sessionVersion ?? 1;
         token.emailVerified = dbUser?.emailVerified?.toISOString() ?? null;
         token.name = dbUser?.name ?? null;
@@ -146,15 +149,15 @@ export const authConfig = {
           token.pendingDeletion = true;
         }
 
-      } else if (token.sub && token.jti) {
-        // Every subsequent request: validate sessionVersion + jti revocation
+      } else if (token.sub && token.sid) {
+        // Every subsequent request: validate sessionVersion + session revocation
         const [dbUser, userSession] = await Promise.all([
           db.user.findUnique({
             where: { id: token.sub },
             select: { sessionVersion: true, emailVerified: true },
           }),
           db.userSession.findUnique({
-            where: { jti: token.jti },
+            where: { jti: token.sid as string },
             select: { revokedAt: true, lastActiveAt: true, totpChallengeVerified: true },
           }),
         ]);
@@ -175,12 +178,12 @@ export const authConfig = {
         const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
         if (userSession.lastActiveAt < fiveMinutesAgo) {
           void db.userSession.update({
-            where: { jti: token.jti },
+            where: { jti: token.sid as string },
             data: { lastActiveAt: new Date() },
           });
         }
 
-      } else if (token.sub && !token.jti) {
+      } else if (token.sub && !token.sid) {
         // Sessions created before P18-06 — validate sessionVersion only
         const dbUser = await db.user.findUnique({
           where: { id: token.sub },
@@ -217,7 +220,9 @@ export const authConfig = {
           ? new Date(token.emailVerified as string)
           : null,
       },
-      jti: token.jti,
+      // Expose the UserSession id as `jti` to the app layer (sessions.ts, totp.ts
+      // compare session.jti against UserSession.jti). Sourced from token.sid.
+      jti: token.sid as string | undefined,
       pendingTotp: token.pendingTotp as boolean | undefined,
       pendingDeletion: token.pendingDeletion as boolean | undefined,
     }),
