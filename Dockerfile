@@ -35,4 +35,5 @@ COPY --from=builder /app/src ./src
 
 EXPOSE 3000
 
-CMD ["npm", "start"]
+# Sync schema to the production DB on every startup (additive-only; safe for new tables/columns).
+CMD ["sh", "-c", "npx prisma db push --skip-generate && npm start"]
