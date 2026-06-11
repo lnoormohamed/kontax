@@ -134,11 +134,11 @@ export async function AppShell({
             </span>
           </Link>
 
-          {navItem("/?tab=people&filter=all", "people", "People", counts?.people)}
-          {navItem("/?tab=people&filter=favorites", "star", "Favorites", counts?.favorites)}
-          {navItem("/?tab=archived&filter=all", "archive", "Archived", counts?.archived)}
-          {navItem("/?tab=duplicates&filter=all", "people", "Duplicates", counts?.duplicates, true)}
-          {navItem("/?tab=activity", "clock", "Activity")}
+          {navItem("/contacts?tab=people&filter=all", "people", "People", counts?.people)}
+          {navItem("/contacts?tab=people&filter=favorites", "star", "Favorites", counts?.favorites)}
+          {navItem("/contacts?tab=archived&filter=all", "archive", "Archived", counts?.archived)}
+          {navItem("/contacts?tab=duplicates&filter=all", "people", "Duplicates", counts?.duplicates, true)}
+          {navItem("/contacts?tab=activity", "clock", "Activity")}
           {navItem("/shares", "download", "Shared with me", incomingShares || undefined, true)}
 
           <div className="mt-auto border-t border-[#e9ece7] pt-2">

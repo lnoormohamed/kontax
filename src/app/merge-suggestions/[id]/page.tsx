@@ -122,7 +122,7 @@ export default async function MergeSuggestionReviewPage({ params }: PageProps) {
           {/* Back link */}
           <Link
             className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#4158f4] hover:underline"
-            href="/?tab=duplicates"
+            href="/contacts?tab=duplicates"
           >
             <svg
               fill="none"
