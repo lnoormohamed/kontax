@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useTransition } from "react";
+
+import { createCheckoutSession } from "~/app/actions/billing";
 
 function Check() {
   return (
@@ -17,11 +19,68 @@ const Dash = () => <span className="dash">—</span>;
  * Pricing comparison: four-tier table with a Monthly/Annual billing toggle.
  * Prices are placeholders (£X) pending the commercial decision — the toggle
  * swaps the billing-period label and the "save ~20%" hint, per the design.
+ *
+ * currentPlan: the authenticated user's current plan ("FREE"|"PRO"|"FAMILY"|"TEAMS"),
+ * or null if not logged in.
  */
-export function PricingComparison() {
+export function PricingComparison({ currentPlan }: { currentPlan?: string | null }) {
   const [annual, setAnnual] = useState(false);
+  const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
   const period = annual ? "billed annually" : "billed monthly";
   const seatPeriod = annual ? "per seat, billed annually" : "per seat, billed monthly";
+  const interval = annual ? "YEARLY" : "MONTHLY";
+
+  const handleUpgrade = (plan: string) => {
+    setLoadingPlan(plan);
+    startTransition(async () => {
+      const result = await createCheckoutSession({ plan, interval });
+      if ("url" in result) {
+        window.location.href = result.url;
+      } else if (result.error === "USE_CUSTOMER_PORTAL") {
+        window.location.href = "/settings";
+      } else if (result.error === "UNAUTHORIZED") {
+        window.location.href = "/login";
+      } else {
+        // BILLING_NOT_CONFIGURED or STRIPE_ERROR — surface gracefully
+        window.location.href = "/pricing?error=billing";
+      }
+      setLoadingPlan(null);
+    });
+  };
+
+  // Returns the CTA for a paid plan column
+  const PaidCta = ({ plan, label, className }: { plan: string; label: string; className: string }) => {
+    const isCurrentPlan = currentPlan === plan;
+    const hasPaidPlan = currentPlan && currentPlan !== "FREE";
+    const isLoading = loadingPlan === plan;
+
+    if (isCurrentPlan) {
+      return (
+        <span className={`${className} cursor-default opacity-60`}>Current plan</span>
+      );
+    }
+
+    if (hasPaidPlan) {
+      return (
+        <Link className={className} href="/settings">
+          Manage subscription
+        </Link>
+      );
+    }
+
+    // Not logged in or on Free → checkout
+    return (
+      <button
+        className={`${className} disabled:opacity-60`}
+        disabled={isLoading}
+        onClick={() => handleUpgrade(plan)}
+        type="button"
+      >
+        {isLoading ? "Loading…" : label}
+      </button>
+    );
+  };
 
   return (
     <>
@@ -70,7 +129,7 @@ export function PricingComparison() {
                       <p className="plan-who">For individual power users</p>
                       <div className="plan-price">£X<small> / mo</small></div>
                       <p className="plan-period">{period}</p>
-                      <Link className="plan-cta plan-cta--primary" href="/register">Choose Pro</Link>
+                      <PaidCta plan="PRO" label="Choose Pro" className="plan-cta plan-cta--primary" />
                     </div>
                   </th>
                   <th>
@@ -79,7 +138,7 @@ export function PricingComparison() {
                       <p className="plan-who">For households up to 6 people</p>
                       <div className="plan-price">£X<small> / mo</small></div>
                       <p className="plan-period">{period}</p>
-                      <Link className="plan-cta plan-cta--ghost" href="/register">Choose Family</Link>
+                      <PaidCta plan="FAMILY" label="Choose Family" className="plan-cta plan-cta--ghost" />
                     </div>
                   </th>
                   <th>
@@ -88,7 +147,7 @@ export function PricingComparison() {
                       <p className="plan-who">For organisations up to 25</p>
                       <div className="plan-price">£X<small> / mo</small></div>
                       <p className="plan-period">{seatPeriod}</p>
-                      <Link className="plan-cta plan-cta--ghost" href="/register">Contact sales</Link>
+                      <PaidCta plan="TEAMS" label="Choose Teams" className="plan-cta plan-cta--ghost" />
                     </div>
                   </th>
                 </tr>

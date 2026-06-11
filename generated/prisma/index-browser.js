@@ -566,6 +566,14 @@ exports.Prisma.ContactShareScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.StripeWebhookEventScalarFieldEnum = {
+  id: 'id',
+  stripeEventId: 'stripeEventId',
+  type: 'type',
+  processedAt: 'processedAt',
+  error: 'error'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -827,7 +835,8 @@ exports.Prisma.ModelName = {
   AddressBook: 'AddressBook',
   TeamSyncAccount: 'TeamSyncAccount',
   GroupContact: 'GroupContact',
-  ContactShare: 'ContactShare'
+  ContactShare: 'ContactShare',
+  StripeWebhookEvent: 'StripeWebhookEvent'
 };
 
 /**

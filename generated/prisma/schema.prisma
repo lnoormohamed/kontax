@@ -883,3 +883,14 @@ model ContactShare {
   @@index([recipientUserId, status])
   @@index([recipientEmail, status])
 }
+
+model StripeWebhookEvent {
+  id            String   @id @default(cuid())
+  stripeEventId String   @unique
+  type          String
+  processedAt   DateTime @default(now())
+  error         String?
+
+  @@index([stripeEventId])
+  @@index([processedAt])
+}

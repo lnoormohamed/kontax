@@ -8,6 +8,7 @@ import {
   SettingsPageHead,
   UsageStat,
 } from "~/app/_components/settings-ui";
+import { BillingSuccessBanner } from "~/app/settings/_components/billing-success-banner";
 import { auth } from "~/server/auth";
 import { canCreateAppPassword } from "~/server/app-passwords";
 import { getUserPlanSummary } from "~/server/billing";
@@ -21,12 +22,18 @@ const PLAN_SUMMARY: Record<string, string> = {
 };
 const PLAN_ORDER = ["Free", "Pro", "Family", "Teams"] as const;
 
-export default async function SettingsPlanPage() {
+export default async function SettingsPlanPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const session = await auth();
   if (!session?.user?.id) {
     redirect("/login");
   }
   const userId = session.user.id;
+  const sp = searchParams ? await searchParams : undefined;
+  const showBillingSuccess = sp?.billing === "success";
 
   const planSummary = await getUserPlanSummary(userId);
   const [appPasswordAllowance, syncAccountsUsed, groupMembership] = await Promise.all([
@@ -60,6 +67,9 @@ export default async function SettingsPlanPage() {
 
   return (
     <>
+      {showBillingSuccess ? (
+        <BillingSuccessBanner planLabel={planSummary.planLabel} />
+      ) : null}
       <SettingsPageHead
         title="Plan & billing"
         sub="Billing visibility and the usage gates that apply to your account, kept out of the main contact workspace."

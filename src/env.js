@@ -31,6 +31,15 @@ export const env = createEnv({
     TOTP_ENCRYPTION_KEY: z.string().length(64).optional(),
     // Cron job secret — guards /api/cron/* routes (P18-10).
     CRON_SECRET: z.string().optional(),
+    // Stripe billing (P19). All optional — billing features degrade gracefully when unset.
+    STRIPE_SECRET_KEY: z.string().min(1).optional(),
+    STRIPE_WEBHOOK_SECRET: z.string().min(1).optional(),
+    STRIPE_PRICE_ID_PRO_MONTHLY: z.string().min(1).optional(),
+    STRIPE_PRICE_ID_PRO_YEARLY: z.string().min(1).optional(),
+    STRIPE_PRICE_ID_FAMILY_MONTHLY: z.string().min(1).optional(),
+    STRIPE_PRICE_ID_FAMILY_YEARLY: z.string().min(1).optional(),
+    STRIPE_PRICE_ID_TEAMS_MONTHLY: z.string().min(1).optional(),
+    STRIPE_PRICE_ID_TEAMS_YEARLY: z.string().min(1).optional(),
   },
 
   /**
@@ -63,6 +72,14 @@ export const env = createEnv({
     MINIO_PUBLIC_URL: process.env.MINIO_PUBLIC_URL,
     TOTP_ENCRYPTION_KEY: process.env.TOTP_ENCRYPTION_KEY,
     CRON_SECRET: process.env.CRON_SECRET,
+    STRIPE_SECRET_KEY: process.env.STRIPE_SECRET_KEY,
+    STRIPE_WEBHOOK_SECRET: process.env.STRIPE_WEBHOOK_SECRET,
+    STRIPE_PRICE_ID_PRO_MONTHLY: process.env.STRIPE_PRICE_ID_PRO_MONTHLY,
+    STRIPE_PRICE_ID_PRO_YEARLY: process.env.STRIPE_PRICE_ID_PRO_YEARLY,
+    STRIPE_PRICE_ID_FAMILY_MONTHLY: process.env.STRIPE_PRICE_ID_FAMILY_MONTHLY,
+    STRIPE_PRICE_ID_FAMILY_YEARLY: process.env.STRIPE_PRICE_ID_FAMILY_YEARLY,
+    STRIPE_PRICE_ID_TEAMS_MONTHLY: process.env.STRIPE_PRICE_ID_TEAMS_MONTHLY,
+    STRIPE_PRICE_ID_TEAMS_YEARLY: process.env.STRIPE_PRICE_ID_TEAMS_YEARLY,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially
