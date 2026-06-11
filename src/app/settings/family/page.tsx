@@ -170,7 +170,7 @@ export default async function FamilySettingsPage() {
               fields={{ groupId: memberOf.groupId }}
               title={`Leave ${memberOf.group.name}?`}
               trigger="Leave family"
-              triggerClassName="rounded-xl bg-[#b5472f] px-4 py-2.5 text-[14px] font-semibold text-white transition hover:bg-[#9a3a23]"
+              triggerClassName="rounded-xl border border-[#dcae9f] px-4 py-2.5 text-[14px] font-semibold text-[#b5472f] transition hover:bg-[#f3e1da]"
             />
           </SettingsCard>
         </div>

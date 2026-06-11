@@ -8,8 +8,11 @@ import { db } from "~/server/db";
 
 function JoinCard({ children }: { children: React.ReactNode }) {
   return (
-    <div className="mx-auto flex min-h-screen max-w-md flex-col justify-center px-5 text-[#1d2823]">
-      <div className="rounded-[18px] border border-[#d8ddd6] bg-white p-8 text-center shadow-[0_4px_24px_rgba(20,30,25,0.08)]">
+    <div
+      className="flex min-h-screen flex-col items-center justify-center px-5 py-10 text-[#1d2823]"
+      style={{ background: "radial-gradient(120% 90% at 50% 0%, #eef3ee 0%, #f6f7f4 55%)" }}
+    >
+      <div className="w-full max-w-md rounded-[24px] border border-[#e3e7e0] bg-white p-8 text-center shadow-[0_18px_50px_rgba(20,30,25,0.10)]">
         {children}
       </div>
     </div>
@@ -116,7 +119,7 @@ export default async function FamilyJoinPage({
   return (
     <JoinCard>
       <FamCrest />
-      <p className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">
+      <p className="text-[11px] font-bold uppercase tracking-[0.13em] text-[#4452c9]">
         Family invitation
       </p>
       <h1 className="mt-1 text-[20px] font-semibold">
