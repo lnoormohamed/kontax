@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { BillingBannerSlot } from "~/app/_components/billing-banner-slot";
 import { ContactDashboard } from "~/app/_components/contact-dashboard";
 import { EmailVerificationBanner } from "~/app/_components/email-verification-banner";
 import { SearchInput } from "~/app/_components/search-input";
@@ -416,6 +417,8 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
       {!session.user.emailVerified && (
         <EmailVerificationBanner email={session.user.email ?? ""} />
       )}
+
+      <BillingBannerSlot userId={session.user.id} />
 
       <ContactDashboard
         activeContacts={sortedActiveContacts}

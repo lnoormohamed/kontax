@@ -73,3 +73,43 @@ export async function createCheckoutSession(input: {
     return { error: "STRIPE_ERROR" };
   }
 }
+
+/**
+ * Open the Stripe-hosted customer portal where the user manages payment method,
+ * invoices, plan changes and cancellation. The portal is the single destination
+ * for every "Manage billing / Update payment method / Keep my plan" CTA across
+ * the P19-DB02 surfaces — the app never mutates subscription rows directly.
+ */
+export async function createBillingPortalSession(): Promise<
+  { url: string } | { error: string }
+> {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "UNAUTHORIZED" };
+  const userId = session.user.id;
+
+  const customer = await db.subscriptionCustomer.findUnique({
+    where: { userId },
+    select: { providerCustomerId: true },
+  });
+  if (!customer) return { error: "NO_BILLING_ACCOUNT" };
+
+  let stripe: ReturnType<typeof getStripeClient>;
+  try {
+    stripe = getStripeClient();
+  } catch {
+    return { error: "BILLING_NOT_CONFIGURED" };
+  }
+
+  const appUrl = process.env.APP_URL ?? "http://localhost:3000";
+
+  try {
+    const portalSession = await stripe.billingPortal.sessions.create({
+      customer: customer.providerCustomerId,
+      return_url: `${appUrl}/settings`,
+    });
+    if (!portalSession.url) return { error: "SESSION_URL_MISSING" };
+    return { url: portalSession.url };
+  } catch {
+    return { error: "STRIPE_ERROR" };
+  }
+}
