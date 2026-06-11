@@ -5,7 +5,7 @@ import Link from "next/link";
  * Section links point at the landing-page anchors so they work from any
  * sub-page. Pass `active` to mark the current page.
  */
-export function PublicNav({ active }: { active?: "pricing" }) {
+export function PublicNav({ active, isAuthenticated }: { active?: "pricing"; isAuthenticated?: boolean }) {
   return (
     <header className="nav">
       <div className="nav__inner">
@@ -20,8 +20,14 @@ export function PublicNav({ active }: { active?: "pricing" }) {
           <Link className="nav__link" href="/pricing" aria-current={active === "pricing" ? "page" : undefined}>Pricing</Link>
         </nav>
         <div className="nav__actions">
-          <Link className="nav__link" href="/login">Log in</Link>
-          <Link className="btn-primary--sm" href="/register">Get started free</Link>
+          {isAuthenticated ? (
+            <Link className="btn-primary--sm" href="/contacts">Open Kontax</Link>
+          ) : (
+            <>
+              <Link className="nav__link" href="/login">Log in</Link>
+              <Link className="btn-primary--sm" href="/register">Get started free</Link>
+            </>
+          )}
         </div>
       </div>
     </header>

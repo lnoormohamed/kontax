@@ -484,7 +484,7 @@ export function ImportPreviewForm({
           <div className="flex flex-col-reverse gap-2.5 sm:flex-row">
             <Link
               className="flex h-11 items-center justify-center rounded-[10px] bg-[#4158f4] px-[18px] text-[14.5px] font-semibold text-white transition hover:bg-[#3347d8]"
-              href="/"
+              href="/contacts"
             >
               ← View contacts
             </Link>

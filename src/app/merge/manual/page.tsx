@@ -63,7 +63,7 @@ export default async function ManualMergePage({ searchParams }: ManualMergePageP
     <main className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(56,189,248,0.18),_transparent_30%),linear-gradient(180deg,#020617_0%,#07111d_45%,#0f172a_100%)] text-white">
       <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-6 py-8 lg:px-10 lg:py-12">
         <div className="rounded-[2rem] border border-white/10 bg-white/5 p-6 shadow-[0_30px_120px_rgba(2,8,23,0.45)] backdrop-blur">
-          <Link className="text-sm font-semibold text-cyan-200 hover:text-cyan-100" href="/">
+          <Link className="text-sm font-semibold text-cyan-200 hover:text-cyan-100" href="/contacts">
             ← Back to dashboard
           </Link>
           <p className="mt-4 text-sm uppercase tracking-[0.35em] text-cyan-200">Manual merge</p>

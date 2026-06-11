@@ -17,7 +17,7 @@ export default async function LoginPage({
   const message = Array.isArray(rawMessage) ? rawMessage[0] : rawMessage;
 
   if (session?.user) {
-    redirect(next ?? "/");
+    redirect(next ?? "/contacts");
   }
 
   return (

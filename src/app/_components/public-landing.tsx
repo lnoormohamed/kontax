@@ -5,12 +5,12 @@ import { PublicFooter } from "~/app/_components/public-footer";
 import { PublicNav } from "~/app/_components/public-nav";
 import "~/app/_components/public-site.css";
 
-export function PublicLanding() {
+export function PublicLanding({ isAuthenticated }: { isAuthenticated?: boolean }) {
   return (
     <div className="kx">
       <LandingReveal />
 
-      <PublicNav />
+      <PublicNav isAuthenticated={isAuthenticated} />
 
       <main id="top">
         {/* ─────────────────────────── HERO ─────────────────────────── */}
@@ -21,11 +21,20 @@ export function PublicLanding() {
               <h1 className="hero__title">Your contacts,<br />synced everywhere.</h1>
               <p className="hero__sub">One address book, always up to date — across all your devices, apps, and the people you share with.</p>
               <div className="hero__ctas">
-                <Link className="btn-primary" href="/register">Get started free</Link>
-                <Link className="btn-secondary" href="/login">
-                  Log in
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h13" /><path d="M13 6l6 6-6 6" /></svg>
-                </Link>
+                {isAuthenticated ? (
+                  <Link className="btn-primary" href="/contacts">
+                    Open Kontax
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h13" /><path d="M13 6l6 6-6 6" /></svg>
+                  </Link>
+                ) : (
+                  <>
+                    <Link className="btn-primary" href="/register">Get started free</Link>
+                    <Link className="btn-secondary" href="/login">
+                      Log in
+                      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h13" /><path d="M13 6l6 6-6 6" /></svg>
+                    </Link>
+                  </>
+                )}
               </div>
             </div>
 
@@ -408,8 +417,14 @@ export function PublicLanding() {
             <h2 className="cta-band__title">Take back your contacts.</h2>
             <p className="cta-band__sub">One clean address book, synced everywhere, that you&rsquo;ll never have to rebuild again.</p>
             <div className="cta-band__btns">
-              <Link className="btn-primary" href="/register">Get started free</Link>
-              <Link className="btn-ghost" href="/pricing">See pricing</Link>
+              {isAuthenticated ? (
+                <Link className="btn-primary" href="/contacts">Open Kontax</Link>
+              ) : (
+                <>
+                  <Link className="btn-primary" href="/register">Get started free</Link>
+                  <Link className="btn-ghost" href="/pricing">See pricing</Link>
+                </>
+              )}
             </div>
           </div>
         </section>

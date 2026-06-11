@@ -251,7 +251,7 @@ export function AuthCard({
       }
       // Hard navigation so the freshly-set session cookie is sent and the server
       // re-renders the destination. router.push can show a stale logged-out view.
-      window.location.assign(next ?? "/");
+      window.location.assign(next ?? "/contacts");
     } else {
       const res = await fetch("/api/register", {
         method: "POST",
@@ -285,7 +285,7 @@ export function AuthCard({
       }
       // Hard navigation so the freshly-set session cookie is sent and the server
       // re-renders the destination. router.push can show a stale logged-out view.
-      window.location.assign(next ?? "/");
+      window.location.assign(next ?? "/contacts");
     }
   };
 

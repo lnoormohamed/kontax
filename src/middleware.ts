@@ -59,7 +59,7 @@ export default auth((req: NextRequest & { auth: { user?: { id?: string }; pendin
   }
 
   // 3. Public content: pass through; the page self-selects logged-out vs
-  //    logged-in content. This is what lets "/" show the marketing landing.
+  //    logged-in content. "/" is now a normal public marketing page (P18-12).
   if (pathname === "/" || PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) {
     return NextResponse.next();
   }

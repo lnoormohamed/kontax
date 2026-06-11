@@ -220,7 +220,7 @@ export function CreateContactForm({
 
         {/* sticky action bar */}
         <div className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-[#d8ddd6] bg-white/95 px-4 backdrop-blur lg:px-6">
-          <Link className="text-sm font-semibold text-[#5c655e] transition hover:text-[#1d2823]" href="/">
+          <Link className="text-sm font-semibold text-[#5c655e] transition hover:text-[#1d2823]" href="/contacts">
             Cancel
           </Link>
           <span className="flex-1 text-center text-[15px] font-semibold text-[#1d2823]">

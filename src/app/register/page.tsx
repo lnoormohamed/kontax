@@ -15,7 +15,7 @@ export default async function RegisterPage({
   const next = nextParam?.startsWith("/") ? nextParam : undefined;
 
   if (session?.user) {
-    redirect(next ?? "/");
+    redirect(next ?? "/contacts");
   }
 
   return (

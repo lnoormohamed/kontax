@@ -90,7 +90,7 @@ export default async function SharesPage() {
             <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#5c655e]">
               When someone shares a contact with you, it&apos;ll show up here to accept or decline.
             </p>
-            <Link className="mt-4 inline-block text-[13px] font-semibold text-[#4158f4]" href="/">
+            <Link className="mt-4 inline-block text-[13px] font-semibold text-[#4158f4]" href="/contacts">
               ← Back to contacts
             </Link>
           </div>

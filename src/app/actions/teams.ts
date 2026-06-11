@@ -209,7 +209,7 @@ export const declineTeamInvite = async (formData: FormData) => {
     });
   }
   revalidatePath("/settings/teams");
-  redirect("/");
+  redirect("/contacts");
 };
 
 // --- Role / membership management -------------------------------------------

@@ -209,7 +209,7 @@ export const declineFamilyInvite = async (formData: FormData) => {
     });
   }
   revalidatePath("/settings/family");
-  redirect("/");
+  redirect("/contacts");
 };
 
 // --- Owner management: revoke invite / remove member ------------------------

@@ -29,7 +29,7 @@ export function LoginForm({ next }: { next?: string }) {
         redirect: false,
       });
 
-      router.push(next ?? "/");
+      router.push(next ?? "/contacts");
       router.refresh();
     } catch {
       // NextAuth v5 throws on failed credentials (CredentialsSignin)

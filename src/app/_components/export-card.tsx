@@ -147,7 +147,7 @@ export function ExportCard({
 
       <p className="mt-4 border-t border-[#e9ece7] pt-3.5 text-[12.5px] leading-[1.5] text-[#8b938c]">
         To export a specific selection, choose contacts in your{" "}
-        <Link className="text-[#5c655e] underline underline-offset-2" href="/">contacts list</Link> and use the bulk-export
+        <Link className="text-[#5c655e] underline underline-offset-2" href="/contacts">contacts list</Link> and use the bulk-export
         action.
       </p>
     </section>

@@ -54,7 +54,7 @@ export function RegisterForm({ next }: { next?: string }) {
       return;
     }
 
-    router.push(next ?? "/");
+    router.push(next ?? "/contacts");
     router.refresh();
   };
 

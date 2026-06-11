@@ -38,7 +38,7 @@ export default async function TeamJoinPage({
             </p>
             <Link
               className="mt-4 inline-flex rounded-[9px] border border-[#d8ddd6] bg-white px-4 py-2 text-sm font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
-              href="/"
+              href="/contacts"
             >
               Go to Kontax
             </Link>
