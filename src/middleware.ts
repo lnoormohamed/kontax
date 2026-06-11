@@ -5,8 +5,15 @@ import { authConfigEdge } from "~/server/auth/config.edge";
 
 const { auth } = NextAuth(authConfigEdge);
 
-// Routes that never require authentication
-const PUBLIC_PATHS = [
+// Static assets + auth endpoints — always allowed, bypass all session gating
+// (these must load even for restricted sessions, e.g. CSS/JS for the 2FA page).
+const ALWAYS_ALLOW = ["/_next", "/favicon.ico", "/api/auth"];
+
+// Public content pages — viewable while logged out. The page component itself
+// decides what to render based on session (e.g. "/" shows the marketing landing
+// when logged out, the dashboard when logged in). "/" is matched exactly because
+// it cannot be a startsWith prefix (that would match every route).
+const PUBLIC_PREFIXES = [
   "/login",
   "/register",
   "/forgot-password",          // P18-05
@@ -14,11 +21,11 @@ const PUBLIC_PATHS = [
   "/verify-email",
   "/account-deleted",          // P18-09
   "/share",         // vCard share public links (P12-02)
-  "/api/auth",      // NextAuth endpoints
+  "/pricing",       // marketing
+  "/privacy",       // legal
+  "/terms",         // legal
   "/api/register",  // Account creation
   "/api/cron",      // Protected separately by CRON_SECRET
-  "/_next",
-  "/favicon.ico",
 ];
 
 // Only the TOTP challenge page is reachable with a pendingTotp session (P18-07)
@@ -31,31 +38,37 @@ export default auth((req: NextRequest & { auth: { user?: { id?: string }; pendin
   const { pathname } = req.nextUrl;
   const session = req.auth;
 
-  if (PUBLIC_PATHS.some((p) => pathname.startsWith(p))) {
+  // 1. Assets + auth API: never gated.
+  if (ALWAYS_ALLOW.some((p) => pathname.startsWith(p))) {
     return NextResponse.next();
   }
 
-  // No session → redirect to login, preserving the intended destination
-  if (!session?.user?.id) {
-    const loginUrl = new URL("/login", req.url);
-    loginUrl.searchParams.set("next", pathname);
-    return NextResponse.redirect(loginUrl);
-  }
-
-  // pendingTotp: password verified but TOTP code not yet submitted (P18-07)
-  if (session.pendingTotp) {
+  // 2. Restricted authenticated sessions are gated everywhere (checked before
+  //    public routes) so they cannot reach app content via "/" or a public page.
+  if (session?.pendingTotp) {
     if (!TOTP_ALLOWED_PATHS.some((p) => pathname.startsWith(p))) {
       return NextResponse.redirect(new URL("/login/verify-2fa", req.url));
     }
     return NextResponse.next();
   }
-
-  // pendingDeletion: account in 30-day grace period (P18-09)
-  if (session.pendingDeletion) {
+  if (session?.pendingDeletion) {
     if (!PENDING_DELETION_ALLOWED_PATHS.some((p) => pathname.startsWith(p))) {
       return NextResponse.redirect(new URL("/account-pending-deletion", req.url));
     }
     return NextResponse.next();
+  }
+
+  // 3. Public content: pass through; the page self-selects logged-out vs
+  //    logged-in content. This is what lets "/" show the marketing landing.
+  if (pathname === "/" || PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) {
+    return NextResponse.next();
+  }
+
+  // 4. Everything else requires a session.
+  if (!session?.user?.id) {
+    const loginUrl = new URL("/login", req.url);
+    loginUrl.searchParams.set("next", pathname);
+    return NextResponse.redirect(loginUrl);
   }
 
   return NextResponse.next();
