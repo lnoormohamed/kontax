@@ -220,9 +220,10 @@ export async function scheduleAccountDeletion(input: {
   });
 
   // Delete MinIO avatar (best effort)
-  if (user?.avatarUrl && process.env.MINIO_ENDPOINT && user.avatarUrl.includes(process.env.MINIO_ENDPOINT)) {
+  const avatarUrl = user?.avatarUrl;
+  if (avatarUrl && process.env.MINIO_ENDPOINT && avatarUrl.includes(process.env.MINIO_ENDPOINT)) {
     import("@aws-sdk/client-s3").then(({ S3Client, DeleteObjectCommand }) => {
-      const url = new URL(user!.avatarUrl!);
+      const url = new URL(avatarUrl);
       const key = url.pathname.slice(1).split("/").slice(1).join("/"); // strip bucket from path
       const s3 = new S3Client({
         endpoint: process.env.MINIO_ENDPOINT,
