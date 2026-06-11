@@ -91,6 +91,7 @@ export const EVENT_PAYLOAD_SCHEMAS = {
   SYNC_PUSHED: syncMutation,
   SYNC_CONFLICT_DETECTED: syncConflictDetected,
   SYNC_CONFLICT_RESOLVED: syncConflictResolved,
+  ACCOUNT_UPDATED: z.object({ field: z.string() }).strict(),
 } satisfies Record<EventType, z.ZodTypeAny>;
 
 export type EventPayloadMap = {

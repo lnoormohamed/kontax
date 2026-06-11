@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { ContactDashboard } from "~/app/_components/contact-dashboard";
+import { EmailVerificationBanner } from "~/app/_components/email-verification-banner";
 import { PublicLanding } from "~/app/_components/public-landing";
 import { SearchInput } from "~/app/_components/search-input";
 import { UserMenu } from "~/app/_components/user-menu";
@@ -532,6 +533,10 @@ export default async function Home({ searchParams }: HomePageProps) {
           </div>
         </div>
       </header>
+
+      {!session.user.emailVerified && (
+        <EmailVerificationBanner email={session.user.email ?? ""} />
+      )}
 
       <ContactDashboard
         activeContacts={sortedActiveContacts}

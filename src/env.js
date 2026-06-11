@@ -19,6 +19,18 @@ export const env = createEnv({
     NODE_ENV: z
       .enum(["development", "test", "production"])
       .default("development"),
+    // Rate limiting — self-hosted Valkey (P18-10). Falls back to in-memory if unset.
+    REDIS_URL: z.string().optional(),
+    // Blob storage — self-hosted MinIO (P18-01). Falls back to URL-only if unset.
+    MINIO_ENDPOINT: z.string().url().optional(),
+    MINIO_ACCESS_KEY: z.string().optional(),
+    MINIO_SECRET_KEY: z.string().optional(),
+    MINIO_BUCKET: z.string().optional(),
+    MINIO_PUBLIC_URL: z.string().url().optional(),
+    // TOTP encryption key — 64-char hex string (P18-07). Required in production.
+    TOTP_ENCRYPTION_KEY: z.string().length(64).optional(),
+    // Cron job secret — guards /api/cron/* routes (P18-10).
+    CRON_SECRET: z.string().optional(),
   },
 
   /**
@@ -43,6 +55,14 @@ export const env = createEnv({
     SES_FROM_ADDRESS: process.env.SES_FROM_ADDRESS,
     APP_URL: process.env.APP_URL,
     NODE_ENV: process.env.NODE_ENV,
+    REDIS_URL: process.env.REDIS_URL,
+    MINIO_ENDPOINT: process.env.MINIO_ENDPOINT,
+    MINIO_ACCESS_KEY: process.env.MINIO_ACCESS_KEY,
+    MINIO_SECRET_KEY: process.env.MINIO_SECRET_KEY,
+    MINIO_BUCKET: process.env.MINIO_BUCKET,
+    MINIO_PUBLIC_URL: process.env.MINIO_PUBLIC_URL,
+    TOTP_ENCRYPTION_KEY: process.env.TOTP_ENCRYPTION_KEY,
+    CRON_SECRET: process.env.CRON_SECRET,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

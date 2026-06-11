@@ -128,6 +128,10 @@ exports.Prisma.UserScalarFieldEnum = {
   password: 'password',
   lifecycleState: 'lifecycleState',
   autoFillPhoneticNames: 'autoFillPhoneticNames',
+  sessionVersion: 'sessionVersion',
+  emailVerified: 'emailVerified',
+  emailPendingChange: 'emailPendingChange',
+  emailPendingChangeRequestedAt: 'emailPendingChangeRequestedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -409,6 +413,39 @@ exports.Prisma.SyncConflictScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.EmailVerificationTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  type: 'type',
+  tokenHash: 'tokenHash',
+  targetEmail: 'targetEmail',
+  expiresAt: 'expiresAt',
+  usedAt: 'usedAt',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.PasswordResetTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  tokenHash: 'tokenHash',
+  expiresAt: 'expiresAt',
+  usedAt: 'usedAt',
+  requestedFromIp: 'requestedFromIp',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.UserSessionScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  jti: 'jti',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent',
+  deviceHint: 'deviceHint',
+  lastActiveAt: 'lastActiveAt',
+  revokedAt: 'revokedAt',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.ActivityEventScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -672,6 +709,11 @@ exports.SyncResolutionStrategy = exports.$Enums.SyncResolutionStrategy = {
   MANUAL_MERGE: 'MANUAL_MERGE'
 };
 
+exports.EmailVerificationTokenType = exports.$Enums.EmailVerificationTokenType = {
+  SIGNUP: 'SIGNUP',
+  EMAIL_CHANGE: 'EMAIL_CHANGE'
+};
+
 exports.EventType = exports.$Enums.EventType = {
   CONTACT_CREATED: 'CONTACT_CREATED',
   CONTACT_UPDATED: 'CONTACT_UPDATED',
@@ -686,7 +728,8 @@ exports.EventType = exports.$Enums.EventType = {
   SYNC_PULLED: 'SYNC_PULLED',
   SYNC_PUSHED: 'SYNC_PUSHED',
   SYNC_CONFLICT_DETECTED: 'SYNC_CONFLICT_DETECTED',
-  SYNC_CONFLICT_RESOLVED: 'SYNC_CONFLICT_RESOLVED'
+  SYNC_CONFLICT_RESOLVED: 'SYNC_CONFLICT_RESOLVED',
+  ACCOUNT_UPDATED: 'ACCOUNT_UPDATED'
 };
 
 exports.Actor = exports.$Enums.Actor = {
@@ -744,6 +787,9 @@ exports.Prisma.ModelName = {
   SyncContactLink: 'SyncContactLink',
   SyncJob: 'SyncJob',
   SyncConflict: 'SyncConflict',
+  EmailVerificationToken: 'EmailVerificationToken',
+  PasswordResetToken: 'PasswordResetToken',
+  UserSession: 'UserSession',
   ActivityEvent: 'ActivityEvent',
   Group: 'Group',
   GroupMember: 'GroupMember',

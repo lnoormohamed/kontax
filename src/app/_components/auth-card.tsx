@@ -184,9 +184,11 @@ function Field({
 export function AuthCard({
   mode,
   next,
+  message,
 }: {
   mode: "login" | "register";
   next?: string;
+  message?: string;
 }) {
   const router = useRouter();
   const isLogin = mode === "login";
@@ -311,6 +313,18 @@ export function AuthCard({
         {isLogin ? "Pick up right where you left off." : "Your contacts, organized and yours."}
       </p>
 
+      {/* Message banners (password-reset, email-changed) */}
+      {message === "password-reset" && (
+        <div className="mt-4 rounded-[1.2rem] border border-[#bcdac9] bg-[#e7efe9] px-4 py-3 text-center text-[13.5px] text-[#17352e]">
+          Your password has been reset. Please sign in with your new password.
+        </div>
+      )}
+      {message === "email-changed" && (
+        <div className="mt-4 rounded-[1.2rem] border border-[#bcdac9] bg-[#e7efe9] px-4 py-3 text-center text-[13.5px] text-[#17352e]">
+          Your email has been updated. Please sign in with your new address.
+        </div>
+      )}
+
       {/* Form */}
       <form
         aria-busy={submitting}
@@ -372,15 +386,15 @@ export function AuthCard({
             {!isLogin ? <StrengthMeter password={password} /> : null}
           </div>
 
-          {/* Forgot password — login only, always visible */}
+          {/* Forgot password — login only */}
           {isLogin ? (
             <div className="-mt-1 flex justify-end">
-              <button
+              <a
                 className="text-[13px] font-medium text-[#5c655e] transition hover:text-[#4158f4]"
-                type="button"
+                href="/forgot-password"
               >
                 Forgot password?
-              </button>
+              </a>
             </div>
           ) : null}
 

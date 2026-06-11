@@ -90,7 +90,7 @@ function StatusPill({ status }: { status: string }) {
     Revoked:  { bg: "#f3e1da", fg: "#b5472f",  dot: "#b5472f" },
     Expired:  { bg: "#f2f4f0", fg: "#8b938c",  dot: "#aeb4ac" },
   };
-  const s = styles[status] ?? styles["Pending"]!;
+  const s = styles[status] ?? styles.Pending!;
   return (
     <span
       className="inline-flex h-[22px] shrink-0 items-center gap-1.5 rounded-[6px] px-2 text-[11.5px] font-bold whitespace-nowrap"

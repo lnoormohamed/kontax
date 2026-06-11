@@ -3,14 +3,29 @@ import { NextResponse, type NextRequest } from "next/server";
 import { z } from "zod";
 
 import { db } from "~/server/db";
+import { sendVerificationEmail } from "~/server/email-verification";
+import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
 
 const registerSchema = z.object({
   email: z.string().trim().toLowerCase().email(),
-  password: z.string().min(6),
+  password: z.string().min(8),
   name: z.string().trim().min(1).max(100).optional(),
 });
 
 export async function POST(request: NextRequest) {
+  const ip =
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ??
+    request.headers.get("x-real-ip") ??
+    "unknown";
+
+  const rl = await checkRateLimit(rateLimiters.registration, `ip:${ip}`);
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { message: "Too many accounts created from this IP. Please try again later." },
+      { status: 429 },
+    );
+  }
+
   const rawBody: unknown = await request.json().catch(() => null);
   const parsedBody = registerSchema.safeParse(rawBody);
 
@@ -66,6 +81,11 @@ export async function POST(request: NextRequest) {
     },
     data: { userId: user.id },
   });
+
+  // Send verification email — failure must never block registration
+  sendVerificationEmail(user.id, "SIGNUP").catch((err: unknown) =>
+    console.warn("[Kontax] Failed to send verification email:", err),
+  );
 
   return NextResponse.json({ ok: true }, { status: 201 });
 }

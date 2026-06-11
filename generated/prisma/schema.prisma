@@ -170,28 +170,38 @@ enum SourceType {
 }
 
 model User {
-  id                    String                @id @default(cuid())
-  name                  String?
-  email                 String                @unique
-  password              String
-  lifecycleState        AccountLifecycleState @default(ACTIVE)
-  autoFillPhoneticNames Boolean               @default(false)
-  appPasswords          AppPassword[]
-  contacts              Contact[]
-  importJobs            ImportJob[]
-  exportJobs            ExportJob[]
-  mergeSuggestions      MergeSuggestion[]
-  mergeDecisions        MergeDecision[]
-  syncAccounts          SyncAccount[]
-  subscriptionCustomer  SubscriptionCustomer?
-  subscriptions         Subscription[]
-  activityEvents        ActivityEvent[]
-  ownedGroups           Group[]               @relation("GroupOwner")
-  groupMemberships      GroupMember[]
-  contactSharesOwned    ContactShare[]        @relation("ShareOwner")
-  contactSharesReceived ContactShare[]        @relation("ShareRecipient")
-  createdAt             DateTime              @default(now())
-  updatedAt             DateTime              @updatedAt
+  id                            String                   @id @default(cuid())
+  name                          String?
+  email                         String                   @unique
+  password                      String
+  lifecycleState                AccountLifecycleState    @default(ACTIVE)
+  autoFillPhoneticNames         Boolean                  @default(false)
+  // P18-02: incremented on password change / session revoke; JWT must match or is rejected
+  sessionVersion                Int                      @default(1)
+  // P18-04: null = unverified; set to now() on token consumption
+  emailVerified                 DateTime?
+  // P18-03: pending email change (cleared on activation or cancellation)
+  emailPendingChange            String?
+  emailPendingChangeRequestedAt DateTime?
+  appPasswords                  AppPassword[]
+  contacts                      Contact[]
+  importJobs                    ImportJob[]
+  exportJobs                    ExportJob[]
+  mergeSuggestions              MergeSuggestion[]
+  mergeDecisions                MergeDecision[]
+  syncAccounts                  SyncAccount[]
+  subscriptionCustomer          SubscriptionCustomer?
+  subscriptions                 Subscription[]
+  activityEvents                ActivityEvent[]
+  ownedGroups                   Group[]                  @relation("GroupOwner")
+  groupMemberships              GroupMember[]
+  contactSharesOwned            ContactShare[]           @relation("ShareOwner")
+  contactSharesReceived         ContactShare[]           @relation("ShareRecipient")
+  emailVerificationTokens       EmailVerificationToken[]
+  passwordResetTokens           PasswordResetToken[]
+  sessions                      UserSession[]
+  createdAt                     DateTime                 @default(now())
+  updatedAt                     DateTime                 @updatedAt
 }
 
 model AppPassword {
@@ -573,6 +583,60 @@ enum EventType {
   SYNC_PUSHED
   SYNC_CONFLICT_DETECTED
   SYNC_CONFLICT_RESOLVED
+  // P18-02+: covers profile edits, password change, email change, 2FA state changes
+  ACCOUNT_UPDATED
+}
+
+enum EmailVerificationTokenType {
+  SIGNUP
+  EMAIL_CHANGE
+}
+
+model EmailVerificationToken {
+  id          String                     @id @default(cuid())
+  userId      String
+  type        EmailVerificationTokenType
+  tokenHash   String                     @unique
+  targetEmail String
+  expiresAt   DateTime
+  usedAt      DateTime?
+  createdAt   DateTime                   @default(now())
+  user        User                       @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, type, usedAt])
+  @@index([tokenHash])
+}
+
+// P18-05: password reset tokens (15-minute expiry, SHA-256 hash stored)
+model PasswordResetToken {
+  id              String    @id @default(cuid())
+  userId          String
+  tokenHash       String    @unique
+  expiresAt       DateTime
+  usedAt          DateTime?
+  requestedFromIp String?
+  createdAt       DateTime  @default(now())
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, usedAt, expiresAt])
+  @@index([tokenHash])
+}
+
+// P18-06: per-device session tracking (jti maps JWT to a revocable DB row)
+model UserSession {
+  id           String    @id @default(cuid())
+  userId       String
+  jti          String    @unique
+  ipAddress    String?
+  userAgent    String?
+  deviceHint   String?
+  lastActiveAt DateTime  @default(now())
+  revokedAt    DateTime?
+  createdAt    DateTime  @default(now())
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, revokedAt, lastActiveAt])
+  @@index([jti])
 }
 
 enum Actor {

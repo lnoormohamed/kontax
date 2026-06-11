@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { EmailVerificationBanner } from "~/app/_components/email-verification-banner";
 import { SearchInput } from "~/app/_components/search-input";
 import { UserMenu } from "~/app/_components/user-menu";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
@@ -108,6 +109,11 @@ export async function AppShell({
           </div>
         </div>
       </header>
+
+      {/* P18-04: soft nudge for unverified accounts */}
+      {session && !session.user.emailVerified && (
+        <EmailVerificationBanner email={account.email} />
+      )}
 
       <div className="flex min-h-0 flex-1">
         {/* sidebar */}

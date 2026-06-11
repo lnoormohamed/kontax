@@ -13,6 +13,8 @@ export default async function LoginPage({
   const rawNext = params?.next;
   const nextParam = Array.isArray(rawNext) ? rawNext[0] : rawNext;
   const next = nextParam?.startsWith("/") ? nextParam : undefined;
+  const rawMessage = params?.message;
+  const message = Array.isArray(rawMessage) ? rawMessage[0] : rawMessage;
 
   if (session?.user) {
     redirect(next ?? "/");
@@ -41,7 +43,7 @@ export default async function LoginPage({
           }}
         />
       </div>
-      <AuthCard mode="login" next={next} />
+      <AuthCard message={message} mode="login" next={next} />
       <p className="text-[12px] text-[#8b938c]">© Kontax · Your contacts, organized and yours.</p>
     </main>
   );

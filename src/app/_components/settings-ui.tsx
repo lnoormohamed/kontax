@@ -47,6 +47,18 @@ export function SectionLabel({ children }: { children: React.ReactNode }) {
   );
 }
 
+/** Section header with inline hairline divider — matches st-account.jsx StSecLabel */
+export function StSecLabel({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex items-center gap-[14px] px-0.5 pb-0.5 pt-[14px]">
+      <span className="whitespace-nowrap text-[12px] font-bold uppercase tracking-[0.08em] text-[#8b938c]">
+        {children}
+      </span>
+      <span className="h-px flex-1 bg-[#d8ddd6]" />
+    </div>
+  );
+}
+
 export function UsageStat({
   label,
   used,
