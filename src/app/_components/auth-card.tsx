@@ -2,7 +2,6 @@
 
 import { signIn } from "next-auth/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 
 // ── Password strength ──────────────────────────────────────────────────────
@@ -190,7 +189,6 @@ export function AuthCard({
   next?: string;
   message?: string;
 }) {
-  const router = useRouter();
   const isLogin = mode === "login";
 
   const [name, setName] = useState("");
@@ -235,16 +233,25 @@ export function AuthCard({
     setSubmitting(true);
 
     if (isLogin) {
+      // The client signIn (next-auth/react) RETURNS { error } on bad credentials
+      // with redirect:false — it does not throw. Check the result; keep the catch
+      // as a fallback for unexpected failures.
+      let signInFailed = false;
       try {
-        await signIn("credentials", { email, password, redirect: false });
-        router.push(next ?? "/");
-        router.refresh();
+        const result = await signIn("credentials", { email, password, redirect: false });
+        if (result?.error) signInFailed = true;
       } catch {
-        // NextAuth v5 throws CredentialsSignin on bad credentials
+        signInFailed = true;
+      }
+      if (signInFailed) {
         setFormError("Incorrect email or password. Please try again.");
         setSubmitting(false);
         setTimeout(() => errorBoxRef.current?.focus(), 0);
+        return;
       }
+      // Hard navigation so the freshly-set session cookie is sent and the server
+      // re-renders the destination. router.push can show a stale logged-out view.
+      window.location.assign(next ?? "/");
     } else {
       const res = await fetch("/api/register", {
         method: "POST",
@@ -264,14 +271,21 @@ export function AuthCard({
         return;
       }
 
+      let signInFailed = false;
       try {
-        await signIn("credentials", { email, password, redirect: false });
-        router.push(next ?? "/");
-        router.refresh();
+        const result = await signIn("credentials", { email, password, redirect: false });
+        if (result?.error) signInFailed = true;
       } catch {
+        signInFailed = true;
+      }
+      if (signInFailed) {
         setFormError("Account created but login didn't complete. Please log in.");
         setSubmitting(false);
+        return;
       }
+      // Hard navigation so the freshly-set session cookie is sent and the server
+      // re-renders the destination. router.push can show a stale logged-out view.
+      window.location.assign(next ?? "/");
     }
   };
 
