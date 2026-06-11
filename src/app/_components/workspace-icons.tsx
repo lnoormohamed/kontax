@@ -65,6 +65,7 @@ const PATHS: Record<string, string[]> = {
   warning: ["M12 4l9 16H3z", "M12 10v4", "M12 17h.01"],
   merge: ["M7 4v6a5 5 0 005 5h5", "M17 4v6", "M14 12l3 3-3 3", "M7 4l-2 2", "M7 4l2 2"],
   trash: ["M4 7h16", "M9 7V4.5h6V7", "M6 7l1 13h10l1-13", "M10 11v6", "M14 11v6"],
+  lock: ["M8 11V7a4 4 0 018 0v4", "M5 11h14v10H5z"],
   signout: ["M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4", "M16 17l5-5-5-5", "M21 12H9"],
   gear: [
     "M12 9a3 3 0 100 6 3 3 0 000-6z",

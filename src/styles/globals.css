@@ -4,3 +4,14 @@
   --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
     "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
+
+/* Live-share status pill pulse — matches the design system keyframe */
+@keyframes livePulse {
+  0%   { box-shadow: 0 0 0 0 rgba(31, 138, 91, 0.5); }
+  70%  { box-shadow: 0 0 0 5px rgba(31, 138, 91, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(31, 138, 91, 0); }
+}
+
+.live-pulse {
+  animation: livePulse 1.8s ease-out infinite;
+}
