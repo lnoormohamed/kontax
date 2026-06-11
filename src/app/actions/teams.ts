@@ -148,7 +148,7 @@ export const inviteTeamMember = async (formData: FormData) => {
     groupId: team.id,
     userId: recipient?.id ?? null,
     invitedEmail: email,
-    role: "MEMBER" as const,
+    role: (str(formData, "role") === "ADMIN" ? "ADMIN" : "MEMBER") as "ADMIN" | "MEMBER",
     inviteStatus: "PENDING" as const,
     canEdit: true,
     inviteToken: token,

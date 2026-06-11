@@ -41,7 +41,7 @@ export default async function SettingsPlanPage() {
             name: true,
             type: true,
             memberSlotsLimit: true,
-            _count: { select: { members: true } },
+            _count: { select: { members: true, addressBooks: true } },
           },
         },
       },
@@ -113,6 +113,9 @@ export default async function SettingsPlanPage() {
                     {groupMembership.group.memberSlotsLimit
                       ? ` · ${groupMembership.group._count.members}/${groupMembership.group.memberSlotsLimit} members`
                       : ` · ${groupMembership.group._count.members} members`}
+                    {planSummary.plan === "TEAMS" && groupMembership.group._count.addressBooks > 0
+                      ? ` · ${groupMembership.group._count.addressBooks} book${groupMembership.group._count.addressBooks === 1 ? "" : "s"}`
+                      : null}
                   </>
                 ) : (
                   <>Your {planSummary.plan === "FAMILY" ? "family" : "team"} group isn&apos;t set up yet.</>

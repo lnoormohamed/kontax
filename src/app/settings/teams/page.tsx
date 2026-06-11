@@ -74,7 +74,7 @@ export default async function TeamSettingsPage() {
       },
       addressBooks: {
         orderBy: { createdAt: "asc" },
-        select: { id: true, name: true, description: true, archivedAt: true },
+        select: { id: true, name: true, description: true, archivedAt: true, _count: { select: { contacts: true } } },
       },
     },
   });
@@ -123,7 +123,7 @@ export default async function TeamSettingsPage() {
               fields={{ groupId: memberOf.groupId }}
               title={`Leave ${memberOf.group.name}?`}
               trigger="Leave team"
-              triggerClassName="rounded-xl bg-[#b5472f] px-4 py-2.5 text-[14px] font-semibold text-white transition hover:bg-[#9a3a23]"
+              triggerClassName="rounded-xl border border-[#dcae9f] px-4 py-2.5 text-[14px] font-semibold text-[#b5472f] transition hover:bg-[#f3e1da]"
             />
           </SettingsCard>
         </div>
@@ -335,7 +335,9 @@ export default async function TeamSettingsPage() {
                     <div className="flex items-center justify-between gap-3 px-5 py-3" key={m.id}>
                       <span className="min-w-0">
                         <span className="block truncate text-[14px] font-medium text-[#1d2823]">{label}</span>
-                        <span className="block text-[12.5px] text-[#5c655e]">{declined ? "Declined" : "Invited"}</span>
+                        <span className="block text-[12.5px] text-[#8b938c]">
+                          Invited as {m.role === "ADMIN" ? "Admin" : "Member"} · {declined ? "declined" : "pending"}
+                        </span>
                       </span>
                       <span className="flex shrink-0 items-center gap-3">
                         {!declined ? (
@@ -372,9 +374,11 @@ export default async function TeamSettingsPage() {
               {ownedTeam.addressBooks.map((b) => (
                 <div className="flex items-center justify-between gap-3 py-2.5" key={b.id}>
                   <span className="min-w-0">
-                    <span className="text-[14px] text-[#1d2823]">{b.name}</span>
-                    {b.archivedAt ? <span className="text-[#8b938c]"> · archived</span> : null}
-                    {b.description ? <span className="block text-[12.5px] text-[#8b938c]">{b.description}</span> : null}
+                    <span className="text-[14px] font-semibold text-[#1d2823]">{b.name}</span>
+                    {b.archivedAt ? <span className="ml-2 text-[12px] font-semibold text-[#8b938c]">Archived</span> : null}
+                    <span className="block text-[12.5px] text-[#8b938c]">
+                      {b.description ? `${b.description} · ` : ""}{b._count.contacts.toLocaleString()} contacts
+                    </span>
                   </span>
                   <span className="flex shrink-0 items-center gap-3">
                     <form action={archiveTeamBook}>
@@ -481,12 +485,19 @@ export default async function TeamSettingsPage() {
           ) : (
             <form action={inviteTeamMember} className="mt-3 flex flex-wrap items-center gap-2">
               <input
-                className="min-w-[220px] flex-1 rounded-xl border border-[#d8ddd6] bg-white px-4 py-2.5 text-[14px] outline-none transition focus:border-[#4158f4] focus:shadow-[0_0_0_3px_#edf0fe]"
+                className="min-w-[200px] flex-1 rounded-xl border border-[#d8ddd6] bg-white px-4 py-2.5 text-[14px] outline-none transition focus:border-[#4158f4] focus:shadow-[0_0_0_3px_#edf0fe]"
                 name="email"
                 placeholder="name@email.com"
                 required
                 type="email"
               />
+              <select
+                className="rounded-xl border border-[#d8ddd6] bg-white px-3 py-2.5 text-[13px] font-semibold text-[#1d2823] outline-none focus:border-[#4158f4]"
+                name="role"
+              >
+                <option value="MEMBER">Member</option>
+                <option value="ADMIN">Admin</option>
+              </select>
               <button
                 className="rounded-xl bg-[#17352e] px-4 py-2.5 text-[14px] font-semibold text-white transition hover:bg-[#20443b]"
                 type="submit"
