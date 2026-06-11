@@ -6,6 +6,10 @@ import type { NextAuthConfig } from "next-auth";
  * The full credentials provider + DB logic lives in config.ts.
  */
 export const authConfigEdge = {
+  // Required for self-hosted deploys behind a reverse proxy (Coolify): trust the
+  // proxy's x-forwarded-host / x-forwarded-proto headers. Without this, Auth.js
+  // throws UntrustedHost and mis-detects https, breaking the session cookie.
+  trustHost: true,
   pages: {
     signIn: "/login",
   },

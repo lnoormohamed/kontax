@@ -45,6 +45,10 @@ function parseDeviceHint(ua: string | null | undefined): string | null {
 }
 
 export const authConfig = {
+  // Required for self-hosted deploys behind a reverse proxy (Coolify): trust the
+  // proxy's x-forwarded-host / x-forwarded-proto headers. Without this, Auth.js
+  // throws UntrustedHost and mis-detects https, breaking the session cookie.
+  trustHost: true,
   pages: {
     signIn: "/login",
   },
