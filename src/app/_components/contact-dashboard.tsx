@@ -154,7 +154,9 @@ export function ContactDashboard({
   const peopleActive = currentTab === "people" && !isFavoritesView && !isEmergencyView;
   const groupByLetter = currentSort === "name" && !query;
 
-  const showGrace = planSummary.lifecycleState === "GRACE";
+  // GRACE is handled by the pinned BillingBanner (§2); the dashboard keeps the
+  // read-only (locked/canceled) and near-limit notices, which are out of scope
+  // for the billing-surfaces design.
   const showLocked = planSummary.lifecycleState === "LOCKED" || planSummary.lifecycleState === "CANCELED";
   const nearLimit =
     planSummary.contactsLimit !== null &&
@@ -162,7 +164,7 @@ export function ContactDashboard({
     planSummary.contactsRemaining !== null &&
     planSummary.contactsRemaining >= 0 &&
     planSummary.contactsRemaining <= 20;
-  const hasBanner = showGrace || showLocked || nearLimit;
+  const hasBanner = showLocked || nearLimit;
 
   const navItem = (
     active: boolean,
@@ -352,15 +354,6 @@ export function ContactDashboard({
                 </span>
                 <Link className="shrink-0 font-semibold underline" href="/settings">
                   Manage plan
-                </Link>
-              </div>
-            ) : null}
-            {showGrace ? (
-              <div className="flex items-center gap-2.5 rounded-[0.9rem] bg-[#f6edd9] px-3.5 py-2.5 text-[13px] text-[#7a5a1a]">
-                <span aria-hidden>⚠️</span>
-                <span className="flex-1">Your subscription needs attention.</span>
-                <Link className="shrink-0 font-semibold underline" href="/settings">
-                  Review
                 </Link>
               </div>
             ) : null}

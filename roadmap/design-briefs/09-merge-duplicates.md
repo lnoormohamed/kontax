@@ -6,7 +6,7 @@
 
 **Priority:** P1 — merging is the quality-of-life feature that keeps the address book clean. A hesitant or confusing merge UI causes users to skip merges and accumulate duplicates, which degrades trust in the whole app.
 
-> **Status: AS-BUILT (2026-06-10).** The suggestion review page is shipped and this brief documents the real behaviour so hi-fi mockups match. Earlier drafts described a per-row radio comparison table; that model was **not** built. The shipped model is **survivor-pick → resolve conflicts only → auto-union multi-value fields → gated merge**, described here.
+> **Status: AS-BUILT (2026-06-11).** The suggestion review page is shipped and this brief documents the real behaviour so hi-fi mockups match. Earlier drafts described a per-row radio comparison table; that model was **not** built. The shipped model is **survivor-pick → resolve conflicts only → auto-union multi-value fields → gated merge**, described here.
 >
 > **Cross-references (do not re-spec here):** the **bulk-merge confirmation dialog**, the **"Merged contacts" / 30-day undo section** (both on the Duplicates tab), and the **source badges** are owned by **brief 10 — Activity Log & Source**. This brief covers the single-suggestion review surface and points to 10 for the rest.
 >
@@ -108,7 +108,7 @@ Switching the survivor does **not** reset already-made field choices — choices
 Shown **only** for fields where both contacts have different non-empty values. Today this covers the governed scalars: **full name, email, phone, company, notes**.
 
 Each card (amber-tinted to read as "needs attention", `#f6edd9`/40):
-- Field label + a status chip: **"Choose one"** (unresolved) → **"Resolved"** (after pick).
+- Field label + a status chip: **"Choose one"** (unresolved) → **"Resolved"** (after pick). Both states use the same amber styling (`bg-[#f3e1da] text-[#7a2f1d]`) — the chip confirms the decision by changing text, not by switching to green.
 - Two option buttons side by side: each shows the source contact's label (its name) as a small uppercase caption + the value. Selected = green ring/tint.
 - **Notes** additionally offers a third full-width option: **"Keep both — combine the notes from both contacts."**
 - Empty value renders as "—".
@@ -142,8 +142,8 @@ There is no success screen on this page — the user lands on the merged (surviv
 ## States
 
 - **Loading:** skeleton for the header, why-panel rows, and field cards.
-- **Not found / already resolved:** centred message "This suggestion was not found. It may have already been dismissed or merged." + `← Back to duplicates`. (The page only loads `OPEN` suggestions; merged/dismissed/stale ones 404 to this state.)
-- **Stale auto-refresh (P10-08):** if either contact changed since the suggestion was generated, it is silently recomputed (or retired) before the page renders — the user never sees outdated reasons. No special UI; the reasons/score simply reflect current data.
+- **Not found / already resolved:** Next.js 404 page — no custom message on this route. Fires for any suggestion that isn't `OPEN` (already merged, dismissed, or stale suggestions all reach 404 via the app's standard not-found page).
+- **Stale auto-refresh (P10-08):** stale suggestions are retired by the bulk-refresh operation, triggered when the user clicks "Refresh duplicates" on the Duplicates tab or via `POST /api/merge-suggestions/refresh`. Individual page loads do **not** recompute inline — if a suggestion's contacts were edited and the refresh hasn't run yet, the page shows the last-generated reasons. A STALE suggestion URL 404s (same as the not-found state above). No special UI beyond the standard 404.
 - **No conflicts (all fields match or are one-sided):** no conflict cards render; instead a calm note "No conflicting fields — everything either matches or only one contact has a value," and the Merge button is enabled immediately.
 - **Merging:** button shows progress; on failure, keep the form and show an error.
 

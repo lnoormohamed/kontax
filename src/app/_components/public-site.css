@@ -351,6 +351,7 @@
 .kx .seg button { border: none; background: transparent; font-family: inherit; font-size: 13.5px; font-weight: 600; color: var(--ink2); padding: 8px 18px; border-radius: 8px; cursor: pointer; transition: background 0.15s ease, color 0.15s ease; }
 .kx .seg button[aria-pressed="true"] { background: var(--paper); color: var(--ink); box-shadow: 0 1px 3px rgba(29,40,35,0.1); }
 .kx .save-hint { font-size: 12.5px; font-weight: 600; color: var(--green); background: var(--green-t); padding: 5px 10px; border-radius: 7px; }
+.kx .save-inline { font-size: 11px; font-weight: 700; color: var(--green); }
 
 .kx .pricing { padding: 8px 0 88px; }
 .kx .ptable-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }
@@ -372,6 +373,10 @@
 .kx .plan-cta--primary:hover { background: var(--accent-hover); }
 .kx .plan-cta--ghost { background: transparent; color: var(--ink); border: 1px solid var(--line); }
 .kx .plan-cta--ghost:hover { background: var(--wash); }
+.kx .plan-cta--destructive { background: #fff; color: #b5472f; border: 1px solid #dcae9f; }
+.kx .plan-cta--destructive:hover { background: #f9ece7; }
+.kx .plan-cta--current { background: #f2f4f0; color: #8b938c; border: 1px solid transparent; cursor: default; }
+.kx .plan-cta-sub { margin: 8px 0 0; font-size: 11px; color: var(--mute); text-align: center; line-height: 1.35; }
 
 .kx .ptable td, .kx .ptable th { text-align: left; }
 .kx .cat-row td { padding: 26px 18px 10px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green); border-bottom: 1px solid var(--line2); }

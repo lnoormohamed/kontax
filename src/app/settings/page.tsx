@@ -6,12 +6,13 @@ import {
   SectionLabel,
   SettingsCard,
   SettingsPageHead,
-  UsageStat,
 } from "~/app/_components/settings-ui";
+import { BillingSection } from "~/app/settings/_components/billing-section";
 import { BillingSuccessBanner } from "~/app/settings/_components/billing-success-banner";
+import { PortalReturnedBanner } from "~/app/settings/_components/portal-returned-banner";
 import { auth } from "~/server/auth";
-import { canCreateAppPassword } from "~/server/app-passwords";
 import { getUserPlanSummary } from "~/server/billing";
+import { getBillingSurface } from "~/server/billing-surface";
 import { db } from "~/server/db";
 
 const PLAN_SUMMARY: Record<string, string> = {
@@ -34,11 +35,15 @@ export default async function SettingsPlanPage({
   const userId = session.user.id;
   const sp = searchParams ? await searchParams : undefined;
   const showBillingSuccess = sp?.billing === "success";
+  const showPortalReturned = sp?.portal === "returned";
 
   const planSummary = await getUserPlanSummary(userId);
-  const [appPasswordAllowance, syncAccountsUsed, groupMembership] = await Promise.all([
-    canCreateAppPassword(userId),
-    db.syncAccount.count({ where: { userId } }),
+  const [billingSurface, syncConnections, liveContacts, groupMembership] = await Promise.all([
+    getBillingSurface(userId),
+    db.syncAccount.count({ where: { userId, status: "ACTIVE" } }),
+    db.contactShare.count({
+      where: { recipientUserId: userId, shareType: "LIVE_SYNC", status: "ACTIVE" },
+    }),
     db.groupMember.findFirst({
       where: { userId, inviteStatus: "ACCEPTED" },
       select: {
@@ -58,55 +63,32 @@ export default async function SettingsPlanPage({
   const isGroupPlan = planSummary.plan === "FAMILY" || planSummary.plan === "TEAMS";
   const currentIdx = PLAN_ORDER.indexOf(planSummary.planLabel as (typeof PLAN_ORDER)[number]);
 
-  const usageRows: Array<{ label: string; used: number; limit: number | null }> = [
-    { label: "Contacts", used: planSummary.contactsUsed, limit: planSummary.entitlements.contactsLimit },
-    { label: "Imports this month", used: planSummary.importedThisMonth, limit: planSummary.entitlements.monthlyImportLimit },
-    { label: "Sync accounts", used: syncAccountsUsed, limit: planSummary.entitlements.syncAccountsLimit },
-    { label: "Device passwords", used: appPasswordAllowance.current, limit: appPasswordAllowance.limit ?? null },
-  ];
+  // Cancellation impact (downgrade modal §3). Members exclude the owner.
+  const cancelDetails = {
+    syncConnections,
+    liveContacts,
+    totalContacts: planSummary.contactsUsed,
+    contactLimit: 500,
+    familyMembers:
+      billingSurface.members && groupMembership?.group.type === "FAMILY"
+        ? Math.max(0, billingSurface.members.used - 1)
+        : null,
+  };
 
   return (
     <>
       {showBillingSuccess ? (
         <BillingSuccessBanner planLabel={planSummary.planLabel} />
       ) : null}
+      {showPortalReturned ? <PortalReturnedBanner /> : null}
       <SettingsPageHead
         title="Plan & billing"
-        sub="Billing visibility and the usage gates that apply to your account, kept out of the main contact workspace."
+        sub="Your subscription, what you’re using, and how to manage payment."
         right={<LifecycleBadge label={planSummary.lifecyclePolicy.label} />}
       />
 
       <div className="grid gap-[18px]">
-        {/* current plan */}
-        <SettingsCard className="flex flex-wrap items-center justify-between gap-4">
-          <div className="min-w-0">
-            <p className="flex items-center gap-2">
-              <span className="text-[20px] font-semibold text-[#1d2823]">{planSummary.planLabel}</span>
-              <span className="rounded-full bg-[#e7efe9] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.08em] text-[#17352e]">
-                Current plan
-              </span>
-            </p>
-            {PLAN_SUMMARY[planSummary.planLabel] ? (
-              <p className="mt-1.5 text-[13px] leading-5 text-[#5c655e]">{PLAN_SUMMARY[planSummary.planLabel]}</p>
-            ) : null}
-          </div>
-          <Link
-            className="shrink-0 rounded-xl bg-[#4158f4] px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-[#3248db]"
-            href="/pricing"
-          >
-            {planSummary.plan === "FREE" ? "Upgrade" : "View plans"}
-          </Link>
-        </SettingsCard>
-
-        {/* usage */}
-        <div>
-          <SectionLabel>Usage this cycle</SectionLabel>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {usageRows.map((row) => (
-              <UsageStat key={row.label} label={row.label} limit={row.limit} used={row.used} />
-            ))}
-          </div>
-        </div>
+        <BillingSection cancelDetails={cancelDetails} surface={billingSurface} />
 
         {/* group membership shortcut */}
         {isGroupPlan ? (

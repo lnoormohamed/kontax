@@ -174,7 +174,7 @@ Sits directly below the CTA button:
 > "By creating an account, you agree to our [Terms] and [Privacy Policy]."
 
 - `font-size: 12px`, `color: #8b938c`, centred, `margin-top: 10px`.
-- Links: `color: #4158f4`, hover `text-decoration: underline`. Point to `/terms` and `/privacy`.
+- Links: `color: #5c655e` at rest, `color: #4158f4` + `text-decoration: underline` on hover. Point to `/terms` and `/privacy`.
 
 ---
 

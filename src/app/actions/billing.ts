@@ -36,6 +36,14 @@ export async function createCheckoutSession(input: {
   });
   if (activeSub) return { error: "USE_CUSTOMER_PORTAL" };
 
+  // 14-day trial for first-time Pro subscribers (no previous non-incomplete Pro sub).
+  const isFirstTimePro =
+    plan === "PRO" &&
+    !(await db.subscription.findFirst({
+      where: { userId, plan: "PRO", status: { not: "INCOMPLETE" } },
+      select: { id: true },
+    }));
+
   let priceId: string;
   try {
     priceId = getStripePriceId(plan, interval);
@@ -61,6 +69,7 @@ export async function createCheckoutSession(input: {
       success_url: `${appUrl}/settings?billing=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/pricing?cancelled=1`,
       subscription_data: {
+        trial_period_days: isFirstTimePro ? 14 : undefined,
         metadata: { kontaxUserId: userId, plan },
       },
       allow_promotion_codes: true,
@@ -69,6 +78,84 @@ export async function createCheckoutSession(input: {
 
     if (!checkoutSession.url) return { error: "SESSION_URL_MISSING" };
     return { url: checkoutSession.url };
+  } catch {
+    return { error: "STRIPE_ERROR" };
+  }
+}
+
+/**
+ * Fetches the live usage data needed to populate the downgrade confirmation modal.
+ * Called from the pricing page when the user clicks "Downgrade to Free".
+ */
+export async function getDowngradeSummary(): Promise<
+  | {
+      syncConnections: number;
+      liveContacts: number;
+      totalContacts: number;
+      contactLimit: number;
+      familyMembers: number | null;
+    }
+  | { error: string }
+> {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "UNAUTHORIZED" };
+  const userId = session.user.id;
+
+  const [syncConnections, liveContacts, totalContacts, familyGroup] = await Promise.all([
+    db.syncAccount.count({ where: { userId, status: "ACTIVE" } }),
+    db.contactShare.count({
+      where: { recipientUserId: userId, shareType: "LIVE_SYNC", status: "ACTIVE" },
+    }),
+    db.contact.count({ where: { userId } }),
+    db.groupMember.findFirst({
+      where: { userId, inviteStatus: "ACCEPTED", role: "OWNER" },
+      select: { group: { select: { type: true, _count: { select: { members: true } } } } },
+    }),
+  ]);
+
+  const familyMembers =
+    familyGroup?.group.type === "FAMILY"
+      ? Math.max(0, familyGroup.group._count.members - 1)
+      : null;
+
+  return { syncConnections, liveContacts, totalContacts, contactLimit: 500, familyMembers };
+}
+
+/**
+ * Open the Stripe-hosted customer portal where the user manages payment method,
+ * invoices, plan changes and cancellation. The portal is the single destination
+ * for every "Manage billing / Update payment method / Keep my plan" CTA across
+ * the P19-DB02 surfaces — the app never mutates subscription rows directly.
+ */
+export async function createBillingPortalSession(): Promise<
+  { url: string } | { error: string }
+> {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "UNAUTHORIZED" };
+  const userId = session.user.id;
+
+  const customer = await db.subscriptionCustomer.findUnique({
+    where: { userId },
+    select: { providerCustomerId: true },
+  });
+  if (!customer) return { error: "NO_BILLING_ACCOUNT" };
+
+  let stripe: ReturnType<typeof getStripeClient>;
+  try {
+    stripe = getStripeClient();
+  } catch {
+    return { error: "BILLING_NOT_CONFIGURED" };
+  }
+
+  const appUrl = process.env.APP_URL ?? "http://localhost:3000";
+
+  try {
+    const portalSession = await stripe.billingPortal.sessions.create({
+      customer: customer.providerCustomerId,
+      return_url: `${appUrl}/settings?portal=returned`,
+    });
+    if (!portalSession.url) return { error: "SESSION_URL_MISSING" };
+    return { url: portalSession.url };
   } catch {
     return { error: "STRIPE_ERROR" };
   }

@@ -3,7 +3,40 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 
-import { createCheckoutSession } from "~/app/actions/billing";
+import { createBillingPortalSession, createCheckoutSession, getDowngradeSummary } from "~/app/actions/billing";
+import { CancelPlanModal, type CancelPlanDetails } from "~/app/settings/_components/cancel-plan-modal";
+
+type PlanCol = "FREE" | "PRO" | "FAMILY" | "TEAMS";
+type CtaKind = "current" | "primary" | "secondary" | "destructive";
+type Cell = "current" | { label: string; kind: CtaKind; sub?: string };
+
+// §4 CTA matrix — the label + style each plan card shows for the viewer's plan.
+const CTA_MATRIX: Record<PlanCol, Record<PlanCol, Cell>> = {
+  FREE: {
+    FREE: "current",
+    PRO: { label: "Start free trial", kind: "primary", sub: "14 days free, then £X/month. Cancel anytime." },
+    FAMILY: { label: "Upgrade to Family", kind: "primary" },
+    TEAMS: { label: "Upgrade to Teams", kind: "primary" },
+  },
+  PRO: {
+    FREE: { label: "Downgrade to Free", kind: "destructive" },
+    PRO: "current",
+    FAMILY: { label: "Switch to Family", kind: "primary" },
+    TEAMS: { label: "Switch to Teams", kind: "primary" },
+  },
+  FAMILY: {
+    FREE: { label: "Downgrade to Free", kind: "destructive" },
+    PRO: { label: "Switch to Pro", kind: "secondary" },
+    FAMILY: "current",
+    TEAMS: { label: "Switch to Teams", kind: "primary" },
+  },
+  TEAMS: {
+    FREE: { label: "Downgrade to Free", kind: "destructive" },
+    PRO: { label: "Switch to Pro", kind: "secondary" },
+    FAMILY: { label: "Switch to Family", kind: "secondary" },
+    TEAMS: "current",
+  },
+};
 
 function Check() {
   return (
@@ -23,13 +56,49 @@ const Dash = () => <span className="dash">—</span>;
  * currentPlan: the authenticated user's current plan ("FREE"|"PRO"|"FAMILY"|"TEAMS"),
  * or null if not logged in.
  */
+// Display price strings from env (NEXT_PUBLIC_PRICE_*). Falls back to "£X".
+const DISPLAY_PRICES: Record<string, { monthly: string; yearly: string }> = {
+  PRO:    { monthly: process.env.NEXT_PUBLIC_PRICE_PRO_MONTHLY    ?? "£X", yearly: process.env.NEXT_PUBLIC_PRICE_PRO_YEARLY    ?? "£X" },
+  FAMILY: { monthly: process.env.NEXT_PUBLIC_PRICE_FAMILY_MONTHLY ?? "£X", yearly: process.env.NEXT_PUBLIC_PRICE_FAMILY_YEARLY ?? "£X" },
+  TEAMS:  { monthly: process.env.NEXT_PUBLIC_PRICE_TEAMS_MONTHLY  ?? "£X", yearly: process.env.NEXT_PUBLIC_PRICE_TEAMS_YEARLY  ?? "£X" },
+};
+
+function parsePence(s: string): number | null {
+  const m = s.replace(/[£$€]/g, "").trim();
+  const n = parseFloat(m);
+  return isNaN(n) ? null : n;
+}
+
+function savingsBadge(plan: string): string | null {
+  const p = DISPLAY_PRICES[plan];
+  if (!p) return null;
+  const monthly = parsePence(p.monthly);
+  const yearly = parsePence(p.yearly);
+  if (!monthly || !yearly) return null;
+  const pct = Math.round((1 - yearly / (monthly * 12)) * 100);
+  return pct > 0 ? `Save ${pct}%` : null;
+}
+
 export function PricingComparison({ currentPlan }: { currentPlan?: string | null }) {
   const [annual, setAnnual] = useState(false);
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [, startTransition] = useTransition();
+  const [downgradeDetails, setDowngradeDetails] = useState<CancelPlanDetails | null>(null);
+  const [downgradeOpen, setDowngradeOpen] = useState(false);
   const period = annual ? "billed annually" : "billed monthly";
   const seatPeriod = annual ? "per seat, billed annually" : "per seat, billed monthly";
   const interval = annual ? "YEARLY" : "MONTHLY";
+
+  const priceLabel = (plan: string) => {
+    const p = DISPLAY_PRICES[plan];
+    if (!p) return "£X";
+    const raw = annual ? p.yearly : p.monthly;
+    if (annual) {
+      const yearly = parsePence(raw);
+      if (yearly) return `${raw.replace(/[\d.]+/, (parseFloat((yearly / 12).toFixed(2)).toString()))}`;
+    }
+    return raw;
+  };
 
   const handleUpgrade = (plan: string) => {
     setLoadingPlan(plan);
@@ -40,7 +109,7 @@ export function PricingComparison({ currentPlan }: { currentPlan?: string | null
       } else if (result.error === "USE_CUSTOMER_PORTAL") {
         window.location.href = "/settings";
       } else if (result.error === "UNAUTHORIZED") {
-        window.location.href = "/login";
+        window.location.href = plan === "PRO" ? "/register?plan=pro" : "/register";
       } else {
         // BILLING_NOT_CONFIGURED or STRIPE_ERROR — surface gracefully
         window.location.href = "/pricing?error=billing";
@@ -49,36 +118,103 @@ export function PricingComparison({ currentPlan }: { currentPlan?: string | null
     });
   };
 
-  // Returns the CTA for a paid plan column
-  const PaidCta = ({ plan, label, className }: { plan: string; label: string; className: string }) => {
-    const isCurrentPlan = currentPlan === plan;
-    const hasPaidPlan = currentPlan && currentPlan !== "FREE";
-    const isLoading = loadingPlan === plan;
+  // Existing paid subscriber switching tiers → the Stripe customer portal.
+  const handlePortal = (card: string) => {
+    setLoadingPlan(card);
+    startTransition(async () => {
+      const result = await createBillingPortalSession();
+      window.location.href = "url" in result ? result.url : "/settings";
+      setLoadingPlan(null);
+    });
+  };
 
-    if (isCurrentPlan) {
+  const handleDowngrade = () => {
+    setLoadingPlan("FREE");
+    startTransition(async () => {
+      const result = await getDowngradeSummary();
+      setLoadingPlan(null);
+      if ("error" in result) {
+        window.location.href = result.error === "UNAUTHORIZED" ? "/login" : "/settings";
+        return;
+      }
+      setDowngradeDetails(result);
+      setDowngradeOpen(true);
+    });
+  };
+
+  const fallbackLabel: Record<PlanCol, string> = {
+    FREE: "Get started",
+    PRO: "Choose Pro",
+    FAMILY: "Choose Family",
+    TEAMS: "Choose Teams",
+  };
+
+  /**
+   * Resolves the CTA for a plan column against the viewer's current plan (§4).
+   * Logged-out / no-plan visitors keep the marketing labels and checkout flow;
+   * logged-in users see Current / Switch / Downgrade per the matrix.
+   */
+  const PlanCta = ({ card }: { card: PlanCol }) => {
+    const viewer = (currentPlan as PlanCol | null) ?? null;
+    const isLoading = loadingPlan === card;
+
+    // Logged out or plan unknown → marketing CTAs.
+    if (!viewer) {
+      if (card === "FREE") {
+        return <Link className="plan-cta plan-cta--ghost" href="/register">Get started</Link>;
+      }
       return (
-        <span className={`${className} cursor-default opacity-60`}>Current plan</span>
+        <button
+          className={`plan-cta plan-cta--${card === "PRO" ? "primary" : "ghost"} disabled:opacity-60`}
+          disabled={isLoading}
+          onClick={() => handleUpgrade(card)}
+          type="button"
+        >
+          {isLoading ? "Loading…" : fallbackLabel[card]}
+        </button>
       );
     }
 
-    if (hasPaidPlan) {
+    const cell = CTA_MATRIX[viewer][card];
+    if (cell === "current") {
+      return <span className="plan-cta plan-cta--current">Current plan</span>;
+    }
+
+    const variantClass =
+      cell.kind === "primary"
+        ? "plan-cta--primary"
+        : cell.kind === "destructive"
+          ? "plan-cta--destructive"
+          : "plan-cta--ghost";
+
+    // Downgrade to Free — load live usage data then show confirmation modal.
+    if (cell.kind === "destructive") {
       return (
-        <Link className={className} href="/settings">
-          Manage subscription
-        </Link>
+        <button
+          className={`plan-cta ${variantClass} disabled:opacity-60`}
+          disabled={isLoading}
+          onClick={handleDowngrade}
+          type="button"
+        >
+          {isLoading ? "Loading…" : cell.label}
+        </button>
       );
     }
 
-    // Not logged in or on Free → checkout
+    // Free viewer → checkout; existing paid subscriber → portal.
+    const onClick = () => (viewer === "FREE" ? handleUpgrade(card) : handlePortal(card));
     return (
-      <button
-        className={`${className} disabled:opacity-60`}
-        disabled={isLoading}
-        onClick={() => handleUpgrade(plan)}
-        type="button"
-      >
-        {isLoading ? "Loading…" : label}
-      </button>
+      <>
+        <button
+          className={`plan-cta ${variantClass} disabled:opacity-60`}
+          disabled={isLoading}
+          onClick={onClick}
+          type="button"
+        >
+          {isLoading ? "Loading…" : cell.label}
+        </button>
+        {cell.sub ? <p className="plan-cta-sub">{cell.sub}</p> : null}
+      </>
     );
   };
 
@@ -94,7 +230,7 @@ export function PricingComparison({ currentPlan }: { currentPlan?: string | null
               <button aria-pressed={!annual} onClick={() => setAnnual(false)} type="button">Monthly</button>
               <button aria-pressed={annual} onClick={() => setAnnual(true)} type="button">Annual</button>
             </div>
-            <span className="save-hint" hidden={!annual}>Save ~20%</span>
+            <span className="save-hint" hidden={!annual}>{savingsBadge("PRO") ?? "Save ~20%"}</span>
           </div>
         </div>
       </section>
@@ -119,7 +255,7 @@ export function PricingComparison({ currentPlan }: { currentPlan?: string | null
                       <p className="plan-who">For getting started and small libraries</p>
                       <div className="plan-price">£0</div>
                       <p className="plan-period">Free forever</p>
-                      <Link className="plan-cta plan-cta--ghost" href="/register">Get started</Link>
+                      <PlanCta card="FREE" />
                     </div>
                   </th>
                   <th>
@@ -127,27 +263,27 @@ export function PricingComparison({ currentPlan }: { currentPlan?: string | null
                       <span className="plan-rec-tag"><span className="chip chip--rec">Recommended</span></span>
                       <div className="plan-name">Pro</div>
                       <p className="plan-who">For individual power users</p>
-                      <div className="plan-price">£X<small> / mo</small></div>
-                      <p className="plan-period">{period}</p>
-                      <PaidCta plan="PRO" label="Choose Pro" className="plan-cta plan-cta--primary" />
+                      <div className="plan-price">{priceLabel("PRO")}<small> / mo</small></div>
+                      <p className="plan-period">{period}{annual && savingsBadge("PRO") ? <> · <span className="save-inline">{savingsBadge("PRO")}</span></> : null}</p>
+                      <PlanCta card="PRO" />
                     </div>
                   </th>
                   <th>
                     <div className="plan-card">
                       <div className="plan-name">Family</div>
                       <p className="plan-who">For households up to 6 people</p>
-                      <div className="plan-price">£X<small> / mo</small></div>
-                      <p className="plan-period">{period}</p>
-                      <PaidCta plan="FAMILY" label="Choose Family" className="plan-cta plan-cta--ghost" />
+                      <div className="plan-price">{priceLabel("FAMILY")}<small> / mo</small></div>
+                      <p className="plan-period">{period}{annual && savingsBadge("FAMILY") ? <> · <span className="save-inline">{savingsBadge("FAMILY")}</span></> : null}</p>
+                      <PlanCta card="FAMILY" />
                     </div>
                   </th>
                   <th>
                     <div className="plan-card">
                       <div className="plan-name">Teams</div>
                       <p className="plan-who">For organisations up to 25</p>
-                      <div className="plan-price">£X<small> / mo</small></div>
-                      <p className="plan-period">{seatPeriod}</p>
-                      <PaidCta plan="TEAMS" label="Choose Teams" className="plan-cta plan-cta--ghost" />
+                      <div className="plan-price">{priceLabel("TEAMS")}<small> / mo</small></div>
+                      <p className="plan-period">{seatPeriod}{annual && savingsBadge("TEAMS") ? <> · <span className="save-inline">{savingsBadge("TEAMS")}</span></> : null}</p>
+                      <PlanCta card="TEAMS" />
                     </div>
                   </th>
                 </tr>
@@ -295,6 +431,15 @@ export function PricingComparison({ currentPlan }: { currentPlan?: string | null
           <p className="pfoot-note">Prices shown are placeholders pending launch (commercial decision in progress). Family and Teams shared address books are coming soon. Your data is never deleted by changing plans — contacts over a plan&rsquo;s limit become read-only, and export is always available. See the <Link href="/privacy">privacy policy</Link> for details.</p>
         </div>
       </section>
+
+      {downgradeDetails ? (
+        <CancelPlanModal
+          details={downgradeDetails}
+          family={currentPlan === "FAMILY"}
+          open={downgradeOpen}
+          onOpenChange={setDowngradeOpen}
+        />
+      ) : null}
     </>
   );
 }

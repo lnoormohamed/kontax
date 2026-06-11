@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { BillingBannerSlot } from "~/app/_components/billing-banner-slot";
 import { EmailVerificationBanner } from "~/app/_components/email-verification-banner";
 import { SearchInput } from "~/app/_components/search-input";
 import { UserMenu } from "~/app/_components/user-menu";
@@ -114,6 +115,9 @@ export async function AppShell({
       {session && !session.user.emailVerified && (
         <EmailVerificationBanner email={account.email} />
       )}
+
+      {/* P19-DB02 §2: pinned grace / trial billing banner */}
+      {session?.user?.id ? <BillingBannerSlot userId={session.user.id} /> : null}
 
       <div className="flex min-h-0 flex-1">
         {/* sidebar */}

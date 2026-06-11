@@ -3,7 +3,7 @@
 **Route:** `/import-export`
 **Priority:** P1 — a primary data entry path, especially for new users onboarding from Google Contacts or Apple Contacts. The export path is used less frequently but must be frictionless.
 
-> **Design decision locked (2026-06-10): light system.** This page uses the locked design language — ink `#1d2823`, secondary `#5c655e`, muted `#8b938c`, hairline `#d8ddd6`, surface `#f2f4f0`, brand green `#17352e`, CTA blue `#4158f4`, Geist. The current build is on the old dark theme and needs replacing. **Two additions since original brief:** (1) **vCard export is Pro-gated** — Free users see an upgrade prompt for the vCard 4.0 format option. (2) **Bulk selection export** — the contacts list supports selecting contacts and exporting the selection as CSV; the export panel here should acknowledge that path and link to it.
+> **Design decision locked (2026-06-10): light system.** This page uses the locked design language — ink `#1d2823`, secondary `#5c655e`, muted `#8b938c`, hairline `#d8ddd6`, surface `#f2f4f0`, brand green `#17352e`, CTA blue `#4158f4`, Geist. The current build is on the old dark theme and needs replacing. **Two additions since original brief:** (1) **vCard export is Pro-gated** — Free users see an upgrade prompt for the vCard 4.0 format option. (2) **Bulk selection export** — the contacts list supports selecting contacts and exporting the selection as CSV; the export panel here should acknowledge that path and link to it. **Import is CSV-only:** vCard _import_ is intentionally deferred (vCard is export-only), so Step 1 must not offer a vCard-import path. **Undo/rollback _archives_ the imported contacts (recoverable), it does not delete them** — copy throughout must reflect "archive", not "remove".
 
 ---
 
@@ -84,7 +84,12 @@ Contains a step indicator and a content zone that transitions between three step
 │  │   Drag & drop your CSV file here                   │  │
 │  │   or  [Browse files]                               │  │
 │  │                                                    │  │
-│  │   Supports CSV files up to 10 MB                   │  │
+│  │   CSV files                                        │  │
+│  └────────────────────────────────────────────────────┘  │
+│                                                          │
+│  ▸ Or paste CSV directly                                 │
+│  ┌────────────────────────────────────────────────────┐  │
+│  │  name,email,phone …                                │  │
 │  └────────────────────────────────────────────────────┘  │
 │                                                          │
 │  Source format                                           │
@@ -100,8 +105,10 @@ Contains a step indicator and a content zone that transitions between three step
 - `border: 2px dashed #d8ddd6`, `border-radius: 12px`, `min-height: 160px`, `background: #f9faf8`.
 - Drag-over: `border-color: #4158f4`, `background: #edf0fe`. "Release to upload" label appears.
 - Content: upload icon (32px, `color: #d8ddd6` rest, `#8b938c` hover), headline `font-size: 15px`, `font-weight: 600`, `color: #5c655e`; "or" in muted; "Browse files" as `color: #4158f4` inline link.
-- Helper: "Supports CSV files up to 10 MB" — `font-size: 12px`, `color: #8b938c`.
+- Helper: "CSV files only" — `font-size: 12px`, `color: #8b938c`. _(A hard file-size cap is **not enforced in the current build** — only recorded as metadata. If we want a "10 MB max" guarantee, flag it as net-new engineering; otherwise don't promise a limit in the UI.)_
 - After file selected: drop zone replaced by **file chip** — file icon + filename (`font-size: 14px`, `font-weight: 600`, `color: #1d2823`) + size (`color: #8b938c`) + × remove button.
+
+**Paste CSV (alternative input — already shipped):** below the drop zone, a collapsible **"Or paste CSV directly"** disclosure reveals a monospace `<textarea>` (`min-height: 120px`, `border: 1px solid #d8ddd6`, `border-radius: 10px`, placeholder `name,email,phone…`). File upload and pasted text are mutually exclusive paths into the same preview step — pasting populates the same parse/preview pipeline (the build names a pasted import `pasted-import.csv`). Either a file **or** non-empty pasted text enables **Continue**.
 
 **Source profile selector:**
 - Label: `font-size: 11px`, `font-weight: 700`, `letter-spacing: 0.1em`, `text-transform: uppercase`, `color: #8b938c`.
@@ -109,7 +116,7 @@ Contains a step indicator and a content zone that transitions between three step
 - Selected: `border: 2px solid #4158f4`, `background: #edf0fe`, `color: #4158f4`.
 - Default: Generic (or remember last per session). Auto-detect heuristic: if filename contains "google" → auto-select Google. Show hint: "We detected this may be a Google Contacts export." — `font-size: 12px`, `color: #8b938c`.
 
-**Continue button:** full-width, `background: #4158f4`, `color: #fff`, "Continue →", `height: 44px`, `border-radius: 10px`. Disabled (`opacity: 0.45`, `cursor: not-allowed`) until file selected. Parse error shown inline in red below the chip: `color: #b5472f`, `font-size: 13px`.
+**Continue button:** full-width, `background: #4158f4`, `color: #fff`, "Continue →", `height: 44px`, `border-radius: 10px`. Disabled (`opacity: 0.45`, `cursor: not-allowed`) until a file is selected **or** CSV text is pasted. Parse error shown inline in red below the chip: `color: #b5472f`, `font-size: 13px`.
 
 ---
 
@@ -172,10 +179,10 @@ Contains a step indicator and a content zone that transitions between three step
 
 **"← View contacts":** `background: #4158f4`, `color: #fff`. Navigates to `/`.
 
-**"Undo import":** `border: 1px solid #d8ddd6`, `color: #1d2823`. Only shown within rollback window. Confirmation dialog:
-- "This will remove the N contacts added in this import. Are you sure?"
-- "Yes, undo": `background: #b5472f`, `color: #fff`. "Cancel": `color: #5c655e`.
-- After undo: card resets to Step 1, banner: "Import undone. N contacts removed." — `background: #e3efe7`, `color: #1c6b48`.
+**"Undo import":** `border: 1px solid #d8ddd6`, `color: #1d2823`. Only shown within rollback window. **Rollback is job-level (all-or-nothing) and _archives_ the imported contacts — it does not delete them.** They move to Archived and can be restored, so the copy must say "archive", not "remove". Confirmation dialog:
+- "This will archive the N contacts added in this import. You can restore them from Archived later. Continue?"
+- "Yes, archive import": `background: #b5472f`, `color: #fff`. "Cancel": `color: #5c655e`.
+- After undo: card resets to Step 1, banner: "Import undone. N contacts archived." — `background: #e3efe7`, `color: #1c6b48`.
 
 **Skipped rows:** collapsible, collapsed by default. Same row format as warnings.
 
@@ -244,7 +251,7 @@ Below the fold — informational.
 
 **Table:** no outer border. Row divider: `1px solid #e9ece7`. Header: `font-size: 11px`, `text-transform: uppercase`, `color: #8b938c`. Data: `font-size: 13px`, `color: #5c655e`. Filename: `color: #1d2823`.
 
-- **↩ rollback icon:** `color: #8b938c`, 16px. Hover tooltip: "Undo this import". Only within rollback window. Clicking opens confirmation dialog (same as Step 3 undo).
+- **↩ rollback icon:** `color: #8b938c`, 16px. Hover tooltip: "Undo this import (archives its contacts)". Only within rollback window. Clicking opens the same archive-confirmation dialog as Step 3 undo.
 - **Rolled-back rows:** line-through text, "Undone" badge — `color: #8b938c`, `font-size: 11px`, `background: #f2f4f0`, `border-radius: 4px`, `padding: 1px 6px`.
 
 **Empty:** "No imports yet." — `color: #8b938c`, centred.
@@ -261,7 +268,7 @@ Below the fold — informational.
 │  │  [Upgrade to Pro to import more contacts]          │  │
 │  └────────────────────────────────────────────────────┘  │
 │                                                          │
-│  Your import limit resets on 1 July.                     │
+│  Your import limit resets on [reset date].               │
 └──────────────────────────────────────────────────────────┘
 ```
 
