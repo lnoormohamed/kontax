@@ -86,7 +86,7 @@ const getRedirectTarget = (formData: FormData) => {
 };
 
 const revalidateSyncViews = () => {
-  revalidatePath("/");
+  revalidatePath("/contacts");
   revalidatePath("/sync");
 };
 

@@ -522,7 +522,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               ) : null}
               <form action={permanentlyDeleteContact}>
                 <input name="contactId" type="hidden" value={contact.id} />
-                <input name="redirectTo" type="hidden" value="/" />
+                <input name="redirectTo" type="hidden" value="/contacts" />
                 <button
                   className="w-full rounded-[0.7rem] px-3 py-2 text-left text-sm font-semibold text-[#b5472f] transition hover:bg-[#fbeae6]"
                   type="submit"

@@ -324,7 +324,7 @@ export const acceptStaticShare = async (formData: FormData) => {
   });
 
   revalidatePath("/shares");
-  revalidatePath("/");
+  revalidatePath("/contacts");
   if (newContactId) {
     redirect(`/contacts/${newContactId}`);
   }
@@ -495,7 +495,7 @@ export const acceptLiveShare = async (formData: FormData) => {
   });
 
   revalidatePath("/shares");
-  revalidatePath("/");
+  revalidatePath("/contacts");
   if (newContactId) {
     redirect(`/contacts/${newContactId}`);
   }

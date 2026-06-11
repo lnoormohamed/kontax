@@ -193,7 +193,7 @@ export const acceptTeamInvite = async (formData: FormData) => {
       inviteExpiresAt: null,
     },
   });
-  revalidatePath("/");
+  revalidatePath("/contacts");
   revalidatePath("/settings/teams");
   redirect("/?tab=people&filter=all");
 };
@@ -492,7 +492,7 @@ export const addContactToTeamBook = async (formData: FormData) => {
     });
   });
 
-  revalidatePath("/");
+  revalidatePath("/contacts");
   revalidatePath(`/contacts/${contactId}`);
 };
 
@@ -567,7 +567,7 @@ export const leaveTeam = async (formData: FormData) => {
     throw new Error("The owner can't leave. Transfer ownership or delete the team.");
   }
   await db.groupMember.delete({ where: { id: member.id } });
-  revalidatePath("/");
+  revalidatePath("/contacts");
   revalidatePath("/settings/teams");
 };
 
@@ -589,7 +589,7 @@ export const deleteTeam = async (formData: FormData) => {
     }
     await tx.group.delete({ where: { id: team.id } });
   });
-  revalidatePath("/");
+  revalidatePath("/contacts");
   revalidatePath("/settings");
   redirect("/settings");
 };

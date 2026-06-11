@@ -206,7 +206,7 @@ const parseStructuredTextLines = (value: string | undefined, itemLabel: string) 
   });
 
 const revalidateContactViews = (contactId?: string) => {
-  revalidatePath("/");
+  revalidatePath("/contacts");
   revalidatePath("/import-export");
   revalidatePath("/merge/manual");
   revalidatePath("/contacts/[id]");

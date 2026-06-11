@@ -193,7 +193,7 @@ export const acceptFamilyInvite = async (formData: FormData) => {
     },
   });
 
-  revalidatePath("/");
+  revalidatePath("/contacts");
   revalidatePath("/settings/family");
   redirect("/?tab=people&filter=all");
 };
@@ -368,7 +368,7 @@ export const addContactToFamilyBook = async (formData: FormData) => {
     });
   });
 
-  revalidatePath("/");
+  revalidatePath("/contacts");
   revalidatePath(`/contacts/${contactId}`);
 };
 
@@ -440,7 +440,7 @@ export const deleteFamilyGroup = async (formData: FormData) => {
     await tx.group.delete({ where: { id: group.id } });
   });
 
-  revalidatePath("/");
+  revalidatePath("/contacts");
   revalidatePath("/settings");
   redirect("/settings");
 };
@@ -459,6 +459,6 @@ export const leaveFamilyGroup = async (formData: FormData) => {
     throw new Error("The owner can't leave. Transfer ownership or delete the group.");
   }
   await db.groupMember.delete({ where: { id: member.id } });
-  revalidatePath("/");
+  revalidatePath("/contacts");
   revalidatePath("/settings/family");
 };

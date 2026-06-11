@@ -30,5 +30,5 @@ export const updatePhoneticSettings = async (formData: FormData) => {
   });
 
   revalidatePath("/settings");
-  revalidatePath("/");
+  revalidatePath("/contacts");
 };

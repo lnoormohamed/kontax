@@ -118,6 +118,6 @@ export const importContactsCsv = async (formData: FormData) => {
     throw error;
   }
 
-  revalidatePath("/");
+  revalidatePath("/contacts");
   revalidatePath("/import-export");
 };

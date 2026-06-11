@@ -37,7 +37,7 @@ export async function POST(request: Request) {
 
   const result = await runQueuedSyncJobs({ limit });
 
-  revalidatePath("/");
+  revalidatePath("/contacts");
   revalidatePath("/sync");
 
   if (typeof redirectTo === "string" && redirectTo.startsWith("/")) {
