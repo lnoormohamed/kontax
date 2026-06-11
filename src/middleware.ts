@@ -20,7 +20,8 @@ const PUBLIC_PREFIXES = [
   "/reset-password",           // P18-05
   "/verify-email",
   "/account-deleted",          // P18-09
-  "/share",         // vCard share public links (P12-02)
+  "/share/",        // vCard share public links (P12-02) — trailing slash so it
+                    // matches /share/<token> but NOT the authenticated /shares page
   "/pricing",       // marketing
   "/privacy",       // legal
   "/terms",         // legal
