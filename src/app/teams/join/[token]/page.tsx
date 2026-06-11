@@ -78,7 +78,7 @@ export default async function TeamJoinPage({
             </h1>
             <p className="mx-auto mt-3 max-w-[340px] text-[14px] leading-[1.6] text-[#5c655e]">
               You&apos;re already a member of{" "}
-              <strong className="font-semibold text-[#3a4540]">{member!.group.name}</strong>. The
+              <strong className="font-semibold text-[#3a4540]">{member?.group.name}</strong>. The
               shared books are in your contacts under the Shared scope.
             </p>
             <Link
