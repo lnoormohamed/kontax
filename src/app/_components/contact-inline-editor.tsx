@@ -605,7 +605,7 @@ export function ContactEditProvider({
  */
 export function ContactDetailHeaderBar({
   contactName,
-  backHref = "/",
+  backHref = "/contacts",
   readActions,
 }: {
   contactName: string;

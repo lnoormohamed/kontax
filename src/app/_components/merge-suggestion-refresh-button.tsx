@@ -22,7 +22,7 @@ export function MergeSuggestionRefreshButton() {
       return;
     }
 
-    window.location.href = "/?mergeSuggestionsRefreshed=1";
+    window.location.href = "/contacts?mergeSuggestionsRefreshed=1";
   };
 
   return (

@@ -83,7 +83,7 @@ export default async function TeamJoinPage({
             </p>
             <Link
               className="mt-6 flex w-full items-center justify-center rounded-[10px] bg-[#4158f4] px-4 py-3 text-[14px] font-semibold text-white transition hover:bg-[#3248db]"
-              href="/"
+              href="/contacts"
             >
               Open my contacts
             </Link>
@@ -103,7 +103,7 @@ export default async function TeamJoinPage({
             </p>
             <Link
               className="mt-6 flex w-full items-center justify-center rounded-[10px] border border-[#d8ddd6] bg-white px-4 py-3 text-[14px] font-semibold text-[#1d2823] transition hover:bg-[#f6f7f4]"
-              href="/"
+              href="/contacts"
             >
               Go to Kontax
             </Link>

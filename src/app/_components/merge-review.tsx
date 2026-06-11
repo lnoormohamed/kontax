@@ -1127,7 +1127,7 @@ function DismissCard({ suggestionId }: { suggestionId: string }) {
       setIsDismissing(false);
       return;
     }
-    window.location.href = "/?tab=duplicates";
+    window.location.href = "/contacts?tab=duplicates";
   };
 
   return (

@@ -146,7 +146,7 @@ export function ContactDashboard({
     if (query) {
       params.set("q", query);
     }
-    return `/?${params.toString()}`;
+    return `/contacts?${params.toString()}`;
   };
 
   const isFavoritesView = currentTab === "people" && currentFilter === "favorites";

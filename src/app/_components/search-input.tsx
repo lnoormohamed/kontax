@@ -36,7 +36,7 @@ export function SearchInput({
     if (next.trim()) {
       params.set("q", next);
     }
-    router.replace(`/?${params.toString()}`, { scroll: false });
+    router.replace(`/contacts?${params.toString()}`, { scroll: false });
   };
 
   const onChange = (next: string) => {

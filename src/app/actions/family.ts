@@ -195,7 +195,7 @@ export const acceptFamilyInvite = async (formData: FormData) => {
 
   revalidatePath("/contacts");
   revalidatePath("/settings/family");
-  redirect("/?tab=people&filter=all");
+  redirect("/contacts?tab=people&filter=all");
 };
 
 export const declineFamilyInvite = async (formData: FormData) => {

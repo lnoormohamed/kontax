@@ -144,11 +144,12 @@ export const inviteTeamMember = async (formData: FormData) => {
   }
 
   const token = randomBytes(24).toString("base64url");
+  const role: "ADMIN" | "MEMBER" = str(formData, "role") === "ADMIN" ? "ADMIN" : "MEMBER";
   const data = {
     groupId: team.id,
     userId: recipient?.id ?? null,
     invitedEmail: email,
-    role: (str(formData, "role") === "ADMIN" ? "ADMIN" : "MEMBER") as "ADMIN" | "MEMBER",
+    role,
     inviteStatus: "PENDING" as const,
     canEdit: true,
     inviteToken: token,
@@ -195,7 +196,7 @@ export const acceptTeamInvite = async (formData: FormData) => {
   });
   revalidatePath("/contacts");
   revalidatePath("/settings/teams");
-  redirect("/?tab=people&filter=all");
+  redirect("/contacts?tab=people&filter=all");
 };
 
 export const declineTeamInvite = async (formData: FormData) => {

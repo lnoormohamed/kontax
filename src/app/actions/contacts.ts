@@ -1211,7 +1211,7 @@ export const bulkAcceptHighConfidenceContacts = async (formData: FormData) => {
 
   revalidateContactViews();
 
-  const base = redirectTo ?? "/?tab=duplicates";
+  const base = redirectTo ?? "/contacts?tab=duplicates";
   const separator = base.includes("?") ? "&" : "?";
   redirect(`${base}${separator}bulkMerged=${mergedCount}&bulkFailed=${failedCount}`);
 };

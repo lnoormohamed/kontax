@@ -71,7 +71,7 @@ export function BulkMergeButton({ count }: { count: number }) {
                 setMerging(false);
               }}
             >
-              <input name="redirectTo" type="hidden" value="/?tab=duplicates" />
+              <input name="redirectTo" type="hidden" value="/contacts?tab=duplicates" />
               <button
                 className="inline-flex h-[42px] items-center gap-2 rounded-[10px] bg-[#17352e] px-[18px] text-[13.5px] font-semibold text-white transition hover:bg-[#20443b] disabled:opacity-80"
                 disabled={merging}
@@ -149,7 +149,7 @@ export function UndoMergeButton({
               </button>
               <form action={undoMergeContacts}>
                 <input name="decisionId" type="hidden" value={decisionId} />
-                <input name="redirectTo" type="hidden" value="/?tab=duplicates" />
+                <input name="redirectTo" type="hidden" value="/contacts?tab=duplicates" />
                 <button
                   className="inline-flex h-[42px] items-center gap-1.5 rounded-[10px] bg-[#17352e] px-[18px] text-[13.5px] font-semibold text-white transition hover:bg-[#20443b]"
                   type="submit"

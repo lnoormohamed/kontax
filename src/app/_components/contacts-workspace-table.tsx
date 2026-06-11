@@ -135,7 +135,7 @@ function RowBadges({ contact, mode }: { contact: WorkspaceContact; mode: "active
         inFamilyBook: contact.sharedKind === "family",
         inTeamBook: contact.sharedKind === "team",
       }}
-      redirectTo={mode === "active" ? "/?tab=people" : "/?tab=archived"}
+      redirectTo={mode === "active" ? "/contacts?tab=people" : "/contacts?tab=archived"}
     />
   );
 }
@@ -179,7 +179,7 @@ function RowActions({ contact, mode }: { contact: WorkspaceContact; mode: "activ
             {mode === "active" ? (
               <form action={archiveContact}>
                 <input name="contactId" type="hidden" value={contact.id} />
-                <input name="redirectTo" type="hidden" value="/?tab=people" />
+                <input name="redirectTo" type="hidden" value="/contacts?tab=people" />
                 <button className="block w-full px-4 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50" type="submit">
                   Archive
                 </button>
@@ -187,7 +187,7 @@ function RowActions({ contact, mode }: { contact: WorkspaceContact; mode: "activ
             ) : (
               <form action={restoreContact}>
                 <input name="contactId" type="hidden" value={contact.id} />
-                <input name="redirectTo" type="hidden" value="/?tab=archived" />
+                <input name="redirectTo" type="hidden" value="/contacts?tab=archived" />
                 <button className="block w-full px-4 py-2 text-left text-sm text-slate-700 transition hover:bg-slate-50" type="submit">
                   Restore
                 </button>
@@ -195,7 +195,7 @@ function RowActions({ contact, mode }: { contact: WorkspaceContact; mode: "activ
             )}
             <form action={permanentlyDeleteContact}>
               <input name="contactId" type="hidden" value={contact.id} />
-              <input name="redirectTo" type="hidden" value={mode === "active" ? "/?tab=people" : "/?tab=archived"} />
+              <input name="redirectTo" type="hidden" value={mode === "active" ? "/contacts?tab=people" : "/contacts?tab=archived"} />
               <button className="block w-full px-4 py-2 text-left text-sm text-rose-600 transition hover:bg-rose-50" type="submit">
                 Delete permanently
               </button>
@@ -432,7 +432,7 @@ export function ContactsWorkspaceTable({
                 {selectedIds.map((id) => (
                   <input key={id} name="contactIds" type="hidden" value={id} />
                 ))}
-                <input name="redirectTo" type="hidden" value="/?tab=people" />
+                <input name="redirectTo" type="hidden" value="/contacts?tab=people" />
                 <button
                   className="inline-flex items-center gap-1.5 rounded-lg border border-[#d8ddd6] bg-white px-3 py-1.5 text-xs font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
                   type="submit"
@@ -446,7 +446,7 @@ export function ContactsWorkspaceTable({
               {selectedIds.map((id) => (
                 <input key={id} name="contactIds" type="hidden" value={id} />
               ))}
-              <input name="redirectTo" type="hidden" value={mode === "active" ? "/?tab=people" : "/?tab=archived"} />
+              <input name="redirectTo" type="hidden" value={mode === "active" ? "/contacts?tab=people" : "/contacts?tab=archived"} />
               <button
                 className="inline-flex items-center gap-1.5 rounded-lg border border-[#d8ddd6] bg-white px-3 py-1.5 text-xs font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
                 type="submit"
@@ -499,7 +499,7 @@ export function ContactsWorkspaceTable({
                 {selectedIds.map((id) => (
                   <input key={id} name="contactIds" type="hidden" value={id} />
                 ))}
-                <input name="redirectTo" type="hidden" value={mode === "active" ? "/?tab=people" : "/?tab=archived"} />
+                <input name="redirectTo" type="hidden" value={mode === "active" ? "/contacts?tab=people" : "/contacts?tab=archived"} />
                 <button
                   className="rounded-[0.9rem] bg-[#b5472f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#9c3c28]"
                   type="submit"
