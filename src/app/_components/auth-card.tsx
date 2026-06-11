@@ -235,15 +235,16 @@ export function AuthCard({
     setSubmitting(true);
 
     if (isLogin) {
-      const result = await signIn("credentials", { email, password, redirect: false });
-      if (result?.error) {
+      try {
+        await signIn("credentials", { email, password, redirect: false });
+        router.push(next ?? "/");
+        router.refresh();
+      } catch {
+        // NextAuth v5 throws CredentialsSignin on bad credentials
         setFormError("Incorrect email or password. Please try again.");
         setSubmitting(false);
         setTimeout(() => errorBoxRef.current?.focus(), 0);
-        return;
       }
-      router.push(next ?? "/");
-      router.refresh();
     } else {
       const res = await fetch("/api/register", {
         method: "POST",
@@ -263,14 +264,14 @@ export function AuthCard({
         return;
       }
 
-      const result = await signIn("credentials", { email, password, redirect: false });
-      if (result?.error) {
+      try {
+        await signIn("credentials", { email, password, redirect: false });
+        router.push(next ?? "/");
+        router.refresh();
+      } catch {
         setFormError("Account created but login didn't complete. Please log in.");
         setSubmitting(false);
-        return;
       }
-      router.push(next ?? "/");
-      router.refresh();
     }
   };
 
