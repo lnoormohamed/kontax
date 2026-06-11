@@ -521,7 +521,11 @@ export function ContactDashboard({
                           </p>
                         </div>
                         {merge.canUndo ? (
-                          <UndoMergeButton decisionId={merge.decisionId} />
+                          <UndoMergeButton
+                            absorbedName={merge.absorbedName}
+                            decisionId={merge.decisionId}
+                            survivorName={merge.survivorName}
+                          />
                         ) : (
                           <span className="text-xs font-medium text-[#aeb4ac]">Expired</span>
                         )}

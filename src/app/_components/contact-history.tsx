@@ -23,50 +23,39 @@ type HistoryEvent = {
 const ACTIVITY_LOG_START =
   process.env.NEXT_PUBLIC_ACTIVITY_LOG_START_DATE ?? "9 June 2026";
 
-// Event-type → timeline badge icon + colours (mirrors the design EVENT_META).
-type EventMeta = { icon: string; bg: string; fg: string };
+// Event-type → glyph + tint colour for the 28px actor circle.
+type EventMeta = { icon: string; color: string };
 const EVENT_META: Record<string, EventMeta> = {
-  CONTACT_CREATED: { icon: "plus", bg: "#e7efe9", fg: "#17352e" },
-  CONTACT_UPDATED: { icon: "pencil", bg: "#e7ecfb", fg: "#4158f4" },
-  CONTACT_ARCHIVED: { icon: "archive", bg: "#f6edd9", fg: "#bf8526" },
-  CONTACT_RESTORED: { icon: "restore", bg: "#e7efe9", fg: "#17352e" },
-  CONTACT_DELETED: { icon: "trash", bg: "#f3e1da", fg: "#b5472f" },
-  CONTACT_MERGED: { icon: "merge", bg: "#f2f4f0", fg: "#5c655e" },
-  CONTACT_MERGE_UNDONE: { icon: "merge", bg: "#f2f4f0", fg: "#5c655e" },
-  CONTACT_IMPORTED: { icon: "download", bg: "#f2f4f0", fg: "#5c655e" },
-  CONTACT_SHARED: { icon: "share", bg: "#e7ecfb", fg: "#4158f4" },
-  CONTACT_SHARE_RECEIVED: { icon: "share", bg: "#e7ecfb", fg: "#4158f4" },
-  SYNC_PULLED: { icon: "cloud", bg: "#f2f4f0", fg: "#5c655e" },
-  SYNC_PUSHED: { icon: "cloud", bg: "#f2f4f0", fg: "#5c655e" },
-  SYNC_CONFLICT_DETECTED: { icon: "warning", bg: "#f6edd9", fg: "#bf8526" },
-  SYNC_CONFLICT_RESOLVED: { icon: "check", bg: "#e7efe9", fg: "#17352e" },
+  CONTACT_CREATED: { icon: "plus", color: "#17352e" },
+  CONTACT_UPDATED: { icon: "pencil", color: "#4158f4" },
+  CONTACT_ARCHIVED: { icon: "archive", color: "#a8741f" },
+  CONTACT_RESTORED: { icon: "restore", color: "#17352e" },
+  CONTACT_DELETED: { icon: "trash", color: "#b5472f" },
+  CONTACT_MERGED: { icon: "merge", color: "#5c655e" },
+  CONTACT_MERGE_UNDONE: { icon: "restore", color: "#5c655e" },
+  CONTACT_IMPORTED: { icon: "upload", color: "#5c655e" },
+  CONTACT_SHARED: { icon: "share", color: "#4158f4" },
+  CONTACT_SHARE_RECEIVED: { icon: "download", color: "#4158f4" },
+  SYNC_PULLED: { icon: "cloud", color: "#2c7a52" },
+  SYNC_PUSHED: { icon: "sync", color: "#2c7a52" },
+  SYNC_CONFLICT_DETECTED: { icon: "warning", color: "#a8741f" },
+  SYNC_CONFLICT_RESOLVED: { icon: "check", color: "#17352e" },
 };
-const eventMeta = (eventType: string): EventMeta =>
-  EVENT_META[eventType] ?? { icon: "pencil", bg: "#e7ecfb", fg: "#4158f4" };
+const eventMeta = (t: string): EventMeta =>
+  EVENT_META[t] ?? { icon: "pencil", color: "#4158f4" };
 
-const stringifyScalar = (value: unknown): string => {
-  if (value === null || value === undefined) {
-    return "";
-  }
-  if (typeof value === "object") {
-    return JSON.stringify(value);
-  }
-  return typeof value === "symbol"
-    ? value.toString()
-    : `${value as string | number | boolean | bigint}`;
+// ── value rendering ──────────────────────────────────────────────────────────
+const stringifyScalar = (v: unknown): string => {
+  if (v === null || v === undefined) return "";
+  if (typeof v === "object") return JSON.stringify(v);
+  return typeof v === "symbol" ? v.toString() : `${v as string | number | boolean | bigint}`;
 };
 
-const renderValue = (value: unknown): string => {
-  if (value === null || value === undefined || value === "") {
-    return "—";
-  }
-  if (Array.isArray(value)) {
-    return value.length > 0 ? value.map(stringifyScalar).join(", ") : "—";
-  }
-  if (typeof value === "object") {
-    return JSON.stringify(value);
-  }
-  const text = stringifyScalar(value);
+const renderValue = (v: unknown): string => {
+  if (v === null || v === undefined || v === "") return "—";
+  if (Array.isArray(v)) return v.length > 0 ? v.map(stringifyScalar).join(", ") : "—";
+  if (typeof v === "object") return JSON.stringify(v);
+  const text = stringifyScalar(v);
   return text.length > 80 ? `${text.slice(0, 80)}…` : text;
 };
 
@@ -77,93 +66,129 @@ const getDiffs = (payload: unknown): FieldDiff[] => {
   return [];
 };
 
-function EventRow({ event, last }: { event: HistoryEvent; last: boolean }) {
+// ── diff table ───────────────────────────────────────────────────────────────
+function DiffTable({ diffs }: { diffs: FieldDiff[] }) {
+  return (
+    <div className="mt-2.5 overflow-hidden rounded-[10px] border border-[#e9ece7]">
+      {diffs.map((diff, i) => (
+        <div
+          className="grid gap-3.5 px-3 py-[9px] text-[12.5px]"
+          key={i}
+          style={{
+            gridTemplateColumns: "128px 1fr",
+            borderTop: i > 0 ? "1px solid #e9ece7" : "none",
+          }}
+        >
+          <span className="pt-px font-medium text-[#8b938c]">
+            {formatFieldLabel(diff.field)}
+          </span>
+          <span className="flex flex-wrap items-center gap-2 min-w-0">
+            <span
+              className="max-w-[42ch] overflow-hidden text-ellipsis whitespace-nowrap font-mono text-[12px] text-[#b5472f]"
+              title={renderValue(diff.before)}
+            >
+              {renderValue(diff.before)}
+            </span>
+            <WorkspaceIcon className="shrink-0 text-[#c8cfc6]" name="chevronRight" size={13} strokeWidth={2} />
+            <span
+              className="max-w-[42ch] overflow-hidden text-ellipsis whitespace-nowrap font-mono text-[12px] text-[#2f7d5b]"
+              title={renderValue(diff.after)}
+            >
+              {renderValue(diff.after)}
+            </span>
+          </span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+// ── event row ────────────────────────────────────────────────────────────────
+function EventRow({ event }: { event: HistoryEvent }) {
   const [open, setOpen] = useState(false);
   const diffs = getDiffs(event.payload);
   const expandable = diffs.length > 0;
   const meta = eventMeta(event.eventType);
 
   return (
-    <div className="relative flex gap-3">
-      {/* timeline rail */}
-      <div className="flex shrink-0 flex-col items-center">
-        <span
-          className="z-[1] grid h-[30px] w-[30px] place-items-center rounded-full"
-          style={{ background: meta.bg, color: meta.fg }}
-        >
-          <WorkspaceIcon name={meta.icon} size={15} strokeWidth={1.8} />
-        </span>
-        {!last ? <span className="my-0.5 w-0.5 flex-1 bg-[#e9ece7]" /> : null}
-      </div>
+    <div
+      className="flex gap-3 rounded-[11px] px-3.5 py-3 transition-colors"
+      style={expandable ? { cursor: "default" } : undefined}
+      onMouseEnter={
+        expandable
+          ? (e) => { (e.currentTarget as HTMLDivElement).style.background = "#f2f4f0"; }
+          : undefined
+      }
+      onMouseLeave={
+        expandable
+          ? (e) => { (e.currentTarget as HTMLDivElement).style.background = ""; }
+          : undefined
+      }
+    >
+      {/* glyph circle — color set on span so WorkspaceIcon inherits via currentColor */}
+      <span
+        className="mt-px grid h-[28px] w-[28px] shrink-0 place-items-center rounded-full bg-[#f2f4f0]"
+        style={{ color: meta.color }}
+      >
+        <WorkspaceIcon name={meta.icon} size={14} strokeWidth={1.7} />
+      </span>
 
-      <div className={`min-w-0 flex-1 ${last ? "" : "pb-[18px]"}`}>
-        <div className="flex items-baseline gap-2">
-          <p className="flex-1 text-[13.5px] leading-[1.4] text-[#1d2823]">
-            <strong className="font-semibold">{event.actorLabel}</strong>{" "}
-            <span className="text-[#5c655e]">{event.summary}</span>
-          </p>
+      {/* body */}
+      <div className="min-w-0 flex-1">
+        <div className="flex items-baseline gap-2.5">
+          <span className="flex-1 min-w-0 text-[13.5px] leading-[1.45] text-[#1d2823]">
+            {event.summary}
+          </span>
           <span
-            className="shrink-0 whitespace-nowrap text-[12px] text-[#8b938c]"
+            className="shrink-0 whitespace-nowrap text-[12px] tabular-nums text-[#8b938c]"
             title={formatAbsoluteTime(event.createdAt)}
           >
             {formatRelativeTime(event.createdAt)}
           </span>
         </div>
 
-        {expandable ? (
-          <>
-            <button
-              aria-expanded={open}
-              className="mt-1.5 inline-flex items-center gap-1.5 text-[12.5px] font-medium text-[#4158f4]"
-              onClick={() => setOpen((v) => !v)}
-              type="button"
-            >
-              <span
-                className={`grid place-items-center transition-transform ${open ? "rotate-90" : ""}`}
+        <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[12px] text-[#8b938c]">
+          <span>{event.actorLabel}</span>
+          {expandable && (
+            <>
+              <span className="text-[#c8cfc6]">·</span>
+              <button
+                aria-expanded={open}
+                className="inline-flex items-center gap-1 font-semibold text-[#4158f4] hover:underline"
+                onClick={() => setOpen((v) => !v)}
+                type="button"
               >
-                <WorkspaceIcon name="chevronRight" size={13} strokeWidth={2} />
-              </span>
-              {open
-                ? "Hide changes"
-                : `View ${diffs.length} ${diffs.length === 1 ? "change" : "changes"}`}
-            </button>
-            {open ? (
-              <div className="mt-2 grid gap-2 rounded-[10px] border border-[#e9ece7] bg-[#f6f7f4] px-3 py-2.5">
-                {diffs.map((diff, index) => (
-                  <div key={index}>
-                    <div className="mb-0.5 text-[10.5px] font-semibold uppercase tracking-[0.06em] text-[#8b938c]">
-                      {formatFieldLabel(diff.field)}
-                    </div>
-                    <div className="flex flex-wrap items-center gap-2 text-[12.5px]">
-                      <span className="font-mono text-[#8b938c] line-through">
-                        {renderValue(diff.before)}
-                      </span>
-                      <WorkspaceIcon className="text-[#aeb4ac]" name="chevronRight" size={13} strokeWidth={2} />
-                      <span className="font-mono text-[#1d2823]">{renderValue(diff.after)}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : null}
-          </>
-        ) : null}
+                <span
+                  style={{
+                    display: "inline-flex",
+                    transition: "transform .15s ease",
+                    transform: open ? "rotate(90deg)" : "none",
+                  }}
+                >
+                  <WorkspaceIcon name="chevronRight" size={12} strokeWidth={2.2} />
+                </span>
+                {open ? "Hide changes" : `View ${diffs.length} change${diffs.length === 1 ? "" : "s"}`}
+              </button>
+            </>
+          )}
+        </div>
+
+        {open && expandable && <DiffTable diffs={diffs} />}
       </div>
     </div>
   );
 }
 
-function SkeletonTimeline() {
+// ── skeleton ─────────────────────────────────────────────────────────────────
+function SkeletonRows() {
   return (
     <div className="animate-pulse">
-      {Array.from({ length: 4 }).map((_, index) => (
-        <div className="flex gap-3" key={index}>
-          <div className="flex shrink-0 flex-col items-center">
-            <span className="h-[30px] w-[30px] rounded-full bg-[#eef1ec]" />
-            {index < 3 ? <span className="my-0.5 w-0.5 flex-1 bg-[#eef1ec]" /> : null}
-          </div>
-          <div className="flex-1 pb-[18px]">
-            <span className="block h-3 w-2/3 rounded bg-[#eef1ec]" />
-            <span className="mt-2 block h-2.5 w-24 rounded bg-[#eef1ec]" />
+      {Array.from({ length: 5 }).map((_, i) => (
+        <div className="flex gap-3 px-3.5 py-3" key={i}>
+          <span className="h-[28px] w-[28px] shrink-0 rounded-full bg-[#eceee9]" />
+          <div className="flex-1 pt-1">
+            <span className="block h-[11px] w-[52%] rounded-[6px] bg-[#eceee9]" />
+            <span className="mt-2 block h-[9px] w-[28%] rounded-[6px] bg-[#eceee9]" />
           </div>
         </div>
       ))}
@@ -171,12 +196,7 @@ function SkeletonTimeline() {
   );
 }
 
-function HistoryCard({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="rounded-[14px] border border-[#d8ddd6] bg-white px-[22px] py-5">{children}</div>
-  );
-}
-
+// ── main component ────────────────────────────────────────────────────────────
 export function ContactHistory({ contactId }: { contactId: string }) {
   const [events, setEvents] = useState<HistoryEvent[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
@@ -188,19 +208,15 @@ export function ContactHistory({ contactId }: { contactId: string }) {
       setStatus(nextCursor ? "loadingMore" : "loading");
       try {
         const url = new URL(`/api/contacts/${contactId}/history`, window.location.origin);
-        if (nextCursor) {
-          url.searchParams.set("cursor", nextCursor);
-        }
+        if (nextCursor) url.searchParams.set("cursor", nextCursor);
         const res = await fetch(url, { cache: "no-store" });
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}`);
-        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = (await res.json()) as {
           events: HistoryEvent[];
           nextCursor: string | null;
           hasMore: boolean;
         };
-        setEvents((current) => (nextCursor ? [...current, ...data.events] : data.events));
+        setEvents((prev) => (nextCursor ? [...prev, ...data.events] : data.events));
         setCursor(data.nextCursor);
         setHasMore(data.hasMore);
         setStatus("done");
@@ -211,83 +227,97 @@ export function ContactHistory({ contactId }: { contactId: string }) {
     [contactId],
   );
 
-  useEffect(() => {
-    void load(null);
-  }, [load]);
+  useEffect(() => { void load(null); }, [load]);
 
+  // Loading skeleton
   if (status === "loading" || status === "idle") {
     return (
-      <HistoryCard>
-        <SkeletonTimeline />
-      </HistoryCard>
+      <div className="overflow-hidden rounded-[14px] border border-[#d8ddd6] bg-white py-1.5">
+        <SkeletonRows />
+      </div>
     );
   }
 
+  // Error (empty)
   if (status === "error" && events.length === 0) {
     return (
-      <HistoryCard>
-        <div className="flex flex-col items-center gap-3 py-8 text-center">
-          <p className="text-sm text-[#5c655e]">Couldn&apos;t load history.</p>
-          <button
-            className="rounded-lg border border-[#d8ddd6] px-3 py-1.5 text-xs font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
-            onClick={() => void load(null)}
-            type="button"
-          >
-            Retry
-          </button>
-        </div>
-      </HistoryCard>
+      <div className="overflow-hidden rounded-[14px] border border-[#d8ddd6] bg-white px-6 py-10 text-center">
+        <span className="mx-auto mb-3 grid h-10 w-10 place-items-center rounded-full bg-[#f3e1da] text-[#b5472f]">
+          <WorkspaceIcon name="warning" size={20} strokeWidth={1.7} />
+        </span>
+        <p className="text-[14px] font-semibold text-[#1d2823]">Couldn&apos;t load history.</p>
+        <p className="mt-1 text-[13px] text-[#5c655e]">Something went wrong fetching the timeline.</p>
+        <button
+          className="mt-4 inline-flex items-center gap-1.5 rounded-[9px] border border-[#d8ddd6] bg-white px-4 py-2 text-[13px] font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+          onClick={() => void load(null)}
+          type="button"
+        >
+          <WorkspaceIcon name="restore" size={14} strokeWidth={1.7} />
+          Retry
+        </button>
+      </div>
     );
   }
 
+  // Empty (no events)
   if (events.length === 0) {
     return (
-      <div className="rounded-[14px] border border-dashed border-[#d8ddd6] px-6 py-11 text-center">
-        <WorkspaceIcon className="mx-auto mb-2 text-[#aeb4ac]" name="clock" size={24} strokeWidth={1.5} />
-        <p className="text-sm font-semibold text-[#5c655e]">Nothing here yet</p>
-        <p className="mx-auto mt-1 max-w-sm text-[13px] text-[#8b938c]">
-          Changes, syncs and merges will show up as you go. History starts from {ACTIVITY_LOG_START}.
+      <div className="overflow-hidden rounded-[14px] border border-[#d8ddd6] bg-white px-6 py-11 text-center">
+        <span className="mx-auto mb-3.5 grid h-[42px] w-[42px] place-items-center rounded-full bg-[#f2f4f0] text-[#c8cfc6]">
+          <WorkspaceIcon name="clock" size={21} strokeWidth={1.6} />
+        </span>
+        <p className="text-[14.5px] font-semibold text-[#1d2823]">
+          History starts from {ACTIVITY_LOG_START}
+        </p>
+        <p className="mx-auto mt-1.5 max-w-[330px] text-[13px] leading-[1.55] text-[#5c655e]">
+          Changes made before this date aren&apos;t recorded. New changes appear here going forward.
         </p>
       </div>
     );
   }
 
-  const oldest = events[events.length - 1];
-
   return (
-    <HistoryCard>
-      <div className="mb-4 flex items-center gap-2">
-        <h3 className="flex-1 text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">
-          Activity
-        </h3>
-        <span className="text-[12px] text-[#8b938c]">
-          {events.length} {events.length === 1 ? "event" : "events"}
-        </span>
+    <div>
+      {/* event card */}
+      <div className="overflow-hidden rounded-[14px] border border-[#d8ddd6] bg-white py-1.5">
+        {events.map((event, i) => (
+          <div key={event.id}>
+            {i > 0 && <div className="mx-3.5 h-px bg-[#e9ece7]" />}
+            <EventRow event={event} />
+          </div>
+        ))}
+
+        {status === "loadingMore" && (
+          <div className="mx-3.5 mt-0.5">
+            <div className="h-px bg-[#e9ece7]" />
+            <div className="flex gap-3 px-0 py-3">
+              <span className="h-[28px] w-[28px] shrink-0 animate-pulse rounded-full bg-[#eceee9]" />
+              <div className="flex-1 pt-1">
+                <span className="block h-[11px] w-[45%] animate-pulse rounded-[6px] bg-[#eceee9]" />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
-      {events.map((event, index) => (
-        <EventRow event={event} key={event.id} last={index === events.length - 1} />
-      ))}
-
-      <div className="mt-2 flex items-center justify-between gap-2.5 border-t border-[#e9ece7] pt-3.5">
+      {/* footer */}
+      <div className="mt-3 flex items-center justify-between gap-3">
         <span className="text-[12px] text-[#8b938c]">
-          {hasMore
-            ? `Showing the latest ${events.length}`
-            : oldest
-              ? `History starts ${formatRelativeTime(oldest.createdAt)}`
-              : `History starts from ${ACTIVITY_LOG_START}`}
+          History starts from {ACTIVITY_LOG_START}
         </span>
         {hasMore ? (
           <button
-            className="rounded-lg border border-[#d8ddd6] bg-white px-3.5 py-1.5 text-[12.5px] font-semibold text-[#5c655e] transition hover:bg-[#f2f4f0] disabled:opacity-50"
+            className="rounded-[9px] border border-[#d8ddd6] bg-white px-3.5 py-[7px] text-[12.5px] font-semibold text-[#5c655e] transition hover:bg-[#f2f4f0] disabled:opacity-50"
             disabled={status === "loadingMore"}
             onClick={() => void load(cursor)}
             type="button"
           >
             {status === "loadingMore" ? "Loading…" : "Load more"}
           </button>
-        ) : null}
+        ) : (
+          <span className="text-[12px] text-[#c8cfc6]">— No older history —</span>
+        )}
       </div>
-    </HistoryCard>
+    </div>
   );
 }

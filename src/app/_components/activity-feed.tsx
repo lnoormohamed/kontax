@@ -23,6 +23,7 @@ type ActivityEventRow = {
   actorIcon: string;
 };
 
+// ── filter options ────────────────────────────────────────────────────────────
 const CATEGORY_OPTIONS = [
   { key: "all", label: "All" },
   { key: "edits", label: "Edits" },
@@ -40,153 +41,347 @@ const ACTOR_OPTIONS = [
   { key: "shared", label: "Shared" },
 ] as const;
 
-const stringifyScalar = (value: unknown): string => {
-  if (value === null || value === undefined) {
-    return "";
-  }
-  if (typeof value === "object") {
-    return JSON.stringify(value);
-  }
-  return typeof value === "symbol"
-    ? value.toString()
-    : `${value as string | number | boolean | bigint}`;
+// ── event glyph + tint ────────────────────────────────────────────────────────
+type EventMeta = { icon: string; color: string };
+const EVENT_META: Record<string, EventMeta> = {
+  CONTACT_CREATED: { icon: "plus", color: "#17352e" },
+  CONTACT_UPDATED: { icon: "pencil", color: "#4158f4" },
+  CONTACT_ARCHIVED: { icon: "archive", color: "#a8741f" },
+  CONTACT_RESTORED: { icon: "restore", color: "#17352e" },
+  CONTACT_DELETED: { icon: "trash", color: "#b5472f" },
+  CONTACT_MERGED: { icon: "merge", color: "#5c655e" },
+  CONTACT_MERGE_UNDONE: { icon: "restore", color: "#5c655e" },
+  CONTACT_IMPORTED: { icon: "upload", color: "#5c655e" },
+  CONTACT_SHARED: { icon: "share", color: "#4158f4" },
+  CONTACT_SHARE_RECEIVED: { icon: "download", color: "#4158f4" },
+  SYNC_PULLED: { icon: "cloud", color: "#2c7a52" },
+  SYNC_PUSHED: { icon: "sync", color: "#2c7a52" },
+  SYNC_CONFLICT_DETECTED: { icon: "warning", color: "#a8741f" },
+  SYNC_CONFLICT_RESOLVED: { icon: "check", color: "#17352e" },
+};
+const eventMeta = (t: string): EventMeta =>
+  EVENT_META[t] ?? { icon: "pencil", color: "#4158f4" };
+
+// ── value rendering ───────────────────────────────────────────────────────────
+const stringifyScalar = (v: unknown): string => {
+  if (v === null || v === undefined) return "";
+  if (typeof v === "object") return JSON.stringify(v);
+  return typeof v === "symbol" ? v.toString() : `${v as string | number | boolean | bigint}`;
 };
 
-const renderValue = (value: unknown): string => {
-  if (value === null || value === undefined || value === "") {
-    return "—";
-  }
-  if (Array.isArray(value)) {
-    return value.length > 0 ? value.map(stringifyScalar).join(", ") : "—";
-  }
-  if (typeof value === "object") {
-    return JSON.stringify(value);
-  }
-  const text = stringifyScalar(value);
+const renderValue = (v: unknown): string => {
+  if (v === null || v === undefined || v === "") return "—";
+  if (Array.isArray(v)) return v.length > 0 ? v.map(stringifyScalar).join(", ") : "—";
+  if (typeof v === "object") return JSON.stringify(v);
+  const text = stringifyScalar(v);
   return text.length > 80 ? `${text.slice(0, 80)}…` : text;
 };
 
 const getDiffs = (payload: unknown): FieldDiff[] => {
-  if (
-    payload &&
-    typeof payload === "object" &&
-    Array.isArray((payload as { diffs?: unknown }).diffs)
-  ) {
+  if (payload && typeof payload === "object" && Array.isArray((payload as { diffs?: unknown }).diffs)) {
     return (payload as { diffs: FieldDiff[] }).diffs;
   }
   return [];
 };
 
-function EventRow({ event }: { event: ActivityEventRow }) {
-  const [open, setOpen] = useState(false);
-  const diffs = getDiffs(event.payload);
-  const expandable = diffs.length > 0;
-
+// ── diff table ────────────────────────────────────────────────────────────────
+function DiffTable({ diffs }: { diffs: FieldDiff[] }) {
   return (
-    <li className="border-b border-[#edf0ea] last:border-b-0">
-      <div className="flex items-start gap-3 px-4 py-3">
-        <span className="mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full bg-[#f2f4f0] text-[#5c655e]">
-          <WorkspaceIcon name={event.actorIcon} size={15} />
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="text-sm text-[#1d2823]">
-            {event.contactId ? (
-              <Link className="font-semibold hover:underline" href={`/contacts/${event.contactId}`}>
-                {event.contactName ?? "Contact"}
-              </Link>
-            ) : (
-              <span className="font-semibold text-[#5c655e]">
-                {event.contactName ?? "Deleted contact"}
-              </span>
-            )}{" "}
-            <span className="text-[#5c655e]">{event.summary}</span>
-          </p>
-          <p className="mt-0.5 text-xs text-[#8b938c]">{event.actorLabel}</p>
-          {expandable ? (
-            <button
-              aria-expanded={open}
-              className="mt-1 text-xs font-semibold text-[#4158f4]"
-              onClick={() => setOpen((v) => !v)}
-              type="button"
+    <div className="mt-2.5 overflow-hidden rounded-[10px] border border-[#e9ece7]">
+      {diffs.map((diff, i) => (
+        <div
+          className="grid gap-3.5 px-3 py-[9px] text-[12.5px]"
+          key={i}
+          style={{
+            gridTemplateColumns: "128px 1fr",
+            borderTop: i > 0 ? "1px solid #e9ece7" : "none",
+          }}
+        >
+          <span className="pt-px font-medium text-[#8b938c]">{formatFieldLabel(diff.field)}</span>
+          <span className="flex min-w-0 flex-wrap items-center gap-2">
+            <span
+              className="max-w-[42ch] overflow-hidden text-ellipsis whitespace-nowrap font-mono text-[12px] text-[#b5472f]"
+              title={renderValue(diff.before)}
             >
-              {open ? "Hide changes" : `View ${diffs.length} ${diffs.length === 1 ? "change" : "changes"}`}
-            </button>
-          ) : null}
-          {expandable && open ? (
-            <div className="mt-2 grid gap-1.5">
-              {diffs.map((diff, index) => (
-                <div className="grid grid-cols-[120px_1fr] gap-2 text-xs" key={index}>
-                  <span className="text-[#8b938c]">{formatFieldLabel(diff.field)}</span>
-                  <span className="text-[#1d2823]">
-                    <span className="text-[#b5472f]">{renderValue(diff.before)}</span>
-                    <span className="mx-1.5 text-[#8b938c]">→</span>
-                    <span className="text-[#2f7d5b]">{renderValue(diff.after)}</span>
-                  </span>
-                </div>
-              ))}
-            </div>
-          ) : null}
+              {renderValue(diff.before)}
+            </span>
+            <WorkspaceIcon className="shrink-0 text-[#c8cfc6]" name="chevronRight" size={13} strokeWidth={2} />
+            <span
+              className="max-w-[42ch] overflow-hidden text-ellipsis whitespace-nowrap font-mono text-[12px] text-[#2f7d5b]"
+              title={renderValue(diff.after)}
+            >
+              {renderValue(diff.after)}
+            </span>
+          </span>
         </div>
-        <span
-          className="shrink-0 text-xs text-[#8b938c]"
-          title={formatAbsoluteTime(event.createdAt)}
-        >
-          {formatRelativeTime(event.createdAt)}
-        </span>
-      </div>
-    </li>
-  );
-}
-
-function SkeletonRows() {
-  return (
-    <ul className="animate-pulse">
-      {Array.from({ length: 6 }).map((_, index) => (
-        <li
-          className="flex items-center gap-3 border-b border-[#edf0ea] px-4 py-3.5 last:border-b-0"
-          key={index}
-        >
-          <span className="h-7 w-7 shrink-0 rounded-full bg-[#eef1ec]" />
-          <span className="h-3 flex-1 rounded bg-[#eef1ec]" />
-          <span className="h-3 w-16 rounded bg-[#eef1ec]" />
-        </li>
       ))}
-    </ul>
-  );
-}
-
-function FilterChips({
-  options,
-  value,
-  onChange,
-}: {
-  options: ReadonlyArray<{ key: string; label: string }>;
-  value: string;
-  onChange: (key: string) => void;
-}) {
-  return (
-    <div className="flex flex-wrap gap-1.5">
-      {options.map((option) => {
-        const active = value === option.key;
-        return (
-          <button
-            className={`rounded-full px-3 py-1 text-[12.5px] font-semibold transition ${
-              active
-                ? "bg-[#17352e] text-white"
-                : "bg-[#f2f4f0] text-[#5c655e] hover:bg-[#e7efe9]"
-            }`}
-            key={option.key}
-            onClick={() => onChange(option.key)}
-            type="button"
-          >
-            {option.label}
-          </button>
-        );
-      })}
     </div>
   );
 }
 
+// ── event row ─────────────────────────────────────────────────────────────────
+function EventRow({ event }: { event: ActivityEventRow }) {
+  const [open, setOpen] = useState(false);
+  const diffs = getDiffs(event.payload);
+  const expandable = diffs.length > 0;
+  const meta = eventMeta(event.eventType);
+
+  return (
+    <div
+      className="flex gap-3 rounded-[11px] px-3.5 py-3 transition-colors"
+      onMouseEnter={
+        expandable
+          ? (e) => { (e.currentTarget as HTMLDivElement).style.background = "#f2f4f0"; }
+          : undefined
+      }
+      onMouseLeave={
+        expandable
+          ? (e) => { (e.currentTarget as HTMLDivElement).style.background = ""; }
+          : undefined
+      }
+    >
+      {/* glyph circle */}
+      <span
+        className="mt-px grid h-[28px] w-[28px] shrink-0 place-items-center rounded-full bg-[#f2f4f0]"
+        style={{ color: meta.color }}
+      >
+        <WorkspaceIcon name={meta.icon} size={14} strokeWidth={1.7} />
+      </span>
+
+      {/* body */}
+      <div className="min-w-0 flex-1">
+        <div className="flex items-baseline gap-2.5">
+          <p className="min-w-0 flex-1 text-[13.5px] leading-[1.45] text-[#1d2823]">
+            {/* contact name prefix (global feed only) */}
+            {event.contactName && (
+              event.contactId ? (
+                <><Link
+                  className="font-semibold text-[#4158f4] hover:underline"
+                  href={`/contacts/${event.contactId}`}
+                >{event.contactName}</Link>{" "}</>
+              ) : (
+                <><span className="font-semibold text-[#8b938c]" title="This contact was permanently deleted">{event.contactName}</span>{" "}</>
+              )
+            )}
+            {/* summary (lowercase first letter when contact name precedes it) */}
+            <span className="text-[#5c655e]">
+              {event.contactName
+                ? event.summary.charAt(0).toLowerCase() + event.summary.slice(1)
+                : event.summary}
+            </span>
+          </p>
+          <span
+            className="shrink-0 whitespace-nowrap text-[12px] tabular-nums text-[#8b938c]"
+            title={formatAbsoluteTime(event.createdAt)}
+          >
+            {formatRelativeTime(event.createdAt)}
+          </span>
+        </div>
+
+        <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[12px] text-[#8b938c]">
+          <span>{event.actorLabel}</span>
+          {expandable && (
+            <>
+              <span className="text-[#c8cfc6]">·</span>
+              <button
+                aria-expanded={open}
+                className="inline-flex items-center gap-1 font-semibold text-[#4158f4] hover:underline"
+                onClick={() => setOpen((v) => !v)}
+                type="button"
+              >
+                <span
+                  style={{
+                    display: "inline-flex",
+                    transition: "transform .15s ease",
+                    transform: open ? "rotate(90deg)" : "none",
+                  }}
+                >
+                  <WorkspaceIcon name="chevronRight" size={12} strokeWidth={2.2} />
+                </span>
+                {open
+                  ? "Hide changes"
+                  : `View ${diffs.length} change${diffs.length === 1 ? "" : "s"}`}
+              </button>
+            </>
+          )}
+        </div>
+
+        {open && expandable && <DiffTable diffs={diffs} />}
+      </div>
+    </div>
+  );
+}
+
+// ── skeleton rows ─────────────────────────────────────────────────────────────
+function SkeletonRows({ count = 6 }: { count?: number }) {
+  return (
+    <>
+      {Array.from({ length: count }).map((_, i) => (
+        <div key={i}>
+          {i > 0 && <div className="mx-3.5 h-px bg-[#e9ece7]" />}
+          <div className="flex animate-pulse gap-3 px-3.5 py-3">
+            <span className="h-[28px] w-[28px] shrink-0 rounded-full bg-[#eceee9]" />
+            <div className="flex-1 pt-0.5">
+              <span className="block h-[11px] w-[52%] rounded-[6px] bg-[#eceee9]" />
+              <span className="mt-2 block h-[9px] w-[28%] rounded-[6px] bg-[#eceee9]" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </>
+  );
+}
+
+// ── filter bar (single wrapped row, chips constrained to 760px column) ────────
+function FilterBar({
+  category,
+  actor,
+  onCategory,
+  onActor,
+}: {
+  category: string;
+  actor: string;
+  onCategory: (v: string) => void;
+  onActor: (v: string) => void;
+}) {
+  const Chip = ({
+    label,
+    active,
+    onClick,
+  }: {
+    label: string;
+    active: boolean;
+    onClick: () => void;
+  }) => (
+    <button
+      className="inline-flex h-[30px] shrink-0 items-center whitespace-nowrap rounded-full border border-transparent px-[13px] text-[12.5px] font-semibold transition"
+      onClick={onClick}
+      style={{
+        background: active ? "#17352e" : "#f2f4f0",
+        color: active ? "#fff" : "#5c655e",
+      }}
+      onMouseEnter={(e) => {
+        if (!active) {
+          (e.currentTarget as HTMLButtonElement).style.background = "#e7efe9";
+          (e.currentTarget as HTMLButtonElement).style.color = "#17352e";
+        }
+      }}
+      onMouseLeave={(e) => {
+        if (!active) {
+          (e.currentTarget as HTMLButtonElement).style.background = "#f2f4f0";
+          (e.currentTarget as HTMLButtonElement).style.color = "#5c655e";
+        }
+      }}
+      type="button"
+    >
+      {label}
+    </button>
+  );
+
+  return (
+    <div className="border-b border-[#e9ece7]">
+      <div
+        className="mx-auto flex flex-wrap items-center gap-[7px] px-[18px] py-3"
+        style={{ maxWidth: 760 }}
+      >
+        <span className="mr-px text-[10px] font-medium uppercase tracking-[0.06em] text-[#8b938c]">
+          Type
+        </span>
+        {CATEGORY_OPTIONS.map((o) => (
+          <Chip key={o.key} active={category === o.key} label={o.label} onClick={() => onCategory(o.key)} />
+        ))}
+        {/* divider between groups */}
+        <span className="mx-1 h-[18px] w-px shrink-0 bg-[#e9ece7]" />
+        <span className="mr-px text-[10px] font-medium uppercase tracking-[0.06em] text-[#8b938c]">
+          By
+        </span>
+        {ACTOR_OPTIONS.map((o) => (
+          <Chip key={o.key} active={actor === o.key} label={o.label} onClick={() => onActor(o.key)} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ── state blocks ──────────────────────────────────────────────────────────────
+function EmptyState({
+  kind,
+  filtering,
+  retention,
+  onClear,
+  onRetry,
+}: {
+  kind: "empty" | "filtered" | "error";
+  filtering?: boolean;
+  retention?: number | null;
+  onClear?: () => void;
+  onRetry?: () => void;
+}) {
+  if (kind === "error") {
+    return (
+      <div className="mx-[18px] my-5 rounded-[14px] border border-[#d8ddd6] px-7 py-[52px] text-center">
+        <span className="mx-auto mb-3.5 grid h-11 w-11 place-items-center rounded-full bg-[#f3e1da] text-[#b5472f]">
+          <WorkspaceIcon name="warning" size={21} strokeWidth={1.7} />
+        </span>
+        <p className="text-[15px] font-semibold text-[#1d2823]">Couldn&apos;t load activity.</p>
+        <p className="mx-auto mt-1.5 max-w-[360px] text-[13px] leading-[1.55] text-[#5c655e]">
+          Something went wrong fetching your timeline.
+        </p>
+        <button
+          className="mt-3.5 inline-flex items-center gap-1.5 rounded-[9px] border border-[#d8ddd6] bg-white px-4 py-2 text-[13px] font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+          onClick={onRetry}
+          type="button"
+        >
+          <WorkspaceIcon name="restore" size={15} strokeWidth={1.7} />
+          Retry
+        </button>
+      </div>
+    );
+  }
+
+  if (kind === "filtered") {
+    return (
+      <div className="mx-[18px] my-5 rounded-[14px] border border-[#d8ddd6] px-7 py-[52px] text-center">
+        <span className="mx-auto mb-3.5 grid h-11 w-11 place-items-center rounded-full bg-[#f2f4f0]">
+          {/* inline filter icon — 3 horizontal lines narrowing */}
+          <svg fill="none" height="21" stroke="#c8cfc6" strokeLinecap="round" strokeWidth="1.7" viewBox="0 0 24 24" width="21">
+            <path d="M4 6h16" />
+            <path d="M7 12h10" />
+            <path d="M10 18h4" />
+          </svg>
+        </span>
+        <p className="text-[15px] font-semibold text-[#1d2823]">No activity matches these filters</p>
+        <p className="mx-auto mt-1.5 max-w-[360px] text-[13px] leading-[1.55] text-[#5c655e]">
+          Try a different category or actor.
+        </p>
+        <button
+          className="mt-3.5 rounded-[9px] border border-[#d8ddd6] bg-white px-4 py-2 text-[12.5px] font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+          onClick={onClear}
+          type="button"
+        >
+          Clear filters
+        </button>
+      </div>
+    );
+  }
+
+  // empty (no activity at all)
+  return (
+    <div className="mx-[18px] my-5 rounded-[14px] border border-[#d8ddd6] px-7 py-[52px] text-center">
+      <span className="mx-auto mb-3.5 grid h-11 w-11 place-items-center rounded-full bg-[#f2f4f0] text-[#c8cfc6]">
+        <WorkspaceIcon name="clock" size={22} strokeWidth={1.6} />
+      </span>
+      <p className="text-[15px] font-semibold text-[#1d2823]">No activity yet</p>
+      <p className="mx-auto mt-1.5 max-w-[380px] text-[13px] leading-[1.55] text-[#5c655e]">
+        {retention === null
+          ? "Edits, syncs, imports, merges, and shares show up here."
+          : `Edits, syncs, imports, merges, and shares from the last ${retention ?? 365} days show up here.`}
+      </p>
+    </div>
+  );
+}
+
+// ── main feed ─────────────────────────────────────────────────────────────────
 export function ActivityFeed({ retentionDays = 90 }: { retentionDays?: number | null }) {
   const [events, setEvents] = useState<ActivityEventRow[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
@@ -194,38 +389,26 @@ export function ActivityFeed({ retentionDays = 90 }: { retentionDays?: number | 
   const [retention, setRetention] = useState<number | null>(retentionDays);
   const [category, setCategory] = useState("all");
   const [actor, setActor] = useState("all");
-  const [status, setStatus] = useState<
-    "idle" | "loading" | "loadingMore" | "error" | "done"
-  >("idle");
+  const [status, setStatus] = useState<"idle" | "loading" | "loadingMore" | "error" | "done">("idle");
 
   const load = useCallback(
     async (nextCursor: string | null, nextCategory: string, nextActor: string) => {
       setStatus(nextCursor ? "loadingMore" : "loading");
       try {
         const url = new URL("/api/activity", window.location.origin);
-        if (nextCursor) {
-          url.searchParams.set("cursor", nextCursor);
-        }
-        if (nextCategory !== "all") {
-          url.searchParams.set("category", nextCategory);
-        }
-        if (nextActor !== "all") {
-          url.searchParams.set("actor", nextActor);
-        }
+        if (nextCursor) url.searchParams.set("cursor", nextCursor);
+        if (nextCategory !== "all") url.searchParams.set("category", nextCategory);
+        if (nextActor !== "all") url.searchParams.set("actor", nextActor);
         const res = await fetch(url, { cache: "no-store" });
-        if (!res.ok) {
-          throw new Error(`HTTP ${res.status}`);
-        }
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
         const data = (await res.json()) as {
           events: ActivityEventRow[];
           nextCursor: string | null;
           hasMore: boolean;
           retentionDays?: number | null;
         };
-        if (data.retentionDays !== undefined) {
-          setRetention(data.retentionDays);
-        }
-        setEvents((current) => (nextCursor ? [...current, ...data.events] : data.events));
+        if (data.retentionDays !== undefined) setRetention(data.retentionDays);
+        setEvents((prev) => (nextCursor ? [...prev, ...data.events] : data.events));
         setCursor(data.nextCursor);
         setHasMore(data.hasMore);
         setStatus("done");
@@ -236,97 +419,120 @@ export function ActivityFeed({ retentionDays = 90 }: { retentionDays?: number | 
     [],
   );
 
-  useEffect(() => {
-    void load(null, category, actor);
-  }, [load, category, actor]);
+  useEffect(() => { void load(null, category, actor); }, [load, category, actor]);
 
   const filtering = category !== "all" || actor !== "all";
 
-  return (
-    <div className="p-4">
-      <div className="flex flex-col gap-2.5 pb-4 sm:flex-row sm:items-center sm:justify-between">
-        <FilterChips onChange={setCategory} options={CATEGORY_OPTIONS} value={category} />
-        <FilterChips onChange={setActor} options={ACTOR_OPTIONS} value={actor} />
-      </div>
+  const handleClear = () => { setCategory("all"); setActor("all"); };
 
-      <div className="overflow-hidden rounded-[1.2rem] border border-[#d8ddd6] bg-white">
-        {status === "loading" || status === "idle" ? (
-          <SkeletonRows />
-        ) : status === "error" && events.length === 0 ? (
-          <div className="flex flex-col items-center gap-3 px-4 py-12 text-center">
-            <p className="text-sm text-[#5c655e]">Couldn&apos;t load activity.</p>
-            <button
-              className="rounded-lg border border-[#d8ddd6] px-3 py-1.5 text-xs font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
-              onClick={() => void load(null, category, actor)}
-              type="button"
-            >
-              Retry
-            </button>
+  const retentionLabel =
+    retention === null
+      ? "Showing all activity"
+      : `Showing the last ${retention} days`;
+
+  return (
+    <div className="flex flex-col" style={{ minHeight: 0 }}>
+      <FilterBar
+        actor={actor}
+        category={category}
+        onActor={setActor}
+        onCategory={setCategory}
+      />
+
+      <div className="flex-1 overflow-y-auto">
+        {/* loading */}
+        {(status === "loading" || status === "idle") && (
+          <div className="mx-auto mt-3 overflow-hidden rounded-[14px] border border-[#d8ddd6] bg-white py-1.5" style={{ maxWidth: 760, margin: "12px 18px 0" }}>
+            <SkeletonRows />
           </div>
-        ) : events.length === 0 ? (
-          <div className="flex flex-col items-center gap-2 px-4 py-12 text-center">
-            <span className="grid h-10 w-10 place-items-center rounded-full bg-[#f2f4f0] text-[#8b938c]">
-              <WorkspaceIcon name="clock" size={18} />
-            </span>
-            <p className="text-sm font-semibold text-[#1d2823]">
-              {filtering ? "No activity matches these filters" : "No activity yet"}
-            </p>
-            <p className="max-w-sm text-xs leading-5 text-[#8b938c]">
-              {filtering
-                ? "Try a different category or actor."
-                : retention === null
-                  ? "Edits, syncs, imports, merges, and shares show up here."
-                  : `Edits, syncs, imports, merges, and shares from the last ${retention} days show up here.`}
-            </p>
-          </div>
-        ) : (
-          <>
-            <ul>
-              {events.map((event) => (
-                <EventRow event={event} key={event.id} />
+        )}
+
+        {/* error (no events loaded) */}
+        {status === "error" && events.length === 0 && (
+          <EmptyState kind="error" onRetry={() => void load(null, category, actor)} />
+        )}
+
+        {/* empty */}
+        {status === "done" && events.length === 0 && (
+          <EmptyState
+            filtering={filtering}
+            kind={filtering ? "filtered" : "empty"}
+            onClear={handleClear}
+            retention={retention}
+          />
+        )}
+
+        {/* populated */}
+        {events.length > 0 && (
+          <div style={{ maxWidth: 760, margin: "0 auto", padding: "12px 18px 0" }}>
+            <div className="overflow-hidden rounded-[14px] border border-[#d8ddd6] bg-white py-1.5">
+              {events.map((event, i) => (
+                <div key={event.id}>
+                  {i > 0 && <div className="mx-3.5 h-px bg-[#e9ece7]" />}
+                  <EventRow event={event} />
+                </div>
               ))}
-            </ul>
-            <div className="px-4 py-3 text-center">
+
+              {status === "loadingMore" && (
+                <div>
+                  <div className="mx-3.5 h-px bg-[#e9ece7]" />
+                  <div className="flex animate-pulse gap-3 px-3.5 py-3">
+                    <span className="h-[28px] w-[28px] shrink-0 rounded-full bg-[#eceee9]" />
+                    <div className="flex-1 pt-0.5">
+                      <span className="block h-[11px] w-[45%] rounded-[6px] bg-[#eceee9]" />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* footer */}
+            <div
+              className="flex flex-col items-center gap-3.5 py-4 pb-7"
+            >
               {hasMore ? (
                 <button
-                  className="rounded-lg border border-[#d8ddd6] px-4 py-1.5 text-xs font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0] disabled:opacity-50"
+                  className="rounded-[10px] border border-[#d8ddd6] bg-white px-[18px] py-[9px] text-[13px] font-semibold text-[#5c655e] transition hover:bg-[#f2f4f0] disabled:opacity-50"
                   disabled={status === "loadingMore"}
                   onClick={() => void load(cursor, category, actor)}
                   type="button"
                 >
                   {status === "loadingMore" ? "Loading…" : "Load more"}
                 </button>
-              ) : (
-                <span className="text-xs text-[#aeb4ac]">
-                  {retention === null ? "— Showing all activity —" : `— Showing the last ${retention} days —`}
-                </span>
-              )}
+              ) : null}
+              <span className="text-[12px] text-[#c8cfc6]">— {retentionLabel} —</span>
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>
   );
 }
 
+// ── locked (Free plan) upsell ─────────────────────────────────────────────────
 export function ActivityLocked({ planLabel }: { planLabel: string }) {
   return (
-    <div className="p-4">
-      <div className="mx-auto max-w-xl rounded-[1.6rem] border border-[#d8ddd6] bg-white px-6 py-12 text-center">
-        <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-[#e7efe9] text-[#17352e]">
-          <WorkspaceIcon name="clock" size={22} />
+    <div className="grid flex-1 place-items-center p-10">
+      <div className="w-[460px] max-w-full overflow-hidden rounded-[18px] border border-[#d8ddd6] bg-white px-9 py-10 text-center shadow-[0_1px_2px_rgba(20,30,25,0.03)]">
+        <span className="mx-auto mb-4 grid h-[60px] w-[60px] place-items-center rounded-full bg-[#e7efe9] text-[#17352e]">
+          <WorkspaceIcon name="clock" size={28} strokeWidth={1.6} />
         </span>
-        <h2 className="mt-4 text-lg font-semibold text-[#1d2823]">Activity log is a Pro feature</h2>
-        <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#5c655e]">
+        <h2 className="text-[20px] font-bold tracking-tight text-[#1d2823]">
+          Activity log is a Pro feature
+        </h2>
+        <p className="mx-auto mt-2.5 max-w-[380px] text-[14px] leading-[1.6] text-[#5c655e]">
           See every edit, sync, import, merge, and share across all your contacts in one timeline —
-          with a year of history and filters. You&apos;re on the {planLabel} plan.
+          with a year of history and filters.
         </p>
         <Link
-          className="mt-5 inline-flex items-center gap-2 rounded-full bg-[#4158f4] px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-[#3248db]"
+          className="mt-5 inline-flex h-[46px] items-center justify-center gap-1.5 rounded-[12px] bg-[#4158f4] px-6 text-[15px] font-semibold text-white transition hover:bg-[#3248db]"
           href="/settings"
         >
           Upgrade to Pro
         </Link>
+        <p className="mt-4 text-[12.5px] text-[#8b938c]">
+          You&apos;re on the {planLabel} plan.
+        </p>
       </div>
     </div>
   );

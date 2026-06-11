@@ -2,112 +2,166 @@
 
 import { useState } from "react";
 
+import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { bulkAcceptHighConfidenceContacts, undoMergeContacts } from "~/app/actions/contacts";
 
-function ConfirmDialog({
-  title,
-  body,
-  confirmLabel,
-  confirmAction,
-  hidden,
-  onCancel,
-  danger,
-}: {
-  title: string;
-  body: string;
-  confirmLabel: string;
-  confirmAction: (formData: FormData) => void;
-  hidden: Record<string, string>;
-  onCancel: () => void;
-  danger?: boolean;
-}) {
+// ── generic modal shell ───────────────────────────────────────────────────────
+function Modal({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
   return (
     <div
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(20,30,25,0.4)] px-4"
+      onClick={onClose}
       role="dialog"
     >
-      <div className="w-full max-w-md rounded-[1.4rem] border border-[#d8ddd6] bg-white p-6 shadow-xl">
-        <p className="text-lg font-semibold text-slate-900">{title}</p>
-        <p className="mt-2 whitespace-pre-line text-sm leading-6 text-slate-500">{body}</p>
-        <div className="mt-5 flex flex-wrap justify-end gap-2">
-          <button
-            className="rounded-[1.1rem] border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-            onClick={onCancel}
-            type="button"
-          >
-            Cancel
-          </button>
-          <form action={confirmAction}>
-            {Object.entries(hidden).map(([name, value]) => (
-              <input key={name} name={name} type="hidden" value={value} />
-            ))}
-            <button
-              className={`rounded-[1.1rem] px-4 py-2 text-sm font-semibold text-white transition ${
-                danger ? "bg-rose-600 hover:bg-rose-700" : "bg-[#17352e] hover:bg-[#20443b]"
-              }`}
-              type="submit"
-            >
-              {confirmLabel}
-            </button>
-          </form>
-        </div>
+      <div
+        className="w-full max-w-[440px] overflow-hidden rounded-[16px] border border-[#d8ddd6] bg-white shadow-[0_24px_60px_rgba(20,30,25,0.3)]"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {children}
       </div>
     </div>
   );
 }
 
+// ── bulk-merge confirmation dialog ────────────────────────────────────────────
 export function BulkMergeButton({ count }: { count: number }) {
   const [open, setOpen] = useState(false);
-  if (count < 1) {
-    return null;
-  }
+  const [merging, setMerging] = useState(false);
+
+  if (count < 1) return null;
+
   return (
     <>
       <button
-        className="inline-flex items-center gap-2 rounded-lg bg-[#17352e] px-3.5 py-2 text-[13px] font-semibold text-white transition hover:bg-[#20443b]"
+        className="inline-flex items-center gap-2 rounded-[10px] bg-[#17352e] px-3.5 py-2 text-[13.5px] font-semibold text-white transition hover:bg-[#20443b]"
         onClick={() => setOpen(true)}
         type="button"
       >
+        <WorkspaceIcon name="merge" size={16} strokeWidth={2} />
         Accept all {count} high-confidence
       </button>
-      {open ? (
-        <ConfirmDialog
-          body={`These are all high-confidence matches. Each pair will be merged, keeping the contact that was added first. You can undo any of them afterwards.`}
-          confirmAction={bulkAcceptHighConfidenceContacts}
-          confirmLabel={`Merge ${count} pair${count === 1 ? "" : "s"}`}
-          hidden={{ redirectTo: "/?tab=duplicates" }}
-          onCancel={() => setOpen(false)}
-          title={`Merge ${count} duplicate pair${count === 1 ? "" : "s"}?`}
-        />
-      ) : null}
+
+      {open && (
+        <Modal onClose={merging ? () => undefined : () => setOpen(false)}>
+          <div className="px-6 pb-1 pt-[22px]">
+            <h3 className="text-[18px] font-bold tracking-tight text-[#1d2823]">
+              Merge {count} duplicate pair{count === 1 ? "" : "s"}?
+            </h3>
+            <p className="mt-2 text-[13.5px] leading-[1.55] text-[#5c655e]">
+              These are all high-confidence matches. Each pair will be merged, keeping the contact
+              that was added first. You can undo any of them afterwards.
+            </p>
+          </div>
+
+          <div className="flex justify-end gap-2.5 px-5 pb-[18px] pt-3">
+            <button
+              className="px-2 py-2.5 text-[13.5px] font-semibold text-[#5c655e] disabled:opacity-50"
+              disabled={merging}
+              onClick={() => setOpen(false)}
+              type="button"
+            >
+              Cancel
+            </button>
+            <form
+              action={async (fd) => {
+                setMerging(true);
+                await bulkAcceptHighConfidenceContacts(fd);
+                setOpen(false);
+                setMerging(false);
+              }}
+            >
+              <input name="redirectTo" type="hidden" value="/?tab=duplicates" />
+              <button
+                className="inline-flex h-[42px] items-center gap-2 rounded-[10px] bg-[#17352e] px-[18px] text-[13.5px] font-semibold text-white transition hover:bg-[#20443b] disabled:opacity-80"
+                disabled={merging}
+                type="submit"
+              >
+                {merging ? (
+                  <>
+                    <span
+                      className="h-[15px] w-[15px] animate-spin rounded-full border-[2.2px] border-white/40 border-t-white"
+                      style={{ display: "block" }}
+                    />
+                    Merging…
+                  </>
+                ) : (
+                  <>
+                    <WorkspaceIcon name="merge" size={16} strokeWidth={2} />
+                    Merge {count} pair{count === 1 ? "" : "s"}
+                  </>
+                )}
+              </button>
+            </form>
+          </div>
+        </Modal>
+      )}
     </>
   );
 }
 
-export function UndoMergeButton({ decisionId }: { decisionId: string }) {
+// ── undo merge button + confirmation dialog ───────────────────────────────────
+export function UndoMergeButton({
+  decisionId,
+  survivorName,
+  absorbedName,
+}: {
+  decisionId: string;
+  survivorName?: string;
+  absorbedName?: string;
+}) {
   const [open, setOpen] = useState(false);
   return (
     <>
       <button
-        className="rounded-lg border border-[#d8ddd6] bg-white px-3 py-1.5 text-xs font-semibold text-[#1d2823] transition hover:bg-slate-50"
+        className="inline-flex items-center gap-1.5 rounded-[8px] border border-[#d8ddd6] bg-white px-3 py-[5px] text-[12.5px] font-semibold text-[#5c655e] transition hover:bg-[#f2f4f0]"
         onClick={() => setOpen(true)}
         type="button"
       >
+        <WorkspaceIcon name="restore" size={14} strokeWidth={1.8} />
         Undo
       </button>
-      {open ? (
-        <ConfirmDialog
-          body={
-            "This restores the absorbed contact as a separate record, reverts the surviving contact to its pre-merge state, and re-opens the duplicate suggestion."
-          }
-          confirmAction={undoMergeContacts}
-          confirmLabel="Undo merge"
-          hidden={{ decisionId, redirectTo: "/?tab=duplicates" }}
-          onCancel={() => setOpen(false)}
-          title="Undo this merge?"
-        />
-      ) : null}
+
+      {open && (
+        <Modal onClose={() => setOpen(false)}>
+          <div className="px-6 py-[22px]">
+            <h3 className="text-[17px] font-bold tracking-tight text-[#1d2823]">Undo this merge?</h3>
+            <p className="mt-2 mb-[18px] text-[13.5px] leading-[1.55] text-[#5c655e]">
+              {survivorName && absorbedName ? (
+                <>
+                  This restores{" "}
+                  <strong className="font-semibold text-[#1d2823]">{absorbedName}</strong> as a
+                  separate record, reverts{" "}
+                  <strong className="font-semibold text-[#1d2823]">{survivorName}</strong> to its
+                  pre-merge state, and re-opens the duplicate suggestion.
+                </>
+              ) : (
+                "This restores the absorbed contact as a separate record, reverts the surviving contact to its pre-merge state, and re-opens the duplicate suggestion."
+              )}
+            </p>
+            <div className="flex justify-end gap-2.5">
+              <button
+                className="px-2 py-2.5 text-[13.5px] font-semibold text-[#5c655e]"
+                onClick={() => setOpen(false)}
+                type="button"
+              >
+                Cancel
+              </button>
+              <form action={undoMergeContacts}>
+                <input name="decisionId" type="hidden" value={decisionId} />
+                <input name="redirectTo" type="hidden" value="/?tab=duplicates" />
+                <button
+                  className="inline-flex h-[42px] items-center gap-1.5 rounded-[10px] bg-[#17352e] px-[18px] text-[13.5px] font-semibold text-white transition hover:bg-[#20443b]"
+                  type="submit"
+                >
+                  <WorkspaceIcon name="restore" size={16} strokeWidth={1.8} />
+                  Undo merge
+                </button>
+              </form>
+            </div>
+          </div>
+        </Modal>
+      )}
     </>
   );
 }
