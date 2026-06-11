@@ -6,6 +6,11 @@ import type {
 } from "../../generated/prisma";
 import type Stripe from "stripe";
 
+import {
+  sendPaymentFailedEmail,
+  sendPlanChangedEmail,
+  sendTrialEndingEmail,
+} from "~/server/billing-emails";
 import { getStripeClient } from "~/server/stripe";
 import { getPlanFromPriceId } from "~/server/stripe-prices";
 
@@ -13,21 +18,25 @@ type Tx = Prisma.TransactionClient;
 
 // ─── Status / lifecycle helpers ───────────────────────────────────────────────
 
-function mapStripeStatus(stripeStatus: Stripe.Subscription.Status): SubscriptionStatus {
+function mapStripeStatus(
+  stripeStatus: Stripe.Subscription.Status,
+): SubscriptionStatus {
   const map: Record<Stripe.Subscription.Status, SubscriptionStatus> = {
-    active:             "ACTIVE",
-    trialing:           "TRIALING",
-    past_due:           "PAST_DUE",
-    canceled:           "CANCELED",
-    unpaid:             "PAST_DUE",
-    incomplete:         "INCOMPLETE",
+    active: "ACTIVE",
+    trialing: "TRIALING",
+    past_due: "PAST_DUE",
+    canceled: "CANCELED",
+    unpaid: "PAST_DUE",
+    incomplete: "INCOMPLETE",
     incomplete_expired: "EXPIRED",
-    paused:             "PAUSED",
+    paused: "PAUSED",
   };
   return map[stripeStatus] ?? "ACTIVE";
 }
 
-function deriveLifecycleState(status: SubscriptionStatus): AccountLifecycleState {
+function deriveLifecycleState(
+  status: SubscriptionStatus,
+): AccountLifecycleState {
   if (status === "ACTIVE" || status === "TRIALING") return "ACTIVE";
   if (status === "PAST_DUE") return "GRACE";
   // CANCELED / EXPIRED → user is back on Free, which is still ACTIVE
@@ -70,7 +79,7 @@ async function upsertSubscription(
     currentPeriodEnd: item?.current_period_end
       ? new Date(item.current_period_end * 1000)
       : null,
-    trialEndsAt:        stripeSubscription.trial_end
+    trialEndsAt: stripeSubscription.trial_end
       ? new Date(stripeSubscription.trial_end * 1000)
       : null,
     cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
@@ -112,6 +121,12 @@ async function upsertSubscription(
 
   if (planRank(planInfo.plan) < planRank(fromPlan)) {
     await applyDowngrade(userId, fromPlan, planInfo.plan, tx);
+  }
+
+  // Notify on any plan change (P20-08). Fire-and-forget so a slow/failed send
+  // never blocks or rolls back the webhook transaction.
+  if (fromPlan !== planInfo.plan) {
+    void sendPlanChangedEmail({ userId, fromPlan, toPlan: planInfo.plan });
   }
 }
 
@@ -160,7 +175,10 @@ async function applyDowngrade(
   }
 
   // 4. Group dissolution — Phase 13/14 owns this; log for now
-  if (["FAMILY", "TEAMS"].includes(fromPlan) && !["FAMILY", "TEAMS"].includes(toPlan)) {
+  if (
+    ["FAMILY", "TEAMS"].includes(fromPlan) &&
+    !["FAMILY", "TEAMS"].includes(toPlan)
+  ) {
     console.warn(
       `[billing] TODO(Phase13/14): dissolve group for user ${userId} on downgrade from ${fromPlan} to ${toPlan}`,
     );
@@ -183,11 +201,14 @@ export async function handleCheckoutSessionCompleted(
     select: { userId: true },
   });
   if (!customer) {
-    throw new Error(`No SubscriptionCustomer found for Stripe customer ${stripeCustomerId}`);
+    throw new Error(
+      `No SubscriptionCustomer found for Stripe customer ${stripeCustomerId}`,
+    );
   }
 
   const stripe = getStripeClient();
-  const stripeSubscription = await stripe.subscriptions.retrieve(stripeSubscriptionId);
+  const stripeSubscription =
+    await stripe.subscriptions.retrieve(stripeSubscriptionId);
 
   await upsertSubscription(customer.userId, stripeSubscription, tx);
 }
@@ -197,7 +218,10 @@ export async function handleSubscriptionUpserted(
   tx: Tx,
 ): Promise<void> {
   const customer = await tx.subscriptionCustomer.findFirst({
-    where: { provider: "STRIPE", providerCustomerId: stripeSubscription.customer as string },
+    where: {
+      provider: "STRIPE",
+      providerCustomerId: stripeSubscription.customer as string,
+    },
     select: { userId: true },
   });
   if (!customer) return;
@@ -210,13 +234,19 @@ export async function handleSubscriptionDeleted(
   tx: Tx,
 ): Promise<void> {
   const customer = await tx.subscriptionCustomer.findFirst({
-    where: { provider: "STRIPE", providerCustomerId: stripeSubscription.customer as string },
+    where: {
+      provider: "STRIPE",
+      providerCustomerId: stripeSubscription.customer as string,
+    },
     select: { userId: true },
   });
   if (!customer) return;
 
   const existing = await tx.subscription.findFirst({
-    where: { userId: customer.userId, providerSubscriptionId: stripeSubscription.id },
+    where: {
+      userId: customer.userId,
+      providerSubscriptionId: stripeSubscription.id,
+    },
   });
 
   if (existing) {
@@ -244,12 +274,20 @@ export async function handleInvoicePaymentFailed(
   tx: Tx,
 ): Promise<void> {
   const customer = await tx.subscriptionCustomer.findFirst({
-    where: { provider: "STRIPE", providerCustomerId: invoice.customer as string },
+    where: {
+      provider: "STRIPE",
+      providerCustomerId: invoice.customer as string,
+    },
     select: { userId: true },
   });
   if (!customer) return;
 
   const graceEndsAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+
+  const activeSub = await tx.subscription.findFirst({
+    where: { userId: customer.userId, status: { in: ["ACTIVE", "TRIALING"] } },
+    select: { plan: true },
+  });
 
   await tx.user.update({
     where: { id: customer.userId },
@@ -260,6 +298,13 @@ export async function handleInvoicePaymentFailed(
     where: { userId: customer.userId, status: { in: ["ACTIVE", "TRIALING"] } },
     data: { status: "PAST_DUE", graceEndsAt },
   });
+
+  // Prompt the user to update their payment method before grace ends (P20-08).
+  void sendPaymentFailedEmail({
+    userId: customer.userId,
+    graceEndsAt,
+    planName: activeSub?.plan ?? "PRO",
+  });
 }
 
 export async function handleInvoicePaymentSucceeded(
@@ -267,7 +312,10 @@ export async function handleInvoicePaymentSucceeded(
   tx: Tx,
 ): Promise<void> {
   const customer = await tx.subscriptionCustomer.findFirst({
-    where: { provider: "STRIPE", providerCustomerId: invoice.customer as string },
+    where: {
+      provider: "STRIPE",
+      providerCustomerId: invoice.customer as string,
+    },
     select: { userId: true },
   });
   if (!customer) return;
@@ -290,10 +338,28 @@ export async function handleTrialWillEnd(
   tx: Tx,
 ): Promise<void> {
   const customer = await tx.subscriptionCustomer.findFirst({
-    where: { provider: "STRIPE", providerCustomerId: subscription.customer as string },
-    select: { user: { select: { id: true, email: true } } },
+    where: {
+      provider: "STRIPE",
+      providerCustomerId: subscription.customer as string,
+    },
+    select: { user: { select: { id: true } } },
   });
   if (!customer) return;
-  // TODO(P20-08): send trial-ending email to customer.user.email
-  console.log("[stripe-webhook] trial_will_end", subscription.id, customer.user.email);
+
+  const trialEndsAt = subscription.trial_end
+    ? new Date(subscription.trial_end * 1000)
+    : null;
+  if (!trialEndsAt) return;
+
+  const daysLeft = Math.max(
+    1,
+    Math.ceil((trialEndsAt.getTime() - Date.now()) / 86_400_000),
+  );
+
+  // Remind the user to add a payment method before the trial ends (P20-08).
+  void sendTrialEndingEmail({
+    userId: customer.user.id,
+    daysLeft,
+    trialEndsAt,
+  });
 }

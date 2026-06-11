@@ -1,14 +1,20 @@
 import crypto from "crypto";
 
 import type { EmailVerificationTokenType } from "../../generated/prisma";
+import VerifyEmail from "~/emails/verify-email";
 import { db } from "~/server/db";
+import { sendEmail } from "~/server/email";
+import { renderEmail } from "~/server/render-email";
 
 const EXPIRY_HOURS: Record<EmailVerificationTokenType, number> = {
   SIGNUP: 72,
   EMAIL_CHANGE: 24,
 };
 
-export function generateVerificationToken(): { plaintext: string; hash: string } {
+export function generateVerificationToken(): {
+  plaintext: string;
+  hash: string;
+} {
   const plaintext = crypto.randomBytes(32).toString("hex");
   const hash = crypto.createHash("sha256").update(plaintext).digest("hex");
   return { plaintext, hash };
@@ -29,22 +35,38 @@ export async function sendVerificationEmail(
   });
 
   const { plaintext, hash } = generateVerificationToken();
-  const expiresAt = new Date(Date.now() + (EXPIRY_HOURS[type] ?? 72) * 60 * 60 * 1000);
+  const expiresAt = new Date(
+    Date.now() + (EXPIRY_HOURS[type] ?? 72) * 60 * 60 * 1000,
+  );
 
   await db.emailVerificationToken.create({
     data: { userId, type, tokenHash: hash, targetEmail: email, expiresAt },
   });
 
-  const appUrl = process.env.APP_URL ?? "http://localhost:3000";
-  const verifyUrl = `${appUrl}/verify-email?token=${plaintext}`;
+  const baseUrl = process.env.APP_URL ?? "http://localhost:3000";
+  const verifyUrl = `${baseUrl}/verify-email?token=${plaintext}`;
 
+  // Surface the link in local dev so the flow can be exercised without SES.
   if (process.env.NODE_ENV !== "production") {
-    console.log(`\n[Kontax] Email verification link (${type}):\n${verifyUrl}\n`);
-    return;
+    console.log(
+      `\n[Kontax] Email verification link (${type}):\n${verifyUrl}\n`,
+    );
   }
 
-  // Phase 20 wires in AWS SES here. For now, log in production too.
-  console.warn(`[Kontax] sendVerificationEmail: SES not yet configured. URL: ${verifyUrl}`);
+  const isChange = type === "EMAIL_CHANGE";
+  const subject = isChange
+    ? "Confirm your new Kontax email address"
+    : "Confirm your Kontax email address";
+
+  const { html, text } = await renderEmail(
+    VerifyEmail({
+      variant: isChange ? "email-change" : "signup",
+      verifyUrl,
+      expiresHours: EXPIRY_HOURS[type] ?? 72,
+    }),
+  );
+
+  await sendEmail({ to: email, subject, html, text });
 }
 
 /**
@@ -85,7 +107,9 @@ export async function activateEmailChange(
 
 export async function verifyEmailToken(
   plaintextToken: string,
-): Promise<{ success: true; type: EmailVerificationTokenType } | { error: string }> {
+): Promise<
+  { success: true; type: EmailVerificationTokenType } | { error: string }
+> {
   const hash = crypto.createHash("sha256").update(plaintextToken).digest("hex");
 
   const token = await db.emailVerificationToken.findUnique({

@@ -159,6 +159,15 @@ export namespace $Enums {
 export type AccountLifecycleState = (typeof AccountLifecycleState)[keyof typeof AccountLifecycleState]
 
 
+export const EmailStatus: {
+  OK: 'OK',
+  BOUNCED: 'BOUNCED',
+  COMPLAINED: 'COMPLAINED'
+};
+
+export type EmailStatus = (typeof EmailStatus)[keyof typeof EmailStatus]
+
+
 export const BillingProvider: {
   STRIPE: 'STRIPE'
 };
@@ -449,6 +458,10 @@ export type ShareStatus = (typeof ShareStatus)[keyof typeof ShareStatus]
 export type AccountLifecycleState = $Enums.AccountLifecycleState
 
 export const AccountLifecycleState: typeof $Enums.AccountLifecycleState
+
+export type EmailStatus = $Enums.EmailStatus
+
+export const EmailStatus: typeof $Enums.EmailStatus
 
 export type BillingProvider = $Enums.BillingProvider
 
@@ -4231,6 +4244,7 @@ export namespace Prisma {
     emailVerified: Date | null
     emailPendingChange: string | null
     emailPendingChangeRequestedAt: Date | null
+    emailStatus: $Enums.EmailStatus | null
     totpEnabled: boolean | null
     totpSecret: string | null
     totpVerifiedAt: Date | null
@@ -4251,6 +4265,7 @@ export namespace Prisma {
     emailVerified: Date | null
     emailPendingChange: string | null
     emailPendingChangeRequestedAt: Date | null
+    emailStatus: $Enums.EmailStatus | null
     totpEnabled: boolean | null
     totpSecret: string | null
     totpVerifiedAt: Date | null
@@ -4271,6 +4286,7 @@ export namespace Prisma {
     emailVerified: number
     emailPendingChange: number
     emailPendingChangeRequestedAt: number
+    emailStatus: number
     totpEnabled: number
     totpSecret: number
     totpVerifiedAt: number
@@ -4301,6 +4317,7 @@ export namespace Prisma {
     emailVerified?: true
     emailPendingChange?: true
     emailPendingChangeRequestedAt?: true
+    emailStatus?: true
     totpEnabled?: true
     totpSecret?: true
     totpVerifiedAt?: true
@@ -4321,6 +4338,7 @@ export namespace Prisma {
     emailVerified?: true
     emailPendingChange?: true
     emailPendingChangeRequestedAt?: true
+    emailStatus?: true
     totpEnabled?: true
     totpSecret?: true
     totpVerifiedAt?: true
@@ -4341,6 +4359,7 @@ export namespace Prisma {
     emailVerified?: true
     emailPendingChange?: true
     emailPendingChangeRequestedAt?: true
+    emailStatus?: true
     totpEnabled?: true
     totpSecret?: true
     totpVerifiedAt?: true
@@ -4448,6 +4467,7 @@ export namespace Prisma {
     emailVerified: Date | null
     emailPendingChange: string | null
     emailPendingChangeRequestedAt: Date | null
+    emailStatus: $Enums.EmailStatus
     totpEnabled: boolean
     totpSecret: string | null
     totpVerifiedAt: Date | null
@@ -4487,6 +4507,7 @@ export namespace Prisma {
     emailVerified?: boolean
     emailPendingChange?: boolean
     emailPendingChangeRequestedAt?: boolean
+    emailStatus?: boolean
     totpEnabled?: boolean
     totpSecret?: boolean
     totpVerifiedAt?: boolean
@@ -4527,6 +4548,7 @@ export namespace Prisma {
     emailVerified?: boolean
     emailPendingChange?: boolean
     emailPendingChangeRequestedAt?: boolean
+    emailStatus?: boolean
     totpEnabled?: boolean
     totpSecret?: boolean
     totpVerifiedAt?: boolean
@@ -4547,6 +4569,7 @@ export namespace Prisma {
     emailVerified?: boolean
     emailPendingChange?: boolean
     emailPendingChangeRequestedAt?: boolean
+    emailStatus?: boolean
     totpEnabled?: boolean
     totpSecret?: boolean
     totpVerifiedAt?: boolean
@@ -4567,6 +4590,7 @@ export namespace Prisma {
     emailVerified?: boolean
     emailPendingChange?: boolean
     emailPendingChangeRequestedAt?: boolean
+    emailStatus?: boolean
     totpEnabled?: boolean
     totpSecret?: boolean
     totpVerifiedAt?: boolean
@@ -4575,7 +4599,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "password" | "lifecycleState" | "autoFillPhoneticNames" | "sessionVersion" | "avatarUrl" | "emailVerified" | "emailPendingChange" | "emailPendingChangeRequestedAt" | "totpEnabled" | "totpSecret" | "totpVerifiedAt" | "scheduledDeleteAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "password" | "lifecycleState" | "autoFillPhoneticNames" | "sessionVersion" | "avatarUrl" | "emailVerified" | "emailPendingChange" | "emailPendingChangeRequestedAt" | "emailStatus" | "totpEnabled" | "totpSecret" | "totpVerifiedAt" | "scheduledDeleteAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     appPasswords?: boolean | User$appPasswordsArgs<ExtArgs>
     contacts?: boolean | User$contactsArgs<ExtArgs>
@@ -4636,6 +4660,7 @@ export namespace Prisma {
       emailVerified: Date | null
       emailPendingChange: string | null
       emailPendingChangeRequestedAt: Date | null
+      emailStatus: $Enums.EmailStatus
       totpEnabled: boolean
       totpSecret: string | null
       totpVerifiedAt: Date | null
@@ -5095,6 +5120,7 @@ export namespace Prisma {
     readonly emailVerified: FieldRef<"User", 'DateTime'>
     readonly emailPendingChange: FieldRef<"User", 'String'>
     readonly emailPendingChangeRequestedAt: FieldRef<"User", 'DateTime'>
+    readonly emailStatus: FieldRef<"User", 'EmailStatus'>
     readonly totpEnabled: FieldRef<"User", 'Boolean'>
     readonly totpSecret: FieldRef<"User", 'String'>
     readonly totpVerifiedAt: FieldRef<"User", 'DateTime'>
@@ -36868,6 +36894,7 @@ export namespace Prisma {
     emailVerified: 'emailVerified',
     emailPendingChange: 'emailPendingChange',
     emailPendingChangeRequestedAt: 'emailPendingChangeRequestedAt',
+    emailStatus: 'emailStatus',
     totpEnabled: 'totpEnabled',
     totpSecret: 'totpSecret',
     totpVerifiedAt: 'totpVerifiedAt',
@@ -37504,6 +37531,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'EmailStatus'
+   */
+  export type EnumEmailStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmailStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'EmailStatus[]'
+   */
+  export type ListEnumEmailStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmailStatus[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Json'
    */
   export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
@@ -37955,6 +37996,7 @@ export namespace Prisma {
     emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
     emailPendingChange?: StringNullableFilter<"User"> | string | null
     emailPendingChangeRequestedAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    emailStatus?: EnumEmailStatusFilter<"User"> | $Enums.EmailStatus
     totpEnabled?: BoolFilter<"User"> | boolean
     totpSecret?: StringNullableFilter<"User"> | string | null
     totpVerifiedAt?: DateTimeNullableFilter<"User"> | Date | string | null
@@ -37994,6 +38036,7 @@ export namespace Prisma {
     emailVerified?: SortOrderInput | SortOrder
     emailPendingChange?: SortOrderInput | SortOrder
     emailPendingChangeRequestedAt?: SortOrderInput | SortOrder
+    emailStatus?: SortOrder
     totpEnabled?: SortOrder
     totpSecret?: SortOrderInput | SortOrder
     totpVerifiedAt?: SortOrderInput | SortOrder
@@ -38036,6 +38079,7 @@ export namespace Prisma {
     emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
     emailPendingChange?: StringNullableFilter<"User"> | string | null
     emailPendingChangeRequestedAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    emailStatus?: EnumEmailStatusFilter<"User"> | $Enums.EmailStatus
     totpEnabled?: BoolFilter<"User"> | boolean
     totpSecret?: StringNullableFilter<"User"> | string | null
     totpVerifiedAt?: DateTimeNullableFilter<"User"> | Date | string | null
@@ -38075,6 +38119,7 @@ export namespace Prisma {
     emailVerified?: SortOrderInput | SortOrder
     emailPendingChange?: SortOrderInput | SortOrder
     emailPendingChangeRequestedAt?: SortOrderInput | SortOrder
+    emailStatus?: SortOrder
     totpEnabled?: SortOrder
     totpSecret?: SortOrderInput | SortOrder
     totpVerifiedAt?: SortOrderInput | SortOrder
@@ -38103,6 +38148,7 @@ export namespace Prisma {
     emailVerified?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     emailPendingChange?: StringNullableWithAggregatesFilter<"User"> | string | null
     emailPendingChangeRequestedAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+    emailStatus?: EnumEmailStatusWithAggregatesFilter<"User"> | $Enums.EmailStatus
     totpEnabled?: BoolWithAggregatesFilter<"User"> | boolean
     totpSecret?: StringNullableWithAggregatesFilter<"User"> | string | null
     totpVerifiedAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
@@ -40827,6 +40873,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -40866,6 +40913,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -40905,6 +40953,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -40944,6 +40993,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -40983,6 +41033,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -41003,6 +41054,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -41023,6 +41075,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -44182,6 +44235,13 @@ export namespace Prisma {
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
+  export type EnumEmailStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.EmailStatus | EnumEmailStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.EmailStatus[] | ListEnumEmailStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EmailStatus[] | ListEnumEmailStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumEmailStatusFilter<$PrismaModel> | $Enums.EmailStatus
+  }
+
   export type DateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -44385,6 +44445,7 @@ export namespace Prisma {
     emailVerified?: SortOrder
     emailPendingChange?: SortOrder
     emailPendingChangeRequestedAt?: SortOrder
+    emailStatus?: SortOrder
     totpEnabled?: SortOrder
     totpSecret?: SortOrder
     totpVerifiedAt?: SortOrder
@@ -44409,6 +44470,7 @@ export namespace Prisma {
     emailVerified?: SortOrder
     emailPendingChange?: SortOrder
     emailPendingChangeRequestedAt?: SortOrder
+    emailStatus?: SortOrder
     totpEnabled?: SortOrder
     totpSecret?: SortOrder
     totpVerifiedAt?: SortOrder
@@ -44429,6 +44491,7 @@ export namespace Prisma {
     emailVerified?: SortOrder
     emailPendingChange?: SortOrder
     emailPendingChangeRequestedAt?: SortOrder
+    emailStatus?: SortOrder
     totpEnabled?: SortOrder
     totpSecret?: SortOrder
     totpVerifiedAt?: SortOrder
@@ -44523,6 +44586,16 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type EnumEmailStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EmailStatus | EnumEmailStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.EmailStatus[] | ListEnumEmailStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EmailStatus[] | ListEnumEmailStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumEmailStatusWithAggregatesFilter<$PrismaModel> | $Enums.EmailStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumEmailStatusFilter<$PrismaModel>
+    _max?: NestedEnumEmailStatusFilter<$PrismaModel>
   }
 
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -47031,6 +47104,10 @@ export namespace Prisma {
     set?: Date | string | null
   }
 
+  export type EnumEmailStatusFieldUpdateOperationsInput = {
+    set?: $Enums.EmailStatus
+  }
+
   export type DateTimeFieldUpdateOperationsInput = {
     set?: Date | string
   }
@@ -49427,6 +49504,13 @@ export namespace Prisma {
     not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
   }
 
+  export type NestedEnumEmailStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.EmailStatus | EnumEmailStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.EmailStatus[] | ListEnumEmailStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EmailStatus[] | ListEnumEmailStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumEmailStatusFilter<$PrismaModel> | $Enums.EmailStatus
+  }
+
   export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -49540,6 +49624,16 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedDateTimeNullableFilter<$PrismaModel>
     _max?: NestedDateTimeNullableFilter<$PrismaModel>
+  }
+
+  export type NestedEnumEmailStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EmailStatus | EnumEmailStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.EmailStatus[] | ListEnumEmailStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EmailStatus[] | ListEnumEmailStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumEmailStatusWithAggregatesFilter<$PrismaModel> | $Enums.EmailStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumEmailStatusFilter<$PrismaModel>
+    _max?: NestedEnumEmailStatusFilter<$PrismaModel>
   }
 
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -51714,6 +51808,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -51752,6 +51847,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -51860,6 +51956,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -51898,6 +51995,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -51978,6 +52076,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -52016,6 +52115,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -52755,6 +52855,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -52793,6 +52894,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -53233,6 +53335,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -53271,6 +53374,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -53405,6 +53509,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -53443,6 +53548,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -53497,6 +53603,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -53535,6 +53642,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -53654,6 +53762,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -53692,6 +53801,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -53777,6 +53887,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -53815,6 +53926,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -53997,6 +54109,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -54035,6 +54148,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -54089,6 +54203,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -54127,6 +54242,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -54181,6 +54297,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -54219,6 +54336,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -54257,6 +54375,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -54295,6 +54414,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -54633,6 +54753,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -54671,6 +54792,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -55026,6 +55148,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -55064,6 +55187,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -55167,6 +55291,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -55205,6 +55330,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -55243,6 +55369,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -55281,6 +55408,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -55514,6 +55642,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -55552,6 +55681,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -56853,6 +56983,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -56891,6 +57022,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -56945,6 +57077,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -56983,6 +57116,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -57021,6 +57155,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -57059,6 +57194,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -57113,6 +57249,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -57151,6 +57288,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -57189,6 +57327,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -57227,6 +57366,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -57281,6 +57421,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -57319,6 +57460,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -57357,6 +57499,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -57395,6 +57538,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -57449,6 +57593,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -57487,6 +57632,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -57525,6 +57671,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -57563,6 +57710,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -57740,6 +57888,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -57778,6 +57927,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -57945,6 +58095,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -57983,6 +58134,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -58216,6 +58368,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -58254,6 +58407,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -58483,6 +58637,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -58521,6 +58676,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -58616,6 +58772,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -58654,6 +58811,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -58852,6 +59010,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -58890,6 +59049,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -59072,6 +59232,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -59110,6 +59271,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -59776,6 +59938,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -59814,6 +59977,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -59980,6 +60144,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -60018,6 +60183,7 @@ export namespace Prisma {
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
     totpEnabled?: boolean
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
@@ -60195,6 +60361,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -60233,6 +60400,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -60411,6 +60579,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -60449,6 +60618,7 @@ export namespace Prisma {
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
     totpEnabled?: BoolFieldUpdateOperationsInput | boolean
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null

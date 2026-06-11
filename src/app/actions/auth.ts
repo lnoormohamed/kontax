@@ -4,10 +4,13 @@ import crypto from "crypto";
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 
+import PasswordReset from "~/emails/password-reset";
 import { signOut } from "~/server/auth";
 import { db } from "~/server/db";
+import { sendEmail } from "~/server/email";
 import { generateVerificationToken } from "~/server/email-verification";
 import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
+import { renderEmail } from "~/server/render-email";
 
 export async function signOutAction() {
   await signOut({ redirectTo: "/login" });
@@ -31,14 +34,21 @@ export async function requestPasswordReset(
   // Rate limit by email and IP (silently — don't reveal the limit was hit)
   const [emailRl, ipRl] = await Promise.all([
     checkRateLimit(rateLimiters.passwordResetByEmail, `email:${normalised}`),
-    ip ? checkRateLimit(rateLimiters.passwordResetByIp, `ip:${ip}`) : { allowed: true },
+    ip
+      ? checkRateLimit(rateLimiters.passwordResetByIp, `ip:${ip}`)
+      : { allowed: true },
   ]);
   if (!emailRl.allowed || !ipRl.allowed) {
-    console.warn(`[Kontax] Password reset rate-limited for ${normalised} / ${ip ?? "unknown"}`);
+    console.warn(
+      `[Kontax] Password reset rate-limited for ${normalised} / ${ip ?? "unknown"}`,
+    );
     return { success: true };
   }
 
-  const user = await db.user.findUnique({ where: { email: normalised }, select: { id: true } });
+  const user = await db.user.findUnique({
+    where: { email: normalised },
+    select: { id: true },
+  });
   if (!user) {
     console.warn(`[Kontax] Password reset: no account for ${normalised}`);
     return { success: true };
@@ -54,14 +64,32 @@ export async function requestPasswordReset(
   const expiresAt = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
   await db.passwordResetToken.create({
-    data: { userId: user.id, tokenHash: hash, expiresAt, requestedFromIp: ip ?? null },
+    data: {
+      userId: user.id,
+      tokenHash: hash,
+      expiresAt,
+      requestedFromIp: ip ?? null,
+    },
   });
 
   const appUrl = process.env.APP_URL ?? "http://localhost:3000";
   const resetUrl = `${appUrl}/reset-password?token=${plaintext}`;
 
-  // Phase 20 wires SES — console in dev
-  console.log(`\n[Kontax] Password reset link for ${normalised}:\n${resetUrl}\n`);
+  if (process.env.NODE_ENV !== "production") {
+    console.log(
+      `\n[Kontax] Password reset link for ${normalised}:\n${resetUrl}\n`,
+    );
+  }
+
+  // Render synchronously, then fire-and-forget the send so a slow SES response
+  // never blocks the HTTP response (and never reveals account existence).
+  const { html, text } = await renderEmail(PasswordReset({ resetUrl }));
+  void sendEmail({
+    to: normalised,
+    subject: "Reset your Kontax password",
+    html,
+    text,
+  });
 
   return { success: true };
 }
@@ -75,7 +103,10 @@ export async function resetPassword(input: {
 }): Promise<{ success: true } | { error: string }> {
   if (input.newPassword.length < 8) return { error: "PASSWORD_TOO_SHORT" };
 
-  const hash = crypto.createHash("sha256").update(input.plaintextToken).digest("hex");
+  const hash = crypto
+    .createHash("sha256")
+    .update(input.plaintextToken)
+    .digest("hex");
 
   const token = await db.passwordResetToken.findUnique({
     where: { tokenHash: hash },

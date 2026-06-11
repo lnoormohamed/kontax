@@ -11,17 +11,13 @@ import {
   assertCanStaticShare,
   getUserBillingContext,
 } from "~/server/billing";
+import ShareInvite from "~/emails/share-invite";
 import { db } from "~/server/db";
 import { appUrl, sendEmail } from "~/server/email";
+import { renderEmail } from "~/server/render-email";
 
-const escapeHtml = (value: string) =>
-  value
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-
-// Notify the recipient by email (P12-06). No-op when SES isn't configured.
+// Notify the recipient by email (P12-06 / P20-06). No-op when SES isn't
+// configured. Renders the React Email share-invite template.
 const sendShareInviteEmail = async (opts: {
   recipientEmail: string;
   ownerName: string;
@@ -29,17 +25,25 @@ const sendShareInviteEmail = async (opts: {
   recipientExists: boolean;
   live: boolean;
 }) => {
-  const dest = opts.recipientExists ? `${appUrl()}/shares` : `${appUrl()}/register`;
-  const kind = opts.live ? "a live-synced contact" : "a contact";
-  const cta = opts.recipientExists
-    ? "Review it in Kontax"
-    : "Create your free Kontax account to accept";
-  const subject = `${opts.ownerName} shared a contact with you on Kontax`;
-  const text = `${opts.ownerName} shared ${kind} (${opts.contactName}) with you on Kontax.\n\n${cta}: ${dest}`;
-  const html =
-    `<p>${escapeHtml(opts.ownerName)} shared ${kind} — <strong>${escapeHtml(opts.contactName)}</strong> — with you on Kontax.</p>` +
-    `<p><a href="${dest}">${cta}</a></p>`;
-  await sendEmail({ to: opts.recipientEmail, subject, html, text });
+  const dest = opts.recipientExists
+    ? `${appUrl()}/shares`
+    : `${appUrl()}/register`;
+  const { html, text } = await renderEmail(
+    ShareInvite({
+      recipientExists: opts.recipientExists,
+      senderName: opts.ownerName,
+      contactName: opts.contactName,
+      shareType: opts.live ? "Live · syncs both ways" : "One-time copy",
+      live: opts.live,
+      actionUrl: dest,
+    }),
+  );
+  await sendEmail({
+    to: opts.recipientEmail,
+    subject: `${opts.ownerName} shared a contact with you on Kontax`,
+    html,
+    text,
+  });
 };
 
 const FREE_LINK_TTL_MS = 7 * 24 * 60 * 60 * 1000;
@@ -110,7 +114,8 @@ export const createVcardShareLink = async (formData: FormData) => {
 
   // Free links expire after 7 days; paid plans default to no expiry.
   const billing = await getUserBillingContext(userId);
-  const expiresAt = billing.plan === "FREE" ? new Date(Date.now() + FREE_LINK_TTL_MS) : null;
+  const expiresAt =
+    billing.plan === "FREE" ? new Date(Date.now() + FREE_LINK_TTL_MS) : null;
 
   await db.contactShare.create({
     data: {
@@ -170,9 +175,18 @@ export const createStaticShare = async (formData: FormData) => {
   }
 
   const [contact, owner, recipient] = await Promise.all([
-    db.contact.findFirst({ where: { id: contactId, userId }, select: SNAPSHOT_SELECT }),
-    db.user.findUnique({ where: { id: userId }, select: { name: true, email: true } }),
-    db.user.findUnique({ where: { email: recipientEmail }, select: { id: true } }),
+    db.contact.findFirst({
+      where: { id: contactId, userId },
+      select: SNAPSHOT_SELECT,
+    }),
+    db.user.findUnique({
+      where: { id: userId },
+      select: { name: true, email: true },
+    }),
+    db.user.findUnique({
+      where: { email: recipientEmail },
+      select: { id: true },
+    }),
   ]);
   if (!contact) {
     throw new Error("Contact not found.");
@@ -183,7 +197,9 @@ export const createStaticShare = async (formData: FormData) => {
 
   const trimmedOwnerName = owner?.name?.trim() ?? "";
   const ownerName =
-    trimmedOwnerName.length > 0 ? trimmedOwnerName : (owner?.email ?? "A Kontax user");
+    trimmedOwnerName.length > 0
+      ? trimmedOwnerName
+      : (owner?.email ?? "A Kontax user");
 
   await db.contactShare.create({
     data: {
@@ -335,7 +351,12 @@ export const declineStaticShare = async (formData: FormData) => {
   const shareId = str(formData, "shareId");
 
   await db.contactShare.updateMany({
-    where: { id: shareId, recipientUserId: userId, status: "ACTIVE", recipientContactId: null },
+    where: {
+      id: shareId,
+      recipientUserId: userId,
+      status: "ACTIVE",
+      recipientContactId: null,
+    },
     data: { status: "DECLINED" },
   });
 
@@ -355,9 +376,18 @@ export const createLiveShare = async (formData: FormData) => {
   }
 
   const [contact, owner, recipient] = await Promise.all([
-    db.contact.findFirst({ where: { id: contactId, userId }, select: { ...SNAPSHOT_SELECT, sourceType: true } }),
-    db.user.findUnique({ where: { id: userId }, select: { name: true, email: true } }),
-    db.user.findUnique({ where: { email: recipientEmail }, select: { id: true } }),
+    db.contact.findFirst({
+      where: { id: contactId, userId },
+      select: { ...SNAPSHOT_SELECT, sourceType: true },
+    }),
+    db.user.findUnique({
+      where: { id: userId },
+      select: { name: true, email: true },
+    }),
+    db.user.findUnique({
+      where: { email: recipientEmail },
+      select: { id: true },
+    }),
   ]);
   if (!contact) {
     throw new Error("Contact not found.");
@@ -369,12 +399,16 @@ export const createLiveShare = async (formData: FormData) => {
   // Circular-share guard: don't live-share a contact that is itself a live copy
   // received from someone else (prevents A→B→A loops).
   if (contactSourceType === "SHARED_LIVE") {
-    throw new Error("This contact is a live share received from someone else and can't be re-shared live.");
+    throw new Error(
+      "This contact is a live share received from someone else and can't be re-shared live.",
+    );
   }
 
   const trimmedOwnerName = owner?.name?.trim() ?? "";
   const ownerName =
-    trimmedOwnerName.length > 0 ? trimmedOwnerName : (owner?.email ?? "A Kontax user");
+    trimmedOwnerName.length > 0
+      ? trimmedOwnerName
+      : (owner?.email ?? "A Kontax user");
 
   await db.contactShare.create({
     data: {

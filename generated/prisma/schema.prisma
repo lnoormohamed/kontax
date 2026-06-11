@@ -16,6 +16,14 @@ enum AccountLifecycleState {
   LOCKED
 }
 
+// P20-10: SES delivery status. BOUNCED/COMPLAINED addresses are suppressed from
+// further sends to protect sender reputation.
+enum EmailStatus {
+  OK
+  BOUNCED
+  COMPLAINED
+}
+
 enum BillingProvider {
   STRIPE
 }
@@ -185,6 +193,8 @@ model User {
   // P18-03: pending email change (cleared on activation or cancellation)
   emailPendingChange            String?
   emailPendingChangeRequestedAt DateTime?
+  // P20-10: SES bounce/complaint status — suppresses sends when not OK
+  emailStatus                   EmailStatus              @default(OK)
   // P18-07: TOTP two-factor authentication
   totpEnabled                   Boolean                  @default(false)
   totpSecret                    String? // AES-256-GCM encrypted

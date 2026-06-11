@@ -3,6 +3,7 @@
 import bcrypt from "bcryptjs";
 import { z } from "zod";
 
+import { sendAccountDeletionScheduledEmail } from "~/server/billing-emails";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { sendVerificationEmail } from "~/server/email-verification";
@@ -57,7 +58,10 @@ export async function changePassword(input: {
   const session = await auth();
   if (!session?.user?.id) return { error: "UNAUTHORIZED" };
 
-  const rl = await checkRateLimit(rateLimiters.passwordChange, `user:${session.user.id}`);
+  const rl = await checkRateLimit(
+    rateLimiters.passwordChange,
+    `user:${session.user.id}`,
+  );
   if (!rl.allowed) return { error: "RATE_LIMIT_EXCEEDED" };
 
   const user = await db.user.findUnique({
@@ -66,11 +70,15 @@ export async function changePassword(input: {
   });
   if (!user) return { error: "UNAUTHORIZED" };
 
-  const currentMatches = await bcrypt.compare(input.currentPassword, user.password);
+  const currentMatches = await bcrypt.compare(
+    input.currentPassword,
+    user.password,
+  );
   if (!currentMatches) return { error: "CURRENT_PASSWORD_INCORRECT" };
 
   if (input.newPassword.length < 8) return { error: "PASSWORD_TOO_SHORT" };
-  if (input.newPassword === input.currentPassword) return { error: "PASSWORD_SAME_AS_CURRENT" };
+  if (input.newPassword === input.currentPassword)
+    return { error: "PASSWORD_SAME_AS_CURRENT" };
 
   const newHash = await bcrypt.hash(input.newPassword, 12);
 
@@ -99,11 +107,20 @@ export async function requestEmailChange(
   const session = await auth();
   if (!session?.user?.id) return { error: "UNAUTHORIZED" };
 
-  const parsed = z.string().trim().toLowerCase().email().max(254).safeParse(newEmail);
+  const parsed = z
+    .string()
+    .trim()
+    .toLowerCase()
+    .email()
+    .max(254)
+    .safeParse(newEmail);
   if (!parsed.success) return { error: "INVALID_EMAIL" };
   const email = parsed.data;
 
-  const rl = await checkRateLimit(rateLimiters.emailResend, `email-change:${session.user.id}`);
+  const rl = await checkRateLimit(
+    rateLimiters.emailResend,
+    `email-change:${session.user.id}`,
+  );
   if (!rl.allowed) return { error: "RATE_LIMIT_EXCEEDED" };
 
   const user = await db.user.findUnique({
@@ -113,12 +130,17 @@ export async function requestEmailChange(
   if (!user) return { error: "UNAUTHORIZED" };
   if (email === user.email) return { error: "EMAIL_SAME_AS_CURRENT" };
 
-  const conflict = await db.user.findFirst({ where: { email, NOT: { id: session.user.id } } });
+  const conflict = await db.user.findFirst({
+    where: { email, NOT: { id: session.user.id } },
+  });
   if (conflict) return { error: "EMAIL_ALREADY_IN_USE" };
 
   await db.user.update({
     where: { id: session.user.id },
-    data: { emailPendingChange: email, emailPendingChangeRequestedAt: new Date() },
+    data: {
+      emailPendingChange: email,
+      emailPendingChangeRequestedAt: new Date(),
+    },
   });
 
   // Send verification to the new address
@@ -165,9 +187,12 @@ export async function scheduleAccountDeletion(input: {
   confirmEmail: string;
 }): Promise<{ success: true } | { error: string }> {
   const session = await auth();
-  if (!session?.user?.id || !session.user.email) return { error: "UNAUTHORIZED" };
+  if (!session?.user?.id || !session.user.email)
+    return { error: "UNAUTHORIZED" };
 
-  if (input.confirmEmail.trim().toLowerCase() !== session.user.email.toLowerCase()) {
+  if (
+    input.confirmEmail.trim().toLowerCase() !== session.user.email.toLowerCase()
+  ) {
     return { error: "EMAIL_MISMATCH" };
   }
 
@@ -184,7 +209,9 @@ export async function scheduleAccountDeletion(input: {
   if (ownedGroup) return { error: "OWNS_ACTIVE_GROUP" };
 
   // TODO(P19): Cancel Stripe subscription here when Phase 19 ships
-  console.warn(`[Kontax] Account deletion: Stripe cancellation stub for user ${session.user.id}`);
+  console.warn(
+    `[Kontax] Account deletion: Stripe cancellation stub for user ${session.user.id}`,
+  );
 
   // Convert accepted live shares to static copies
   await db.contactShare.updateMany({
@@ -221,18 +248,34 @@ export async function scheduleAccountDeletion(input: {
 
   // Delete MinIO avatar (best effort)
   const avatarUrl = user?.avatarUrl;
-  if (avatarUrl && process.env.MINIO_ENDPOINT && avatarUrl.includes(process.env.MINIO_ENDPOINT)) {
-    import("@aws-sdk/client-s3").then(({ S3Client, DeleteObjectCommand }) => {
-      const url = new URL(avatarUrl);
-      const key = url.pathname.slice(1).split("/").slice(1).join("/"); // strip bucket from path
-      const s3 = new S3Client({
-        endpoint: process.env.MINIO_ENDPOINT,
-        region: "us-east-1",
-        credentials: { accessKeyId: process.env.MINIO_ACCESS_KEY ?? "", secretAccessKey: process.env.MINIO_SECRET_KEY ?? "" },
-        forcePathStyle: true,
-      });
-      return s3.send(new DeleteObjectCommand({ Bucket: process.env.MINIO_BUCKET ?? "kontax-uploads", Key: key }));
-    }).catch((err: unknown) => console.warn("[Kontax] Avatar cleanup failed:", err));
+  if (
+    avatarUrl &&
+    process.env.MINIO_ENDPOINT &&
+    avatarUrl.includes(process.env.MINIO_ENDPOINT)
+  ) {
+    import("@aws-sdk/client-s3")
+      .then(({ S3Client, DeleteObjectCommand }) => {
+        const url = new URL(avatarUrl);
+        const key = url.pathname.slice(1).split("/").slice(1).join("/"); // strip bucket from path
+        const s3 = new S3Client({
+          endpoint: process.env.MINIO_ENDPOINT,
+          region: "us-east-1",
+          credentials: {
+            accessKeyId: process.env.MINIO_ACCESS_KEY ?? "",
+            secretAccessKey: process.env.MINIO_SECRET_KEY ?? "",
+          },
+          forcePathStyle: true,
+        });
+        return s3.send(
+          new DeleteObjectCommand({
+            Bucket: process.env.MINIO_BUCKET ?? "kontax-uploads",
+            Key: key,
+          }),
+        );
+      })
+      .catch((err: unknown) =>
+        console.warn("[Kontax] Avatar cleanup failed:", err),
+      );
   }
 
   await db.activityEvent.create({
@@ -240,8 +283,18 @@ export async function scheduleAccountDeletion(input: {
       userId: session.user.id,
       eventType: "ACCOUNT_UPDATED",
       actor: "USER",
-      payload: { field: "accountDeletionScheduled", scheduledDeleteAt: scheduledDeleteAt.toISOString() },
+      payload: {
+        field: "accountDeletionScheduled",
+        scheduledDeleteAt: scheduledDeleteAt.toISOString(),
+      },
     },
+  });
+
+  // Confirm the 30-day deletion countdown by email (P20-08). Fire-and-forget —
+  // a slow send must not block the deletion request.
+  void sendAccountDeletionScheduledEmail({
+    userId: session.user.id,
+    scheduledDeleteAt,
   });
 
   return { success: true };
@@ -291,7 +344,10 @@ export async function resendVerificationEmail(): Promise<
   const session = await auth();
   if (!session?.user?.id) return { error: "UNAUTHORIZED" };
 
-  const rl = await checkRateLimit(rateLimiters.emailResend, `user:${session.user.id}`);
+  const rl = await checkRateLimit(
+    rateLimiters.emailResend,
+    `user:${session.user.id}`,
+  );
   if (!rl.allowed) return { error: "RATE_LIMIT_EXCEEDED" };
 
   const user = await db.user.findUnique({

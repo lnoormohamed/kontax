@@ -11,10 +11,14 @@ export const env = createEnv({
     DATABASE_URL: z.string().url(),
     SYNC_CREDENTIAL_ENCRYPTION_KEY: z.string().min(32).optional(),
     SYNC_CREDENTIAL_ENCRYPTION_KEY_ID: z.string().optional(),
-    // Transactional email via AWS SES (P12-06). All optional — when unset, email
-    // is skipped and the app falls back to in-app notifications only.
-    AWS_REGION: z.string().optional(),
-    SES_FROM_ADDRESS: z.string().email().optional(),
+    // Transactional email via AWS SES (P20-01). All optional — when unset, email
+    // is logged to console (dev) and the app falls back to in-app notifications.
+    // SES_CONFIGURED (src/server/email.ts) treats email as live only when all
+    // four are present.
+    AWS_ACCESS_KEY_ID: z.string().optional(),
+    AWS_SECRET_ACCESS_KEY: z.string().optional(),
+    AWS_SES_REGION: z.string().optional(),
+    EMAIL_FROM: z.string().email().optional(),
     APP_URL: z.string().url().optional(),
     NODE_ENV: z
       .enum(["development", "test", "production"])
@@ -67,8 +71,10 @@ export const env = createEnv({
     DATABASE_URL: process.env.DATABASE_URL,
     SYNC_CREDENTIAL_ENCRYPTION_KEY: process.env.SYNC_CREDENTIAL_ENCRYPTION_KEY,
     SYNC_CREDENTIAL_ENCRYPTION_KEY_ID: process.env.SYNC_CREDENTIAL_ENCRYPTION_KEY_ID,
-    AWS_REGION: process.env.AWS_REGION,
-    SES_FROM_ADDRESS: process.env.SES_FROM_ADDRESS,
+    AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
+    AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
+    AWS_SES_REGION: process.env.AWS_SES_REGION,
+    EMAIL_FROM: process.env.EMAIL_FROM,
     APP_URL: process.env.APP_URL,
     NODE_ENV: process.env.NODE_ENV,
     REDIS_URL: process.env.REDIS_URL,

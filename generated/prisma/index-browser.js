@@ -133,6 +133,7 @@ exports.Prisma.UserScalarFieldEnum = {
   emailVerified: 'emailVerified',
   emailPendingChange: 'emailPendingChange',
   emailPendingChangeRequestedAt: 'emailPendingChangeRequestedAt',
+  emailStatus: 'emailStatus',
   totpEnabled: 'totpEnabled',
   totpSecret: 'totpSecret',
   totpVerifiedAt: 'totpVerifiedAt',
@@ -609,6 +610,12 @@ exports.AccountLifecycleState = exports.$Enums.AccountLifecycleState = {
   GRACE: 'GRACE',
   CANCELED: 'CANCELED',
   LOCKED: 'LOCKED'
+};
+
+exports.EmailStatus = exports.$Enums.EmailStatus = {
+  OK: 'OK',
+  BOUNCED: 'BOUNCED',
+  COMPLAINED: 'COMPLAINED'
 };
 
 exports.SourceType = exports.$Enums.SourceType = {
