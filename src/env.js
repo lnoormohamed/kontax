@@ -48,7 +48,14 @@ export const env = createEnv({
    * `NEXT_PUBLIC_`.
    */
   client: {
-    // NEXT_PUBLIC_CLIENTVAR: z.string(),
+    // Display-only price strings shown on the pricing page (P19-08).
+    // Keep server-side Stripe price IDs separate — only display strings are public.
+    NEXT_PUBLIC_PRICE_PRO_MONTHLY: z.string().optional(),
+    NEXT_PUBLIC_PRICE_PRO_YEARLY: z.string().optional(),
+    NEXT_PUBLIC_PRICE_FAMILY_MONTHLY: z.string().optional(),
+    NEXT_PUBLIC_PRICE_FAMILY_YEARLY: z.string().optional(),
+    NEXT_PUBLIC_PRICE_TEAMS_MONTHLY: z.string().optional(),
+    NEXT_PUBLIC_PRICE_TEAMS_YEARLY: z.string().optional(),
   },
 
   /**
@@ -80,6 +87,12 @@ export const env = createEnv({
     STRIPE_PRICE_ID_FAMILY_YEARLY: process.env.STRIPE_PRICE_ID_FAMILY_YEARLY,
     STRIPE_PRICE_ID_TEAMS_MONTHLY: process.env.STRIPE_PRICE_ID_TEAMS_MONTHLY,
     STRIPE_PRICE_ID_TEAMS_YEARLY: process.env.STRIPE_PRICE_ID_TEAMS_YEARLY,
+    NEXT_PUBLIC_PRICE_PRO_MONTHLY: process.env.NEXT_PUBLIC_PRICE_PRO_MONTHLY,
+    NEXT_PUBLIC_PRICE_PRO_YEARLY: process.env.NEXT_PUBLIC_PRICE_PRO_YEARLY,
+    NEXT_PUBLIC_PRICE_FAMILY_MONTHLY: process.env.NEXT_PUBLIC_PRICE_FAMILY_MONTHLY,
+    NEXT_PUBLIC_PRICE_FAMILY_YEARLY: process.env.NEXT_PUBLIC_PRICE_FAMILY_YEARLY,
+    NEXT_PUBLIC_PRICE_TEAMS_MONTHLY: process.env.NEXT_PUBLIC_PRICE_TEAMS_MONTHLY,
+    NEXT_PUBLIC_PRICE_TEAMS_YEARLY: process.env.NEXT_PUBLIC_PRICE_TEAMS_YEARLY,
   },
   /**
    * Run `build` or `dev` with `SKIP_ENV_VALIDATION` to skip env validation. This is especially

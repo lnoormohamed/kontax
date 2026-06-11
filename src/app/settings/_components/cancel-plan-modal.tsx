@@ -30,11 +30,22 @@ const InfoIcon = () => (
 export function CancelPlanModal({
   details,
   family = false,
+  open: controlledOpen,
+  onOpenChange,
 }: {
   details: CancelPlanDetails;
   family?: boolean;
+  /** Controlled mode — omit to render the built-in "Cancel plan" trigger button. */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
 }) {
-  const [open, setOpen] = useState(false);
+  const isControlled = controlledOpen !== undefined;
+  const [internalOpen, setInternalOpen] = useState(false);
+  const open = isControlled ? controlledOpen : internalOpen;
+  const setOpen = (v: boolean) => {
+    if (!isControlled) setInternalOpen(v);
+    onOpenChange?.(v);
+  };
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState(false);
 
@@ -68,13 +79,15 @@ export function CancelPlanModal({
 
   return (
     <>
-      <button
-        className="border-none bg-transparent p-1 text-[13px] font-semibold text-[#8b938c] transition hover:text-[#5c655e] hover:underline"
-        onClick={() => setOpen(true)}
-        type="button"
-      >
-        Cancel plan
-      </button>
+      {!isControlled ? (
+        <button
+          className="border-none bg-transparent p-1 text-[13px] font-semibold text-[#8b938c] transition hover:text-[#5c655e] hover:underline"
+          onClick={() => setOpen(true)}
+          type="button"
+        >
+          Cancel plan
+        </button>
+      ) : null}
 
       {open ? (
         <div

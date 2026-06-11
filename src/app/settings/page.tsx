@@ -9,6 +9,7 @@ import {
 } from "~/app/_components/settings-ui";
 import { BillingSection } from "~/app/settings/_components/billing-section";
 import { BillingSuccessBanner } from "~/app/settings/_components/billing-success-banner";
+import { PortalReturnedBanner } from "~/app/settings/_components/portal-returned-banner";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
 import { getBillingSurface } from "~/server/billing-surface";
@@ -34,6 +35,7 @@ export default async function SettingsPlanPage({
   const userId = session.user.id;
   const sp = searchParams ? await searchParams : undefined;
   const showBillingSuccess = sp?.billing === "success";
+  const showPortalReturned = sp?.portal === "returned";
 
   const planSummary = await getUserPlanSummary(userId);
   const [billingSurface, syncConnections, liveContacts, groupMembership] = await Promise.all([
@@ -78,6 +80,7 @@ export default async function SettingsPlanPage({
       {showBillingSuccess ? (
         <BillingSuccessBanner planLabel={planSummary.planLabel} />
       ) : null}
+      {showPortalReturned ? <PortalReturnedBanner /> : null}
       <SettingsPageHead
         title="Plan & billing"
         sub="Your subscription, what you’re using, and how to manage payment."

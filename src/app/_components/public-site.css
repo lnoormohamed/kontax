@@ -351,6 +351,7 @@
 .kx .seg button { border: none; background: transparent; font-family: inherit; font-size: 13.5px; font-weight: 600; color: var(--ink2); padding: 8px 18px; border-radius: 8px; cursor: pointer; transition: background 0.15s ease, color 0.15s ease; }
 .kx .seg button[aria-pressed="true"] { background: var(--paper); color: var(--ink); box-shadow: 0 1px 3px rgba(29,40,35,0.1); }
 .kx .save-hint { font-size: 12.5px; font-weight: 600; color: var(--green); background: var(--green-t); padding: 5px 10px; border-radius: 7px; }
+.kx .save-inline { font-size: 11px; font-weight: 700; color: var(--green); }
 
 .kx .pricing { padding: 8px 0 88px; }
 .kx .ptable-scroll { overflow-x: auto; -webkit-overflow-scrolling: touch; }

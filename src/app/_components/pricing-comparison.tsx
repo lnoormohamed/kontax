@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useState, useTransition } from "react";
 
-import { createBillingPortalSession, createCheckoutSession } from "~/app/actions/billing";
+import { createBillingPortalSession, createCheckoutSession, getDowngradeSummary } from "~/app/actions/billing";
+import { CancelPlanModal, type CancelPlanDetails } from "~/app/settings/_components/cancel-plan-modal";
 
 type PlanCol = "FREE" | "PRO" | "FAMILY" | "TEAMS";
 type CtaKind = "current" | "primary" | "secondary" | "destructive";
@@ -13,7 +14,7 @@ type Cell = "current" | { label: string; kind: CtaKind; sub?: string };
 const CTA_MATRIX: Record<PlanCol, Record<PlanCol, Cell>> = {
   FREE: {
     FREE: "current",
-    PRO: { label: "Start free trial", kind: "primary", sub: "Then £X/month. Cancel anytime." },
+    PRO: { label: "Start free trial", kind: "primary", sub: "14 days free, then £X/month. Cancel anytime." },
     FAMILY: { label: "Upgrade to Family", kind: "primary" },
     TEAMS: { label: "Upgrade to Teams", kind: "primary" },
   },
@@ -55,13 +56,49 @@ const Dash = () => <span className="dash">—</span>;
  * currentPlan: the authenticated user's current plan ("FREE"|"PRO"|"FAMILY"|"TEAMS"),
  * or null if not logged in.
  */
+// Display price strings from env (NEXT_PUBLIC_PRICE_*). Falls back to "£X".
+const DISPLAY_PRICES: Record<string, { monthly: string; yearly: string }> = {
+  PRO:    { monthly: process.env.NEXT_PUBLIC_PRICE_PRO_MONTHLY    ?? "£X", yearly: process.env.NEXT_PUBLIC_PRICE_PRO_YEARLY    ?? "£X" },
+  FAMILY: { monthly: process.env.NEXT_PUBLIC_PRICE_FAMILY_MONTHLY ?? "£X", yearly: process.env.NEXT_PUBLIC_PRICE_FAMILY_YEARLY ?? "£X" },
+  TEAMS:  { monthly: process.env.NEXT_PUBLIC_PRICE_TEAMS_MONTHLY  ?? "£X", yearly: process.env.NEXT_PUBLIC_PRICE_TEAMS_YEARLY  ?? "£X" },
+};
+
+function parsePence(s: string): number | null {
+  const m = s.replace(/[£$€]/g, "").trim();
+  const n = parseFloat(m);
+  return isNaN(n) ? null : n;
+}
+
+function savingsBadge(plan: string): string | null {
+  const p = DISPLAY_PRICES[plan];
+  if (!p) return null;
+  const monthly = parsePence(p.monthly);
+  const yearly = parsePence(p.yearly);
+  if (!monthly || !yearly) return null;
+  const pct = Math.round((1 - yearly / (monthly * 12)) * 100);
+  return pct > 0 ? `Save ${pct}%` : null;
+}
+
 export function PricingComparison({ currentPlan }: { currentPlan?: string | null }) {
   const [annual, setAnnual] = useState(false);
   const [loadingPlan, setLoadingPlan] = useState<string | null>(null);
   const [, startTransition] = useTransition();
+  const [downgradeDetails, setDowngradeDetails] = useState<CancelPlanDetails | null>(null);
+  const [downgradeOpen, setDowngradeOpen] = useState(false);
   const period = annual ? "billed annually" : "billed monthly";
   const seatPeriod = annual ? "per seat, billed annually" : "per seat, billed monthly";
   const interval = annual ? "YEARLY" : "MONTHLY";
+
+  const priceLabel = (plan: string) => {
+    const p = DISPLAY_PRICES[plan];
+    if (!p) return "£X";
+    const raw = annual ? p.yearly : p.monthly;
+    if (annual) {
+      const yearly = parsePence(raw);
+      if (yearly) return `${raw.replace(/[\d.]+/, (parseFloat((yearly / 12).toFixed(2)).toString()))}`;
+    }
+    return raw;
+  };
 
   const handleUpgrade = (plan: string) => {
     setLoadingPlan(plan);
@@ -72,7 +109,7 @@ export function PricingComparison({ currentPlan }: { currentPlan?: string | null
       } else if (result.error === "USE_CUSTOMER_PORTAL") {
         window.location.href = "/settings";
       } else if (result.error === "UNAUTHORIZED") {
-        window.location.href = "/login";
+        window.location.href = plan === "PRO" ? "/register?plan=pro" : "/register";
       } else {
         // BILLING_NOT_CONFIGURED or STRIPE_ERROR — surface gracefully
         window.location.href = "/pricing?error=billing";
@@ -88,6 +125,20 @@ export function PricingComparison({ currentPlan }: { currentPlan?: string | null
       const result = await createBillingPortalSession();
       window.location.href = "url" in result ? result.url : "/settings";
       setLoadingPlan(null);
+    });
+  };
+
+  const handleDowngrade = () => {
+    setLoadingPlan("FREE");
+    startTransition(async () => {
+      const result = await getDowngradeSummary();
+      setLoadingPlan(null);
+      if ("error" in result) {
+        window.location.href = result.error === "UNAUTHORIZED" ? "/login" : "/settings";
+        return;
+      }
+      setDowngradeDetails(result);
+      setDowngradeOpen(true);
     });
   };
 
@@ -136,12 +187,17 @@ export function PricingComparison({ currentPlan }: { currentPlan?: string | null
           ? "plan-cta--destructive"
           : "plan-cta--ghost";
 
-    // Downgrade to Free is handled from settings (Cancel plan / portal).
+    // Downgrade to Free — load live usage data then show confirmation modal.
     if (cell.kind === "destructive") {
       return (
-        <Link className={`plan-cta ${variantClass}`} href="/settings">
-          {cell.label}
-        </Link>
+        <button
+          className={`plan-cta ${variantClass} disabled:opacity-60`}
+          disabled={isLoading}
+          onClick={handleDowngrade}
+          type="button"
+        >
+          {isLoading ? "Loading…" : cell.label}
+        </button>
       );
     }
 
@@ -174,7 +230,7 @@ export function PricingComparison({ currentPlan }: { currentPlan?: string | null
               <button aria-pressed={!annual} onClick={() => setAnnual(false)} type="button">Monthly</button>
               <button aria-pressed={annual} onClick={() => setAnnual(true)} type="button">Annual</button>
             </div>
-            <span className="save-hint" hidden={!annual}>Save ~20%</span>
+            <span className="save-hint" hidden={!annual}>{savingsBadge("PRO") ?? "Save ~20%"}</span>
           </div>
         </div>
       </section>
@@ -207,8 +263,8 @@ export function PricingComparison({ currentPlan }: { currentPlan?: string | null
                       <span className="plan-rec-tag"><span className="chip chip--rec">Recommended</span></span>
                       <div className="plan-name">Pro</div>
                       <p className="plan-who">For individual power users</p>
-                      <div className="plan-price">£X<small> / mo</small></div>
-                      <p className="plan-period">{period}</p>
+                      <div className="plan-price">{priceLabel("PRO")}<small> / mo</small></div>
+                      <p className="plan-period">{period}{annual && savingsBadge("PRO") ? <> · <span className="save-inline">{savingsBadge("PRO")}</span></> : null}</p>
                       <PlanCta card="PRO" />
                     </div>
                   </th>
@@ -216,8 +272,8 @@ export function PricingComparison({ currentPlan }: { currentPlan?: string | null
                     <div className="plan-card">
                       <div className="plan-name">Family</div>
                       <p className="plan-who">For households up to 6 people</p>
-                      <div className="plan-price">£X<small> / mo</small></div>
-                      <p className="plan-period">{period}</p>
+                      <div className="plan-price">{priceLabel("FAMILY")}<small> / mo</small></div>
+                      <p className="plan-period">{period}{annual && savingsBadge("FAMILY") ? <> · <span className="save-inline">{savingsBadge("FAMILY")}</span></> : null}</p>
                       <PlanCta card="FAMILY" />
                     </div>
                   </th>
@@ -225,8 +281,8 @@ export function PricingComparison({ currentPlan }: { currentPlan?: string | null
                     <div className="plan-card">
                       <div className="plan-name">Teams</div>
                       <p className="plan-who">For organisations up to 25</p>
-                      <div className="plan-price">£X<small> / mo</small></div>
-                      <p className="plan-period">{seatPeriod}</p>
+                      <div className="plan-price">{priceLabel("TEAMS")}<small> / mo</small></div>
+                      <p className="plan-period">{seatPeriod}{annual && savingsBadge("TEAMS") ? <> · <span className="save-inline">{savingsBadge("TEAMS")}</span></> : null}</p>
                       <PlanCta card="TEAMS" />
                     </div>
                   </th>
@@ -375,6 +431,15 @@ export function PricingComparison({ currentPlan }: { currentPlan?: string | null
           <p className="pfoot-note">Prices shown are placeholders pending launch (commercial decision in progress). Family and Teams shared address books are coming soon. Your data is never deleted by changing plans — contacts over a plan&rsquo;s limit become read-only, and export is always available. See the <Link href="/privacy">privacy policy</Link> for details.</p>
         </div>
       </section>
+
+      {downgradeDetails ? (
+        <CancelPlanModal
+          details={downgradeDetails}
+          family={currentPlan === "FAMILY"}
+          open={downgradeOpen}
+          onOpenChange={setDowngradeOpen}
+        />
+      ) : null}
     </>
   );
 }

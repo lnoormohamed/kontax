@@ -13,6 +13,8 @@ export default async function RegisterPage({
   const rawNext = params?.next;
   const nextParam = Array.isArray(rawNext) ? rawNext[0] : rawNext;
   const next = nextParam?.startsWith("/") ? nextParam : undefined;
+  const rawPlan = params?.plan;
+  const plan = Array.isArray(rawPlan) ? rawPlan[0] : rawPlan;
 
   if (session?.user) {
     redirect(next ?? "/contacts");
@@ -41,7 +43,7 @@ export default async function RegisterPage({
           }}
         />
       </div>
-      <AuthCard mode="register" next={next} />
+      <AuthCard mode="register" next={next} plan={plan} />
       <p className="text-[12px] text-[#8b938c]">© Kontax · Your contacts, organized and yours.</p>
     </main>
   );

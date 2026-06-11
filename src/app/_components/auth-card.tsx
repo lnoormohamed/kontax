@@ -184,10 +184,13 @@ export function AuthCard({
   mode,
   next,
   message,
+  plan,
 }: {
   mode: "login" | "register";
   next?: string;
   message?: string;
+  /** Pre-selected plan from ?plan= — "pro" shows a 14-day trial callout. */
+  plan?: string;
 }) {
   const isLogin = mode === "login";
 
@@ -339,6 +342,18 @@ export function AuthCard({
           Your email has been updated. Please sign in with your new address.
         </div>
       )}
+
+      {/* Trial callout — register with ?plan=pro */}
+      {!isLogin && plan === "pro" ? (
+        <div className="mt-4 flex items-start gap-2.5 rounded-[1.2rem] border border-[#c5cdf9] bg-[#edf0fe] px-4 py-3 text-[13.5px] leading-[1.45] text-[#3142c4]">
+          <svg aria-hidden className="mt-px h-[17px] w-[17px] shrink-0" fill="none" stroke="#4158f4" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.85" viewBox="0 0 24 24">
+            <path d="M12 3l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17.8 6.1 20.8l1.3-6.5L2.5 9.8 9.1 9z" />
+          </svg>
+          <span>
+            <strong className="font-semibold">14-day free Pro trial included</strong> — all Pro features, no card required to start.
+          </span>
+        </div>
+      ) : null}
 
       {/* Form */}
       <form

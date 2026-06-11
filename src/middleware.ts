@@ -25,8 +25,9 @@ const PUBLIC_PREFIXES = [
   "/pricing",       // marketing
   "/privacy",       // legal
   "/terms",         // legal
-  "/api/register",  // Account creation
-  "/api/cron",      // Protected separately by CRON_SECRET
+  "/api/register",       // Account creation
+  "/api/cron",           // Protected separately by CRON_SECRET
+  "/api/stripe/webhook", // Authenticated by Stripe signature, not session
 ];
 
 // Only the TOTP challenge page is reachable with a pendingTotp session (P18-07)
