@@ -131,12 +131,12 @@ function EventRow({ event }: { event: ActivityEventRow }) {
       className="flex gap-3 rounded-[11px] px-3.5 py-3 transition-colors"
       onMouseEnter={
         expandable
-          ? (e) => { (e.currentTarget as HTMLDivElement).style.background = "#f2f4f0"; }
+          ? (e) => { e.currentTarget.style.background = "#f2f4f0"; }
           : undefined
       }
       onMouseLeave={
         expandable
-          ? (e) => { (e.currentTarget as HTMLDivElement).style.background = ""; }
+          ? (e) => { e.currentTarget.style.background = ""; }
           : undefined
       }
     >
@@ -262,14 +262,14 @@ function FilterBar({
       }}
       onMouseEnter={(e) => {
         if (!active) {
-          (e.currentTarget as HTMLButtonElement).style.background = "#e7efe9";
-          (e.currentTarget as HTMLButtonElement).style.color = "#17352e";
+          e.currentTarget.style.background = "#e7efe9";
+          e.currentTarget.style.color = "#17352e";
         }
       }}
       onMouseLeave={(e) => {
         if (!active) {
-          (e.currentTarget as HTMLButtonElement).style.background = "#f2f4f0";
-          (e.currentTarget as HTMLButtonElement).style.color = "#5c655e";
+          e.currentTarget.style.background = "#f2f4f0";
+          e.currentTarget.style.color = "#5c655e";
         }
       }}
       type="button"
@@ -306,13 +306,11 @@ function FilterBar({
 // ── state blocks ──────────────────────────────────────────────────────────────
 function EmptyState({
   kind,
-  filtering,
   retention,
   onClear,
   onRetry,
 }: {
   kind: "empty" | "filtered" | "error";
-  filtering?: boolean;
   retention?: number | null;
   onClear?: () => void;
   onRetry?: () => void;
@@ -455,7 +453,6 @@ export function ActivityFeed({ retentionDays = 90 }: { retentionDays?: number | 
         {/* empty */}
         {status === "done" && events.length === 0 && (
           <EmptyState
-            filtering={filtering}
             kind={filtering ? "filtered" : "empty"}
             onClear={handleClear}
             retention={retention}

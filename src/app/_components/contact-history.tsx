@@ -116,12 +116,12 @@ function EventRow({ event }: { event: HistoryEvent }) {
       style={expandable ? { cursor: "default" } : undefined}
       onMouseEnter={
         expandable
-          ? (e) => { (e.currentTarget as HTMLDivElement).style.background = "#f2f4f0"; }
+          ? (e) => { e.currentTarget.style.background = "#f2f4f0"; }
           : undefined
       }
       onMouseLeave={
         expandable
-          ? (e) => { (e.currentTarget as HTMLDivElement).style.background = ""; }
+          ? (e) => { e.currentTarget.style.background = ""; }
           : undefined
       }
     >
