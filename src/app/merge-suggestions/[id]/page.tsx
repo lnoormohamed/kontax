@@ -1,56 +1,88 @@
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
-import { MergeReview, type MergeReviewUnions } from "~/app/_components/merge-review";
-import { MergeSuggestionDismissButton } from "~/app/_components/merge-suggestion-dismiss-button";
+import { AppShell } from "~/app/_components/app-shell";
+import {
+  MergeReview,
+  type MergeReviewContact,
+  type MergeReviewUnions,
+} from "~/app/_components/merge-review";
 import { auth } from "~/server/auth";
+import { getUserPlanSummary } from "~/server/billing";
+import { db } from "~/server/db";
 import {
   buildMergedContactPreview,
   getMergeSuggestionByIdForUser,
   type MergePreview,
 } from "~/server/contact-merge";
 
-type MergeSuggestionReviewPageProps = {
-  params: Promise<{
-    id: string;
-  }>;
+type PageProps = {
+  params: Promise<{ id: string }>;
 };
 
 const toUnions = (preview: MergePreview): MergeReviewUnions => {
-  const merged = preview.mergedContact;
+  const m = preview.mergedContact;
   return {
-    emails: merged.emailAddresses ?? [],
-    phones: merged.phoneNumbers ?? [],
-    addresses: (merged.postalAddresses ?? []).map((entry) => entry.formatted),
-    websites: (merged.websiteEntries ?? []).map((entry) => entry.value),
-    labels: merged.labels ?? [],
-    dates: (merged.significantDates ?? []).map((entry) => `${entry.label}: ${entry.date}`),
-    related: (merged.relatedPeople ?? []).map((entry) => `${entry.relationship}: ${entry.name}`),
-    custom: (merged.customFields ?? []).map((entry) => `${entry.label}: ${entry.value}`),
+    emails: m.emailAddresses ?? [],
+    phones: m.phoneNumbers ?? [],
+    addresses: (m.postalAddresses ?? []).map((e) => e.formatted),
+    websites: (m.websiteEntries ?? []).map((e) => e.value),
+    labels: m.labels ?? [],
+    dates: (m.significantDates ?? []).map((e) => `${e.label}: ${e.date}`),
+    related: (m.relatedPeople ?? []).map((e) => `${e.relationship}: ${e.name}`),
+    custom: (m.customFields ?? []).map((e) => `${e.label}: ${e.value}`),
   };
 };
 
-const confidenceBadge: Record<string, string> = {
-  high: "bg-[#eef5ef] text-[#17352e]",
-  medium: "bg-[#f6edd9] text-[#7a5a1a]",
-  low: "bg-[#eef0f3] text-[#5c655e]",
-};
+const toReviewContact = (c: {
+  id: string;
+  fullName: string;
+  email: string | null;
+  phone: string | null;
+  company: string | null;
+  jobTitle: string | null;
+  nickname: string | null;
+  website: string | null;
+  birthday: string | null;
+  notes: string | null;
+}): MergeReviewContact => ({
+  id: c.id,
+  fullName: c.fullName,
+  email: c.email,
+  phone: c.phone,
+  company: c.company,
+  jobTitle: c.jobTitle,
+  nickname: c.nickname,
+  website: c.website,
+  birthday: c.birthday,
+  notes: c.notes,
+});
 
-export default async function MergeSuggestionReviewPage({
-  params,
-}: MergeSuggestionReviewPageProps) {
+export default async function MergeSuggestionReviewPage({ params }: PageProps) {
   const session = await auth();
-
-  if (!session?.user?.id) {
-    redirect("/login");
-  }
+  if (!session?.user?.id) redirect("/login");
+  const userId = session.user.id;
 
   const { id } = await params;
-  const suggestion = await getMergeSuggestionByIdForUser(session.user.id, id);
+  const [suggestion, planSummary, contactCounts] = await Promise.all([
+    getMergeSuggestionByIdForUser(userId, id),
+    getUserPlanSummary(userId),
+    db.contact.groupBy({
+      by: ["archivedAt"],
+      where: { userId },
+      _count: { id: true },
+    }),
+  ]);
 
   if (!suggestion) {
     notFound();
   }
+
+  const people = contactCounts.find((r) => r.archivedAt === null)?._count.id ?? 0;
+  const archived = contactCounts.find((r) => r.archivedAt !== null)?._count.id ?? 0;
+  const openDuplicates = await db.mergeSuggestion.count({
+    where: { userId, status: "OPEN" },
+  });
 
   const keepLeftPreview = buildMergedContactPreview(
     suggestion.leftContact,
@@ -61,107 +93,76 @@ export default async function MergeSuggestionReviewPage({
     suggestion.leftContact,
   );
 
-  const contactA = {
-    id: suggestion.leftContact.id,
-    fullName: suggestion.leftContact.fullName,
-    email: suggestion.leftContact.email,
-    phone: suggestion.leftContact.phone,
-    company: suggestion.leftContact.company,
-    notes: suggestion.leftContact.notes,
-  };
-  const contactB = {
-    id: suggestion.rightContact.id,
-    fullName: suggestion.rightContact.fullName,
-    email: suggestion.rightContact.email,
-    phone: suggestion.rightContact.phone,
-    company: suggestion.rightContact.company,
-    notes: suggestion.rightContact.notes,
-  };
-
-  // Reasons that aren't scored signal contributions are edge-case warnings.
   const contributionLabels = new Set(suggestion.contributions.map((c) => c.label));
-  const warnings = suggestion.reasons.filter((reason) => !contributionLabels.has(reason));
+  const warnings = (suggestion.reasons as string[]).filter(
+    (reason) => !contributionLabels.has(reason),
+  );
+
+  const userLabel =
+    session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
 
   return (
-    <main className="min-h-screen bg-[#f4f6f2] text-[#1d2823]">
-      <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-5 py-8 lg:py-12">
-        <div>
-          <Link className="text-[13px] font-semibold text-[#4158f4]" href="/?tab=duplicates">
-            ← Back to duplicates
-          </Link>
-          <h1 className="mt-3 text-2xl font-semibold tracking-tight">Review duplicate</h1>
-          <p className="mt-2 text-[14px] text-[#5c655e]">
-            Pick which record survives, resolve any conflicting fields, then merge. Multi-value
-            fields like phones and addresses are kept from both.
-          </p>
-          <div className="mt-3 flex flex-wrap gap-2 text-[12px] font-semibold">
-            <span
-              className={`rounded-full px-2.5 py-1 ${
-                confidenceBadge[suggestion.confidence] ?? confidenceBadge.low
-              }`}
+    <AppShell
+      account={{
+        name: userLabel,
+        email: session.user.email ?? "",
+        plan: planSummary.planLabel,
+      }}
+      counts={{
+        people,
+        favorites: 0,
+        archived,
+        duplicates: openDuplicates,
+      }}
+    >
+      <div
+        className="min-h-full overflow-y-auto"
+        style={{ background: "#f6f7f4" }}
+      >
+        <div
+          style={{
+            maxWidth: 860,
+            margin: "0 auto",
+            padding: "30px 28px 110px",
+            display: "grid",
+            gap: 18,
+            alignContent: "start",
+          }}
+        >
+          {/* Back link */}
+          <Link
+            className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#4158f4] hover:underline"
+            href="/?tab=duplicates"
+          >
+            <svg
+              fill="none"
+              height="15"
+              stroke="#4158f4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              viewBox="0 0 24 24"
+              width="15"
             >
-              {suggestion.confidence} confidence
-            </span>
-            <span className="rounded-full bg-white px-2.5 py-1 text-[#5c655e]">
-              Score {suggestion.score}
-            </span>
-          </div>
-        </div>
+              <path d="M15 5l-7 7 7 7" />
+            </svg>
+            Back to duplicates
+          </Link>
 
-        {suggestion.contributions.length > 0 || suggestion.reasons.length > 0 ? (
-          <div className="rounded-[1.4rem] border border-[#d8ddd6] bg-white p-5">
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.13em] text-[#8b938c]">
-                Why this was suggested
-              </p>
-              <span className="text-[12px] font-semibold text-[#5c655e]">
-                Match score {suggestion.score}
-              </span>
-            </div>
-            <ul className="mt-2.5 grid gap-1.5">
-              {suggestion.contributions.map((contribution) => (
-                <li
-                  className="flex items-center justify-between gap-3 text-[13.5px] text-[#1d2823]"
-                  key={`${contribution.signal}-${contribution.label}`}
-                >
-                  <span>{contribution.label}</span>
-                  <span className="shrink-0 rounded-full bg-[#e7efe9] px-2 py-0.5 text-[11px] font-semibold text-[#17352e]">
-                    +{contribution.score}
-                  </span>
-                </li>
-              ))}
-            </ul>
-            {warnings.length > 0 ? (
-              <ul className="mt-2.5 grid gap-1.5 border-t border-[#edf0ea] pt-2.5">
-                {warnings.map((warning) => (
-                  <li className="text-[12.5px] leading-5 text-[#7a5a1a]" key={warning}>
-                    ⚠ {warning}
-                  </li>
-                ))}
-              </ul>
-            ) : null}
-          </div>
-        ) : null}
-
-        <MergeReview
-          contactA={contactA}
-          contactB={contactB}
-          mergeSource="suggestion-review"
-          suggestionId={suggestion.id}
-          unionsA={toUnions(keepLeftPreview)}
-          unionsB={toUnions(keepRightPreview)}
-        />
-
-        <div className="rounded-[1.4rem] border border-[#d8ddd6] bg-white p-5">
-          <p className="text-[13px] font-semibold text-[#1d2823]">Not a duplicate?</p>
-          <p className="mt-1 text-[13px] text-[#5c655e]">
-            Dismiss this suggestion to remove it from the open queue. The review history is kept.
-          </p>
-          <div className="mt-3">
-            <MergeSuggestionDismissButton suggestionId={suggestion.id} />
-          </div>
+          <MergeReview
+            confidence={suggestion.confidence}
+            contactA={toReviewContact(suggestion.leftContact)}
+            contactB={toReviewContact(suggestion.rightContact)}
+            contributions={suggestion.contributions}
+            mergeSource="suggestion-review"
+            score={suggestion.score}
+            suggestionId={suggestion.id}
+            unionsA={toUnions(keepLeftPreview)}
+            unionsB={toUnions(keepRightPreview)}
+            warnings={warnings}
+          />
         </div>
       </div>
-    </main>
+    </AppShell>
   );
 }
