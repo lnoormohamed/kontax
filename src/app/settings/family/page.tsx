@@ -39,13 +39,21 @@ function Avatar({ label }: { label: string }) {
   );
 }
 
-function Tag({ children, green }: { children: React.ReactNode; green?: boolean }) {
+type TagKind = "Owner" | "Can edit" | "View only" | "Pending" | "Declined" | "Member";
+
+const TAG_STYLES: Record<TagKind, string> = {
+  Owner:      "bg-[#e7efe9] text-[#17352e]",
+  "Can edit": "bg-[#edf0fe] text-[#3142c4]",
+  "View only":"bg-[#f2f4f0] text-[#5c655e]",
+  Pending:    "bg-[#f6edd9] text-[#7c5511]",
+  Declined:   "bg-[#f3e1da] text-[#9a3a23]",
+  Member:     "bg-[#f2f4f0] text-[#5c655e]",
+};
+
+function Tag({ children, kind }: { children: React.ReactNode; kind?: TagKind; green?: boolean }) {
+  const cls = kind ? TAG_STYLES[kind] : TAG_STYLES.Member;
   return (
-    <span
-      className={`inline-flex h-[22px] items-center rounded-md px-2 text-[11.5px] font-semibold ${
-        green ? "bg-[#e7efe9] text-[#17352e]" : "bg-[#f2f4f0] text-[#5c655e]"
-      }`}
-    >
+    <span className={`inline-flex h-[22px] items-center rounded-md px-2 text-[11.5px] font-semibold whitespace-nowrap ${cls}`}>
       {children}
     </span>
   );
@@ -137,7 +145,9 @@ export default async function FamilySettingsPage() {
                           </span>
                         </span>
                       </span>
-                      <Tag green={m.role === "OWNER"}>{m.role === "OWNER" ? "Owner" : "Member"}</Tag>
+                      <Tag kind={m.role === "OWNER" ? "Owner" : m.canEdit ? "Can edit" : "View only"}>
+                        {m.role === "OWNER" ? "Owner" : m.canEdit ? "Can edit" : "View only"}
+                      </Tag>
                     </div>
                   );
                 })}
@@ -293,7 +303,9 @@ export default async function FamilySettingsPage() {
                       </span>
                     </span>
                     <span className="sm:justify-self-start">
-                      <Tag green={isOwner}>{isOwner ? "Owner" : "Member"}</Tag>
+                      <Tag kind={isOwner ? "Owner" : m.canEdit ? "Can edit" : "View only"}>
+                        {isOwner ? "Owner" : m.canEdit ? "Can edit" : "View only"}
+                      </Tag>
                     </span>
                     <span className="justify-self-center">
                       {isOwner ? (
@@ -349,26 +361,35 @@ export default async function FamilySettingsPage() {
                   const label = m.user?.email ?? m.invitedEmail ?? "Invited";
                   const declined = m.inviteStatus === "DECLINED";
                   return (
-                    <div className="flex items-center justify-between gap-3 px-5 py-3" key={m.id}>
-                      <span className="min-w-0">
-                        <span className="block truncate text-[14px] font-medium text-[#1d2823]">{label}</span>
-                        <span className="block text-[12.5px] text-[#5c655e]">
-                          {declined ? "Declined" : "Invited"}
+                    <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 px-5 py-3" key={m.id}>
+                      <span className="flex min-w-0 items-center gap-3">
+                        {/* ghost avatar for uninvited */}
+                        <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-[#f2f4f0]">
+                          <WorkspaceIcon name={declined ? "x" : "people"} size={16} className="text-[#8b938c]" />
+                        </span>
+                        <span className="min-w-0">
+                          <span className="block truncate text-[14px] font-medium text-[#1d2823]">{label}</span>
+                          <span className="block text-[12.5px] text-[#8b938c]">
+                            {declined ? "Declined the invite" : "Invite pending"}
+                          </span>
                         </span>
                       </span>
                       <span className="flex shrink-0 items-center gap-3">
+                        <Tag kind={declined ? "Declined" : "Pending"}>
+                          {declined ? "Declined" : "Pending"}
+                        </Tag>
                         {!declined ? (
                           <form action={resendFamilyInvite}>
                             <input name="memberId" type="hidden" value={m.id} />
-                            <button className="text-[13px] font-semibold text-[#4158f4]" type="submit">
+                            <button className="text-[13px] font-semibold text-[#4158f4] hover:underline" type="submit">
                               Resend
                             </button>
                           </form>
                         ) : null}
                         <form action={removeFamilyMember}>
                           <input name="memberId" type="hidden" value={m.id} />
-                          <button className="text-[13px] font-semibold text-[#b5472f]" type="submit">
-                            {declined ? "Remove" : "Cancel"}
+                          <button className="text-[13px] font-semibold text-[#b5472f] hover:underline" type="submit">
+                            {declined ? "Dismiss" : "Revoke"}
                           </button>
                         </form>
                       </span>

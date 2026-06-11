@@ -117,9 +117,11 @@ function MultiValue({
 
 export function CreateContactForm({
   familyBookName,
+  familyCanEdit = true,
   teamBooks = [],
 }: {
   familyBookName?: string | null;
+  familyCanEdit?: boolean;
   teamBooks?: { id: string; name: string }[];
 }) {
   const [mode, setMode] = useState<"person" | "org">("person");
@@ -235,24 +237,36 @@ export function CreateContactForm({
 
         <div className="mx-auto grid w-full max-w-[600px] gap-5 px-4 py-7 lg:px-0">
           {/* save-to target (Family / Team members) */}
-          {familyBookName || teamBooks.length > 0 ? (
+          {(familyBookName || teamBooks.length > 0) && !familyCanEdit ? (
+            // View-only members can't add to the family book
+            <div className="flex items-center justify-center gap-2 rounded-[10px] bg-[#f6f7f4] px-3.5 py-2.5 text-[13px] text-[#5c655e]">
+              <WorkspaceIcon name="people" size={15} strokeWidth={1.7} className="shrink-0 text-[#8b938c]" />
+              Saving to your <strong className="mx-0.5 font-semibold text-[#1d2823]">private</strong> contacts.
+              View-only members can&apos;t add to the family book.
+            </div>
+          ) : familyBookName || teamBooks.length > 0 ? (
             <div className="flex flex-wrap items-center justify-center gap-2 text-[13px]">
-              <span className="text-[#8b938c]">Save to</span>
-              <div className="inline-flex flex-wrap rounded-[0.7rem] bg-[#f2f4f0] p-0.5 font-semibold">
+              <span className="font-medium text-[#8b938c]">Save to</span>
+              <div className="inline-flex flex-wrap rounded-[0.9rem] bg-[#f2f4f0] p-1 gap-1">
                 {[
-                  { key: "private", label: "Private" },
-                  ...(familyBookName ? [{ key: "family", label: familyBookName }] : []),
-                  ...teamBooks.map((b) => ({ key: `team:${b.id}`, label: b.name })),
-                ].map(({ key, label }) => (
+                  { key: "private", label: "Private", sub: "Only you" },
+                  ...(familyBookName
+                    ? [{ key: "family", label: familyBookName, sub: "Shared with family" }]
+                    : []),
+                  ...teamBooks.map((b) => ({ key: `team:${b.id}`, label: b.name, sub: "Team book" })),
+                ].map(({ key, label, sub }) => (
                   <button
-                    className={`rounded-[0.55rem] px-3 py-1 transition ${
-                      target === key ? "bg-white text-[#1d2823] shadow-sm" : "text-[#8b938c]"
+                    className={`flex flex-col items-center rounded-[0.65rem] px-3.5 py-1.5 transition leading-tight ${
+                      target === key
+                        ? "bg-white text-[#1d2823] shadow-sm"
+                        : "text-[#8b938c] hover:text-[#5c655e]"
                     }`}
                     key={key}
                     onClick={() => setTarget(key)}
                     type="button"
                   >
-                    {label}
+                    <span className="text-[13px] font-semibold">{label}</span>
+                    <span className="text-[11px] font-normal opacity-80">{sub}</span>
                   </button>
                 ))}
               </div>

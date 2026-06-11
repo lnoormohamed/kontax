@@ -397,7 +397,7 @@ export function ContactDashboard({
                 <div className="flex items-center gap-1 rounded-lg bg-[#f2f4f0] p-0.5">
                   {segment("All", currentScope === "all" && !currentBook, buildHref("people", { scope: "all", book: null }))}
                   {segment("Private", currentScope === "private" && !currentBook, buildHref("people", { scope: "private", book: null }))}
-                  {segment("Shared", currentScope === "shared" && !currentBook, buildHref("people", { scope: "shared", book: null }))}
+                  {segment("Family", currentScope === "shared" && !currentBook, buildHref("people", { scope: "shared", book: null }))}
                 </div>
               ) : null}
             </>

@@ -29,8 +29,10 @@ export default async function NewContactPage() {
     getUserFamilyMembership(userId),
     getAccessibleTeamBooks(userId),
   ]);
-  const familyTarget =
-    familyMembership?.canEdit && familyMembership.bookId ? familyMembership.groupName : null;
+  // Show the family option when the user is in a family book (owner or member).
+  // canEdit drives the save-to selector vs. the view-only locked note.
+  const familyTarget = familyMembership?.bookId ? familyMembership.groupName : null;
+  const familyCanEdit = !!familyMembership?.canEdit;
   const editableTeamBooks = teamBooks
     .filter((b) => b.permission === "EDIT")
     .map((b) => ({ id: b.id, name: b.name }));
@@ -47,7 +49,7 @@ export default async function NewContactPage() {
         duplicates: duplicatesCount,
       }}
     >
-      <CreateContactForm familyBookName={familyTarget} teamBooks={editableTeamBooks} />
+      <CreateContactForm familyBookName={familyTarget} familyCanEdit={familyCanEdit} teamBooks={editableTeamBooks} />
     </AppShell>
   );
 }
