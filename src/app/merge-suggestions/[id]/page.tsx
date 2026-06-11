@@ -116,19 +116,9 @@ export default async function MergeSuggestionReviewPage({ params }: PageProps) {
       }}
     >
       <div
-        className="min-h-full overflow-y-auto"
-        style={{ background: "#f6f7f4" }}
+        className="mx-auto grid w-full content-start gap-[18px] px-7 pb-28 pt-8"
+        style={{ maxWidth: 860 }}
       >
-        <div
-          style={{
-            maxWidth: 860,
-            margin: "0 auto",
-            padding: "30px 28px 110px",
-            display: "grid",
-            gap: 18,
-            alignContent: "start",
-          }}
-        >
           {/* Back link */}
           <Link
             className="inline-flex items-center gap-1.5 text-[13px] font-semibold text-[#4158f4] hover:underline"
@@ -161,7 +151,6 @@ export default async function MergeSuggestionReviewPage({ params }: PageProps) {
             unionsB={toUnions(keepRightPreview)}
             warnings={warnings}
           />
-        </div>
       </div>
     </AppShell>
   );
