@@ -1226,8 +1226,8 @@ export function MergeReview({
   const scalarRows = useMemo(
     () =>
       SCALAR_FIELDS.map((f) => {
-        const a = trim(contactA[f.key as keyof MergeReviewContact] as string | null);
-        const b = trim(contactB[f.key as keyof MergeReviewContact] as string | null);
+        const a = trim(contactA[f.key as keyof MergeReviewContact]);
+        const b = trim(contactB[f.key as keyof MergeReviewContact]);
         return { ...f, a, b, status: classify(a, b) };
       }),
     [contactA, contactB],
@@ -1240,7 +1240,7 @@ export function MergeReview({
   const scalarConflicts = scalarRows.filter((r) => r.status === "conflict");
   const autoFilledRows = scalarRows.filter((r) => r.status === "auto").map((r) => ({
     label: r.label,
-    from: (r.a ? "A" : "B") as "A" | "B",
+    from: r.a ? ("A" as const) : ("B" as const),
   }));
   if (notesStatus === "auto") {
     autoFilledRows.push({ label: "Notes", from: notesA ? "A" : "B" });
@@ -1255,8 +1255,6 @@ export function MergeReview({
   const unresolvedCount =
     scalarConflicts.filter((r) => !choices[r.key]).length +
     (notesStatus === "conflict" && !choices.notes ? 1 : 0);
-
-  const ready = unresolvedCount === 0;
 
   // Translate A/B choice into primary/secondary for the server action
   const toPS = (v: ChoiceValue) => {
@@ -1322,7 +1320,7 @@ export function MergeReview({
           </h2>
           {scalarConflicts.map((row) => (
             <ConflictCard
-              choice={choices[row.key] as ChoiceValue | undefined}
+              choice={choices[row.key]}
               key={row.key}
               label={row.label}
               labelA={labelA}
@@ -1335,7 +1333,7 @@ export function MergeReview({
           {notesStatus === "conflict" && (
             <ConflictCard
               allowCombine
-              choice={choices.notes as ChoiceValue | undefined}
+              choice={choices.notes}
               label="Notes"
               labelA={labelA}
               labelB={labelB}

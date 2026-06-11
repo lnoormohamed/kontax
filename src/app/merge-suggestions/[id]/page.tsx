@@ -94,7 +94,7 @@ export default async function MergeSuggestionReviewPage({ params }: PageProps) {
   );
 
   const contributionLabels = new Set(suggestion.contributions.map((c) => c.label));
-  const warnings = (suggestion.reasons as string[]).filter(
+  const warnings = suggestion.reasons.filter(
     (reason) => !contributionLabels.has(reason),
   );
 
