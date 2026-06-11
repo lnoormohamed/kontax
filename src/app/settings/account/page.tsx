@@ -25,7 +25,10 @@ export default async function SettingsAccountPage() {
       />
 
       <StSecLabel>Profile</StSecLabel>
-      <ProfileSection initialName={session.user.name ?? ""} />
+      <ProfileSection
+        initialAvatarUrl={session.user.avatarUrl}
+        initialName={session.user.name ?? ""}
+      />
 
       <StSecLabel>Account</StSecLabel>
       <EmailSection

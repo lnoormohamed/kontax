@@ -94,6 +94,11 @@ export type PasswordResetToken = $Result.DefaultSelection<Prisma.$PasswordResetT
  */
 export type UserSession = $Result.DefaultSelection<Prisma.$UserSessionPayload>
 /**
+ * Model TotpRecoveryCode
+ * 
+ */
+export type TotpRecoveryCode = $Result.DefaultSelection<Prisma.$TotpRecoveryCodePayload>
+/**
  * Model ActivityEvent
  * 
  */
@@ -830,6 +835,16 @@ export class PrismaClient<
   get userSession(): Prisma.UserSessionDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.totpRecoveryCode`: Exposes CRUD operations for the **TotpRecoveryCode** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more TotpRecoveryCodes
+    * const totpRecoveryCodes = await prisma.totpRecoveryCode.findMany()
+    * ```
+    */
+  get totpRecoveryCode(): Prisma.TotpRecoveryCodeDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.activityEvent`: Exposes CRUD operations for the **ActivityEvent** model.
     * Example usage:
     * ```ts
@@ -1355,6 +1370,7 @@ export namespace Prisma {
     EmailVerificationToken: 'EmailVerificationToken',
     PasswordResetToken: 'PasswordResetToken',
     UserSession: 'UserSession',
+    TotpRecoveryCode: 'TotpRecoveryCode',
     ActivityEvent: 'ActivityEvent',
     Group: 'Group',
     GroupMember: 'GroupMember',
@@ -1380,7 +1396,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "activityEvent" | "group" | "groupMember" | "groupAddressBook" | "teamSyncAccount" | "groupContact" | "contactShare"
+      modelProps: "user" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "group" | "groupMember" | "groupAddressBook" | "teamSyncAccount" | "groupContact" | "contactShare"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2568,6 +2584,80 @@ export namespace Prisma {
           }
         }
       }
+      TotpRecoveryCode: {
+        payload: Prisma.$TotpRecoveryCodePayload<ExtArgs>
+        fields: Prisma.TotpRecoveryCodeFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.TotpRecoveryCodeFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotpRecoveryCodePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.TotpRecoveryCodeFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotpRecoveryCodePayload>
+          }
+          findFirst: {
+            args: Prisma.TotpRecoveryCodeFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotpRecoveryCodePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.TotpRecoveryCodeFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotpRecoveryCodePayload>
+          }
+          findMany: {
+            args: Prisma.TotpRecoveryCodeFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotpRecoveryCodePayload>[]
+          }
+          create: {
+            args: Prisma.TotpRecoveryCodeCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotpRecoveryCodePayload>
+          }
+          createMany: {
+            args: Prisma.TotpRecoveryCodeCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.TotpRecoveryCodeCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotpRecoveryCodePayload>[]
+          }
+          delete: {
+            args: Prisma.TotpRecoveryCodeDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotpRecoveryCodePayload>
+          }
+          update: {
+            args: Prisma.TotpRecoveryCodeUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotpRecoveryCodePayload>
+          }
+          deleteMany: {
+            args: Prisma.TotpRecoveryCodeDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.TotpRecoveryCodeUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.TotpRecoveryCodeUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotpRecoveryCodePayload>[]
+          }
+          upsert: {
+            args: Prisma.TotpRecoveryCodeUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$TotpRecoveryCodePayload>
+          }
+          aggregate: {
+            args: Prisma.TotpRecoveryCodeAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateTotpRecoveryCode>
+          }
+          groupBy: {
+            args: Prisma.TotpRecoveryCodeGroupByArgs<ExtArgs>
+            result: $Utils.Optional<TotpRecoveryCodeGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.TotpRecoveryCodeCountArgs<ExtArgs>
+            result: $Utils.Optional<TotpRecoveryCodeCountAggregateOutputType> | number
+          }
+        }
+      }
       ActivityEvent: {
         payload: Prisma.$ActivityEventPayload<ExtArgs>
         fields: Prisma.ActivityEventFieldRefs
@@ -3198,6 +3288,7 @@ export namespace Prisma {
     emailVerificationToken?: EmailVerificationTokenOmit
     passwordResetToken?: PasswordResetTokenOmit
     userSession?: UserSessionOmit
+    totpRecoveryCode?: TotpRecoveryCodeOmit
     activityEvent?: ActivityEventOmit
     group?: GroupOmit
     groupMember?: GroupMemberOmit
@@ -3301,6 +3392,7 @@ export namespace Prisma {
     emailVerificationTokens: number
     passwordResetTokens: number
     sessions: number
+    totpRecoveryCodes: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3320,6 +3412,7 @@ export namespace Prisma {
     emailVerificationTokens?: boolean | UserCountOutputTypeCountEmailVerificationTokensArgs
     passwordResetTokens?: boolean | UserCountOutputTypeCountPasswordResetTokensArgs
     sessions?: boolean | UserCountOutputTypeCountSessionsArgs
+    totpRecoveryCodes?: boolean | UserCountOutputTypeCountTotpRecoveryCodesArgs
   }
 
   // Custom InputTypes
@@ -3443,6 +3536,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountSessionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: UserSessionWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountTotpRecoveryCodesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TotpRecoveryCodeWhereInput
   }
 
 
@@ -3905,9 +4005,13 @@ export namespace Prisma {
     lifecycleState: $Enums.AccountLifecycleState | null
     autoFillPhoneticNames: boolean | null
     sessionVersion: number | null
+    avatarUrl: string | null
     emailVerified: Date | null
     emailPendingChange: string | null
     emailPendingChangeRequestedAt: Date | null
+    totpEnabled: boolean | null
+    totpSecret: string | null
+    totpVerifiedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -3920,9 +4024,13 @@ export namespace Prisma {
     lifecycleState: $Enums.AccountLifecycleState | null
     autoFillPhoneticNames: boolean | null
     sessionVersion: number | null
+    avatarUrl: string | null
     emailVerified: Date | null
     emailPendingChange: string | null
     emailPendingChangeRequestedAt: Date | null
+    totpEnabled: boolean | null
+    totpSecret: string | null
+    totpVerifiedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -3935,9 +4043,13 @@ export namespace Prisma {
     lifecycleState: number
     autoFillPhoneticNames: number
     sessionVersion: number
+    avatarUrl: number
     emailVerified: number
     emailPendingChange: number
     emailPendingChangeRequestedAt: number
+    totpEnabled: number
+    totpSecret: number
+    totpVerifiedAt: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -3960,9 +4072,13 @@ export namespace Prisma {
     lifecycleState?: true
     autoFillPhoneticNames?: true
     sessionVersion?: true
+    avatarUrl?: true
     emailVerified?: true
     emailPendingChange?: true
     emailPendingChangeRequestedAt?: true
+    totpEnabled?: true
+    totpSecret?: true
+    totpVerifiedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -3975,9 +4091,13 @@ export namespace Prisma {
     lifecycleState?: true
     autoFillPhoneticNames?: true
     sessionVersion?: true
+    avatarUrl?: true
     emailVerified?: true
     emailPendingChange?: true
     emailPendingChangeRequestedAt?: true
+    totpEnabled?: true
+    totpSecret?: true
+    totpVerifiedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -3990,9 +4110,13 @@ export namespace Prisma {
     lifecycleState?: true
     autoFillPhoneticNames?: true
     sessionVersion?: true
+    avatarUrl?: true
     emailVerified?: true
     emailPendingChange?: true
     emailPendingChangeRequestedAt?: true
+    totpEnabled?: true
+    totpSecret?: true
+    totpVerifiedAt?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -4092,9 +4216,13 @@ export namespace Prisma {
     lifecycleState: $Enums.AccountLifecycleState
     autoFillPhoneticNames: boolean
     sessionVersion: number
+    avatarUrl: string | null
     emailVerified: Date | null
     emailPendingChange: string | null
     emailPendingChangeRequestedAt: Date | null
+    totpEnabled: boolean
+    totpSecret: string | null
+    totpVerifiedAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
@@ -4126,9 +4254,13 @@ export namespace Prisma {
     lifecycleState?: boolean
     autoFillPhoneticNames?: boolean
     sessionVersion?: boolean
+    avatarUrl?: boolean
     emailVerified?: boolean
     emailPendingChange?: boolean
     emailPendingChangeRequestedAt?: boolean
+    totpEnabled?: boolean
+    totpSecret?: boolean
+    totpVerifiedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     appPasswords?: boolean | User$appPasswordsArgs<ExtArgs>
@@ -4148,6 +4280,7 @@ export namespace Prisma {
     emailVerificationTokens?: boolean | User$emailVerificationTokensArgs<ExtArgs>
     passwordResetTokens?: boolean | User$passwordResetTokensArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
+    totpRecoveryCodes?: boolean | User$totpRecoveryCodesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -4159,9 +4292,13 @@ export namespace Prisma {
     lifecycleState?: boolean
     autoFillPhoneticNames?: boolean
     sessionVersion?: boolean
+    avatarUrl?: boolean
     emailVerified?: boolean
     emailPendingChange?: boolean
     emailPendingChangeRequestedAt?: boolean
+    totpEnabled?: boolean
+    totpSecret?: boolean
+    totpVerifiedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -4174,9 +4311,13 @@ export namespace Prisma {
     lifecycleState?: boolean
     autoFillPhoneticNames?: boolean
     sessionVersion?: boolean
+    avatarUrl?: boolean
     emailVerified?: boolean
     emailPendingChange?: boolean
     emailPendingChangeRequestedAt?: boolean
+    totpEnabled?: boolean
+    totpSecret?: boolean
+    totpVerifiedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -4189,14 +4330,18 @@ export namespace Prisma {
     lifecycleState?: boolean
     autoFillPhoneticNames?: boolean
     sessionVersion?: boolean
+    avatarUrl?: boolean
     emailVerified?: boolean
     emailPendingChange?: boolean
     emailPendingChangeRequestedAt?: boolean
+    totpEnabled?: boolean
+    totpSecret?: boolean
+    totpVerifiedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "password" | "lifecycleState" | "autoFillPhoneticNames" | "sessionVersion" | "emailVerified" | "emailPendingChange" | "emailPendingChangeRequestedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "password" | "lifecycleState" | "autoFillPhoneticNames" | "sessionVersion" | "avatarUrl" | "emailVerified" | "emailPendingChange" | "emailPendingChangeRequestedAt" | "totpEnabled" | "totpSecret" | "totpVerifiedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     appPasswords?: boolean | User$appPasswordsArgs<ExtArgs>
     contacts?: boolean | User$contactsArgs<ExtArgs>
@@ -4215,6 +4360,7 @@ export namespace Prisma {
     emailVerificationTokens?: boolean | User$emailVerificationTokensArgs<ExtArgs>
     passwordResetTokens?: boolean | User$passwordResetTokensArgs<ExtArgs>
     sessions?: boolean | User$sessionsArgs<ExtArgs>
+    totpRecoveryCodes?: boolean | User$totpRecoveryCodesArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -4240,6 +4386,7 @@ export namespace Prisma {
       emailVerificationTokens: Prisma.$EmailVerificationTokenPayload<ExtArgs>[]
       passwordResetTokens: Prisma.$PasswordResetTokenPayload<ExtArgs>[]
       sessions: Prisma.$UserSessionPayload<ExtArgs>[]
+      totpRecoveryCodes: Prisma.$TotpRecoveryCodePayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4249,9 +4396,13 @@ export namespace Prisma {
       lifecycleState: $Enums.AccountLifecycleState
       autoFillPhoneticNames: boolean
       sessionVersion: number
+      avatarUrl: string | null
       emailVerified: Date | null
       emailPendingChange: string | null
       emailPendingChangeRequestedAt: Date | null
+      totpEnabled: boolean
+      totpSecret: string | null
+      totpVerifiedAt: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -4665,6 +4816,7 @@ export namespace Prisma {
     emailVerificationTokens<T extends User$emailVerificationTokensArgs<ExtArgs> = {}>(args?: Subset<T, User$emailVerificationTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$EmailVerificationTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     passwordResetTokens<T extends User$passwordResetTokensArgs<ExtArgs> = {}>(args?: Subset<T, User$passwordResetTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PasswordResetTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sessions<T extends User$sessionsArgs<ExtArgs> = {}>(args?: Subset<T, User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    totpRecoveryCodes<T extends User$totpRecoveryCodesArgs<ExtArgs> = {}>(args?: Subset<T, User$totpRecoveryCodesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TotpRecoveryCodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4701,9 +4853,13 @@ export namespace Prisma {
     readonly lifecycleState: FieldRef<"User", 'AccountLifecycleState'>
     readonly autoFillPhoneticNames: FieldRef<"User", 'Boolean'>
     readonly sessionVersion: FieldRef<"User", 'Int'>
+    readonly avatarUrl: FieldRef<"User", 'String'>
     readonly emailVerified: FieldRef<"User", 'DateTime'>
     readonly emailPendingChange: FieldRef<"User", 'String'>
     readonly emailPendingChangeRequestedAt: FieldRef<"User", 'DateTime'>
+    readonly totpEnabled: FieldRef<"User", 'Boolean'>
+    readonly totpSecret: FieldRef<"User", 'String'>
+    readonly totpVerifiedAt: FieldRef<"User", 'DateTime'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
   }
@@ -5494,6 +5650,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: UserSessionScalarFieldEnum | UserSessionScalarFieldEnum[]
+  }
+
+  /**
+   * User.totpRecoveryCodes
+   */
+  export type User$totpRecoveryCodesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotpRecoveryCode
+     */
+    select?: TotpRecoveryCodeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotpRecoveryCode
+     */
+    omit?: TotpRecoveryCodeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotpRecoveryCodeInclude<ExtArgs> | null
+    where?: TotpRecoveryCodeWhereInput
+    orderBy?: TotpRecoveryCodeOrderByWithRelationInput | TotpRecoveryCodeOrderByWithRelationInput[]
+    cursor?: TotpRecoveryCodeWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TotpRecoveryCodeScalarFieldEnum | TotpRecoveryCodeScalarFieldEnum[]
   }
 
   /**
@@ -23785,6 +23965,7 @@ export namespace Prisma {
     deviceHint: string | null
     lastActiveAt: Date | null
     revokedAt: Date | null
+    totpChallengeVerified: Date | null
     createdAt: Date | null
   }
 
@@ -23797,6 +23978,7 @@ export namespace Prisma {
     deviceHint: string | null
     lastActiveAt: Date | null
     revokedAt: Date | null
+    totpChallengeVerified: Date | null
     createdAt: Date | null
   }
 
@@ -23809,6 +23991,7 @@ export namespace Prisma {
     deviceHint: number
     lastActiveAt: number
     revokedAt: number
+    totpChallengeVerified: number
     createdAt: number
     _all: number
   }
@@ -23823,6 +24006,7 @@ export namespace Prisma {
     deviceHint?: true
     lastActiveAt?: true
     revokedAt?: true
+    totpChallengeVerified?: true
     createdAt?: true
   }
 
@@ -23835,6 +24019,7 @@ export namespace Prisma {
     deviceHint?: true
     lastActiveAt?: true
     revokedAt?: true
+    totpChallengeVerified?: true
     createdAt?: true
   }
 
@@ -23847,6 +24032,7 @@ export namespace Prisma {
     deviceHint?: true
     lastActiveAt?: true
     revokedAt?: true
+    totpChallengeVerified?: true
     createdAt?: true
     _all?: true
   }
@@ -23932,6 +24118,7 @@ export namespace Prisma {
     deviceHint: string | null
     lastActiveAt: Date
     revokedAt: Date | null
+    totpChallengeVerified: Date | null
     createdAt: Date
     _count: UserSessionCountAggregateOutputType | null
     _min: UserSessionMinAggregateOutputType | null
@@ -23961,6 +24148,7 @@ export namespace Prisma {
     deviceHint?: boolean
     lastActiveAt?: boolean
     revokedAt?: boolean
+    totpChallengeVerified?: boolean
     createdAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["userSession"]>
@@ -23974,6 +24162,7 @@ export namespace Prisma {
     deviceHint?: boolean
     lastActiveAt?: boolean
     revokedAt?: boolean
+    totpChallengeVerified?: boolean
     createdAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["userSession"]>
@@ -23987,6 +24176,7 @@ export namespace Prisma {
     deviceHint?: boolean
     lastActiveAt?: boolean
     revokedAt?: boolean
+    totpChallengeVerified?: boolean
     createdAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["userSession"]>
@@ -24000,10 +24190,11 @@ export namespace Prisma {
     deviceHint?: boolean
     lastActiveAt?: boolean
     revokedAt?: boolean
+    totpChallengeVerified?: boolean
     createdAt?: boolean
   }
 
-  export type UserSessionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "jti" | "ipAddress" | "userAgent" | "deviceHint" | "lastActiveAt" | "revokedAt" | "createdAt", ExtArgs["result"]["userSession"]>
+  export type UserSessionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "jti" | "ipAddress" | "userAgent" | "deviceHint" | "lastActiveAt" | "revokedAt" | "totpChallengeVerified" | "createdAt", ExtArgs["result"]["userSession"]>
   export type UserSessionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -24028,6 +24219,7 @@ export namespace Prisma {
       deviceHint: string | null
       lastActiveAt: Date
       revokedAt: Date | null
+      totpChallengeVerified: Date | null
       createdAt: Date
     }, ExtArgs["result"]["userSession"]>
     composites: {}
@@ -24461,6 +24653,7 @@ export namespace Prisma {
     readonly deviceHint: FieldRef<"UserSession", 'String'>
     readonly lastActiveAt: FieldRef<"UserSession", 'DateTime'>
     readonly revokedAt: FieldRef<"UserSession", 'DateTime'>
+    readonly totpChallengeVerified: FieldRef<"UserSession", 'DateTime'>
     readonly createdAt: FieldRef<"UserSession", 'DateTime'>
   }
     
@@ -24873,6 +25066,1064 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: UserSessionInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model TotpRecoveryCode
+   */
+
+  export type AggregateTotpRecoveryCode = {
+    _count: TotpRecoveryCodeCountAggregateOutputType | null
+    _min: TotpRecoveryCodeMinAggregateOutputType | null
+    _max: TotpRecoveryCodeMaxAggregateOutputType | null
+  }
+
+  export type TotpRecoveryCodeMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    codeHash: string | null
+    usedAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type TotpRecoveryCodeMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    codeHash: string | null
+    usedAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type TotpRecoveryCodeCountAggregateOutputType = {
+    id: number
+    userId: number
+    codeHash: number
+    usedAt: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type TotpRecoveryCodeMinAggregateInputType = {
+    id?: true
+    userId?: true
+    codeHash?: true
+    usedAt?: true
+    createdAt?: true
+  }
+
+  export type TotpRecoveryCodeMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    codeHash?: true
+    usedAt?: true
+    createdAt?: true
+  }
+
+  export type TotpRecoveryCodeCountAggregateInputType = {
+    id?: true
+    userId?: true
+    codeHash?: true
+    usedAt?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type TotpRecoveryCodeAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TotpRecoveryCode to aggregate.
+     */
+    where?: TotpRecoveryCodeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TotpRecoveryCodes to fetch.
+     */
+    orderBy?: TotpRecoveryCodeOrderByWithRelationInput | TotpRecoveryCodeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: TotpRecoveryCodeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TotpRecoveryCodes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TotpRecoveryCodes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned TotpRecoveryCodes
+    **/
+    _count?: true | TotpRecoveryCodeCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: TotpRecoveryCodeMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: TotpRecoveryCodeMaxAggregateInputType
+  }
+
+  export type GetTotpRecoveryCodeAggregateType<T extends TotpRecoveryCodeAggregateArgs> = {
+        [P in keyof T & keyof AggregateTotpRecoveryCode]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateTotpRecoveryCode[P]>
+      : GetScalarType<T[P], AggregateTotpRecoveryCode[P]>
+  }
+
+
+
+
+  export type TotpRecoveryCodeGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TotpRecoveryCodeWhereInput
+    orderBy?: TotpRecoveryCodeOrderByWithAggregationInput | TotpRecoveryCodeOrderByWithAggregationInput[]
+    by: TotpRecoveryCodeScalarFieldEnum[] | TotpRecoveryCodeScalarFieldEnum
+    having?: TotpRecoveryCodeScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: TotpRecoveryCodeCountAggregateInputType | true
+    _min?: TotpRecoveryCodeMinAggregateInputType
+    _max?: TotpRecoveryCodeMaxAggregateInputType
+  }
+
+  export type TotpRecoveryCodeGroupByOutputType = {
+    id: string
+    userId: string
+    codeHash: string
+    usedAt: Date | null
+    createdAt: Date
+    _count: TotpRecoveryCodeCountAggregateOutputType | null
+    _min: TotpRecoveryCodeMinAggregateOutputType | null
+    _max: TotpRecoveryCodeMaxAggregateOutputType | null
+  }
+
+  type GetTotpRecoveryCodeGroupByPayload<T extends TotpRecoveryCodeGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<TotpRecoveryCodeGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof TotpRecoveryCodeGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], TotpRecoveryCodeGroupByOutputType[P]>
+            : GetScalarType<T[P], TotpRecoveryCodeGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type TotpRecoveryCodeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    codeHash?: boolean
+    usedAt?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["totpRecoveryCode"]>
+
+  export type TotpRecoveryCodeSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    codeHash?: boolean
+    usedAt?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["totpRecoveryCode"]>
+
+  export type TotpRecoveryCodeSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    codeHash?: boolean
+    usedAt?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["totpRecoveryCode"]>
+
+  export type TotpRecoveryCodeSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    codeHash?: boolean
+    usedAt?: boolean
+    createdAt?: boolean
+  }
+
+  export type TotpRecoveryCodeOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "codeHash" | "usedAt" | "createdAt", ExtArgs["result"]["totpRecoveryCode"]>
+  export type TotpRecoveryCodeInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type TotpRecoveryCodeIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type TotpRecoveryCodeIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $TotpRecoveryCodePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "TotpRecoveryCode"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      codeHash: string
+      usedAt: Date | null
+      createdAt: Date
+    }, ExtArgs["result"]["totpRecoveryCode"]>
+    composites: {}
+  }
+
+  type TotpRecoveryCodeGetPayload<S extends boolean | null | undefined | TotpRecoveryCodeDefaultArgs> = $Result.GetResult<Prisma.$TotpRecoveryCodePayload, S>
+
+  type TotpRecoveryCodeCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<TotpRecoveryCodeFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: TotpRecoveryCodeCountAggregateInputType | true
+    }
+
+  export interface TotpRecoveryCodeDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['TotpRecoveryCode'], meta: { name: 'TotpRecoveryCode' } }
+    /**
+     * Find zero or one TotpRecoveryCode that matches the filter.
+     * @param {TotpRecoveryCodeFindUniqueArgs} args - Arguments to find a TotpRecoveryCode
+     * @example
+     * // Get one TotpRecoveryCode
+     * const totpRecoveryCode = await prisma.totpRecoveryCode.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends TotpRecoveryCodeFindUniqueArgs>(args: SelectSubset<T, TotpRecoveryCodeFindUniqueArgs<ExtArgs>>): Prisma__TotpRecoveryCodeClient<$Result.GetResult<Prisma.$TotpRecoveryCodePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one TotpRecoveryCode that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {TotpRecoveryCodeFindUniqueOrThrowArgs} args - Arguments to find a TotpRecoveryCode
+     * @example
+     * // Get one TotpRecoveryCode
+     * const totpRecoveryCode = await prisma.totpRecoveryCode.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends TotpRecoveryCodeFindUniqueOrThrowArgs>(args: SelectSubset<T, TotpRecoveryCodeFindUniqueOrThrowArgs<ExtArgs>>): Prisma__TotpRecoveryCodeClient<$Result.GetResult<Prisma.$TotpRecoveryCodePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TotpRecoveryCode that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotpRecoveryCodeFindFirstArgs} args - Arguments to find a TotpRecoveryCode
+     * @example
+     * // Get one TotpRecoveryCode
+     * const totpRecoveryCode = await prisma.totpRecoveryCode.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends TotpRecoveryCodeFindFirstArgs>(args?: SelectSubset<T, TotpRecoveryCodeFindFirstArgs<ExtArgs>>): Prisma__TotpRecoveryCodeClient<$Result.GetResult<Prisma.$TotpRecoveryCodePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first TotpRecoveryCode that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotpRecoveryCodeFindFirstOrThrowArgs} args - Arguments to find a TotpRecoveryCode
+     * @example
+     * // Get one TotpRecoveryCode
+     * const totpRecoveryCode = await prisma.totpRecoveryCode.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends TotpRecoveryCodeFindFirstOrThrowArgs>(args?: SelectSubset<T, TotpRecoveryCodeFindFirstOrThrowArgs<ExtArgs>>): Prisma__TotpRecoveryCodeClient<$Result.GetResult<Prisma.$TotpRecoveryCodePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more TotpRecoveryCodes that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotpRecoveryCodeFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all TotpRecoveryCodes
+     * const totpRecoveryCodes = await prisma.totpRecoveryCode.findMany()
+     * 
+     * // Get first 10 TotpRecoveryCodes
+     * const totpRecoveryCodes = await prisma.totpRecoveryCode.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const totpRecoveryCodeWithIdOnly = await prisma.totpRecoveryCode.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends TotpRecoveryCodeFindManyArgs>(args?: SelectSubset<T, TotpRecoveryCodeFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TotpRecoveryCodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a TotpRecoveryCode.
+     * @param {TotpRecoveryCodeCreateArgs} args - Arguments to create a TotpRecoveryCode.
+     * @example
+     * // Create one TotpRecoveryCode
+     * const TotpRecoveryCode = await prisma.totpRecoveryCode.create({
+     *   data: {
+     *     // ... data to create a TotpRecoveryCode
+     *   }
+     * })
+     * 
+     */
+    create<T extends TotpRecoveryCodeCreateArgs>(args: SelectSubset<T, TotpRecoveryCodeCreateArgs<ExtArgs>>): Prisma__TotpRecoveryCodeClient<$Result.GetResult<Prisma.$TotpRecoveryCodePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many TotpRecoveryCodes.
+     * @param {TotpRecoveryCodeCreateManyArgs} args - Arguments to create many TotpRecoveryCodes.
+     * @example
+     * // Create many TotpRecoveryCodes
+     * const totpRecoveryCode = await prisma.totpRecoveryCode.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends TotpRecoveryCodeCreateManyArgs>(args?: SelectSubset<T, TotpRecoveryCodeCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many TotpRecoveryCodes and returns the data saved in the database.
+     * @param {TotpRecoveryCodeCreateManyAndReturnArgs} args - Arguments to create many TotpRecoveryCodes.
+     * @example
+     * // Create many TotpRecoveryCodes
+     * const totpRecoveryCode = await prisma.totpRecoveryCode.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many TotpRecoveryCodes and only return the `id`
+     * const totpRecoveryCodeWithIdOnly = await prisma.totpRecoveryCode.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends TotpRecoveryCodeCreateManyAndReturnArgs>(args?: SelectSubset<T, TotpRecoveryCodeCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TotpRecoveryCodePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a TotpRecoveryCode.
+     * @param {TotpRecoveryCodeDeleteArgs} args - Arguments to delete one TotpRecoveryCode.
+     * @example
+     * // Delete one TotpRecoveryCode
+     * const TotpRecoveryCode = await prisma.totpRecoveryCode.delete({
+     *   where: {
+     *     // ... filter to delete one TotpRecoveryCode
+     *   }
+     * })
+     * 
+     */
+    delete<T extends TotpRecoveryCodeDeleteArgs>(args: SelectSubset<T, TotpRecoveryCodeDeleteArgs<ExtArgs>>): Prisma__TotpRecoveryCodeClient<$Result.GetResult<Prisma.$TotpRecoveryCodePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one TotpRecoveryCode.
+     * @param {TotpRecoveryCodeUpdateArgs} args - Arguments to update one TotpRecoveryCode.
+     * @example
+     * // Update one TotpRecoveryCode
+     * const totpRecoveryCode = await prisma.totpRecoveryCode.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends TotpRecoveryCodeUpdateArgs>(args: SelectSubset<T, TotpRecoveryCodeUpdateArgs<ExtArgs>>): Prisma__TotpRecoveryCodeClient<$Result.GetResult<Prisma.$TotpRecoveryCodePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more TotpRecoveryCodes.
+     * @param {TotpRecoveryCodeDeleteManyArgs} args - Arguments to filter TotpRecoveryCodes to delete.
+     * @example
+     * // Delete a few TotpRecoveryCodes
+     * const { count } = await prisma.totpRecoveryCode.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends TotpRecoveryCodeDeleteManyArgs>(args?: SelectSubset<T, TotpRecoveryCodeDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TotpRecoveryCodes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotpRecoveryCodeUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many TotpRecoveryCodes
+     * const totpRecoveryCode = await prisma.totpRecoveryCode.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends TotpRecoveryCodeUpdateManyArgs>(args: SelectSubset<T, TotpRecoveryCodeUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more TotpRecoveryCodes and returns the data updated in the database.
+     * @param {TotpRecoveryCodeUpdateManyAndReturnArgs} args - Arguments to update many TotpRecoveryCodes.
+     * @example
+     * // Update many TotpRecoveryCodes
+     * const totpRecoveryCode = await prisma.totpRecoveryCode.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more TotpRecoveryCodes and only return the `id`
+     * const totpRecoveryCodeWithIdOnly = await prisma.totpRecoveryCode.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends TotpRecoveryCodeUpdateManyAndReturnArgs>(args: SelectSubset<T, TotpRecoveryCodeUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TotpRecoveryCodePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one TotpRecoveryCode.
+     * @param {TotpRecoveryCodeUpsertArgs} args - Arguments to update or create a TotpRecoveryCode.
+     * @example
+     * // Update or create a TotpRecoveryCode
+     * const totpRecoveryCode = await prisma.totpRecoveryCode.upsert({
+     *   create: {
+     *     // ... data to create a TotpRecoveryCode
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the TotpRecoveryCode we want to update
+     *   }
+     * })
+     */
+    upsert<T extends TotpRecoveryCodeUpsertArgs>(args: SelectSubset<T, TotpRecoveryCodeUpsertArgs<ExtArgs>>): Prisma__TotpRecoveryCodeClient<$Result.GetResult<Prisma.$TotpRecoveryCodePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of TotpRecoveryCodes.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotpRecoveryCodeCountArgs} args - Arguments to filter TotpRecoveryCodes to count.
+     * @example
+     * // Count the number of TotpRecoveryCodes
+     * const count = await prisma.totpRecoveryCode.count({
+     *   where: {
+     *     // ... the filter for the TotpRecoveryCodes we want to count
+     *   }
+     * })
+    **/
+    count<T extends TotpRecoveryCodeCountArgs>(
+      args?: Subset<T, TotpRecoveryCodeCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], TotpRecoveryCodeCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a TotpRecoveryCode.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotpRecoveryCodeAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends TotpRecoveryCodeAggregateArgs>(args: Subset<T, TotpRecoveryCodeAggregateArgs>): Prisma.PrismaPromise<GetTotpRecoveryCodeAggregateType<T>>
+
+    /**
+     * Group by TotpRecoveryCode.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {TotpRecoveryCodeGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends TotpRecoveryCodeGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: TotpRecoveryCodeGroupByArgs['orderBy'] }
+        : { orderBy?: TotpRecoveryCodeGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, TotpRecoveryCodeGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetTotpRecoveryCodeGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the TotpRecoveryCode model
+   */
+  readonly fields: TotpRecoveryCodeFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for TotpRecoveryCode.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__TotpRecoveryCodeClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the TotpRecoveryCode model
+   */
+  interface TotpRecoveryCodeFieldRefs {
+    readonly id: FieldRef<"TotpRecoveryCode", 'String'>
+    readonly userId: FieldRef<"TotpRecoveryCode", 'String'>
+    readonly codeHash: FieldRef<"TotpRecoveryCode", 'String'>
+    readonly usedAt: FieldRef<"TotpRecoveryCode", 'DateTime'>
+    readonly createdAt: FieldRef<"TotpRecoveryCode", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * TotpRecoveryCode findUnique
+   */
+  export type TotpRecoveryCodeFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotpRecoveryCode
+     */
+    select?: TotpRecoveryCodeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotpRecoveryCode
+     */
+    omit?: TotpRecoveryCodeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotpRecoveryCodeInclude<ExtArgs> | null
+    /**
+     * Filter, which TotpRecoveryCode to fetch.
+     */
+    where: TotpRecoveryCodeWhereUniqueInput
+  }
+
+  /**
+   * TotpRecoveryCode findUniqueOrThrow
+   */
+  export type TotpRecoveryCodeFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotpRecoveryCode
+     */
+    select?: TotpRecoveryCodeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotpRecoveryCode
+     */
+    omit?: TotpRecoveryCodeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotpRecoveryCodeInclude<ExtArgs> | null
+    /**
+     * Filter, which TotpRecoveryCode to fetch.
+     */
+    where: TotpRecoveryCodeWhereUniqueInput
+  }
+
+  /**
+   * TotpRecoveryCode findFirst
+   */
+  export type TotpRecoveryCodeFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotpRecoveryCode
+     */
+    select?: TotpRecoveryCodeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotpRecoveryCode
+     */
+    omit?: TotpRecoveryCodeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotpRecoveryCodeInclude<ExtArgs> | null
+    /**
+     * Filter, which TotpRecoveryCode to fetch.
+     */
+    where?: TotpRecoveryCodeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TotpRecoveryCodes to fetch.
+     */
+    orderBy?: TotpRecoveryCodeOrderByWithRelationInput | TotpRecoveryCodeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TotpRecoveryCodes.
+     */
+    cursor?: TotpRecoveryCodeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TotpRecoveryCodes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TotpRecoveryCodes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TotpRecoveryCodes.
+     */
+    distinct?: TotpRecoveryCodeScalarFieldEnum | TotpRecoveryCodeScalarFieldEnum[]
+  }
+
+  /**
+   * TotpRecoveryCode findFirstOrThrow
+   */
+  export type TotpRecoveryCodeFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotpRecoveryCode
+     */
+    select?: TotpRecoveryCodeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotpRecoveryCode
+     */
+    omit?: TotpRecoveryCodeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotpRecoveryCodeInclude<ExtArgs> | null
+    /**
+     * Filter, which TotpRecoveryCode to fetch.
+     */
+    where?: TotpRecoveryCodeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TotpRecoveryCodes to fetch.
+     */
+    orderBy?: TotpRecoveryCodeOrderByWithRelationInput | TotpRecoveryCodeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for TotpRecoveryCodes.
+     */
+    cursor?: TotpRecoveryCodeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TotpRecoveryCodes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TotpRecoveryCodes.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of TotpRecoveryCodes.
+     */
+    distinct?: TotpRecoveryCodeScalarFieldEnum | TotpRecoveryCodeScalarFieldEnum[]
+  }
+
+  /**
+   * TotpRecoveryCode findMany
+   */
+  export type TotpRecoveryCodeFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotpRecoveryCode
+     */
+    select?: TotpRecoveryCodeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotpRecoveryCode
+     */
+    omit?: TotpRecoveryCodeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotpRecoveryCodeInclude<ExtArgs> | null
+    /**
+     * Filter, which TotpRecoveryCodes to fetch.
+     */
+    where?: TotpRecoveryCodeWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of TotpRecoveryCodes to fetch.
+     */
+    orderBy?: TotpRecoveryCodeOrderByWithRelationInput | TotpRecoveryCodeOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing TotpRecoveryCodes.
+     */
+    cursor?: TotpRecoveryCodeWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` TotpRecoveryCodes from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` TotpRecoveryCodes.
+     */
+    skip?: number
+    distinct?: TotpRecoveryCodeScalarFieldEnum | TotpRecoveryCodeScalarFieldEnum[]
+  }
+
+  /**
+   * TotpRecoveryCode create
+   */
+  export type TotpRecoveryCodeCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotpRecoveryCode
+     */
+    select?: TotpRecoveryCodeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotpRecoveryCode
+     */
+    omit?: TotpRecoveryCodeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotpRecoveryCodeInclude<ExtArgs> | null
+    /**
+     * The data needed to create a TotpRecoveryCode.
+     */
+    data: XOR<TotpRecoveryCodeCreateInput, TotpRecoveryCodeUncheckedCreateInput>
+  }
+
+  /**
+   * TotpRecoveryCode createMany
+   */
+  export type TotpRecoveryCodeCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many TotpRecoveryCodes.
+     */
+    data: TotpRecoveryCodeCreateManyInput | TotpRecoveryCodeCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * TotpRecoveryCode createManyAndReturn
+   */
+  export type TotpRecoveryCodeCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotpRecoveryCode
+     */
+    select?: TotpRecoveryCodeSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotpRecoveryCode
+     */
+    omit?: TotpRecoveryCodeOmit<ExtArgs> | null
+    /**
+     * The data used to create many TotpRecoveryCodes.
+     */
+    data: TotpRecoveryCodeCreateManyInput | TotpRecoveryCodeCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotpRecoveryCodeIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * TotpRecoveryCode update
+   */
+  export type TotpRecoveryCodeUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotpRecoveryCode
+     */
+    select?: TotpRecoveryCodeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotpRecoveryCode
+     */
+    omit?: TotpRecoveryCodeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotpRecoveryCodeInclude<ExtArgs> | null
+    /**
+     * The data needed to update a TotpRecoveryCode.
+     */
+    data: XOR<TotpRecoveryCodeUpdateInput, TotpRecoveryCodeUncheckedUpdateInput>
+    /**
+     * Choose, which TotpRecoveryCode to update.
+     */
+    where: TotpRecoveryCodeWhereUniqueInput
+  }
+
+  /**
+   * TotpRecoveryCode updateMany
+   */
+  export type TotpRecoveryCodeUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update TotpRecoveryCodes.
+     */
+    data: XOR<TotpRecoveryCodeUpdateManyMutationInput, TotpRecoveryCodeUncheckedUpdateManyInput>
+    /**
+     * Filter which TotpRecoveryCodes to update
+     */
+    where?: TotpRecoveryCodeWhereInput
+    /**
+     * Limit how many TotpRecoveryCodes to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * TotpRecoveryCode updateManyAndReturn
+   */
+  export type TotpRecoveryCodeUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotpRecoveryCode
+     */
+    select?: TotpRecoveryCodeSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotpRecoveryCode
+     */
+    omit?: TotpRecoveryCodeOmit<ExtArgs> | null
+    /**
+     * The data used to update TotpRecoveryCodes.
+     */
+    data: XOR<TotpRecoveryCodeUpdateManyMutationInput, TotpRecoveryCodeUncheckedUpdateManyInput>
+    /**
+     * Filter which TotpRecoveryCodes to update
+     */
+    where?: TotpRecoveryCodeWhereInput
+    /**
+     * Limit how many TotpRecoveryCodes to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotpRecoveryCodeIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * TotpRecoveryCode upsert
+   */
+  export type TotpRecoveryCodeUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotpRecoveryCode
+     */
+    select?: TotpRecoveryCodeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotpRecoveryCode
+     */
+    omit?: TotpRecoveryCodeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotpRecoveryCodeInclude<ExtArgs> | null
+    /**
+     * The filter to search for the TotpRecoveryCode to update in case it exists.
+     */
+    where: TotpRecoveryCodeWhereUniqueInput
+    /**
+     * In case the TotpRecoveryCode found by the `where` argument doesn't exist, create a new TotpRecoveryCode with this data.
+     */
+    create: XOR<TotpRecoveryCodeCreateInput, TotpRecoveryCodeUncheckedCreateInput>
+    /**
+     * In case the TotpRecoveryCode was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<TotpRecoveryCodeUpdateInput, TotpRecoveryCodeUncheckedUpdateInput>
+  }
+
+  /**
+   * TotpRecoveryCode delete
+   */
+  export type TotpRecoveryCodeDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotpRecoveryCode
+     */
+    select?: TotpRecoveryCodeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotpRecoveryCode
+     */
+    omit?: TotpRecoveryCodeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotpRecoveryCodeInclude<ExtArgs> | null
+    /**
+     * Filter which TotpRecoveryCode to delete.
+     */
+    where: TotpRecoveryCodeWhereUniqueInput
+  }
+
+  /**
+   * TotpRecoveryCode deleteMany
+   */
+  export type TotpRecoveryCodeDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which TotpRecoveryCodes to delete
+     */
+    where?: TotpRecoveryCodeWhereInput
+    /**
+     * Limit how many TotpRecoveryCodes to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * TotpRecoveryCode without action
+   */
+  export type TotpRecoveryCodeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the TotpRecoveryCode
+     */
+    select?: TotpRecoveryCodeSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the TotpRecoveryCode
+     */
+    omit?: TotpRecoveryCodeOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TotpRecoveryCodeInclude<ExtArgs> | null
   }
 
 
@@ -33149,9 +34400,13 @@ export namespace Prisma {
     lifecycleState: 'lifecycleState',
     autoFillPhoneticNames: 'autoFillPhoneticNames',
     sessionVersion: 'sessionVersion',
+    avatarUrl: 'avatarUrl',
     emailVerified: 'emailVerified',
     emailPendingChange: 'emailPendingChange',
     emailPendingChangeRequestedAt: 'emailPendingChangeRequestedAt',
+    totpEnabled: 'totpEnabled',
+    totpSecret: 'totpSecret',
+    totpVerifiedAt: 'totpVerifiedAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -33508,10 +34763,22 @@ export namespace Prisma {
     deviceHint: 'deviceHint',
     lastActiveAt: 'lastActiveAt',
     revokedAt: 'revokedAt',
+    totpChallengeVerified: 'totpChallengeVerified',
     createdAt: 'createdAt'
   };
 
   export type UserSessionScalarFieldEnum = (typeof UserSessionScalarFieldEnum)[keyof typeof UserSessionScalarFieldEnum]
+
+
+  export const TotpRecoveryCodeScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    codeHash: 'codeHash',
+    usedAt: 'usedAt',
+    createdAt: 'createdAt'
+  };
+
+  export type TotpRecoveryCodeScalarFieldEnum = (typeof TotpRecoveryCodeScalarFieldEnum)[keyof typeof TotpRecoveryCodeScalarFieldEnum]
 
 
   export const ActivityEventScalarFieldEnum: {
@@ -34190,9 +35457,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFilter<"User"> | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFilter<"User"> | boolean
     sessionVersion?: IntFilter<"User"> | number
+    avatarUrl?: StringNullableFilter<"User"> | string | null
     emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
     emailPendingChange?: StringNullableFilter<"User"> | string | null
     emailPendingChangeRequestedAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    totpEnabled?: BoolFilter<"User"> | boolean
+    totpSecret?: StringNullableFilter<"User"> | string | null
+    totpVerifiedAt?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     appPasswords?: AppPasswordListRelationFilter
@@ -34212,6 +35483,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenListRelationFilter
     passwordResetTokens?: PasswordResetTokenListRelationFilter
     sessions?: UserSessionListRelationFilter
+    totpRecoveryCodes?: TotpRecoveryCodeListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -34222,9 +35494,13 @@ export namespace Prisma {
     lifecycleState?: SortOrder
     autoFillPhoneticNames?: SortOrder
     sessionVersion?: SortOrder
+    avatarUrl?: SortOrderInput | SortOrder
     emailVerified?: SortOrderInput | SortOrder
     emailPendingChange?: SortOrderInput | SortOrder
     emailPendingChangeRequestedAt?: SortOrderInput | SortOrder
+    totpEnabled?: SortOrder
+    totpSecret?: SortOrderInput | SortOrder
+    totpVerifiedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     appPasswords?: AppPasswordOrderByRelationAggregateInput
@@ -34244,6 +35520,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenOrderByRelationAggregateInput
     passwordResetTokens?: PasswordResetTokenOrderByRelationAggregateInput
     sessions?: UserSessionOrderByRelationAggregateInput
+    totpRecoveryCodes?: TotpRecoveryCodeOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -34257,9 +35534,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFilter<"User"> | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFilter<"User"> | boolean
     sessionVersion?: IntFilter<"User"> | number
+    avatarUrl?: StringNullableFilter<"User"> | string | null
     emailVerified?: DateTimeNullableFilter<"User"> | Date | string | null
     emailPendingChange?: StringNullableFilter<"User"> | string | null
     emailPendingChangeRequestedAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    totpEnabled?: BoolFilter<"User"> | boolean
+    totpSecret?: StringNullableFilter<"User"> | string | null
+    totpVerifiedAt?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     appPasswords?: AppPasswordListRelationFilter
@@ -34279,6 +35560,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenListRelationFilter
     passwordResetTokens?: PasswordResetTokenListRelationFilter
     sessions?: UserSessionListRelationFilter
+    totpRecoveryCodes?: TotpRecoveryCodeListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -34289,9 +35571,13 @@ export namespace Prisma {
     lifecycleState?: SortOrder
     autoFillPhoneticNames?: SortOrder
     sessionVersion?: SortOrder
+    avatarUrl?: SortOrderInput | SortOrder
     emailVerified?: SortOrderInput | SortOrder
     emailPendingChange?: SortOrderInput | SortOrder
     emailPendingChangeRequestedAt?: SortOrderInput | SortOrder
+    totpEnabled?: SortOrder
+    totpSecret?: SortOrderInput | SortOrder
+    totpVerifiedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -34312,9 +35598,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateWithAggregatesFilter<"User"> | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolWithAggregatesFilter<"User"> | boolean
     sessionVersion?: IntWithAggregatesFilter<"User"> | number
+    avatarUrl?: StringNullableWithAggregatesFilter<"User"> | string | null
     emailVerified?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     emailPendingChange?: StringNullableWithAggregatesFilter<"User"> | string | null
     emailPendingChangeRequestedAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+    totpEnabled?: BoolWithAggregatesFilter<"User"> | boolean
+    totpSecret?: StringNullableWithAggregatesFilter<"User"> | string | null
+    totpVerifiedAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
@@ -36142,6 +37432,7 @@ export namespace Prisma {
     deviceHint?: StringNullableFilter<"UserSession"> | string | null
     lastActiveAt?: DateTimeFilter<"UserSession"> | Date | string
     revokedAt?: DateTimeNullableFilter<"UserSession"> | Date | string | null
+    totpChallengeVerified?: DateTimeNullableFilter<"UserSession"> | Date | string | null
     createdAt?: DateTimeFilter<"UserSession"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }
@@ -36155,6 +37446,7 @@ export namespace Prisma {
     deviceHint?: SortOrderInput | SortOrder
     lastActiveAt?: SortOrder
     revokedAt?: SortOrderInput | SortOrder
+    totpChallengeVerified?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     user?: UserOrderByWithRelationInput
   }
@@ -36171,6 +37463,7 @@ export namespace Prisma {
     deviceHint?: StringNullableFilter<"UserSession"> | string | null
     lastActiveAt?: DateTimeFilter<"UserSession"> | Date | string
     revokedAt?: DateTimeNullableFilter<"UserSession"> | Date | string | null
+    totpChallengeVerified?: DateTimeNullableFilter<"UserSession"> | Date | string | null
     createdAt?: DateTimeFilter<"UserSession"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
   }, "id" | "jti">
@@ -36184,6 +37477,7 @@ export namespace Prisma {
     deviceHint?: SortOrderInput | SortOrder
     lastActiveAt?: SortOrder
     revokedAt?: SortOrderInput | SortOrder
+    totpChallengeVerified?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     _count?: UserSessionCountOrderByAggregateInput
     _max?: UserSessionMaxOrderByAggregateInput
@@ -36202,7 +37496,63 @@ export namespace Prisma {
     deviceHint?: StringNullableWithAggregatesFilter<"UserSession"> | string | null
     lastActiveAt?: DateTimeWithAggregatesFilter<"UserSession"> | Date | string
     revokedAt?: DateTimeNullableWithAggregatesFilter<"UserSession"> | Date | string | null
+    totpChallengeVerified?: DateTimeNullableWithAggregatesFilter<"UserSession"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"UserSession"> | Date | string
+  }
+
+  export type TotpRecoveryCodeWhereInput = {
+    AND?: TotpRecoveryCodeWhereInput | TotpRecoveryCodeWhereInput[]
+    OR?: TotpRecoveryCodeWhereInput[]
+    NOT?: TotpRecoveryCodeWhereInput | TotpRecoveryCodeWhereInput[]
+    id?: StringFilter<"TotpRecoveryCode"> | string
+    userId?: StringFilter<"TotpRecoveryCode"> | string
+    codeHash?: StringFilter<"TotpRecoveryCode"> | string
+    usedAt?: DateTimeNullableFilter<"TotpRecoveryCode"> | Date | string | null
+    createdAt?: DateTimeFilter<"TotpRecoveryCode"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type TotpRecoveryCodeOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    codeHash?: SortOrder
+    usedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type TotpRecoveryCodeWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: TotpRecoveryCodeWhereInput | TotpRecoveryCodeWhereInput[]
+    OR?: TotpRecoveryCodeWhereInput[]
+    NOT?: TotpRecoveryCodeWhereInput | TotpRecoveryCodeWhereInput[]
+    userId?: StringFilter<"TotpRecoveryCode"> | string
+    codeHash?: StringFilter<"TotpRecoveryCode"> | string
+    usedAt?: DateTimeNullableFilter<"TotpRecoveryCode"> | Date | string | null
+    createdAt?: DateTimeFilter<"TotpRecoveryCode"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type TotpRecoveryCodeOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    codeHash?: SortOrder
+    usedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: TotpRecoveryCodeCountOrderByAggregateInput
+    _max?: TotpRecoveryCodeMaxOrderByAggregateInput
+    _min?: TotpRecoveryCodeMinOrderByAggregateInput
+  }
+
+  export type TotpRecoveryCodeScalarWhereWithAggregatesInput = {
+    AND?: TotpRecoveryCodeScalarWhereWithAggregatesInput | TotpRecoveryCodeScalarWhereWithAggregatesInput[]
+    OR?: TotpRecoveryCodeScalarWhereWithAggregatesInput[]
+    NOT?: TotpRecoveryCodeScalarWhereWithAggregatesInput | TotpRecoveryCodeScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"TotpRecoveryCode"> | string
+    userId?: StringWithAggregatesFilter<"TotpRecoveryCode"> | string
+    codeHash?: StringWithAggregatesFilter<"TotpRecoveryCode"> | string
+    usedAt?: DateTimeNullableWithAggregatesFilter<"TotpRecoveryCode"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"TotpRecoveryCode"> | Date | string
   }
 
   export type ActivityEventWhereInput = {
@@ -36822,9 +38172,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -36844,6 +38198,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -36854,9 +38209,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -36876,6 +38235,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -36886,9 +38246,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -36908,6 +38272,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -36918,9 +38283,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -36940,6 +38309,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -36950,9 +38320,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -36965,9 +38339,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -36980,9 +38358,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -39133,6 +40515,7 @@ export namespace Prisma {
     deviceHint?: string | null
     lastActiveAt?: Date | string
     revokedAt?: Date | string | null
+    totpChallengeVerified?: Date | string | null
     createdAt?: Date | string
     user: UserCreateNestedOneWithoutSessionsInput
   }
@@ -39146,6 +40529,7 @@ export namespace Prisma {
     deviceHint?: string | null
     lastActiveAt?: Date | string
     revokedAt?: Date | string | null
+    totpChallengeVerified?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -39157,6 +40541,7 @@ export namespace Prisma {
     deviceHint?: NullableStringFieldUpdateOperationsInput | string | null
     lastActiveAt?: DateTimeFieldUpdateOperationsInput | Date | string
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpChallengeVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSessionsNestedInput
   }
@@ -39170,6 +40555,7 @@ export namespace Prisma {
     deviceHint?: NullableStringFieldUpdateOperationsInput | string | null
     lastActiveAt?: DateTimeFieldUpdateOperationsInput | Date | string
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpChallengeVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -39182,6 +40568,7 @@ export namespace Prisma {
     deviceHint?: string | null
     lastActiveAt?: Date | string
     revokedAt?: Date | string | null
+    totpChallengeVerified?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -39193,6 +40580,7 @@ export namespace Prisma {
     deviceHint?: NullableStringFieldUpdateOperationsInput | string | null
     lastActiveAt?: DateTimeFieldUpdateOperationsInput | Date | string
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpChallengeVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -39205,6 +40593,62 @@ export namespace Prisma {
     deviceHint?: NullableStringFieldUpdateOperationsInput | string | null
     lastActiveAt?: DateTimeFieldUpdateOperationsInput | Date | string
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpChallengeVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TotpRecoveryCodeCreateInput = {
+    id?: string
+    codeHash: string
+    usedAt?: Date | string | null
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutTotpRecoveryCodesInput
+  }
+
+  export type TotpRecoveryCodeUncheckedCreateInput = {
+    id?: string
+    userId: string
+    codeHash: string
+    usedAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type TotpRecoveryCodeUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    codeHash?: StringFieldUpdateOperationsInput | string
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutTotpRecoveryCodesNestedInput
+  }
+
+  export type TotpRecoveryCodeUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    codeHash?: StringFieldUpdateOperationsInput | string
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TotpRecoveryCodeCreateManyInput = {
+    id?: string
+    userId: string
+    codeHash: string
+    usedAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type TotpRecoveryCodeUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    codeHash?: StringFieldUpdateOperationsInput | string
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TotpRecoveryCodeUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    codeHash?: StringFieldUpdateOperationsInput | string
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -40019,6 +41463,12 @@ export namespace Prisma {
     none?: UserSessionWhereInput
   }
 
+  export type TotpRecoveryCodeListRelationFilter = {
+    every?: TotpRecoveryCodeWhereInput
+    some?: TotpRecoveryCodeWhereInput
+    none?: TotpRecoveryCodeWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -40084,6 +41534,10 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type TotpRecoveryCodeOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
@@ -40092,9 +41546,13 @@ export namespace Prisma {
     lifecycleState?: SortOrder
     autoFillPhoneticNames?: SortOrder
     sessionVersion?: SortOrder
+    avatarUrl?: SortOrder
     emailVerified?: SortOrder
     emailPendingChange?: SortOrder
     emailPendingChangeRequestedAt?: SortOrder
+    totpEnabled?: SortOrder
+    totpSecret?: SortOrder
+    totpVerifiedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -40111,9 +41569,13 @@ export namespace Prisma {
     lifecycleState?: SortOrder
     autoFillPhoneticNames?: SortOrder
     sessionVersion?: SortOrder
+    avatarUrl?: SortOrder
     emailVerified?: SortOrder
     emailPendingChange?: SortOrder
     emailPendingChangeRequestedAt?: SortOrder
+    totpEnabled?: SortOrder
+    totpSecret?: SortOrder
+    totpVerifiedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -40126,9 +41588,13 @@ export namespace Prisma {
     lifecycleState?: SortOrder
     autoFillPhoneticNames?: SortOrder
     sessionVersion?: SortOrder
+    avatarUrl?: SortOrder
     emailVerified?: SortOrder
     emailPendingChange?: SortOrder
     emailPendingChangeRequestedAt?: SortOrder
+    totpEnabled?: SortOrder
+    totpSecret?: SortOrder
+    totpVerifiedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -41843,6 +43309,7 @@ export namespace Prisma {
     deviceHint?: SortOrder
     lastActiveAt?: SortOrder
     revokedAt?: SortOrder
+    totpChallengeVerified?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -41855,6 +43322,7 @@ export namespace Prisma {
     deviceHint?: SortOrder
     lastActiveAt?: SortOrder
     revokedAt?: SortOrder
+    totpChallengeVerified?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -41867,6 +43335,31 @@ export namespace Prisma {
     deviceHint?: SortOrder
     lastActiveAt?: SortOrder
     revokedAt?: SortOrder
+    totpChallengeVerified?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type TotpRecoveryCodeCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    codeHash?: SortOrder
+    usedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type TotpRecoveryCodeMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    codeHash?: SortOrder
+    usedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type TotpRecoveryCodeMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    codeHash?: SortOrder
+    usedAt?: SortOrder
     createdAt?: SortOrder
   }
 
@@ -42447,6 +43940,13 @@ export namespace Prisma {
     connect?: UserSessionWhereUniqueInput | UserSessionWhereUniqueInput[]
   }
 
+  export type TotpRecoveryCodeCreateNestedManyWithoutUserInput = {
+    create?: XOR<TotpRecoveryCodeCreateWithoutUserInput, TotpRecoveryCodeUncheckedCreateWithoutUserInput> | TotpRecoveryCodeCreateWithoutUserInput[] | TotpRecoveryCodeUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: TotpRecoveryCodeCreateOrConnectWithoutUserInput | TotpRecoveryCodeCreateOrConnectWithoutUserInput[]
+    createMany?: TotpRecoveryCodeCreateManyUserInputEnvelope
+    connect?: TotpRecoveryCodeWhereUniqueInput | TotpRecoveryCodeWhereUniqueInput[]
+  }
+
   export type AppPasswordUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
@@ -42563,6 +44063,13 @@ export namespace Prisma {
     connectOrCreate?: UserSessionCreateOrConnectWithoutUserInput | UserSessionCreateOrConnectWithoutUserInput[]
     createMany?: UserSessionCreateManyUserInputEnvelope
     connect?: UserSessionWhereUniqueInput | UserSessionWhereUniqueInput[]
+  }
+
+  export type TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<TotpRecoveryCodeCreateWithoutUserInput, TotpRecoveryCodeUncheckedCreateWithoutUserInput> | TotpRecoveryCodeCreateWithoutUserInput[] | TotpRecoveryCodeUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: TotpRecoveryCodeCreateOrConnectWithoutUserInput | TotpRecoveryCodeCreateOrConnectWithoutUserInput[]
+    createMany?: TotpRecoveryCodeCreateManyUserInputEnvelope
+    connect?: TotpRecoveryCodeWhereUniqueInput | TotpRecoveryCodeWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -42831,6 +44338,20 @@ export namespace Prisma {
     deleteMany?: UserSessionScalarWhereInput | UserSessionScalarWhereInput[]
   }
 
+  export type TotpRecoveryCodeUpdateManyWithoutUserNestedInput = {
+    create?: XOR<TotpRecoveryCodeCreateWithoutUserInput, TotpRecoveryCodeUncheckedCreateWithoutUserInput> | TotpRecoveryCodeCreateWithoutUserInput[] | TotpRecoveryCodeUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: TotpRecoveryCodeCreateOrConnectWithoutUserInput | TotpRecoveryCodeCreateOrConnectWithoutUserInput[]
+    upsert?: TotpRecoveryCodeUpsertWithWhereUniqueWithoutUserInput | TotpRecoveryCodeUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: TotpRecoveryCodeCreateManyUserInputEnvelope
+    set?: TotpRecoveryCodeWhereUniqueInput | TotpRecoveryCodeWhereUniqueInput[]
+    disconnect?: TotpRecoveryCodeWhereUniqueInput | TotpRecoveryCodeWhereUniqueInput[]
+    delete?: TotpRecoveryCodeWhereUniqueInput | TotpRecoveryCodeWhereUniqueInput[]
+    connect?: TotpRecoveryCodeWhereUniqueInput | TotpRecoveryCodeWhereUniqueInput[]
+    update?: TotpRecoveryCodeUpdateWithWhereUniqueWithoutUserInput | TotpRecoveryCodeUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: TotpRecoveryCodeUpdateManyWithWhereWithoutUserInput | TotpRecoveryCodeUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: TotpRecoveryCodeScalarWhereInput | TotpRecoveryCodeScalarWhereInput[]
+  }
+
   export type AppPasswordUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
@@ -43063,6 +44584,20 @@ export namespace Prisma {
     update?: UserSessionUpdateWithWhereUniqueWithoutUserInput | UserSessionUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: UserSessionUpdateManyWithWhereWithoutUserInput | UserSessionUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: UserSessionScalarWhereInput | UserSessionScalarWhereInput[]
+  }
+
+  export type TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<TotpRecoveryCodeCreateWithoutUserInput, TotpRecoveryCodeUncheckedCreateWithoutUserInput> | TotpRecoveryCodeCreateWithoutUserInput[] | TotpRecoveryCodeUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: TotpRecoveryCodeCreateOrConnectWithoutUserInput | TotpRecoveryCodeCreateOrConnectWithoutUserInput[]
+    upsert?: TotpRecoveryCodeUpsertWithWhereUniqueWithoutUserInput | TotpRecoveryCodeUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: TotpRecoveryCodeCreateManyUserInputEnvelope
+    set?: TotpRecoveryCodeWhereUniqueInput | TotpRecoveryCodeWhereUniqueInput[]
+    disconnect?: TotpRecoveryCodeWhereUniqueInput | TotpRecoveryCodeWhereUniqueInput[]
+    delete?: TotpRecoveryCodeWhereUniqueInput | TotpRecoveryCodeWhereUniqueInput[]
+    connect?: TotpRecoveryCodeWhereUniqueInput | TotpRecoveryCodeWhereUniqueInput[]
+    update?: TotpRecoveryCodeUpdateWithWhereUniqueWithoutUserInput | TotpRecoveryCodeUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: TotpRecoveryCodeUpdateManyWithWhereWithoutUserInput | TotpRecoveryCodeUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: TotpRecoveryCodeScalarWhereInput | TotpRecoveryCodeScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutAppPasswordsInput = {
@@ -44309,6 +45844,20 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutSessionsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSessionsInput, UserUpdateWithoutSessionsInput>, UserUncheckedUpdateWithoutSessionsInput>
+  }
+
+  export type UserCreateNestedOneWithoutTotpRecoveryCodesInput = {
+    create?: XOR<UserCreateWithoutTotpRecoveryCodesInput, UserUncheckedCreateWithoutTotpRecoveryCodesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutTotpRecoveryCodesInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutTotpRecoveryCodesNestedInput = {
+    create?: XOR<UserCreateWithoutTotpRecoveryCodesInput, UserUncheckedCreateWithoutTotpRecoveryCodesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutTotpRecoveryCodesInput
+    upsert?: UserUpsertWithoutTotpRecoveryCodesInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutTotpRecoveryCodesInput, UserUpdateWithoutTotpRecoveryCodesInput>, UserUncheckedUpdateWithoutTotpRecoveryCodesInput>
   }
 
   export type UserCreateNestedOneWithoutActivityEventsInput = {
@@ -46345,6 +47894,7 @@ export namespace Prisma {
     deviceHint?: string | null
     lastActiveAt?: Date | string
     revokedAt?: Date | string | null
+    totpChallengeVerified?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -46356,6 +47906,7 @@ export namespace Prisma {
     deviceHint?: string | null
     lastActiveAt?: Date | string
     revokedAt?: Date | string | null
+    totpChallengeVerified?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -46366,6 +47917,30 @@ export namespace Prisma {
 
   export type UserSessionCreateManyUserInputEnvelope = {
     data: UserSessionCreateManyUserInput | UserSessionCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type TotpRecoveryCodeCreateWithoutUserInput = {
+    id?: string
+    codeHash: string
+    usedAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type TotpRecoveryCodeUncheckedCreateWithoutUserInput = {
+    id?: string
+    codeHash: string
+    usedAt?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type TotpRecoveryCodeCreateOrConnectWithoutUserInput = {
+    where: TotpRecoveryCodeWhereUniqueInput
+    create: XOR<TotpRecoveryCodeCreateWithoutUserInput, TotpRecoveryCodeUncheckedCreateWithoutUserInput>
+  }
+
+  export type TotpRecoveryCodeCreateManyUserInputEnvelope = {
+    data: TotpRecoveryCodeCreateManyUserInput | TotpRecoveryCodeCreateManyUserInput[]
     skipDuplicates?: boolean
   }
 
@@ -46994,7 +48569,35 @@ export namespace Prisma {
     deviceHint?: StringNullableFilter<"UserSession"> | string | null
     lastActiveAt?: DateTimeFilter<"UserSession"> | Date | string
     revokedAt?: DateTimeNullableFilter<"UserSession"> | Date | string | null
+    totpChallengeVerified?: DateTimeNullableFilter<"UserSession"> | Date | string | null
     createdAt?: DateTimeFilter<"UserSession"> | Date | string
+  }
+
+  export type TotpRecoveryCodeUpsertWithWhereUniqueWithoutUserInput = {
+    where: TotpRecoveryCodeWhereUniqueInput
+    update: XOR<TotpRecoveryCodeUpdateWithoutUserInput, TotpRecoveryCodeUncheckedUpdateWithoutUserInput>
+    create: XOR<TotpRecoveryCodeCreateWithoutUserInput, TotpRecoveryCodeUncheckedCreateWithoutUserInput>
+  }
+
+  export type TotpRecoveryCodeUpdateWithWhereUniqueWithoutUserInput = {
+    where: TotpRecoveryCodeWhereUniqueInput
+    data: XOR<TotpRecoveryCodeUpdateWithoutUserInput, TotpRecoveryCodeUncheckedUpdateWithoutUserInput>
+  }
+
+  export type TotpRecoveryCodeUpdateManyWithWhereWithoutUserInput = {
+    where: TotpRecoveryCodeScalarWhereInput
+    data: XOR<TotpRecoveryCodeUpdateManyMutationInput, TotpRecoveryCodeUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type TotpRecoveryCodeScalarWhereInput = {
+    AND?: TotpRecoveryCodeScalarWhereInput | TotpRecoveryCodeScalarWhereInput[]
+    OR?: TotpRecoveryCodeScalarWhereInput[]
+    NOT?: TotpRecoveryCodeScalarWhereInput | TotpRecoveryCodeScalarWhereInput[]
+    id?: StringFilter<"TotpRecoveryCode"> | string
+    userId?: StringFilter<"TotpRecoveryCode"> | string
+    codeHash?: StringFilter<"TotpRecoveryCode"> | string
+    usedAt?: DateTimeNullableFilter<"TotpRecoveryCode"> | Date | string | null
+    createdAt?: DateTimeFilter<"TotpRecoveryCode"> | Date | string
   }
 
   export type UserCreateWithoutAppPasswordsInput = {
@@ -47005,9 +48608,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -47026,6 +48633,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAppPasswordsInput = {
@@ -47036,9 +48644,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -47057,6 +48669,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAppPasswordsInput = {
@@ -47137,9 +48750,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -47158,6 +48775,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAppPasswordsInput = {
@@ -47168,9 +48786,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -47189,6 +48811,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SyncConflictUpsertWithWhereUniqueWithoutAppPasswordInput = {
@@ -47241,9 +48864,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -47262,6 +48889,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutContactsInput = {
@@ -47272,9 +48900,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -47293,6 +48925,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutContactsInput = {
@@ -47969,9 +49602,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -47990,6 +49627,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutContactsInput = {
@@ -48000,9 +49638,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -48021,6 +49663,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ImportJobUpsertWithoutContactsInput = {
@@ -48394,9 +50037,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -48415,6 +50062,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSubscriptionCustomerInput = {
@@ -48425,9 +50073,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -48446,6 +50098,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSubscriptionCustomerInput = {
@@ -48552,9 +50205,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -48573,6 +50230,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSubscriptionCustomerInput = {
@@ -48583,9 +50241,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -48604,6 +50266,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SubscriptionUpsertWithWhereUniqueWithoutSubscriptionCustomerInput = {
@@ -48630,9 +50293,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -48651,6 +50318,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSubscriptionsInput = {
@@ -48661,9 +50329,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -48682,6 +50354,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSubscriptionsInput = {
@@ -48773,9 +50446,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -48794,6 +50471,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSubscriptionsInput = {
@@ -48804,9 +50482,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -48825,6 +50507,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SubscriptionCustomerUpsertWithoutSubscriptionsInput = {
@@ -48882,9 +50565,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -48903,6 +50590,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutImportJobsInput = {
@@ -48913,9 +50601,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -48934,6 +50626,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutImportJobsInput = {
@@ -49086,9 +50779,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -49107,6 +50804,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutImportJobsInput = {
@@ -49117,9 +50815,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -49138,6 +50840,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ContactUpsertWithWhereUniqueWithoutImportJobInput = {
@@ -49164,9 +50867,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -49185,6 +50892,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutExportJobsInput = {
@@ -49195,9 +50903,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -49216,6 +50928,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutExportJobsInput = {
@@ -49242,9 +50955,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -49263,6 +50980,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutExportJobsInput = {
@@ -49273,9 +50991,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -49294,6 +51016,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutMergeSuggestionsInput = {
@@ -49304,9 +51027,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -49325,6 +51052,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutMergeSuggestionsInput = {
@@ -49335,9 +51063,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -49356,6 +51088,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutMergeSuggestionsInput = {
@@ -49662,9 +51395,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -49683,6 +51420,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMergeSuggestionsInput = {
@@ -49693,9 +51431,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -49714,6 +51456,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ContactUpsertWithoutLeftMergeSuggestionsInput = {
@@ -50037,9 +51780,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -50058,6 +51805,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutMergeDecisionsInput = {
@@ -50068,9 +51816,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -50089,6 +51841,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutMergeDecisionsInput = {
@@ -50164,9 +51917,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -50185,6 +51942,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMergeDecisionsInput = {
@@ -50195,9 +51953,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -50216,6 +51978,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutSyncAccountsInput = {
@@ -50226,9 +51989,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -50247,6 +52014,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSyncAccountsInput = {
@@ -50257,9 +52025,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -50278,6 +52050,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSyncAccountsInput = {
@@ -50483,9 +52256,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -50504,6 +52281,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSyncAccountsInput = {
@@ -50514,9 +52292,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -50535,6 +52317,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SyncContactLinkUpsertWithWhereUniqueWithoutSyncAccountInput = {
@@ -51800,9 +53583,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -51821,6 +53608,7 @@ export namespace Prisma {
     contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutEmailVerificationTokensInput = {
@@ -51831,9 +53619,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -51852,6 +53644,7 @@ export namespace Prisma {
     contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutEmailVerificationTokensInput = {
@@ -51878,9 +53671,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -51899,6 +53696,7 @@ export namespace Prisma {
     contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEmailVerificationTokensInput = {
@@ -51909,9 +53707,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -51930,6 +53732,7 @@ export namespace Prisma {
     contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutPasswordResetTokensInput = {
@@ -51940,9 +53743,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -51961,6 +53768,7 @@ export namespace Prisma {
     contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
     emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
@@ -51971,9 +53779,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -51992,6 +53804,7 @@ export namespace Prisma {
     contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
     emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutPasswordResetTokensInput = {
@@ -52018,9 +53831,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -52039,6 +53856,7 @@ export namespace Prisma {
     contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
     emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
@@ -52049,9 +53867,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -52070,6 +53892,7 @@ export namespace Prisma {
     contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
     emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutSessionsInput = {
@@ -52080,9 +53903,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -52101,6 +53928,7 @@ export namespace Prisma {
     contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
     emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -52111,9 +53939,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -52132,6 +53964,7 @@ export namespace Prisma {
     contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
     emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -52158,9 +53991,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -52179,6 +54016,7 @@ export namespace Prisma {
     contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
     emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -52189,9 +54027,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -52210,6 +54052,167 @@ export namespace Prisma {
     contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
     emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutTotpRecoveryCodesInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutTotpRecoveryCodesInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutTotpRecoveryCodesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutTotpRecoveryCodesInput, UserUncheckedCreateWithoutTotpRecoveryCodesInput>
+  }
+
+  export type UserUpsertWithoutTotpRecoveryCodesInput = {
+    update: XOR<UserUpdateWithoutTotpRecoveryCodesInput, UserUncheckedUpdateWithoutTotpRecoveryCodesInput>
+    create: XOR<UserCreateWithoutTotpRecoveryCodesInput, UserUncheckedCreateWithoutTotpRecoveryCodesInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutTotpRecoveryCodesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutTotpRecoveryCodesInput, UserUncheckedUpdateWithoutTotpRecoveryCodesInput>
+  }
+
+  export type UserUpdateWithoutTotpRecoveryCodesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutTotpRecoveryCodesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutActivityEventsInput = {
@@ -52220,9 +54223,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -52241,6 +54248,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutActivityEventsInput = {
@@ -52251,9 +54259,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -52272,6 +54284,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutActivityEventsInput = {
@@ -52419,9 +54432,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -52440,6 +54457,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutActivityEventsInput = {
@@ -52450,9 +54468,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -52471,6 +54493,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ContactUpsertWithoutActivityEventsInput = {
@@ -52608,9 +54631,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -52629,6 +54656,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutOwnedGroupsInput = {
@@ -52639,9 +54667,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -52660,6 +54692,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutOwnedGroupsInput = {
@@ -52863,9 +54896,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -52884,6 +54921,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOwnedGroupsInput = {
@@ -52894,9 +54932,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -52915,6 +54957,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SubscriptionUpsertWithoutGroupsInput = {
@@ -53115,9 +55158,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -53136,6 +55183,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutGroupMembershipsInput = {
@@ -53146,9 +55194,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -53167,6 +55219,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutGroupMembershipsInput = {
@@ -53234,9 +55287,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -53255,6 +55312,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutGroupMembershipsInput = {
@@ -53265,9 +55323,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -53286,6 +55348,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type GroupCreateWithoutAddressBooksInput = {
@@ -54056,9 +56119,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -54077,6 +56144,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutContactSharesOwnedInput = {
@@ -54087,9 +56155,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -54108,6 +56180,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutContactSharesOwnedInput = {
@@ -54244,9 +56317,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -54265,6 +56342,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutContactSharesReceivedInput = {
@@ -54275,9 +56353,13 @@ export namespace Prisma {
     lifecycleState?: $Enums.AccountLifecycleState
     autoFillPhoneticNames?: boolean
     sessionVersion?: number
+    avatarUrl?: string | null
     emailVerified?: Date | string | null
     emailPendingChange?: string | null
     emailPendingChangeRequestedAt?: Date | string | null
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -54296,6 +56378,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutContactSharesReceivedInput = {
@@ -54443,9 +56526,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -54464,6 +56551,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutContactSharesOwnedInput = {
@@ -54474,9 +56562,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -54495,6 +56587,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ContactUpsertWithoutSharesFromContactInput = {
@@ -54643,9 +56736,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -54664,6 +56761,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutContactSharesReceivedInput = {
@@ -54674,9 +56772,13 @@ export namespace Prisma {
     lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
     autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
     sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
     emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
     emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -54695,6 +56797,7 @@ export namespace Prisma {
     emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ContactUpsertWithoutSharesAsRecipientCopyInput = {
@@ -55122,6 +57225,14 @@ export namespace Prisma {
     deviceHint?: string | null
     lastActiveAt?: Date | string
     revokedAt?: Date | string | null
+    totpChallengeVerified?: Date | string | null
+    createdAt?: Date | string
+  }
+
+  export type TotpRecoveryCodeCreateManyUserInput = {
+    id?: string
+    codeHash: string
+    usedAt?: Date | string | null
     createdAt?: Date | string
   }
 
@@ -56043,6 +58154,7 @@ export namespace Prisma {
     deviceHint?: NullableStringFieldUpdateOperationsInput | string | null
     lastActiveAt?: DateTimeFieldUpdateOperationsInput | Date | string
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpChallengeVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -56054,6 +58166,7 @@ export namespace Prisma {
     deviceHint?: NullableStringFieldUpdateOperationsInput | string | null
     lastActiveAt?: DateTimeFieldUpdateOperationsInput | Date | string
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpChallengeVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
@@ -56065,6 +58178,28 @@ export namespace Prisma {
     deviceHint?: NullableStringFieldUpdateOperationsInput | string | null
     lastActiveAt?: DateTimeFieldUpdateOperationsInput | Date | string
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    totpChallengeVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TotpRecoveryCodeUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    codeHash?: StringFieldUpdateOperationsInput | string
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TotpRecoveryCodeUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    codeHash?: StringFieldUpdateOperationsInput | string
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TotpRecoveryCodeUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    codeHash?: StringFieldUpdateOperationsInput | string
+    usedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 

@@ -14,6 +14,7 @@ declare module "next-auth" {
     user: {
       id: string;
       emailVerified: Date | null;
+      avatarUrl: string | null;
     } & DefaultSession["user"];
     jti?: string;
     // Set by P18-07 (TOTP) — user authenticated with password but TOTP code not yet submitted
@@ -93,6 +94,8 @@ export const authConfig = {
           // Custom fields passed through to jwt callback
           _ip: ip,
           _ua: ua,
+          // P18-07: flag pending TOTP challenge if user has 2FA enabled
+          _pendingTotp: user.totpEnabled,
         };
       },
     }),
@@ -108,7 +111,7 @@ export const authConfig = {
         const [dbUser] = await Promise.all([
           db.user.findUnique({
             where: { id: user.id },
-            select: { sessionVersion: true, emailVerified: true },
+            select: { sessionVersion: true, emailVerified: true, name: true, avatarUrl: true },
           }),
           // Create UserSession row (P18-06)
           db.userSession.create({
@@ -126,6 +129,12 @@ export const authConfig = {
         token.jti = jti;
         token.sv = dbUser?.sessionVersion ?? 1;
         token.emailVerified = dbUser?.emailVerified?.toISOString() ?? null;
+        token.name = dbUser?.name ?? null;
+        token.avatarUrl = dbUser?.avatarUrl ?? null;
+        // P18-07: embed pendingTotp if credentials verified but TOTP not yet confirmed
+        if ((user as { _pendingTotp?: boolean })._pendingTotp) {
+          token.pendingTotp = true;
+        }
 
       } else if (token.sub && token.jti) {
         // Every subsequent request: validate sessionVersion + jti revocation
@@ -136,12 +145,17 @@ export const authConfig = {
           }),
           db.userSession.findUnique({
             where: { jti: token.jti },
-            select: { revokedAt: true, lastActiveAt: true },
+            select: { revokedAt: true, lastActiveAt: true, totpChallengeVerified: true },
           }),
         ]);
 
         if (!dbUser || dbUser.sessionVersion !== token.sv || !userSession || userSession.revokedAt) {
           return {};
+        }
+
+        // P18-07: TOTP challenge completed — clear pendingTotp from token
+        if (token.pendingTotp && userSession.totpChallengeVerified) {
+          token.pendingTotp = undefined;
         }
 
         // Keep emailVerified fresh
@@ -169,10 +183,16 @@ export const authConfig = {
       if (trigger === "update" && session) {
         const fresh = await db.user.findUnique({
           where: { id: token.sub ?? "" },
-          select: { sessionVersion: true, emailVerified: true },
+          select: { sessionVersion: true, emailVerified: true, name: true, avatarUrl: true },
         });
         token.sv = fresh?.sessionVersion ?? token.sv;
         token.emailVerified = fresh?.emailVerified?.toISOString() ?? null;
+        token.name = fresh?.name ?? token.name;
+        token.avatarUrl = fresh?.avatarUrl ?? null;
+        // P18-07: clear pendingTotp after successful TOTP challenge
+        if ((session as { clearPendingTotp?: boolean }).clearPendingTotp) {
+          token.pendingTotp = undefined;
+        }
       }
       return token;
     },
@@ -181,6 +201,8 @@ export const authConfig = {
       user: {
         ...session.user,
         id: token.sub ?? session.user.id,
+        name: token.name as string | null,
+        avatarUrl: token.avatarUrl as string | null,
         emailVerified: token.emailVerified
           ? new Date(token.emailVerified as string)
           : null,

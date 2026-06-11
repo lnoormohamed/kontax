@@ -129,9 +129,13 @@ exports.Prisma.UserScalarFieldEnum = {
   lifecycleState: 'lifecycleState',
   autoFillPhoneticNames: 'autoFillPhoneticNames',
   sessionVersion: 'sessionVersion',
+  avatarUrl: 'avatarUrl',
   emailVerified: 'emailVerified',
   emailPendingChange: 'emailPendingChange',
   emailPendingChangeRequestedAt: 'emailPendingChangeRequestedAt',
+  totpEnabled: 'totpEnabled',
+  totpSecret: 'totpSecret',
+  totpVerifiedAt: 'totpVerifiedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -443,6 +447,15 @@ exports.Prisma.UserSessionScalarFieldEnum = {
   deviceHint: 'deviceHint',
   lastActiveAt: 'lastActiveAt',
   revokedAt: 'revokedAt',
+  totpChallengeVerified: 'totpChallengeVerified',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.TotpRecoveryCodeScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  codeHash: 'codeHash',
+  usedAt: 'usedAt',
   createdAt: 'createdAt'
 };
 
@@ -790,6 +803,7 @@ exports.Prisma.ModelName = {
   EmailVerificationToken: 'EmailVerificationToken',
   PasswordResetToken: 'PasswordResetToken',
   UserSession: 'UserSession',
+  TotpRecoveryCode: 'TotpRecoveryCode',
   ActivityEvent: 'ActivityEvent',
   Group: 'Group',
   GroupMember: 'GroupMember',

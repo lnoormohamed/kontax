@@ -178,11 +178,17 @@ model User {
   autoFillPhoneticNames         Boolean                  @default(false)
   // P18-02: incremented on password change / session revoke; JWT must match or is rejected
   sessionVersion                Int                      @default(1)
+  // P18-01: optional profile photo URL (served from MinIO)
+  avatarUrl                     String?
   // P18-04: null = unverified; set to now() on token consumption
   emailVerified                 DateTime?
   // P18-03: pending email change (cleared on activation or cancellation)
   emailPendingChange            String?
   emailPendingChangeRequestedAt DateTime?
+  // P18-07: TOTP two-factor authentication
+  totpEnabled                   Boolean                  @default(false)
+  totpSecret                    String? // AES-256-GCM encrypted
+  totpVerifiedAt                DateTime?
   appPasswords                  AppPassword[]
   contacts                      Contact[]
   importJobs                    ImportJob[]
@@ -200,6 +206,7 @@ model User {
   emailVerificationTokens       EmailVerificationToken[]
   passwordResetTokens           PasswordResetToken[]
   sessions                      UserSession[]
+  totpRecoveryCodes             TotpRecoveryCode[]
   createdAt                     DateTime                 @default(now())
   updatedAt                     DateTime                 @updatedAt
 }
@@ -624,19 +631,33 @@ model PasswordResetToken {
 
 // P18-06: per-device session tracking (jti maps JWT to a revocable DB row)
 model UserSession {
-  id           String    @id @default(cuid())
-  userId       String
-  jti          String    @unique
-  ipAddress    String?
-  userAgent    String?
-  deviceHint   String?
-  lastActiveAt DateTime  @default(now())
-  revokedAt    DateTime?
-  createdAt    DateTime  @default(now())
-  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                    String    @id @default(cuid())
+  userId                String
+  jti                   String    @unique
+  ipAddress             String?
+  userAgent             String?
+  deviceHint            String?
+  lastActiveAt          DateTime  @default(now())
+  revokedAt             DateTime?
+  // P18-07: set when TOTP challenge is completed for this session
+  totpChallengeVerified DateTime?
+  createdAt             DateTime  @default(now())
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, revokedAt, lastActiveAt])
   @@index([jti])
+}
+
+// P18-07: single-use TOTP recovery codes (stored as SHA-256 hashes)
+model TotpRecoveryCode {
+  id        String    @id @default(cuid())
+  userId    String
+  codeHash  String
+  usedAt    DateTime?
+  createdAt DateTime  @default(now())
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, usedAt])
 }
 
 enum Actor {

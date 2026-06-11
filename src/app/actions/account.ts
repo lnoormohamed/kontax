@@ -8,6 +8,46 @@ import { db } from "~/server/db";
 import { sendVerificationEmail } from "~/server/email-verification";
 import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
 
+// ─── Profile Edit (P18-01) ───────────────────────────────────────────────────
+
+export async function updateProfile(input: {
+  name: string;
+  avatarUrl?: string | null;
+}): Promise<{ success: true } | { error: string }> {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "UNAUTHORIZED" };
+
+  const name = input.name.trim();
+  if (!name) return { error: "NAME_REQUIRED" };
+  if (name.length > 120) return { error: "NAME_TOO_LONG" };
+
+  // Validate avatarUrl: must be HTTPS or null
+  if (input.avatarUrl) {
+    try {
+      const url = new URL(input.avatarUrl);
+      if (url.protocol !== "https:") return { error: "AVATAR_URL_NOT_HTTPS" };
+    } catch {
+      return { error: "AVATAR_URL_INVALID" };
+    }
+  }
+
+  await db.user.update({
+    where: { id: session.user.id },
+    data: { name, avatarUrl: input.avatarUrl ?? null },
+  });
+
+  await db.activityEvent.create({
+    data: {
+      userId: session.user.id,
+      eventType: "ACCOUNT_UPDATED",
+      actor: "USER",
+      payload: { field: "profile" },
+    },
+  });
+
+  return { success: true };
+}
+
 // ─── Password Change (P18-02) ────────────────────────────────────────────────
 
 export async function changePassword(input: {

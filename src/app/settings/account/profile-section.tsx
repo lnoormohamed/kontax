@@ -3,6 +3,8 @@
 import { useRef, useState, useTransition } from "react";
 import { useSession } from "next-auth/react";
 
+import { updateProfile } from "~/app/actions/account";
+
 const MAX_NAME = 120;
 
 function Spinner({ size = 15, light = true }: { size?: number; light?: boolean }) {
@@ -37,43 +39,74 @@ function tint(name: string): [string, string] {
   return [t[0], t[1]];
 }
 
-export function ProfileSection({ initialName }: { initialName: string }) {
+export function ProfileSection({
+  initialName,
+  initialAvatarUrl,
+}: {
+  initialName: string;
+  initialAvatarUrl?: string | null;
+}) {
   const { update } = useSession();
   const fileRef = useRef<HTMLInputElement>(null);
-  const [photo, setPhoto] = useState<string | null>(null);
+  const [photo, setPhoto] = useState<string | null>(initialAvatarUrl ?? null);
+  const [pendingAvatarUrl, setPendingAvatarUrl] = useState<string | null>(initialAvatarUrl ?? null);
   const [uploading, setUploading] = useState(false);
+  const [uploadErr, setUploadErr] = useState("");
   const [name, setName] = useState(initialName);
   const [saved, setSaved] = useState(initialName);
+  const [savedAvatar, setSavedAvatar] = useState<string | null>(initialAvatarUrl ?? null);
   const [justSaved, setJustSaved] = useState(false);
+  const [saveErr, setSaveErr] = useState("");
   const [touched, setTouched] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const remaining = MAX_NAME - name.length;
   const empty = !name.trim();
-  const dirty = name !== saved;
-  const canSave = dirty && !empty && !isPending;
+  const dirty = name !== saved || pendingAvatarUrl !== savedAvatar;
+  const canSave = !empty && dirty && !isPending;
 
   const onFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const f = e.target.files?.[0];
     if (!f) return;
+    setUploadErr("");
     setUploading(true);
-    const reader = new FileReader();
-    reader.onload = () => {
-      setTimeout(() => { setPhoto(reader.result as string); setUploading(false); }, 1200);
-    };
-    reader.readAsDataURL(f);
+    const formData = new FormData();
+    formData.set("avatar", f);
+    fetch("/api/upload/avatar", { method: "POST", body: formData })
+      .then((r) => r.json() as Promise<{ url?: string; error?: string }>)
+      .then((data) => {
+        if (data.url) {
+          setPhoto(data.url);
+          setPendingAvatarUrl(data.url);
+        } else {
+          setUploadErr(data.error === "FILE_TOO_LARGE" ? "Image must be under 2 MB."
+            : data.error === "INVALID_FILE_TYPE" ? "Please upload a JPG, PNG, WebP, or GIF."
+            : data.error === "UPLOAD_NOT_CONFIGURED" ? "Avatar upload is not yet configured."
+            : "Upload failed. Please try again.");
+        }
+      })
+      .catch(() => setUploadErr("Upload failed. Please try again."))
+      .finally(() => setUploading(false));
     e.target.value = "";
   };
 
   const save = () => {
     if (!canSave) { if (empty) setTouched(true); return; }
+    setSaveErr("");
     startTransition(async () => {
-      // P18-01 server action will go here — for now optimistic update
-      await new Promise((r) => setTimeout(r, 800));
-      setSaved(name);
-      setJustSaved(true);
-      await update(); // refresh JWT name
-      setTimeout(() => setJustSaved(false), 2000);
+      const result = await updateProfile({ name, avatarUrl: pendingAvatarUrl });
+      if ("success" in result) {
+        setSaved(name);
+        setSavedAvatar(pendingAvatarUrl);
+        setJustSaved(true);
+        await update(); // refresh JWT name + avatarUrl
+        setTimeout(() => setJustSaved(false), 2000);
+      } else {
+        setSaveErr(result.error === "NAME_REQUIRED" ? "Please enter your name."
+          : result.error === "NAME_TOO_LONG" ? "Name must be 120 characters or fewer."
+          : result.error === "AVATAR_URL_NOT_HTTPS" ? "Avatar must be a valid HTTPS URL."
+          : "Something went wrong.");
+      }
     });
   };
 
@@ -118,12 +151,13 @@ export function ProfileSection({ initialName }: { initialName: string }) {
             {photo && !uploading && (
               <button
                 className="border-none bg-transparent p-0 text-[13.5px] font-medium text-[#8b938c] transition hover:text-[#b5472f]"
-                onClick={() => setPhoto(null)}
+                onClick={() => { setPhoto(null); setPendingAvatarUrl(null); }}
                 type="button"
               >
                 Remove
               </button>
             )}
+            {uploadErr && <p className="text-[12.5px] text-[#9a3a23]">{uploadErr}</p>}
           </div>
         </div>
       </div>
@@ -163,6 +197,7 @@ export function ProfileSection({ initialName }: { initialName: string }) {
           >
             {isPending ? <><Spinner size={15} /> Saving…</> : "Save changes"}
           </button>
+          {saveErr && <p className="text-[12.5px] text-[#9a3a23]">{saveErr}</p>}
           {justSaved && (
             <span className="inline-flex items-center gap-1.5 text-[13.5px] font-semibold text-[#17352e]">
               <svg fill="none" height="16" stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.4" viewBox="0 0 24 24" width="16"><polyline points="20 6 9 17 4 12" /></svg>
