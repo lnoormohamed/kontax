@@ -70,7 +70,7 @@ export function PricingComparison() {
                       <p className="plan-who">For individual power users</p>
                       <div className="plan-price">£X<small> / mo</small></div>
                       <p className="plan-period">{period}</p>
-                      <Link className="plan-cta plan-cta--primary" href="/register">Upgrade to Pro</Link>
+                      <Link className="plan-cta plan-cta--primary" href="/register">Choose Pro</Link>
                     </div>
                   </th>
                   <th>
@@ -174,7 +174,7 @@ export function PricingComparison() {
                 </tr>
 
                 {/* COLLABORATION */}
-                <tr className="cat-row"><td colSpan={5}>Collaboration <span style={{ fontWeight: 600, letterSpacing: "0.02em", textTransform: "none", color: "var(--mute)", fontSize: "11px" }}>· coming soon</span></td></tr>
+                <tr className="cat-row"><td colSpan={5}>Collaboration <span style={{ fontWeight: 600, letterSpacing: "0.02em", textTransform: "none", color: "var(--mute)", fontSize: "11px" }}>· shared books — Phase 13+</span></td></tr>
                 <tr className="feat-row">
                   <td className="feat-name">Members</td>
                   <td className="cell"><Dash /></td>
@@ -187,7 +187,7 @@ export function PricingComparison() {
                   <td className="cell"><Dash /></td>
                   <td className="cell cell-rec"><Dash /></td>
                   <td className="cell"><span className="val">1 shared book</span></td>
-                  <td className="cell"><span className="val">Unlimited</span></td>
+                  <td className="cell"><span className="val">Multiple</span></td>
                 </tr>
                 <tr className="feat-row">
                   <td className="feat-name">Roles &amp; admin controls</td>
@@ -197,7 +197,7 @@ export function PricingComparison() {
                   <td className="cell">Roles per book</td>
                 </tr>
                 <tr className="feat-row">
-                  <td className="feat-name">Team audit log</td>
+                  <td className="feat-name">Audit log</td>
                   <td className="cell"><Dash /></td>
                   <td className="cell cell-rec"><Dash /></td>
                   <td className="cell"><Dash /></td>
