@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 
@@ -15,51 +15,34 @@ const REVEAL_WIDTH = 168; // two 84px action buttons
 const SNAP_THRESHOLD = 0.4; // 40% of row width → snap open
 
 export function SwipeableRow({ onArchive, onToggleFavourite, isFavourite, children }: SwipeableRowProps) {
+  // State-driven transform: React owns the offset so a re-render (e.g. the
+  // virtualizer's measureElement ResizeObserver) can't wipe an imperatively-set
+  // style mid-gesture. `offsetRef` mirrors it for the synchronous snap decision.
+  const [offset, setOffset] = useState(0);
+  const [animate, setAnimate] = useState(false);
+  const offsetRef = useRef(0);
+
   const rowRef = useRef<HTMLDivElement>(null);
-  const foregroundRef = useRef<HTMLDivElement>(null);
   const startX = useRef(0);
   const startY = useRef(0);
   const baseX = useRef(0);
-  const currentX = useRef(0);
-  const pendingX = useRef(0);
-  const frame = useRef<number | null>(null);
   const intent = useRef<"none" | "swipe" | "scroll">("none");
   const pointerId = useRef<number | null>(null);
 
-  const applyTransform = (value: number, animate: boolean) => {
-    const foreground = foregroundRef.current;
-    if (!foreground) return;
-    foreground.style.transition = animate ? "transform 0.24s cubic-bezier(0.2,0.8,0.2,1)" : "none";
-    foreground.style.transform = value > 0 ? `translate3d(-${value}px,0,0)` : "translate3d(0,0,0)";
-    foreground.style.willChange = value > 0 || !animate ? "transform" : "auto";
-    currentX.current = value;
-  };
-
-  const scheduleTransform = (value: number) => {
-    pendingX.current = value;
-    if (frame.current !== null) return;
-    frame.current = requestAnimationFrame(() => {
-      frame.current = null;
-      applyTransform(pendingX.current, false);
-    });
-  };
-
-  const snapTo = (target: number) => {
-    if (frame.current !== null) {
-      cancelAnimationFrame(frame.current);
-      frame.current = null;
-    }
-    applyTransform(target, true);
+  const move = (value: number, withAnim: boolean) => {
+    offsetRef.current = value;
+    setAnimate(withAnim);
+    setOffset(value);
   };
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    if (e.pointerType === "mouse") return; // desktop only uses hover actions
+    if (e.pointerType === "mouse") return; // desktop uses hover actions, not swipe
     startX.current = e.clientX;
     startY.current = e.clientY;
-    baseX.current = currentX.current;
+    baseX.current = offsetRef.current;
     intent.current = "none";
     pointerId.current = e.pointerId;
-    applyTransform(currentX.current, false);
+    setAnimate(false);
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
@@ -67,7 +50,7 @@ export function SwipeableRow({ onArchive, onToggleFavourite, isFavourite, childr
     const dx = startX.current - e.clientX;
     const dy = Math.abs(e.clientY - startY.current);
 
-    // Determine intent on first significant movement
+    // Commit to swipe vs scroll on the first significant movement.
     if (intent.current === "none") {
       if (Math.abs(dx) > 4 || dy > 4) {
         intent.current = dy > Math.abs(dx) ? "scroll" : "swipe";
@@ -81,17 +64,20 @@ export function SwipeableRow({ onArchive, onToggleFavourite, isFavourite, childr
 
     let next = baseX.current + dx;
     next = Math.max(0, next);
-    // Rubber-band past full reveal
-    if (next > REVEAL_WIDTH) next = REVEAL_WIDTH + (next - REVEAL_WIDTH) * 0.28;
-    scheduleTransform(next);
+    if (next > REVEAL_WIDTH) next = REVEAL_WIDTH + (next - REVEAL_WIDTH) * 0.28; // rubber-band
+    move(next, false);
   };
 
   const handlePointerUp = () => {
-    if (intent.current !== "swipe") { intent.current = "none"; pointerId.current = null; return; }
+    if (intent.current !== "swipe") {
+      intent.current = "none";
+      pointerId.current = null;
+      return;
+    }
     intent.current = "none";
     pointerId.current = null;
     const rowW = rowRef.current?.offsetWidth ?? 375;
-    snapTo(currentX.current >= rowW * SNAP_THRESHOLD ? REVEAL_WIDTH : 0);
+    move(offsetRef.current >= rowW * SNAP_THRESHOLD ? REVEAL_WIDTH : 0, true);
   };
 
   const vibrate = () => { try { navigator.vibrate?.(10); } catch (_) {} };
@@ -99,12 +85,12 @@ export function SwipeableRow({ onArchive, onToggleFavourite, isFavourite, childr
   const handleFav = () => {
     vibrate();
     onToggleFavourite();
-    snapTo(0);
+    move(0, true);
   };
 
   const handleArchive = () => {
     vibrate();
-    snapTo(rowRef.current?.offsetWidth ?? 375);
+    move(rowRef.current?.offsetWidth ?? 375, true);
     setTimeout(() => onArchive(), 200);
   };
 
@@ -112,7 +98,7 @@ export function SwipeableRow({ onArchive, onToggleFavourite, isFavourite, childr
     <div ref={rowRef} style={{ position: "relative", overflow: "hidden" }}>
       {/* Revealed actions */}
       <div
-        aria-hidden
+        aria-hidden={offset <= 4}
         style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: REVEAL_WIDTH, display: "flex" }}
       >
         <button
@@ -143,9 +129,8 @@ export function SwipeableRow({ onArchive, onToggleFavourite, isFavourite, childr
         </button>
       </div>
 
-      {/* Sliding foreground */}
+      {/* Sliding foreground — transform driven by React state */}
       <div
-        ref={foregroundRef}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -153,10 +138,10 @@ export function SwipeableRow({ onArchive, onToggleFavourite, isFavourite, childr
         style={{
           position: "relative",
           zIndex: 1,
-          transform: "translate3d(0,0,0)",
-          transition: "none",
+          transform: `translate3d(${-offset}px,0,0)`,
+          transition: animate ? "transform 0.24s cubic-bezier(0.2,0.8,0.2,1)" : "none",
           touchAction: "pan-y",
-          willChange: "auto",
+          willChange: offset > 0 ? "transform" : "auto",
         }}
       >
         {children}
