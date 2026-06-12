@@ -54,7 +54,7 @@ Requirements** section; the paired build ticket builds to it.
 | --- | --- | --- | --- | --- | --- |
 | P24B-01 | `MobilePlainHeader` (title + bell) — extract & adopt on Activity/Sync/Settings roots | B1 | P1 | ☐ | — |
 | P24B-02 | Settings layout: secondary-header back-nav on sub-pages (‹ Settings · <title>) | B1, E6 | **P0** | ✅ | — |
-| P24B-03 | Variance primitives: `UpsellCard`, `NearLimitBanner`, `ReadOnlyBanner`, `PendingChip`, `PermissionGate` | E0.4, C | **P0** | ☐ | — |
+| P24B-03 | Variance primitives: `UpsellCard`, `NearLimitBanner`, `ReadOnlyBanner`, `PendingChip`, `PermissionGate` | E0.4, C | **P0** | ✅ | P24B-DB14 |
 | P24B-04 | "Stack table → cards / h-scroll" helper | C, F | P1 | ☐ | — |
 | P24B-05 | Confirm-dialog / action-sheet primitive | D4 | P1 | ☐ | — |
 | P24B-06 | `MobileInstallPrompt` (iOS steps / Android programmatic) | D5 | P2 | ☐ | — |
@@ -144,3 +144,7 @@ Requirements** section; the paired build ticket builds to it.
 - 2026-06-12 — **P24B-02 done** — settings sub-pages now get a back header (‹ Settings · title)
   via `MobileSettingsHeader`; root keeps the plain title. Verified at 375px; desktop unchanged.
   Follow-up for P24B-12: drop the redundant in-page "SETTINGS" kicker on mobile sub-pages.
+- 2026-06-12 — **P24B-03 done** — variance primitives built to DB14 in
+  `_components/mobile-variance.tsx` (UpsellCard, GenuineEmpty, NearLimitBanner, ReadOnlyBanner,
+  PendingChip, PermissionGate). Server-compatible (Link nav, no hooks). Verified every state at
+  375px against the design via `/wireframes/variance`. Ready for consumers (P24B-08/09/10/11/13…).
