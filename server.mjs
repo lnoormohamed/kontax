@@ -158,6 +158,8 @@ const getPublicRequestUrl = (req) => {
 
   const host = req.headers["x-forwarded-host"] ?? req.headers.host ?? `localhost:${port}`;
   const forwardedProto = req.headers["x-forwarded-proto"]?.split(",")[0]?.trim();
+  const fallbackProto =
+    host.includes("localhost") || host.startsWith("127.0.0.1") ? "http" : "https";
   const cloudflareScheme = (() => {
     const value = req.headers["cf-visitor"];
 
@@ -171,7 +173,7 @@ const getPublicRequestUrl = (req) => {
       return null;
     }
   })();
-  const proto = forwardedProto ?? cloudflareScheme ?? "http";
+  const proto = forwardedProto ?? cloudflareScheme ?? fallbackProto;
 
   return new URL(req.url ?? "/", `${proto}://${host}`);
 };
