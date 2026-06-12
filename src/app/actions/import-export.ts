@@ -18,6 +18,11 @@ const getRequiredUserId = async () => {
     throw new Error("You must be signed in to import contacts.");
   }
 
+  // P21-07: impersonation sessions are read-only.
+  if (session?.impersonatedBy) {
+    throw new Error("This is a read-only impersonation session — changes are blocked.");
+  }
+
   return userId;
 };
 

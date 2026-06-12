@@ -17,6 +17,7 @@ export async function updateProfile(input: {
 }): Promise<{ success: true } | { error: string }> {
   const session = await auth();
   if (!session?.user?.id) return { error: "UNAUTHORIZED" };
+  if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
 
   const name = input.name.trim();
   if (!name) return { error: "NAME_REQUIRED" };
@@ -57,6 +58,7 @@ export async function changePassword(input: {
 }): Promise<{ success: true } | { error: string }> {
   const session = await auth();
   if (!session?.user?.id) return { error: "UNAUTHORIZED" };
+  if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
 
   const rl = await checkRateLimit(
     rateLimiters.passwordChange,
@@ -106,6 +108,7 @@ export async function requestEmailChange(
 ): Promise<{ success: true } | { error: string }> {
   const session = await auth();
   if (!session?.user?.id) return { error: "UNAUTHORIZED" };
+  if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
 
   const parsed = z
     .string()
@@ -189,6 +192,7 @@ export async function scheduleAccountDeletion(input: {
   const session = await auth();
   if (!session?.user?.id || !session.user.email)
     return { error: "UNAUTHORIZED" };
+  if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
 
   if (
     input.confirmEmail.trim().toLowerCase() !== session.user.email.toLowerCase()
@@ -343,6 +347,7 @@ export async function resendVerificationEmail(): Promise<
 > {
   const session = await auth();
   if (!session?.user?.id) return { error: "UNAUTHORIZED" };
+  if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
 
   const rl = await checkRateLimit(
     rateLimiters.emailResend,

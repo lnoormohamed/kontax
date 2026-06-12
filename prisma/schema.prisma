@@ -16,6 +16,12 @@ enum AccountLifecycleState {
     LOCKED
 }
 
+// P21-01: platform staff role. ADMIN unlocks the internal /admin tooling.
+enum UserRole {
+    USER
+    ADMIN
+}
+
 // P20-10: SES delivery status. BOUNCED/COMPLAINED addresses are suppressed from
 // further sends to protect sender reputation.
 enum EmailStatus {
@@ -201,6 +207,11 @@ model User {
     totpVerifiedAt                DateTime?
     // P18-09: scheduled hard-delete (30-day grace period after user confirms deletion)
     scheduledDeleteAt             DateTime?
+    // P21-01: platform admin role (default USER). Gates the /admin surfaces.
+    role                          UserRole  @default(USER)
+    // P21-04: admin plan override — set the local plan without touching Stripe.
+    planOverrideReason            String?
+    planOverriddenAt              DateTime?
     appPasswords          AppPassword[]
     contacts              Contact[]
     importJobs            ImportJob[]
@@ -220,6 +231,7 @@ model User {
     sessions                UserSession[]
     totpRecoveryCodes       TotpRecoveryCode[]
     addressBooks            AddressBook[]
+    adminAuditEvents        AdminAuditEvent[]       @relation("AdminActor")
     createdAt             DateTime                @default(now())
     updatedAt             DateTime                @updatedAt
 
@@ -704,6 +716,52 @@ model ActivityEvent {
 
     @@index([userId, createdAt(sort: Desc)])
     @@index([contactId, createdAt(sort: Desc)])
+}
+
+// --- Internal admin tooling (Phase 21) -----------------------------------------
+
+// P21-02: append-only audit trail for every privileged admin action. Separate
+// from ActivityEvent (which is user-scoped) so admin activity never pollutes a
+// user's own history. targetEmail is denormalised so the log survives the
+// target account being hard-deleted.
+model AdminAuditEvent {
+    id           String   @id @default(cuid())
+    adminUserId  String
+    action       String
+    targetUserId String?
+    targetEmail  String?
+    details      Json     @default("{}")
+    ipAddress    String?
+    createdAt    DateTime @default(now())
+    admin        User     @relation("AdminActor", fields: [adminUserId], references: [id], onDelete: Cascade)
+
+    @@index([adminUserId, createdAt(sort: Desc)])
+    @@index([action, createdAt(sort: Desc)])
+    @@index([targetUserId, createdAt(sort: Desc)])
+}
+
+// P21-08: feature-flag gating with per-user allow-list and percentage rollout.
+enum FeatureFlagMode {
+    OFF
+    SPECIFIC_USERS
+    ALL
+    ROLLOUT
+}
+
+model FeatureFlag {
+    id             String          @id @default(cuid())
+    key            String          @unique
+    name           String
+    description    String          @default("")
+    mode           FeatureFlagMode @default(OFF)
+    // Percentage of all users (0-100) when mode = ROLLOUT.
+    rolloutPct     Int             @default(0)
+    // Explicit allow-list of userIds when mode = SPECIFIC_USERS.
+    allowedUserIds String[]        @default([])
+    updatedById    String?
+    updatedByName  String?
+    createdAt      DateTime        @default(now())
+    updatedAt      DateTime        @updatedAt
 }
 
 // --- Group scaffolding (P11-02) ------------------------------------------------

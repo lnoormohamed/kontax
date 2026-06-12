@@ -138,6 +138,9 @@ exports.Prisma.UserScalarFieldEnum = {
   totpSecret: 'totpSecret',
   totpVerifiedAt: 'totpVerifiedAt',
   scheduledDeleteAt: 'scheduledDeleteAt',
+  role: 'role',
+  planOverrideReason: 'planOverrideReason',
+  planOverriddenAt: 'planOverriddenAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -473,6 +476,31 @@ exports.Prisma.ActivityEventScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.AdminAuditEventScalarFieldEnum = {
+  id: 'id',
+  adminUserId: 'adminUserId',
+  action: 'action',
+  targetUserId: 'targetUserId',
+  targetEmail: 'targetEmail',
+  details: 'details',
+  ipAddress: 'ipAddress',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.FeatureFlagScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  name: 'name',
+  description: 'description',
+  mode: 'mode',
+  rolloutPct: 'rolloutPct',
+  allowedUserIds: 'allowedUserIds',
+  updatedById: 'updatedById',
+  updatedByName: 'updatedByName',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.GroupScalarFieldEnum = {
   id: 'id',
   ownerId: 'ownerId',
@@ -616,6 +644,11 @@ exports.EmailStatus = exports.$Enums.EmailStatus = {
   OK: 'OK',
   BOUNCED: 'BOUNCED',
   COMPLAINED: 'COMPLAINED'
+};
+
+exports.UserRole = exports.$Enums.UserRole = {
+  USER: 'USER',
+  ADMIN: 'ADMIN'
 };
 
 exports.SourceType = exports.$Enums.SourceType = {
@@ -786,6 +819,13 @@ exports.Actor = exports.$Enums.Actor = {
   SYSTEM: 'SYSTEM'
 };
 
+exports.FeatureFlagMode = exports.$Enums.FeatureFlagMode = {
+  OFF: 'OFF',
+  SPECIFIC_USERS: 'SPECIFIC_USERS',
+  ALL: 'ALL',
+  ROLLOUT: 'ROLLOUT'
+};
+
 exports.GroupType = exports.$Enums.GroupType = {
   FAMILY: 'FAMILY',
   TEAM: 'TEAM'
@@ -836,6 +876,8 @@ exports.Prisma.ModelName = {
   UserSession: 'UserSession',
   TotpRecoveryCode: 'TotpRecoveryCode',
   ActivityEvent: 'ActivityEvent',
+  AdminAuditEvent: 'AdminAuditEvent',
+  FeatureFlag: 'FeatureFlag',
   Group: 'Group',
   GroupMember: 'GroupMember',
   GroupAddressBook: 'GroupAddressBook',

@@ -104,6 +104,16 @@ export type TotpRecoveryCode = $Result.DefaultSelection<Prisma.$TotpRecoveryCode
  */
 export type ActivityEvent = $Result.DefaultSelection<Prisma.$ActivityEventPayload>
 /**
+ * Model AdminAuditEvent
+ * 
+ */
+export type AdminAuditEvent = $Result.DefaultSelection<Prisma.$AdminAuditEventPayload>
+/**
+ * Model FeatureFlag
+ * 
+ */
+export type FeatureFlag = $Result.DefaultSelection<Prisma.$FeatureFlagPayload>
+/**
  * Model Group
  * 
  */
@@ -157,6 +167,14 @@ export namespace $Enums {
 };
 
 export type AccountLifecycleState = (typeof AccountLifecycleState)[keyof typeof AccountLifecycleState]
+
+
+export const UserRole: {
+  USER: 'USER',
+  ADMIN: 'ADMIN'
+};
+
+export type UserRole = (typeof UserRole)[keyof typeof UserRole]
 
 
 export const EmailStatus: {
@@ -435,6 +453,16 @@ export const Actor: {
 export type Actor = (typeof Actor)[keyof typeof Actor]
 
 
+export const FeatureFlagMode: {
+  OFF: 'OFF',
+  SPECIFIC_USERS: 'SPECIFIC_USERS',
+  ALL: 'ALL',
+  ROLLOUT: 'ROLLOUT'
+};
+
+export type FeatureFlagMode = (typeof FeatureFlagMode)[keyof typeof FeatureFlagMode]
+
+
 export const ShareType: {
   VCARD_LINK: 'VCARD_LINK',
   STATIC_COPY: 'STATIC_COPY',
@@ -458,6 +486,10 @@ export type ShareStatus = (typeof ShareStatus)[keyof typeof ShareStatus]
 export type AccountLifecycleState = $Enums.AccountLifecycleState
 
 export const AccountLifecycleState: typeof $Enums.AccountLifecycleState
+
+export type UserRole = $Enums.UserRole
+
+export const UserRole: typeof $Enums.UserRole
 
 export type EmailStatus = $Enums.EmailStatus
 
@@ -570,6 +602,10 @@ export const EmailVerificationTokenType: typeof $Enums.EmailVerificationTokenTyp
 export type Actor = $Enums.Actor
 
 export const Actor: typeof $Enums.Actor
+
+export type FeatureFlagMode = $Enums.FeatureFlagMode
+
+export const FeatureFlagMode: typeof $Enums.FeatureFlagMode
 
 export type ShareType = $Enums.ShareType
 
@@ -876,6 +912,26 @@ export class PrismaClient<
     * ```
     */
   get activityEvent(): Prisma.ActivityEventDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.adminAuditEvent`: Exposes CRUD operations for the **AdminAuditEvent** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more AdminAuditEvents
+    * const adminAuditEvents = await prisma.adminAuditEvent.findMany()
+    * ```
+    */
+  get adminAuditEvent(): Prisma.AdminAuditEventDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.featureFlag`: Exposes CRUD operations for the **FeatureFlag** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more FeatureFlags
+    * const featureFlags = await prisma.featureFlag.findMany()
+    * ```
+    */
+  get featureFlag(): Prisma.FeatureFlagDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.group`: Exposes CRUD operations for the **Group** model.
@@ -1415,6 +1471,8 @@ export namespace Prisma {
     UserSession: 'UserSession',
     TotpRecoveryCode: 'TotpRecoveryCode',
     ActivityEvent: 'ActivityEvent',
+    AdminAuditEvent: 'AdminAuditEvent',
+    FeatureFlag: 'FeatureFlag',
     Group: 'Group',
     GroupMember: 'GroupMember',
     GroupAddressBook: 'GroupAddressBook',
@@ -1441,7 +1499,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent"
+      modelProps: "user" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2777,6 +2835,154 @@ export namespace Prisma {
           }
         }
       }
+      AdminAuditEvent: {
+        payload: Prisma.$AdminAuditEventPayload<ExtArgs>
+        fields: Prisma.AdminAuditEventFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.AdminAuditEventFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminAuditEventPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.AdminAuditEventFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminAuditEventPayload>
+          }
+          findFirst: {
+            args: Prisma.AdminAuditEventFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminAuditEventPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.AdminAuditEventFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminAuditEventPayload>
+          }
+          findMany: {
+            args: Prisma.AdminAuditEventFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminAuditEventPayload>[]
+          }
+          create: {
+            args: Prisma.AdminAuditEventCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminAuditEventPayload>
+          }
+          createMany: {
+            args: Prisma.AdminAuditEventCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.AdminAuditEventCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminAuditEventPayload>[]
+          }
+          delete: {
+            args: Prisma.AdminAuditEventDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminAuditEventPayload>
+          }
+          update: {
+            args: Prisma.AdminAuditEventUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminAuditEventPayload>
+          }
+          deleteMany: {
+            args: Prisma.AdminAuditEventDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.AdminAuditEventUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.AdminAuditEventUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminAuditEventPayload>[]
+          }
+          upsert: {
+            args: Prisma.AdminAuditEventUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$AdminAuditEventPayload>
+          }
+          aggregate: {
+            args: Prisma.AdminAuditEventAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateAdminAuditEvent>
+          }
+          groupBy: {
+            args: Prisma.AdminAuditEventGroupByArgs<ExtArgs>
+            result: $Utils.Optional<AdminAuditEventGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.AdminAuditEventCountArgs<ExtArgs>
+            result: $Utils.Optional<AdminAuditEventCountAggregateOutputType> | number
+          }
+        }
+      }
+      FeatureFlag: {
+        payload: Prisma.$FeatureFlagPayload<ExtArgs>
+        fields: Prisma.FeatureFlagFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FeatureFlagFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeatureFlagPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FeatureFlagFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeatureFlagPayload>
+          }
+          findFirst: {
+            args: Prisma.FeatureFlagFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeatureFlagPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FeatureFlagFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeatureFlagPayload>
+          }
+          findMany: {
+            args: Prisma.FeatureFlagFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeatureFlagPayload>[]
+          }
+          create: {
+            args: Prisma.FeatureFlagCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeatureFlagPayload>
+          }
+          createMany: {
+            args: Prisma.FeatureFlagCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.FeatureFlagCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeatureFlagPayload>[]
+          }
+          delete: {
+            args: Prisma.FeatureFlagDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeatureFlagPayload>
+          }
+          update: {
+            args: Prisma.FeatureFlagUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeatureFlagPayload>
+          }
+          deleteMany: {
+            args: Prisma.FeatureFlagDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FeatureFlagUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.FeatureFlagUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeatureFlagPayload>[]
+          }
+          upsert: {
+            args: Prisma.FeatureFlagUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FeatureFlagPayload>
+          }
+          aggregate: {
+            args: Prisma.FeatureFlagAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFeatureFlag>
+          }
+          groupBy: {
+            args: Prisma.FeatureFlagGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FeatureFlagGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FeatureFlagCountArgs<ExtArgs>
+            result: $Utils.Optional<FeatureFlagCountAggregateOutputType> | number
+          }
+        }
+      }
       Group: {
         payload: Prisma.$GroupPayload<ExtArgs>
         fields: Prisma.GroupFieldRefs
@@ -3483,6 +3689,8 @@ export namespace Prisma {
     userSession?: UserSessionOmit
     totpRecoveryCode?: TotpRecoveryCodeOmit
     activityEvent?: ActivityEventOmit
+    adminAuditEvent?: AdminAuditEventOmit
+    featureFlag?: FeatureFlagOmit
     group?: GroupOmit
     groupMember?: GroupMemberOmit
     groupAddressBook?: GroupAddressBookOmit
@@ -3589,6 +3797,7 @@ export namespace Prisma {
     sessions: number
     totpRecoveryCodes: number
     addressBooks: number
+    adminAuditEvents: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -3610,6 +3819,7 @@ export namespace Prisma {
     sessions?: boolean | UserCountOutputTypeCountSessionsArgs
     totpRecoveryCodes?: boolean | UserCountOutputTypeCountTotpRecoveryCodesArgs
     addressBooks?: boolean | UserCountOutputTypeCountAddressBooksArgs
+    adminAuditEvents?: boolean | UserCountOutputTypeCountAdminAuditEventsArgs
   }
 
   // Custom InputTypes
@@ -3747,6 +3957,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountAddressBooksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: AddressBookWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountAdminAuditEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AdminAuditEventWhereInput
   }
 
 
@@ -4249,6 +4466,9 @@ export namespace Prisma {
     totpSecret: string | null
     totpVerifiedAt: Date | null
     scheduledDeleteAt: Date | null
+    role: $Enums.UserRole | null
+    planOverrideReason: string | null
+    planOverriddenAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4270,6 +4490,9 @@ export namespace Prisma {
     totpSecret: string | null
     totpVerifiedAt: Date | null
     scheduledDeleteAt: Date | null
+    role: $Enums.UserRole | null
+    planOverrideReason: string | null
+    planOverriddenAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4291,6 +4514,9 @@ export namespace Prisma {
     totpSecret: number
     totpVerifiedAt: number
     scheduledDeleteAt: number
+    role: number
+    planOverrideReason: number
+    planOverriddenAt: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -4322,6 +4548,9 @@ export namespace Prisma {
     totpSecret?: true
     totpVerifiedAt?: true
     scheduledDeleteAt?: true
+    role?: true
+    planOverrideReason?: true
+    planOverriddenAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4343,6 +4572,9 @@ export namespace Prisma {
     totpSecret?: true
     totpVerifiedAt?: true
     scheduledDeleteAt?: true
+    role?: true
+    planOverrideReason?: true
+    planOverriddenAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4364,6 +4596,9 @@ export namespace Prisma {
     totpSecret?: true
     totpVerifiedAt?: true
     scheduledDeleteAt?: true
+    role?: true
+    planOverrideReason?: true
+    planOverriddenAt?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -4472,6 +4707,9 @@ export namespace Prisma {
     totpSecret: string | null
     totpVerifiedAt: Date | null
     scheduledDeleteAt: Date | null
+    role: $Enums.UserRole
+    planOverrideReason: string | null
+    planOverriddenAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
@@ -4512,6 +4750,9 @@ export namespace Prisma {
     totpSecret?: boolean
     totpVerifiedAt?: boolean
     scheduledDeleteAt?: boolean
+    role?: boolean
+    planOverrideReason?: boolean
+    planOverriddenAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     appPasswords?: boolean | User$appPasswordsArgs<ExtArgs>
@@ -4533,6 +4774,7 @@ export namespace Prisma {
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     totpRecoveryCodes?: boolean | User$totpRecoveryCodesArgs<ExtArgs>
     addressBooks?: boolean | User$addressBooksArgs<ExtArgs>
+    adminAuditEvents?: boolean | User$adminAuditEventsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -4553,6 +4795,9 @@ export namespace Prisma {
     totpSecret?: boolean
     totpVerifiedAt?: boolean
     scheduledDeleteAt?: boolean
+    role?: boolean
+    planOverrideReason?: boolean
+    planOverriddenAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -4574,6 +4819,9 @@ export namespace Prisma {
     totpSecret?: boolean
     totpVerifiedAt?: boolean
     scheduledDeleteAt?: boolean
+    role?: boolean
+    planOverrideReason?: boolean
+    planOverriddenAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -4595,11 +4843,14 @@ export namespace Prisma {
     totpSecret?: boolean
     totpVerifiedAt?: boolean
     scheduledDeleteAt?: boolean
+    role?: boolean
+    planOverrideReason?: boolean
+    planOverriddenAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "password" | "lifecycleState" | "autoFillPhoneticNames" | "sessionVersion" | "avatarUrl" | "emailVerified" | "emailPendingChange" | "emailPendingChangeRequestedAt" | "emailStatus" | "totpEnabled" | "totpSecret" | "totpVerifiedAt" | "scheduledDeleteAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "password" | "lifecycleState" | "autoFillPhoneticNames" | "sessionVersion" | "avatarUrl" | "emailVerified" | "emailPendingChange" | "emailPendingChangeRequestedAt" | "emailStatus" | "totpEnabled" | "totpSecret" | "totpVerifiedAt" | "scheduledDeleteAt" | "role" | "planOverrideReason" | "planOverriddenAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     appPasswords?: boolean | User$appPasswordsArgs<ExtArgs>
     contacts?: boolean | User$contactsArgs<ExtArgs>
@@ -4620,6 +4871,7 @@ export namespace Prisma {
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     totpRecoveryCodes?: boolean | User$totpRecoveryCodesArgs<ExtArgs>
     addressBooks?: boolean | User$addressBooksArgs<ExtArgs>
+    adminAuditEvents?: boolean | User$adminAuditEventsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -4647,6 +4899,7 @@ export namespace Prisma {
       sessions: Prisma.$UserSessionPayload<ExtArgs>[]
       totpRecoveryCodes: Prisma.$TotpRecoveryCodePayload<ExtArgs>[]
       addressBooks: Prisma.$AddressBookPayload<ExtArgs>[]
+      adminAuditEvents: Prisma.$AdminAuditEventPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -4665,6 +4918,9 @@ export namespace Prisma {
       totpSecret: string | null
       totpVerifiedAt: Date | null
       scheduledDeleteAt: Date | null
+      role: $Enums.UserRole
+      planOverrideReason: string | null
+      planOverriddenAt: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -5080,6 +5336,7 @@ export namespace Prisma {
     sessions<T extends User$sessionsArgs<ExtArgs> = {}>(args?: Subset<T, User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     totpRecoveryCodes<T extends User$totpRecoveryCodesArgs<ExtArgs> = {}>(args?: Subset<T, User$totpRecoveryCodesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TotpRecoveryCodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     addressBooks<T extends User$addressBooksArgs<ExtArgs> = {}>(args?: Subset<T, User$addressBooksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AddressBookPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    adminAuditEvents<T extends User$adminAuditEventsArgs<ExtArgs> = {}>(args?: Subset<T, User$adminAuditEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminAuditEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5125,6 +5382,9 @@ export namespace Prisma {
     readonly totpSecret: FieldRef<"User", 'String'>
     readonly totpVerifiedAt: FieldRef<"User", 'DateTime'>
     readonly scheduledDeleteAt: FieldRef<"User", 'DateTime'>
+    readonly role: FieldRef<"User", 'UserRole'>
+    readonly planOverrideReason: FieldRef<"User", 'String'>
+    readonly planOverriddenAt: FieldRef<"User", 'DateTime'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
   }
@@ -5963,6 +6223,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: AddressBookScalarFieldEnum | AddressBookScalarFieldEnum[]
+  }
+
+  /**
+   * User.adminAuditEvents
+   */
+  export type User$adminAuditEventsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminAuditEvent
+     */
+    select?: AdminAuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminAuditEvent
+     */
+    omit?: AdminAuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminAuditEventInclude<ExtArgs> | null
+    where?: AdminAuditEventWhereInput
+    orderBy?: AdminAuditEventOrderByWithRelationInput | AdminAuditEventOrderByWithRelationInput[]
+    cursor?: AdminAuditEventWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: AdminAuditEventScalarFieldEnum | AdminAuditEventScalarFieldEnum[]
   }
 
   /**
@@ -27577,6 +27861,2202 @@ export namespace Prisma {
 
 
   /**
+   * Model AdminAuditEvent
+   */
+
+  export type AggregateAdminAuditEvent = {
+    _count: AdminAuditEventCountAggregateOutputType | null
+    _min: AdminAuditEventMinAggregateOutputType | null
+    _max: AdminAuditEventMaxAggregateOutputType | null
+  }
+
+  export type AdminAuditEventMinAggregateOutputType = {
+    id: string | null
+    adminUserId: string | null
+    action: string | null
+    targetUserId: string | null
+    targetEmail: string | null
+    ipAddress: string | null
+    createdAt: Date | null
+  }
+
+  export type AdminAuditEventMaxAggregateOutputType = {
+    id: string | null
+    adminUserId: string | null
+    action: string | null
+    targetUserId: string | null
+    targetEmail: string | null
+    ipAddress: string | null
+    createdAt: Date | null
+  }
+
+  export type AdminAuditEventCountAggregateOutputType = {
+    id: number
+    adminUserId: number
+    action: number
+    targetUserId: number
+    targetEmail: number
+    details: number
+    ipAddress: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type AdminAuditEventMinAggregateInputType = {
+    id?: true
+    adminUserId?: true
+    action?: true
+    targetUserId?: true
+    targetEmail?: true
+    ipAddress?: true
+    createdAt?: true
+  }
+
+  export type AdminAuditEventMaxAggregateInputType = {
+    id?: true
+    adminUserId?: true
+    action?: true
+    targetUserId?: true
+    targetEmail?: true
+    ipAddress?: true
+    createdAt?: true
+  }
+
+  export type AdminAuditEventCountAggregateInputType = {
+    id?: true
+    adminUserId?: true
+    action?: true
+    targetUserId?: true
+    targetEmail?: true
+    details?: true
+    ipAddress?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type AdminAuditEventAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AdminAuditEvent to aggregate.
+     */
+    where?: AdminAuditEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AdminAuditEvents to fetch.
+     */
+    orderBy?: AdminAuditEventOrderByWithRelationInput | AdminAuditEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: AdminAuditEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AdminAuditEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AdminAuditEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned AdminAuditEvents
+    **/
+    _count?: true | AdminAuditEventCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: AdminAuditEventMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: AdminAuditEventMaxAggregateInputType
+  }
+
+  export type GetAdminAuditEventAggregateType<T extends AdminAuditEventAggregateArgs> = {
+        [P in keyof T & keyof AggregateAdminAuditEvent]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateAdminAuditEvent[P]>
+      : GetScalarType<T[P], AggregateAdminAuditEvent[P]>
+  }
+
+
+
+
+  export type AdminAuditEventGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: AdminAuditEventWhereInput
+    orderBy?: AdminAuditEventOrderByWithAggregationInput | AdminAuditEventOrderByWithAggregationInput[]
+    by: AdminAuditEventScalarFieldEnum[] | AdminAuditEventScalarFieldEnum
+    having?: AdminAuditEventScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: AdminAuditEventCountAggregateInputType | true
+    _min?: AdminAuditEventMinAggregateInputType
+    _max?: AdminAuditEventMaxAggregateInputType
+  }
+
+  export type AdminAuditEventGroupByOutputType = {
+    id: string
+    adminUserId: string
+    action: string
+    targetUserId: string | null
+    targetEmail: string | null
+    details: JsonValue
+    ipAddress: string | null
+    createdAt: Date
+    _count: AdminAuditEventCountAggregateOutputType | null
+    _min: AdminAuditEventMinAggregateOutputType | null
+    _max: AdminAuditEventMaxAggregateOutputType | null
+  }
+
+  type GetAdminAuditEventGroupByPayload<T extends AdminAuditEventGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<AdminAuditEventGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof AdminAuditEventGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], AdminAuditEventGroupByOutputType[P]>
+            : GetScalarType<T[P], AdminAuditEventGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type AdminAuditEventSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    adminUserId?: boolean
+    action?: boolean
+    targetUserId?: boolean
+    targetEmail?: boolean
+    details?: boolean
+    ipAddress?: boolean
+    createdAt?: boolean
+    admin?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["adminAuditEvent"]>
+
+  export type AdminAuditEventSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    adminUserId?: boolean
+    action?: boolean
+    targetUserId?: boolean
+    targetEmail?: boolean
+    details?: boolean
+    ipAddress?: boolean
+    createdAt?: boolean
+    admin?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["adminAuditEvent"]>
+
+  export type AdminAuditEventSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    adminUserId?: boolean
+    action?: boolean
+    targetUserId?: boolean
+    targetEmail?: boolean
+    details?: boolean
+    ipAddress?: boolean
+    createdAt?: boolean
+    admin?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["adminAuditEvent"]>
+
+  export type AdminAuditEventSelectScalar = {
+    id?: boolean
+    adminUserId?: boolean
+    action?: boolean
+    targetUserId?: boolean
+    targetEmail?: boolean
+    details?: boolean
+    ipAddress?: boolean
+    createdAt?: boolean
+  }
+
+  export type AdminAuditEventOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "adminUserId" | "action" | "targetUserId" | "targetEmail" | "details" | "ipAddress" | "createdAt", ExtArgs["result"]["adminAuditEvent"]>
+  export type AdminAuditEventInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    admin?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type AdminAuditEventIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    admin?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type AdminAuditEventIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    admin?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $AdminAuditEventPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "AdminAuditEvent"
+    objects: {
+      admin: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      adminUserId: string
+      action: string
+      targetUserId: string | null
+      targetEmail: string | null
+      details: Prisma.JsonValue
+      ipAddress: string | null
+      createdAt: Date
+    }, ExtArgs["result"]["adminAuditEvent"]>
+    composites: {}
+  }
+
+  type AdminAuditEventGetPayload<S extends boolean | null | undefined | AdminAuditEventDefaultArgs> = $Result.GetResult<Prisma.$AdminAuditEventPayload, S>
+
+  type AdminAuditEventCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<AdminAuditEventFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: AdminAuditEventCountAggregateInputType | true
+    }
+
+  export interface AdminAuditEventDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['AdminAuditEvent'], meta: { name: 'AdminAuditEvent' } }
+    /**
+     * Find zero or one AdminAuditEvent that matches the filter.
+     * @param {AdminAuditEventFindUniqueArgs} args - Arguments to find a AdminAuditEvent
+     * @example
+     * // Get one AdminAuditEvent
+     * const adminAuditEvent = await prisma.adminAuditEvent.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends AdminAuditEventFindUniqueArgs>(args: SelectSubset<T, AdminAuditEventFindUniqueArgs<ExtArgs>>): Prisma__AdminAuditEventClient<$Result.GetResult<Prisma.$AdminAuditEventPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one AdminAuditEvent that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {AdminAuditEventFindUniqueOrThrowArgs} args - Arguments to find a AdminAuditEvent
+     * @example
+     * // Get one AdminAuditEvent
+     * const adminAuditEvent = await prisma.adminAuditEvent.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends AdminAuditEventFindUniqueOrThrowArgs>(args: SelectSubset<T, AdminAuditEventFindUniqueOrThrowArgs<ExtArgs>>): Prisma__AdminAuditEventClient<$Result.GetResult<Prisma.$AdminAuditEventPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AdminAuditEvent that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminAuditEventFindFirstArgs} args - Arguments to find a AdminAuditEvent
+     * @example
+     * // Get one AdminAuditEvent
+     * const adminAuditEvent = await prisma.adminAuditEvent.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends AdminAuditEventFindFirstArgs>(args?: SelectSubset<T, AdminAuditEventFindFirstArgs<ExtArgs>>): Prisma__AdminAuditEventClient<$Result.GetResult<Prisma.$AdminAuditEventPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first AdminAuditEvent that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminAuditEventFindFirstOrThrowArgs} args - Arguments to find a AdminAuditEvent
+     * @example
+     * // Get one AdminAuditEvent
+     * const adminAuditEvent = await prisma.adminAuditEvent.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends AdminAuditEventFindFirstOrThrowArgs>(args?: SelectSubset<T, AdminAuditEventFindFirstOrThrowArgs<ExtArgs>>): Prisma__AdminAuditEventClient<$Result.GetResult<Prisma.$AdminAuditEventPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more AdminAuditEvents that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminAuditEventFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all AdminAuditEvents
+     * const adminAuditEvents = await prisma.adminAuditEvent.findMany()
+     * 
+     * // Get first 10 AdminAuditEvents
+     * const adminAuditEvents = await prisma.adminAuditEvent.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const adminAuditEventWithIdOnly = await prisma.adminAuditEvent.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends AdminAuditEventFindManyArgs>(args?: SelectSubset<T, AdminAuditEventFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminAuditEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a AdminAuditEvent.
+     * @param {AdminAuditEventCreateArgs} args - Arguments to create a AdminAuditEvent.
+     * @example
+     * // Create one AdminAuditEvent
+     * const AdminAuditEvent = await prisma.adminAuditEvent.create({
+     *   data: {
+     *     // ... data to create a AdminAuditEvent
+     *   }
+     * })
+     * 
+     */
+    create<T extends AdminAuditEventCreateArgs>(args: SelectSubset<T, AdminAuditEventCreateArgs<ExtArgs>>): Prisma__AdminAuditEventClient<$Result.GetResult<Prisma.$AdminAuditEventPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many AdminAuditEvents.
+     * @param {AdminAuditEventCreateManyArgs} args - Arguments to create many AdminAuditEvents.
+     * @example
+     * // Create many AdminAuditEvents
+     * const adminAuditEvent = await prisma.adminAuditEvent.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends AdminAuditEventCreateManyArgs>(args?: SelectSubset<T, AdminAuditEventCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many AdminAuditEvents and returns the data saved in the database.
+     * @param {AdminAuditEventCreateManyAndReturnArgs} args - Arguments to create many AdminAuditEvents.
+     * @example
+     * // Create many AdminAuditEvents
+     * const adminAuditEvent = await prisma.adminAuditEvent.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many AdminAuditEvents and only return the `id`
+     * const adminAuditEventWithIdOnly = await prisma.adminAuditEvent.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends AdminAuditEventCreateManyAndReturnArgs>(args?: SelectSubset<T, AdminAuditEventCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminAuditEventPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a AdminAuditEvent.
+     * @param {AdminAuditEventDeleteArgs} args - Arguments to delete one AdminAuditEvent.
+     * @example
+     * // Delete one AdminAuditEvent
+     * const AdminAuditEvent = await prisma.adminAuditEvent.delete({
+     *   where: {
+     *     // ... filter to delete one AdminAuditEvent
+     *   }
+     * })
+     * 
+     */
+    delete<T extends AdminAuditEventDeleteArgs>(args: SelectSubset<T, AdminAuditEventDeleteArgs<ExtArgs>>): Prisma__AdminAuditEventClient<$Result.GetResult<Prisma.$AdminAuditEventPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one AdminAuditEvent.
+     * @param {AdminAuditEventUpdateArgs} args - Arguments to update one AdminAuditEvent.
+     * @example
+     * // Update one AdminAuditEvent
+     * const adminAuditEvent = await prisma.adminAuditEvent.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends AdminAuditEventUpdateArgs>(args: SelectSubset<T, AdminAuditEventUpdateArgs<ExtArgs>>): Prisma__AdminAuditEventClient<$Result.GetResult<Prisma.$AdminAuditEventPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more AdminAuditEvents.
+     * @param {AdminAuditEventDeleteManyArgs} args - Arguments to filter AdminAuditEvents to delete.
+     * @example
+     * // Delete a few AdminAuditEvents
+     * const { count } = await prisma.adminAuditEvent.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends AdminAuditEventDeleteManyArgs>(args?: SelectSubset<T, AdminAuditEventDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AdminAuditEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminAuditEventUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many AdminAuditEvents
+     * const adminAuditEvent = await prisma.adminAuditEvent.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends AdminAuditEventUpdateManyArgs>(args: SelectSubset<T, AdminAuditEventUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more AdminAuditEvents and returns the data updated in the database.
+     * @param {AdminAuditEventUpdateManyAndReturnArgs} args - Arguments to update many AdminAuditEvents.
+     * @example
+     * // Update many AdminAuditEvents
+     * const adminAuditEvent = await prisma.adminAuditEvent.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more AdminAuditEvents and only return the `id`
+     * const adminAuditEventWithIdOnly = await prisma.adminAuditEvent.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends AdminAuditEventUpdateManyAndReturnArgs>(args: SelectSubset<T, AdminAuditEventUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminAuditEventPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one AdminAuditEvent.
+     * @param {AdminAuditEventUpsertArgs} args - Arguments to update or create a AdminAuditEvent.
+     * @example
+     * // Update or create a AdminAuditEvent
+     * const adminAuditEvent = await prisma.adminAuditEvent.upsert({
+     *   create: {
+     *     // ... data to create a AdminAuditEvent
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the AdminAuditEvent we want to update
+     *   }
+     * })
+     */
+    upsert<T extends AdminAuditEventUpsertArgs>(args: SelectSubset<T, AdminAuditEventUpsertArgs<ExtArgs>>): Prisma__AdminAuditEventClient<$Result.GetResult<Prisma.$AdminAuditEventPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of AdminAuditEvents.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminAuditEventCountArgs} args - Arguments to filter AdminAuditEvents to count.
+     * @example
+     * // Count the number of AdminAuditEvents
+     * const count = await prisma.adminAuditEvent.count({
+     *   where: {
+     *     // ... the filter for the AdminAuditEvents we want to count
+     *   }
+     * })
+    **/
+    count<T extends AdminAuditEventCountArgs>(
+      args?: Subset<T, AdminAuditEventCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], AdminAuditEventCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a AdminAuditEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminAuditEventAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends AdminAuditEventAggregateArgs>(args: Subset<T, AdminAuditEventAggregateArgs>): Prisma.PrismaPromise<GetAdminAuditEventAggregateType<T>>
+
+    /**
+     * Group by AdminAuditEvent.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {AdminAuditEventGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends AdminAuditEventGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: AdminAuditEventGroupByArgs['orderBy'] }
+        : { orderBy?: AdminAuditEventGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, AdminAuditEventGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetAdminAuditEventGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the AdminAuditEvent model
+   */
+  readonly fields: AdminAuditEventFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for AdminAuditEvent.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__AdminAuditEventClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    admin<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the AdminAuditEvent model
+   */
+  interface AdminAuditEventFieldRefs {
+    readonly id: FieldRef<"AdminAuditEvent", 'String'>
+    readonly adminUserId: FieldRef<"AdminAuditEvent", 'String'>
+    readonly action: FieldRef<"AdminAuditEvent", 'String'>
+    readonly targetUserId: FieldRef<"AdminAuditEvent", 'String'>
+    readonly targetEmail: FieldRef<"AdminAuditEvent", 'String'>
+    readonly details: FieldRef<"AdminAuditEvent", 'Json'>
+    readonly ipAddress: FieldRef<"AdminAuditEvent", 'String'>
+    readonly createdAt: FieldRef<"AdminAuditEvent", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * AdminAuditEvent findUnique
+   */
+  export type AdminAuditEventFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminAuditEvent
+     */
+    select?: AdminAuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminAuditEvent
+     */
+    omit?: AdminAuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminAuditEventInclude<ExtArgs> | null
+    /**
+     * Filter, which AdminAuditEvent to fetch.
+     */
+    where: AdminAuditEventWhereUniqueInput
+  }
+
+  /**
+   * AdminAuditEvent findUniqueOrThrow
+   */
+  export type AdminAuditEventFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminAuditEvent
+     */
+    select?: AdminAuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminAuditEvent
+     */
+    omit?: AdminAuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminAuditEventInclude<ExtArgs> | null
+    /**
+     * Filter, which AdminAuditEvent to fetch.
+     */
+    where: AdminAuditEventWhereUniqueInput
+  }
+
+  /**
+   * AdminAuditEvent findFirst
+   */
+  export type AdminAuditEventFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminAuditEvent
+     */
+    select?: AdminAuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminAuditEvent
+     */
+    omit?: AdminAuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminAuditEventInclude<ExtArgs> | null
+    /**
+     * Filter, which AdminAuditEvent to fetch.
+     */
+    where?: AdminAuditEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AdminAuditEvents to fetch.
+     */
+    orderBy?: AdminAuditEventOrderByWithRelationInput | AdminAuditEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AdminAuditEvents.
+     */
+    cursor?: AdminAuditEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AdminAuditEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AdminAuditEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AdminAuditEvents.
+     */
+    distinct?: AdminAuditEventScalarFieldEnum | AdminAuditEventScalarFieldEnum[]
+  }
+
+  /**
+   * AdminAuditEvent findFirstOrThrow
+   */
+  export type AdminAuditEventFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminAuditEvent
+     */
+    select?: AdminAuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminAuditEvent
+     */
+    omit?: AdminAuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminAuditEventInclude<ExtArgs> | null
+    /**
+     * Filter, which AdminAuditEvent to fetch.
+     */
+    where?: AdminAuditEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AdminAuditEvents to fetch.
+     */
+    orderBy?: AdminAuditEventOrderByWithRelationInput | AdminAuditEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for AdminAuditEvents.
+     */
+    cursor?: AdminAuditEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AdminAuditEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AdminAuditEvents.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of AdminAuditEvents.
+     */
+    distinct?: AdminAuditEventScalarFieldEnum | AdminAuditEventScalarFieldEnum[]
+  }
+
+  /**
+   * AdminAuditEvent findMany
+   */
+  export type AdminAuditEventFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminAuditEvent
+     */
+    select?: AdminAuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminAuditEvent
+     */
+    omit?: AdminAuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminAuditEventInclude<ExtArgs> | null
+    /**
+     * Filter, which AdminAuditEvents to fetch.
+     */
+    where?: AdminAuditEventWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of AdminAuditEvents to fetch.
+     */
+    orderBy?: AdminAuditEventOrderByWithRelationInput | AdminAuditEventOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing AdminAuditEvents.
+     */
+    cursor?: AdminAuditEventWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` AdminAuditEvents from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` AdminAuditEvents.
+     */
+    skip?: number
+    distinct?: AdminAuditEventScalarFieldEnum | AdminAuditEventScalarFieldEnum[]
+  }
+
+  /**
+   * AdminAuditEvent create
+   */
+  export type AdminAuditEventCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminAuditEvent
+     */
+    select?: AdminAuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminAuditEvent
+     */
+    omit?: AdminAuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminAuditEventInclude<ExtArgs> | null
+    /**
+     * The data needed to create a AdminAuditEvent.
+     */
+    data: XOR<AdminAuditEventCreateInput, AdminAuditEventUncheckedCreateInput>
+  }
+
+  /**
+   * AdminAuditEvent createMany
+   */
+  export type AdminAuditEventCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many AdminAuditEvents.
+     */
+    data: AdminAuditEventCreateManyInput | AdminAuditEventCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * AdminAuditEvent createManyAndReturn
+   */
+  export type AdminAuditEventCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminAuditEvent
+     */
+    select?: AdminAuditEventSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminAuditEvent
+     */
+    omit?: AdminAuditEventOmit<ExtArgs> | null
+    /**
+     * The data used to create many AdminAuditEvents.
+     */
+    data: AdminAuditEventCreateManyInput | AdminAuditEventCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminAuditEventIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AdminAuditEvent update
+   */
+  export type AdminAuditEventUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminAuditEvent
+     */
+    select?: AdminAuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminAuditEvent
+     */
+    omit?: AdminAuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminAuditEventInclude<ExtArgs> | null
+    /**
+     * The data needed to update a AdminAuditEvent.
+     */
+    data: XOR<AdminAuditEventUpdateInput, AdminAuditEventUncheckedUpdateInput>
+    /**
+     * Choose, which AdminAuditEvent to update.
+     */
+    where: AdminAuditEventWhereUniqueInput
+  }
+
+  /**
+   * AdminAuditEvent updateMany
+   */
+  export type AdminAuditEventUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update AdminAuditEvents.
+     */
+    data: XOR<AdminAuditEventUpdateManyMutationInput, AdminAuditEventUncheckedUpdateManyInput>
+    /**
+     * Filter which AdminAuditEvents to update
+     */
+    where?: AdminAuditEventWhereInput
+    /**
+     * Limit how many AdminAuditEvents to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * AdminAuditEvent updateManyAndReturn
+   */
+  export type AdminAuditEventUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminAuditEvent
+     */
+    select?: AdminAuditEventSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminAuditEvent
+     */
+    omit?: AdminAuditEventOmit<ExtArgs> | null
+    /**
+     * The data used to update AdminAuditEvents.
+     */
+    data: XOR<AdminAuditEventUpdateManyMutationInput, AdminAuditEventUncheckedUpdateManyInput>
+    /**
+     * Filter which AdminAuditEvents to update
+     */
+    where?: AdminAuditEventWhereInput
+    /**
+     * Limit how many AdminAuditEvents to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminAuditEventIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * AdminAuditEvent upsert
+   */
+  export type AdminAuditEventUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminAuditEvent
+     */
+    select?: AdminAuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminAuditEvent
+     */
+    omit?: AdminAuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminAuditEventInclude<ExtArgs> | null
+    /**
+     * The filter to search for the AdminAuditEvent to update in case it exists.
+     */
+    where: AdminAuditEventWhereUniqueInput
+    /**
+     * In case the AdminAuditEvent found by the `where` argument doesn't exist, create a new AdminAuditEvent with this data.
+     */
+    create: XOR<AdminAuditEventCreateInput, AdminAuditEventUncheckedCreateInput>
+    /**
+     * In case the AdminAuditEvent was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<AdminAuditEventUpdateInput, AdminAuditEventUncheckedUpdateInput>
+  }
+
+  /**
+   * AdminAuditEvent delete
+   */
+  export type AdminAuditEventDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminAuditEvent
+     */
+    select?: AdminAuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminAuditEvent
+     */
+    omit?: AdminAuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminAuditEventInclude<ExtArgs> | null
+    /**
+     * Filter which AdminAuditEvent to delete.
+     */
+    where: AdminAuditEventWhereUniqueInput
+  }
+
+  /**
+   * AdminAuditEvent deleteMany
+   */
+  export type AdminAuditEventDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which AdminAuditEvents to delete
+     */
+    where?: AdminAuditEventWhereInput
+    /**
+     * Limit how many AdminAuditEvents to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * AdminAuditEvent without action
+   */
+  export type AdminAuditEventDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the AdminAuditEvent
+     */
+    select?: AdminAuditEventSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the AdminAuditEvent
+     */
+    omit?: AdminAuditEventOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: AdminAuditEventInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model FeatureFlag
+   */
+
+  export type AggregateFeatureFlag = {
+    _count: FeatureFlagCountAggregateOutputType | null
+    _avg: FeatureFlagAvgAggregateOutputType | null
+    _sum: FeatureFlagSumAggregateOutputType | null
+    _min: FeatureFlagMinAggregateOutputType | null
+    _max: FeatureFlagMaxAggregateOutputType | null
+  }
+
+  export type FeatureFlagAvgAggregateOutputType = {
+    rolloutPct: number | null
+  }
+
+  export type FeatureFlagSumAggregateOutputType = {
+    rolloutPct: number | null
+  }
+
+  export type FeatureFlagMinAggregateOutputType = {
+    id: string | null
+    key: string | null
+    name: string | null
+    description: string | null
+    mode: $Enums.FeatureFlagMode | null
+    rolloutPct: number | null
+    updatedById: string | null
+    updatedByName: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FeatureFlagMaxAggregateOutputType = {
+    id: string | null
+    key: string | null
+    name: string | null
+    description: string | null
+    mode: $Enums.FeatureFlagMode | null
+    rolloutPct: number | null
+    updatedById: string | null
+    updatedByName: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type FeatureFlagCountAggregateOutputType = {
+    id: number
+    key: number
+    name: number
+    description: number
+    mode: number
+    rolloutPct: number
+    allowedUserIds: number
+    updatedById: number
+    updatedByName: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type FeatureFlagAvgAggregateInputType = {
+    rolloutPct?: true
+  }
+
+  export type FeatureFlagSumAggregateInputType = {
+    rolloutPct?: true
+  }
+
+  export type FeatureFlagMinAggregateInputType = {
+    id?: true
+    key?: true
+    name?: true
+    description?: true
+    mode?: true
+    rolloutPct?: true
+    updatedById?: true
+    updatedByName?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FeatureFlagMaxAggregateInputType = {
+    id?: true
+    key?: true
+    name?: true
+    description?: true
+    mode?: true
+    rolloutPct?: true
+    updatedById?: true
+    updatedByName?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type FeatureFlagCountAggregateInputType = {
+    id?: true
+    key?: true
+    name?: true
+    description?: true
+    mode?: true
+    rolloutPct?: true
+    allowedUserIds?: true
+    updatedById?: true
+    updatedByName?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type FeatureFlagAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FeatureFlag to aggregate.
+     */
+    where?: FeatureFlagWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FeatureFlags to fetch.
+     */
+    orderBy?: FeatureFlagOrderByWithRelationInput | FeatureFlagOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FeatureFlagWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FeatureFlags from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FeatureFlags.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned FeatureFlags
+    **/
+    _count?: true | FeatureFlagCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: FeatureFlagAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: FeatureFlagSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FeatureFlagMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FeatureFlagMaxAggregateInputType
+  }
+
+  export type GetFeatureFlagAggregateType<T extends FeatureFlagAggregateArgs> = {
+        [P in keyof T & keyof AggregateFeatureFlag]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFeatureFlag[P]>
+      : GetScalarType<T[P], AggregateFeatureFlag[P]>
+  }
+
+
+
+
+  export type FeatureFlagGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FeatureFlagWhereInput
+    orderBy?: FeatureFlagOrderByWithAggregationInput | FeatureFlagOrderByWithAggregationInput[]
+    by: FeatureFlagScalarFieldEnum[] | FeatureFlagScalarFieldEnum
+    having?: FeatureFlagScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FeatureFlagCountAggregateInputType | true
+    _avg?: FeatureFlagAvgAggregateInputType
+    _sum?: FeatureFlagSumAggregateInputType
+    _min?: FeatureFlagMinAggregateInputType
+    _max?: FeatureFlagMaxAggregateInputType
+  }
+
+  export type FeatureFlagGroupByOutputType = {
+    id: string
+    key: string
+    name: string
+    description: string
+    mode: $Enums.FeatureFlagMode
+    rolloutPct: number
+    allowedUserIds: string[]
+    updatedById: string | null
+    updatedByName: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: FeatureFlagCountAggregateOutputType | null
+    _avg: FeatureFlagAvgAggregateOutputType | null
+    _sum: FeatureFlagSumAggregateOutputType | null
+    _min: FeatureFlagMinAggregateOutputType | null
+    _max: FeatureFlagMaxAggregateOutputType | null
+  }
+
+  type GetFeatureFlagGroupByPayload<T extends FeatureFlagGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FeatureFlagGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FeatureFlagGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FeatureFlagGroupByOutputType[P]>
+            : GetScalarType<T[P], FeatureFlagGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FeatureFlagSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    key?: boolean
+    name?: boolean
+    description?: boolean
+    mode?: boolean
+    rolloutPct?: boolean
+    allowedUserIds?: boolean
+    updatedById?: boolean
+    updatedByName?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["featureFlag"]>
+
+  export type FeatureFlagSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    key?: boolean
+    name?: boolean
+    description?: boolean
+    mode?: boolean
+    rolloutPct?: boolean
+    allowedUserIds?: boolean
+    updatedById?: boolean
+    updatedByName?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["featureFlag"]>
+
+  export type FeatureFlagSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    key?: boolean
+    name?: boolean
+    description?: boolean
+    mode?: boolean
+    rolloutPct?: boolean
+    allowedUserIds?: boolean
+    updatedById?: boolean
+    updatedByName?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["featureFlag"]>
+
+  export type FeatureFlagSelectScalar = {
+    id?: boolean
+    key?: boolean
+    name?: boolean
+    description?: boolean
+    mode?: boolean
+    rolloutPct?: boolean
+    allowedUserIds?: boolean
+    updatedById?: boolean
+    updatedByName?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type FeatureFlagOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "key" | "name" | "description" | "mode" | "rolloutPct" | "allowedUserIds" | "updatedById" | "updatedByName" | "createdAt" | "updatedAt", ExtArgs["result"]["featureFlag"]>
+
+  export type $FeatureFlagPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "FeatureFlag"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      key: string
+      name: string
+      description: string
+      mode: $Enums.FeatureFlagMode
+      rolloutPct: number
+      allowedUserIds: string[]
+      updatedById: string | null
+      updatedByName: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["featureFlag"]>
+    composites: {}
+  }
+
+  type FeatureFlagGetPayload<S extends boolean | null | undefined | FeatureFlagDefaultArgs> = $Result.GetResult<Prisma.$FeatureFlagPayload, S>
+
+  type FeatureFlagCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<FeatureFlagFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: FeatureFlagCountAggregateInputType | true
+    }
+
+  export interface FeatureFlagDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['FeatureFlag'], meta: { name: 'FeatureFlag' } }
+    /**
+     * Find zero or one FeatureFlag that matches the filter.
+     * @param {FeatureFlagFindUniqueArgs} args - Arguments to find a FeatureFlag
+     * @example
+     * // Get one FeatureFlag
+     * const featureFlag = await prisma.featureFlag.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FeatureFlagFindUniqueArgs>(args: SelectSubset<T, FeatureFlagFindUniqueArgs<ExtArgs>>): Prisma__FeatureFlagClient<$Result.GetResult<Prisma.$FeatureFlagPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one FeatureFlag that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {FeatureFlagFindUniqueOrThrowArgs} args - Arguments to find a FeatureFlag
+     * @example
+     * // Get one FeatureFlag
+     * const featureFlag = await prisma.featureFlag.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FeatureFlagFindUniqueOrThrowArgs>(args: SelectSubset<T, FeatureFlagFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FeatureFlagClient<$Result.GetResult<Prisma.$FeatureFlagPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FeatureFlag that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeatureFlagFindFirstArgs} args - Arguments to find a FeatureFlag
+     * @example
+     * // Get one FeatureFlag
+     * const featureFlag = await prisma.featureFlag.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FeatureFlagFindFirstArgs>(args?: SelectSubset<T, FeatureFlagFindFirstArgs<ExtArgs>>): Prisma__FeatureFlagClient<$Result.GetResult<Prisma.$FeatureFlagPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FeatureFlag that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeatureFlagFindFirstOrThrowArgs} args - Arguments to find a FeatureFlag
+     * @example
+     * // Get one FeatureFlag
+     * const featureFlag = await prisma.featureFlag.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FeatureFlagFindFirstOrThrowArgs>(args?: SelectSubset<T, FeatureFlagFindFirstOrThrowArgs<ExtArgs>>): Prisma__FeatureFlagClient<$Result.GetResult<Prisma.$FeatureFlagPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more FeatureFlags that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeatureFlagFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all FeatureFlags
+     * const featureFlags = await prisma.featureFlag.findMany()
+     * 
+     * // Get first 10 FeatureFlags
+     * const featureFlags = await prisma.featureFlag.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const featureFlagWithIdOnly = await prisma.featureFlag.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends FeatureFlagFindManyArgs>(args?: SelectSubset<T, FeatureFlagFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FeatureFlagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a FeatureFlag.
+     * @param {FeatureFlagCreateArgs} args - Arguments to create a FeatureFlag.
+     * @example
+     * // Create one FeatureFlag
+     * const FeatureFlag = await prisma.featureFlag.create({
+     *   data: {
+     *     // ... data to create a FeatureFlag
+     *   }
+     * })
+     * 
+     */
+    create<T extends FeatureFlagCreateArgs>(args: SelectSubset<T, FeatureFlagCreateArgs<ExtArgs>>): Prisma__FeatureFlagClient<$Result.GetResult<Prisma.$FeatureFlagPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many FeatureFlags.
+     * @param {FeatureFlagCreateManyArgs} args - Arguments to create many FeatureFlags.
+     * @example
+     * // Create many FeatureFlags
+     * const featureFlag = await prisma.featureFlag.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FeatureFlagCreateManyArgs>(args?: SelectSubset<T, FeatureFlagCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many FeatureFlags and returns the data saved in the database.
+     * @param {FeatureFlagCreateManyAndReturnArgs} args - Arguments to create many FeatureFlags.
+     * @example
+     * // Create many FeatureFlags
+     * const featureFlag = await prisma.featureFlag.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many FeatureFlags and only return the `id`
+     * const featureFlagWithIdOnly = await prisma.featureFlag.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends FeatureFlagCreateManyAndReturnArgs>(args?: SelectSubset<T, FeatureFlagCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FeatureFlagPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a FeatureFlag.
+     * @param {FeatureFlagDeleteArgs} args - Arguments to delete one FeatureFlag.
+     * @example
+     * // Delete one FeatureFlag
+     * const FeatureFlag = await prisma.featureFlag.delete({
+     *   where: {
+     *     // ... filter to delete one FeatureFlag
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FeatureFlagDeleteArgs>(args: SelectSubset<T, FeatureFlagDeleteArgs<ExtArgs>>): Prisma__FeatureFlagClient<$Result.GetResult<Prisma.$FeatureFlagPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one FeatureFlag.
+     * @param {FeatureFlagUpdateArgs} args - Arguments to update one FeatureFlag.
+     * @example
+     * // Update one FeatureFlag
+     * const featureFlag = await prisma.featureFlag.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FeatureFlagUpdateArgs>(args: SelectSubset<T, FeatureFlagUpdateArgs<ExtArgs>>): Prisma__FeatureFlagClient<$Result.GetResult<Prisma.$FeatureFlagPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more FeatureFlags.
+     * @param {FeatureFlagDeleteManyArgs} args - Arguments to filter FeatureFlags to delete.
+     * @example
+     * // Delete a few FeatureFlags
+     * const { count } = await prisma.featureFlag.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FeatureFlagDeleteManyArgs>(args?: SelectSubset<T, FeatureFlagDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FeatureFlags.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeatureFlagUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many FeatureFlags
+     * const featureFlag = await prisma.featureFlag.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FeatureFlagUpdateManyArgs>(args: SelectSubset<T, FeatureFlagUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FeatureFlags and returns the data updated in the database.
+     * @param {FeatureFlagUpdateManyAndReturnArgs} args - Arguments to update many FeatureFlags.
+     * @example
+     * // Update many FeatureFlags
+     * const featureFlag = await prisma.featureFlag.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more FeatureFlags and only return the `id`
+     * const featureFlagWithIdOnly = await prisma.featureFlag.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends FeatureFlagUpdateManyAndReturnArgs>(args: SelectSubset<T, FeatureFlagUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FeatureFlagPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one FeatureFlag.
+     * @param {FeatureFlagUpsertArgs} args - Arguments to update or create a FeatureFlag.
+     * @example
+     * // Update or create a FeatureFlag
+     * const featureFlag = await prisma.featureFlag.upsert({
+     *   create: {
+     *     // ... data to create a FeatureFlag
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the FeatureFlag we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FeatureFlagUpsertArgs>(args: SelectSubset<T, FeatureFlagUpsertArgs<ExtArgs>>): Prisma__FeatureFlagClient<$Result.GetResult<Prisma.$FeatureFlagPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of FeatureFlags.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeatureFlagCountArgs} args - Arguments to filter FeatureFlags to count.
+     * @example
+     * // Count the number of FeatureFlags
+     * const count = await prisma.featureFlag.count({
+     *   where: {
+     *     // ... the filter for the FeatureFlags we want to count
+     *   }
+     * })
+    **/
+    count<T extends FeatureFlagCountArgs>(
+      args?: Subset<T, FeatureFlagCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FeatureFlagCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a FeatureFlag.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeatureFlagAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FeatureFlagAggregateArgs>(args: Subset<T, FeatureFlagAggregateArgs>): Prisma.PrismaPromise<GetFeatureFlagAggregateType<T>>
+
+    /**
+     * Group by FeatureFlag.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FeatureFlagGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FeatureFlagGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FeatureFlagGroupByArgs['orderBy'] }
+        : { orderBy?: FeatureFlagGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FeatureFlagGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFeatureFlagGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the FeatureFlag model
+   */
+  readonly fields: FeatureFlagFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for FeatureFlag.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FeatureFlagClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the FeatureFlag model
+   */
+  interface FeatureFlagFieldRefs {
+    readonly id: FieldRef<"FeatureFlag", 'String'>
+    readonly key: FieldRef<"FeatureFlag", 'String'>
+    readonly name: FieldRef<"FeatureFlag", 'String'>
+    readonly description: FieldRef<"FeatureFlag", 'String'>
+    readonly mode: FieldRef<"FeatureFlag", 'FeatureFlagMode'>
+    readonly rolloutPct: FieldRef<"FeatureFlag", 'Int'>
+    readonly allowedUserIds: FieldRef<"FeatureFlag", 'String[]'>
+    readonly updatedById: FieldRef<"FeatureFlag", 'String'>
+    readonly updatedByName: FieldRef<"FeatureFlag", 'String'>
+    readonly createdAt: FieldRef<"FeatureFlag", 'DateTime'>
+    readonly updatedAt: FieldRef<"FeatureFlag", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * FeatureFlag findUnique
+   */
+  export type FeatureFlagFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeatureFlag
+     */
+    select?: FeatureFlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeatureFlag
+     */
+    omit?: FeatureFlagOmit<ExtArgs> | null
+    /**
+     * Filter, which FeatureFlag to fetch.
+     */
+    where: FeatureFlagWhereUniqueInput
+  }
+
+  /**
+   * FeatureFlag findUniqueOrThrow
+   */
+  export type FeatureFlagFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeatureFlag
+     */
+    select?: FeatureFlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeatureFlag
+     */
+    omit?: FeatureFlagOmit<ExtArgs> | null
+    /**
+     * Filter, which FeatureFlag to fetch.
+     */
+    where: FeatureFlagWhereUniqueInput
+  }
+
+  /**
+   * FeatureFlag findFirst
+   */
+  export type FeatureFlagFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeatureFlag
+     */
+    select?: FeatureFlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeatureFlag
+     */
+    omit?: FeatureFlagOmit<ExtArgs> | null
+    /**
+     * Filter, which FeatureFlag to fetch.
+     */
+    where?: FeatureFlagWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FeatureFlags to fetch.
+     */
+    orderBy?: FeatureFlagOrderByWithRelationInput | FeatureFlagOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FeatureFlags.
+     */
+    cursor?: FeatureFlagWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FeatureFlags from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FeatureFlags.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FeatureFlags.
+     */
+    distinct?: FeatureFlagScalarFieldEnum | FeatureFlagScalarFieldEnum[]
+  }
+
+  /**
+   * FeatureFlag findFirstOrThrow
+   */
+  export type FeatureFlagFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeatureFlag
+     */
+    select?: FeatureFlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeatureFlag
+     */
+    omit?: FeatureFlagOmit<ExtArgs> | null
+    /**
+     * Filter, which FeatureFlag to fetch.
+     */
+    where?: FeatureFlagWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FeatureFlags to fetch.
+     */
+    orderBy?: FeatureFlagOrderByWithRelationInput | FeatureFlagOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FeatureFlags.
+     */
+    cursor?: FeatureFlagWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FeatureFlags from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FeatureFlags.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FeatureFlags.
+     */
+    distinct?: FeatureFlagScalarFieldEnum | FeatureFlagScalarFieldEnum[]
+  }
+
+  /**
+   * FeatureFlag findMany
+   */
+  export type FeatureFlagFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeatureFlag
+     */
+    select?: FeatureFlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeatureFlag
+     */
+    omit?: FeatureFlagOmit<ExtArgs> | null
+    /**
+     * Filter, which FeatureFlags to fetch.
+     */
+    where?: FeatureFlagWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FeatureFlags to fetch.
+     */
+    orderBy?: FeatureFlagOrderByWithRelationInput | FeatureFlagOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing FeatureFlags.
+     */
+    cursor?: FeatureFlagWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FeatureFlags from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FeatureFlags.
+     */
+    skip?: number
+    distinct?: FeatureFlagScalarFieldEnum | FeatureFlagScalarFieldEnum[]
+  }
+
+  /**
+   * FeatureFlag create
+   */
+  export type FeatureFlagCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeatureFlag
+     */
+    select?: FeatureFlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeatureFlag
+     */
+    omit?: FeatureFlagOmit<ExtArgs> | null
+    /**
+     * The data needed to create a FeatureFlag.
+     */
+    data: XOR<FeatureFlagCreateInput, FeatureFlagUncheckedCreateInput>
+  }
+
+  /**
+   * FeatureFlag createMany
+   */
+  export type FeatureFlagCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many FeatureFlags.
+     */
+    data: FeatureFlagCreateManyInput | FeatureFlagCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FeatureFlag createManyAndReturn
+   */
+  export type FeatureFlagCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeatureFlag
+     */
+    select?: FeatureFlagSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeatureFlag
+     */
+    omit?: FeatureFlagOmit<ExtArgs> | null
+    /**
+     * The data used to create many FeatureFlags.
+     */
+    data: FeatureFlagCreateManyInput | FeatureFlagCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FeatureFlag update
+   */
+  export type FeatureFlagUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeatureFlag
+     */
+    select?: FeatureFlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeatureFlag
+     */
+    omit?: FeatureFlagOmit<ExtArgs> | null
+    /**
+     * The data needed to update a FeatureFlag.
+     */
+    data: XOR<FeatureFlagUpdateInput, FeatureFlagUncheckedUpdateInput>
+    /**
+     * Choose, which FeatureFlag to update.
+     */
+    where: FeatureFlagWhereUniqueInput
+  }
+
+  /**
+   * FeatureFlag updateMany
+   */
+  export type FeatureFlagUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update FeatureFlags.
+     */
+    data: XOR<FeatureFlagUpdateManyMutationInput, FeatureFlagUncheckedUpdateManyInput>
+    /**
+     * Filter which FeatureFlags to update
+     */
+    where?: FeatureFlagWhereInput
+    /**
+     * Limit how many FeatureFlags to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * FeatureFlag updateManyAndReturn
+   */
+  export type FeatureFlagUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeatureFlag
+     */
+    select?: FeatureFlagSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeatureFlag
+     */
+    omit?: FeatureFlagOmit<ExtArgs> | null
+    /**
+     * The data used to update FeatureFlags.
+     */
+    data: XOR<FeatureFlagUpdateManyMutationInput, FeatureFlagUncheckedUpdateManyInput>
+    /**
+     * Filter which FeatureFlags to update
+     */
+    where?: FeatureFlagWhereInput
+    /**
+     * Limit how many FeatureFlags to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * FeatureFlag upsert
+   */
+  export type FeatureFlagUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeatureFlag
+     */
+    select?: FeatureFlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeatureFlag
+     */
+    omit?: FeatureFlagOmit<ExtArgs> | null
+    /**
+     * The filter to search for the FeatureFlag to update in case it exists.
+     */
+    where: FeatureFlagWhereUniqueInput
+    /**
+     * In case the FeatureFlag found by the `where` argument doesn't exist, create a new FeatureFlag with this data.
+     */
+    create: XOR<FeatureFlagCreateInput, FeatureFlagUncheckedCreateInput>
+    /**
+     * In case the FeatureFlag was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FeatureFlagUpdateInput, FeatureFlagUncheckedUpdateInput>
+  }
+
+  /**
+   * FeatureFlag delete
+   */
+  export type FeatureFlagDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeatureFlag
+     */
+    select?: FeatureFlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeatureFlag
+     */
+    omit?: FeatureFlagOmit<ExtArgs> | null
+    /**
+     * Filter which FeatureFlag to delete.
+     */
+    where: FeatureFlagWhereUniqueInput
+  }
+
+  /**
+   * FeatureFlag deleteMany
+   */
+  export type FeatureFlagDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FeatureFlags to delete
+     */
+    where?: FeatureFlagWhereInput
+    /**
+     * Limit how many FeatureFlags to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * FeatureFlag without action
+   */
+  export type FeatureFlagDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FeatureFlag
+     */
+    select?: FeatureFlagSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FeatureFlag
+     */
+    omit?: FeatureFlagOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Model Group
    */
 
@@ -36899,6 +39379,9 @@ export namespace Prisma {
     totpSecret: 'totpSecret',
     totpVerifiedAt: 'totpVerifiedAt',
     scheduledDeleteAt: 'scheduledDeleteAt',
+    role: 'role',
+    planOverrideReason: 'planOverrideReason',
+    planOverriddenAt: 'planOverriddenAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -37288,6 +39771,37 @@ export namespace Prisma {
   export type ActivityEventScalarFieldEnum = (typeof ActivityEventScalarFieldEnum)[keyof typeof ActivityEventScalarFieldEnum]
 
 
+  export const AdminAuditEventScalarFieldEnum: {
+    id: 'id',
+    adminUserId: 'adminUserId',
+    action: 'action',
+    targetUserId: 'targetUserId',
+    targetEmail: 'targetEmail',
+    details: 'details',
+    ipAddress: 'ipAddress',
+    createdAt: 'createdAt'
+  };
+
+  export type AdminAuditEventScalarFieldEnum = (typeof AdminAuditEventScalarFieldEnum)[keyof typeof AdminAuditEventScalarFieldEnum]
+
+
+  export const FeatureFlagScalarFieldEnum: {
+    id: 'id',
+    key: 'key',
+    name: 'name',
+    description: 'description',
+    mode: 'mode',
+    rolloutPct: 'rolloutPct',
+    allowedUserIds: 'allowedUserIds',
+    updatedById: 'updatedById',
+    updatedByName: 'updatedByName',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type FeatureFlagScalarFieldEnum = (typeof FeatureFlagScalarFieldEnum)[keyof typeof FeatureFlagScalarFieldEnum]
+
+
   export const GroupScalarFieldEnum: {
     id: 'id',
     ownerId: 'ownerId',
@@ -37541,6 +40055,20 @@ export namespace Prisma {
    * Reference to a field of type 'EmailStatus[]'
    */
   export type ListEnumEmailStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EmailStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'UserRole'
+   */
+  export type EnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole'>
+    
+
+
+  /**
+   * Reference to a field of type 'UserRole[]'
+   */
+  export type ListEnumUserRoleFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'UserRole[]'>
     
 
 
@@ -37895,6 +40423,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'FeatureFlagMode'
+   */
+  export type EnumFeatureFlagModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FeatureFlagMode'>
+    
+
+
+  /**
+   * Reference to a field of type 'FeatureFlagMode[]'
+   */
+  export type ListEnumFeatureFlagModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'FeatureFlagMode[]'>
+    
+
+
+  /**
    * Reference to a field of type 'GroupType'
    */
   export type EnumGroupTypeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'GroupType'>
@@ -38001,6 +40543,9 @@ export namespace Prisma {
     totpSecret?: StringNullableFilter<"User"> | string | null
     totpVerifiedAt?: DateTimeNullableFilter<"User"> | Date | string | null
     scheduledDeleteAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
+    planOverrideReason?: StringNullableFilter<"User"> | string | null
+    planOverriddenAt?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     appPasswords?: AppPasswordListRelationFilter
@@ -38022,6 +40567,7 @@ export namespace Prisma {
     sessions?: UserSessionListRelationFilter
     totpRecoveryCodes?: TotpRecoveryCodeListRelationFilter
     addressBooks?: AddressBookListRelationFilter
+    adminAuditEvents?: AdminAuditEventListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -38041,6 +40587,9 @@ export namespace Prisma {
     totpSecret?: SortOrderInput | SortOrder
     totpVerifiedAt?: SortOrderInput | SortOrder
     scheduledDeleteAt?: SortOrderInput | SortOrder
+    role?: SortOrder
+    planOverrideReason?: SortOrderInput | SortOrder
+    planOverriddenAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     appPasswords?: AppPasswordOrderByRelationAggregateInput
@@ -38062,6 +40611,7 @@ export namespace Prisma {
     sessions?: UserSessionOrderByRelationAggregateInput
     totpRecoveryCodes?: TotpRecoveryCodeOrderByRelationAggregateInput
     addressBooks?: AddressBookOrderByRelationAggregateInput
+    adminAuditEvents?: AdminAuditEventOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -38084,6 +40634,9 @@ export namespace Prisma {
     totpSecret?: StringNullableFilter<"User"> | string | null
     totpVerifiedAt?: DateTimeNullableFilter<"User"> | Date | string | null
     scheduledDeleteAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
+    planOverrideReason?: StringNullableFilter<"User"> | string | null
+    planOverriddenAt?: DateTimeNullableFilter<"User"> | Date | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     appPasswords?: AppPasswordListRelationFilter
@@ -38105,6 +40658,7 @@ export namespace Prisma {
     sessions?: UserSessionListRelationFilter
     totpRecoveryCodes?: TotpRecoveryCodeListRelationFilter
     addressBooks?: AddressBookListRelationFilter
+    adminAuditEvents?: AdminAuditEventListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -38124,6 +40678,9 @@ export namespace Prisma {
     totpSecret?: SortOrderInput | SortOrder
     totpVerifiedAt?: SortOrderInput | SortOrder
     scheduledDeleteAt?: SortOrderInput | SortOrder
+    role?: SortOrder
+    planOverrideReason?: SortOrderInput | SortOrder
+    planOverriddenAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -38153,6 +40710,9 @@ export namespace Prisma {
     totpSecret?: StringNullableWithAggregatesFilter<"User"> | string | null
     totpVerifiedAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     scheduledDeleteAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+    role?: EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
+    planOverrideReason?: StringNullableWithAggregatesFilter<"User"> | string | null
+    planOverriddenAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
@@ -40184,6 +42744,160 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"ActivityEvent"> | Date | string
   }
 
+  export type AdminAuditEventWhereInput = {
+    AND?: AdminAuditEventWhereInput | AdminAuditEventWhereInput[]
+    OR?: AdminAuditEventWhereInput[]
+    NOT?: AdminAuditEventWhereInput | AdminAuditEventWhereInput[]
+    id?: StringFilter<"AdminAuditEvent"> | string
+    adminUserId?: StringFilter<"AdminAuditEvent"> | string
+    action?: StringFilter<"AdminAuditEvent"> | string
+    targetUserId?: StringNullableFilter<"AdminAuditEvent"> | string | null
+    targetEmail?: StringNullableFilter<"AdminAuditEvent"> | string | null
+    details?: JsonFilter<"AdminAuditEvent">
+    ipAddress?: StringNullableFilter<"AdminAuditEvent"> | string | null
+    createdAt?: DateTimeFilter<"AdminAuditEvent"> | Date | string
+    admin?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type AdminAuditEventOrderByWithRelationInput = {
+    id?: SortOrder
+    adminUserId?: SortOrder
+    action?: SortOrder
+    targetUserId?: SortOrderInput | SortOrder
+    targetEmail?: SortOrderInput | SortOrder
+    details?: SortOrder
+    ipAddress?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    admin?: UserOrderByWithRelationInput
+  }
+
+  export type AdminAuditEventWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: AdminAuditEventWhereInput | AdminAuditEventWhereInput[]
+    OR?: AdminAuditEventWhereInput[]
+    NOT?: AdminAuditEventWhereInput | AdminAuditEventWhereInput[]
+    adminUserId?: StringFilter<"AdminAuditEvent"> | string
+    action?: StringFilter<"AdminAuditEvent"> | string
+    targetUserId?: StringNullableFilter<"AdminAuditEvent"> | string | null
+    targetEmail?: StringNullableFilter<"AdminAuditEvent"> | string | null
+    details?: JsonFilter<"AdminAuditEvent">
+    ipAddress?: StringNullableFilter<"AdminAuditEvent"> | string | null
+    createdAt?: DateTimeFilter<"AdminAuditEvent"> | Date | string
+    admin?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type AdminAuditEventOrderByWithAggregationInput = {
+    id?: SortOrder
+    adminUserId?: SortOrder
+    action?: SortOrder
+    targetUserId?: SortOrderInput | SortOrder
+    targetEmail?: SortOrderInput | SortOrder
+    details?: SortOrder
+    ipAddress?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: AdminAuditEventCountOrderByAggregateInput
+    _max?: AdminAuditEventMaxOrderByAggregateInput
+    _min?: AdminAuditEventMinOrderByAggregateInput
+  }
+
+  export type AdminAuditEventScalarWhereWithAggregatesInput = {
+    AND?: AdminAuditEventScalarWhereWithAggregatesInput | AdminAuditEventScalarWhereWithAggregatesInput[]
+    OR?: AdminAuditEventScalarWhereWithAggregatesInput[]
+    NOT?: AdminAuditEventScalarWhereWithAggregatesInput | AdminAuditEventScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"AdminAuditEvent"> | string
+    adminUserId?: StringWithAggregatesFilter<"AdminAuditEvent"> | string
+    action?: StringWithAggregatesFilter<"AdminAuditEvent"> | string
+    targetUserId?: StringNullableWithAggregatesFilter<"AdminAuditEvent"> | string | null
+    targetEmail?: StringNullableWithAggregatesFilter<"AdminAuditEvent"> | string | null
+    details?: JsonWithAggregatesFilter<"AdminAuditEvent">
+    ipAddress?: StringNullableWithAggregatesFilter<"AdminAuditEvent"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"AdminAuditEvent"> | Date | string
+  }
+
+  export type FeatureFlagWhereInput = {
+    AND?: FeatureFlagWhereInput | FeatureFlagWhereInput[]
+    OR?: FeatureFlagWhereInput[]
+    NOT?: FeatureFlagWhereInput | FeatureFlagWhereInput[]
+    id?: StringFilter<"FeatureFlag"> | string
+    key?: StringFilter<"FeatureFlag"> | string
+    name?: StringFilter<"FeatureFlag"> | string
+    description?: StringFilter<"FeatureFlag"> | string
+    mode?: EnumFeatureFlagModeFilter<"FeatureFlag"> | $Enums.FeatureFlagMode
+    rolloutPct?: IntFilter<"FeatureFlag"> | number
+    allowedUserIds?: StringNullableListFilter<"FeatureFlag">
+    updatedById?: StringNullableFilter<"FeatureFlag"> | string | null
+    updatedByName?: StringNullableFilter<"FeatureFlag"> | string | null
+    createdAt?: DateTimeFilter<"FeatureFlag"> | Date | string
+    updatedAt?: DateTimeFilter<"FeatureFlag"> | Date | string
+  }
+
+  export type FeatureFlagOrderByWithRelationInput = {
+    id?: SortOrder
+    key?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    mode?: SortOrder
+    rolloutPct?: SortOrder
+    allowedUserIds?: SortOrder
+    updatedById?: SortOrderInput | SortOrder
+    updatedByName?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FeatureFlagWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    key?: string
+    AND?: FeatureFlagWhereInput | FeatureFlagWhereInput[]
+    OR?: FeatureFlagWhereInput[]
+    NOT?: FeatureFlagWhereInput | FeatureFlagWhereInput[]
+    name?: StringFilter<"FeatureFlag"> | string
+    description?: StringFilter<"FeatureFlag"> | string
+    mode?: EnumFeatureFlagModeFilter<"FeatureFlag"> | $Enums.FeatureFlagMode
+    rolloutPct?: IntFilter<"FeatureFlag"> | number
+    allowedUserIds?: StringNullableListFilter<"FeatureFlag">
+    updatedById?: StringNullableFilter<"FeatureFlag"> | string | null
+    updatedByName?: StringNullableFilter<"FeatureFlag"> | string | null
+    createdAt?: DateTimeFilter<"FeatureFlag"> | Date | string
+    updatedAt?: DateTimeFilter<"FeatureFlag"> | Date | string
+  }, "id" | "key">
+
+  export type FeatureFlagOrderByWithAggregationInput = {
+    id?: SortOrder
+    key?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    mode?: SortOrder
+    rolloutPct?: SortOrder
+    allowedUserIds?: SortOrder
+    updatedById?: SortOrderInput | SortOrder
+    updatedByName?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: FeatureFlagCountOrderByAggregateInput
+    _avg?: FeatureFlagAvgOrderByAggregateInput
+    _max?: FeatureFlagMaxOrderByAggregateInput
+    _min?: FeatureFlagMinOrderByAggregateInput
+    _sum?: FeatureFlagSumOrderByAggregateInput
+  }
+
+  export type FeatureFlagScalarWhereWithAggregatesInput = {
+    AND?: FeatureFlagScalarWhereWithAggregatesInput | FeatureFlagScalarWhereWithAggregatesInput[]
+    OR?: FeatureFlagScalarWhereWithAggregatesInput[]
+    NOT?: FeatureFlagScalarWhereWithAggregatesInput | FeatureFlagScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"FeatureFlag"> | string
+    key?: StringWithAggregatesFilter<"FeatureFlag"> | string
+    name?: StringWithAggregatesFilter<"FeatureFlag"> | string
+    description?: StringWithAggregatesFilter<"FeatureFlag"> | string
+    mode?: EnumFeatureFlagModeWithAggregatesFilter<"FeatureFlag"> | $Enums.FeatureFlagMode
+    rolloutPct?: IntWithAggregatesFilter<"FeatureFlag"> | number
+    allowedUserIds?: StringNullableListFilter<"FeatureFlag">
+    updatedById?: StringNullableWithAggregatesFilter<"FeatureFlag"> | string | null
+    updatedByName?: StringNullableWithAggregatesFilter<"FeatureFlag"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"FeatureFlag"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"FeatureFlag"> | Date | string
+  }
+
   export type GroupWhereInput = {
     AND?: GroupWhereInput | GroupWhereInput[]
     OR?: GroupWhereInput[]
@@ -40878,6 +43592,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -40899,6 +43616,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -40918,6 +43636,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -40939,6 +43660,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
   }
 
   export type UserUpdateInput = {
@@ -40958,6 +43680,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -40979,6 +43704,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -40998,6 +43724,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -41019,6 +43748,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -41038,6 +43768,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -41059,6 +43792,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -41080,6 +43816,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -43448,6 +46187,180 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type AdminAuditEventCreateInput = {
+    id?: string
+    action: string
+    targetUserId?: string | null
+    targetEmail?: string | null
+    details?: JsonNullValueInput | InputJsonValue
+    ipAddress?: string | null
+    createdAt?: Date | string
+    admin: UserCreateNestedOneWithoutAdminAuditEventsInput
+  }
+
+  export type AdminAuditEventUncheckedCreateInput = {
+    id?: string
+    adminUserId: string
+    action: string
+    targetUserId?: string | null
+    targetEmail?: string | null
+    details?: JsonNullValueInput | InputJsonValue
+    ipAddress?: string | null
+    createdAt?: Date | string
+  }
+
+  export type AdminAuditEventUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    targetEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: JsonNullValueInput | InputJsonValue
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    admin?: UserUpdateOneRequiredWithoutAdminAuditEventsNestedInput
+  }
+
+  export type AdminAuditEventUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    adminUserId?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    targetEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: JsonNullValueInput | InputJsonValue
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminAuditEventCreateManyInput = {
+    id?: string
+    adminUserId: string
+    action: string
+    targetUserId?: string | null
+    targetEmail?: string | null
+    details?: JsonNullValueInput | InputJsonValue
+    ipAddress?: string | null
+    createdAt?: Date | string
+  }
+
+  export type AdminAuditEventUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    targetEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: JsonNullValueInput | InputJsonValue
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminAuditEventUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    adminUserId?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    targetEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: JsonNullValueInput | InputJsonValue
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FeatureFlagCreateInput = {
+    id?: string
+    key: string
+    name: string
+    description?: string
+    mode?: $Enums.FeatureFlagMode
+    rolloutPct?: number
+    allowedUserIds?: FeatureFlagCreateallowedUserIdsInput | string[]
+    updatedById?: string | null
+    updatedByName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FeatureFlagUncheckedCreateInput = {
+    id?: string
+    key: string
+    name: string
+    description?: string
+    mode?: $Enums.FeatureFlagMode
+    rolloutPct?: number
+    allowedUserIds?: FeatureFlagCreateallowedUserIdsInput | string[]
+    updatedById?: string | null
+    updatedByName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FeatureFlagUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    mode?: EnumFeatureFlagModeFieldUpdateOperationsInput | $Enums.FeatureFlagMode
+    rolloutPct?: IntFieldUpdateOperationsInput | number
+    allowedUserIds?: FeatureFlagUpdateallowedUserIdsInput | string[]
+    updatedById?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FeatureFlagUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    mode?: EnumFeatureFlagModeFieldUpdateOperationsInput | $Enums.FeatureFlagMode
+    rolloutPct?: IntFieldUpdateOperationsInput | number
+    allowedUserIds?: FeatureFlagUpdateallowedUserIdsInput | string[]
+    updatedById?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FeatureFlagCreateManyInput = {
+    id?: string
+    key: string
+    name: string
+    description?: string
+    mode?: $Enums.FeatureFlagMode
+    rolloutPct?: number
+    allowedUserIds?: FeatureFlagCreateallowedUserIdsInput | string[]
+    updatedById?: string | null
+    updatedByName?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type FeatureFlagUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    mode?: EnumFeatureFlagModeFieldUpdateOperationsInput | $Enums.FeatureFlagMode
+    rolloutPct?: IntFieldUpdateOperationsInput | number
+    allowedUserIds?: FeatureFlagUpdateallowedUserIdsInput | string[]
+    updatedById?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FeatureFlagUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    key?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    description?: StringFieldUpdateOperationsInput | string
+    mode?: EnumFeatureFlagModeFieldUpdateOperationsInput | $Enums.FeatureFlagMode
+    rolloutPct?: IntFieldUpdateOperationsInput | number
+    allowedUserIds?: FeatureFlagUpdateallowedUserIdsInput | string[]
+    updatedById?: NullableStringFieldUpdateOperationsInput | string | null
+    updatedByName?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type GroupCreateInput = {
     id?: string
     type: $Enums.GroupType
@@ -44242,6 +47155,13 @@ export namespace Prisma {
     not?: NestedEnumEmailStatusFilter<$PrismaModel> | $Enums.EmailStatus
   }
 
+  export type EnumUserRoleFilter<$PrismaModel = never> = {
+    equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumUserRoleFilter<$PrismaModel> | $Enums.UserRole
+  }
+
   export type DateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -44360,6 +47280,12 @@ export namespace Prisma {
     none?: AddressBookWhereInput
   }
 
+  export type AdminAuditEventListRelationFilter = {
+    every?: AdminAuditEventWhereInput
+    some?: AdminAuditEventWhereInput
+    none?: AdminAuditEventWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -44433,6 +47359,10 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type AdminAuditEventOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
@@ -44450,6 +47380,9 @@ export namespace Prisma {
     totpSecret?: SortOrder
     totpVerifiedAt?: SortOrder
     scheduledDeleteAt?: SortOrder
+    role?: SortOrder
+    planOverrideReason?: SortOrder
+    planOverriddenAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -44475,6 +47408,9 @@ export namespace Prisma {
     totpSecret?: SortOrder
     totpVerifiedAt?: SortOrder
     scheduledDeleteAt?: SortOrder
+    role?: SortOrder
+    planOverrideReason?: SortOrder
+    planOverriddenAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -44496,6 +47432,9 @@ export namespace Prisma {
     totpSecret?: SortOrder
     totpVerifiedAt?: SortOrder
     scheduledDeleteAt?: SortOrder
+    role?: SortOrder
+    planOverrideReason?: SortOrder
+    planOverriddenAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -44596,6 +47535,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumEmailStatusFilter<$PrismaModel>
     _max?: NestedEnumEmailStatusFilter<$PrismaModel>
+  }
+
+  export type EnumUserRoleWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumUserRoleWithAggregatesFilter<$PrismaModel> | $Enums.UserRole
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumUserRoleFilter<$PrismaModel>
+    _max?: NestedEnumUserRoleFilter<$PrismaModel>
   }
 
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -46347,6 +49296,110 @@ export namespace Prisma {
     _max?: NestedEnumActorFilter<$PrismaModel>
   }
 
+  export type AdminAuditEventCountOrderByAggregateInput = {
+    id?: SortOrder
+    adminUserId?: SortOrder
+    action?: SortOrder
+    targetUserId?: SortOrder
+    targetEmail?: SortOrder
+    details?: SortOrder
+    ipAddress?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type AdminAuditEventMaxOrderByAggregateInput = {
+    id?: SortOrder
+    adminUserId?: SortOrder
+    action?: SortOrder
+    targetUserId?: SortOrder
+    targetEmail?: SortOrder
+    ipAddress?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type AdminAuditEventMinOrderByAggregateInput = {
+    id?: SortOrder
+    adminUserId?: SortOrder
+    action?: SortOrder
+    targetUserId?: SortOrder
+    targetEmail?: SortOrder
+    ipAddress?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type EnumFeatureFlagModeFilter<$PrismaModel = never> = {
+    equals?: $Enums.FeatureFlagMode | EnumFeatureFlagModeFieldRefInput<$PrismaModel>
+    in?: $Enums.FeatureFlagMode[] | ListEnumFeatureFlagModeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FeatureFlagMode[] | ListEnumFeatureFlagModeFieldRefInput<$PrismaModel>
+    not?: NestedEnumFeatureFlagModeFilter<$PrismaModel> | $Enums.FeatureFlagMode
+  }
+
+  export type StringNullableListFilter<$PrismaModel = never> = {
+    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    has?: string | StringFieldRefInput<$PrismaModel> | null
+    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
+    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
+  }
+
+  export type FeatureFlagCountOrderByAggregateInput = {
+    id?: SortOrder
+    key?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    mode?: SortOrder
+    rolloutPct?: SortOrder
+    allowedUserIds?: SortOrder
+    updatedById?: SortOrder
+    updatedByName?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FeatureFlagAvgOrderByAggregateInput = {
+    rolloutPct?: SortOrder
+  }
+
+  export type FeatureFlagMaxOrderByAggregateInput = {
+    id?: SortOrder
+    key?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    mode?: SortOrder
+    rolloutPct?: SortOrder
+    updatedById?: SortOrder
+    updatedByName?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FeatureFlagMinOrderByAggregateInput = {
+    id?: SortOrder
+    key?: SortOrder
+    name?: SortOrder
+    description?: SortOrder
+    mode?: SortOrder
+    rolloutPct?: SortOrder
+    updatedById?: SortOrder
+    updatedByName?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type FeatureFlagSumOrderByAggregateInput = {
+    rolloutPct?: SortOrder
+  }
+
+  export type EnumFeatureFlagModeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FeatureFlagMode | EnumFeatureFlagModeFieldRefInput<$PrismaModel>
+    in?: $Enums.FeatureFlagMode[] | ListEnumFeatureFlagModeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FeatureFlagMode[] | ListEnumFeatureFlagModeFieldRefInput<$PrismaModel>
+    not?: NestedEnumFeatureFlagModeWithAggregatesFilter<$PrismaModel> | $Enums.FeatureFlagMode
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumFeatureFlagModeFilter<$PrismaModel>
+    _max?: NestedEnumFeatureFlagModeFilter<$PrismaModel>
+  }
+
   export type EnumGroupTypeFilter<$PrismaModel = never> = {
     equals?: $Enums.GroupType | EnumGroupTypeFieldRefInput<$PrismaModel>
     in?: $Enums.GroupType[] | ListEnumGroupTypeFieldRefInput<$PrismaModel>
@@ -46944,6 +49997,13 @@ export namespace Prisma {
     connect?: AddressBookWhereUniqueInput | AddressBookWhereUniqueInput[]
   }
 
+  export type AdminAuditEventCreateNestedManyWithoutAdminInput = {
+    create?: XOR<AdminAuditEventCreateWithoutAdminInput, AdminAuditEventUncheckedCreateWithoutAdminInput> | AdminAuditEventCreateWithoutAdminInput[] | AdminAuditEventUncheckedCreateWithoutAdminInput[]
+    connectOrCreate?: AdminAuditEventCreateOrConnectWithoutAdminInput | AdminAuditEventCreateOrConnectWithoutAdminInput[]
+    createMany?: AdminAuditEventCreateManyAdminInputEnvelope
+    connect?: AdminAuditEventWhereUniqueInput | AdminAuditEventWhereUniqueInput[]
+  }
+
   export type AppPasswordUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
@@ -47076,6 +50136,13 @@ export namespace Prisma {
     connect?: AddressBookWhereUniqueInput | AddressBookWhereUniqueInput[]
   }
 
+  export type AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput = {
+    create?: XOR<AdminAuditEventCreateWithoutAdminInput, AdminAuditEventUncheckedCreateWithoutAdminInput> | AdminAuditEventCreateWithoutAdminInput[] | AdminAuditEventUncheckedCreateWithoutAdminInput[]
+    connectOrCreate?: AdminAuditEventCreateOrConnectWithoutAdminInput | AdminAuditEventCreateOrConnectWithoutAdminInput[]
+    createMany?: AdminAuditEventCreateManyAdminInputEnvelope
+    connect?: AdminAuditEventWhereUniqueInput | AdminAuditEventWhereUniqueInput[]
+  }
+
   export type StringFieldUpdateOperationsInput = {
     set?: string
   }
@@ -47106,6 +50173,10 @@ export namespace Prisma {
 
   export type EnumEmailStatusFieldUpdateOperationsInput = {
     set?: $Enums.EmailStatus
+  }
+
+  export type EnumUserRoleFieldUpdateOperationsInput = {
+    set?: $Enums.UserRole
   }
 
   export type DateTimeFieldUpdateOperationsInput = {
@@ -47374,6 +50445,20 @@ export namespace Prisma {
     deleteMany?: AddressBookScalarWhereInput | AddressBookScalarWhereInput[]
   }
 
+  export type AdminAuditEventUpdateManyWithoutAdminNestedInput = {
+    create?: XOR<AdminAuditEventCreateWithoutAdminInput, AdminAuditEventUncheckedCreateWithoutAdminInput> | AdminAuditEventCreateWithoutAdminInput[] | AdminAuditEventUncheckedCreateWithoutAdminInput[]
+    connectOrCreate?: AdminAuditEventCreateOrConnectWithoutAdminInput | AdminAuditEventCreateOrConnectWithoutAdminInput[]
+    upsert?: AdminAuditEventUpsertWithWhereUniqueWithoutAdminInput | AdminAuditEventUpsertWithWhereUniqueWithoutAdminInput[]
+    createMany?: AdminAuditEventCreateManyAdminInputEnvelope
+    set?: AdminAuditEventWhereUniqueInput | AdminAuditEventWhereUniqueInput[]
+    disconnect?: AdminAuditEventWhereUniqueInput | AdminAuditEventWhereUniqueInput[]
+    delete?: AdminAuditEventWhereUniqueInput | AdminAuditEventWhereUniqueInput[]
+    connect?: AdminAuditEventWhereUniqueInput | AdminAuditEventWhereUniqueInput[]
+    update?: AdminAuditEventUpdateWithWhereUniqueWithoutAdminInput | AdminAuditEventUpdateWithWhereUniqueWithoutAdminInput[]
+    updateMany?: AdminAuditEventUpdateManyWithWhereWithoutAdminInput | AdminAuditEventUpdateManyWithWhereWithoutAdminInput[]
+    deleteMany?: AdminAuditEventScalarWhereInput | AdminAuditEventScalarWhereInput[]
+  }
+
   export type AppPasswordUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
@@ -47634,6 +50719,20 @@ export namespace Prisma {
     update?: AddressBookUpdateWithWhereUniqueWithoutUserInput | AddressBookUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: AddressBookUpdateManyWithWhereWithoutUserInput | AddressBookUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: AddressBookScalarWhereInput | AddressBookScalarWhereInput[]
+  }
+
+  export type AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput = {
+    create?: XOR<AdminAuditEventCreateWithoutAdminInput, AdminAuditEventUncheckedCreateWithoutAdminInput> | AdminAuditEventCreateWithoutAdminInput[] | AdminAuditEventUncheckedCreateWithoutAdminInput[]
+    connectOrCreate?: AdminAuditEventCreateOrConnectWithoutAdminInput | AdminAuditEventCreateOrConnectWithoutAdminInput[]
+    upsert?: AdminAuditEventUpsertWithWhereUniqueWithoutAdminInput | AdminAuditEventUpsertWithWhereUniqueWithoutAdminInput[]
+    createMany?: AdminAuditEventCreateManyAdminInputEnvelope
+    set?: AdminAuditEventWhereUniqueInput | AdminAuditEventWhereUniqueInput[]
+    disconnect?: AdminAuditEventWhereUniqueInput | AdminAuditEventWhereUniqueInput[]
+    delete?: AdminAuditEventWhereUniqueInput | AdminAuditEventWhereUniqueInput[]
+    connect?: AdminAuditEventWhereUniqueInput | AdminAuditEventWhereUniqueInput[]
+    update?: AdminAuditEventUpdateWithWhereUniqueWithoutAdminInput | AdminAuditEventUpdateWithWhereUniqueWithoutAdminInput[]
+    updateMany?: AdminAuditEventUpdateManyWithWhereWithoutAdminInput | AdminAuditEventUpdateManyWithWhereWithoutAdminInput[]
+    deleteMany?: AdminAuditEventScalarWhereInput | AdminAuditEventScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutAppPasswordsInput = {
@@ -48950,6 +52049,33 @@ export namespace Prisma {
     update?: XOR<XOR<ContactUpdateToOneWithWhereWithoutActivityEventsInput, ContactUpdateWithoutActivityEventsInput>, ContactUncheckedUpdateWithoutActivityEventsInput>
   }
 
+  export type UserCreateNestedOneWithoutAdminAuditEventsInput = {
+    create?: XOR<UserCreateWithoutAdminAuditEventsInput, UserUncheckedCreateWithoutAdminAuditEventsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutAdminAuditEventsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutAdminAuditEventsNestedInput = {
+    create?: XOR<UserCreateWithoutAdminAuditEventsInput, UserUncheckedCreateWithoutAdminAuditEventsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutAdminAuditEventsInput
+    upsert?: UserUpsertWithoutAdminAuditEventsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutAdminAuditEventsInput, UserUpdateWithoutAdminAuditEventsInput>, UserUncheckedUpdateWithoutAdminAuditEventsInput>
+  }
+
+  export type FeatureFlagCreateallowedUserIdsInput = {
+    set: string[]
+  }
+
+  export type EnumFeatureFlagModeFieldUpdateOperationsInput = {
+    set?: $Enums.FeatureFlagMode
+  }
+
+  export type FeatureFlagUpdateallowedUserIdsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
   export type UserCreateNestedOneWithoutOwnedGroupsInput = {
     create?: XOR<UserCreateWithoutOwnedGroupsInput, UserUncheckedCreateWithoutOwnedGroupsInput>
     connectOrCreate?: UserCreateOrConnectWithoutOwnedGroupsInput
@@ -49511,6 +52637,13 @@ export namespace Prisma {
     not?: NestedEnumEmailStatusFilter<$PrismaModel> | $Enums.EmailStatus
   }
 
+  export type NestedEnumUserRoleFilter<$PrismaModel = never> = {
+    equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumUserRoleFilter<$PrismaModel> | $Enums.UserRole
+  }
+
   export type NestedDateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
     in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel>
@@ -49634,6 +52767,16 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumEmailStatusFilter<$PrismaModel>
     _max?: NestedEnumEmailStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumUserRoleWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.UserRole | EnumUserRoleFieldRefInput<$PrismaModel>
+    in?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
+    not?: NestedEnumUserRoleWithAggregatesFilter<$PrismaModel> | $Enums.UserRole
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumUserRoleFilter<$PrismaModel>
+    _max?: NestedEnumUserRoleFilter<$PrismaModel>
   }
 
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
@@ -50129,6 +53272,23 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumActorFilter<$PrismaModel>
     _max?: NestedEnumActorFilter<$PrismaModel>
+  }
+
+  export type NestedEnumFeatureFlagModeFilter<$PrismaModel = never> = {
+    equals?: $Enums.FeatureFlagMode | EnumFeatureFlagModeFieldRefInput<$PrismaModel>
+    in?: $Enums.FeatureFlagMode[] | ListEnumFeatureFlagModeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FeatureFlagMode[] | ListEnumFeatureFlagModeFieldRefInput<$PrismaModel>
+    not?: NestedEnumFeatureFlagModeFilter<$PrismaModel> | $Enums.FeatureFlagMode
+  }
+
+  export type NestedEnumFeatureFlagModeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.FeatureFlagMode | EnumFeatureFlagModeFieldRefInput<$PrismaModel>
+    in?: $Enums.FeatureFlagMode[] | ListEnumFeatureFlagModeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.FeatureFlagMode[] | ListEnumFeatureFlagModeFieldRefInput<$PrismaModel>
+    not?: NestedEnumFeatureFlagModeWithAggregatesFilter<$PrismaModel> | $Enums.FeatureFlagMode
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumFeatureFlagModeFilter<$PrismaModel>
+    _max?: NestedEnumFeatureFlagModeFilter<$PrismaModel>
   }
 
   export type NestedEnumGroupTypeFilter<$PrismaModel = never> = {
@@ -51107,6 +54267,36 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type AdminAuditEventCreateWithoutAdminInput = {
+    id?: string
+    action: string
+    targetUserId?: string | null
+    targetEmail?: string | null
+    details?: JsonNullValueInput | InputJsonValue
+    ipAddress?: string | null
+    createdAt?: Date | string
+  }
+
+  export type AdminAuditEventUncheckedCreateWithoutAdminInput = {
+    id?: string
+    action: string
+    targetUserId?: string | null
+    targetEmail?: string | null
+    details?: JsonNullValueInput | InputJsonValue
+    ipAddress?: string | null
+    createdAt?: Date | string
+  }
+
+  export type AdminAuditEventCreateOrConnectWithoutAdminInput = {
+    where: AdminAuditEventWhereUniqueInput
+    create: XOR<AdminAuditEventCreateWithoutAdminInput, AdminAuditEventUncheckedCreateWithoutAdminInput>
+  }
+
+  export type AdminAuditEventCreateManyAdminInputEnvelope = {
+    data: AdminAuditEventCreateManyAdminInput | AdminAuditEventCreateManyAdminInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AppPasswordUpsertWithWhereUniqueWithoutUserInput = {
     where: AppPasswordWhereUniqueInput
     update: XOR<AppPasswordUpdateWithoutUserInput, AppPasswordUncheckedUpdateWithoutUserInput>
@@ -51796,6 +54986,36 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"AddressBook"> | Date | string
   }
 
+  export type AdminAuditEventUpsertWithWhereUniqueWithoutAdminInput = {
+    where: AdminAuditEventWhereUniqueInput
+    update: XOR<AdminAuditEventUpdateWithoutAdminInput, AdminAuditEventUncheckedUpdateWithoutAdminInput>
+    create: XOR<AdminAuditEventCreateWithoutAdminInput, AdminAuditEventUncheckedCreateWithoutAdminInput>
+  }
+
+  export type AdminAuditEventUpdateWithWhereUniqueWithoutAdminInput = {
+    where: AdminAuditEventWhereUniqueInput
+    data: XOR<AdminAuditEventUpdateWithoutAdminInput, AdminAuditEventUncheckedUpdateWithoutAdminInput>
+  }
+
+  export type AdminAuditEventUpdateManyWithWhereWithoutAdminInput = {
+    where: AdminAuditEventScalarWhereInput
+    data: XOR<AdminAuditEventUpdateManyMutationInput, AdminAuditEventUncheckedUpdateManyWithoutAdminInput>
+  }
+
+  export type AdminAuditEventScalarWhereInput = {
+    AND?: AdminAuditEventScalarWhereInput | AdminAuditEventScalarWhereInput[]
+    OR?: AdminAuditEventScalarWhereInput[]
+    NOT?: AdminAuditEventScalarWhereInput | AdminAuditEventScalarWhereInput[]
+    id?: StringFilter<"AdminAuditEvent"> | string
+    adminUserId?: StringFilter<"AdminAuditEvent"> | string
+    action?: StringFilter<"AdminAuditEvent"> | string
+    targetUserId?: StringNullableFilter<"AdminAuditEvent"> | string | null
+    targetEmail?: StringNullableFilter<"AdminAuditEvent"> | string | null
+    details?: JsonFilter<"AdminAuditEvent">
+    ipAddress?: StringNullableFilter<"AdminAuditEvent"> | string | null
+    createdAt?: DateTimeFilter<"AdminAuditEvent"> | Date | string
+  }
+
   export type UserCreateWithoutAppPasswordsInput = {
     id?: string
     name?: string | null
@@ -51813,6 +55033,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -51833,6 +55056,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
   }
 
   export type UserUncheckedCreateWithoutAppPasswordsInput = {
@@ -51852,6 +55076,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -51872,6 +55099,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
   }
 
   export type UserCreateOrConnectWithoutAppPasswordsInput = {
@@ -51961,6 +55189,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -51981,6 +55212,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAppPasswordsInput = {
@@ -52000,6 +55232,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -52020,6 +55255,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
   }
 
   export type SyncConflictUpsertWithWhereUniqueWithoutAppPasswordInput = {
@@ -52081,6 +55317,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -52101,6 +55340,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
   }
 
   export type UserUncheckedCreateWithoutContactsInput = {
@@ -52120,6 +55360,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -52140,6 +55383,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
   }
 
   export type UserCreateOrConnectWithoutContactsInput = {
@@ -52860,6 +56104,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -52880,6 +56127,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
   }
 
   export type UserUncheckedUpdateWithoutContactsInput = {
@@ -52899,6 +56147,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -52919,6 +56170,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
   }
 
   export type ImportJobUpsertWithoutContactsInput = {
@@ -53340,6 +56592,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -53360,6 +56615,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
   }
 
   export type UserUncheckedCreateWithoutSubscriptionCustomerInput = {
@@ -53379,6 +56635,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -53399,6 +56658,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
   }
 
   export type UserCreateOrConnectWithoutSubscriptionCustomerInput = {
@@ -53514,6 +56774,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -53534,6 +56797,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSubscriptionCustomerInput = {
@@ -53553,6 +56817,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -53573,6 +56840,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
   }
 
   export type SubscriptionUpsertWithWhereUniqueWithoutSubscriptionCustomerInput = {
@@ -53608,6 +56876,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -53628,6 +56899,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
   }
 
   export type UserUncheckedCreateWithoutSubscriptionsInput = {
@@ -53647,6 +56919,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -53667,6 +56942,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
   }
 
   export type UserCreateOrConnectWithoutSubscriptionsInput = {
@@ -53767,6 +57043,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -53787,6 +57066,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSubscriptionsInput = {
@@ -53806,6 +57086,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -53826,6 +57109,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
   }
 
   export type SubscriptionCustomerUpsertWithoutSubscriptionsInput = {
@@ -53892,6 +57176,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -53912,6 +57199,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
   }
 
   export type UserUncheckedCreateWithoutImportJobsInput = {
@@ -53931,6 +57219,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -53951,6 +57242,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
   }
 
   export type UserCreateOrConnectWithoutImportJobsInput = {
@@ -54114,6 +57406,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -54134,6 +57429,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
   }
 
   export type UserUncheckedUpdateWithoutImportJobsInput = {
@@ -54153,6 +57449,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -54173,6 +57472,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
   }
 
   export type ContactUpsertWithWhereUniqueWithoutImportJobInput = {
@@ -54208,6 +57508,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -54228,6 +57531,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
   }
 
   export type UserUncheckedCreateWithoutExportJobsInput = {
@@ -54247,6 +57551,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -54267,6 +57574,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
   }
 
   export type UserCreateOrConnectWithoutExportJobsInput = {
@@ -54302,6 +57610,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -54322,6 +57633,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
   }
 
   export type UserUncheckedUpdateWithoutExportJobsInput = {
@@ -54341,6 +57653,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -54361,6 +57676,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
   }
 
   export type UserCreateWithoutMergeSuggestionsInput = {
@@ -54380,6 +57696,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -54400,6 +57719,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
   }
 
   export type UserUncheckedCreateWithoutMergeSuggestionsInput = {
@@ -54419,6 +57739,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -54439,6 +57762,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
   }
 
   export type UserCreateOrConnectWithoutMergeSuggestionsInput = {
@@ -54758,6 +58082,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -54778,6 +58105,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMergeSuggestionsInput = {
@@ -54797,6 +58125,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -54817,6 +58148,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
   }
 
   export type ContactUpsertWithoutLeftMergeSuggestionsInput = {
@@ -55153,6 +58485,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -55173,6 +58508,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
   }
 
   export type UserUncheckedCreateWithoutMergeDecisionsInput = {
@@ -55192,6 +58528,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -55212,6 +58551,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
   }
 
   export type UserCreateOrConnectWithoutMergeDecisionsInput = {
@@ -55296,6 +58636,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -55316,6 +58659,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMergeDecisionsInput = {
@@ -55335,6 +58679,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -55355,6 +58702,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
   }
 
   export type UserCreateWithoutSyncAccountsInput = {
@@ -55374,6 +58722,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -55394,6 +58745,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
   }
 
   export type UserUncheckedCreateWithoutSyncAccountsInput = {
@@ -55413,6 +58765,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -55433,6 +58788,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
   }
 
   export type UserCreateOrConnectWithoutSyncAccountsInput = {
@@ -55647,6 +59003,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -55667,6 +59026,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSyncAccountsInput = {
@@ -55686,6 +59046,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -55706,6 +59069,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
   }
 
   export type SyncContactLinkUpsertWithWhereUniqueWithoutSyncAccountInput = {
@@ -56988,6 +60352,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -57008,6 +60375,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
   }
 
   export type UserUncheckedCreateWithoutEmailVerificationTokensInput = {
@@ -57027,6 +60395,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -57047,6 +60418,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
   }
 
   export type UserCreateOrConnectWithoutEmailVerificationTokensInput = {
@@ -57082,6 +60454,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -57102,6 +60477,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEmailVerificationTokensInput = {
@@ -57121,6 +60497,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -57141,6 +60520,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
   }
 
   export type UserCreateWithoutPasswordResetTokensInput = {
@@ -57160,6 +60540,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -57180,6 +60563,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
   }
 
   export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
@@ -57199,6 +60583,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -57219,6 +60606,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
   }
 
   export type UserCreateOrConnectWithoutPasswordResetTokensInput = {
@@ -57254,6 +60642,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -57274,6 +60665,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
@@ -57293,6 +60685,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -57313,6 +60708,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
   }
 
   export type UserCreateWithoutSessionsInput = {
@@ -57332,6 +60728,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -57352,6 +60751,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -57371,6 +60771,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -57391,6 +60794,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -57426,6 +60830,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -57446,6 +60853,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -57465,6 +60873,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -57485,6 +60896,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
   }
 
   export type UserCreateWithoutTotpRecoveryCodesInput = {
@@ -57504,6 +60916,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -57524,6 +60939,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
   }
 
   export type UserUncheckedCreateWithoutTotpRecoveryCodesInput = {
@@ -57543,6 +60959,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -57563,6 +60982,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
   }
 
   export type UserCreateOrConnectWithoutTotpRecoveryCodesInput = {
@@ -57598,6 +61018,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -57618,6 +61041,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
   }
 
   export type UserUncheckedUpdateWithoutTotpRecoveryCodesInput = {
@@ -57637,6 +61061,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -57657,6 +61084,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
   }
 
   export type UserCreateWithoutActivityEventsInput = {
@@ -57676,6 +61104,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -57696,6 +61127,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
   }
 
   export type UserUncheckedCreateWithoutActivityEventsInput = {
@@ -57715,6 +61147,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -57735,6 +61170,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
   }
 
   export type UserCreateOrConnectWithoutActivityEventsInput = {
@@ -57893,6 +61329,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -57913,6 +61352,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
   }
 
   export type UserUncheckedUpdateWithoutActivityEventsInput = {
@@ -57932,6 +61372,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -57952,6 +61395,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
   }
 
   export type ContactUpsertWithoutActivityEventsInput = {
@@ -58083,6 +61527,194 @@ export namespace Prisma {
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
+  export type UserCreateWithoutAdminAuditEventsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutAdminAuditEventsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutAdminAuditEventsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutAdminAuditEventsInput, UserUncheckedCreateWithoutAdminAuditEventsInput>
+  }
+
+  export type UserUpsertWithoutAdminAuditEventsInput = {
+    update: XOR<UserUpdateWithoutAdminAuditEventsInput, UserUncheckedUpdateWithoutAdminAuditEventsInput>
+    create: XOR<UserCreateWithoutAdminAuditEventsInput, UserUncheckedCreateWithoutAdminAuditEventsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutAdminAuditEventsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutAdminAuditEventsInput, UserUncheckedUpdateWithoutAdminAuditEventsInput>
+  }
+
+  export type UserUpdateWithoutAdminAuditEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutAdminAuditEventsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+  }
+
   export type UserCreateWithoutOwnedGroupsInput = {
     id?: string
     name?: string | null
@@ -58100,6 +61732,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -58120,6 +61755,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
   }
 
   export type UserUncheckedCreateWithoutOwnedGroupsInput = {
@@ -58139,6 +61775,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -58159,6 +61798,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
   }
 
   export type UserCreateOrConnectWithoutOwnedGroupsInput = {
@@ -58373,6 +62013,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -58393,6 +62036,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOwnedGroupsInput = {
@@ -58412,6 +62056,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -58432,6 +62079,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
   }
 
   export type SubscriptionUpsertWithoutGroupsInput = {
@@ -58642,6 +62290,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -58662,6 +62313,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
   }
 
   export type UserUncheckedCreateWithoutGroupMembershipsInput = {
@@ -58681,6 +62333,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -58701,6 +62356,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
   }
 
   export type UserCreateOrConnectWithoutGroupMembershipsInput = {
@@ -58777,6 +62433,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -58797,6 +62456,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
   }
 
   export type UserUncheckedUpdateWithoutGroupMembershipsInput = {
@@ -58816,6 +62476,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -58836,6 +62499,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
   }
 
   export type GroupCreateWithoutAddressBooksInput = {
@@ -59015,6 +62679,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -59035,6 +62702,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
   }
 
   export type UserUncheckedCreateWithoutAddressBooksInput = {
@@ -59054,6 +62722,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -59074,6 +62745,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
   }
 
   export type UserCreateOrConnectWithoutAddressBooksInput = {
@@ -59237,6 +62909,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -59257,6 +62932,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAddressBooksInput = {
@@ -59276,6 +62952,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -59296,6 +62975,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
   }
 
   export type ContactUpsertWithWhereUniqueWithoutBookInput = {
@@ -59943,6 +63623,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -59963,6 +63646,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
   }
 
   export type UserUncheckedCreateWithoutContactSharesOwnedInput = {
@@ -59982,6 +63666,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -60002,6 +63689,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
   }
 
   export type UserCreateOrConnectWithoutContactSharesOwnedInput = {
@@ -60149,6 +63837,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -60169,6 +63860,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
   }
 
   export type UserUncheckedCreateWithoutContactSharesReceivedInput = {
@@ -60188,6 +63880,9 @@ export namespace Prisma {
     totpSecret?: string | null
     totpVerifiedAt?: Date | string | null
     scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -60208,6 +63903,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
   }
 
   export type UserCreateOrConnectWithoutContactSharesReceivedInput = {
@@ -60366,6 +64062,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -60386,6 +64085,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
   }
 
   export type UserUncheckedUpdateWithoutContactSharesOwnedInput = {
@@ -60405,6 +64105,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -60425,6 +64128,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
   }
 
   export type ContactUpsertWithoutSharesFromContactInput = {
@@ -60584,6 +64288,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -60604,6 +64311,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
   }
 
   export type UserUncheckedUpdateWithoutContactSharesReceivedInput = {
@@ -60623,6 +64331,9 @@ export namespace Prisma {
     totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
     totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -60643,6 +64354,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
   }
 
   export type ContactUpsertWithoutSharesAsRecipientCopyInput = {
@@ -61094,6 +64806,16 @@ export namespace Prisma {
     archivedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+  }
+
+  export type AdminAuditEventCreateManyAdminInput = {
+    id?: string
+    action: string
+    targetUserId?: string | null
+    targetEmail?: string | null
+    details?: JsonNullValueInput | InputJsonValue
+    ipAddress?: string | null
+    createdAt?: Date | string
   }
 
   export type AppPasswordUpdateWithoutUserInput = {
@@ -62102,6 +65824,36 @@ export namespace Prisma {
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminAuditEventUpdateWithoutAdminInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    targetEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: JsonNullValueInput | InputJsonValue
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminAuditEventUncheckedUpdateWithoutAdminInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    targetEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: JsonNullValueInput | InputJsonValue
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type AdminAuditEventUncheckedUpdateManyWithoutAdminInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    action?: StringFieldUpdateOperationsInput | string
+    targetUserId?: NullableStringFieldUpdateOperationsInput | string | null
+    targetEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    details?: JsonNullValueInput | InputJsonValue
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SyncConflictCreateManyAppPasswordInput = {

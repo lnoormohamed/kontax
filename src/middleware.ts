@@ -44,7 +44,7 @@ export default auth(
   (
     req: NextRequest & {
       auth: {
-        user?: { id?: string };
+        user?: { id?: string; role?: "USER" | "ADMIN" };
         pendingTotp?: boolean;
         pendingDeletion?: boolean;
       } | null;
@@ -89,6 +89,15 @@ export default auth(
       const loginUrl = new URL("/login", req.url);
       loginUrl.searchParams.set("next", pathname);
       return NextResponse.redirect(loginUrl);
+    }
+
+    // 5. Admin tooling (P21-01): only ADMIN-role users may reach /admin. The
+    //    token role is a fast first gate; assertAdmin() re-checks the DB on every
+    //    admin page + action, so a stale token can never grant real access.
+    if (pathname === "/admin" || pathname.startsWith("/admin/")) {
+      if (session.user.role !== "ADMIN") {
+        return NextResponse.redirect(new URL("/contacts", req.url));
+      }
     }
 
     return NextResponse.next();

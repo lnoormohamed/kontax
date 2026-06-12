@@ -38,7 +38,7 @@ export default async function SettingsPlanPage({
   const showPortalReturned = sp?.portal === "returned";
 
   const planSummary = await getUserPlanSummary(userId);
-  const [billingSurface, syncConnections, liveContacts, groupMembership] = await Promise.all([
+  const [billingSurface, syncConnections, liveContacts, groupMembership, overrideInfo] = await Promise.all([
     getBillingSurface(userId),
     db.syncAccount.count({ where: { userId, status: "ACTIVE" } }),
     db.contactShare.count({
@@ -58,6 +58,7 @@ export default async function SettingsPlanPage({
         },
       },
     }),
+    db.user.findUnique({ where: { id: userId }, select: { planOverriddenAt: true } }),
   ]);
 
   const isGroupPlan = planSummary.plan === "FAMILY" || planSummary.plan === "TEAMS";
@@ -88,6 +89,17 @@ export default async function SettingsPlanPage({
       />
 
       <div className="grid gap-[18px]">
+        {overrideInfo?.planOverriddenAt ? (
+          <div className="flex items-center gap-2.5 rounded-xl border border-[#c7d0fb] bg-[#f0f2fb] px-4 py-3 text-[13px] font-medium text-[#1d4ed8]">
+            <svg width={16} height={16} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 21V4" />
+              <path d="M5 4h11l-2.2 3.5L16 11H5" />
+            </svg>
+            <span>
+              Your plan is set by an admin override. Billing changes are managed by the Kontax team.
+            </span>
+          </div>
+        ) : null}
         <BillingSection cancelDetails={cancelDetails} surface={billingSurface} />
 
         {/* group membership shortcut */}

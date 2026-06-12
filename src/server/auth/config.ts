@@ -15,12 +15,16 @@ declare module "next-auth" {
       id: string;
       emailVerified: Date | null;
       avatarUrl: string | null;
+      // P21-01: platform admin role, surfaced so middleware can gate /admin.
+      role: "USER" | "ADMIN";
     } & DefaultSession["user"];
     jti?: string;
     // Set by P18-07 (TOTP) — user authenticated with password but TOTP code not yet submitted
     pendingTotp?: boolean;
     // Set by P18-09 (account deletion) — account is in the 30-day grace period
     pendingDeletion?: boolean;
+    // P21-07: present when an admin is impersonating this user (read-only view).
+    impersonatedBy?: string;
   }
 }
 
@@ -117,7 +121,7 @@ export const authConfig = {
         const [dbUser] = await Promise.all([
           db.user.findUnique({
             where: { id: user.id },
-            select: { sessionVersion: true, emailVerified: true, name: true, avatarUrl: true },
+            select: { sessionVersion: true, emailVerified: true, name: true, avatarUrl: true, role: true },
           }),
           // Create UserSession row (P18-06)
           db.userSession.create({
@@ -140,6 +144,7 @@ export const authConfig = {
         token.emailVerified = dbUser?.emailVerified?.toISOString() ?? null;
         token.name = dbUser?.name ?? null;
         token.avatarUrl = dbUser?.avatarUrl ?? null;
+        token.role = dbUser?.role ?? "USER";
         // P18-07: embed pendingTotp if credentials verified but TOTP not yet confirmed
         if ((user as { _pendingTotp?: boolean })._pendingTotp) {
           token.pendingTotp = true;
@@ -154,7 +159,7 @@ export const authConfig = {
         const [dbUser, userSession] = await Promise.all([
           db.user.findUnique({
             where: { id: token.sub },
-            select: { sessionVersion: true, emailVerified: true },
+            select: { sessionVersion: true, emailVerified: true, role: true },
           }),
           db.userSession.findUnique({
             where: { jti: token.sid as string },
@@ -171,8 +176,9 @@ export const authConfig = {
           token.pendingTotp = undefined;
         }
 
-        // Keep emailVerified fresh
+        // Keep emailVerified + role fresh
         token.emailVerified = dbUser.emailVerified?.toISOString() ?? null;
+        token.role = dbUser.role;
 
         // Update lastActiveAt if stale by > 5 minutes (fire-and-forget)
         const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
@@ -187,10 +193,11 @@ export const authConfig = {
         // Sessions created before P18-06 — validate sessionVersion only
         const dbUser = await db.user.findUnique({
           where: { id: token.sub },
-          select: { sessionVersion: true, emailVerified: true },
+          select: { sessionVersion: true, emailVerified: true, role: true },
         });
         if (!dbUser || dbUser.sessionVersion !== token.sv) return {};
         token.emailVerified = dbUser.emailVerified?.toISOString() ?? null;
+        token.role = dbUser.role;
       }
 
       if (trigger === "update" && session) {
@@ -216,6 +223,7 @@ export const authConfig = {
         id: token.sub ?? session.user.id,
         name: token.name as string | null,
         avatarUrl: token.avatarUrl as string | null,
+        role: (token.role as "USER" | "ADMIN" | undefined) ?? "USER",
         emailVerified: token.emailVerified
           ? new Date(token.emailVerified as string)
           : null,

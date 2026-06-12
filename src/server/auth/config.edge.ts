@@ -27,6 +27,7 @@ export const authConfigEdge = {
         ...session.user,
         id: token.sub ?? session.user.id,
       avatarUrl: (token.avatarUrl as string | null) ?? null,
+      role: (token.role as "USER" | "ADMIN" | undefined) ?? "USER",
       },
       pendingTotp: (token.pendingTotp as boolean | undefined) ?? false,
       pendingDeletion: (token.pendingDeletion as boolean | undefined) ?? false,
