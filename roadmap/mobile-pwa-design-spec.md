@@ -3,7 +3,9 @@
 **Status:** living spec · created 2026-06-12
 **Companion docs:** [`mobile-design-brief.md`](./mobile-design-brief.md) tracks per-route *status &
 priority*; this document is the *design language + per-page design* that all mobile work must follow.
-**Design source of truth:** the `mob-*.jsx` / `cx-kit.jsx` modules from the Mobile-PWA prototype.
+**Design source of truth:** the `mob-*.jsx` / `cx-kit.jsx` modules from the Mobile-PWA prototype,
+vendored at [`design-briefs/mobile-pwa-prototype/`](./design-briefs/mobile-pwa-prototype/) — open
+`Mobile PWA.html` to interact with the live reference.
 
 > Goal: one consistent visual language across **every** mobile page, with enough detail that any page
 > can be built without guessing. If a value isn't here, derive it from Part A, don't invent a new one.

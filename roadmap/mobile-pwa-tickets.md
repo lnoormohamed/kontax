@@ -3,6 +3,9 @@
 **Created:** 2026-06-12 · **Tracks:** building every mobile page **strictly** to the design.
 **Design source of truth:** [`mobile-pwa-design-spec.md`](./mobile-pwa-design-spec.md) (language + per-page,
 derived from the `mob-*.jsx` modules behind **Mobile PWA.html / Mobile PWA Overview.html**).
+**Live reference prototype (vendored):** [`design-briefs/mobile-pwa-prototype/`](./design-briefs/mobile-pwa-prototype/)
+— open `Mobile PWA.html` to interact (online/offline, empty/full, install states). The visual
+acceptance bar for every ticket.
 **Status audit:** [`mobile-design-brief.md`](./mobile-design-brief.md).
 
 > Lineage: **P24** initial PWA shell → **P24A** critical fixes (sync/activity/nav, shipped) →
