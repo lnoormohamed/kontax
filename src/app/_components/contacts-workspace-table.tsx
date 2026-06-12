@@ -151,6 +151,7 @@ function RowActions({ contact, mode }: { contact: WorkspaceContact; mode: "activ
         aria-label="Edit contact"
         className="hidden h-[30px] w-[30px] place-items-center rounded-md text-slate-500 transition hover:bg-[rgba(0,0,0,0.06)] hover:text-slate-700 group-hover:grid"
         href={`/contacts/${contact.id}`}
+        prefetch={false}
         onClick={(event) => event.stopPropagation()}
       >
         ✎
@@ -176,7 +177,7 @@ function RowActions({ contact, mode }: { contact: WorkspaceContact; mode: "activ
             type="button"
           />
           <div className="absolute right-0 top-9 z-20 w-44 overflow-hidden rounded-[0.9rem] border border-[#d8ddd6] bg-white py-1 shadow-[0_12px_34px_rgba(20,30,25,0.16)]">
-            <Link className="block px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-50" href={`/contacts/${contact.id}`}>
+            <Link className="block px-4 py-2 text-sm text-slate-700 transition hover:bg-slate-50" href={`/contacts/${contact.id}`} prefetch={false}>
               Open
             </Link>
             {mode === "active" ? (
@@ -291,7 +292,7 @@ function ContactRow({
       {avatarSlot}
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
-          <Link className="min-w-0 truncate" href={`/contacts/${contact.id}`}>
+          <Link className="min-w-0 truncate" href={`/contacts/${contact.id}`} prefetch={false}>
             <span className="truncate text-[14.5px] font-semibold text-[#1d2823]">
               <Highlight query={query} text={displayName} />
             </span>
@@ -343,7 +344,7 @@ function ContactRow({
       <div className={`hidden ${GRID} items-center gap-4 px-3 py-2 lg:grid`}>
         {avatarSlot}
         <div className="flex min-w-0 items-center gap-1.5">
-          <Link className="min-w-0 truncate" href={`/contacts/${contact.id}`}>
+          <Link className="min-w-0 truncate" href={`/contacts/${contact.id}`} prefetch={false}>
             <span className="truncate text-sm font-semibold text-[#1d2823]">
               <Highlight query={query} text={displayName} />
             </span>

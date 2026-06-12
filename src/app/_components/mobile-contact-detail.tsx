@@ -423,6 +423,7 @@ export function MobileContactDetail({
           <Link
             aria-label="Share"
             href={`/contacts/${contactId}?tab=sharing`}
+            prefetch={false}
             style={quickActionStyle}
           >
             <WorkspaceIcon name="share" size={22} />
@@ -450,6 +451,7 @@ export function MobileContactDetail({
           <Link
             key={key}
             href={`/contacts/${contactId}?tab=${key}`}
+            prefetch={false}
             style={{
               display: "flex",
               alignItems: "center",
