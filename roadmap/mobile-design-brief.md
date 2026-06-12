@@ -68,43 +68,46 @@ prototype never covered.
 | `/sync` | Plain "Sync" + BottomNav | ✅ | MobileSyncScreen cards + add deep-link (P24A). |
 | `/settings` (root) | Plain "Settings" + BottomNav | ✅ | MobileSettingsNav matches design. Missing design's danger "Sign out" row (minor). |
 
-### Settings sub-pages — **cross-cutting gap: no back-to-Settings on mobile**
-The settings layout shows a static "Settings" title with **no back button**, and the sidebar is
-hidden on mobile. Once you tap into a sub-page you can only leave via the bottom nav. **Fix:** when a
-sub-page is active, the layout header should become a `MobileSecondaryHeader` (‹ back to Settings +
-sub-page title). Then audit each sub-page's content for mobile fit.
+### Settings sub-pages — **the one real gap is back-navigation, not content**
+Verified at 375px: the content is **already card-based and stacks cleanly** (profile, devices,
+security, family-member, teams-upsell all fit with no overflow). The consistent problem is the
+settings layout shows a static "Settings" title with **no back button**, and the sidebar is hidden
+on mobile — so once you tap into a sub-page you can only leave via the bottom nav (which exits
+Settings entirely). **Fix (P1):** when a sub-page is active, the layout header becomes a
+`MobileSecondaryHeader` (‹ Settings + sub-page title).
 
 | Route | Status | Mobile spec / notes |
 | --- | --- | --- |
-| `/settings/profile` | 🟡 | Form; needs single-column + back header. Has 1 `md:` util already. |
-| `/settings/account` | ⚪ | Email/account; single-column, back header. |
-| `/settings/notifications` | ⚪ | Toggle list → GroupCard rows. |
-| `/settings/preferences` | ⚪ | Toggle/select list → GroupCard rows. |
-| `/settings/devices` | 🟡 | Device/app-password **table** → stack into cards on mobile. |
-| `/settings/security` | 🟡 | 2FA + sessions + app passwords; dense. Stack sections; sessions as cards. |
-| `/settings/family` | 🟡 | Member management; roster + invites as cards, not table. |
-| `/settings/teams` | 🟡 | 3 wide-content markers — **likely overflows**. Roster/permission matrix needs a mobile layout. |
-| `/settings/teams/audit` | ⚪ | Audit log table → stacked rows w/ horizontal scroll if needed. |
+| `/settings/profile` | ✅ content · back-nav gap | Verified — cards stack, fits. |
+| `/settings/account` | ⚪→likely ✅ | Same shell/pattern as profile. Spot-check. |
+| `/settings/notifications` | ⚪→likely ✅ | Toggle list; verify rows fit. |
+| `/settings/preferences` | ⚪→likely ✅ | Toggle/select list; verify rows fit. |
+| `/settings/devices` | ✅ content · back-nav gap | Verified — connection cards + Copy buttons fit; app-password list is card-based. |
+| `/settings/security` | ✅ content · back-nav gap | Verified — 2FA / sessions / connected-accounts sections stack. (2FA QR **modal** unverified.) |
+| `/settings/family` (member) | ✅ content · back-nav gap | Verified — roster rows + role badges + danger card. Excellent. |
+| `/settings/family` (owner) | ⚪ | Owner invite-management view not reachable as a member — verify roster/invite editing. |
+| `/settings/teams` (upsell) | ✅ content · back-nav gap | Verified — Free-user upsell card fits. |
+| `/settings/teams` (team active) | 🟡 unverified | Owner view has the 3 wide-content markers (permission matrix) — **likely needs a mobile layout**; not reachable on Free. |
+| `/settings/teams/audit` | ⚪ | Audit log table → stacked rows / h-scroll. |
 
 ### Collaboration / data
 | Route | Chrome | Status | Mobile spec / notes |
 | --- | --- | --- | --- |
 | `/import-export` | AppShell | 🟠 | **Decision: adapt the existing wizard responsively** (keep the 4-step Upload→Map→Preview→Done incl. field-mapping). Make steps single-column, the source picker a 2×2 chip grid, the preview table h-scroll with sticky Name/Email columns. Do **not** drop to the prototype's simpler screen. |
-| `/shares` | AppShell | ⚪ | Incoming/outgoing shares — render as cards; verify fit. |
-| `/merge-suggestions/[id]` | AppShell | 🟡 | Side-by-side merge compare is desktop-shaped; needs stacked A/B mobile compare. |
-| `/merge/manual` | ⚪ | Manual merge picker; same stacking concern. |
+| `/shares` | AppShell | ✅ | Verified — pending empty-state card + accepted/declined rows stack well. |
+| `/merge-suggestions/[id]` | AppShell | 🟠 unverified | Side-by-side A/B compare is desktop-shaped → needs stacked mobile compare. **Likely shares the off-brand styling of `/merge/manual` — verify.** |
+| `/merge/manual` | full page | 🔴 **off-brand** | Verified — renders in a **dark navy/cyan dev-scaffold theme** with "Ticket `P4-03`" copy, not the Kontax light design system. This is a desktop problem too, not just mobile: needs a full restyle before any mobile tuning. |
 
 ### Auth & public (no app chrome — centered card / marketing)
 | Route | Status | Mobile spec / notes |
 | --- | --- | --- |
-| `/login`, `/login/verify-2fa` | ⚪ | Centered card; ensure full-width with padding < 768, inputs 16px (no iOS zoom). |
-| `/register` | ⚪ | As above. |
-| `/forgot-password`, `/reset-password`, `/verify-email` | ⚪ | Already `max-w-[400–420px]`; confirm padding + tap targets. |
-| `/account-deleted`, `/account-pending-deletion` | ⚪ | Simple status pages; should be fine, verify. |
-| `/` (landing) | ⚪ | Marketing — responsive hero/sections. |
-| `/pricing` | ⚪ | Plan cards must stack 1-col; CTA full-width. |
-| `/privacy`, `/terms` | ⚪ | Long-form legal; readable measure + padding. |
-| `/family/join/[token]`, `/teams/join/[token]` | ⚪ | Invite acceptance; centered card, clear single CTA. |
+| `/forgot-password` | ✅ | Verified — perfect centered-card pattern (wordmark, input, full-width CTA, footer). |
+| `/login`, `/login/verify-2fa`, `/register`, `/reset-password`, `/verify-email` | ✅ (by pattern) | Same centered-card auth pattern as forgot-password. Spot-check 2FA code entry + 16px inputs. |
+| `/account-deleted`, `/account-pending-deletion` | ⚪→likely ✅ | Simple status cards. |
+| `/` (landing) | ✅ | Verified — responsive hero, full-width CTA, product mockup. |
+| `/pricing` | 🟡 | Verified — hero + Monthly/Annual toggle fit, but the **plan card is offset right and the feature-comparison table doesn't stack** on mobile. Needs 1-col plan cards + stacked/scrollable comparison. |
+| `/privacy`, `/terms` | ⚪→likely ✅ | Long-form legal; verify measure + padding. |
+| `/family/join/[token]`, `/teams/join/[token]` | ⚪→likely ✅ | Invite acceptance; centered-card pattern. |
 
 ### Admin
 | Route | Status | Mobile spec / notes |
@@ -124,8 +127,9 @@ sub-page title). Then audit each sub-page's content for mobile fit.
    inline. One component, consistent 52px chrome.
 2. **Settings sub-page back navigation** — layout swaps the static "Settings" title for a
    `MobileSecondaryHeader` (‹ Settings · <subpage>) when not at the root. **Highest-value nav fix.**
-3. **Table→cards helper** — devices, security sessions, family/team rosters, audit logs all need the
-   same "stack a table into cards under `md`" treatment.
+3. **Table→cards** — *mostly already done.* Sweep showed settings content is card-based and stacks.
+   Remaining candidates: the **team-owner permission matrix**, **teams/audit log**, and the
+   **pricing comparison table** — these still need stacking/scroll under `md`.
 4. **Create/Edit as a sheet** *(confirmed)* — unify `/contacts/new` and edit onto `MobileBottomSheet`
    with the design's collapsible sections + keyboard bar; keep the full page as a `?full=1` fallback.
 5. **Activity feed mobile rows** — GroupCard event-row variant of `ActivityFeed` for < 768.
@@ -140,11 +144,24 @@ sub-page title). Then audit each sub-page's content for mobile fit.
 
 ---
 
-## 6. Priority order (proposed)
-1. Settings sub-page back nav + single-column content (P1 — navigation is broken today).
-2. Create/Edit bottom sheet (P1 — most-used write flow, wrong pattern).
-3. Activity feed mobile rows; detail action pills (P2 — polish on shipped tabs).
-4. Import mobile screen/decision; merge & shares stacking (P2).
-5. Settings tables→cards (devices/security/family/teams) (P2).
-6. Auth/marketing/legal verification pass (P3 — likely small fixes).
-7. Admin decision + minimal hardening (P3).
+## 6. Priority order (updated after the 2026-06-12 verification sweep)
+1. **Settings sub-page back nav** (P1) — only the back button is missing; content already fits.
+   Smaller than first thought (no content rework needed).
+2. **Create/Edit bottom sheet** (P1) — most-used write flow, wrong pattern.
+3. **`/merge/manual` (+ likely `/merge-suggestions/[id]`) restyle** (P1) — off-brand dark/cyan
+   dev-scaffold theme; broken on *all* viewports, not just mobile. Restyle to the light system,
+   then stack the A/B compare.
+4. Activity feed mobile rows; detail action pills (P2 — polish on shipped tabs).
+5. Import responsive wizard (P2).
+6. Pricing comparison table stacking; teams-owner matrix + teams/audit stacking (P2).
+7. Spot-check the ⚪→likely-✅ pages (account/notifications/preferences, privacy/terms, join pages,
+   2FA entry, account-deleted) — small fixes expected (P3).
+8. Admin minimal hardening (P3).
+
+### Verification sweep results (2026-06-12, 375px, logged in as a Free family-member)
+- **Confirmed good:** contacts list, contact detail (minus action-pill style), sync, settings root,
+  all settings sub-page **content**, `/shares`, `/forgot-password` (→ auth pattern), `/` landing.
+- **Confirmed problems:** settings back-nav (all sub-pages), `/merge/manual` off-brand, `/pricing`
+  comparison table not stacking, create/edit full-page pattern, activity feed desktop component.
+- **Could not reach (state-gated), still ⚪:** team-owner views, family-owner invite mgmt, 2FA setup
+  modal, merge-suggestion detail, invite-join token pages, privacy/terms.
