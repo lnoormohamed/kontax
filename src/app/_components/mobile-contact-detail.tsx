@@ -409,7 +409,6 @@ export function MobileContactDetail({
           </form>
           <form action={archiveOrRestoreAction} style={{ display: "contents" }}>
             <input name="contactId" type="hidden" value={contactId} />
-            <input name="redirectTo" type="hidden" value={`/contacts/${contactId}`} />
             <button
               aria-label={isArchived ? "Restore" : "Archive"}
               style={quickActionStyle}

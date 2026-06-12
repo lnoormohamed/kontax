@@ -635,7 +635,6 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
             </Link>
             <form action={contact.archivedAt ? restoreContact : archiveContact}>
               <input name="contactId" type="hidden" value={contact.id} />
-              <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}`} />
               <button
                 className="flex h-[34px] items-center gap-1.5 rounded-[8px] border border-[#d8ddd6] bg-white px-3 text-[13px] font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
                 type="submit"
@@ -770,7 +769,6 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               ) : null}
               <form action={toggleFavoriteContact}>
                 <input name="contactId" type="hidden" value={contact.id} />
-                <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}`} />
                 <button
                   aria-label={contact.isFavorite ? "Unfavorite" : "Favorite"}
                   className="grid h-9 w-9 place-items-center rounded-[9px] text-[#e0a31c] transition hover:bg-[#f2f4f0]"
@@ -782,7 +780,6 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               </form>
               <form action={toggleEmergencyContact}>
                 <input name="contactId" type="hidden" value={contact.id} />
-                <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}`} />
                 <button
                   aria-label={contact.isEmergency ? "Remove emergency contact" : "Mark as emergency contact"}
                   aria-pressed={contact.isEmergency}
@@ -809,7 +806,6 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               </Link>
               <form action={contact.archivedAt ? restoreContact : archiveContact}>
                 <input name="contactId" type="hidden" value={contact.id} />
-                <input name="redirectTo" type="hidden" value={`/contacts/${contact.id}`} />
                 <button
                   aria-label={contact.archivedAt ? "Restore" : "Archive"}
                   className="grid h-9 w-9 place-items-center rounded-[9px] text-[#5c655e] transition hover:bg-[#f2f4f0]"
