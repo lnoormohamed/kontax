@@ -5,6 +5,7 @@ import { BottomNav } from "~/app/_components/bottom-nav";
 import { EmailVerificationBanner } from "~/app/_components/email-verification-banner";
 import { MobileSecondaryHeader } from "~/app/_components/mobile-header";
 import { NotificationBellSlot } from "~/app/_components/notification-bell-slot";
+import { OfflineBanner } from "~/app/_components/offline-banner";
 import { SecurityAlertBannerSlot } from "~/app/_components/security-alert-banner-slot";
 import { SearchInput } from "~/app/_components/search-input";
 import { UserMenu } from "~/app/_components/user-menu";
@@ -131,6 +132,9 @@ export async function AppShell({
 
       {/* P22-DB05 surface 4: security alert banner (below billing banner) */}
       {session?.user?.id ? <SecurityAlertBannerSlot userId={session.user.id} /> : null}
+
+      {/* P24-08: offline indicator */}
+      <OfflineBanner />
 
       <div className="flex min-h-0 flex-1">
         {/* sidebar */}

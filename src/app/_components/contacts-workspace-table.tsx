@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useMemo, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 
 import {
   archiveContact,
@@ -321,10 +322,9 @@ function ContactRow({
         onToggleFavourite={handleSwipeFavourite}
       >
         <div
-          className={`group flex min-h-[60px] items-center gap-3 border-b border-[#edf0ea] px-3 transition last:border-b-0 ${
+          className={`group flex min-h-[60px] items-center gap-3 border-b border-[#edf0ea] px-3 transition ${
             selected ? "bg-[#edf0fe]" : "bg-white hover:bg-[#f2f4f0]"
           }`}
-          style={{ contentVisibility: "auto", containIntrinsicSize: "auto 60px" }}
         >
           {stacked}
         </div>
@@ -335,11 +335,10 @@ function ContactRow({
   // Compact: column grid on desktop, 60px stacked row on mobile (<lg).
   return (
     <div
-      className={`group border-b border-[#edf0ea] transition last:border-b-0 ${
+      className={`group border-b border-[#edf0ea] transition ${
         selected ? "bg-[#edf0fe]" : "hover:bg-[#f2f4f0]"
       }`}
       data-selected={selected ? "1" : "0"}
-      style={{ contentVisibility: "auto", containIntrinsicSize: "auto 52px" }}
     >
       <div className={`hidden ${GRID} items-center gap-4 px-3 py-2 lg:grid`}>
         {avatarSlot}
@@ -391,6 +390,12 @@ function GroupHeading({ label, favorites }: { label: string; favorites?: boolean
   );
 }
 
+type VRow =
+  | { type: "group-header"; label: string; favorites?: boolean }
+  | { type: "contact"; contact: WorkspaceContact };
+
+const GROUP_H = 44;
+
 export function ContactsWorkspaceTable({
   contacts,
   emptyState,
@@ -405,6 +410,22 @@ export function ContactsWorkspaceTable({
   const [undoContactId, setUndoContactId] = useState<string | null>(null);
   const undoTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const [, startUndoTransition] = useTransition();
+
+  // State (not ref) so the virtualizer re-renders when the scroll container is discovered.
+  const listRef = useRef<HTMLDivElement>(null);
+  const [scrollEl, setScrollEl] = useState<HTMLElement | null>(null);
+
+  useEffect(() => {
+    let el: Element | null = listRef.current?.parentElement ?? null;
+    while (el && el !== document.documentElement) {
+      const oy = getComputedStyle(el).overflowY;
+      if (oy === "auto" || oy === "scroll") {
+        setScrollEl(el as HTMLElement);
+        break;
+      }
+      el = el.parentElement;
+    }
+  }, []);
 
   const visibleContacts = useMemo(
     () => contacts.filter((c) => !hiddenIds.has(c.id)),
@@ -445,16 +466,13 @@ export function ContactsWorkspaceTable({
     setSelectedIds((current) =>
       current.includes(id) ? current.filter((value) => value !== id) : [...current, id],
     );
-  const toggleSelectAll = () =>
-    setSelectedIds(allSelected ? [] : visibleIds);
+  const toggleSelectAll = () => setSelectedIds(allSelected ? [] : visibleIds);
 
   const favorites = !isSearching && mode === "active" ? visibleContacts.filter((c) => c.isFavorite) : [];
   const rest = !isSearching && mode === "active" ? visibleContacts.filter((c) => !c.isFavorite) : visibleContacts;
 
   const groups = useMemo(() => {
-    if (!groupByLetter || isSearching) {
-      return null;
-    }
+    if (!groupByLetter || isSearching) return null;
     const map = new Map<string, WorkspaceContact[]>();
     for (const contact of rest) {
       const letter = getGroupLetter(contact);
@@ -465,6 +483,41 @@ export function ContactsWorkspaceTable({
     return [...map.entries()].sort(([a], [b]) => a.localeCompare(b));
   }, [groupByLetter, isSearching, rest]);
 
+  // Flatten groups + favorites into a single array for the virtualizer.
+  const flatRows = useMemo<VRow[]>(() => {
+    const rows: VRow[] = [];
+    if (favorites.length > 0) {
+      rows.push({ type: "group-header", label: "Favorites", favorites: true });
+      for (const c of favorites) rows.push({ type: "contact", contact: c });
+    }
+    if (groups) {
+      for (const [letter, bucket] of groups) {
+        rows.push({ type: "group-header", label: letter });
+        for (const c of bucket) rows.push({ type: "contact", contact: c });
+      }
+    } else {
+      for (const c of rest) rows.push({ type: "contact", contact: c });
+    }
+    return rows;
+  }, [favorites, groups, rest]);
+
+  const rowH = viewMode === "cozy" ? 60 : 52;
+
+  const virtualizer = useVirtualizer({
+    count: flatRows.length,
+    getScrollElement: () => scrollEl,
+    estimateSize: (i) => (flatRows[i]?.type === "group-header" ? GROUP_H : rowH),
+    overscan: 12,
+    // Seed the viewport height so items render immediately (before the scroll
+    // container is discovered via useEffect). Without this, calculateRange
+    // guards on outerSize > 0 and returns null on the first render.
+    initialRect: { width: 0, height: typeof window !== "undefined" ? window.innerHeight : 900 },
+    measureElement:
+      typeof window !== "undefined" && navigator.userAgent.indexOf("Firefox") === -1
+        ? (el) => el.getBoundingClientRect().height
+        : undefined,
+  });
+
   if (contacts.length === 0) {
     return (
       <div className="m-4 rounded-[1.6rem] border border-dashed border-[#d8ddd6] bg-white px-6 py-12 text-center text-sm text-slate-500">
@@ -472,19 +525,6 @@ export function ContactsWorkspaceTable({
       </div>
     );
   }
-
-  const renderRow = (contact: WorkspaceContact) => (
-    <ContactRow
-      contact={contact}
-      key={contact.id}
-      mode={mode}
-      onArchived={handleArchived}
-      onToggleSelect={toggleSelect}
-      query={query}
-      selected={selectedSet.has(contact.id)}
-      viewMode={viewMode}
-    />
-  );
 
   return (
     <div className="bg-white">
@@ -515,7 +555,6 @@ export function ContactsWorkspaceTable({
                 </button>
               </form>
             ) : null}
-
             <form action={mode === "active" ? archiveContactsBulk : restoreContactsBulk}>
               {selectedIds.map((id) => (
                 <input key={id} name="contactIds" type="hidden" value={id} />
@@ -528,14 +567,12 @@ export function ContactsWorkspaceTable({
                 {mode === "active" ? "Archive" : "Restore"}
               </button>
             </form>
-
             <a
               className="inline-flex items-center gap-1.5 rounded-lg border border-[#d8ddd6] bg-white px-3 py-1.5 text-xs font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
               href={`/api/exports/contacts/csv?ids=${encodeURIComponent(selectedIds.join(","))}`}
             >
               <span aria-hidden>↓</span> Export
             </a>
-
             <button
               className="inline-flex items-center gap-1.5 rounded-lg border border-[#b5472f] bg-white px-3 py-1.5 text-xs font-semibold text-[#b5472f] transition hover:bg-[#fbeae6]"
               onClick={() => setConfirmDelete(true)}
@@ -548,18 +585,13 @@ export function ContactsWorkspaceTable({
       ) : null}
 
       {confirmDelete ? (
-        <div
-          aria-modal="true"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4"
-          role="dialog"
-        >
+        <div aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4" role="dialog">
           <div className="w-full max-w-md rounded-[1.4rem] border border-[#d8ddd6] bg-white p-6 shadow-xl">
             <p className="text-lg font-semibold text-[#1d2823]">
               Delete {selectedIds.length} contact{selectedIds.length === 1 ? "" : "s"} permanently?
             </p>
             <p className="mt-2 text-sm leading-6 text-slate-500">
-              This can&apos;t be undone. The contact{selectedIds.length === 1 ? "" : "s"} and their
-              sync links will be removed from Kontax.
+              This can&apos;t be undone. The contact{selectedIds.length === 1 ? "" : "s"} and their sync links will be removed from Kontax.
             </p>
             <div className="mt-5 flex flex-wrap justify-end gap-2">
               <button
@@ -574,10 +606,7 @@ export function ContactsWorkspaceTable({
                   <input key={id} name="contactIds" type="hidden" value={id} />
                 ))}
                 <input name="redirectTo" type="hidden" value={mode === "active" ? "/contacts?tab=people" : "/contacts?tab=archived"} />
-                <button
-                  className="rounded-[0.9rem] bg-[#b5472f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#9c3c28]"
-                  type="submit"
-                >
+                <button className="rounded-[0.9rem] bg-[#b5472f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#9c3c28]" type="submit">
                   Delete {selectedIds.length}
                 </button>
               </form>
@@ -586,11 +615,9 @@ export function ContactsWorkspaceTable({
         </div>
       ) : null}
 
-      {/* sticky column header (compact only) */}
+      {/* Sticky column header — compact desktop only, sits above the virtual list */}
       {viewMode === "compact" ? (
-        <div
-          className={`sticky top-0 z-[3] hidden ${GRID} items-center gap-4 border-b border-[#e9ece7] bg-white px-3 py-2.5 text-[10.5px] font-bold uppercase tracking-[0.07em] text-[#8b938c] lg:grid`}
-        >
+        <div className={`sticky top-0 z-[3] hidden ${GRID} items-center gap-4 border-b border-[#e9ece7] bg-white px-3 py-2.5 text-[10.5px] font-bold uppercase tracking-[0.07em] text-[#8b938c] lg:grid`}>
           <button
             aria-label={allSelected ? "Deselect all" : "Select all"}
             className={`grid h-[18px] w-[18px] place-items-center rounded-[5px] border-[1.6px] text-[10px] transition ${
@@ -609,54 +636,43 @@ export function ContactsWorkspaceTable({
         </div>
       ) : null}
 
-      {favorites.length > 0 ? (
-        <>
-          <GroupHeading favorites label="Favorites" />
-          {favorites.map(renderRow)}
-        </>
-      ) : null}
-
-      {groups
-        ? groups.map(([letter, bucket]) => (
-            <div key={letter}>
-              <GroupHeading label={letter} />
-              {bucket.map(renderRow)}
+      {/* Virtualised list — only renders rows near the viewport */}
+      <div ref={listRef} style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
+        {virtualizer.getVirtualItems().map((vItem) => {
+          const row = flatRows[vItem.index]!;
+          return (
+            <div
+              key={vItem.key}
+              data-index={vItem.index}
+              ref={virtualizer.measureElement}
+              style={{ position: "absolute", top: 0, left: 0, right: 0, transform: `translateY(${vItem.start}px)` }}
+            >
+              {row.type === "group-header" ? (
+                <GroupHeading favorites={row.favorites} label={row.label} />
+              ) : (
+                <ContactRow
+                  contact={row.contact}
+                  mode={mode}
+                  onArchived={handleArchived}
+                  onToggleSelect={toggleSelect}
+                  query={query}
+                  selected={selectedSet.has(row.contact.id)}
+                  viewMode={viewMode}
+                />
+              )}
             </div>
-          ))
-        : rest.map(renderRow)}
+          );
+        })}
+      </div>
 
       {/* Undo toast — mobile only, appears above the bottom nav after swipe-archive */}
       {undoContactId ? (
-        <div
-          className="fixed bottom-[calc(56px+env(safe-area-inset-bottom)+8px)] left-4 right-4 z-[60] md:hidden"
-          role="status"
-        >
-          <div
-            style={{
-              background: "#1d2823",
-              color: "#fff",
-              borderRadius: 12,
-              padding: "12px 16px",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              fontSize: 14,
-              fontWeight: 500,
-              boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
-            }}
-          >
+        <div className="fixed bottom-[calc(56px+env(safe-area-inset-bottom)+8px)] left-4 right-4 z-[60] md:hidden" role="status">
+          <div style={{ background: "#1d2823", color: "#fff", borderRadius: 12, padding: "12px 16px", display: "flex", alignItems: "center", justifyContent: "space-between", fontSize: 14, fontWeight: 500, boxShadow: "0 4px 16px rgba(0,0,0,0.2)" }}>
             <span>Archived.</span>
             <button
               onClick={handleUndo}
-              style={{
-                color: "#7c9ef4",
-                fontWeight: 700,
-                background: "none",
-                border: "none",
-                cursor: "pointer",
-                fontSize: 14,
-                padding: "0 4px",
-              }}
+              style={{ color: "#7c9ef4", fontWeight: 700, background: "none", border: "none", cursor: "pointer", fontSize: 14, padding: "0 4px" }}
               type="button"
             >
               Undo

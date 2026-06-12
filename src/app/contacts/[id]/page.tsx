@@ -331,23 +331,27 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
   };
 
   // Sharing (Phase 12): owner-side shares — only needed on the sharing tab.
-  const shareOrigin = detailTab === "sharing" ? await getPublicOrigin() : "";
-  const contactShares = detailTab === "sharing" ? await db.contactShare.findMany({
-    where: { contactId: contact.id, ownerUserId: session.user.id },
-    orderBy: { createdAt: "desc" },
-    select: {
-      id: true,
-      shareType: true,
-      token: true,
-      status: true,
-      expiresAt: true,
-      downloadCount: true,
-      recipientEmail: true,
-      recipientContactId: true,
-      lastPushedAt: true,
-      lastErrorCode: true,
-    },
-  }) : [];
+  const [shareOrigin, contactShares] = await Promise.all([
+    detailTab === "sharing" ? getPublicOrigin() : Promise.resolve(""),
+    detailTab === "sharing"
+      ? db.contactShare.findMany({
+          where: { contactId: contact.id, ownerUserId: session.user.id },
+          orderBy: { createdAt: "desc" },
+          select: {
+            id: true,
+            shareType: true,
+            token: true,
+            status: true,
+            expiresAt: true,
+            downloadCount: true,
+            recipientEmail: true,
+            recipientContactId: true,
+            lastPushedAt: true,
+            lastErrorCode: true,
+          },
+        })
+      : Promise.resolve([]),
+  ]);
   const vcardLinks = contactShares.filter(
     (share) => share.shareType === "VCARD_LINK" && share.status === "ACTIVE",
   );
@@ -396,51 +400,49 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
   const lastEditedAt = lastFamilyEvent ? formatMetaDate(lastFamilyEvent.createdAt) : null;
 
   // Shared books — only needed on the sharing tab.
-  const sharedBooks = detailTab === "sharing" ? await db.group.findMany({
-    where: {
-      OR: [
-        { ownerId: session.user.id },
-        { members: { some: { userId: session.user.id, inviteStatus: "ACCEPTED" } } },
-      ],
-    },
-    orderBy: { createdAt: "asc" },
-    select: { id: true, name: true, type: true, _count: { select: { members: true } } },
-  }) : [];
+  const sharedBooks = await (detailTab === "sharing"
+    ? db.group.findMany({
+        where: {
+          OR: [
+            { ownerId: session.user.id },
+            { members: { some: { userId: session.user.id, inviteStatus: "ACCEPTED" } } },
+          ],
+        },
+        orderBy: { createdAt: "asc" },
+        select: { id: true, name: true, type: true, _count: { select: { members: true } } },
+      })
+    : Promise.resolve([]));
 
-  const syncLinks = detailTab === "details" ? await db.syncContactLink.findMany({
-    where: {
-      contactId: contact.id,
-      syncAccount: {
-        userId: session.user.id,
-      },
-    },
-    orderBy: [{ lastSyncedAt: "desc" }, { updatedAt: "desc" }],
-    select: {
-      id: true,
-      remoteUid: true,
-      remoteHref: true,
-      remoteETag: true,
-      lastSyncedAt: true,
-      tombstonedAt: true,
-      remoteDeletedAt: true,
-      lastErrorCode: true,
-      lastErrorMessage: true,
-      syncAccount: {
+  const syncLinks = await (detailTab === "details"
+    ? db.syncContactLink.findMany({
+        where: {
+          contactId: contact.id,
+          syncAccount: { userId: session.user.id },
+        },
+        orderBy: [{ lastSyncedAt: "desc" }, { updatedAt: "desc" }],
         select: {
           id: true,
-          label: true,
-          addressBookDisplayName: true,
-          status: true,
+          remoteUid: true,
+          remoteHref: true,
+          remoteETag: true,
           lastSyncedAt: true,
+          tombstonedAt: true,
+          remoteDeletedAt: true,
+          lastErrorCode: true,
+          lastErrorMessage: true,
+          syncAccount: {
+            select: {
+              id: true,
+              label: true,
+              addressBookDisplayName: true,
+              status: true,
+              lastSyncedAt: true,
+            },
+          },
+          _count: { select: { syncConflicts: true } },
         },
-      },
-      _count: {
-        select: {
-          syncConflicts: true,
-        },
-      },
-    },
-  }) : [];
+      })
+    : Promise.resolve([]));
 
 
   const editorContact = {
