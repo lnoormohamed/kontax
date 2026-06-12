@@ -33,6 +33,21 @@ acceptance bar for every ticket.
 
 ---
 
+## Design briefs (`p24b-dbNN` — design requirements; precede the build)
+Core flows (contacts, detail, create/edit, activity, sync, settings, import, install) are already
+briefed by `p24-db06` + [`mobile-pwa-design-spec.md`](./mobile-pwa-design-spec.md) + the vendored
+prototype. These cover the **net-new** surfaces the prototype never drew. Each contains a **Design
+Requirements** section; the paired build ticket builds to it.
+
+| Brief | Title | Builds | Status |
+| --- | --- | --- | --- |
+| P24B-DB14 | Mobile variance & gating system | P24B-03 (+ all pages) | ☐ |
+| P24B-DB15 | Family & Teams mobile management surfaces | P24B-13, P24B-14 | ☐ |
+| P24B-DB16 | Merge surfaces (restyle + mobile compare) | P24B-17 | ☐ |
+| P24B-DB17 | Pricing page mobile | P24B-18 | ☐ |
+
+---
+
 ## Workstream A — Shared foundations (do first; unblock the rest)
 | Ticket | Title | Spec § | Priority | Status | Depends |
 | --- | --- | --- | --- | --- | --- |
@@ -91,8 +106,9 @@ acceptance bar for every ticket.
   account. The verification sweep could only reach a Free family-member, so owner/admin/2FA/read-only
   states are still unverified. Seed these before the QA pass. See [[db-and-verification-workflow]].
 - **P24B-17 (merge restyle)** is also a desktop fix — those pages are off-brand on every viewport.
-- A **design brief already exists** (the spec + status brief), so there is no separate `DB-` ticket;
-  this phase is build + verify only.
+- **Design briefs** (`p24b-dbNN`) carry the design requirements and precede their build tickets; the
+  `p24b-NN` files are the engineering builds. Core flows reuse `p24-db06` + the spec/prototype; the
+  four new briefs (DB14–DB17) cover the surfaces the prototype never drew. Build to the brief.
 
 ## Suggested order
 1. P24B-02, P24B-03 (foundations, P0) → 2. P24B-07 (create/edit sheet, P0) →

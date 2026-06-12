@@ -30,4 +30,5 @@ scroll. Monthly/Annual segmented control stays. Current-plan state and Upgrade C
 
 ## Risks and Open Questions
 
+- **Design brief:** P24B-DB17 (pricing page mobile) — build to its requirements.
 - Decide stacked-cards vs scrolled-table for the comparison; stacked is usually clearer on phones.

@@ -28,4 +28,5 @@ Visible to owner/admin only (members don't see audit).
 
 ## Risks and Open Questions
 
+- **Design brief:** P24B-DB15 (Family & Teams mobile management surfaces) — audit section.
 - Needs a seeded Teams account with audit history to verify.

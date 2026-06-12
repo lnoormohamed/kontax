@@ -45,6 +45,7 @@ Inputs come from `planSummary` (plan, lifecycleState, lifecyclePolicy.canWrite, 
 
 ## Risks and Open Questions
 
+- **Design brief:** P24B-DB14 (mobile variance & gating system) — build to its requirements.
 - Confirm the exact upsell target plan per feature (e.g., Activity → "Pro", Family setup → "Family").
 - `canWrite` already exists on `lifecyclePolicy`; ensure read-only disables the *same* affordance set
   everywhere (FAB, swipe-edit, edit/save, add-connection, invite).

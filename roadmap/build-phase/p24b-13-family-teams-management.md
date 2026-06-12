@@ -42,5 +42,6 @@ Per spec §E6 and §E0.3.
 
 ## Risks and Open Questions
 
+- **Design brief:** P24B-DB15 (Family & Teams mobile management surfaces) — build to its requirements.
 - **Needs seeded accounts** (Family owner; Teams owner/admin/member) — not reachable as Free member.
 - Confirm ADMIN capabilities for Family vs Teams (ADMIN is primarily a Teams role).

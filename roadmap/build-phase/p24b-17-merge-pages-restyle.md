@@ -37,6 +37,7 @@ Per spec §E8.
 
 ## Risks and Open Questions
 
+- **Design brief:** P24B-DB16 (merge surfaces restyle + mobile compare) — build to its requirements.
 - Scope check: this is partly a **desktop** fix. Confirm we restyle both viewports here vs splitting a
   desktop ticket.
 - Need a duplicate pair / a suggestion id seeded to verify end-to-end.
