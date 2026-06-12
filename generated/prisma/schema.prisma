@@ -133,6 +133,13 @@ enum SyncAccountStatus {
   ERROR
 }
 
+// P23-01: per-connection conflict resolution policy.
+enum ConflictPolicy {
+  SERVER_WINS // remote change always wins
+  DEVICE_WINS // Kontax change always wins (export-biased) — see data-loss note in P23-01
+  MANUAL // write a SyncConflict row for user review
+}
+
 enum SyncJobTrigger {
   MANUAL
   SCHEDULED
@@ -159,6 +166,9 @@ enum SyncConflictStatus {
   OPEN
   RESOLVED
   IGNORED
+  // P23-05: conflict auto-resolved by the connection's SERVER_WINS / DEVICE_WINS
+  // policy — kept as an audit record, never shown in the manual review queue.
+  AUTO_RESOLVED
 }
 
 enum SyncConflictSource {
@@ -499,11 +509,11 @@ model MergeDecision {
 }
 
 model SyncAccount {
-  id                        String            @id @default(cuid())
+  id                        String               @id @default(cuid())
   userId                    String
-  provider                  SyncProvider      @default(CARDDAV)
-  status                    SyncAccountStatus @default(PAUSED)
-  syncDirection             SyncDirection     @default(TWO_WAY)
+  provider                  SyncProvider         @default(CARDDAV)
+  status                    SyncAccountStatus    @default(PAUSED)
+  syncDirection             SyncDirection        @default(TWO_WAY)
   label                     String
   baseUrl                   String
   principalUrl              String?
@@ -512,7 +522,7 @@ model SyncAccount {
   remoteAccountId           String?
   remoteCTag                String?
   credentialReference       String?
-  credentialVersion         Int               @default(1)
+  credentialVersion         Int                  @default(1)
   credentialUpdatedAt       DateTime?
   credentialLastValidatedAt DateTime?
   credentialRevokedAt       DateTime?
@@ -524,16 +534,56 @@ model SyncAccount {
   lastErrorAt               DateTime?
   lastErrorCode             String?
   lastErrorMessage          String?
-  createdAt                 DateTime          @default(now())
-  updatedAt                 DateTime          @updatedAt
-  user                      User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  // P23-03: cached CardDAV book discovery — array of { url, displayName, ctag,
+  // readOnly } objects, refreshed on demand (1h TTL) by the book allowlist UI.
+  discoveredBooks           Json?
+  booksDiscoveredAt         DateTime?
+  createdAt                 DateTime             @default(now())
+  updatedAt                 DateTime             @updatedAt
+  user                      User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
   syncLinks                 SyncContactLink[]
   syncJobs                  SyncJob[]
   syncConflicts             SyncConflict[]
   teamLink                  TeamSyncAccount?
+  settings                  SyncAccountSettings?
 
   @@unique([userId, baseUrl, label])
   @@index([userId, status, updatedAt])
+}
+
+// P23-01: per-connection configuration beyond the credential/endpoint fields on
+// SyncAccount. 1:1 with SyncAccount, created lazily on first save (see
+// getOrCreateSyncAccountSettings). Additive and backwards-compatible: accounts
+// without a row fall back to the column defaults below.
+model SyncAccountSettings {
+  id                   String         @id @default(cuid())
+  syncAccountId        String         @unique
+  syncDirection        SyncDirection  @default(TWO_WAY)
+  conflictPolicy       ConflictPolicy @default(SERVER_WINS)
+  // empty = sync all discovered books; otherwise the remote address-book URLs to include
+  bookAllowlist        String[]
+  // null = platform default (60 min); 0 = manual only (the "Manual only" UI option)
+  syncFrequencyMinutes Int?
+  // P23-06: require password re-auth before editing connection settings
+  requireReauthToEdit  Boolean        @default(true)
+  lastModifiedAt       DateTime       @updatedAt
+  createdAt            DateTime       @default(now())
+
+  syncAccount SyncAccount @relation(fields: [syncAccountId], references: [id], onDelete: Cascade)
+}
+
+// P23-06: short-lived (15 min) "sudo mode" elevation, proving the user re-entered
+// their password before changing sensitive sync settings. Tied to the session's
+// UserSession id (jti) so a new login / revoke invalidates it.
+model SyncSettingsElevation {
+  id        String   @id @default(cuid())
+  userId    String
+  jti       String
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@unique([userId, jti])
+  @@index([userId, jti])
 }
 
 model SyncContactLink {
@@ -641,6 +691,9 @@ enum EventType {
   SYNC_PUSHED
   SYNC_CONFLICT_DETECTED
   SYNC_CONFLICT_RESOLVED
+  // P23-06: a sync connection's settings (direction, conflict policy, frequency,
+  // book allowlist) were changed — security-relevant, audited.
+  SYNC_SETTINGS_CHANGED
   // P18-02+: covers profile edits, password change, email change, 2FA state changes
   ACCOUNT_UPDATED
 }
@@ -871,6 +924,12 @@ model AddressBook {
   slug              String // URL-safe, used in CardDAV paths (e.g. "default")
   description       String?
   isDefault         Boolean   @default(false)
+  // P23-07: Kontax-as-CardDAV-server device settings. deviceWritable=false makes
+  // the book read-only to connected devices (PUT/DELETE → 403). sourceBookIds, when
+  // non-empty, aggregates contacts from those personal books into this collection;
+  // empty preserves the default per-book scope (contacts whose bookId is this book).
+  deviceWritable    Boolean   @default(true)
+  sourceBookIds     String[]
   // Preserved so re-subscription can locate former shared-book contacts (Phase 13)
   sourceGroupBookId String?
   archivedAt        DateTime?

@@ -356,8 +356,30 @@ exports.Prisma.SyncAccountScalarFieldEnum = {
   lastErrorAt: 'lastErrorAt',
   lastErrorCode: 'lastErrorCode',
   lastErrorMessage: 'lastErrorMessage',
+  discoveredBooks: 'discoveredBooks',
+  booksDiscoveredAt: 'booksDiscoveredAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.SyncAccountSettingsScalarFieldEnum = {
+  id: 'id',
+  syncAccountId: 'syncAccountId',
+  syncDirection: 'syncDirection',
+  conflictPolicy: 'conflictPolicy',
+  bookAllowlist: 'bookAllowlist',
+  syncFrequencyMinutes: 'syncFrequencyMinutes',
+  requireReauthToEdit: 'requireReauthToEdit',
+  lastModifiedAt: 'lastModifiedAt',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.SyncSettingsElevationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  jti: 'jti',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.SyncContactLinkScalarFieldEnum = {
@@ -553,6 +575,8 @@ exports.Prisma.AddressBookScalarFieldEnum = {
   slug: 'slug',
   description: 'description',
   isDefault: 'isDefault',
+  deviceWritable: 'deviceWritable',
+  sourceBookIds: 'sourceBookIds',
   sourceGroupBookId: 'sourceGroupBookId',
   archivedAt: 'archivedAt',
   createdAt: 'createdAt',
@@ -803,6 +827,12 @@ exports.SyncDirection = exports.$Enums.SyncDirection = {
   EXPORT_ONLY: 'EXPORT_ONLY'
 };
 
+exports.ConflictPolicy = exports.$Enums.ConflictPolicy = {
+  SERVER_WINS: 'SERVER_WINS',
+  DEVICE_WINS: 'DEVICE_WINS',
+  MANUAL: 'MANUAL'
+};
+
 exports.SyncJobStatus = exports.$Enums.SyncJobStatus = {
   QUEUED: 'QUEUED',
   RUNNING: 'RUNNING',
@@ -833,7 +863,8 @@ exports.SyncConflictSource = exports.$Enums.SyncConflictSource = {
 exports.SyncConflictStatus = exports.$Enums.SyncConflictStatus = {
   OPEN: 'OPEN',
   RESOLVED: 'RESOLVED',
-  IGNORED: 'IGNORED'
+  IGNORED: 'IGNORED',
+  AUTO_RESOLVED: 'AUTO_RESOLVED'
 };
 
 exports.SyncResolutionStrategy = exports.$Enums.SyncResolutionStrategy = {
@@ -864,6 +895,7 @@ exports.EventType = exports.$Enums.EventType = {
   SYNC_PUSHED: 'SYNC_PUSHED',
   SYNC_CONFLICT_DETECTED: 'SYNC_CONFLICT_DETECTED',
   SYNC_CONFLICT_RESOLVED: 'SYNC_CONFLICT_RESOLVED',
+  SYNC_SETTINGS_CHANGED: 'SYNC_SETTINGS_CHANGED',
   ACCOUNT_UPDATED: 'ACCOUNT_UPDATED'
 };
 
@@ -941,6 +973,8 @@ exports.Prisma.ModelName = {
   MergeSuggestion: 'MergeSuggestion',
   MergeDecision: 'MergeDecision',
   SyncAccount: 'SyncAccount',
+  SyncAccountSettings: 'SyncAccountSettings',
+  SyncSettingsElevation: 'SyncSettingsElevation',
   SyncContactLink: 'SyncContactLink',
   SyncJob: 'SyncJob',
   SyncConflict: 'SyncConflict',

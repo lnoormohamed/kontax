@@ -64,6 +64,16 @@ export type MergeDecision = $Result.DefaultSelection<Prisma.$MergeDecisionPayloa
  */
 export type SyncAccount = $Result.DefaultSelection<Prisma.$SyncAccountPayload>
 /**
+ * Model SyncAccountSettings
+ * 
+ */
+export type SyncAccountSettings = $Result.DefaultSelection<Prisma.$SyncAccountSettingsPayload>
+/**
+ * Model SyncSettingsElevation
+ * 
+ */
+export type SyncSettingsElevation = $Result.DefaultSelection<Prisma.$SyncSettingsElevationPayload>
+/**
  * Model SyncContactLink
  * 
  */
@@ -365,6 +375,15 @@ export const SyncAccountStatus: {
 export type SyncAccountStatus = (typeof SyncAccountStatus)[keyof typeof SyncAccountStatus]
 
 
+export const ConflictPolicy: {
+  SERVER_WINS: 'SERVER_WINS',
+  DEVICE_WINS: 'DEVICE_WINS',
+  MANUAL: 'MANUAL'
+};
+
+export type ConflictPolicy = (typeof ConflictPolicy)[keyof typeof ConflictPolicy]
+
+
 export const SyncJobTrigger: {
   MANUAL: 'MANUAL',
   SCHEDULED: 'SCHEDULED',
@@ -399,7 +418,8 @@ export type SyncConflictType = (typeof SyncConflictType)[keyof typeof SyncConfli
 export const SyncConflictStatus: {
   OPEN: 'OPEN',
   RESOLVED: 'RESOLVED',
-  IGNORED: 'IGNORED'
+  IGNORED: 'IGNORED',
+  AUTO_RESOLVED: 'AUTO_RESOLVED'
 };
 
 export type SyncConflictStatus = (typeof SyncConflictStatus)[keyof typeof SyncConflictStatus]
@@ -451,6 +471,7 @@ export const EventType: {
   SYNC_PUSHED: 'SYNC_PUSHED',
   SYNC_CONFLICT_DETECTED: 'SYNC_CONFLICT_DETECTED',
   SYNC_CONFLICT_RESOLVED: 'SYNC_CONFLICT_RESOLVED',
+  SYNC_SETTINGS_CHANGED: 'SYNC_SETTINGS_CHANGED',
   ACCOUNT_UPDATED: 'ACCOUNT_UPDATED'
 };
 
@@ -608,6 +629,10 @@ export const SyncDirection: typeof $Enums.SyncDirection
 export type SyncAccountStatus = $Enums.SyncAccountStatus
 
 export const SyncAccountStatus: typeof $Enums.SyncAccountStatus
+
+export type ConflictPolicy = $Enums.ConflictPolicy
+
+export const ConflictPolicy: typeof $Enums.ConflictPolicy
 
 export type SyncJobTrigger = $Enums.SyncJobTrigger
 
@@ -886,6 +911,26 @@ export class PrismaClient<
     * ```
     */
   get syncAccount(): Prisma.SyncAccountDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.syncAccountSettings`: Exposes CRUD operations for the **SyncAccountSettings** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SyncAccountSettings
+    * const syncAccountSettings = await prisma.syncAccountSettings.findMany()
+    * ```
+    */
+  get syncAccountSettings(): Prisma.SyncAccountSettingsDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.syncSettingsElevation`: Exposes CRUD operations for the **SyncSettingsElevation** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SyncSettingsElevations
+    * const syncSettingsElevations = await prisma.syncSettingsElevation.findMany()
+    * ```
+    */
+  get syncSettingsElevation(): Prisma.SyncSettingsElevationDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.syncContactLink`: Exposes CRUD operations for the **SyncContactLink** model.
@@ -1567,6 +1612,8 @@ export namespace Prisma {
     MergeSuggestion: 'MergeSuggestion',
     MergeDecision: 'MergeDecision',
     SyncAccount: 'SyncAccount',
+    SyncAccountSettings: 'SyncAccountSettings',
+    SyncSettingsElevation: 'SyncSettingsElevation',
     SyncContactLink: 'SyncContactLink',
     SyncJob: 'SyncJob',
     SyncConflict: 'SyncConflict',
@@ -1608,7 +1655,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState"
+      modelProps: "user" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2349,6 +2396,154 @@ export namespace Prisma {
           count: {
             args: Prisma.SyncAccountCountArgs<ExtArgs>
             result: $Utils.Optional<SyncAccountCountAggregateOutputType> | number
+          }
+        }
+      }
+      SyncAccountSettings: {
+        payload: Prisma.$SyncAccountSettingsPayload<ExtArgs>
+        fields: Prisma.SyncAccountSettingsFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SyncAccountSettingsFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncAccountSettingsPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SyncAccountSettingsFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncAccountSettingsPayload>
+          }
+          findFirst: {
+            args: Prisma.SyncAccountSettingsFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncAccountSettingsPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SyncAccountSettingsFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncAccountSettingsPayload>
+          }
+          findMany: {
+            args: Prisma.SyncAccountSettingsFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncAccountSettingsPayload>[]
+          }
+          create: {
+            args: Prisma.SyncAccountSettingsCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncAccountSettingsPayload>
+          }
+          createMany: {
+            args: Prisma.SyncAccountSettingsCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SyncAccountSettingsCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncAccountSettingsPayload>[]
+          }
+          delete: {
+            args: Prisma.SyncAccountSettingsDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncAccountSettingsPayload>
+          }
+          update: {
+            args: Prisma.SyncAccountSettingsUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncAccountSettingsPayload>
+          }
+          deleteMany: {
+            args: Prisma.SyncAccountSettingsDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SyncAccountSettingsUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SyncAccountSettingsUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncAccountSettingsPayload>[]
+          }
+          upsert: {
+            args: Prisma.SyncAccountSettingsUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncAccountSettingsPayload>
+          }
+          aggregate: {
+            args: Prisma.SyncAccountSettingsAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSyncAccountSettings>
+          }
+          groupBy: {
+            args: Prisma.SyncAccountSettingsGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SyncAccountSettingsGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SyncAccountSettingsCountArgs<ExtArgs>
+            result: $Utils.Optional<SyncAccountSettingsCountAggregateOutputType> | number
+          }
+        }
+      }
+      SyncSettingsElevation: {
+        payload: Prisma.$SyncSettingsElevationPayload<ExtArgs>
+        fields: Prisma.SyncSettingsElevationFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SyncSettingsElevationFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncSettingsElevationPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SyncSettingsElevationFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncSettingsElevationPayload>
+          }
+          findFirst: {
+            args: Prisma.SyncSettingsElevationFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncSettingsElevationPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SyncSettingsElevationFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncSettingsElevationPayload>
+          }
+          findMany: {
+            args: Prisma.SyncSettingsElevationFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncSettingsElevationPayload>[]
+          }
+          create: {
+            args: Prisma.SyncSettingsElevationCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncSettingsElevationPayload>
+          }
+          createMany: {
+            args: Prisma.SyncSettingsElevationCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SyncSettingsElevationCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncSettingsElevationPayload>[]
+          }
+          delete: {
+            args: Prisma.SyncSettingsElevationDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncSettingsElevationPayload>
+          }
+          update: {
+            args: Prisma.SyncSettingsElevationUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncSettingsElevationPayload>
+          }
+          deleteMany: {
+            args: Prisma.SyncSettingsElevationDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SyncSettingsElevationUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SyncSettingsElevationUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncSettingsElevationPayload>[]
+          }
+          upsert: {
+            args: Prisma.SyncSettingsElevationUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SyncSettingsElevationPayload>
+          }
+          aggregate: {
+            args: Prisma.SyncSettingsElevationAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSyncSettingsElevation>
+          }
+          groupBy: {
+            args: Prisma.SyncSettingsElevationGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SyncSettingsElevationGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SyncSettingsElevationCountArgs<ExtArgs>
+            result: $Utils.Optional<SyncSettingsElevationCountAggregateOutputType> | number
           }
         }
       }
@@ -4160,6 +4355,8 @@ export namespace Prisma {
     mergeSuggestion?: MergeSuggestionOmit
     mergeDecision?: MergeDecisionOmit
     syncAccount?: SyncAccountOmit
+    syncAccountSettings?: SyncAccountSettingsOmit
+    syncSettingsElevation?: SyncSettingsElevationOmit
     syncContactLink?: SyncContactLinkOmit
     syncJob?: SyncJobOmit
     syncConflict?: SyncConflictOmit
@@ -17765,6 +17962,7 @@ export namespace Prisma {
     lastErrorAt: Date | null
     lastErrorCode: string | null
     lastErrorMessage: string | null
+    booksDiscoveredAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -17795,6 +17993,7 @@ export namespace Prisma {
     lastErrorAt: Date | null
     lastErrorCode: string | null
     lastErrorMessage: string | null
+    booksDiscoveredAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -17825,6 +18024,8 @@ export namespace Prisma {
     lastErrorAt: number
     lastErrorCode: number
     lastErrorMessage: number
+    discoveredBooks: number
+    booksDiscoveredAt: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -17865,6 +18066,7 @@ export namespace Prisma {
     lastErrorAt?: true
     lastErrorCode?: true
     lastErrorMessage?: true
+    booksDiscoveredAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -17895,6 +18097,7 @@ export namespace Prisma {
     lastErrorAt?: true
     lastErrorCode?: true
     lastErrorMessage?: true
+    booksDiscoveredAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -17925,6 +18128,8 @@ export namespace Prisma {
     lastErrorAt?: true
     lastErrorCode?: true
     lastErrorMessage?: true
+    discoveredBooks?: true
+    booksDiscoveredAt?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -18042,6 +18247,8 @@ export namespace Prisma {
     lastErrorAt: Date | null
     lastErrorCode: string | null
     lastErrorMessage: string | null
+    discoveredBooks: JsonValue | null
+    booksDiscoveredAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: SyncAccountCountAggregateOutputType | null
@@ -18091,6 +18298,8 @@ export namespace Prisma {
     lastErrorAt?: boolean
     lastErrorCode?: boolean
     lastErrorMessage?: boolean
+    discoveredBooks?: boolean
+    booksDiscoveredAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -18098,6 +18307,7 @@ export namespace Prisma {
     syncJobs?: boolean | SyncAccount$syncJobsArgs<ExtArgs>
     syncConflicts?: boolean | SyncAccount$syncConflictsArgs<ExtArgs>
     teamLink?: boolean | SyncAccount$teamLinkArgs<ExtArgs>
+    settings?: boolean | SyncAccount$settingsArgs<ExtArgs>
     _count?: boolean | SyncAccountCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["syncAccount"]>
 
@@ -18127,6 +18337,8 @@ export namespace Prisma {
     lastErrorAt?: boolean
     lastErrorCode?: boolean
     lastErrorMessage?: boolean
+    discoveredBooks?: boolean
+    booksDiscoveredAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -18158,6 +18370,8 @@ export namespace Prisma {
     lastErrorAt?: boolean
     lastErrorCode?: boolean
     lastErrorMessage?: boolean
+    discoveredBooks?: boolean
+    booksDiscoveredAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -18189,17 +18403,20 @@ export namespace Prisma {
     lastErrorAt?: boolean
     lastErrorCode?: boolean
     lastErrorMessage?: boolean
+    discoveredBooks?: boolean
+    booksDiscoveredAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type SyncAccountOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "provider" | "status" | "syncDirection" | "label" | "baseUrl" | "principalUrl" | "addressBookUrl" | "addressBookDisplayName" | "remoteAccountId" | "remoteCTag" | "credentialReference" | "credentialVersion" | "credentialUpdatedAt" | "credentialLastValidatedAt" | "credentialRevokedAt" | "encryptionKeyRef" | "connectionValidatedAt" | "lastSyncCursor" | "lastSyncedAt" | "lastSucceededAt" | "lastErrorAt" | "lastErrorCode" | "lastErrorMessage" | "createdAt" | "updatedAt", ExtArgs["result"]["syncAccount"]>
+  export type SyncAccountOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "provider" | "status" | "syncDirection" | "label" | "baseUrl" | "principalUrl" | "addressBookUrl" | "addressBookDisplayName" | "remoteAccountId" | "remoteCTag" | "credentialReference" | "credentialVersion" | "credentialUpdatedAt" | "credentialLastValidatedAt" | "credentialRevokedAt" | "encryptionKeyRef" | "connectionValidatedAt" | "lastSyncCursor" | "lastSyncedAt" | "lastSucceededAt" | "lastErrorAt" | "lastErrorCode" | "lastErrorMessage" | "discoveredBooks" | "booksDiscoveredAt" | "createdAt" | "updatedAt", ExtArgs["result"]["syncAccount"]>
   export type SyncAccountInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     syncLinks?: boolean | SyncAccount$syncLinksArgs<ExtArgs>
     syncJobs?: boolean | SyncAccount$syncJobsArgs<ExtArgs>
     syncConflicts?: boolean | SyncAccount$syncConflictsArgs<ExtArgs>
     teamLink?: boolean | SyncAccount$teamLinkArgs<ExtArgs>
+    settings?: boolean | SyncAccount$settingsArgs<ExtArgs>
     _count?: boolean | SyncAccountCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type SyncAccountIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -18217,6 +18434,7 @@ export namespace Prisma {
       syncJobs: Prisma.$SyncJobPayload<ExtArgs>[]
       syncConflicts: Prisma.$SyncConflictPayload<ExtArgs>[]
       teamLink: Prisma.$TeamSyncAccountPayload<ExtArgs> | null
+      settings: Prisma.$SyncAccountSettingsPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -18244,6 +18462,8 @@ export namespace Prisma {
       lastErrorAt: Date | null
       lastErrorCode: string | null
       lastErrorMessage: string | null
+      discoveredBooks: Prisma.JsonValue | null
+      booksDiscoveredAt: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["syncAccount"]>
@@ -18645,6 +18865,7 @@ export namespace Prisma {
     syncJobs<T extends SyncAccount$syncJobsArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccount$syncJobsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     syncConflicts<T extends SyncAccount$syncConflictsArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccount$syncConflictsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncConflictPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     teamLink<T extends SyncAccount$teamLinkArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccount$teamLinkArgs<ExtArgs>>): Prisma__TeamSyncAccountClient<$Result.GetResult<Prisma.$TeamSyncAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    settings<T extends SyncAccount$settingsArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccount$settingsArgs<ExtArgs>>): Prisma__SyncAccountSettingsClient<$Result.GetResult<Prisma.$SyncAccountSettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -18699,6 +18920,8 @@ export namespace Prisma {
     readonly lastErrorAt: FieldRef<"SyncAccount", 'DateTime'>
     readonly lastErrorCode: FieldRef<"SyncAccount", 'String'>
     readonly lastErrorMessage: FieldRef<"SyncAccount", 'String'>
+    readonly discoveredBooks: FieldRef<"SyncAccount", 'Json'>
+    readonly booksDiscoveredAt: FieldRef<"SyncAccount", 'DateTime'>
     readonly createdAt: FieldRef<"SyncAccount", 'DateTime'>
     readonly updatedAt: FieldRef<"SyncAccount", 'DateTime'>
   }
@@ -19188,6 +19411,25 @@ export namespace Prisma {
   }
 
   /**
+   * SyncAccount.settings
+   */
+  export type SyncAccount$settingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccountSettings
+     */
+    select?: SyncAccountSettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccountSettings
+     */
+    omit?: SyncAccountSettingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountSettingsInclude<ExtArgs> | null
+    where?: SyncAccountSettingsWhereInput
+  }
+
+  /**
    * SyncAccount without action
    */
   export type SyncAccountDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -19203,6 +19445,2141 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: SyncAccountInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SyncAccountSettings
+   */
+
+  export type AggregateSyncAccountSettings = {
+    _count: SyncAccountSettingsCountAggregateOutputType | null
+    _avg: SyncAccountSettingsAvgAggregateOutputType | null
+    _sum: SyncAccountSettingsSumAggregateOutputType | null
+    _min: SyncAccountSettingsMinAggregateOutputType | null
+    _max: SyncAccountSettingsMaxAggregateOutputType | null
+  }
+
+  export type SyncAccountSettingsAvgAggregateOutputType = {
+    syncFrequencyMinutes: number | null
+  }
+
+  export type SyncAccountSettingsSumAggregateOutputType = {
+    syncFrequencyMinutes: number | null
+  }
+
+  export type SyncAccountSettingsMinAggregateOutputType = {
+    id: string | null
+    syncAccountId: string | null
+    syncDirection: $Enums.SyncDirection | null
+    conflictPolicy: $Enums.ConflictPolicy | null
+    syncFrequencyMinutes: number | null
+    requireReauthToEdit: boolean | null
+    lastModifiedAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type SyncAccountSettingsMaxAggregateOutputType = {
+    id: string | null
+    syncAccountId: string | null
+    syncDirection: $Enums.SyncDirection | null
+    conflictPolicy: $Enums.ConflictPolicy | null
+    syncFrequencyMinutes: number | null
+    requireReauthToEdit: boolean | null
+    lastModifiedAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type SyncAccountSettingsCountAggregateOutputType = {
+    id: number
+    syncAccountId: number
+    syncDirection: number
+    conflictPolicy: number
+    bookAllowlist: number
+    syncFrequencyMinutes: number
+    requireReauthToEdit: number
+    lastModifiedAt: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type SyncAccountSettingsAvgAggregateInputType = {
+    syncFrequencyMinutes?: true
+  }
+
+  export type SyncAccountSettingsSumAggregateInputType = {
+    syncFrequencyMinutes?: true
+  }
+
+  export type SyncAccountSettingsMinAggregateInputType = {
+    id?: true
+    syncAccountId?: true
+    syncDirection?: true
+    conflictPolicy?: true
+    syncFrequencyMinutes?: true
+    requireReauthToEdit?: true
+    lastModifiedAt?: true
+    createdAt?: true
+  }
+
+  export type SyncAccountSettingsMaxAggregateInputType = {
+    id?: true
+    syncAccountId?: true
+    syncDirection?: true
+    conflictPolicy?: true
+    syncFrequencyMinutes?: true
+    requireReauthToEdit?: true
+    lastModifiedAt?: true
+    createdAt?: true
+  }
+
+  export type SyncAccountSettingsCountAggregateInputType = {
+    id?: true
+    syncAccountId?: true
+    syncDirection?: true
+    conflictPolicy?: true
+    bookAllowlist?: true
+    syncFrequencyMinutes?: true
+    requireReauthToEdit?: true
+    lastModifiedAt?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type SyncAccountSettingsAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SyncAccountSettings to aggregate.
+     */
+    where?: SyncAccountSettingsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SyncAccountSettings to fetch.
+     */
+    orderBy?: SyncAccountSettingsOrderByWithRelationInput | SyncAccountSettingsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SyncAccountSettingsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SyncAccountSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SyncAccountSettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SyncAccountSettings
+    **/
+    _count?: true | SyncAccountSettingsCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SyncAccountSettingsAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SyncAccountSettingsSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SyncAccountSettingsMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SyncAccountSettingsMaxAggregateInputType
+  }
+
+  export type GetSyncAccountSettingsAggregateType<T extends SyncAccountSettingsAggregateArgs> = {
+        [P in keyof T & keyof AggregateSyncAccountSettings]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSyncAccountSettings[P]>
+      : GetScalarType<T[P], AggregateSyncAccountSettings[P]>
+  }
+
+
+
+
+  export type SyncAccountSettingsGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SyncAccountSettingsWhereInput
+    orderBy?: SyncAccountSettingsOrderByWithAggregationInput | SyncAccountSettingsOrderByWithAggregationInput[]
+    by: SyncAccountSettingsScalarFieldEnum[] | SyncAccountSettingsScalarFieldEnum
+    having?: SyncAccountSettingsScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SyncAccountSettingsCountAggregateInputType | true
+    _avg?: SyncAccountSettingsAvgAggregateInputType
+    _sum?: SyncAccountSettingsSumAggregateInputType
+    _min?: SyncAccountSettingsMinAggregateInputType
+    _max?: SyncAccountSettingsMaxAggregateInputType
+  }
+
+  export type SyncAccountSettingsGroupByOutputType = {
+    id: string
+    syncAccountId: string
+    syncDirection: $Enums.SyncDirection
+    conflictPolicy: $Enums.ConflictPolicy
+    bookAllowlist: string[]
+    syncFrequencyMinutes: number | null
+    requireReauthToEdit: boolean
+    lastModifiedAt: Date
+    createdAt: Date
+    _count: SyncAccountSettingsCountAggregateOutputType | null
+    _avg: SyncAccountSettingsAvgAggregateOutputType | null
+    _sum: SyncAccountSettingsSumAggregateOutputType | null
+    _min: SyncAccountSettingsMinAggregateOutputType | null
+    _max: SyncAccountSettingsMaxAggregateOutputType | null
+  }
+
+  type GetSyncAccountSettingsGroupByPayload<T extends SyncAccountSettingsGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SyncAccountSettingsGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SyncAccountSettingsGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SyncAccountSettingsGroupByOutputType[P]>
+            : GetScalarType<T[P], SyncAccountSettingsGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SyncAccountSettingsSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    syncAccountId?: boolean
+    syncDirection?: boolean
+    conflictPolicy?: boolean
+    bookAllowlist?: boolean
+    syncFrequencyMinutes?: boolean
+    requireReauthToEdit?: boolean
+    lastModifiedAt?: boolean
+    createdAt?: boolean
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["syncAccountSettings"]>
+
+  export type SyncAccountSettingsSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    syncAccountId?: boolean
+    syncDirection?: boolean
+    conflictPolicy?: boolean
+    bookAllowlist?: boolean
+    syncFrequencyMinutes?: boolean
+    requireReauthToEdit?: boolean
+    lastModifiedAt?: boolean
+    createdAt?: boolean
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["syncAccountSettings"]>
+
+  export type SyncAccountSettingsSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    syncAccountId?: boolean
+    syncDirection?: boolean
+    conflictPolicy?: boolean
+    bookAllowlist?: boolean
+    syncFrequencyMinutes?: boolean
+    requireReauthToEdit?: boolean
+    lastModifiedAt?: boolean
+    createdAt?: boolean
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["syncAccountSettings"]>
+
+  export type SyncAccountSettingsSelectScalar = {
+    id?: boolean
+    syncAccountId?: boolean
+    syncDirection?: boolean
+    conflictPolicy?: boolean
+    bookAllowlist?: boolean
+    syncFrequencyMinutes?: boolean
+    requireReauthToEdit?: boolean
+    lastModifiedAt?: boolean
+    createdAt?: boolean
+  }
+
+  export type SyncAccountSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "syncAccountId" | "syncDirection" | "conflictPolicy" | "bookAllowlist" | "syncFrequencyMinutes" | "requireReauthToEdit" | "lastModifiedAt" | "createdAt", ExtArgs["result"]["syncAccountSettings"]>
+  export type SyncAccountSettingsInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+  }
+  export type SyncAccountSettingsIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+  }
+  export type SyncAccountSettingsIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+  }
+
+  export type $SyncAccountSettingsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SyncAccountSettings"
+    objects: {
+      syncAccount: Prisma.$SyncAccountPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      syncAccountId: string
+      syncDirection: $Enums.SyncDirection
+      conflictPolicy: $Enums.ConflictPolicy
+      bookAllowlist: string[]
+      syncFrequencyMinutes: number | null
+      requireReauthToEdit: boolean
+      lastModifiedAt: Date
+      createdAt: Date
+    }, ExtArgs["result"]["syncAccountSettings"]>
+    composites: {}
+  }
+
+  type SyncAccountSettingsGetPayload<S extends boolean | null | undefined | SyncAccountSettingsDefaultArgs> = $Result.GetResult<Prisma.$SyncAccountSettingsPayload, S>
+
+  type SyncAccountSettingsCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SyncAccountSettingsFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SyncAccountSettingsCountAggregateInputType | true
+    }
+
+  export interface SyncAccountSettingsDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SyncAccountSettings'], meta: { name: 'SyncAccountSettings' } }
+    /**
+     * Find zero or one SyncAccountSettings that matches the filter.
+     * @param {SyncAccountSettingsFindUniqueArgs} args - Arguments to find a SyncAccountSettings
+     * @example
+     * // Get one SyncAccountSettings
+     * const syncAccountSettings = await prisma.syncAccountSettings.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SyncAccountSettingsFindUniqueArgs>(args: SelectSubset<T, SyncAccountSettingsFindUniqueArgs<ExtArgs>>): Prisma__SyncAccountSettingsClient<$Result.GetResult<Prisma.$SyncAccountSettingsPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SyncAccountSettings that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SyncAccountSettingsFindUniqueOrThrowArgs} args - Arguments to find a SyncAccountSettings
+     * @example
+     * // Get one SyncAccountSettings
+     * const syncAccountSettings = await prisma.syncAccountSettings.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SyncAccountSettingsFindUniqueOrThrowArgs>(args: SelectSubset<T, SyncAccountSettingsFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SyncAccountSettingsClient<$Result.GetResult<Prisma.$SyncAccountSettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SyncAccountSettings that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncAccountSettingsFindFirstArgs} args - Arguments to find a SyncAccountSettings
+     * @example
+     * // Get one SyncAccountSettings
+     * const syncAccountSettings = await prisma.syncAccountSettings.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SyncAccountSettingsFindFirstArgs>(args?: SelectSubset<T, SyncAccountSettingsFindFirstArgs<ExtArgs>>): Prisma__SyncAccountSettingsClient<$Result.GetResult<Prisma.$SyncAccountSettingsPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SyncAccountSettings that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncAccountSettingsFindFirstOrThrowArgs} args - Arguments to find a SyncAccountSettings
+     * @example
+     * // Get one SyncAccountSettings
+     * const syncAccountSettings = await prisma.syncAccountSettings.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SyncAccountSettingsFindFirstOrThrowArgs>(args?: SelectSubset<T, SyncAccountSettingsFindFirstOrThrowArgs<ExtArgs>>): Prisma__SyncAccountSettingsClient<$Result.GetResult<Prisma.$SyncAccountSettingsPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SyncAccountSettings that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncAccountSettingsFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SyncAccountSettings
+     * const syncAccountSettings = await prisma.syncAccountSettings.findMany()
+     * 
+     * // Get first 10 SyncAccountSettings
+     * const syncAccountSettings = await prisma.syncAccountSettings.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const syncAccountSettingsWithIdOnly = await prisma.syncAccountSettings.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SyncAccountSettingsFindManyArgs>(args?: SelectSubset<T, SyncAccountSettingsFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncAccountSettingsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SyncAccountSettings.
+     * @param {SyncAccountSettingsCreateArgs} args - Arguments to create a SyncAccountSettings.
+     * @example
+     * // Create one SyncAccountSettings
+     * const SyncAccountSettings = await prisma.syncAccountSettings.create({
+     *   data: {
+     *     // ... data to create a SyncAccountSettings
+     *   }
+     * })
+     * 
+     */
+    create<T extends SyncAccountSettingsCreateArgs>(args: SelectSubset<T, SyncAccountSettingsCreateArgs<ExtArgs>>): Prisma__SyncAccountSettingsClient<$Result.GetResult<Prisma.$SyncAccountSettingsPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SyncAccountSettings.
+     * @param {SyncAccountSettingsCreateManyArgs} args - Arguments to create many SyncAccountSettings.
+     * @example
+     * // Create many SyncAccountSettings
+     * const syncAccountSettings = await prisma.syncAccountSettings.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SyncAccountSettingsCreateManyArgs>(args?: SelectSubset<T, SyncAccountSettingsCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SyncAccountSettings and returns the data saved in the database.
+     * @param {SyncAccountSettingsCreateManyAndReturnArgs} args - Arguments to create many SyncAccountSettings.
+     * @example
+     * // Create many SyncAccountSettings
+     * const syncAccountSettings = await prisma.syncAccountSettings.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SyncAccountSettings and only return the `id`
+     * const syncAccountSettingsWithIdOnly = await prisma.syncAccountSettings.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SyncAccountSettingsCreateManyAndReturnArgs>(args?: SelectSubset<T, SyncAccountSettingsCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncAccountSettingsPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SyncAccountSettings.
+     * @param {SyncAccountSettingsDeleteArgs} args - Arguments to delete one SyncAccountSettings.
+     * @example
+     * // Delete one SyncAccountSettings
+     * const SyncAccountSettings = await prisma.syncAccountSettings.delete({
+     *   where: {
+     *     // ... filter to delete one SyncAccountSettings
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SyncAccountSettingsDeleteArgs>(args: SelectSubset<T, SyncAccountSettingsDeleteArgs<ExtArgs>>): Prisma__SyncAccountSettingsClient<$Result.GetResult<Prisma.$SyncAccountSettingsPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SyncAccountSettings.
+     * @param {SyncAccountSettingsUpdateArgs} args - Arguments to update one SyncAccountSettings.
+     * @example
+     * // Update one SyncAccountSettings
+     * const syncAccountSettings = await prisma.syncAccountSettings.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SyncAccountSettingsUpdateArgs>(args: SelectSubset<T, SyncAccountSettingsUpdateArgs<ExtArgs>>): Prisma__SyncAccountSettingsClient<$Result.GetResult<Prisma.$SyncAccountSettingsPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SyncAccountSettings.
+     * @param {SyncAccountSettingsDeleteManyArgs} args - Arguments to filter SyncAccountSettings to delete.
+     * @example
+     * // Delete a few SyncAccountSettings
+     * const { count } = await prisma.syncAccountSettings.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SyncAccountSettingsDeleteManyArgs>(args?: SelectSubset<T, SyncAccountSettingsDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SyncAccountSettings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncAccountSettingsUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SyncAccountSettings
+     * const syncAccountSettings = await prisma.syncAccountSettings.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SyncAccountSettingsUpdateManyArgs>(args: SelectSubset<T, SyncAccountSettingsUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SyncAccountSettings and returns the data updated in the database.
+     * @param {SyncAccountSettingsUpdateManyAndReturnArgs} args - Arguments to update many SyncAccountSettings.
+     * @example
+     * // Update many SyncAccountSettings
+     * const syncAccountSettings = await prisma.syncAccountSettings.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SyncAccountSettings and only return the `id`
+     * const syncAccountSettingsWithIdOnly = await prisma.syncAccountSettings.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SyncAccountSettingsUpdateManyAndReturnArgs>(args: SelectSubset<T, SyncAccountSettingsUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncAccountSettingsPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SyncAccountSettings.
+     * @param {SyncAccountSettingsUpsertArgs} args - Arguments to update or create a SyncAccountSettings.
+     * @example
+     * // Update or create a SyncAccountSettings
+     * const syncAccountSettings = await prisma.syncAccountSettings.upsert({
+     *   create: {
+     *     // ... data to create a SyncAccountSettings
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SyncAccountSettings we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SyncAccountSettingsUpsertArgs>(args: SelectSubset<T, SyncAccountSettingsUpsertArgs<ExtArgs>>): Prisma__SyncAccountSettingsClient<$Result.GetResult<Prisma.$SyncAccountSettingsPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SyncAccountSettings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncAccountSettingsCountArgs} args - Arguments to filter SyncAccountSettings to count.
+     * @example
+     * // Count the number of SyncAccountSettings
+     * const count = await prisma.syncAccountSettings.count({
+     *   where: {
+     *     // ... the filter for the SyncAccountSettings we want to count
+     *   }
+     * })
+    **/
+    count<T extends SyncAccountSettingsCountArgs>(
+      args?: Subset<T, SyncAccountSettingsCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SyncAccountSettingsCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SyncAccountSettings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncAccountSettingsAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SyncAccountSettingsAggregateArgs>(args: Subset<T, SyncAccountSettingsAggregateArgs>): Prisma.PrismaPromise<GetSyncAccountSettingsAggregateType<T>>
+
+    /**
+     * Group by SyncAccountSettings.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncAccountSettingsGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SyncAccountSettingsGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SyncAccountSettingsGroupByArgs['orderBy'] }
+        : { orderBy?: SyncAccountSettingsGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SyncAccountSettingsGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSyncAccountSettingsGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SyncAccountSettings model
+   */
+  readonly fields: SyncAccountSettingsFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SyncAccountSettings.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SyncAccountSettingsClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    syncAccount<T extends SyncAccountDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccountDefaultArgs<ExtArgs>>): Prisma__SyncAccountClient<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SyncAccountSettings model
+   */
+  interface SyncAccountSettingsFieldRefs {
+    readonly id: FieldRef<"SyncAccountSettings", 'String'>
+    readonly syncAccountId: FieldRef<"SyncAccountSettings", 'String'>
+    readonly syncDirection: FieldRef<"SyncAccountSettings", 'SyncDirection'>
+    readonly conflictPolicy: FieldRef<"SyncAccountSettings", 'ConflictPolicy'>
+    readonly bookAllowlist: FieldRef<"SyncAccountSettings", 'String[]'>
+    readonly syncFrequencyMinutes: FieldRef<"SyncAccountSettings", 'Int'>
+    readonly requireReauthToEdit: FieldRef<"SyncAccountSettings", 'Boolean'>
+    readonly lastModifiedAt: FieldRef<"SyncAccountSettings", 'DateTime'>
+    readonly createdAt: FieldRef<"SyncAccountSettings", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SyncAccountSettings findUnique
+   */
+  export type SyncAccountSettingsFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccountSettings
+     */
+    select?: SyncAccountSettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccountSettings
+     */
+    omit?: SyncAccountSettingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountSettingsInclude<ExtArgs> | null
+    /**
+     * Filter, which SyncAccountSettings to fetch.
+     */
+    where: SyncAccountSettingsWhereUniqueInput
+  }
+
+  /**
+   * SyncAccountSettings findUniqueOrThrow
+   */
+  export type SyncAccountSettingsFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccountSettings
+     */
+    select?: SyncAccountSettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccountSettings
+     */
+    omit?: SyncAccountSettingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountSettingsInclude<ExtArgs> | null
+    /**
+     * Filter, which SyncAccountSettings to fetch.
+     */
+    where: SyncAccountSettingsWhereUniqueInput
+  }
+
+  /**
+   * SyncAccountSettings findFirst
+   */
+  export type SyncAccountSettingsFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccountSettings
+     */
+    select?: SyncAccountSettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccountSettings
+     */
+    omit?: SyncAccountSettingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountSettingsInclude<ExtArgs> | null
+    /**
+     * Filter, which SyncAccountSettings to fetch.
+     */
+    where?: SyncAccountSettingsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SyncAccountSettings to fetch.
+     */
+    orderBy?: SyncAccountSettingsOrderByWithRelationInput | SyncAccountSettingsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SyncAccountSettings.
+     */
+    cursor?: SyncAccountSettingsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SyncAccountSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SyncAccountSettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SyncAccountSettings.
+     */
+    distinct?: SyncAccountSettingsScalarFieldEnum | SyncAccountSettingsScalarFieldEnum[]
+  }
+
+  /**
+   * SyncAccountSettings findFirstOrThrow
+   */
+  export type SyncAccountSettingsFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccountSettings
+     */
+    select?: SyncAccountSettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccountSettings
+     */
+    omit?: SyncAccountSettingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountSettingsInclude<ExtArgs> | null
+    /**
+     * Filter, which SyncAccountSettings to fetch.
+     */
+    where?: SyncAccountSettingsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SyncAccountSettings to fetch.
+     */
+    orderBy?: SyncAccountSettingsOrderByWithRelationInput | SyncAccountSettingsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SyncAccountSettings.
+     */
+    cursor?: SyncAccountSettingsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SyncAccountSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SyncAccountSettings.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SyncAccountSettings.
+     */
+    distinct?: SyncAccountSettingsScalarFieldEnum | SyncAccountSettingsScalarFieldEnum[]
+  }
+
+  /**
+   * SyncAccountSettings findMany
+   */
+  export type SyncAccountSettingsFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccountSettings
+     */
+    select?: SyncAccountSettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccountSettings
+     */
+    omit?: SyncAccountSettingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountSettingsInclude<ExtArgs> | null
+    /**
+     * Filter, which SyncAccountSettings to fetch.
+     */
+    where?: SyncAccountSettingsWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SyncAccountSettings to fetch.
+     */
+    orderBy?: SyncAccountSettingsOrderByWithRelationInput | SyncAccountSettingsOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SyncAccountSettings.
+     */
+    cursor?: SyncAccountSettingsWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SyncAccountSettings from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SyncAccountSettings.
+     */
+    skip?: number
+    distinct?: SyncAccountSettingsScalarFieldEnum | SyncAccountSettingsScalarFieldEnum[]
+  }
+
+  /**
+   * SyncAccountSettings create
+   */
+  export type SyncAccountSettingsCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccountSettings
+     */
+    select?: SyncAccountSettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccountSettings
+     */
+    omit?: SyncAccountSettingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountSettingsInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SyncAccountSettings.
+     */
+    data: XOR<SyncAccountSettingsCreateInput, SyncAccountSettingsUncheckedCreateInput>
+  }
+
+  /**
+   * SyncAccountSettings createMany
+   */
+  export type SyncAccountSettingsCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SyncAccountSettings.
+     */
+    data: SyncAccountSettingsCreateManyInput | SyncAccountSettingsCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SyncAccountSettings createManyAndReturn
+   */
+  export type SyncAccountSettingsCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccountSettings
+     */
+    select?: SyncAccountSettingsSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccountSettings
+     */
+    omit?: SyncAccountSettingsOmit<ExtArgs> | null
+    /**
+     * The data used to create many SyncAccountSettings.
+     */
+    data: SyncAccountSettingsCreateManyInput | SyncAccountSettingsCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountSettingsIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SyncAccountSettings update
+   */
+  export type SyncAccountSettingsUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccountSettings
+     */
+    select?: SyncAccountSettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccountSettings
+     */
+    omit?: SyncAccountSettingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountSettingsInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SyncAccountSettings.
+     */
+    data: XOR<SyncAccountSettingsUpdateInput, SyncAccountSettingsUncheckedUpdateInput>
+    /**
+     * Choose, which SyncAccountSettings to update.
+     */
+    where: SyncAccountSettingsWhereUniqueInput
+  }
+
+  /**
+   * SyncAccountSettings updateMany
+   */
+  export type SyncAccountSettingsUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SyncAccountSettings.
+     */
+    data: XOR<SyncAccountSettingsUpdateManyMutationInput, SyncAccountSettingsUncheckedUpdateManyInput>
+    /**
+     * Filter which SyncAccountSettings to update
+     */
+    where?: SyncAccountSettingsWhereInput
+    /**
+     * Limit how many SyncAccountSettings to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SyncAccountSettings updateManyAndReturn
+   */
+  export type SyncAccountSettingsUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccountSettings
+     */
+    select?: SyncAccountSettingsSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccountSettings
+     */
+    omit?: SyncAccountSettingsOmit<ExtArgs> | null
+    /**
+     * The data used to update SyncAccountSettings.
+     */
+    data: XOR<SyncAccountSettingsUpdateManyMutationInput, SyncAccountSettingsUncheckedUpdateManyInput>
+    /**
+     * Filter which SyncAccountSettings to update
+     */
+    where?: SyncAccountSettingsWhereInput
+    /**
+     * Limit how many SyncAccountSettings to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountSettingsIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SyncAccountSettings upsert
+   */
+  export type SyncAccountSettingsUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccountSettings
+     */
+    select?: SyncAccountSettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccountSettings
+     */
+    omit?: SyncAccountSettingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountSettingsInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SyncAccountSettings to update in case it exists.
+     */
+    where: SyncAccountSettingsWhereUniqueInput
+    /**
+     * In case the SyncAccountSettings found by the `where` argument doesn't exist, create a new SyncAccountSettings with this data.
+     */
+    create: XOR<SyncAccountSettingsCreateInput, SyncAccountSettingsUncheckedCreateInput>
+    /**
+     * In case the SyncAccountSettings was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SyncAccountSettingsUpdateInput, SyncAccountSettingsUncheckedUpdateInput>
+  }
+
+  /**
+   * SyncAccountSettings delete
+   */
+  export type SyncAccountSettingsDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccountSettings
+     */
+    select?: SyncAccountSettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccountSettings
+     */
+    omit?: SyncAccountSettingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountSettingsInclude<ExtArgs> | null
+    /**
+     * Filter which SyncAccountSettings to delete.
+     */
+    where: SyncAccountSettingsWhereUniqueInput
+  }
+
+  /**
+   * SyncAccountSettings deleteMany
+   */
+  export type SyncAccountSettingsDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SyncAccountSettings to delete
+     */
+    where?: SyncAccountSettingsWhereInput
+    /**
+     * Limit how many SyncAccountSettings to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SyncAccountSettings without action
+   */
+  export type SyncAccountSettingsDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccountSettings
+     */
+    select?: SyncAccountSettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccountSettings
+     */
+    omit?: SyncAccountSettingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountSettingsInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model SyncSettingsElevation
+   */
+
+  export type AggregateSyncSettingsElevation = {
+    _count: SyncSettingsElevationCountAggregateOutputType | null
+    _min: SyncSettingsElevationMinAggregateOutputType | null
+    _max: SyncSettingsElevationMaxAggregateOutputType | null
+  }
+
+  export type SyncSettingsElevationMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    jti: string | null
+    expiresAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type SyncSettingsElevationMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    jti: string | null
+    expiresAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type SyncSettingsElevationCountAggregateOutputType = {
+    id: number
+    userId: number
+    jti: number
+    expiresAt: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type SyncSettingsElevationMinAggregateInputType = {
+    id?: true
+    userId?: true
+    jti?: true
+    expiresAt?: true
+    createdAt?: true
+  }
+
+  export type SyncSettingsElevationMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    jti?: true
+    expiresAt?: true
+    createdAt?: true
+  }
+
+  export type SyncSettingsElevationCountAggregateInputType = {
+    id?: true
+    userId?: true
+    jti?: true
+    expiresAt?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type SyncSettingsElevationAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SyncSettingsElevation to aggregate.
+     */
+    where?: SyncSettingsElevationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SyncSettingsElevations to fetch.
+     */
+    orderBy?: SyncSettingsElevationOrderByWithRelationInput | SyncSettingsElevationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SyncSettingsElevationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SyncSettingsElevations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SyncSettingsElevations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SyncSettingsElevations
+    **/
+    _count?: true | SyncSettingsElevationCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SyncSettingsElevationMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SyncSettingsElevationMaxAggregateInputType
+  }
+
+  export type GetSyncSettingsElevationAggregateType<T extends SyncSettingsElevationAggregateArgs> = {
+        [P in keyof T & keyof AggregateSyncSettingsElevation]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSyncSettingsElevation[P]>
+      : GetScalarType<T[P], AggregateSyncSettingsElevation[P]>
+  }
+
+
+
+
+  export type SyncSettingsElevationGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SyncSettingsElevationWhereInput
+    orderBy?: SyncSettingsElevationOrderByWithAggregationInput | SyncSettingsElevationOrderByWithAggregationInput[]
+    by: SyncSettingsElevationScalarFieldEnum[] | SyncSettingsElevationScalarFieldEnum
+    having?: SyncSettingsElevationScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SyncSettingsElevationCountAggregateInputType | true
+    _min?: SyncSettingsElevationMinAggregateInputType
+    _max?: SyncSettingsElevationMaxAggregateInputType
+  }
+
+  export type SyncSettingsElevationGroupByOutputType = {
+    id: string
+    userId: string
+    jti: string
+    expiresAt: Date
+    createdAt: Date
+    _count: SyncSettingsElevationCountAggregateOutputType | null
+    _min: SyncSettingsElevationMinAggregateOutputType | null
+    _max: SyncSettingsElevationMaxAggregateOutputType | null
+  }
+
+  type GetSyncSettingsElevationGroupByPayload<T extends SyncSettingsElevationGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SyncSettingsElevationGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SyncSettingsElevationGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SyncSettingsElevationGroupByOutputType[P]>
+            : GetScalarType<T[P], SyncSettingsElevationGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SyncSettingsElevationSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    jti?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["syncSettingsElevation"]>
+
+  export type SyncSettingsElevationSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    jti?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["syncSettingsElevation"]>
+
+  export type SyncSettingsElevationSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    jti?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+  }, ExtArgs["result"]["syncSettingsElevation"]>
+
+  export type SyncSettingsElevationSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    jti?: boolean
+    expiresAt?: boolean
+    createdAt?: boolean
+  }
+
+  export type SyncSettingsElevationOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "jti" | "expiresAt" | "createdAt", ExtArgs["result"]["syncSettingsElevation"]>
+
+  export type $SyncSettingsElevationPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SyncSettingsElevation"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      jti: string
+      expiresAt: Date
+      createdAt: Date
+    }, ExtArgs["result"]["syncSettingsElevation"]>
+    composites: {}
+  }
+
+  type SyncSettingsElevationGetPayload<S extends boolean | null | undefined | SyncSettingsElevationDefaultArgs> = $Result.GetResult<Prisma.$SyncSettingsElevationPayload, S>
+
+  type SyncSettingsElevationCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SyncSettingsElevationFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SyncSettingsElevationCountAggregateInputType | true
+    }
+
+  export interface SyncSettingsElevationDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SyncSettingsElevation'], meta: { name: 'SyncSettingsElevation' } }
+    /**
+     * Find zero or one SyncSettingsElevation that matches the filter.
+     * @param {SyncSettingsElevationFindUniqueArgs} args - Arguments to find a SyncSettingsElevation
+     * @example
+     * // Get one SyncSettingsElevation
+     * const syncSettingsElevation = await prisma.syncSettingsElevation.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SyncSettingsElevationFindUniqueArgs>(args: SelectSubset<T, SyncSettingsElevationFindUniqueArgs<ExtArgs>>): Prisma__SyncSettingsElevationClient<$Result.GetResult<Prisma.$SyncSettingsElevationPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SyncSettingsElevation that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SyncSettingsElevationFindUniqueOrThrowArgs} args - Arguments to find a SyncSettingsElevation
+     * @example
+     * // Get one SyncSettingsElevation
+     * const syncSettingsElevation = await prisma.syncSettingsElevation.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SyncSettingsElevationFindUniqueOrThrowArgs>(args: SelectSubset<T, SyncSettingsElevationFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SyncSettingsElevationClient<$Result.GetResult<Prisma.$SyncSettingsElevationPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SyncSettingsElevation that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncSettingsElevationFindFirstArgs} args - Arguments to find a SyncSettingsElevation
+     * @example
+     * // Get one SyncSettingsElevation
+     * const syncSettingsElevation = await prisma.syncSettingsElevation.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SyncSettingsElevationFindFirstArgs>(args?: SelectSubset<T, SyncSettingsElevationFindFirstArgs<ExtArgs>>): Prisma__SyncSettingsElevationClient<$Result.GetResult<Prisma.$SyncSettingsElevationPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SyncSettingsElevation that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncSettingsElevationFindFirstOrThrowArgs} args - Arguments to find a SyncSettingsElevation
+     * @example
+     * // Get one SyncSettingsElevation
+     * const syncSettingsElevation = await prisma.syncSettingsElevation.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SyncSettingsElevationFindFirstOrThrowArgs>(args?: SelectSubset<T, SyncSettingsElevationFindFirstOrThrowArgs<ExtArgs>>): Prisma__SyncSettingsElevationClient<$Result.GetResult<Prisma.$SyncSettingsElevationPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SyncSettingsElevations that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncSettingsElevationFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SyncSettingsElevations
+     * const syncSettingsElevations = await prisma.syncSettingsElevation.findMany()
+     * 
+     * // Get first 10 SyncSettingsElevations
+     * const syncSettingsElevations = await prisma.syncSettingsElevation.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const syncSettingsElevationWithIdOnly = await prisma.syncSettingsElevation.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SyncSettingsElevationFindManyArgs>(args?: SelectSubset<T, SyncSettingsElevationFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncSettingsElevationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SyncSettingsElevation.
+     * @param {SyncSettingsElevationCreateArgs} args - Arguments to create a SyncSettingsElevation.
+     * @example
+     * // Create one SyncSettingsElevation
+     * const SyncSettingsElevation = await prisma.syncSettingsElevation.create({
+     *   data: {
+     *     // ... data to create a SyncSettingsElevation
+     *   }
+     * })
+     * 
+     */
+    create<T extends SyncSettingsElevationCreateArgs>(args: SelectSubset<T, SyncSettingsElevationCreateArgs<ExtArgs>>): Prisma__SyncSettingsElevationClient<$Result.GetResult<Prisma.$SyncSettingsElevationPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SyncSettingsElevations.
+     * @param {SyncSettingsElevationCreateManyArgs} args - Arguments to create many SyncSettingsElevations.
+     * @example
+     * // Create many SyncSettingsElevations
+     * const syncSettingsElevation = await prisma.syncSettingsElevation.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SyncSettingsElevationCreateManyArgs>(args?: SelectSubset<T, SyncSettingsElevationCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SyncSettingsElevations and returns the data saved in the database.
+     * @param {SyncSettingsElevationCreateManyAndReturnArgs} args - Arguments to create many SyncSettingsElevations.
+     * @example
+     * // Create many SyncSettingsElevations
+     * const syncSettingsElevation = await prisma.syncSettingsElevation.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SyncSettingsElevations and only return the `id`
+     * const syncSettingsElevationWithIdOnly = await prisma.syncSettingsElevation.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SyncSettingsElevationCreateManyAndReturnArgs>(args?: SelectSubset<T, SyncSettingsElevationCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncSettingsElevationPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SyncSettingsElevation.
+     * @param {SyncSettingsElevationDeleteArgs} args - Arguments to delete one SyncSettingsElevation.
+     * @example
+     * // Delete one SyncSettingsElevation
+     * const SyncSettingsElevation = await prisma.syncSettingsElevation.delete({
+     *   where: {
+     *     // ... filter to delete one SyncSettingsElevation
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SyncSettingsElevationDeleteArgs>(args: SelectSubset<T, SyncSettingsElevationDeleteArgs<ExtArgs>>): Prisma__SyncSettingsElevationClient<$Result.GetResult<Prisma.$SyncSettingsElevationPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SyncSettingsElevation.
+     * @param {SyncSettingsElevationUpdateArgs} args - Arguments to update one SyncSettingsElevation.
+     * @example
+     * // Update one SyncSettingsElevation
+     * const syncSettingsElevation = await prisma.syncSettingsElevation.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SyncSettingsElevationUpdateArgs>(args: SelectSubset<T, SyncSettingsElevationUpdateArgs<ExtArgs>>): Prisma__SyncSettingsElevationClient<$Result.GetResult<Prisma.$SyncSettingsElevationPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SyncSettingsElevations.
+     * @param {SyncSettingsElevationDeleteManyArgs} args - Arguments to filter SyncSettingsElevations to delete.
+     * @example
+     * // Delete a few SyncSettingsElevations
+     * const { count } = await prisma.syncSettingsElevation.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SyncSettingsElevationDeleteManyArgs>(args?: SelectSubset<T, SyncSettingsElevationDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SyncSettingsElevations.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncSettingsElevationUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SyncSettingsElevations
+     * const syncSettingsElevation = await prisma.syncSettingsElevation.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SyncSettingsElevationUpdateManyArgs>(args: SelectSubset<T, SyncSettingsElevationUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SyncSettingsElevations and returns the data updated in the database.
+     * @param {SyncSettingsElevationUpdateManyAndReturnArgs} args - Arguments to update many SyncSettingsElevations.
+     * @example
+     * // Update many SyncSettingsElevations
+     * const syncSettingsElevation = await prisma.syncSettingsElevation.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SyncSettingsElevations and only return the `id`
+     * const syncSettingsElevationWithIdOnly = await prisma.syncSettingsElevation.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SyncSettingsElevationUpdateManyAndReturnArgs>(args: SelectSubset<T, SyncSettingsElevationUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncSettingsElevationPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SyncSettingsElevation.
+     * @param {SyncSettingsElevationUpsertArgs} args - Arguments to update or create a SyncSettingsElevation.
+     * @example
+     * // Update or create a SyncSettingsElevation
+     * const syncSettingsElevation = await prisma.syncSettingsElevation.upsert({
+     *   create: {
+     *     // ... data to create a SyncSettingsElevation
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SyncSettingsElevation we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SyncSettingsElevationUpsertArgs>(args: SelectSubset<T, SyncSettingsElevationUpsertArgs<ExtArgs>>): Prisma__SyncSettingsElevationClient<$Result.GetResult<Prisma.$SyncSettingsElevationPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SyncSettingsElevations.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncSettingsElevationCountArgs} args - Arguments to filter SyncSettingsElevations to count.
+     * @example
+     * // Count the number of SyncSettingsElevations
+     * const count = await prisma.syncSettingsElevation.count({
+     *   where: {
+     *     // ... the filter for the SyncSettingsElevations we want to count
+     *   }
+     * })
+    **/
+    count<T extends SyncSettingsElevationCountArgs>(
+      args?: Subset<T, SyncSettingsElevationCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SyncSettingsElevationCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SyncSettingsElevation.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncSettingsElevationAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SyncSettingsElevationAggregateArgs>(args: Subset<T, SyncSettingsElevationAggregateArgs>): Prisma.PrismaPromise<GetSyncSettingsElevationAggregateType<T>>
+
+    /**
+     * Group by SyncSettingsElevation.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SyncSettingsElevationGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SyncSettingsElevationGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SyncSettingsElevationGroupByArgs['orderBy'] }
+        : { orderBy?: SyncSettingsElevationGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SyncSettingsElevationGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSyncSettingsElevationGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SyncSettingsElevation model
+   */
+  readonly fields: SyncSettingsElevationFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SyncSettingsElevation.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SyncSettingsElevationClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SyncSettingsElevation model
+   */
+  interface SyncSettingsElevationFieldRefs {
+    readonly id: FieldRef<"SyncSettingsElevation", 'String'>
+    readonly userId: FieldRef<"SyncSettingsElevation", 'String'>
+    readonly jti: FieldRef<"SyncSettingsElevation", 'String'>
+    readonly expiresAt: FieldRef<"SyncSettingsElevation", 'DateTime'>
+    readonly createdAt: FieldRef<"SyncSettingsElevation", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SyncSettingsElevation findUnique
+   */
+  export type SyncSettingsElevationFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncSettingsElevation
+     */
+    select?: SyncSettingsElevationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncSettingsElevation
+     */
+    omit?: SyncSettingsElevationOmit<ExtArgs> | null
+    /**
+     * Filter, which SyncSettingsElevation to fetch.
+     */
+    where: SyncSettingsElevationWhereUniqueInput
+  }
+
+  /**
+   * SyncSettingsElevation findUniqueOrThrow
+   */
+  export type SyncSettingsElevationFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncSettingsElevation
+     */
+    select?: SyncSettingsElevationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncSettingsElevation
+     */
+    omit?: SyncSettingsElevationOmit<ExtArgs> | null
+    /**
+     * Filter, which SyncSettingsElevation to fetch.
+     */
+    where: SyncSettingsElevationWhereUniqueInput
+  }
+
+  /**
+   * SyncSettingsElevation findFirst
+   */
+  export type SyncSettingsElevationFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncSettingsElevation
+     */
+    select?: SyncSettingsElevationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncSettingsElevation
+     */
+    omit?: SyncSettingsElevationOmit<ExtArgs> | null
+    /**
+     * Filter, which SyncSettingsElevation to fetch.
+     */
+    where?: SyncSettingsElevationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SyncSettingsElevations to fetch.
+     */
+    orderBy?: SyncSettingsElevationOrderByWithRelationInput | SyncSettingsElevationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SyncSettingsElevations.
+     */
+    cursor?: SyncSettingsElevationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SyncSettingsElevations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SyncSettingsElevations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SyncSettingsElevations.
+     */
+    distinct?: SyncSettingsElevationScalarFieldEnum | SyncSettingsElevationScalarFieldEnum[]
+  }
+
+  /**
+   * SyncSettingsElevation findFirstOrThrow
+   */
+  export type SyncSettingsElevationFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncSettingsElevation
+     */
+    select?: SyncSettingsElevationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncSettingsElevation
+     */
+    omit?: SyncSettingsElevationOmit<ExtArgs> | null
+    /**
+     * Filter, which SyncSettingsElevation to fetch.
+     */
+    where?: SyncSettingsElevationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SyncSettingsElevations to fetch.
+     */
+    orderBy?: SyncSettingsElevationOrderByWithRelationInput | SyncSettingsElevationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SyncSettingsElevations.
+     */
+    cursor?: SyncSettingsElevationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SyncSettingsElevations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SyncSettingsElevations.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SyncSettingsElevations.
+     */
+    distinct?: SyncSettingsElevationScalarFieldEnum | SyncSettingsElevationScalarFieldEnum[]
+  }
+
+  /**
+   * SyncSettingsElevation findMany
+   */
+  export type SyncSettingsElevationFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncSettingsElevation
+     */
+    select?: SyncSettingsElevationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncSettingsElevation
+     */
+    omit?: SyncSettingsElevationOmit<ExtArgs> | null
+    /**
+     * Filter, which SyncSettingsElevations to fetch.
+     */
+    where?: SyncSettingsElevationWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SyncSettingsElevations to fetch.
+     */
+    orderBy?: SyncSettingsElevationOrderByWithRelationInput | SyncSettingsElevationOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SyncSettingsElevations.
+     */
+    cursor?: SyncSettingsElevationWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SyncSettingsElevations from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SyncSettingsElevations.
+     */
+    skip?: number
+    distinct?: SyncSettingsElevationScalarFieldEnum | SyncSettingsElevationScalarFieldEnum[]
+  }
+
+  /**
+   * SyncSettingsElevation create
+   */
+  export type SyncSettingsElevationCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncSettingsElevation
+     */
+    select?: SyncSettingsElevationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncSettingsElevation
+     */
+    omit?: SyncSettingsElevationOmit<ExtArgs> | null
+    /**
+     * The data needed to create a SyncSettingsElevation.
+     */
+    data: XOR<SyncSettingsElevationCreateInput, SyncSettingsElevationUncheckedCreateInput>
+  }
+
+  /**
+   * SyncSettingsElevation createMany
+   */
+  export type SyncSettingsElevationCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SyncSettingsElevations.
+     */
+    data: SyncSettingsElevationCreateManyInput | SyncSettingsElevationCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SyncSettingsElevation createManyAndReturn
+   */
+  export type SyncSettingsElevationCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncSettingsElevation
+     */
+    select?: SyncSettingsElevationSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncSettingsElevation
+     */
+    omit?: SyncSettingsElevationOmit<ExtArgs> | null
+    /**
+     * The data used to create many SyncSettingsElevations.
+     */
+    data: SyncSettingsElevationCreateManyInput | SyncSettingsElevationCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SyncSettingsElevation update
+   */
+  export type SyncSettingsElevationUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncSettingsElevation
+     */
+    select?: SyncSettingsElevationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncSettingsElevation
+     */
+    omit?: SyncSettingsElevationOmit<ExtArgs> | null
+    /**
+     * The data needed to update a SyncSettingsElevation.
+     */
+    data: XOR<SyncSettingsElevationUpdateInput, SyncSettingsElevationUncheckedUpdateInput>
+    /**
+     * Choose, which SyncSettingsElevation to update.
+     */
+    where: SyncSettingsElevationWhereUniqueInput
+  }
+
+  /**
+   * SyncSettingsElevation updateMany
+   */
+  export type SyncSettingsElevationUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SyncSettingsElevations.
+     */
+    data: XOR<SyncSettingsElevationUpdateManyMutationInput, SyncSettingsElevationUncheckedUpdateManyInput>
+    /**
+     * Filter which SyncSettingsElevations to update
+     */
+    where?: SyncSettingsElevationWhereInput
+    /**
+     * Limit how many SyncSettingsElevations to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SyncSettingsElevation updateManyAndReturn
+   */
+  export type SyncSettingsElevationUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncSettingsElevation
+     */
+    select?: SyncSettingsElevationSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncSettingsElevation
+     */
+    omit?: SyncSettingsElevationOmit<ExtArgs> | null
+    /**
+     * The data used to update SyncSettingsElevations.
+     */
+    data: XOR<SyncSettingsElevationUpdateManyMutationInput, SyncSettingsElevationUncheckedUpdateManyInput>
+    /**
+     * Filter which SyncSettingsElevations to update
+     */
+    where?: SyncSettingsElevationWhereInput
+    /**
+     * Limit how many SyncSettingsElevations to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SyncSettingsElevation upsert
+   */
+  export type SyncSettingsElevationUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncSettingsElevation
+     */
+    select?: SyncSettingsElevationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncSettingsElevation
+     */
+    omit?: SyncSettingsElevationOmit<ExtArgs> | null
+    /**
+     * The filter to search for the SyncSettingsElevation to update in case it exists.
+     */
+    where: SyncSettingsElevationWhereUniqueInput
+    /**
+     * In case the SyncSettingsElevation found by the `where` argument doesn't exist, create a new SyncSettingsElevation with this data.
+     */
+    create: XOR<SyncSettingsElevationCreateInput, SyncSettingsElevationUncheckedCreateInput>
+    /**
+     * In case the SyncSettingsElevation was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SyncSettingsElevationUpdateInput, SyncSettingsElevationUncheckedUpdateInput>
+  }
+
+  /**
+   * SyncSettingsElevation delete
+   */
+  export type SyncSettingsElevationDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncSettingsElevation
+     */
+    select?: SyncSettingsElevationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncSettingsElevation
+     */
+    omit?: SyncSettingsElevationOmit<ExtArgs> | null
+    /**
+     * Filter which SyncSettingsElevation to delete.
+     */
+    where: SyncSettingsElevationWhereUniqueInput
+  }
+
+  /**
+   * SyncSettingsElevation deleteMany
+   */
+  export type SyncSettingsElevationDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SyncSettingsElevations to delete
+     */
+    where?: SyncSettingsElevationWhereInput
+    /**
+     * Limit how many SyncSettingsElevations to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SyncSettingsElevation without action
+   */
+  export type SyncSettingsElevationDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncSettingsElevation
+     */
+    select?: SyncSettingsElevationSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncSettingsElevation
+     */
+    omit?: SyncSettingsElevationOmit<ExtArgs> | null
   }
 
 
@@ -34483,6 +36860,7 @@ export namespace Prisma {
     slug: string | null
     description: string | null
     isDefault: boolean | null
+    deviceWritable: boolean | null
     sourceGroupBookId: string | null
     archivedAt: Date | null
     createdAt: Date | null
@@ -34496,6 +36874,7 @@ export namespace Prisma {
     slug: string | null
     description: string | null
     isDefault: boolean | null
+    deviceWritable: boolean | null
     sourceGroupBookId: string | null
     archivedAt: Date | null
     createdAt: Date | null
@@ -34509,6 +36888,8 @@ export namespace Prisma {
     slug: number
     description: number
     isDefault: number
+    deviceWritable: number
+    sourceBookIds: number
     sourceGroupBookId: number
     archivedAt: number
     createdAt: number
@@ -34524,6 +36905,7 @@ export namespace Prisma {
     slug?: true
     description?: true
     isDefault?: true
+    deviceWritable?: true
     sourceGroupBookId?: true
     archivedAt?: true
     createdAt?: true
@@ -34537,6 +36919,7 @@ export namespace Prisma {
     slug?: true
     description?: true
     isDefault?: true
+    deviceWritable?: true
     sourceGroupBookId?: true
     archivedAt?: true
     createdAt?: true
@@ -34550,6 +36933,8 @@ export namespace Prisma {
     slug?: true
     description?: true
     isDefault?: true
+    deviceWritable?: true
+    sourceBookIds?: true
     sourceGroupBookId?: true
     archivedAt?: true
     createdAt?: true
@@ -34636,6 +37021,8 @@ export namespace Prisma {
     slug: string
     description: string | null
     isDefault: boolean
+    deviceWritable: boolean
+    sourceBookIds: string[]
     sourceGroupBookId: string | null
     archivedAt: Date | null
     createdAt: Date
@@ -34666,6 +37053,8 @@ export namespace Prisma {
     slug?: boolean
     description?: boolean
     isDefault?: boolean
+    deviceWritable?: boolean
+    sourceBookIds?: boolean
     sourceGroupBookId?: boolean
     archivedAt?: boolean
     createdAt?: boolean
@@ -34682,6 +37071,8 @@ export namespace Prisma {
     slug?: boolean
     description?: boolean
     isDefault?: boolean
+    deviceWritable?: boolean
+    sourceBookIds?: boolean
     sourceGroupBookId?: boolean
     archivedAt?: boolean
     createdAt?: boolean
@@ -34696,6 +37087,8 @@ export namespace Prisma {
     slug?: boolean
     description?: boolean
     isDefault?: boolean
+    deviceWritable?: boolean
+    sourceBookIds?: boolean
     sourceGroupBookId?: boolean
     archivedAt?: boolean
     createdAt?: boolean
@@ -34710,13 +37103,15 @@ export namespace Prisma {
     slug?: boolean
     description?: boolean
     isDefault?: boolean
+    deviceWritable?: boolean
+    sourceBookIds?: boolean
     sourceGroupBookId?: boolean
     archivedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type AddressBookOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "name" | "slug" | "description" | "isDefault" | "sourceGroupBookId" | "archivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["addressBook"]>
+  export type AddressBookOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "name" | "slug" | "description" | "isDefault" | "deviceWritable" | "sourceBookIds" | "sourceGroupBookId" | "archivedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["addressBook"]>
   export type AddressBookInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     contacts?: boolean | AddressBook$contactsArgs<ExtArgs>
@@ -34742,6 +37137,8 @@ export namespace Prisma {
       slug: string
       description: string | null
       isDefault: boolean
+      deviceWritable: boolean
+      sourceBookIds: string[]
       sourceGroupBookId: string | null
       archivedAt: Date | null
       createdAt: Date
@@ -35177,6 +37574,8 @@ export namespace Prisma {
     readonly slug: FieldRef<"AddressBook", 'String'>
     readonly description: FieldRef<"AddressBook", 'String'>
     readonly isDefault: FieldRef<"AddressBook", 'Boolean'>
+    readonly deviceWritable: FieldRef<"AddressBook", 'Boolean'>
+    readonly sourceBookIds: FieldRef<"AddressBook", 'String[]'>
     readonly sourceGroupBookId: FieldRef<"AddressBook", 'String'>
     readonly archivedAt: FieldRef<"AddressBook", 'DateTime'>
     readonly createdAt: FieldRef<"AddressBook", 'DateTime'>
@@ -45974,11 +48373,39 @@ export namespace Prisma {
     lastErrorAt: 'lastErrorAt',
     lastErrorCode: 'lastErrorCode',
     lastErrorMessage: 'lastErrorMessage',
+    discoveredBooks: 'discoveredBooks',
+    booksDiscoveredAt: 'booksDiscoveredAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
 
   export type SyncAccountScalarFieldEnum = (typeof SyncAccountScalarFieldEnum)[keyof typeof SyncAccountScalarFieldEnum]
+
+
+  export const SyncAccountSettingsScalarFieldEnum: {
+    id: 'id',
+    syncAccountId: 'syncAccountId',
+    syncDirection: 'syncDirection',
+    conflictPolicy: 'conflictPolicy',
+    bookAllowlist: 'bookAllowlist',
+    syncFrequencyMinutes: 'syncFrequencyMinutes',
+    requireReauthToEdit: 'requireReauthToEdit',
+    lastModifiedAt: 'lastModifiedAt',
+    createdAt: 'createdAt'
+  };
+
+  export type SyncAccountSettingsScalarFieldEnum = (typeof SyncAccountSettingsScalarFieldEnum)[keyof typeof SyncAccountSettingsScalarFieldEnum]
+
+
+  export const SyncSettingsElevationScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    jti: 'jti',
+    expiresAt: 'expiresAt',
+    createdAt: 'createdAt'
+  };
+
+  export type SyncSettingsElevationScalarFieldEnum = (typeof SyncSettingsElevationScalarFieldEnum)[keyof typeof SyncSettingsElevationScalarFieldEnum]
 
 
   export const SyncContactLinkScalarFieldEnum: {
@@ -46213,6 +48640,8 @@ export namespace Prisma {
     slug: 'slug',
     description: 'description',
     isDefault: 'isDefault',
+    deviceWritable: 'deviceWritable',
+    sourceBookIds: 'sourceBookIds',
     sourceGroupBookId: 'sourceGroupBookId',
     archivedAt: 'archivedAt',
     createdAt: 'createdAt',
@@ -46716,6 +49145,20 @@ export namespace Prisma {
    * Reference to a field of type 'SyncDirection[]'
    */
   export type ListEnumSyncDirectionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'SyncDirection[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'ConflictPolicy'
+   */
+  export type EnumConflictPolicyFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ConflictPolicy'>
+    
+
+
+  /**
+   * Reference to a field of type 'ConflictPolicy[]'
+   */
+  export type ListEnumConflictPolicyFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ConflictPolicy[]'>
     
 
 
@@ -48336,6 +50779,8 @@ export namespace Prisma {
     lastErrorAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     lastErrorCode?: StringNullableFilter<"SyncAccount"> | string | null
     lastErrorMessage?: StringNullableFilter<"SyncAccount"> | string | null
+    discoveredBooks?: JsonNullableFilter<"SyncAccount">
+    booksDiscoveredAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     createdAt?: DateTimeFilter<"SyncAccount"> | Date | string
     updatedAt?: DateTimeFilter<"SyncAccount"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -48343,6 +50788,7 @@ export namespace Prisma {
     syncJobs?: SyncJobListRelationFilter
     syncConflicts?: SyncConflictListRelationFilter
     teamLink?: XOR<TeamSyncAccountNullableScalarRelationFilter, TeamSyncAccountWhereInput> | null
+    settings?: XOR<SyncAccountSettingsNullableScalarRelationFilter, SyncAccountSettingsWhereInput> | null
   }
 
   export type SyncAccountOrderByWithRelationInput = {
@@ -48371,6 +50817,8 @@ export namespace Prisma {
     lastErrorAt?: SortOrderInput | SortOrder
     lastErrorCode?: SortOrderInput | SortOrder
     lastErrorMessage?: SortOrderInput | SortOrder
+    discoveredBooks?: SortOrderInput | SortOrder
+    booksDiscoveredAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -48378,6 +50826,7 @@ export namespace Prisma {
     syncJobs?: SyncJobOrderByRelationAggregateInput
     syncConflicts?: SyncConflictOrderByRelationAggregateInput
     teamLink?: TeamSyncAccountOrderByWithRelationInput
+    settings?: SyncAccountSettingsOrderByWithRelationInput
   }
 
   export type SyncAccountWhereUniqueInput = Prisma.AtLeast<{
@@ -48410,6 +50859,8 @@ export namespace Prisma {
     lastErrorAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     lastErrorCode?: StringNullableFilter<"SyncAccount"> | string | null
     lastErrorMessage?: StringNullableFilter<"SyncAccount"> | string | null
+    discoveredBooks?: JsonNullableFilter<"SyncAccount">
+    booksDiscoveredAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     createdAt?: DateTimeFilter<"SyncAccount"> | Date | string
     updatedAt?: DateTimeFilter<"SyncAccount"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -48417,6 +50868,7 @@ export namespace Prisma {
     syncJobs?: SyncJobListRelationFilter
     syncConflicts?: SyncConflictListRelationFilter
     teamLink?: XOR<TeamSyncAccountNullableScalarRelationFilter, TeamSyncAccountWhereInput> | null
+    settings?: XOR<SyncAccountSettingsNullableScalarRelationFilter, SyncAccountSettingsWhereInput> | null
   }, "id" | "userId_baseUrl_label">
 
   export type SyncAccountOrderByWithAggregationInput = {
@@ -48445,6 +50897,8 @@ export namespace Prisma {
     lastErrorAt?: SortOrderInput | SortOrder
     lastErrorCode?: SortOrderInput | SortOrder
     lastErrorMessage?: SortOrderInput | SortOrder
+    discoveredBooks?: SortOrderInput | SortOrder
+    booksDiscoveredAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: SyncAccountCountOrderByAggregateInput
@@ -48483,8 +50937,140 @@ export namespace Prisma {
     lastErrorAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
     lastErrorCode?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
     lastErrorMessage?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
+    discoveredBooks?: JsonNullableWithAggregatesFilter<"SyncAccount">
+    booksDiscoveredAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"SyncAccount"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"SyncAccount"> | Date | string
+  }
+
+  export type SyncAccountSettingsWhereInput = {
+    AND?: SyncAccountSettingsWhereInput | SyncAccountSettingsWhereInput[]
+    OR?: SyncAccountSettingsWhereInput[]
+    NOT?: SyncAccountSettingsWhereInput | SyncAccountSettingsWhereInput[]
+    id?: StringFilter<"SyncAccountSettings"> | string
+    syncAccountId?: StringFilter<"SyncAccountSettings"> | string
+    syncDirection?: EnumSyncDirectionFilter<"SyncAccountSettings"> | $Enums.SyncDirection
+    conflictPolicy?: EnumConflictPolicyFilter<"SyncAccountSettings"> | $Enums.ConflictPolicy
+    bookAllowlist?: StringNullableListFilter<"SyncAccountSettings">
+    syncFrequencyMinutes?: IntNullableFilter<"SyncAccountSettings"> | number | null
+    requireReauthToEdit?: BoolFilter<"SyncAccountSettings"> | boolean
+    lastModifiedAt?: DateTimeFilter<"SyncAccountSettings"> | Date | string
+    createdAt?: DateTimeFilter<"SyncAccountSettings"> | Date | string
+    syncAccount?: XOR<SyncAccountScalarRelationFilter, SyncAccountWhereInput>
+  }
+
+  export type SyncAccountSettingsOrderByWithRelationInput = {
+    id?: SortOrder
+    syncAccountId?: SortOrder
+    syncDirection?: SortOrder
+    conflictPolicy?: SortOrder
+    bookAllowlist?: SortOrder
+    syncFrequencyMinutes?: SortOrderInput | SortOrder
+    requireReauthToEdit?: SortOrder
+    lastModifiedAt?: SortOrder
+    createdAt?: SortOrder
+    syncAccount?: SyncAccountOrderByWithRelationInput
+  }
+
+  export type SyncAccountSettingsWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    syncAccountId?: string
+    AND?: SyncAccountSettingsWhereInput | SyncAccountSettingsWhereInput[]
+    OR?: SyncAccountSettingsWhereInput[]
+    NOT?: SyncAccountSettingsWhereInput | SyncAccountSettingsWhereInput[]
+    syncDirection?: EnumSyncDirectionFilter<"SyncAccountSettings"> | $Enums.SyncDirection
+    conflictPolicy?: EnumConflictPolicyFilter<"SyncAccountSettings"> | $Enums.ConflictPolicy
+    bookAllowlist?: StringNullableListFilter<"SyncAccountSettings">
+    syncFrequencyMinutes?: IntNullableFilter<"SyncAccountSettings"> | number | null
+    requireReauthToEdit?: BoolFilter<"SyncAccountSettings"> | boolean
+    lastModifiedAt?: DateTimeFilter<"SyncAccountSettings"> | Date | string
+    createdAt?: DateTimeFilter<"SyncAccountSettings"> | Date | string
+    syncAccount?: XOR<SyncAccountScalarRelationFilter, SyncAccountWhereInput>
+  }, "id" | "syncAccountId">
+
+  export type SyncAccountSettingsOrderByWithAggregationInput = {
+    id?: SortOrder
+    syncAccountId?: SortOrder
+    syncDirection?: SortOrder
+    conflictPolicy?: SortOrder
+    bookAllowlist?: SortOrder
+    syncFrequencyMinutes?: SortOrderInput | SortOrder
+    requireReauthToEdit?: SortOrder
+    lastModifiedAt?: SortOrder
+    createdAt?: SortOrder
+    _count?: SyncAccountSettingsCountOrderByAggregateInput
+    _avg?: SyncAccountSettingsAvgOrderByAggregateInput
+    _max?: SyncAccountSettingsMaxOrderByAggregateInput
+    _min?: SyncAccountSettingsMinOrderByAggregateInput
+    _sum?: SyncAccountSettingsSumOrderByAggregateInput
+  }
+
+  export type SyncAccountSettingsScalarWhereWithAggregatesInput = {
+    AND?: SyncAccountSettingsScalarWhereWithAggregatesInput | SyncAccountSettingsScalarWhereWithAggregatesInput[]
+    OR?: SyncAccountSettingsScalarWhereWithAggregatesInput[]
+    NOT?: SyncAccountSettingsScalarWhereWithAggregatesInput | SyncAccountSettingsScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SyncAccountSettings"> | string
+    syncAccountId?: StringWithAggregatesFilter<"SyncAccountSettings"> | string
+    syncDirection?: EnumSyncDirectionWithAggregatesFilter<"SyncAccountSettings"> | $Enums.SyncDirection
+    conflictPolicy?: EnumConflictPolicyWithAggregatesFilter<"SyncAccountSettings"> | $Enums.ConflictPolicy
+    bookAllowlist?: StringNullableListFilter<"SyncAccountSettings">
+    syncFrequencyMinutes?: IntNullableWithAggregatesFilter<"SyncAccountSettings"> | number | null
+    requireReauthToEdit?: BoolWithAggregatesFilter<"SyncAccountSettings"> | boolean
+    lastModifiedAt?: DateTimeWithAggregatesFilter<"SyncAccountSettings"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"SyncAccountSettings"> | Date | string
+  }
+
+  export type SyncSettingsElevationWhereInput = {
+    AND?: SyncSettingsElevationWhereInput | SyncSettingsElevationWhereInput[]
+    OR?: SyncSettingsElevationWhereInput[]
+    NOT?: SyncSettingsElevationWhereInput | SyncSettingsElevationWhereInput[]
+    id?: StringFilter<"SyncSettingsElevation"> | string
+    userId?: StringFilter<"SyncSettingsElevation"> | string
+    jti?: StringFilter<"SyncSettingsElevation"> | string
+    expiresAt?: DateTimeFilter<"SyncSettingsElevation"> | Date | string
+    createdAt?: DateTimeFilter<"SyncSettingsElevation"> | Date | string
+  }
+
+  export type SyncSettingsElevationOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    jti?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type SyncSettingsElevationWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId_jti?: SyncSettingsElevationUserIdJtiCompoundUniqueInput
+    AND?: SyncSettingsElevationWhereInput | SyncSettingsElevationWhereInput[]
+    OR?: SyncSettingsElevationWhereInput[]
+    NOT?: SyncSettingsElevationWhereInput | SyncSettingsElevationWhereInput[]
+    userId?: StringFilter<"SyncSettingsElevation"> | string
+    jti?: StringFilter<"SyncSettingsElevation"> | string
+    expiresAt?: DateTimeFilter<"SyncSettingsElevation"> | Date | string
+    createdAt?: DateTimeFilter<"SyncSettingsElevation"> | Date | string
+  }, "id" | "userId_jti">
+
+  export type SyncSettingsElevationOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    jti?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+    _count?: SyncSettingsElevationCountOrderByAggregateInput
+    _max?: SyncSettingsElevationMaxOrderByAggregateInput
+    _min?: SyncSettingsElevationMinOrderByAggregateInput
+  }
+
+  export type SyncSettingsElevationScalarWhereWithAggregatesInput = {
+    AND?: SyncSettingsElevationScalarWhereWithAggregatesInput | SyncSettingsElevationScalarWhereWithAggregatesInput[]
+    OR?: SyncSettingsElevationScalarWhereWithAggregatesInput[]
+    NOT?: SyncSettingsElevationScalarWhereWithAggregatesInput | SyncSettingsElevationScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SyncSettingsElevation"> | string
+    userId?: StringWithAggregatesFilter<"SyncSettingsElevation"> | string
+    jti?: StringWithAggregatesFilter<"SyncSettingsElevation"> | string
+    expiresAt?: DateTimeWithAggregatesFilter<"SyncSettingsElevation"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"SyncSettingsElevation"> | Date | string
   }
 
   export type SyncContactLinkWhereInput = {
@@ -49672,6 +52258,8 @@ export namespace Prisma {
     slug?: StringFilter<"AddressBook"> | string
     description?: StringNullableFilter<"AddressBook"> | string | null
     isDefault?: BoolFilter<"AddressBook"> | boolean
+    deviceWritable?: BoolFilter<"AddressBook"> | boolean
+    sourceBookIds?: StringNullableListFilter<"AddressBook">
     sourceGroupBookId?: StringNullableFilter<"AddressBook"> | string | null
     archivedAt?: DateTimeNullableFilter<"AddressBook"> | Date | string | null
     createdAt?: DateTimeFilter<"AddressBook"> | Date | string
@@ -49687,6 +52275,8 @@ export namespace Prisma {
     slug?: SortOrder
     description?: SortOrderInput | SortOrder
     isDefault?: SortOrder
+    deviceWritable?: SortOrder
+    sourceBookIds?: SortOrder
     sourceGroupBookId?: SortOrderInput | SortOrder
     archivedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -49706,6 +52296,8 @@ export namespace Prisma {
     slug?: StringFilter<"AddressBook"> | string
     description?: StringNullableFilter<"AddressBook"> | string | null
     isDefault?: BoolFilter<"AddressBook"> | boolean
+    deviceWritable?: BoolFilter<"AddressBook"> | boolean
+    sourceBookIds?: StringNullableListFilter<"AddressBook">
     sourceGroupBookId?: StringNullableFilter<"AddressBook"> | string | null
     archivedAt?: DateTimeNullableFilter<"AddressBook"> | Date | string | null
     createdAt?: DateTimeFilter<"AddressBook"> | Date | string
@@ -49721,6 +52313,8 @@ export namespace Prisma {
     slug?: SortOrder
     description?: SortOrderInput | SortOrder
     isDefault?: SortOrder
+    deviceWritable?: SortOrder
+    sourceBookIds?: SortOrder
     sourceGroupBookId?: SortOrderInput | SortOrder
     archivedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
@@ -49740,6 +52334,8 @@ export namespace Prisma {
     slug?: StringWithAggregatesFilter<"AddressBook"> | string
     description?: StringNullableWithAggregatesFilter<"AddressBook"> | string | null
     isDefault?: BoolWithAggregatesFilter<"AddressBook"> | boolean
+    deviceWritable?: BoolWithAggregatesFilter<"AddressBook"> | boolean
+    sourceBookIds?: StringNullableListFilter<"AddressBook">
     sourceGroupBookId?: StringNullableWithAggregatesFilter<"AddressBook"> | string | null
     archivedAt?: DateTimeNullableWithAggregatesFilter<"AddressBook"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"AddressBook"> | Date | string
@@ -52054,6 +54650,8 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
@@ -52061,6 +54659,7 @@ export namespace Prisma {
     syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
     teamLink?: TeamSyncAccountCreateNestedOneWithoutSyncAccountInput
+    settings?: SyncAccountSettingsCreateNestedOneWithoutSyncAccountInput
   }
 
   export type SyncAccountUncheckedCreateInput = {
@@ -52089,12 +54688,15 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
     syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
     teamLink?: TeamSyncAccountUncheckedCreateNestedOneWithoutSyncAccountInput
+    settings?: SyncAccountSettingsUncheckedCreateNestedOneWithoutSyncAccountInput
   }
 
   export type SyncAccountUpdateInput = {
@@ -52122,6 +54724,8 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
@@ -52129,6 +54733,7 @@ export namespace Prisma {
     syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
     teamLink?: TeamSyncAccountUpdateOneWithoutSyncAccountNestedInput
+    settings?: SyncAccountSettingsUpdateOneWithoutSyncAccountNestedInput
   }
 
   export type SyncAccountUncheckedUpdateInput = {
@@ -52157,12 +54762,15 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
     teamLink?: TeamSyncAccountUncheckedUpdateOneWithoutSyncAccountNestedInput
+    settings?: SyncAccountSettingsUncheckedUpdateOneWithoutSyncAccountNestedInput
   }
 
   export type SyncAccountCreateManyInput = {
@@ -52191,6 +54799,8 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -52220,6 +54830,8 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -52250,8 +54862,149 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncAccountSettingsCreateInput = {
+    id?: string
+    syncDirection?: $Enums.SyncDirection
+    conflictPolicy?: $Enums.ConflictPolicy
+    bookAllowlist?: SyncAccountSettingsCreatebookAllowlistInput | string[]
+    syncFrequencyMinutes?: number | null
+    requireReauthToEdit?: boolean
+    lastModifiedAt?: Date | string
+    createdAt?: Date | string
+    syncAccount: SyncAccountCreateNestedOneWithoutSettingsInput
+  }
+
+  export type SyncAccountSettingsUncheckedCreateInput = {
+    id?: string
+    syncAccountId: string
+    syncDirection?: $Enums.SyncDirection
+    conflictPolicy?: $Enums.ConflictPolicy
+    bookAllowlist?: SyncAccountSettingsCreatebookAllowlistInput | string[]
+    syncFrequencyMinutes?: number | null
+    requireReauthToEdit?: boolean
+    lastModifiedAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type SyncAccountSettingsUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    conflictPolicy?: EnumConflictPolicyFieldUpdateOperationsInput | $Enums.ConflictPolicy
+    bookAllowlist?: SyncAccountSettingsUpdatebookAllowlistInput | string[]
+    syncFrequencyMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    requireReauthToEdit?: BoolFieldUpdateOperationsInput | boolean
+    lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncAccount?: SyncAccountUpdateOneRequiredWithoutSettingsNestedInput
+  }
+
+  export type SyncAccountSettingsUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: StringFieldUpdateOperationsInput | string
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    conflictPolicy?: EnumConflictPolicyFieldUpdateOperationsInput | $Enums.ConflictPolicy
+    bookAllowlist?: SyncAccountSettingsUpdatebookAllowlistInput | string[]
+    syncFrequencyMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    requireReauthToEdit?: BoolFieldUpdateOperationsInput | boolean
+    lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncAccountSettingsCreateManyInput = {
+    id?: string
+    syncAccountId: string
+    syncDirection?: $Enums.SyncDirection
+    conflictPolicy?: $Enums.ConflictPolicy
+    bookAllowlist?: SyncAccountSettingsCreatebookAllowlistInput | string[]
+    syncFrequencyMinutes?: number | null
+    requireReauthToEdit?: boolean
+    lastModifiedAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type SyncAccountSettingsUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    conflictPolicy?: EnumConflictPolicyFieldUpdateOperationsInput | $Enums.ConflictPolicy
+    bookAllowlist?: SyncAccountSettingsUpdatebookAllowlistInput | string[]
+    syncFrequencyMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    requireReauthToEdit?: BoolFieldUpdateOperationsInput | boolean
+    lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncAccountSettingsUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: StringFieldUpdateOperationsInput | string
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    conflictPolicy?: EnumConflictPolicyFieldUpdateOperationsInput | $Enums.ConflictPolicy
+    bookAllowlist?: SyncAccountSettingsUpdatebookAllowlistInput | string[]
+    syncFrequencyMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    requireReauthToEdit?: BoolFieldUpdateOperationsInput | boolean
+    lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncSettingsElevationCreateInput = {
+    id?: string
+    userId: string
+    jti: string
+    expiresAt: Date | string
+    createdAt?: Date | string
+  }
+
+  export type SyncSettingsElevationUncheckedCreateInput = {
+    id?: string
+    userId: string
+    jti: string
+    expiresAt: Date | string
+    createdAt?: Date | string
+  }
+
+  export type SyncSettingsElevationUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    jti?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncSettingsElevationUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    jti?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncSettingsElevationCreateManyInput = {
+    id?: string
+    userId: string
+    jti: string
+    expiresAt: Date | string
+    createdAt?: Date | string
+  }
+
+  export type SyncSettingsElevationUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    jti?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncSettingsElevationUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    jti?: StringFieldUpdateOperationsInput | string
+    expiresAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SyncContactLinkCreateInput = {
@@ -53567,6 +56320,8 @@ export namespace Prisma {
     slug: string
     description?: string | null
     isDefault?: boolean
+    deviceWritable?: boolean
+    sourceBookIds?: AddressBookCreatesourceBookIdsInput | string[]
     sourceGroupBookId?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -53582,6 +56337,8 @@ export namespace Prisma {
     slug: string
     description?: string | null
     isDefault?: boolean
+    deviceWritable?: boolean
+    sourceBookIds?: AddressBookCreatesourceBookIdsInput | string[]
     sourceGroupBookId?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -53595,6 +56352,8 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    deviceWritable?: BoolFieldUpdateOperationsInput | boolean
+    sourceBookIds?: AddressBookUpdatesourceBookIdsInput | string[]
     sourceGroupBookId?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -53610,6 +56369,8 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    deviceWritable?: BoolFieldUpdateOperationsInput | boolean
+    sourceBookIds?: AddressBookUpdatesourceBookIdsInput | string[]
     sourceGroupBookId?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -53624,6 +56385,8 @@ export namespace Prisma {
     slug: string
     description?: string | null
     isDefault?: boolean
+    deviceWritable?: boolean
+    sourceBookIds?: AddressBookCreatesourceBookIdsInput | string[]
     sourceGroupBookId?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -53636,6 +56399,8 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    deviceWritable?: BoolFieldUpdateOperationsInput | boolean
+    sourceBookIds?: AddressBookUpdatesourceBookIdsInput | string[]
     sourceGroupBookId?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -53649,6 +56414,8 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    deviceWritable?: BoolFieldUpdateOperationsInput | boolean
+    sourceBookIds?: AddressBookUpdatesourceBookIdsInput | string[]
     sourceGroupBookId?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -55917,6 +58684,11 @@ export namespace Prisma {
     isNot?: TeamSyncAccountWhereInput | null
   }
 
+  export type SyncAccountSettingsNullableScalarRelationFilter = {
+    is?: SyncAccountSettingsWhereInput | null
+    isNot?: SyncAccountSettingsWhereInput | null
+  }
+
   export type SyncJobOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -55953,6 +58725,8 @@ export namespace Prisma {
     lastErrorAt?: SortOrder
     lastErrorCode?: SortOrder
     lastErrorMessage?: SortOrder
+    discoveredBooks?: SortOrder
+    booksDiscoveredAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -55987,6 +58761,7 @@ export namespace Prisma {
     lastErrorAt?: SortOrder
     lastErrorCode?: SortOrder
     lastErrorMessage?: SortOrder
+    booksDiscoveredAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -56017,6 +58792,7 @@ export namespace Prisma {
     lastErrorAt?: SortOrder
     lastErrorCode?: SortOrder
     lastErrorMessage?: SortOrder
+    booksDiscoveredAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -56055,9 +58831,105 @@ export namespace Prisma {
     _max?: NestedEnumSyncDirectionFilter<$PrismaModel>
   }
 
+  export type EnumConflictPolicyFilter<$PrismaModel = never> = {
+    equals?: $Enums.ConflictPolicy | EnumConflictPolicyFieldRefInput<$PrismaModel>
+    in?: $Enums.ConflictPolicy[] | ListEnumConflictPolicyFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ConflictPolicy[] | ListEnumConflictPolicyFieldRefInput<$PrismaModel>
+    not?: NestedEnumConflictPolicyFilter<$PrismaModel> | $Enums.ConflictPolicy
+  }
+
+  export type StringNullableListFilter<$PrismaModel = never> = {
+    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
+    has?: string | StringFieldRefInput<$PrismaModel> | null
+    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
+    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
+    isEmpty?: boolean
+  }
+
   export type SyncAccountScalarRelationFilter = {
     is?: SyncAccountWhereInput
     isNot?: SyncAccountWhereInput
+  }
+
+  export type SyncAccountSettingsCountOrderByAggregateInput = {
+    id?: SortOrder
+    syncAccountId?: SortOrder
+    syncDirection?: SortOrder
+    conflictPolicy?: SortOrder
+    bookAllowlist?: SortOrder
+    syncFrequencyMinutes?: SortOrder
+    requireReauthToEdit?: SortOrder
+    lastModifiedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type SyncAccountSettingsAvgOrderByAggregateInput = {
+    syncFrequencyMinutes?: SortOrder
+  }
+
+  export type SyncAccountSettingsMaxOrderByAggregateInput = {
+    id?: SortOrder
+    syncAccountId?: SortOrder
+    syncDirection?: SortOrder
+    conflictPolicy?: SortOrder
+    syncFrequencyMinutes?: SortOrder
+    requireReauthToEdit?: SortOrder
+    lastModifiedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type SyncAccountSettingsMinOrderByAggregateInput = {
+    id?: SortOrder
+    syncAccountId?: SortOrder
+    syncDirection?: SortOrder
+    conflictPolicy?: SortOrder
+    syncFrequencyMinutes?: SortOrder
+    requireReauthToEdit?: SortOrder
+    lastModifiedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type SyncAccountSettingsSumOrderByAggregateInput = {
+    syncFrequencyMinutes?: SortOrder
+  }
+
+  export type EnumConflictPolicyWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ConflictPolicy | EnumConflictPolicyFieldRefInput<$PrismaModel>
+    in?: $Enums.ConflictPolicy[] | ListEnumConflictPolicyFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ConflictPolicy[] | ListEnumConflictPolicyFieldRefInput<$PrismaModel>
+    not?: NestedEnumConflictPolicyWithAggregatesFilter<$PrismaModel> | $Enums.ConflictPolicy
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumConflictPolicyFilter<$PrismaModel>
+    _max?: NestedEnumConflictPolicyFilter<$PrismaModel>
+  }
+
+  export type SyncSettingsElevationUserIdJtiCompoundUniqueInput = {
+    userId: string
+    jti: string
+  }
+
+  export type SyncSettingsElevationCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    jti?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type SyncSettingsElevationMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    jti?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type SyncSettingsElevationMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    jti?: SortOrder
+    expiresAt?: SortOrder
+    createdAt?: SortOrder
   }
 
   export type SyncContactLinkSyncAccountIdContactIdCompoundUniqueInput = {
@@ -56665,14 +59537,6 @@ export namespace Prisma {
     not?: NestedEnumFeatureFlagModeFilter<$PrismaModel> | $Enums.FeatureFlagMode
   }
 
-  export type StringNullableListFilter<$PrismaModel = never> = {
-    equals?: string[] | ListStringFieldRefInput<$PrismaModel> | null
-    has?: string | StringFieldRefInput<$PrismaModel> | null
-    hasEvery?: string[] | ListStringFieldRefInput<$PrismaModel>
-    hasSome?: string[] | ListStringFieldRefInput<$PrismaModel>
-    isEmpty?: boolean
-  }
-
   export type FeatureFlagCountOrderByAggregateInput = {
     id?: SortOrder
     key?: SortOrder
@@ -56973,6 +59837,8 @@ export namespace Prisma {
     slug?: SortOrder
     description?: SortOrder
     isDefault?: SortOrder
+    deviceWritable?: SortOrder
+    sourceBookIds?: SortOrder
     sourceGroupBookId?: SortOrder
     archivedAt?: SortOrder
     createdAt?: SortOrder
@@ -56986,6 +59852,7 @@ export namespace Prisma {
     slug?: SortOrder
     description?: SortOrder
     isDefault?: SortOrder
+    deviceWritable?: SortOrder
     sourceGroupBookId?: SortOrder
     archivedAt?: SortOrder
     createdAt?: SortOrder
@@ -56999,6 +59866,7 @@ export namespace Prisma {
     slug?: SortOrder
     description?: SortOrder
     isDefault?: SortOrder
+    deviceWritable?: SortOrder
     sourceGroupBookId?: SortOrder
     archivedAt?: SortOrder
     createdAt?: SortOrder
@@ -59417,6 +62285,12 @@ export namespace Prisma {
     connect?: TeamSyncAccountWhereUniqueInput
   }
 
+  export type SyncAccountSettingsCreateNestedOneWithoutSyncAccountInput = {
+    create?: XOR<SyncAccountSettingsCreateWithoutSyncAccountInput, SyncAccountSettingsUncheckedCreateWithoutSyncAccountInput>
+    connectOrCreate?: SyncAccountSettingsCreateOrConnectWithoutSyncAccountInput
+    connect?: SyncAccountSettingsWhereUniqueInput
+  }
+
   export type SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput = {
     create?: XOR<SyncContactLinkCreateWithoutSyncAccountInput, SyncContactLinkUncheckedCreateWithoutSyncAccountInput> | SyncContactLinkCreateWithoutSyncAccountInput[] | SyncContactLinkUncheckedCreateWithoutSyncAccountInput[]
     connectOrCreate?: SyncContactLinkCreateOrConnectWithoutSyncAccountInput | SyncContactLinkCreateOrConnectWithoutSyncAccountInput[]
@@ -59442,6 +62316,12 @@ export namespace Prisma {
     create?: XOR<TeamSyncAccountCreateWithoutSyncAccountInput, TeamSyncAccountUncheckedCreateWithoutSyncAccountInput>
     connectOrCreate?: TeamSyncAccountCreateOrConnectWithoutSyncAccountInput
     connect?: TeamSyncAccountWhereUniqueInput
+  }
+
+  export type SyncAccountSettingsUncheckedCreateNestedOneWithoutSyncAccountInput = {
+    create?: XOR<SyncAccountSettingsCreateWithoutSyncAccountInput, SyncAccountSettingsUncheckedCreateWithoutSyncAccountInput>
+    connectOrCreate?: SyncAccountSettingsCreateOrConnectWithoutSyncAccountInput
+    connect?: SyncAccountSettingsWhereUniqueInput
   }
 
   export type EnumSyncProviderFieldUpdateOperationsInput = {
@@ -59516,6 +62396,16 @@ export namespace Prisma {
     update?: XOR<XOR<TeamSyncAccountUpdateToOneWithWhereWithoutSyncAccountInput, TeamSyncAccountUpdateWithoutSyncAccountInput>, TeamSyncAccountUncheckedUpdateWithoutSyncAccountInput>
   }
 
+  export type SyncAccountSettingsUpdateOneWithoutSyncAccountNestedInput = {
+    create?: XOR<SyncAccountSettingsCreateWithoutSyncAccountInput, SyncAccountSettingsUncheckedCreateWithoutSyncAccountInput>
+    connectOrCreate?: SyncAccountSettingsCreateOrConnectWithoutSyncAccountInput
+    upsert?: SyncAccountSettingsUpsertWithoutSyncAccountInput
+    disconnect?: SyncAccountSettingsWhereInput | boolean
+    delete?: SyncAccountSettingsWhereInput | boolean
+    connect?: SyncAccountSettingsWhereUniqueInput
+    update?: XOR<XOR<SyncAccountSettingsUpdateToOneWithWhereWithoutSyncAccountInput, SyncAccountSettingsUpdateWithoutSyncAccountInput>, SyncAccountSettingsUncheckedUpdateWithoutSyncAccountInput>
+  }
+
   export type SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput = {
     create?: XOR<SyncContactLinkCreateWithoutSyncAccountInput, SyncContactLinkUncheckedCreateWithoutSyncAccountInput> | SyncContactLinkCreateWithoutSyncAccountInput[] | SyncContactLinkUncheckedCreateWithoutSyncAccountInput[]
     connectOrCreate?: SyncContactLinkCreateOrConnectWithoutSyncAccountInput | SyncContactLinkCreateOrConnectWithoutSyncAccountInput[]
@@ -59566,6 +62456,43 @@ export namespace Prisma {
     delete?: TeamSyncAccountWhereInput | boolean
     connect?: TeamSyncAccountWhereUniqueInput
     update?: XOR<XOR<TeamSyncAccountUpdateToOneWithWhereWithoutSyncAccountInput, TeamSyncAccountUpdateWithoutSyncAccountInput>, TeamSyncAccountUncheckedUpdateWithoutSyncAccountInput>
+  }
+
+  export type SyncAccountSettingsUncheckedUpdateOneWithoutSyncAccountNestedInput = {
+    create?: XOR<SyncAccountSettingsCreateWithoutSyncAccountInput, SyncAccountSettingsUncheckedCreateWithoutSyncAccountInput>
+    connectOrCreate?: SyncAccountSettingsCreateOrConnectWithoutSyncAccountInput
+    upsert?: SyncAccountSettingsUpsertWithoutSyncAccountInput
+    disconnect?: SyncAccountSettingsWhereInput | boolean
+    delete?: SyncAccountSettingsWhereInput | boolean
+    connect?: SyncAccountSettingsWhereUniqueInput
+    update?: XOR<XOR<SyncAccountSettingsUpdateToOneWithWhereWithoutSyncAccountInput, SyncAccountSettingsUpdateWithoutSyncAccountInput>, SyncAccountSettingsUncheckedUpdateWithoutSyncAccountInput>
+  }
+
+  export type SyncAccountSettingsCreatebookAllowlistInput = {
+    set: string[]
+  }
+
+  export type SyncAccountCreateNestedOneWithoutSettingsInput = {
+    create?: XOR<SyncAccountCreateWithoutSettingsInput, SyncAccountUncheckedCreateWithoutSettingsInput>
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutSettingsInput
+    connect?: SyncAccountWhereUniqueInput
+  }
+
+  export type EnumConflictPolicyFieldUpdateOperationsInput = {
+    set?: $Enums.ConflictPolicy
+  }
+
+  export type SyncAccountSettingsUpdatebookAllowlistInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type SyncAccountUpdateOneRequiredWithoutSettingsNestedInput = {
+    create?: XOR<SyncAccountCreateWithoutSettingsInput, SyncAccountUncheckedCreateWithoutSettingsInput>
+    connectOrCreate?: SyncAccountCreateOrConnectWithoutSettingsInput
+    upsert?: SyncAccountUpsertWithoutSettingsInput
+    connect?: SyncAccountWhereUniqueInput
+    update?: XOR<XOR<SyncAccountUpdateToOneWithWhereWithoutSettingsInput, SyncAccountUpdateWithoutSettingsInput>, SyncAccountUncheckedUpdateWithoutSettingsInput>
   }
 
   export type SyncAccountCreateNestedOneWithoutSyncLinksInput = {
@@ -60161,6 +63088,10 @@ export namespace Prisma {
     deleteMany?: TeamSyncAccountScalarWhereInput | TeamSyncAccountScalarWhereInput[]
   }
 
+  export type AddressBookCreatesourceBookIdsInput = {
+    set: string[]
+  }
+
   export type UserCreateNestedOneWithoutAddressBooksInput = {
     create?: XOR<UserCreateWithoutAddressBooksInput, UserUncheckedCreateWithoutAddressBooksInput>
     connectOrCreate?: UserCreateOrConnectWithoutAddressBooksInput
@@ -60179,6 +63110,11 @@ export namespace Prisma {
     connectOrCreate?: ContactCreateOrConnectWithoutBookInput | ContactCreateOrConnectWithoutBookInput[]
     createMany?: ContactCreateManyBookInputEnvelope
     connect?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+  }
+
+  export type AddressBookUpdatesourceBookIdsInput = {
+    set?: string[]
+    push?: string | string[]
   }
 
   export type UserUpdateOneRequiredWithoutAddressBooksNestedInput = {
@@ -61060,6 +63996,23 @@ export namespace Prisma {
     _max?: NestedEnumSyncDirectionFilter<$PrismaModel>
   }
 
+  export type NestedEnumConflictPolicyFilter<$PrismaModel = never> = {
+    equals?: $Enums.ConflictPolicy | EnumConflictPolicyFieldRefInput<$PrismaModel>
+    in?: $Enums.ConflictPolicy[] | ListEnumConflictPolicyFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ConflictPolicy[] | ListEnumConflictPolicyFieldRefInput<$PrismaModel>
+    not?: NestedEnumConflictPolicyFilter<$PrismaModel> | $Enums.ConflictPolicy
+  }
+
+  export type NestedEnumConflictPolicyWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ConflictPolicy | EnumConflictPolicyFieldRefInput<$PrismaModel>
+    in?: $Enums.ConflictPolicy[] | ListEnumConflictPolicyFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ConflictPolicy[] | ListEnumConflictPolicyFieldRefInput<$PrismaModel>
+    not?: NestedEnumConflictPolicyWithAggregatesFilter<$PrismaModel> | $Enums.ConflictPolicy
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumConflictPolicyFilter<$PrismaModel>
+    _max?: NestedEnumConflictPolicyFilter<$PrismaModel>
+  }
+
   export type NestedEnumSyncJobStatusFilter<$PrismaModel = never> = {
     equals?: $Enums.SyncJobStatus | EnumSyncJobStatusFieldRefInput<$PrismaModel>
     in?: $Enums.SyncJobStatus[] | ListEnumSyncJobStatusFieldRefInput<$PrismaModel>
@@ -61724,12 +64677,15 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
     syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
     teamLink?: TeamSyncAccountCreateNestedOneWithoutSyncAccountInput
+    settings?: SyncAccountSettingsCreateNestedOneWithoutSyncAccountInput
   }
 
   export type SyncAccountUncheckedCreateWithoutUserInput = {
@@ -61757,12 +64713,15 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
     syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
     teamLink?: TeamSyncAccountUncheckedCreateNestedOneWithoutSyncAccountInput
+    settings?: SyncAccountSettingsUncheckedCreateNestedOneWithoutSyncAccountInput
   }
 
   export type SyncAccountCreateOrConnectWithoutUserInput = {
@@ -62214,6 +65173,8 @@ export namespace Prisma {
     slug: string
     description?: string | null
     isDefault?: boolean
+    deviceWritable?: boolean
+    sourceBookIds?: AddressBookCreatesourceBookIdsInput | string[]
     sourceGroupBookId?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -62227,6 +65188,8 @@ export namespace Prisma {
     slug: string
     description?: string | null
     isDefault?: boolean
+    deviceWritable?: boolean
+    sourceBookIds?: AddressBookCreatesourceBookIdsInput | string[]
     sourceGroupBookId?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -62718,6 +65681,8 @@ export namespace Prisma {
     lastErrorAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     lastErrorCode?: StringNullableFilter<"SyncAccount"> | string | null
     lastErrorMessage?: StringNullableFilter<"SyncAccount"> | string | null
+    discoveredBooks?: JsonNullableFilter<"SyncAccount">
+    booksDiscoveredAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     createdAt?: DateTimeFilter<"SyncAccount"> | Date | string
     updatedAt?: DateTimeFilter<"SyncAccount"> | Date | string
   }
@@ -63105,6 +66070,8 @@ export namespace Prisma {
     slug?: StringFilter<"AddressBook"> | string
     description?: StringNullableFilter<"AddressBook"> | string | null
     isDefault?: BoolFilter<"AddressBook"> | boolean
+    deviceWritable?: BoolFilter<"AddressBook"> | boolean
+    sourceBookIds?: StringNullableListFilter<"AddressBook">
     sourceGroupBookId?: StringNullableFilter<"AddressBook"> | string | null
     archivedAt?: DateTimeNullableFilter<"AddressBook"> | Date | string | null
     createdAt?: DateTimeFilter<"AddressBook"> | Date | string
@@ -64405,6 +67372,8 @@ export namespace Prisma {
     slug: string
     description?: string | null
     isDefault?: boolean
+    deviceWritable?: boolean
+    sourceBookIds?: AddressBookCreatesourceBookIdsInput | string[]
     sourceGroupBookId?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -64419,6 +67388,8 @@ export namespace Prisma {
     slug: string
     description?: string | null
     isDefault?: boolean
+    deviceWritable?: boolean
+    sourceBookIds?: AddressBookCreatesourceBookIdsInput | string[]
     sourceGroupBookId?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -64943,6 +67914,8 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    deviceWritable?: BoolFieldUpdateOperationsInput | boolean
+    sourceBookIds?: AddressBookUpdatesourceBookIdsInput | string[]
     sourceGroupBookId?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -64957,6 +67930,8 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    deviceWritable?: BoolFieldUpdateOperationsInput | boolean
+    sourceBookIds?: AddressBookUpdatesourceBookIdsInput | string[]
     sourceGroupBookId?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -67565,6 +70540,33 @@ export namespace Prisma {
     create: XOR<TeamSyncAccountCreateWithoutSyncAccountInput, TeamSyncAccountUncheckedCreateWithoutSyncAccountInput>
   }
 
+  export type SyncAccountSettingsCreateWithoutSyncAccountInput = {
+    id?: string
+    syncDirection?: $Enums.SyncDirection
+    conflictPolicy?: $Enums.ConflictPolicy
+    bookAllowlist?: SyncAccountSettingsCreatebookAllowlistInput | string[]
+    syncFrequencyMinutes?: number | null
+    requireReauthToEdit?: boolean
+    lastModifiedAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type SyncAccountSettingsUncheckedCreateWithoutSyncAccountInput = {
+    id?: string
+    syncDirection?: $Enums.SyncDirection
+    conflictPolicy?: $Enums.ConflictPolicy
+    bookAllowlist?: SyncAccountSettingsCreatebookAllowlistInput | string[]
+    syncFrequencyMinutes?: number | null
+    requireReauthToEdit?: boolean
+    lastModifiedAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type SyncAccountSettingsCreateOrConnectWithoutSyncAccountInput = {
+    where: SyncAccountSettingsWhereUniqueInput
+    create: XOR<SyncAccountSettingsCreateWithoutSyncAccountInput, SyncAccountSettingsUncheckedCreateWithoutSyncAccountInput>
+  }
+
   export type UserUpsertWithoutSyncAccountsInput = {
     update: XOR<UserUpdateWithoutSyncAccountsInput, UserUncheckedUpdateWithoutSyncAccountsInput>
     create: XOR<UserCreateWithoutSyncAccountsInput, UserUncheckedCreateWithoutSyncAccountsInput>
@@ -67781,6 +70783,199 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type SyncAccountSettingsUpsertWithoutSyncAccountInput = {
+    update: XOR<SyncAccountSettingsUpdateWithoutSyncAccountInput, SyncAccountSettingsUncheckedUpdateWithoutSyncAccountInput>
+    create: XOR<SyncAccountSettingsCreateWithoutSyncAccountInput, SyncAccountSettingsUncheckedCreateWithoutSyncAccountInput>
+    where?: SyncAccountSettingsWhereInput
+  }
+
+  export type SyncAccountSettingsUpdateToOneWithWhereWithoutSyncAccountInput = {
+    where?: SyncAccountSettingsWhereInput
+    data: XOR<SyncAccountSettingsUpdateWithoutSyncAccountInput, SyncAccountSettingsUncheckedUpdateWithoutSyncAccountInput>
+  }
+
+  export type SyncAccountSettingsUpdateWithoutSyncAccountInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    conflictPolicy?: EnumConflictPolicyFieldUpdateOperationsInput | $Enums.ConflictPolicy
+    bookAllowlist?: SyncAccountSettingsUpdatebookAllowlistInput | string[]
+    syncFrequencyMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    requireReauthToEdit?: BoolFieldUpdateOperationsInput | boolean
+    lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncAccountSettingsUncheckedUpdateWithoutSyncAccountInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    conflictPolicy?: EnumConflictPolicyFieldUpdateOperationsInput | $Enums.ConflictPolicy
+    bookAllowlist?: SyncAccountSettingsUpdatebookAllowlistInput | string[]
+    syncFrequencyMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    requireReauthToEdit?: BoolFieldUpdateOperationsInput | boolean
+    lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncAccountCreateWithoutSettingsInput = {
+    id?: string
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutSyncAccountsInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
+    syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
+    teamLink?: TeamSyncAccountCreateNestedOneWithoutSyncAccountInput
+  }
+
+  export type SyncAccountUncheckedCreateWithoutSettingsInput = {
+    id?: string
+    userId: string
+    provider?: $Enums.SyncProvider
+    status?: $Enums.SyncAccountStatus
+    syncDirection?: $Enums.SyncDirection
+    label: string
+    baseUrl: string
+    principalUrl?: string | null
+    addressBookUrl?: string | null
+    addressBookDisplayName?: string | null
+    remoteAccountId?: string | null
+    remoteCTag?: string | null
+    credentialReference?: string | null
+    credentialVersion?: number
+    credentialUpdatedAt?: Date | string | null
+    credentialLastValidatedAt?: Date | string | null
+    credentialRevokedAt?: Date | string | null
+    encryptionKeyRef?: string | null
+    connectionValidatedAt?: Date | string | null
+    lastSyncCursor?: string | null
+    lastSyncedAt?: Date | string | null
+    lastSucceededAt?: Date | string | null
+    lastErrorAt?: Date | string | null
+    lastErrorCode?: string | null
+    lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
+    syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
+    teamLink?: TeamSyncAccountUncheckedCreateNestedOneWithoutSyncAccountInput
+  }
+
+  export type SyncAccountCreateOrConnectWithoutSettingsInput = {
+    where: SyncAccountWhereUniqueInput
+    create: XOR<SyncAccountCreateWithoutSettingsInput, SyncAccountUncheckedCreateWithoutSettingsInput>
+  }
+
+  export type SyncAccountUpsertWithoutSettingsInput = {
+    update: XOR<SyncAccountUpdateWithoutSettingsInput, SyncAccountUncheckedUpdateWithoutSettingsInput>
+    create: XOR<SyncAccountCreateWithoutSettingsInput, SyncAccountUncheckedCreateWithoutSettingsInput>
+    where?: SyncAccountWhereInput
+  }
+
+  export type SyncAccountUpdateToOneWithWhereWithoutSettingsInput = {
+    where?: SyncAccountWhereInput
+    data: XOR<SyncAccountUpdateWithoutSettingsInput, SyncAccountUncheckedUpdateWithoutSettingsInput>
+  }
+
+  export type SyncAccountUpdateWithoutSettingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
+    syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
+    teamLink?: TeamSyncAccountUpdateOneWithoutSyncAccountNestedInput
+  }
+
+  export type SyncAccountUncheckedUpdateWithoutSettingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    provider?: EnumSyncProviderFieldUpdateOperationsInput | $Enums.SyncProvider
+    status?: EnumSyncAccountStatusFieldUpdateOperationsInput | $Enums.SyncAccountStatus
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    label?: StringFieldUpdateOperationsInput | string
+    baseUrl?: StringFieldUpdateOperationsInput | string
+    principalUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    addressBookDisplayName?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteAccountId?: NullableStringFieldUpdateOperationsInput | string | null
+    remoteCTag?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialReference?: NullableStringFieldUpdateOperationsInput | string | null
+    credentialVersion?: IntFieldUpdateOperationsInput | number
+    credentialUpdatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialLastValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    credentialRevokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    encryptionKeyRef?: NullableStringFieldUpdateOperationsInput | string | null
+    connectionValidatedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSyncCursor?: NullableStringFieldUpdateOperationsInput | string | null
+    lastSyncedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastSucceededAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
+    lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
+    syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
+    teamLink?: TeamSyncAccountUncheckedUpdateOneWithoutSyncAccountNestedInput
+  }
+
   export type SyncAccountCreateWithoutSyncLinksInput = {
     id?: string
     provider?: $Enums.SyncProvider
@@ -67806,12 +71001,15 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
     syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
     teamLink?: TeamSyncAccountCreateNestedOneWithoutSyncAccountInput
+    settings?: SyncAccountSettingsCreateNestedOneWithoutSyncAccountInput
   }
 
   export type SyncAccountUncheckedCreateWithoutSyncLinksInput = {
@@ -67840,11 +71038,14 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
     teamLink?: TeamSyncAccountUncheckedCreateNestedOneWithoutSyncAccountInput
+    settings?: SyncAccountSettingsUncheckedCreateNestedOneWithoutSyncAccountInput
   }
 
   export type SyncAccountCreateOrConnectWithoutSyncLinksInput = {
@@ -68069,12 +71270,15 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
     syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
     teamLink?: TeamSyncAccountUpdateOneWithoutSyncAccountNestedInput
+    settings?: SyncAccountSettingsUpdateOneWithoutSyncAccountNestedInput
   }
 
   export type SyncAccountUncheckedUpdateWithoutSyncLinksInput = {
@@ -68103,11 +71307,14 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
     teamLink?: TeamSyncAccountUncheckedUpdateOneWithoutSyncAccountNestedInput
+    settings?: SyncAccountSettingsUncheckedUpdateOneWithoutSyncAccountNestedInput
   }
 
   export type ContactUpsertWithoutSyncLinksInput = {
@@ -68284,12 +71491,15 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
     teamLink?: TeamSyncAccountCreateNestedOneWithoutSyncAccountInput
+    settings?: SyncAccountSettingsCreateNestedOneWithoutSyncAccountInput
   }
 
   export type SyncAccountUncheckedCreateWithoutSyncJobsInput = {
@@ -68318,11 +71528,14 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
     teamLink?: TeamSyncAccountUncheckedCreateNestedOneWithoutSyncAccountInput
+    settings?: SyncAccountSettingsUncheckedCreateNestedOneWithoutSyncAccountInput
   }
 
   export type SyncAccountCreateOrConnectWithoutSyncJobsInput = {
@@ -68366,12 +71579,15 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
     teamLink?: TeamSyncAccountUpdateOneWithoutSyncAccountNestedInput
+    settings?: SyncAccountSettingsUpdateOneWithoutSyncAccountNestedInput
   }
 
   export type SyncAccountUncheckedUpdateWithoutSyncJobsInput = {
@@ -68400,11 +71616,14 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
     teamLink?: TeamSyncAccountUncheckedUpdateOneWithoutSyncAccountNestedInput
+    settings?: SyncAccountSettingsUncheckedUpdateOneWithoutSyncAccountNestedInput
   }
 
   export type SyncAccountCreateWithoutSyncConflictsInput = {
@@ -68432,12 +71651,15 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
     syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
     teamLink?: TeamSyncAccountCreateNestedOneWithoutSyncAccountInput
+    settings?: SyncAccountSettingsCreateNestedOneWithoutSyncAccountInput
   }
 
   export type SyncAccountUncheckedCreateWithoutSyncConflictsInput = {
@@ -68466,11 +71688,14 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
     syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
     teamLink?: TeamSyncAccountUncheckedCreateNestedOneWithoutSyncAccountInput
+    settings?: SyncAccountSettingsUncheckedCreateNestedOneWithoutSyncAccountInput
   }
 
   export type SyncAccountCreateOrConnectWithoutSyncConflictsInput = {
@@ -68705,12 +71930,15 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
     syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
     teamLink?: TeamSyncAccountUpdateOneWithoutSyncAccountNestedInput
+    settings?: SyncAccountSettingsUpdateOneWithoutSyncAccountNestedInput
   }
 
   export type SyncAccountUncheckedUpdateWithoutSyncConflictsInput = {
@@ -68739,11 +71967,14 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
     teamLink?: TeamSyncAccountUncheckedUpdateOneWithoutSyncAccountNestedInput
+    settings?: SyncAccountSettingsUncheckedUpdateOneWithoutSyncAccountNestedInput
   }
 
   export type SyncContactLinkUpsertWithoutSyncConflictsInput = {
@@ -71938,12 +75169,15 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
     syncJobs?: SyncJobCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutSyncAccountInput
+    settings?: SyncAccountSettingsCreateNestedOneWithoutSyncAccountInput
   }
 
   export type SyncAccountUncheckedCreateWithoutTeamLinkInput = {
@@ -71972,11 +75206,14 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
     syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutSyncAccountInput
+    settings?: SyncAccountSettingsUncheckedCreateNestedOneWithoutSyncAccountInput
   }
 
   export type SyncAccountCreateOrConnectWithoutTeamLinkInput = {
@@ -72092,12 +75329,15 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
     syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
+    settings?: SyncAccountSettingsUpdateOneWithoutSyncAccountNestedInput
   }
 
   export type SyncAccountUncheckedUpdateWithoutTeamLinkInput = {
@@ -72126,11 +75366,14 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
+    settings?: SyncAccountSettingsUncheckedUpdateOneWithoutSyncAccountNestedInput
   }
 
   export type GroupAddressBookUpsertWithoutTeamSyncAccountsInput = {
@@ -75063,6 +78306,8 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     lastErrorMessage?: string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -75223,6 +78468,8 @@ export namespace Prisma {
     slug: string
     description?: string | null
     isDefault?: boolean
+    deviceWritable?: boolean
+    sourceBookIds?: AddressBookCreatesourceBookIdsInput | string[]
     sourceGroupBookId?: string | null
     archivedAt?: Date | string | null
     createdAt?: Date | string
@@ -75724,12 +78971,15 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
     syncJobs?: SyncJobUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutSyncAccountNestedInput
     teamLink?: TeamSyncAccountUpdateOneWithoutSyncAccountNestedInput
+    settings?: SyncAccountSettingsUpdateOneWithoutSyncAccountNestedInput
   }
 
   export type SyncAccountUncheckedUpdateWithoutUserInput = {
@@ -75757,12 +79007,15 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
     teamLink?: TeamSyncAccountUncheckedUpdateOneWithoutSyncAccountNestedInput
+    settings?: SyncAccountSettingsUncheckedUpdateOneWithoutSyncAccountNestedInput
   }
 
   export type SyncAccountUncheckedUpdateManyWithoutUserInput = {
@@ -75790,6 +79043,8 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
+    booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -76258,6 +79513,8 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    deviceWritable?: BoolFieldUpdateOperationsInput | boolean
+    sourceBookIds?: AddressBookUpdatesourceBookIdsInput | string[]
     sourceGroupBookId?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -76271,6 +79528,8 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    deviceWritable?: BoolFieldUpdateOperationsInput | boolean
+    sourceBookIds?: AddressBookUpdatesourceBookIdsInput | string[]
     sourceGroupBookId?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
@@ -76284,6 +79543,8 @@ export namespace Prisma {
     slug?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
     isDefault?: BoolFieldUpdateOperationsInput | boolean
+    deviceWritable?: BoolFieldUpdateOperationsInput | boolean
+    sourceBookIds?: AddressBookUpdatesourceBookIdsInput | string[]
     sourceGroupBookId?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
