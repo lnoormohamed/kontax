@@ -25,6 +25,10 @@ const requireUserId = async () => {
   if (!session?.user?.id) {
     throw new Error("You need to be signed in.");
   }
+  // P21-07: impersonation sessions are read-only.
+  if (session.impersonatedBy) {
+    throw new Error("This is a read-only impersonation session — changes are blocked.");
+  }
   return session.user.id;
 };
 

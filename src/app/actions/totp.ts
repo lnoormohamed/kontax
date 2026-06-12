@@ -24,6 +24,7 @@ export async function startTotpEnrolment(): Promise<
 > {
   const session = await auth();
   if (!session?.user?.id) return { error: "UNAUTHORIZED" };
+  if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
 
   const user = await db.user.findUnique({
     where: { id: session.user.id },
@@ -52,6 +53,7 @@ export async function confirmTotpEnrolment(input: {
 }): Promise<{ success: true; recoveryCodes: string[] } | { error: string }> {
   const session = await auth();
   if (!session?.user?.id) return { error: "UNAUTHORIZED" };
+  if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
 
   // Decrypt and validate the pending token
   let payload: { secret: string; expiresAt: number };
@@ -101,6 +103,7 @@ export async function regenerateRecoveryCodes(): Promise<
 > {
   const session = await auth();
   if (!session?.user?.id) return { error: "UNAUTHORIZED" };
+  if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
 
   const user = await db.user.findUnique({
     where: { id: session.user.id },
@@ -132,6 +135,7 @@ export async function submitTotpChallenge(
 ): Promise<{ success: true } | { error: string }> {
   const session = await auth();
   if (!session?.user?.id) return { error: "UNAUTHORIZED" };
+  if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
   if (!session.pendingTotp) return { error: "NOT_PENDING_TOTP" };
 
   const rl = await checkRateLimit(rateLimiters.totpChallenge, `user:${session.user.id}`);
@@ -162,6 +166,7 @@ export async function redeemTotpRecoveryCode(
 ): Promise<{ success: true; remaining: number } | { error: string }> {
   const session = await auth();
   if (!session?.user?.id) return { error: "UNAUTHORIZED" };
+  if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
   if (!session.pendingTotp) return { error: "NOT_PENDING_TOTP" };
 
   const rl = await checkRateLimit(rateLimiters.totpRecovery, `user:${session.user.id}`);
@@ -198,6 +203,7 @@ export async function disableTotpAuth(input: {
 }): Promise<{ success: true } | { error: string }> {
   const session = await auth();
   if (!session?.user?.id) return { error: "UNAUTHORIZED" };
+  if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
 
   const user = await db.user.findUnique({
     where: { id: session.user.id },

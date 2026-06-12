@@ -303,15 +303,15 @@ This roadmap is the implementation source of truth for phases 1–16. Each phase
 
 | Ticket | Phase | Status | Priority | Depends On | Owner | Acceptance |
 | --- | --- | --- | --- | --- | --- | --- |
-| P21-DB04 | 21 | Not Started | P1 | — | Unassigned | Design brief covers all admin surfaces, table states, confirmation dialogs, and impersonation banner |
-| P21-01 | 21 | Not Started | P0 | P18-10 | Unassigned | UserRole enum; User.role; middleware redirects non-admins from /admin/**; assertAdmin() throws FORBIDDEN; admin layout shell renders |
-| P21-02 | 21 | Not Started | P0 | P21-01 | Unassigned | AdminAuditEvent model; emitAdminEvent callable; /admin/audit table paginated and filterable; read-only |
-| P21-03 | 21 | Not Started | P0 | P21-01, P21-02 | Unassigned | /admin/users search works by email and name; /admin/users/[id] shows all account, usage, session, and activity fields; USER_VIEWED emitted |
-| P21-04 | 21 | Not Started | P1 | P21-02, P21-03 | Unassigned | overridePlan sets local subscription plan without touching Stripe; override badge visible in admin and user settings |
-| P21-05 | 21 | Not Started | P0 | P21-02, P21-03, P18-09, P20-08 | Unassigned | suspendAccount sets LOCKED and invalidates sessions; unsuspendAccount restores ACTIVE; adminDeleteAccount schedules 30-day deletion; each requires reason; audit events emitted |
-| P21-06 | 21 | Not Started | P1 | P21-01 | Unassigned | /admin/metrics shows live user counts, plan breakdown, DAU/MAU, import/sync error rates; warning indicator at >5% failure |
-| P21-07 | 21 | Not Started | P2 | P21-01, P21-02 | Unassigned | Admin can impersonate non-admin user; all write actions return WRITE_BLOCKED; impersonation banner visible; end returns admin session; cannot impersonate admin |
-| P21-08 | 21 | Not Started | P1 | P21-01, P21-02 | Unassigned | FeatureFlag model; isFeatureEnabled with per-user and rollout-percent modes; /admin/feature-flags CRUD; FEATURE_FLAG_CHANGED emitted |
+| P21-DB04 | 21 | Done | P1 | — | Unassigned | Design brief covers all admin surfaces, table states, confirmation dialogs, and impersonation banner |
+| P21-01 | 21 | Done | P0 | P18-10 | Unassigned | UserRole enum + User.role; middleware redirects non-admins from /admin/**; assertAdmin() throws FORBIDDEN; admin shell (sidebar/header/CSS) renders |
+| P21-02 | 21 | Done | P0 | P21-01 | Unassigned | AdminAuditEvent model; emitAdminEvent + ADMIN_ACTIONS; /admin/audit paginated (50/page) + action/target/range filters + row-expand JSON; read-only |
+| P21-03 | 21 | Done | P0 | P21-01, P21-02 | Unassigned | /admin/users search by email/name; /admin/users/[id] shows overview, subscription, live usage vs entitlements, group, activity, sessions; USER_VIEWED emitted |
+| P21-04 | 21 | Done | P1 | P21-02, P21-03 | Unassigned | overridePlan upserts local subscription (admin-override-*), never touches Stripe; override badge in admin detail + user settings banner |
+| P21-05 | 21 | Done | P0 | P21-02, P21-03, P18-09, P20-08 | Unassigned | suspendAccount sets LOCKED + bumps sessionVersion + suspension email; unsuspendAccount restores ACTIVE; adminDeleteAccount schedules 30-day deletion; reason required; events emitted |
+| P21-06 | 21 | Done | P1 | P21-01 | Unassigned | /admin/metrics shows live user counts, plan breakdown, paying/MRR, sync/imports, 24h import/sync error rates; amber >5% / red >15% severity |
+| P21-07 | 21 | Done | P2 | P21-01, P21-02 | Unassigned | Signed-cookie impersonation; auth() resolves to target for ADMINs; write actions blocked (contacts/import/sync/app-pwds/settings/account/shares/family/teams/totp); banner in root layout; end restores admin; cannot impersonate admin |
+| P21-08 | 21 | Done | P1 | P21-01, P21-02 | Unassigned | FeatureFlag model; isFeatureEnabled (off/all/specific/rollout %); /admin/feature-flags binary toggle + Edit slide-over; FEATURE_FLAG_CHANGED emitted |
 
 ### Phase 22 — In-App Notifications & Security Alerts
 
