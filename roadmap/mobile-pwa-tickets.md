@@ -70,7 +70,7 @@ Requirements** section; the paired build ticket builds to it.
 | P24B-08 | Contact detail: 4 green-tint **ActionPills** + scroll-aware compact header; Free history cap (last 3) + Sharing-tab gating | E2 | P1 | ✅ | P24B-03 |
 | P24B-09 | Activity: mobile **GroupCard event rows** + retention caption; keep Free upsell (distinct from empty) | E4 | P1 | ✅ | P24B-03 |
 | P24B-10 | Sync: confirm to spec + Free **CardDAV upsell / 1-account cap** variance | E5 | P2 | ✅ | P24B-03 |
-| P24B-11 | Contacts list: sticky group headers (deferred from P24A) + limit/read-only variance | E1 | P2 | ☐ | P24B-03 |
+| P24B-11 | Contacts list: sticky group headers (deferred from P24A) + limit/read-only variance | E1 | P2 | ✅ | P24B-03 |
 | P24B-22 | Mobile **search overlay** → to spec (results, recents, no-match, offline) | E13 | P1 | ☐ | P24B-DB18 |
 | P24B-23 | Mobile **notifications overlay** → to spec (category rows, security drawer, mark-all-read; cover bottom nav) | E14 | P1 | ☐ | P24B-DB18 |
 
@@ -180,3 +180,11 @@ Requirements** section; the paired build ticket builds to it.
   "Sync is a Pro feature"; **Pro+** → cards + Add, disabled at syncAccountsLimit (with reason);
   **read-only** → ReadOnlyBanner + Add disabled. Verified Free (upsell) and Pro (enabled Add) at 375px
   via the temp-Pro recipe.
+- 2026-06-13 — **P24B-11 done** — sticky group headers in the virtualized contacts list: a scroll-driven
+  overlay (`position: sticky`, md:hidden) pins the current section letter at the top of the scroll
+  viewport (native sticky can't pin absolutely-positioned virtual rows). Verified at 375px with 70
+  seeded contacts ("C" pins while C rows scroll under it). Variance: the near-limit + read-only banners
+  already exist in contact-dashboard and the read-only FAB is already hidden (canWrite); added an
+  `atLimit` prop so the create FAB hides at the contact cap (the near-limit banner explains + Upgrade).
+  NOTE: ~60 random contacts were seeded into ngozi for scroll testing — re-run seed-demo-showcase for a
+  clean demo. (Turbopack/SW staleness masked the working code mid-build; a clean .next + SW clear fixed it.)

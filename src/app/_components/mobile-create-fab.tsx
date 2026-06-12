@@ -10,12 +10,15 @@ interface MobileCreateFabProps {
   /** Only the contacts (people) list shows the FAB — matches the mobile design,
    *  which has no create FAB on Activity / Archived / Duplicates. */
   show?: boolean;
+  /** At the plan's contact ceiling (Free 500) — hide the FAB; the near-limit
+   *  banner explains why and offers Upgrade. */
+  atLimit?: boolean;
 }
 
-export function MobileCreateFab({ canWrite, show = true }: MobileCreateFabProps) {
+export function MobileCreateFab({ canWrite, show = true, atLimit = false }: MobileCreateFabProps) {
   const [open, setOpen] = useState(false);
 
-  if (!canWrite || !show) return null;
+  if (!canWrite || !show || atLimit) return null;
 
   return (
     <>

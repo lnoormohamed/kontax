@@ -739,6 +739,33 @@ export function ContactsWorkspaceTable({
 
       {/* Virtualised list — only renders rows near the viewport */}
       <div ref={listRef} style={{ height: virtualizer.getTotalSize(), position: "relative" }}>
+        {/* Sticky group header (mobile) — native sticky can't pin the absolutely
+            positioned virtual rows, so we overlay the current section's header at
+            the top of the scroll viewport, recomputed each scroll-driven render. */}
+        {(() => {
+          const items = virtualizer.getVirtualItems();
+          if (items.length === 0) return null;
+          const offset = scrollEl?.scrollTop ?? 0;
+          let topIndex = items[0]!.index;
+          for (const it of items) {
+            if (it.start <= offset) topIndex = it.index;
+            else break;
+          }
+          let section: (typeof flatRows)[number] | null = null;
+          for (let i = topIndex; i >= 0; i--) {
+            const r = flatRows[i];
+            if (r?.type === "group-header") {
+              section = r;
+              break;
+            }
+          }
+          if (!section || section.type !== "group-header") return null;
+          return (
+            <div className="md:hidden" style={{ position: "sticky", top: 0, zIndex: 5 }}>
+              <GroupHeading favorites={section.favorites} label={section.label} />
+            </div>
+          );
+        })()}
         {virtualizer.getVirtualItems().map((vItem) => {
           const row = flatRows[vItem.index]!;
           return (
