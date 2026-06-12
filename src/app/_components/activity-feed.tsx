@@ -281,7 +281,7 @@ function FilterBar({
   return (
     <div className="border-b border-[#e9ece7]">
       <div
-        className="mx-auto flex flex-wrap items-center gap-[7px] px-[18px] py-3"
+        className="mx-auto flex flex-nowrap items-center gap-[7px] overflow-x-auto px-[18px] py-3 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:flex-wrap md:overflow-x-visible"
         style={{ maxWidth: 760 }}
       >
         <span className="mr-px text-[10px] font-medium uppercase tracking-[0.06em] text-[#8b938c]">

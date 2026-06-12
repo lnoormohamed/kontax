@@ -68,7 +68,7 @@ Requirements** section; the paired build ticket builds to it.
 | Ticket | Title | Spec § | Priority | Status | Depends |
 | --- | --- | --- | --- | --- | --- |
 | P24B-08 | Contact detail: 4 green-tint **ActionPills** + scroll-aware compact header; Free history cap (last 3) + Sharing-tab gating | E2 | P1 | ✅ | P24B-03 |
-| P24B-09 | Activity: mobile **GroupCard event rows** + retention caption; keep Free upsell (distinct from empty) | E4 | P1 | ☐ | P24B-03 |
+| P24B-09 | Activity: mobile **GroupCard event rows** + retention caption; keep Free upsell (distinct from empty) | E4 | P1 | ✅ | P24B-03 |
 | P24B-10 | Sync: confirm to spec + Free **CardDAV upsell / 1-account cap** variance | E5 | P2 | ☐ | P24B-03 |
 | P24B-11 | Contacts list: sticky group headers (deferred from P24A) + limit/read-only variance | E1 | P2 | ☐ | P24B-03 |
 | P24B-22 | Mobile **search overlay** → to spec (results, recents, no-match, offline) | E13 | P1 | ☐ | P24B-DB18 |
@@ -170,3 +170,8 @@ Requirements** section; the paired build ticket builds to it.
   Share / Archive moved into a "More" bottom sheet. Verified at 375px. Scroll-aware compact header
   already existed; Free Sharing-tab gating ("Pro & above") and history cap are already enforced by the
   existing plan-aware ContactSharing / ContactHistory components.
+- 2026-06-13 — **P24B-09 done** — verified the unlocked activity feed at 375px with a temporary Pro
+  account: it already renders as a responsive GroupCard event feed (circle icon · name/action · actor ·
+  timestamp), with the retention caption at the footer and the Free upsell (P24A) correct. The one real
+  fix: the FilterBar now h-scrolls as a single row on mobile (`flex-nowrap overflow-x-auto`,
+  `md:flex-wrap`) instead of wrapping into 3 rows — reclaims vertical space per spec §E4.
