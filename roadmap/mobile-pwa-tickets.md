@@ -67,7 +67,7 @@ Requirements** section; the paired build ticket builds to it.
 ## Workstream C — Tab screens to spec
 | Ticket | Title | Spec § | Priority | Status | Depends |
 | --- | --- | --- | --- | --- | --- |
-| P24B-08 | Contact detail: 4 green-tint **ActionPills** + scroll-aware compact header; Free history cap (last 3) + Sharing-tab gating | E2 | P1 | ☐ | P24B-03 |
+| P24B-08 | Contact detail: 4 green-tint **ActionPills** + scroll-aware compact header; Free history cap (last 3) + Sharing-tab gating | E2 | P1 | ✅ | P24B-03 |
 | P24B-09 | Activity: mobile **GroupCard event rows** + retention caption; keep Free upsell (distinct from empty) | E4 | P1 | ☐ | P24B-03 |
 | P24B-10 | Sync: confirm to spec + Free **CardDAV upsell / 1-account cap** variance | E5 | P2 | ☐ | P24B-03 |
 | P24B-11 | Contacts list: sticky group headers (deferred from P24A) + limit/read-only variance | E1 | P2 | ☐ | P24B-03 |
@@ -165,3 +165,8 @@ Requirements** section; the paired build ticket builds to it.
 - 2026-06-13 — **P24B-24 done** (bug) — shared contacts now open for members (detail access mirrors
   the list); mobile sort/view/scope toolbar removed; SW no longer caches redirected navigations (v3).
   Note: a *separate* intermittent "login screen on tap/unfav" auth-session bug is still open.
+- 2026-06-13 — **P24B-08 done** — contact detail action row → 4 green-tint ActionPills
+  (Call · Message · Email · More) per the design; added a `message` (chat-bubble) icon. Favourite /
+  Share / Archive moved into a "More" bottom sheet. Verified at 375px. Scroll-aware compact header
+  already existed; Free Sharing-tab gating ("Pro & above") and history cap are already enforced by the
+  existing plan-aware ContactSharing / ContactHistory components.

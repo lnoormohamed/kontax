@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import { useContactEdit } from "~/app/_components/contact-inline-editor";
+import { MobileBottomSheet } from "~/app/_components/mobile-bottom-sheet";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 
 interface MobileContactDetailProps {
@@ -51,6 +52,7 @@ export function MobileContactDetail({
 }: MobileContactDetailProps) {
   const { mode, saving, enterEdit, cancel, save } = useContactEdit();
   const editing = mode === "edit";
+  const [moreOpen, setMoreOpen] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [heroVisible, setHeroVisible] = useState(true);
@@ -360,75 +362,64 @@ export function MobileContactDetail({
           )}
         </div>
 
-        {/* Quick action buttons */}
-        <div
-          style={{
-            display: "flex",
-            gap: 10,
-            justifyContent: "center",
-            marginTop: 20,
-          }}
-        >
-          {phone && (
-            <a
-              aria-label="Call"
-              href={`tel:${phone}`}
-              style={quickActionStyle}
-            >
-              <WorkspaceIcon name="phone" size={22} />
-              <span style={quickActionLabelStyle}>Call</span>
+        {/* Action pills — Call · Message · Email · More (design ActionRow) */}
+        <div style={{ display: "flex", gap: 8, marginTop: 18 }}>
+          {phone ? (
+            <a aria-label="Call" href={`tel:${phone}`} style={pillStyle}>
+              <span style={pillCircleStyle}>
+                <WorkspaceIcon name="phone" size={21} className="text-[#17352e]" />
+              </span>
+              <span style={pillLabelStyle}>Call</span>
             </a>
-          )}
-          {email && (
-            <a
-              aria-label="Email"
-              href={`mailto:${email}`}
-              style={quickActionStyle}
-            >
-              <WorkspaceIcon name="mail" size={22} />
-              <span style={quickActionLabelStyle}>Email</span>
+          ) : null}
+          {phone ? (
+            <a aria-label="Message" href={`sms:${phone}`} style={pillStyle}>
+              <span style={pillCircleStyle}>
+                <WorkspaceIcon name="message" size={21} className="text-[#17352e]" />
+              </span>
+              <span style={pillLabelStyle}>Message</span>
             </a>
-          )}
-          <form action={toggleFavoriteAction} style={{ display: "contents" }}>
-            <input name="contactId" type="hidden" value={contactId} />
-            <button
-              aria-label={isFavorite ? "Unfavorite" : "Favorite"}
-              style={{
-                ...quickActionStyle,
-                color: isFavorite ? "#e0a31c" : "#5c655e",
-              }}
-              type="submit"
-            >
-              <WorkspaceIcon
-                fill={isFavorite ? "#e0a31c" : "none"}
-                name="star"
-                size={22}
-              />
-              <span style={quickActionLabelStyle}>{isFavorite ? "Unfav" : "Fav"}</span>
-            </button>
-          </form>
-          <form action={archiveOrRestoreAction} style={{ display: "contents" }}>
-            <input name="contactId" type="hidden" value={contactId} />
-            <button
-              aria-label={isArchived ? "Restore" : "Archive"}
-              style={quickActionStyle}
-              type="submit"
-            >
-              <WorkspaceIcon name={isArchived ? "restore" : "archive"} size={22} />
-              <span style={quickActionLabelStyle}>{isArchived ? "Restore" : "Archive"}</span>
-            </button>
-          </form>
-          <Link
-            aria-label="Share"
-            href={`/contacts/${contactId}?tab=sharing`}
-            prefetch={false}
-            style={quickActionStyle}
-          >
-            <WorkspaceIcon name="share" size={22} />
-            <span style={quickActionLabelStyle}>Share</span>
-          </Link>
+          ) : null}
+          {email ? (
+            <a aria-label="Email" href={`mailto:${email}`} style={pillStyle}>
+              <span style={pillCircleStyle}>
+                <WorkspaceIcon name="mail" size={21} className="text-[#17352e]" />
+              </span>
+              <span style={pillLabelStyle}>Email</span>
+            </a>
+          ) : null}
+          <button type="button" aria-label="More actions" onClick={() => setMoreOpen(true)} style={{ ...pillStyle, border: "none", background: "transparent" }}>
+            <span style={pillCircleStyle}>
+              <WorkspaceIcon name="more" size={21} className="text-[#17352e]" />
+            </span>
+            <span style={pillLabelStyle}>More</span>
+          </button>
         </div>
       </div>
+
+      {/* More actions sheet — Favourite · Archive · Share */}
+      <MobileBottomSheet isOpen={moreOpen} onClose={() => setMoreOpen(false)} title={contactName}>
+        <div style={{ display: "flex", flexDirection: "column" }}>
+          <form action={toggleFavoriteAction} onSubmit={() => setMoreOpen(false)}>
+            <input name="contactId" type="hidden" value={contactId} />
+            <button type="submit" style={moreRowStyle}>
+              <WorkspaceIcon name="star" size={20} fill={isFavorite ? "#bf8526" : "none"} className={isFavorite ? "text-[#bf8526]" : "text-[#5c655e]"} />
+              <span style={moreLabelStyle}>{isFavorite ? "Remove from favourites" : "Add to favourites"}</span>
+            </button>
+          </form>
+          <Link href={`/contacts/${contactId}?tab=sharing`} prefetch={false} onClick={() => setMoreOpen(false)} style={moreRowStyle}>
+            <WorkspaceIcon name="share" size={20} className="text-[#5c655e]" />
+            <span style={moreLabelStyle}>Share</span>
+          </Link>
+          <form action={archiveOrRestoreAction} onSubmit={() => setMoreOpen(false)}>
+            <input name="contactId" type="hidden" value={contactId} />
+            <button type="submit" style={{ ...moreRowStyle, color: isArchived ? "#1d2823" : "#b5472f" }}>
+              <WorkspaceIcon name={isArchived ? "restore" : "archive"} size={20} className={isArchived ? "text-[#5c655e]" : "text-[#b5472f]"} />
+              <span style={{ ...moreLabelStyle, color: isArchived ? "#1d2823" : "#b5472f" }}>{isArchived ? "Restore contact" : "Archive contact"}</span>
+            </button>
+          </form>
+        </div>
+      </MobileBottomSheet>
 
       {/* Sticky tab bar */}
       <div
@@ -506,27 +497,52 @@ export function MobileContactDetail({
   );
 }
 
-const quickActionStyle: React.CSSProperties = {
+// Design ActionPill: column, 46px green-tint circle + 11.5/600 label.
+const pillStyle: React.CSSProperties = {
+  flex: 1,
   display: "flex",
   flexDirection: "column",
   alignItems: "center",
-  justifyContent: "center",
-  gap: 5,
-  width: 60,
-  height: 60,
-  borderRadius: 14,
-  border: "1px solid #d8ddd6",
-  backgroundColor: "#fff",
-  color: "#17352e",
+  gap: 6,
+  border: "none",
+  background: "transparent",
+  padding: "4px 0",
   textDecoration: "none",
   cursor: "pointer",
-  fontSize: 11,
-  fontWeight: 600,
   WebkitTapHighlightColor: "transparent",
 };
 
-const quickActionLabelStyle: React.CSSProperties = {
-  fontSize: 11,
+const pillCircleStyle: React.CSSProperties = {
+  width: 46,
+  height: 46,
+  borderRadius: "50%",
+  background: "#e7efe9",
+  display: "grid",
+  placeItems: "center",
+};
+
+const pillLabelStyle: React.CSSProperties = {
+  fontSize: 11.5,
   fontWeight: 600,
   color: "#5c655e",
+};
+
+const moreRowStyle: React.CSSProperties = {
+  display: "flex",
+  alignItems: "center",
+  gap: 14,
+  width: "100%",
+  height: 52,
+  padding: "0 4px",
+  border: "none",
+  background: "transparent",
+  cursor: "pointer",
+  textDecoration: "none",
+  borderBottom: "1px solid #f2f4f0",
+};
+
+const moreLabelStyle: React.CSSProperties = {
+  fontSize: 15,
+  fontWeight: 500,
+  color: "#1d2823",
 };
