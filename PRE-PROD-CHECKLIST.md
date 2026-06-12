@@ -1,4 +1,4 @@
-# TBD — pre-production checklist
+# Pre-production checklist
 
 Operational / infra items deferred until we go to prod. These are **not code gaps** —
 the code is shipped and working; these are deployment-environment steps. Clean up
