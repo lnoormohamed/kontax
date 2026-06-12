@@ -47,6 +47,14 @@ Per spec §E3 and §D1–D3.
 - Person/Organisation toggle and Save-to target work; save persists via the existing action.
 - Variance: read-only (GRACE/LOCKED) hides the create entry points entirely.
 
+## Decision (2026-06-13)
+
+Create uses the new `MobileContactSheet` (collapsible sections, pinned Save). **Edit keeps the
+existing in-place `ContactInlineEditor`** — it covers the full field set (middle name, phonetic,
+websites, related people, significant dates, custom fields) which the focused sheet intentionally does
+not. The sheet remains edit-capable for future use; the comprehensive editor is the better edit UX, so
+the detail "Edit" button is unchanged. The full create form stays the `?full=1` fallback. Done.
+
 ## Risks and Open Questions
 
 - `visualViewport` is iOS 13+; fall back to a fixed bottom padding on older iOS.

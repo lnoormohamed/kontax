@@ -62,7 +62,7 @@ Requirements** section; the paired build ticket builds to it.
 ## Workstream B — Core write flow
 | Ticket | Title | Spec § | Priority | Status | Depends |
 | --- | --- | --- | --- | --- | --- |
-| P24B-07 | Create/Edit as **bottom sheet** — collapsible sections, keyboard accessory bar, pinned Save; full page kept as `?full=1` fallback | E3, D1–D3 | **P0** | ☐ | P24B-03 |
+| P24B-07 | Create/Edit as **bottom sheet** — collapsible sections, keyboard accessory bar, pinned Save; full page kept as `?full=1` fallback | E3, D1–D3 | **P0** | ✅ | P24B-03 |
 
 ## Workstream C — Tab screens to spec
 | Ticket | Title | Spec § | Priority | Status | Depends |
@@ -158,3 +158,10 @@ Requirements** section; the paired build ticket builds to it.
   `MobileTable` (stack-to-cards + sticky-column scroll; demo `/wireframes/mobile-table`),
   `ConfirmDialog` (portal, scrim/Escape dismiss, destructive/neutral; demo `/wireframes/confirm-dialog`).
   **Wave 1 foundations all ✅** — next is the P0 P24B-07 (create/edit bottom sheet).
+- 2026-06-13 — **P24B-07 done** — create contact via the design bottom sheet (`MobileContactSheet`:
+  collapsible Basic/Phones/Emails/Address/More, pinned Save, keyboard-aware). FAB opens it; verified
+  end-to-end at 375px (create → saved → detail). **Decision:** edit keeps the comprehensive in-place
+  `ContactInlineEditor` (fuller field set than the sheet); full form is the `?full=1` fallback.
+- 2026-06-13 — **P24B-24 done** (bug) — shared contacts now open for members (detail access mirrors
+  the list); mobile sort/view/scope toolbar removed; SW no longer caches redirected navigations (v3).
+  Note: a *separate* intermittent "login screen on tap/unfav" auth-session bug is still open.
