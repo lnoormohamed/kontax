@@ -1,5 +1,7 @@
 import Link from "next/link";
+import { Suspense } from "react";
 
+import { MobileSearchButton } from "~/app/_components/mobile-search-button";
 import { NotificationBellSlot } from "~/app/_components/notification-bell-slot";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 
@@ -63,8 +65,11 @@ export function MobileHomeHeader({ userId }: MobileHomeHeaderProps) {
         </span>
       </Link>
 
-      <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 4 }}>
+      <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 0 }}>
         <NotificationBellSlot userId={userId} />
+        <Suspense fallback={null}>
+          <MobileSearchButton />
+        </Suspense>
       </div>
     </header>
   );

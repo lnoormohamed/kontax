@@ -377,15 +377,30 @@ function ContactRow({
 }
 
 function GroupHeading({ label, favorites }: { label: string; favorites?: boolean }) {
+  if (favorites) {
+    return (
+      <div className="flex items-center gap-2 px-4 pb-1.5 pt-3.5">
+        <span style={{ fontSize: 14, color: "#c9960c" }}>★</span>
+        <span className="text-[12px] font-bold uppercase tracking-[0.06em] text-[#a07a10]">
+          Favourites
+        </span>
+        <span className="h-px flex-1 bg-[#e9ece7]" />
+      </div>
+    );
+  }
   return (
-    <div className="flex items-center gap-3 px-3 pb-1.5 pt-3.5">
-      {favorites ? <span className="text-sm text-amber-500">★</span> : null}
-      <span
-        className={`font-bold leading-none ${favorites ? "text-[12px] uppercase tracking-[0.06em] text-amber-600" : "text-[16px] text-[#aeb4ac]"}`}
-      >
-        {favorites ? "Favorites" : label}
+    <div
+      style={{
+        height: 28,
+        display: "flex",
+        alignItems: "center",
+        backgroundColor: "#f2f4f0",
+        paddingLeft: 16,
+      }}
+    >
+      <span style={{ fontSize: 11, fontWeight: 700, color: "#8b938c", lineHeight: 1 }}>
+        {label}
       </span>
-      <span className="h-px flex-1 bg-[#e9ece7]" />
     </div>
   );
 }
@@ -394,7 +409,8 @@ type VRow =
   | { type: "group-header"; label: string; favorites?: boolean }
   | { type: "contact"; contact: WorkspaceContact };
 
-const GROUP_H = 44;
+const FAVE_H = 44; // Favourites header has extra padding
+const LETTER_H = 28; // Alphabetical letter headers per design spec
 
 export function ContactsWorkspaceTable({
   contacts,
@@ -511,7 +527,11 @@ export function ContactsWorkspaceTable({
   const virtualizer = useVirtualizer({
     count: flatRows.length,
     getScrollElement: () => scrollEl,
-    estimateSize: (i) => (flatRows[i]?.type === "group-header" ? GROUP_H : rowH),
+    estimateSize: (i) => {
+      const row = flatRows[i];
+      if (row?.type === "group-header") return row.favorites ? FAVE_H : LETTER_H;
+      return rowH;
+    },
     overscan: 12,
     // 0 during SSR so server and client render the same empty list (no hydration
     // mismatch). The layout effect above sets mounted=true synchronously before

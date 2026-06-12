@@ -88,13 +88,13 @@ export function MobileCreateFab({ canWrite }: MobileCreateFabProps) {
           width: 52,
           height: 52,
           borderRadius: "50%",
-          backgroundColor: "#4158f4",
+          backgroundColor: "#1d2823",
           color: "#fff",
           border: "none",
           cursor: "pointer",
           placeItems: "center",
           zIndex: 35,
-          boxShadow: "0 4px 16px rgba(65,88,244,0.38)",
+          boxShadow: "0 4px 16px rgba(0,0,0,0.22)",
           WebkitTapHighlightColor: "transparent",
         }}
         type="button"
