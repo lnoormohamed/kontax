@@ -5,6 +5,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { z } from "zod";
 
 import { db } from "~/server/db";
+import { detectNewDeviceSignIn } from "~/server/notifications";
 
 /**
  * Module augmentation for `next-auth` types.
@@ -117,6 +118,13 @@ export const authConfig = {
         const jti = createId();
         const ip = (user as { _ip?: string | null })._ip ?? null;
         const ua = (user as { _ua?: string | null })._ua ?? null;
+        const deviceHint = parseDeviceHint(ua);
+
+        // P22-DB05: raise a security alert when this (device, IP) pair has never
+        // been seen on a prior session. Runs BEFORE the new session row is
+        // inserted so the lookup reflects history. Never throws — sign-in must
+        // not be blocked.
+        await detectNewDeviceSignIn({ userId: user.id!, ipAddress: ip, deviceHint });
 
         const [dbUser] = await Promise.all([
           db.user.findUnique({
@@ -130,7 +138,7 @@ export const authConfig = {
               jti,
               ipAddress: ip,
               userAgent: ua,
-              deviceHint: parseDeviceHint(ua),
+              deviceHint,
             },
           }),
         ]);

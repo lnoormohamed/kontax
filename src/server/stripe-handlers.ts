@@ -11,6 +11,7 @@ import {
   sendPlanChangedEmail,
   sendTrialEndingEmail,
 } from "~/server/billing-emails";
+import { createNotification } from "~/server/notifications";
 import { getStripeClient } from "~/server/stripe";
 import { getPlanFromPriceId } from "~/server/stripe-prices";
 
@@ -304,6 +305,15 @@ export async function handleInvoicePaymentFailed(
     userId: customer.userId,
     graceEndsAt,
     planName: activeSub?.plan ?? "PRO",
+  });
+
+  // P22-DB05: in-app BILLING notification (always-on / locked category).
+  void createNotification({
+    userId: customer.userId,
+    category: "BILLING",
+    title: "Payment failed",
+    body: "We couldn't process your payment. Update your payment method before your grace period ends.",
+    actionUrl: "/settings",
   });
 }
 

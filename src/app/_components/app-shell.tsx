@@ -2,6 +2,8 @@ import Link from "next/link";
 
 import { BillingBannerSlot } from "~/app/_components/billing-banner-slot";
 import { EmailVerificationBanner } from "~/app/_components/email-verification-banner";
+import { NotificationBellSlot } from "~/app/_components/notification-bell-slot";
+import { SecurityAlertBannerSlot } from "~/app/_components/security-alert-banner-slot";
 import { SearchInput } from "~/app/_components/search-input";
 import { UserMenu } from "~/app/_components/user-menu";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
@@ -92,20 +94,8 @@ export async function AppShell({
               <WorkspaceIcon name="plus" size={18} strokeWidth={2} />
               <span className="hidden sm:inline">Create contact</span>
             </Link>
-            <Link
-              aria-label={
-                incomingShares > 0 ? `${incomingShares} pending shares` : "Notifications"
-              }
-              className="relative hidden h-10 w-10 items-center justify-center rounded-full border border-[#d8ddd6] bg-white text-[#5c655e] transition hover:bg-[#f2f4f0] sm:inline-flex"
-              href="/shares"
-            >
-              <WorkspaceIcon name="bell" size={18} />
-              {incomingShares > 0 ? (
-                <span className="absolute -right-0.5 -top-0.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[#bf8526] px-1 text-[10px] font-bold text-white">
-                  {incomingShares}
-                </span>
-              ) : null}
-            </Link>
+            {/* P22-DB05: unified notification bell (replaces the legacy /shares bell). */}
+            {session?.user?.id ? <NotificationBellSlot userId={session.user.id} /> : null}
             <UserMenu email={account.email} initials={getInitials(account.name)} name={account.name} />
           </div>
         </div>
@@ -118,6 +108,9 @@ export async function AppShell({
 
       {/* P19-DB02 §2: pinned grace / trial billing banner */}
       {session?.user?.id ? <BillingBannerSlot userId={session.user.id} /> : null}
+
+      {/* P22-DB05 surface 4: security alert banner (below billing banner) */}
+      {session?.user?.id ? <SecurityAlertBannerSlot userId={session.user.id} /> : null}
 
       <div className="flex min-h-0 flex-1">
         {/* sidebar */}

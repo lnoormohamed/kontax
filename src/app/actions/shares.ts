@@ -14,6 +14,7 @@ import {
 import ShareInvite from "~/emails/share-invite";
 import { db } from "~/server/db";
 import { appUrl, sendEmail } from "~/server/email";
+import { createNotification } from "~/server/notifications";
 import { renderEmail } from "~/server/render-email";
 
 // Notify the recipient by email (P12-06 / P20-06). No-op when SES isn't
@@ -227,6 +228,17 @@ export const createStaticShare = async (formData: FormData) => {
     live: false,
   });
 
+  // P22-DB05: in-app SHARING notification for registered recipients.
+  if (recipient?.id) {
+    await createNotification({
+      userId: recipient.id,
+      category: "SHARING",
+      title: `${ownerName} shared a contact`,
+      body: `"${contact.fullName ?? "A contact"}" was shared with you — accept it in Shared with me.`,
+      actionUrl: "/shares",
+    });
+  }
+
   revalidatePath(`/contacts/${contactId}`);
 };
 
@@ -433,6 +445,17 @@ export const createLiveShare = async (formData: FormData) => {
     recipientExists: Boolean(recipient?.id),
     live: true,
   });
+
+  // P22-DB05: in-app SHARING notification for registered recipients.
+  if (recipient?.id) {
+    await createNotification({
+      userId: recipient.id,
+      category: "SHARING",
+      title: `${ownerName} shared a contact`,
+      body: `"${snapshotFields.fullName ?? "A contact"}" was shared with you — accept it in Shared with me.`,
+      actionUrl: "/shares",
+    });
+  }
 
   revalidatePath(`/contacts/${contactId}`);
 };

@@ -1,13 +1,13 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { NotificationBellSlot } from "~/app/_components/notification-bell-slot";
 import { SearchInput } from "~/app/_components/search-input";
 import { SettingsSidebar } from "~/app/_components/settings-sidebar";
 import { UserMenu } from "~/app/_components/user-menu";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
-import { db } from "~/server/db";
 import { getUserFamilyMembership } from "~/server/family-access";
 import { getUserTeamMembership } from "~/server/team-access";
 
@@ -27,18 +27,10 @@ export default async function SettingsLayout({ children }: { children: React.Rea
   }
   const userId = session.user.id;
 
-  const [planSummary, familyMembership, teamMembership, incomingShares] = await Promise.all([
+  const [planSummary, familyMembership, teamMembership] = await Promise.all([
     getUserPlanSummary(userId),
     getUserFamilyMembership(userId),
     getUserTeamMembership(userId),
-    db.contactShare.count({
-      where: {
-        recipientUserId: userId,
-        shareType: { in: ["STATIC_COPY", "LIVE_SYNC"] },
-        status: "ACTIVE",
-        recipientContactId: null,
-      },
-    }),
   ]);
 
   const userLabel = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
@@ -76,18 +68,8 @@ export default async function SettingsLayout({ children }: { children: React.Rea
               <WorkspaceIcon name="plus" size={18} strokeWidth={2} />
               <span className="hidden sm:inline">Create contact</span>
             </Link>
-            <Link
-              aria-label={incomingShares > 0 ? `${incomingShares} pending shares` : "Notifications"}
-              className="relative hidden h-10 w-10 items-center justify-center rounded-full border border-[#d8ddd6] bg-white text-[#5c655e] transition hover:bg-[#f2f4f0] sm:inline-flex"
-              href="/shares"
-            >
-              <WorkspaceIcon name="bell" size={18} />
-              {incomingShares > 0 ? (
-                <span className="absolute -right-0.5 -top-0.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[#bf8526] px-1 text-[10px] font-bold text-white">
-                  {incomingShares}
-                </span>
-              ) : null}
-            </Link>
+            {/* P22-DB05: unified notification bell (replaces the legacy /shares bell). */}
+            <NotificationBellSlot userId={userId} />
             <UserMenu email={session.user.email ?? ""} initials={getInitials(userLabel)} name={userLabel} />
           </div>
         </div>

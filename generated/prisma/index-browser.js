@@ -603,6 +603,45 @@ exports.Prisma.StripeWebhookEventScalarFieldEnum = {
   error: 'error'
 };
 
+exports.Prisma.NotificationScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  category: 'category',
+  title: 'title',
+  body: 'body',
+  read: 'read',
+  readAt: 'readAt',
+  dismissedAt: 'dismissedAt',
+  actionUrl: 'actionUrl',
+  securityAlertId: 'securityAlertId',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.SecurityAlertScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  kind: 'kind',
+  title: 'title',
+  summary: 'summary',
+  payload: 'payload',
+  resolution: 'resolution',
+  resolvedAt: 'resolvedAt',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.NotificationSettingsScalarFieldEnum = {
+  userId: 'userId',
+  sharingInApp: 'sharingInApp',
+  sharingEmail: 'sharingEmail',
+  syncInApp: 'syncInApp',
+  syncEmail: 'syncEmail',
+  remindersInApp: 'remindersInApp',
+  remindersEmail: 'remindersEmail',
+  productInApp: 'productInApp',
+  productEmail: 'productEmail',
+  digest: 'digest'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -857,6 +896,21 @@ exports.ShareStatus = exports.$Enums.ShareStatus = {
   DECLINED: 'DECLINED'
 };
 
+exports.NotificationCategory = exports.$Enums.NotificationCategory = {
+  SECURITY: 'SECURITY',
+  SHARING: 'SHARING',
+  SYNC_STATUS: 'SYNC_STATUS',
+  BILLING: 'BILLING',
+  REMINDERS: 'REMINDERS',
+  PRODUCT_UPDATES: 'PRODUCT_UPDATES'
+};
+
+exports.DigestCadence = exports.$Enums.DigestCadence = {
+  NONE: 'NONE',
+  DAILY: 'DAILY',
+  WEEKLY: 'WEEKLY'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   AppPassword: 'AppPassword',
@@ -885,7 +939,10 @@ exports.Prisma.ModelName = {
   TeamSyncAccount: 'TeamSyncAccount',
   GroupContact: 'GroupContact',
   ContactShare: 'ContactShare',
-  StripeWebhookEvent: 'StripeWebhookEvent'
+  StripeWebhookEvent: 'StripeWebhookEvent',
+  Notification: 'Notification',
+  SecurityAlert: 'SecurityAlert',
+  NotificationSettings: 'NotificationSettings'
 };
 
 /**

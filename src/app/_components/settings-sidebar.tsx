@@ -28,6 +28,7 @@ const SECTIONS = [
   { href: "/settings/profile", icon: "people", label: "Profile" },
   { href: "/settings/account", icon: "person", label: "Account" },
   { href: "/settings/preferences", icon: "gear", label: "Preferences" },
+  { href: "/settings/notifications", icon: "bell", label: "Notifications" },
   { href: "/settings/devices", icon: "phone", label: "Devices & app passwords" },
   { href: "/sync", icon: "sync", label: "Sync connections" },
   { href: "/settings/security", icon: "emergency", label: "Security & session" },

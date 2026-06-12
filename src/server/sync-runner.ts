@@ -7,6 +7,7 @@ import {
 import { parseContactPostalAddresses, parseContactStringArray } from "~/server/contact-portability";
 import { db } from "~/server/db";
 import { emitEvent } from "~/lib/activity";
+import { createNotification } from "~/server/notifications";
 import {
   AUTO_PAUSE_FAILURE_STREAK,
   getConsecutiveFailureStreak,
@@ -208,6 +209,30 @@ const markJobFailed = async ({
       },
     }),
   ]);
+
+  // P22-DB05: notify on the transition into an attention-needed state (re-auth
+  // required or auto-paused) — not on every transient retry.
+  if (
+    (finalStatus === "NEEDS_REAUTH" || finalStatus === "PAUSED") &&
+    accountStatus !== finalStatus
+  ) {
+    const account = await db.syncAccount.findUnique({
+      where: { id: syncAccountId },
+      select: { userId: true, provider: true },
+    });
+    if (account) {
+      const needsReauth = finalStatus === "NEEDS_REAUTH";
+      await createNotification({
+        userId: account.userId,
+        category: "SYNC_STATUS",
+        title: `Sync error — ${account.provider}`,
+        body: needsReauth
+          ? "Re-authentication is required to keep this account in sync."
+          : "Kontax paused this sync account after repeated failures. Review it to resume syncing.",
+        actionUrl: "/sync",
+      });
+    }
+  }
 };
 
 export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) => {

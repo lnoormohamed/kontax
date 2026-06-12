@@ -232,6 +232,10 @@ model User {
     totpRecoveryCodes       TotpRecoveryCode[]
     addressBooks            AddressBook[]
     adminAuditEvents        AdminAuditEvent[]       @relation("AdminActor")
+    // P22-DB05: in-app notification layer
+    notifications           Notification[]
+    securityAlerts          SecurityAlert[]
+    notificationSettings    NotificationSettings?
     createdAt             DateTime                @default(now())
     updatedAt             DateTime                @updatedAt
 
@@ -961,4 +965,83 @@ model StripeWebhookEvent {
 
     @@index([stripeEventId])
     @@index([processedAt])
+}
+
+// --- Notification & suspicious-activity layer (Phase 22, P22-DB05) -------------
+
+enum NotificationCategory {
+    SECURITY
+    SHARING
+    SYNC_STATUS
+    BILLING
+    REMINDERS
+    PRODUCT_UPDATES
+}
+
+enum DigestCadence {
+    NONE
+    DAILY
+    WEEKLY
+}
+
+// In-app notification feed row. One per user-facing event; the bell badge counts
+// unread (read=false), the dropdown lists non-dismissed rows newest-first.
+model Notification {
+    id              String               @id @default(cuid())
+    userId          String
+    category        NotificationCategory
+    title           String
+    body            String
+    read            Boolean              @default(false)
+    readAt          DateTime?
+    dismissedAt     DateTime?
+    // SHARING uses this to deep-link (e.g. "/shares"); null otherwise.
+    actionUrl       String?
+    // SECURITY rows deep-link 1:1 to their anomaly (Resolution 3).
+    securityAlertId String?
+    createdAt       DateTime             @default(now())
+
+    user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+    securityAlert SecurityAlert? @relation(fields: [securityAlertId], references: [id], onDelete: SetNull)
+
+    @@index([userId, createdAt(sort: Desc)])
+    @@index([userId, read])
+}
+
+// Persisted anomaly record behind a SECURITY notification. kind drives the drawer
+// variant: "device" → IP/device block, "bulk" → affected-contacts event list.
+model SecurityAlert {
+    id         String    @id @default(cuid())
+    userId     String
+    kind       String
+    title      String
+    summary    String
+    // device: { "Device", "IP address", "Time" } · bulk: { events:[{name,at}], more }
+    payload    Json      @default("{}")
+    // null = active (shows in banner) · "DISMISSED" (that-was-me) · "SECURED" (wasn't-me)
+    resolution String?
+    resolvedAt DateTime?
+    createdAt  DateTime  @default(now())
+
+    user          User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+    notifications Notification[]
+
+    @@index([userId, createdAt(sort: Desc)])
+}
+
+// Per-user notification preferences. One row per user (lazily created with the
+// brief's defaults). SECURITY and BILLING are always-on and have no columns.
+model NotificationSettings {
+    userId         String        @id
+    sharingInApp   Boolean       @default(true)
+    sharingEmail   Boolean       @default(true)
+    syncInApp      Boolean       @default(true)
+    syncEmail      Boolean       @default(true)
+    remindersInApp Boolean       @default(true)
+    remindersEmail Boolean       @default(false)
+    productInApp   Boolean       @default(true)
+    productEmail   Boolean       @default(false)
+    digest         DigestCadence @default(NONE)
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

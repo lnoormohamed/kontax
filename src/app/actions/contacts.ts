@@ -15,6 +15,7 @@ import {
 import { propagateLiveShares } from "~/server/contact-shares";
 import { db } from "~/server/db";
 import { editableContactWhere, getUserFamilyMembership } from "~/server/family-access";
+import { detectBulkContactDelete } from "~/server/notifications";
 import { resolveContactEditAccess } from "~/server/shared-access";
 import { canEditTeamBook } from "~/server/team-access";
 import { emitEvent } from "~/lib/activity";
@@ -447,6 +448,18 @@ const parseContactIds = (formData: FormData) => {
   }
 
   return [...new Set(contactIds)];
+};
+
+// Best-effort display name for activity payloads / security-alert samples.
+const contactDisplayName = (c: {
+  fullName?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+}) => {
+  const full = c.fullName?.trim();
+  if (full) return full;
+  const composed = `${c.firstName ?? ""} ${c.lastName ?? ""}`.trim();
+  return composed.length > 0 ? composed : "Unnamed contact";
 };
 
 const parseMergeDecisionId = (formData: FormData) => {
@@ -939,13 +952,13 @@ export const archiveContactsBulk = async (formData: FormData) => {
   const contactIds = parseContactIds(formData);
   const redirectTo = getRedirectTarget(formData);
 
-  await db.$transaction(async (tx) => {
+  const removedNames = await db.$transaction(async (tx) => {
     const affected = await tx.contact.findMany({
       where: { id: { in: contactIds }, userId, archivedAt: null },
-      select: { id: true },
+      select: { id: true, fullName: true, firstName: true, lastName: true },
     });
     if (affected.length === 0) {
-      return;
+      return [] as string[];
     }
     await tx.contact.updateMany({
       where: { id: { in: affected.map((c) => c.id) } },
@@ -966,7 +979,11 @@ export const archiveContactsBulk = async (formData: FormData) => {
         payload: {},
       })),
     });
+    return affected.map(contactDisplayName);
   });
+
+  // P22-DB05: raise a "bulk contact delete" security alert past the threshold.
+  await detectBulkContactDelete(userId, removedNames.length, removedNames);
 
   revalidateContactViews();
 
@@ -1102,13 +1119,13 @@ export const deleteContactsBulk = async (formData: FormData) => {
   const contactIds = parseContactIds(formData);
   const redirectTo = getRedirectTarget(formData);
 
-  await db.$transaction(async (tx) => {
+  const removedNames = await db.$transaction(async (tx) => {
     const affected = await tx.contact.findMany({
       where: { id: { in: contactIds }, userId },
       select: { id: true, fullName: true, firstName: true, lastName: true, email: true, phone: true },
     });
     if (affected.length === 0) {
-      return;
+      return [] as string[];
     }
     await tx.contact.deleteMany({
       where: { id: { in: affected.map((c) => c.id) }, userId },
@@ -1120,16 +1137,17 @@ export const deleteContactsBulk = async (formData: FormData) => {
         eventType: "CONTACT_DELETED" as const,
         actor: "USER" as const,
         payload: {
-          fullName:
-            c.fullName?.trim() ||
-            `${c.firstName ?? ""} ${c.lastName ?? ""}`.trim() ||
-            "Unnamed contact",
+          fullName: contactDisplayName(c),
           ...(c.email ? { email: c.email } : {}),
           ...(c.phone ? { phone: c.phone } : {}),
         },
       })),
     });
+    return affected.map(contactDisplayName);
   });
+
+  // P22-DB05: raise a "bulk contact delete" security alert past the threshold.
+  await detectBulkContactDelete(userId, removedNames.length, removedNames);
 
   revalidateContactViews();
 

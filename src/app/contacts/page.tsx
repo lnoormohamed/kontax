@@ -4,6 +4,8 @@ import { redirect } from "next/navigation";
 import { BillingBannerSlot } from "~/app/_components/billing-banner-slot";
 import { ContactDashboard } from "~/app/_components/contact-dashboard";
 import { EmailVerificationBanner } from "~/app/_components/email-verification-banner";
+import { NotificationBellSlot } from "~/app/_components/notification-bell-slot";
+import { SecurityAlertBannerSlot } from "~/app/_components/security-alert-banner-slot";
 import { SearchInput } from "~/app/_components/search-input";
 import { UserMenu } from "~/app/_components/user-menu";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
@@ -397,18 +399,8 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
               <WorkspaceIcon name="plus" size={18} strokeWidth={2} />
               <span className="hidden sm:inline">Create contact</span>
             </Link>
-            <Link
-              aria-label={incomingSharesCount > 0 ? `${incomingSharesCount} pending shares` : "Notifications"}
-              className="relative hidden h-10 w-10 items-center justify-center rounded-full border border-[#d8ddd6] bg-white text-[#5c655e] transition hover:bg-[#f2f4f0] sm:inline-flex"
-              href="/shares"
-            >
-              <WorkspaceIcon name="bell" size={18} />
-              {incomingSharesCount > 0 ? (
-                <span className="absolute -right-0.5 -top-0.5 grid h-[18px] min-w-[18px] place-items-center rounded-full bg-[#bf8526] px-1 text-[10px] font-bold text-white">
-                  {incomingSharesCount}
-                </span>
-              ) : null}
-            </Link>
+            {/* P22-DB05: unified notification bell (replaces the legacy /shares bell). */}
+            <NotificationBellSlot userId={session.user.id} />
             <UserMenu email={session.user.email ?? ""} initials={userInitials} name={userLabel} />
           </div>
         </div>
@@ -419,6 +411,9 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
       )}
 
       <BillingBannerSlot userId={session.user.id} />
+
+      {/* P22-DB05 surface 4: security alert banner (below billing banner) */}
+      <SecurityAlertBannerSlot userId={session.user.id} />
 
       <ContactDashboard
         activeContacts={sortedActiveContacts}
