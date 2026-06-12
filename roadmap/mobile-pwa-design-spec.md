@@ -172,10 +172,82 @@ it". **Android:** "Install" (blue) + "Not now". Triggered by the install heurist
 
 ---
 
+# Part E0 — Plan, lifecycle & role variance (read before Part E)
+
+The same route renders differently along **four independent axes**. Every page in Part E must define
+its variants on whichever of these apply. Don't hard-code one happy path.
+
+## E0.1 The four axes
+1. **Plan** — `FREE · PRO · FAMILY · TEAMS` (from `planSummary.plan`). Gates features (table below).
+2. **Billing lifecycle** — `ACTIVE · TRIALING · GRACE · CANCELED · LOCKED` (`planSummary.lifecycleState`).
+   `GRACE`/`LOCKED` set `canWrite=false` → **read-only mode** (owned contacts visible, basic export
+   stays for portability; all create/edit/delete affordances disabled).
+3. **Group role** — for Family/Team members: `OWNER · ADMIN · MEMBER` (`GroupMember.role`). Determines
+   who manages members, invites, books, and billing.
+4. **Per-resource permission** — `canEdit` (can the member edit the shared book), `addressBookPermissions`
+   (per-book read/write, Teams), `inviteStatus` (`PENDING/ACCEPTED/DECLINED/REVOKED`).
+
+## E0.2 Plan entitlement matrix (what each plan unlocks)
+| Capability | FREE | PRO | FAMILY | TEAMS |
+| --- | --- | --- | --- | --- |
+| Contacts | 500 (limit banner near/at cap) | ∞ | ∞ | ∞ |
+| Imports / month | 3 (quota meter) | ∞ | ∞ | ∞ |
+| Sync accounts | **1** | 5 | 5 | 5 |
+| CardDAV sync + device setup | **✗ (upsell)** | ✓ | ✓ | ✓ |
+| App passwords | 1 | 5 | 5 | 5 |
+| Activity log | **✗ locked card** | 365 days | 90 days | unlimited |
+| Per-contact history shown | last **3** | full | full | full |
+| Live + static sharing | **✗** | ✓ | ✓ | ✓ |
+| Premium export · advanced merge | ✗ | ✓ | ✓ | ✓ |
+| Family group | ✗ | ✗ | ✓ (1 book · 6 seats) | ✗ |
+| Teams | ✗ | ✗ | ✗ | ✓ (multi-book · 25 seats) |
+
+## E0.3 Role capability matrix (Family / Team)
+| Action | OWNER | ADMIN (Teams) | MEMBER |
+| --- | --- | --- | --- |
+| View shared book | ✓ | ✓ | ✓ |
+| Edit shared contacts | ✓ | ✓ | per `canEdit` / book perms |
+| Invite / remove members | ✓ | ✓ | ✗ |
+| Manage roles & per-book permissions | ✓ | ✓ (not owner) | ✗ |
+| Create / delete address books (Teams) | ✓ | ✓ | ✗ |
+| Billing & plan | ✓ | ✗ | ✗ |
+| Leave group | disband/transfer | ✓ | ✓ |
+
+## E0.4 Reusable variance treatments (design once, apply everywhere)
+- **Upsell card** — plan-gated feature: centered `wash` icon, "<Feature> is a <Plan> feature",
+  one-line value prop, `blue` "Upgrade to <Plan>", "You're on the <Plan> plan." (Activity-locked is the
+  reference; reuse for Sharing tab on Free, Sync/CardDAV on Free, Family/Team setup, etc.)
+- **Near/at-limit banner** — amber under the header: "{used} of {limit} … remaining" + Upgrade link
+  (contacts 500, imports 3/mo). At-limit disables the create affordance.
+- **Read-only banner** — `red-t`, "Your account is read-only. {lifecycle reason}" + "Manage plan".
+  Hides/disables FAB, swipe-edit, edit/save buttons, add-connection, invite buttons.
+- **Permission-hidden** — never show a control the role can't use (no "Invite", "Manage", per-book
+  edit) for `MEMBER`; show a read affordance instead. Prefer hiding over disabling for role gates;
+  use disabled+explanation for *temporary* gates (offline, read-only).
+- **Pending state** — `inviteStatus = PENDING` members render with a muted "Pending" chip and a
+  resend/revoke affordance (owner/admin only).
+- **Empty-because-plan vs empty-because-new** — distinguish "Activity is a Pro feature" (upsell) from
+  "No activity yet" (genuine empty). Never show an upsell as if it were empty data.
+
+## E0.5 Who-sees-what (most-affected pages)
+| Page | FREE | PRO | FAMILY member | FAMILY/TEAM owner/admin | Read-only (GRACE/LOCKED) |
+| --- | --- | --- | --- | --- | --- |
+| Contacts | limit banner; FAB on | full | + "Save to family" target | + manage entry points | FAB/swipe-edit off, locked banner |
+| Contact detail | history capped to 3; no Sharing | full | shared badge; edit per `canEdit` | edit | view-only, no edit |
+| Activity | locked upsell | feed (365d) | feed (90d) | feed | feed (read) |
+| Sync | upsell (CardDAV off) or 1-acct cap | up to 5 | personal | personal | add disabled |
+| Settings root | no Family/Team rows; "Upgrade" | personal rows | "Family management" | "Family/Team management" | billing emphasised |
+| Family/Teams | upsell card | upsell card | roster + "Leave" (no manage) | roster + invite/role/book mgmt | read |
+| Import/export | 3/mo quota; basic export only | unlimited; premium export | same as Pro | same | export-only (portability) |
+| Shares | sharing locked (upsell) | full | full | full | incoming view only |
+
+---
+
 # Part E — Per-page design
 
-> Format: **Chrome** · **Layout** · **States** · **Interactions/notes**. Tokens/components reference
-> Parts A–D. ✅ = built to spec · 🟡 = exists, restyle to spec · 🟠 = wrong pattern · 🔴 = broken/off-brand · ☐ = to design.
+> Format: **Chrome** · **Layout** · **States** · **Variance** (plan/role, per Part E0) · **Interactions**.
+> Tokens/components reference Parts A–D. ✅ = built to spec · 🟡 = exists, restyle · 🟠 = wrong pattern ·
+> 🔴 = broken/off-brand · ☐ = to design.
 
 ## E1. Contacts tab
 **`/contacts` — People list** · ✅
@@ -184,6 +256,9 @@ it". **Android:** "Install" (blue) + "Not now". Triggered by the install heurist
   60px swipe rows; trailing 12px spacer.
 - *States:* empty = centered empty state ("No contacts yet" + import hint); offline = banner + FAB
   disabled (`faint`, toast on tap); read-only = locked banner.
+- *Variance:* **Free** near/at 500 → limit banner, FAB disabled at cap. **Read-only** (GRACE/LOCKED) →
+  locked banner, FAB + swipe-edit off. **Family/Team** member → contacts show a shared badge and a
+  "Save to {Private/Family/Team}" target in create; book scope chips when in a shared book.
 - *Interactions:* tap → detail; swipe → Favourite/Archive (40% snap, haptic); archive → undo toast;
   star tap target on the right. Group headers should be sticky (currently deferred in the virtualizer).
 
@@ -201,6 +276,9 @@ it". **Android:** "Install" (blue) + "Not now". Triggered by the install heurist
 - *Sharing tab:* FieldCard "Shared with" rows (Family · permission, Public link · state).
 - *History tab:* FieldCard recent-activity rows (icon · when · what).
 - *States:* not-found → friendly empty + back; shared/read-only contact → hide edit affordances.
+- *Variance:* **Free** History tab capped to last 3 entries (+ "Upgrade for full history"); **Sharing tab
+  hidden/locked** on Free (no live/static sharing). Member viewing a shared contact without `canEdit` →
+  read-only (no Edit/FAB). Read-only lifecycle → view-only.
 - *Note:* current build uses 5 outlined square buttons — **replace with the 4 green-tint pills**.
 
 ## E3. Create / Edit contact
@@ -219,9 +297,10 @@ it". **Android:** "Install" (blue) + "Not now". Triggered by the install heurist
 - *Chrome:* Plain "Activity" header + bottom nav (no FAB).
 - *Layout (unlocked):* GroupCard feed of event rows — 32px circle `wash` icon · "**Name** · action" (14.5
   `ink`) · timestamp (12 `mute`). Optional lightweight filter (category/actor) that must not overflow.
-- *States:* **locked (Free):** centered card — clock icon, "Activity log is a Pro feature", description,
-  blue "Upgrade to Pro", plan note (must fit `w-full max-w-[460px]`); loading skeleton rows; empty =
-  "No activity yet"; load-more on scroll.
+- *States:* loading skeleton rows; empty = "No activity yet"; load-more on scroll.
+- *Variance:* **Free** → upsell card (clock icon, "Activity log is a Pro feature", blue "Upgrade to Pro",
+  plan note; must fit `w-full max-w-[460px]`) — never the empty state. **Pro** 365-day / **Family** 90-day
+  / **Teams** unlimited retention; show the retention window as a caption ("Showing the last N days").
 
 ## E5. Sync tab
 **`/sync`** · ✅
@@ -230,6 +309,9 @@ it". **Android:** "Install" (blue) + "Not now". Triggered by the install heurist
   status line 12.5 ("Synced 2m ago", "Paused", "Reconnect needed", error in tone color) · status dot.
   Below: dashed "+ Add connection" button.
 - *States:* empty = centered empty state + Add; offline = banner + disabled add.
+- *Variance:* **Free** has no CardDAV sync → the screen is an **upsell** ("Sync is a Pro feature") OR a
+  single-account cap with Add disabled past 1 (match the entitlement: `cardDavSyncEnabled=false`,
+  `syncAccountsLimit=1`). **Pro+** up to 5 accounts. Read-only → Add disabled.
 - *Interactions:* tap a row → full-screen connection detail (deep-link `?account=`); Add → full-screen
   add form (`?add=1`); detail/add back button returns to the summary. Conflict/settings/job-history
   live inside the detail (power-user, desktop-derived but usable full-screen).
@@ -240,6 +322,9 @@ it". **Android:** "Install" (blue) + "Not now". Triggered by the install heurist
 - *Layout:* account GroupCard (48px avatar, name 16/700, "email · plan"); grouped NavRows —
   [Sync connections · Family/Team management · Import & export], [Profile · Notifications · Devices ·
   Security · Plan & billing]; danger group ([Sign out], red) to match the design; "Kontax · kontax.app" footer.
+- *Variance:* the **Family/Team management** row shows only when the user is in a group or on the matching
+  plan (Free/Pro without a group → no row, or an "Upgrade" upsell row). Account card shows the live plan
+  label. Read-only → surface the billing/"Manage plan" entry prominently.
 
 **Settings sub-pages** (`profile · account · notifications · preferences · devices · security · family ·
 teams · teams/audit`) · ✅ content / **back-nav gap (P1)**
@@ -247,6 +332,10 @@ teams · teams/audit`) · ✅ content / **back-nav gap (P1)**
   (‹ Settings · <sub-page title>) so users can get back without leaving Settings.
 - *Layout:* keep the established card pattern — section-labelled FieldCards / GroupCards, toggle rows,
   roster rows (avatar · name/email · role badge), danger cards. Single column.
+- *Variance (Family/Teams):* **member** sees roster (read) + "Leave"; **owner/admin** additionally see
+  invite, role-change, remove, and (Teams) per-book permission controls — *hidden* for members, not just
+  disabled. `PENDING` invitees show a muted chip + resend/revoke (owner/admin). Free/Pro without a group
+  → upsell card. Billing/seat management = owner only.
 - *To design properly:* **team-owner view** (roster + per-book permission **matrix**) and
   **teams/audit** log — stack the matrix into per-member cards or an h-scroll table under `md`;
   audit as stacked rows. **Family-owner** invite management as cards. **2FA setup** as a sheet
@@ -261,12 +350,18 @@ teams · teams/audit`) · ✅ content / **back-nav gap (P1)**
   bordered table that **h-scrolls with sticky Name/Email columns**; commit button full-width `green`.
   **Export:** format radio cards (CSV / vCard) + summary + full-width "Export" (`blue`, download icon).
 - *States:* quota near/over-limit banner; empty/locked per plan; success toast with "View".
+- *Variance:* **Free** import quota 3/mo (meter + at-limit block + Upgrade), **export = basic CSV/vCard
+  only** (premium/filtered export gated → upsell). **Pro+** unlimited imports + premium export. Read-only
+  → export still allowed (portability), import disabled.
 
 ## E8. Collaboration
 **`/shares`** · ✅
 - Secondary header + bottom nav. Pending shares = dashed empty card when none; "Earlier" = accepted/
   declined rows (avatar · "Name · shared by X" · status · "View contact →"). Pending rows get
   Accept/Decline actions.
+- *Variance:* **Free** can't create outbound shares (sharing gated → "Sharing is a Pro feature" on the
+  share affordance), but **can still receive/accept** incoming shares. Pro+ → full. Read-only → view
+  incoming only.
 
 **`/merge-suggestions/[id]` · `/merge/manual`** · 🔴 **restyle to the design system first**
 - *Current:* off-brand dark-navy/cyan dev-scaffold theme — does not follow this spec on any viewport.
@@ -305,9 +400,11 @@ dense tables in horizontal scroll, keep headers/controls readable and tap target
 # Part F — Global states & edge cases
 Every data screen must define: **loading** (skeletons matching row/card shape — never a bare spinner
 where content will land), **empty** (Part C empty state), **error** (inline card + retry), **offline**
-(banner; writes disabled with explanatory toast), **locked/upsell** (plan-gated centered card),
-**permission** (read-only → hide write affordances, show locked banner). Respect `prefers-reduced-motion`
-(disable slide/scale, keep opacity). All tap targets ≥ 44×44.
+(banner; writes disabled with explanatory toast), and the **plan/lifecycle/role variants from Part E0**
+— upsell (plan-gated), near/at-limit, read-only (lifecycle), and permission-hidden (role). Two rules:
+distinguish *empty-because-plan* (upsell) from *empty-because-new* (genuine empty); and **hide** controls
+a role can't use rather than disabling them (reserve disabled+explanation for temporary gates: offline,
+read-only). Respect `prefers-reduced-motion` (disable slide/scale, keep opacity). Tap targets ≥ 44×44.
 
 ---
 
