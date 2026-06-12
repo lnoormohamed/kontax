@@ -9,9 +9,11 @@ interface MobileBottomSheetProps {
   onClose: () => void;
   title: string;
   children: React.ReactNode;
+  /** Pinned footer (e.g. a Save button) — stays above the keyboard. */
+  footer?: React.ReactNode;
 }
 
-export function MobileBottomSheet({ isOpen, onClose, title, children }: MobileBottomSheetProps) {
+export function MobileBottomSheet({ isOpen, onClose, title, children, footer }: MobileBottomSheetProps) {
   const [keyboardOffset, setKeyboardOffset] = useState(0);
   const [mounted, setMounted] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -170,11 +172,27 @@ export function MobileBottomSheet({ isOpen, onClose, title, children }: MobileBo
             flex: 1,
             overflowY: "auto",
             WebkitOverflowScrolling: "touch",
-            padding: "16px 16px 32px",
+            padding: footer ? "16px 16px 16px" : "16px 16px 32px",
           }}
         >
           {children}
         </div>
+
+        {/* Pinned footer (Save) — sits above the keyboard since the sheet's
+            bottom is offset by the keyboard height. */}
+        {footer ? (
+          <div
+            style={{
+              flexShrink: 0,
+              borderTop: "1px solid #e9ece7",
+              padding: "10px 16px",
+              paddingBottom: keyboardOffset > 0 ? 10 : "calc(10px + env(safe-area-inset-bottom))",
+              background: "#fff",
+            }}
+          >
+            {footer}
+          </div>
+        ) : null}
       </div>
     </>
   );
