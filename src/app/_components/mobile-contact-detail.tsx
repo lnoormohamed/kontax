@@ -391,7 +391,6 @@ export function MobileContactDetail({
           )}
           <form action={toggleFavoriteAction} style={{ display: "contents" }}>
             <input name="contactId" type="hidden" value={contactId} />
-            <input name="redirectTo" type="hidden" value={`/contacts/${contactId}`} />
             <button
               aria-label={isFavorite ? "Unfavorite" : "Favorite"}
               style={{
