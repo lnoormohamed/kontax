@@ -13,7 +13,10 @@ acceptance bar for every ticket.
 > not reinventing it.
 
 ## How to use
-- Ticket IDs `P24B-NN`. Status: ☐ todo · ◑ in progress · ✅ done · ⬚ blocked.
+- Ticket IDs `P24B-NN`. Each has a full ticket file in
+  [`build-phase/`](./build-phase/) (`p24b-NN-*.md`) with Purpose / Background / Scope / Spec /
+  Acceptance Criteria / Risks. This file is the index; the build-phase files are the detail.
+- Status: ☐ todo · ◑ in progress · ✅ done · ⬚ blocked.
 - Every ticket's **Definition of Done** is: matches the referenced spec §, covers the **Part E0
   plan/role/lifecycle variants** that apply, and reproduces the relevant **Overview states**
   (offline / empty / swipe-revealed / keyboard-aware / install / locked) where the Overview defines them.
