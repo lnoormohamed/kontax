@@ -18,12 +18,11 @@ export type ContactBadgeFlags = {
 export function ContactBadgeCluster({
   contactId,
   flags,
-  redirectTo,
 }: {
   contactId: string;
   flags: ContactBadgeFlags;
-  /** where the favorite toggle returns to */
-  redirectTo: string;
+  /** @deprecated favorite toggles no longer redirect in the PWA flow */
+  redirectTo?: string;
 }) {
   const badges = resolveContactBadges(flags);
   const visible = badges.slice(0, ROW_BADGE_CAP);
@@ -33,7 +32,6 @@ export function ContactBadgeCluster({
     <span className="inline-flex shrink-0 items-center gap-1">
       <form action={toggleFavoriteContact} className="inline-flex">
         <input name="contactId" type="hidden" value={contactId} />
-        <input name="redirectTo" type="hidden" value={redirectTo} />
         <button
           aria-label={flags.isFavorite ? "Unfavorite" : "Favorite"}
           aria-pressed={flags.isFavorite}

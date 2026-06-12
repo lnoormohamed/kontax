@@ -228,6 +228,7 @@ function ContactRow({
   selected,
   onToggleSelect,
   onArchived,
+  onOpenContact,
 }: {
   contact: WorkspaceContact;
   mode: "active" | "archived";
@@ -236,6 +237,7 @@ function ContactRow({
   selected: boolean;
   onToggleSelect: (id: string) => void;
   onArchived: (contactId: string) => void;
+  onOpenContact: () => void;
 }) {
   const [, startTransition] = useTransition();
   const displayName = getDisplayName(contact);
@@ -292,7 +294,7 @@ function ContactRow({
       {avatarSlot}
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
-          <Link className="min-w-0 truncate" href={`/contacts/${contact.id}`} prefetch={false}>
+          <Link className="min-w-0 truncate" href={`/contacts/${contact.id}`} onClick={onOpenContact} prefetch={false}>
             <span className="truncate text-[14.5px] font-semibold text-[#1d2823]">
               <Highlight query={query} text={displayName} />
             </span>
@@ -344,7 +346,7 @@ function ContactRow({
       <div className={`hidden ${GRID} items-center gap-4 px-3 py-2 lg:grid`}>
         {avatarSlot}
         <div className="flex min-w-0 items-center gap-1.5">
-          <Link className="min-w-0 truncate" href={`/contacts/${contact.id}`} prefetch={false}>
+          <Link className="min-w-0 truncate" href={`/contacts/${contact.id}`} onClick={onOpenContact} prefetch={false}>
             <span className="truncate text-sm font-semibold text-[#1d2823]">
               <Highlight query={query} text={displayName} />
             </span>
@@ -420,6 +422,7 @@ type VRow =
 
 const FAVE_H = 28; // Favourites header — same height as letter headers
 const LETTER_H = 28; // Alphabetical letter headers per design spec
+const CONTACT_LIST_SCROLL_KEY = "kontax:contacts:list-scroll";
 
 export function ContactsWorkspaceTable({
   contacts,
@@ -461,6 +464,24 @@ export function ContactsWorkspaceTable({
     () => contacts.filter((c) => !hiddenIds.has(c.id)),
     [contacts, hiddenIds],
   );
+
+  const scrollMemoryKey = useMemo(
+    () => JSON.stringify({ mode, viewMode, groupByLetter, query }),
+    [groupByLetter, mode, query, viewMode],
+  );
+
+  const saveListScrollPosition = useCallback(() => {
+    if (typeof window === "undefined") return;
+
+    sessionStorage.setItem(
+      CONTACT_LIST_SCROLL_KEY,
+      JSON.stringify({
+        key: scrollMemoryKey,
+        scrollTop: scrollEl?.scrollTop ?? null,
+        windowY: window.scrollY,
+      }),
+    );
+  }, [scrollEl, scrollMemoryKey]);
 
   const handleArchived = useCallback((contactId: string) => {
     setHiddenIds((prev) => new Set([...prev, contactId]));
@@ -551,6 +572,36 @@ export function ContactsWorkspaceTable({
         ? (el) => el.getBoundingClientRect().height
         : undefined,
   });
+
+  const restoredScrollRef = useRef(false);
+  useLayoutEffect(() => {
+    if (!mounted || restoredScrollRef.current || typeof window === "undefined") return;
+
+    const raw = sessionStorage.getItem(CONTACT_LIST_SCROLL_KEY);
+    if (!raw) return;
+
+    try {
+      const saved = JSON.parse(raw) as {
+        key?: string;
+        scrollTop?: number | null;
+        windowY?: number;
+      };
+
+      if (saved.key !== scrollMemoryKey) return;
+
+      restoredScrollRef.current = true;
+      requestAnimationFrame(() => {
+        if (scrollEl && typeof saved.scrollTop === "number") {
+          scrollEl.scrollTop = saved.scrollTop;
+        }
+        if (typeof saved.windowY === "number") {
+          window.scrollTo({ top: saved.windowY, behavior: "instant" });
+        }
+      });
+    } catch {
+      sessionStorage.removeItem(CONTACT_LIST_SCROLL_KEY);
+    }
+  }, [mounted, scrollEl, scrollMemoryKey]);
 
   if (contacts.length === 0) {
     return (
@@ -688,6 +739,7 @@ export function ContactsWorkspaceTable({
                   contact={row.contact}
                   mode={mode}
                   onArchived={handleArchived}
+                  onOpenContact={saveListScrollPosition}
                   onToggleSelect={toggleSelect}
                   query={query}
                   selected={selectedSet.has(row.contact.id)}
