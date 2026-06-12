@@ -513,7 +513,7 @@ export function ContactsWorkspaceTable({
     // guards on outerSize > 0 and returns null on the first render.
     initialRect: { width: 0, height: typeof window !== "undefined" ? window.innerHeight : 900 },
     measureElement:
-      typeof window !== "undefined" && navigator.userAgent.indexOf("Firefox") === -1
+      typeof window !== "undefined" && !navigator.userAgent.includes("Firefox")
         ? (el) => el.getBoundingClientRect().height
         : undefined,
   });

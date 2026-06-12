@@ -444,7 +444,7 @@ export function MobileContactDetail({
           scrollbarWidth: "none",
           transition: "top 150ms ease",
           WebkitOverflowScrolling: "touch",
-        } as React.CSSProperties}
+        }}
       >
         {TABS.map(({ key, label, icon }) => (
           <Link

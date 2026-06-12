@@ -26,13 +26,16 @@ export function SettingsPageHead({
 export function SettingsCard({
   children,
   className,
+  lazy,
 }: {
   children: React.ReactNode;
   className?: string;
+  lazy?: boolean;
 }) {
   return (
     <section
       className={`rounded-2xl border border-[#d8ddd6] bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,0.05)] ${className ?? ""}`}
+      style={lazy ? { contentVisibility: "auto", containIntrinsicSize: "0 auto" } : undefined}
     >
       {children}
     </section>

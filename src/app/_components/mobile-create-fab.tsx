@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useTransition } from "react";
 
@@ -240,12 +241,12 @@ export function MobileCreateFab({ canWrite }: MobileCreateFabProps) {
           {/* Link to full form */}
           <p style={{ textAlign: "center", marginTop: 16, fontSize: 13, color: "#8b938c" }}>
             Need more fields?{" "}
-            <a
+            <Link
               href="/contacts/new"
               style={{ color: "#4158f4", fontWeight: 600, textDecoration: "none" }}
             >
               Open full form
-            </a>
+            </Link>
           </p>
         </form>
       </MobileBottomSheet>

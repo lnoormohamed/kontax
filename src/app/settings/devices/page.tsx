@@ -44,7 +44,7 @@ export default async function SettingsDevicesPage() {
           </div>
         </SettingsCard>
 
-        <SettingsCard>
+        <SettingsCard lazy>
           <p className="text-[15px] font-semibold text-[#1d2823]">App passwords</p>
           <p className="mt-1 text-[14px] leading-6 text-[#5c655e]">
             Each device uses its own app password instead of your Kontax login, so you can revoke a single
@@ -55,7 +55,7 @@ export default async function SettingsDevicesPage() {
           </div>
         </SettingsCard>
 
-        <SettingsCard>
+        <SettingsCard lazy>
           <p className="text-[15px] font-semibold text-[#1d2823]">Step-by-step setup</p>
           <p className="mt-1 text-[14px] leading-6 text-[#5c655e]">
             Pick your device and follow the steps. The server URL and username are already filled in for you.

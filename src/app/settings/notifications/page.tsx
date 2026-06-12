@@ -182,7 +182,7 @@ export default async function NotificationSettingsPage() {
           <p className="mb-3 text-[12px] font-bold uppercase tracking-[0.1em] text-[#8b938c]">
             Email digest
           </p>
-          <SettingsCard>
+          <SettingsCard lazy>
             <p className="mb-1 text-[13.5px] text-[#5c655e]">
               Instead of individual emails, receive a summary on a schedule.
             </p>

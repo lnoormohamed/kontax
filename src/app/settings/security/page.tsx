@@ -55,7 +55,7 @@ export default function SettingsSecurityPage() {
       <SessionsSection flash={flash} />
 
       <StSecLabel>Connected accounts</StSecLabel>
-      <section className="rounded-[2rem] border border-[#d8ddd6] bg-[#fbfcf9] p-6 shadow-none">
+      <section className="rounded-[2rem] border border-[#d8ddd6] bg-[#fbfcf9] p-6 shadow-none" style={{ contentVisibility: "auto", containIntrinsicSize: "0 auto" }}>
         <div className="flex flex-wrap items-center gap-[10px]">
           <span className="text-[16px] font-semibold text-[#1d2823]">Connected accounts</span>
           <span className="rounded-[6px] bg-[#f2f4f0] px-[7px] py-[2px] text-[10px] font-bold uppercase tracking-[0.06em] text-[#8b938c]">

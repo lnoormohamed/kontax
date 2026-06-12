@@ -905,7 +905,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               />
             ) : null}
 
-            <section className="overflow-hidden rounded-[14px] border border-[#d8ddd6] bg-white">
+            <section className="overflow-hidden rounded-[14px] border border-[#d8ddd6] bg-white" style={{ contentVisibility: "auto", containIntrinsicSize: "0 auto" }}>
               <h3 className="px-5 pt-3.5 text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">
                 Sync
               </h3>
