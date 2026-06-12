@@ -41,6 +41,11 @@ const PENDING_DELETION_ALLOWED_PATHS = [
   "/api/auth",
 ];
 
+const hasAuthSessionCookie = (req: NextRequest) =>
+  req.cookies
+    .getAll()
+    .some(({ name }) => name.includes("authjs.session-token"));
+
 export default auth(
   (
     req: NextRequest & {
@@ -87,6 +92,16 @@ export default auth(
 
     // 4. Everything else requires a session.
     if (!session?.user?.id) {
+      // Safari can occasionally present a valid Auth.js session cookie that the
+      // lightweight edge middleware cannot decode, while the full Node auth()
+      // used by pages can. If middleware redirects in that state, /contacts and
+      // /login can bounce forever: middleware sends /contacts -> /login, then
+      // the login page's server auth sends /login -> /contacts. Let the server
+      // page make the final auth decision whenever a session cookie is present.
+      if (hasAuthSessionCookie(req)) {
+        return NextResponse.next();
+      }
+
       const loginUrl = new URL("/login", req.url);
       loginUrl.searchParams.set("next", pathname);
       return NextResponse.redirect(loginUrl);
