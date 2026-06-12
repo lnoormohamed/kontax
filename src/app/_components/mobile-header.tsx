@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 
+import { MobilePlainHeader } from "~/app/_components/mobile-plain-header";
 import { MobileSearchButton } from "~/app/_components/mobile-search-button";
 import { NotificationBellSlot } from "~/app/_components/notification-bell-slot";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
@@ -14,8 +15,14 @@ interface MobileHomeHeaderProps {
 }
 
 export function MobileHomeHeader({ userId, tab }: MobileHomeHeaderProps) {
-  const isActivity = tab === "activity";
+  // Activity tab → the shared plain-title header (P24B-01).
+  if (tab === "activity") {
+    return (
+      <MobilePlainHeader title="Activity" sticky bell={<NotificationBellSlot userId={userId} />} />
+    );
+  }
 
+  // People list → wordmark + bell + search.
   return (
     <header
       className="flex md:hidden"
@@ -32,20 +39,15 @@ export function MobileHomeHeader({ userId, tab }: MobileHomeHeaderProps) {
         zIndex: 40,
       }}
     >
-      {isActivity ? (
-        <span style={{ fontSize: 19, fontWeight: 700, color: "#1d2823", flex: 1 }}>
-          Activity
-        </span>
-      ) : (
-        <Link
-          href="/contacts"
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 9,
-            textDecoration: "none",
-          }}
-        >
+      <Link
+        href="/contacts"
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 9,
+          textDecoration: "none",
+        }}
+      >
           <span
             style={{
               width: 28,
@@ -72,15 +74,12 @@ export function MobileHomeHeader({ userId, tab }: MobileHomeHeaderProps) {
             Kontax
           </span>
         </Link>
-      )}
 
       <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 0 }}>
         <NotificationBellSlot userId={userId} />
-        {!isActivity && (
-          <Suspense fallback={null}>
-            <MobileSearchButton />
-          </Suspense>
-        )}
+        <Suspense fallback={null}>
+          <MobileSearchButton />
+        </Suspense>
       </div>
     </header>
   );

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { MobilePlainHeader } from "~/app/_components/mobile-plain-header";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 
 // P24B-02: route-aware mobile settings header (md:hidden).
@@ -28,46 +29,46 @@ export function MobileSettingsHeader({ bell }: { bell: React.ReactNode }) {
   const isRoot = segment === "";
   const title = isRoot ? "Settings" : (SUBPAGE_TITLES[segment] ?? "Settings");
 
+  // Root: the shared plain-title header. Sub-pages: a back header (this stays
+  // local since it needs the route-aware back/title).
+  if (isRoot) {
+    return <MobilePlainHeader title="Settings" bell={bell} />;
+  }
+
   return (
     <header
       className="flex shrink-0 items-center border-b border-[#d8ddd6] bg-white md:hidden"
-      style={{ height: 52, padding: isRoot ? "0 16px" : "0 12px 0 4px", gap: 8 }}
+      style={{ height: 52, padding: "0 12px 0 4px", gap: 8 }}
     >
-      {isRoot ? (
-        <span style={{ fontSize: 19, fontWeight: 700, color: "#1d2823", flex: 1 }}>Settings</span>
-      ) : (
-        <>
-          <Link
-            href="/settings"
-            aria-label="Back to Settings"
-            style={{
-              width: 44,
-              height: 44,
-              display: "grid",
-              placeItems: "center",
-              flexShrink: 0,
-              color: "#1d2823",
-              WebkitTapHighlightColor: "transparent",
-            }}
-          >
-            <WorkspaceIcon name="back" size={22} />
-          </Link>
-          <span
-            style={{
-              flex: 1,
-              minWidth: 0,
-              fontSize: 17,
-              fontWeight: 700,
-              color: "#1d2823",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {title}
-          </span>
-        </>
-      )}
+      <Link
+        href="/settings"
+        aria-label="Back to Settings"
+        style={{
+          width: 44,
+          height: 44,
+          display: "grid",
+          placeItems: "center",
+          flexShrink: 0,
+          color: "#1d2823",
+          WebkitTapHighlightColor: "transparent",
+        }}
+      >
+        <WorkspaceIcon name="back" size={22} />
+      </Link>
+      <span
+        style={{
+          flex: 1,
+          minWidth: 0,
+          fontSize: 17,
+          fontWeight: 700,
+          color: "#1d2823",
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {title}
+      </span>
       <div style={{ flexShrink: 0 }}>{bell}</div>
     </header>
   );

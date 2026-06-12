@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { BottomNav } from "~/app/_components/bottom-nav";
+import { MobilePlainHeader } from "~/app/_components/mobile-plain-header";
 import { NotificationBellSlot } from "~/app/_components/notification-bell-slot";
 import { SettingsSidebar } from "~/app/_components/settings-sidebar";
 import { SearchInput } from "~/app/_components/search-input";
@@ -314,14 +315,8 @@ export default async function SyncPage({ searchParams }: PageProps) {
         </div>
       </header>
 
-      {/* ── Mobile header — "Sync" title, shown only on mobile ── */}
-      <header
-        className="flex shrink-0 items-center border-b border-[#d8ddd6] bg-white md:hidden"
-        style={{ height: 52, padding: "0 16px", gap: 12, zIndex: 20 }}
-      >
-        <span style={{ fontSize: 19, fontWeight: 700, color: "#1d2823", flex: 1 }}>Sync</span>
-        <NotificationBellSlot userId={userId} />
-      </header>
+      {/* ── Mobile header — "Sync" title, shown only on mobile (P24B-01) ── */}
+      <MobilePlainHeader title="Sync" bell={<NotificationBellSlot userId={userId} />} />
 
       {/* ── three-rail body ── */}
       <div className="flex min-h-0 flex-1">
