@@ -94,6 +94,11 @@ Requirements** section; the paired build ticket builds to it.
 | P24B-18 | Pricing: 1-col plan cards + stacked/scrollable comparison table | E10 | P2 | ☐ | P24B-04 |
 | P24B-19 | Auth/public verification pass (login/register/2fa/reset/verify · privacy/terms · join-token · account-status) | E9–E10 | P2 | ☐ | — |
 
+## Bugs
+| Ticket | Title | Spec § | Priority | Status | Depends |
+| --- | --- | --- | --- | --- | --- |
+| P24B-24 | Shared contacts 404 for members (detail access) + mobile toolbar removal + SW stale-login hardening | E1, E2 | **P0** | ✅ | — |
+
 ## Workstream G — Admin & cross-cutting QA
 | Ticket | Title | Spec § | Priority | Status | Depends |
 | --- | --- | --- | --- | --- | --- |

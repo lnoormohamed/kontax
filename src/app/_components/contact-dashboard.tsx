@@ -373,9 +373,10 @@ export function ContactDashboard({
           </div>
         ) : null}
 
-        {/* toolbar */}
+        {/* toolbar — desktop only; the mobile design has no sort/view/scope bar
+            (search is the mobile filter, sort defaults to Name A–Z). */}
         {currentTab === "activity" ? null : (
-        <div className="flex shrink-0 items-center gap-3 border-b border-[#e9ece7] px-4 py-2.5">
+        <div className="hidden shrink-0 items-center gap-3 border-b border-[#e9ece7] px-4 py-2.5 md:flex">
           {currentTab !== "duplicates" ? (
             <>
               <SortMenu

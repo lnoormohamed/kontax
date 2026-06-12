@@ -1,7 +1,7 @@
 // @ts-nocheck
-const SHELL_CACHE = "kontax-shell-v2";
-const PAGE_CACHE = "kontax-pages-v2";
-const ASSET_CACHE = "kontax-assets-v2";
+const SHELL_CACHE = "kontax-shell-v3";
+const PAGE_CACHE = "kontax-pages-v3";
+const ASSET_CACHE = "kontax-assets-v3";
 const OFFLINE_URL = "/offline.html";
 
 const ALL_CACHES = [SHELL_CACHE, PAGE_CACHE, ASSET_CACHE];
@@ -55,7 +55,11 @@ self.addEventListener("fetch", (event) => {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
-          if (response.ok) {
+          // Only cache a clean 200 for this exact URL. Never cache a redirected
+          // response (e.g. an auth redirect to /login) — caching that under the
+          // requested page URL would later serve the login screen for an
+          // authenticated route.
+          if (response.ok && !response.redirected) {
             const clone = response.clone();
             caches.open(PAGE_CACHE).then((c) => c.put(event.request, clone));
           }

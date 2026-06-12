@@ -29,7 +29,7 @@ import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
 import { db } from "~/server/db";
 import { getContactFamilyContext, getUserFamilyMembership } from "~/server/family-access";
-import { getContactTeamContext } from "~/server/team-access";
+import { getAccessibleTeamBooks, getContactTeamContext } from "~/server/team-access";
 import { getPublicOrigin } from "~/lib/public-origin";
 
 type ContactDetailPageProps = {
@@ -247,10 +247,28 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
   const detailTab: "details" | "sharing" | "history" =
     tabValue === "sharing" || tabValue === "history" ? tabValue : "details";
 
+  // Access mirrors the contacts list exactly (contacts/page.tsx): a contact is
+  // viewable if the user owns it OR it lives in a shared family/team book the
+  // user can read. Without this, members saw shared contacts in the list but
+  // hit a 404 when opening them. Do not widen beyond the list's access.
+  const [familyForAccess, teamBooksForAccess] = await Promise.all([
+    getUserFamilyMembership(session.user.id),
+    getAccessibleTeamBooks(session.user.id),
+  ]);
+  const accessibleBookIds = [
+    familyForAccess?.bookId,
+    ...teamBooksForAccess.map((b) => b.id),
+  ].filter((bookId): bookId is string => Boolean(bookId));
+
   const contact = await db.contact.findFirst({
     where: {
       id,
-      userId: session.user.id,
+      OR: [
+        { userId: session.user.id },
+        ...(accessibleBookIds.length > 0
+          ? [{ groupContacts: { some: { groupAddressBookId: { in: accessibleBookIds } } } }]
+          : []),
+      ],
     },
     select: {
       id: true,
