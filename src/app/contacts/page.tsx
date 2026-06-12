@@ -2,8 +2,11 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { BillingBannerSlot } from "~/app/_components/billing-banner-slot";
+import { BottomNav } from "~/app/_components/bottom-nav";
 import { ContactDashboard } from "~/app/_components/contact-dashboard";
 import { EmailVerificationBanner } from "~/app/_components/email-verification-banner";
+import { MobileHomeHeader } from "~/app/_components/mobile-header";
+import { MobileCreateFab } from "~/app/_components/mobile-create-fab";
 import { NotificationBellSlot } from "~/app/_components/notification-bell-slot";
 import { SecurityAlertBannerSlot } from "~/app/_components/security-alert-banner-slot";
 import { SearchInput } from "~/app/_components/search-input";
@@ -326,7 +329,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
     ...teamActive.map((c) => ({ ...c, sharedKind: "team" as const })),
   ];
 
-  const [privatePeopleCount, sharedPeopleCount, favoritesCount, emergencyCount, archivedCount, incomingSharesCount] =
+  const [privatePeopleCount, sharedPeopleCount, favoritesCount, emergencyCount, archivedCount, incomingSharesCount, unreadCount, syncErrorCount] =
     await Promise.all([
       db.contact.count({ where: { userId: session.user.id, archivedAt: null, groupContacts: { none: {} } } }),
       sharedBooks.length > 0
@@ -345,6 +348,8 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
           recipientContactId: null,
         },
       }),
+      db.notification.count({ where: { userId: session.user.id, readAt: null, dismissedAt: null } }),
+      db.syncAccount.count({ where: { userId: session.user.id, status: { in: ["ERROR", "NEEDS_REAUTH"] } } }),
     ]);
   const peopleCount = privatePeopleCount + sharedPeopleCount;
 
@@ -369,8 +374,12 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
   const userInitials = getInitials(userLabel);
 
   return (
-    <main className="flex h-screen flex-col overflow-hidden bg-white text-[#1d2823]">
-      <header className="shrink-0 border-b border-[#d8ddd6] bg-white">
+    <main className="flex h-dvh flex-col overflow-hidden bg-white text-[#1d2823]">
+      {/* mobile home header — wordmark + bell */}
+      <MobileHomeHeader userId={session.user.id} />
+
+      {/* desktop header */}
+      <header className="hidden shrink-0 border-b border-[#d8ddd6] bg-white md:block">
         <div className="flex h-[60px] w-full items-center gap-4 px-4 lg:px-[18px]">
           <Link className="flex shrink-0 items-center gap-2.5 lg:w-[230px]" href="/contacts">
             <span className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-[#17352e] text-[17px] font-bold text-[#dff0e7]">
@@ -457,6 +466,9 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         recentMerges={recentMerges}
         incomingShares={incomingSharesCount || undefined}
       />
+
+      <MobileCreateFab canWrite={planSummary.lifecyclePolicy.canWrite} />
+      <BottomNav unreadCount={unreadCount} syncErrorCount={syncErrorCount} />
     </main>
   );
 }

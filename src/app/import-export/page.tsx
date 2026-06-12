@@ -85,8 +85,8 @@ export default async function ImportExportPage({ searchParams }: ImportExportPag
   const account = { name: userLabel, email: session.user.email ?? "", plan: planSummary.planLabel };
 
   return (
-    <AppShell account={account}>
-      <div className="mx-auto grid w-full max-w-[1060px] content-start gap-4 px-9 pb-24 pt-8">
+    <AppShell account={account} mobileTitle="Import & Export" mobileBackHref="/contacts" mobileBackLabel="Contacts">
+      <div className="mx-auto grid w-full max-w-[1060px] content-start gap-4 px-4 pb-24 pt-6 md:px-9 md:pt-8">
           <div>
             <div className="text-[11px] font-bold uppercase tracking-[0.14em] text-[#8b938c]">Data</div>
             <h1 className="mt-1.5 text-[clamp(23px,2.5vw,29px)] font-semibold tracking-[-0.02em] text-[#1d2823]">
@@ -122,44 +122,46 @@ export default async function ImportExportPage({ searchParams }: ImportExportPag
             {importJobs.length === 0 ? (
               <div className="py-7 text-center text-[14px] text-[#8b938c]">No imports yet.</div>
             ) : (
-              <div>
-                <div className="grid grid-cols-[132px_minmax(0,1.5fr)_116px_76px_104px_48px] gap-x-3.5 border-b-[1.5px] border-[#e9ece7] px-3 pb-2.5 text-[11px] font-bold uppercase tracking-[0.06em] text-[#8b938c]">
-                  <span>Date</span>
-                  <span>File</span>
-                  <span>Source</span>
-                  <span className="text-right">Count</span>
-                  <span>Status</span>
-                  <span />
+              <div className="-mx-6 overflow-x-auto">
+                <div className="min-w-[560px] px-6">
+                  <div className="grid grid-cols-[132px_minmax(0,1.5fr)_116px_76px_104px_48px] gap-x-3.5 border-b-[1.5px] border-[#e9ece7] px-3 pb-2.5 text-[11px] font-bold uppercase tracking-[0.06em] text-[#8b938c]">
+                    <span>Date</span>
+                    <span>File</span>
+                    <span>Source</span>
+                    <span className="text-right">Count</span>
+                    <span>Status</span>
+                    <span />
+                  </div>
+                  {importJobs.map((job) => {
+                    const undone = job.rolledBackAt != null;
+                    const canUndo = job.status === "COMPLETED" && job.importedCount > 0 && !undone;
+                    return (
+                      <div
+                        className="grid grid-cols-[132px_minmax(0,1.5fr)_116px_76px_104px_48px] items-center gap-x-3.5 border-b border-[#e9ece7] px-3 py-3 text-[13.5px]"
+                        key={job.id}
+                      >
+                        <span className={`font-medium text-[#5c655e] ${undone ? "line-through" : ""}`}>
+                          {formatHistoryDate(job.createdAt)}
+                        </span>
+                        <span className={`min-w-0 truncate font-semibold ${undone ? "text-[#8b938c] line-through" : "text-[#1d2823]"}`}>
+                          {job.sourceFileName ?? "CSV import"}
+                        </span>
+                        <span className="text-[#5c655e]">{PROFILE_LABEL[job.sourceProfile ?? "GENERIC"] ?? "Generic"}</span>
+                        <span className="text-right font-semibold tabular-nums text-[#5c655e]">{job.importedCount}</span>
+                        <span>
+                          {undone ? (
+                            <span className="inline-block rounded-full bg-[#f2f4f0] px-2 py-0.5 text-[11px] font-bold text-[#8b938c]">Undone</span>
+                          ) : (
+                            <span className="inline-block rounded-full bg-[#e7efe9] px-2 py-0.5 text-[11px] font-bold text-[#17352e]">Imported</span>
+                          )}
+                        </span>
+                        <span className="flex justify-end">
+                          {canUndo ? <ImportJobRollbackButton jobId={job.id} /> : null}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
-                {importJobs.map((job) => {
-                  const undone = job.rolledBackAt != null;
-                  const canUndo = job.status === "COMPLETED" && job.importedCount > 0 && !undone;
-                  return (
-                    <div
-                      className="grid grid-cols-[132px_minmax(0,1.5fr)_116px_76px_104px_48px] items-center gap-x-3.5 border-b border-[#e9ece7] px-3 py-3 text-[13.5px]"
-                      key={job.id}
-                    >
-                      <span className={`font-medium text-[#5c655e] ${undone ? "line-through" : ""}`}>
-                        {formatHistoryDate(job.createdAt)}
-                      </span>
-                      <span className={`min-w-0 truncate font-semibold ${undone ? "text-[#8b938c] line-through" : "text-[#1d2823]"}`}>
-                        {job.sourceFileName ?? "CSV import"}
-                      </span>
-                      <span className="text-[#5c655e]">{PROFILE_LABEL[job.sourceProfile ?? "GENERIC"] ?? "Generic"}</span>
-                      <span className="text-right font-semibold tabular-nums text-[#5c655e]">{job.importedCount}</span>
-                      <span>
-                        {undone ? (
-                          <span className="inline-block rounded-full bg-[#f2f4f0] px-2 py-0.5 text-[11px] font-bold text-[#8b938c]">Undone</span>
-                        ) : (
-                          <span className="inline-block rounded-full bg-[#e7efe9] px-2 py-0.5 text-[11px] font-bold text-[#17352e]">Imported</span>
-                        )}
-                      </span>
-                      <span className="flex justify-end">
-                        {canUndo ? <ImportJobRollbackButton jobId={job.id} /> : null}
-                      </span>
-                    </div>
-                  );
-                })}
               </div>
             )}
           </section>

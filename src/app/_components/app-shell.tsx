@@ -1,7 +1,9 @@
 import Link from "next/link";
 
 import { BillingBannerSlot } from "~/app/_components/billing-banner-slot";
+import { BottomNav } from "~/app/_components/bottom-nav";
 import { EmailVerificationBanner } from "~/app/_components/email-verification-banner";
+import { MobileSecondaryHeader } from "~/app/_components/mobile-header";
 import { NotificationBellSlot } from "~/app/_components/notification-bell-slot";
 import { SecurityAlertBannerSlot } from "~/app/_components/security-alert-banner-slot";
 import { SearchInput } from "~/app/_components/search-input";
@@ -31,30 +33,39 @@ const getInitials = (value: string) =>
 export async function AppShell({
   account,
   counts,
+  mobileTitle,
+  mobileBackHref = "/contacts",
+  mobileBackLabel = "Contacts",
   children,
 }: {
   account: AppShellAccount;
   counts?: AppShellCounts;
+  mobileTitle?: string;
+  mobileBackHref?: string;
+  mobileBackLabel?: string;
   children: React.ReactNode;
 }) {
   // Pending incoming shares → badge on "Shared with me" (P12-05 indicator).
   const session = await auth();
-  const incomingShares = session?.user?.id
-    ? await db.contactShare.count({
-        where: {
-          recipientUserId: session.user.id,
-          shareType: { in: ["STATIC_COPY", "LIVE_SYNC"] },
-          status: "ACTIVE",
-          recipientContactId: null,
-        },
-      })
-    : 0;
-  // Green "connected" dot on the Sync footer link when a CardDAV account is live.
-  const syncConnected = session?.user?.id
-    ? (await db.syncAccount.count({
-        where: { userId: session.user.id, status: "ACTIVE" },
-      })) > 0
-    : false;
+  const userId = session?.user?.id;
+
+  const [incomingShares, syncConnected, unreadCount, syncErrorCount] = userId
+    ? await Promise.all([
+        db.contactShare.count({
+          where: {
+            recipientUserId: userId,
+            shareType: { in: ["STATIC_COPY", "LIVE_SYNC"] },
+            status: "ACTIVE",
+            recipientContactId: null,
+          },
+        }),
+        db.syncAccount
+          .count({ where: { userId, status: "ACTIVE" } })
+          .then((n) => n > 0),
+        db.notification.count({ where: { userId, readAt: null, dismissedAt: null } }),
+        db.syncAccount.count({ where: { userId, status: { in: ["ERROR", "NEEDS_REAUTH"] } } }),
+      ])
+    : [0, false, 0, 0];
   const navItem = (href: string, icon: string, label: string, count?: number, badge?: boolean) => (
     <Link
       className="flex h-9 items-center gap-3 rounded-lg px-2.5 text-[13.5px] font-medium text-[#5c655e] transition hover:bg-[#f2f4f0]"
@@ -73,9 +84,18 @@ export async function AppShell({
   );
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-white text-[#1d2823]">
-      {/* top header */}
-      <header className="shrink-0 border-b border-[#d8ddd6] bg-white">
+    <div className="flex h-dvh flex-col overflow-hidden bg-white text-[#1d2823]">
+      {/* mobile secondary header — back + title */}
+      {mobileTitle && (
+        <MobileSecondaryHeader
+          title={mobileTitle}
+          backHref={mobileBackHref}
+          backLabel={mobileBackLabel}
+        />
+      )}
+
+      {/* desktop top header */}
+      <header className="hidden shrink-0 border-b border-[#d8ddd6] bg-white md:block">
         <div className="flex h-[60px] w-full items-center gap-4 px-4 lg:px-[18px]">
           <Link className="flex shrink-0 items-center gap-2.5 lg:w-[230px]" href="/contacts">
             <span className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-[#17352e] text-[17px] font-bold text-[#dff0e7]">
@@ -114,7 +134,7 @@ export async function AppShell({
 
       <div className="flex min-h-0 flex-1">
         {/* sidebar */}
-        <aside className="hidden w-[248px] shrink-0 flex-col gap-1 overflow-y-auto border-r border-[#d8ddd6] bg-white px-3 py-3.5 lg:flex">
+        <aside className="hidden w-[248px] shrink-0 flex-col gap-1 overflow-y-auto border-r border-[#d8ddd6] bg-white px-3 py-3.5 md:flex">
           <Link
             className="mb-2 flex items-center gap-3 rounded-xl border border-[#e9ece7] bg-[#f6f7f4] p-2.5 transition hover:bg-[#f2f4f0]"
             href="/settings"
@@ -162,8 +182,12 @@ export async function AppShell({
         </aside>
 
         {/* content */}
-        <div className="flex min-w-0 flex-1 flex-col overflow-y-auto bg-[#f4f6f2]">{children}</div>
+        <div className="flex min-w-0 flex-1 flex-col overflow-y-auto bg-[#f4f6f2] pb-[calc(56px+env(safe-area-inset-bottom))] md:pb-0">
+          {children}
+        </div>
       </div>
+
+      <BottomNav unreadCount={unreadCount} syncErrorCount={syncErrorCount} />
     </div>
   );
 }

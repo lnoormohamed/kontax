@@ -48,6 +48,9 @@ export default async function NewContactPage() {
         archived: archivedCount,
         duplicates: duplicatesCount,
       }}
+      mobileTitle="New contact"
+      mobileBackHref="/contacts"
+      mobileBackLabel="Contacts"
     >
       <CreateContactForm familyBookName={familyTarget} familyCanEdit={familyCanEdit} teamBooks={editableTeamBooks} />
     </AppShell>

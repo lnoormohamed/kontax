@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState, useTransition } from "react";
 
 import {
   archiveContact,
@@ -11,8 +11,10 @@ import {
   permanentlyDeleteContact,
   restoreContact,
   restoreContactsBulk,
+  toggleFavoriteContact,
 } from "~/app/actions/contacts";
 import { ContactBadgeCluster } from "~/app/_components/contact-badge-cluster";
+import { SwipeableRow } from "~/app/_components/contact-list/swipeable-row";
 
 type WorkspaceContact = {
   id: string;
@@ -223,6 +225,7 @@ function ContactRow({
   query,
   selected,
   onToggleSelect,
+  onArchived,
 }: {
   contact: WorkspaceContact;
   mode: "active" | "archived";
@@ -230,9 +233,28 @@ function ContactRow({
   query: string;
   selected: boolean;
   onToggleSelect: (id: string) => void;
+  onArchived: (contactId: string) => void;
 }) {
+  const [, startTransition] = useTransition();
   const displayName = getDisplayName(contact);
   const avatarSize = viewMode === "compact" ? 32 : 40;
+
+  const handleSwipeArchive = () => {
+    onArchived(contact.id);
+    startTransition(async () => {
+      const fd = new FormData();
+      fd.set("contactId", contact.id);
+      await archiveContact(fd);
+    });
+  };
+
+  const handleSwipeFavourite = () => {
+    startTransition(async () => {
+      const fd = new FormData();
+      fd.set("contactId", contact.id);
+      await toggleFavoriteContact(fd);
+    });
+  };
 
   const avatarSlot = (
     <span className="relative inline-grid place-items-center" style={{ width: 40, height: 40 }}>
@@ -293,25 +315,33 @@ function ContactRow({
   // Cozy: stacked two-line at every width.
   if (viewMode === "cozy") {
     return (
-      <div
-        className={`group flex items-center gap-3 border-b border-[#edf0ea] px-3 py-2.5 transition last:border-b-0 ${
-          selected ? "bg-[#edf0fe]" : "hover:bg-[#f2f4f0]"
-        }`}
+      <SwipeableRow
+        isFavourite={contact.isFavorite}
+        onArchive={handleSwipeArchive}
+        onToggleFavourite={handleSwipeFavourite}
       >
-        {stacked}
-      </div>
+        <div
+          className={`group flex min-h-[60px] items-center gap-3 border-b border-[#edf0ea] px-3 transition last:border-b-0 ${
+            selected ? "bg-[#edf0fe]" : "bg-white hover:bg-[#f2f4f0]"
+          }`}
+          style={{ contentVisibility: "auto", containIntrinsicSize: "auto 60px" }}
+        >
+          {stacked}
+        </div>
+      </SwipeableRow>
     );
   }
 
-  // Compact: column grid on desktop, stacked fallback on mobile (<lg).
+  // Compact: column grid on desktop, 60px stacked row on mobile (<lg).
   return (
     <div
-      className={`group border-b border-[#edf0ea] px-3 transition last:border-b-0 ${
+      className={`group border-b border-[#edf0ea] transition last:border-b-0 ${
         selected ? "bg-[#edf0fe]" : "hover:bg-[#f2f4f0]"
       }`}
       data-selected={selected ? "1" : "0"}
+      style={{ contentVisibility: "auto", containIntrinsicSize: "auto 52px" }}
     >
-      <div className={`hidden ${GRID} items-center gap-4 py-2 lg:grid`}>
+      <div className={`hidden ${GRID} items-center gap-4 px-3 py-2 lg:grid`}>
         {avatarSlot}
         <div className="flex min-w-0 items-center gap-1.5">
           <Link className="min-w-0 truncate" href={`/contacts/${contact.id}`}>
@@ -332,7 +362,17 @@ function ContactRow({
         </div>
         <RowActions contact={contact} mode={mode} />
       </div>
-      <div className="flex py-2 lg:hidden">{stacked}</div>
+      <div className="lg:hidden">
+        <SwipeableRow
+          isFavourite={contact.isFavorite}
+          onArchive={handleSwipeArchive}
+          onToggleFavourite={handleSwipeFavourite}
+        >
+          <div className={`flex min-h-[60px] items-center px-3 ${selected ? "bg-[#edf0fe]" : "bg-white"}`}>
+            {stacked}
+          </div>
+        </SwipeableRow>
+      </div>
     </div>
   );
 }
@@ -361,11 +401,44 @@ export function ContactsWorkspaceTable({
 }: ContactsWorkspaceTableProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [confirmDelete, setConfirmDelete] = useState(false);
+  const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
+  const [undoContactId, setUndoContactId] = useState<string | null>(null);
+  const undoTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const [, startUndoTransition] = useTransition();
+
+  const visibleContacts = useMemo(
+    () => contacts.filter((c) => !hiddenIds.has(c.id)),
+    [contacts, hiddenIds],
+  );
+
+  const handleArchived = useCallback((contactId: string) => {
+    setHiddenIds((prev) => new Set([...prev, contactId]));
+    clearTimeout(undoTimer.current);
+    setUndoContactId(contactId);
+    undoTimer.current = setTimeout(() => setUndoContactId(null), 5000);
+  }, []);
+
+  const handleUndo = () => {
+    if (!undoContactId) return;
+    clearTimeout(undoTimer.current);
+    const id = undoContactId;
+    setUndoContactId(null);
+    setHiddenIds((prev) => {
+      const next = new Set(prev);
+      next.delete(id);
+      return next;
+    });
+    startUndoTransition(async () => {
+      const fd = new FormData();
+      fd.set("contactId", id);
+      await restoreContact(fd);
+    });
+  };
 
   const isSearching = query.trim().length > 0;
   const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds]);
   const hasSelection = selectedIds.length > 0;
-  const visibleIds = contacts.map((contact) => contact.id);
+  const visibleIds = visibleContacts.map((contact) => contact.id);
   const allSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedSet.has(id));
 
   const toggleSelect = (id: string) =>
@@ -375,8 +448,8 @@ export function ContactsWorkspaceTable({
   const toggleSelectAll = () =>
     setSelectedIds(allSelected ? [] : visibleIds);
 
-  const favorites = !isSearching && mode === "active" ? contacts.filter((c) => c.isFavorite) : [];
-  const rest = !isSearching && mode === "active" ? contacts.filter((c) => !c.isFavorite) : contacts;
+  const favorites = !isSearching && mode === "active" ? visibleContacts.filter((c) => c.isFavorite) : [];
+  const rest = !isSearching && mode === "active" ? visibleContacts.filter((c) => !c.isFavorite) : visibleContacts;
 
   const groups = useMemo(() => {
     if (!groupByLetter || isSearching) {
@@ -405,6 +478,7 @@ export function ContactsWorkspaceTable({
       contact={contact}
       key={contact.id}
       mode={mode}
+      onArchived={handleArchived}
       onToggleSelect={toggleSelect}
       query={query}
       selected={selectedSet.has(contact.id)}
@@ -550,6 +624,46 @@ export function ContactsWorkspaceTable({
             </div>
           ))
         : rest.map(renderRow)}
+
+      {/* Undo toast — mobile only, appears above the bottom nav after swipe-archive */}
+      {undoContactId ? (
+        <div
+          className="fixed bottom-[calc(56px+env(safe-area-inset-bottom)+8px)] left-4 right-4 z-[60] md:hidden"
+          role="status"
+        >
+          <div
+            style={{
+              background: "#1d2823",
+              color: "#fff",
+              borderRadius: 12,
+              padding: "12px 16px",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              fontSize: 14,
+              fontWeight: 500,
+              boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
+            }}
+          >
+            <span>Archived.</span>
+            <button
+              onClick={handleUndo}
+              style={{
+                color: "#7c9ef4",
+                fontWeight: 700,
+                background: "none",
+                border: "none",
+                cursor: "pointer",
+                fontSize: 14,
+                padding: "0 4px",
+              }}
+              type="button"
+            >
+              Undo
+            </button>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -35,6 +35,7 @@ const PATHS: Record<string, string[]> = {
   link: ["M9.5 13.5l5-5", "M8 11l-2 2a3.5 3.5 0 005 5l2-2", "M16 13l2-2a3.5 3.5 0 00-5-5l-2 2"],
   chevronRight: ["M9 5l7 7-7 7"],
   check: ["M5 12.5l4.5 4.5L19 7"],
+  close: ["M6 6l12 12", "M18 6l-12 12"],
   briefcase: ["M3 8h18v12H3z", "M8 8V5.5h8V8", "M3 13h18"],
   gift: [
     "M4 11h16v9H4z",
@@ -54,6 +55,15 @@ const PATHS: Record<string, string[]> = {
     "M16 5.2a3 3 0 010 5.6",
     "M17.5 14.6c2 .8 3.5 2 3.5 4.4",
   ],
+  layoutList: [
+    "M3 4.5h7v7H3z",
+    "M14 6h7",
+    "M14 11h7",
+    "M3 15.5h7v4H3z",
+    "M14 16h7",
+    "M14 19.5h7",
+  ],
+  activity: ["M22 12h-3.5l-2.5 7-4-15-2.5 8H2"],
   team: [
     "M4 21V9l6-4 6 4v12",
     "M9 21v-5h2v5",

@@ -10,6 +10,7 @@ import {
   ContactEditProvider,
   ContactInlineEditor,
 } from "~/app/_components/contact-inline-editor";
+import { MobileContactDetail } from "~/app/_components/mobile-contact-detail";
 import { ContactSharing } from "~/app/_components/contact-sharing";
 import { CopyMonoRow } from "~/app/_components/copy-field";
 import { LastUpdatedBy } from "~/app/_components/last-updated-by";
@@ -329,9 +330,9 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     duplicates: shellDuplicates,
   };
 
-  // Sharing (Phase 12): owner-side shares for this contact + the public origin.
-  const shareOrigin = await getPublicOrigin();
-  const contactShares = await db.contactShare.findMany({
+  // Sharing (Phase 12): owner-side shares — only needed on the sharing tab.
+  const shareOrigin = detailTab === "sharing" ? await getPublicOrigin() : "";
+  const contactShares = detailTab === "sharing" ? await db.contactShare.findMany({
     where: { contactId: contact.id, ownerUserId: session.user.id },
     orderBy: { createdAt: "desc" },
     select: {
@@ -346,7 +347,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
       lastPushedAt: true,
       lastErrorCode: true,
     },
-  });
+  }) : [];
   const vcardLinks = contactShares.filter(
     (share) => share.shareType === "VCARD_LINK" && share.status === "ACTIVE",
   );
@@ -394,9 +395,8 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     : null;
   const lastEditedAt = lastFamilyEvent ? formatMetaDate(lastFamilyEvent.createdAt) : null;
 
-  // Shared books the user owns/belongs to (for the "Add to a shared book"
-  // section of the Sharing tab). Adding a contact to a book lands in Phase 13.
-  const sharedBooks = await db.group.findMany({
+  // Shared books — only needed on the sharing tab.
+  const sharedBooks = detailTab === "sharing" ? await db.group.findMany({
     where: {
       OR: [
         { ownerId: session.user.id },
@@ -405,9 +405,9 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     },
     orderBy: { createdAt: "asc" },
     select: { id: true, name: true, type: true, _count: { select: { members: true } } },
-  });
+  }) : [];
 
-  const syncLinks = await db.syncContactLink.findMany({
+  const syncLinks = detailTab === "details" ? await db.syncContactLink.findMany({
     where: {
       contactId: contact.id,
       syncAccount: {
@@ -440,7 +440,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
         },
       },
     },
-  });
+  }) : [];
 
 
   const editorContact = {
@@ -474,13 +474,128 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     related: normaliseRelated(contact.relatedPeople),
   };
 
+  const [avatarBg, avatarFg] = tintForName(contact.fullName);
+
   return (
-    <AppShell account={shellAccount} counts={shellCounts}>
+    <AppShell
+      account={shellAccount}
+      counts={shellCounts}
+    >
       <ContactEditProvider
         contact={editorContact}
         editableShared={!isLiveReceived}
         entries={editorEntries}
       >
+
+      {/* ── MOBILE layout (< md) ─────────────────────────────────────── */}
+      <div className="md:hidden">
+        <MobileContactDetail
+          archiveOrRestoreAction={contact.archivedAt ? restoreContact : archiveContact}
+          avatarBg={avatarBg}
+          avatarFg={avatarFg}
+          backHref="/contacts"
+          contactId={contact.id}
+          contactName={contact.fullName}
+          detailTab={detailTab}
+          email={contact.email}
+          initials={getInitials(contact.fullName)}
+          isArchived={Boolean(contact.archivedAt)}
+          isEditable={!isLiveReceived}
+          isFavorite={contact.isFavorite}
+          phone={contact.phone}
+          subtitle={[contact.jobTitle, contact.company].filter(Boolean).join(" · ") || null}
+          toggleFavoriteAction={toggleFavoriteContact}
+        >
+          {detailTab === "details" ? (
+            <div className="grid gap-4 px-4 py-4">
+              {wasSaved ? (
+                <div className="flex items-center gap-2.5 rounded-[12px] bg-[#e3efe7] px-4 py-2.5 text-[13px] text-[#1c6b48]">
+                  <WorkspaceIcon name="check" size={15} strokeWidth={2} />
+                  Contact saved successfully.
+                </div>
+              ) : null}
+              {wasMerged ? (
+                <div className="flex items-center gap-2.5 rounded-[12px] bg-[#e3efe7] px-4 py-2.5 text-[13px] text-[#1c6b48]">
+                  <WorkspaceIcon name="check" size={15} strokeWidth={2} />
+                  Merge completed. You can undo the latest merge from the action rail.
+                </div>
+              ) : null}
+              {contact.archivedAt ? (
+                <div className="flex items-center gap-2.5 rounded-[12px] bg-[#f6edd9] px-4 py-2.5 text-[13px] text-[#7a5a1a]">
+                  <WorkspaceIcon name="archive" size={15} strokeWidth={2} />
+                  This contact is archived — it won&apos;t appear in your main list.
+                </div>
+              ) : null}
+              {isSharedContact && familyContext ? (
+                <ContactFamilyPanel
+                  groupName={familyContext.groupName}
+                  lastEditedAt={lastEditedAt}
+                  lastEditedBy={lastEditedBy}
+                  members={familyPanelMembers}
+                  viewerCanEdit={Boolean(familyMembership?.canEdit)}
+                />
+              ) : null}
+              <ContactInlineEditor />
+              {reminderHasDate ? (
+                <ContactReminderOverride
+                  contactId={contact.id}
+                  override={contact.reminderLeadDaysOverride}
+                  userDefault={reminderUserDefault}
+                />
+              ) : null}
+            </div>
+          ) : null}
+          {detailTab === "sharing" ? (
+            <div className="px-4 py-4">
+              <ContactSharing
+                books={sharedBooks.map((b) => ({
+                  id: b.id,
+                  name: b.name,
+                  type: b.type,
+                  memberCount: b._count.members,
+                }))}
+                contactId={contact.id}
+                isFree={shellPlan.plan === "FREE"}
+                isLiveReceived={isLiveReceived}
+                liveOwnerLabel={contact.sourceDetail}
+                liveShareEnabled={liveShareEnabled}
+                liveShares={liveShares.map((s) => ({
+                  id: s.id,
+                  status: s.status,
+                  recipientEmail: s.recipientEmail,
+                  accepted: Boolean(s.recipientContactId),
+                  lastPushedAt: s.lastPushedAt ? s.lastPushedAt.toISOString() : null,
+                  lastErrorCode: s.lastErrorCode,
+                }))}
+                shareOrigin={shareOrigin}
+                staticShareEnabled={staticShareEnabled}
+                staticShares={staticShares.map((s) => ({
+                  id: s.id,
+                  status: s.status,
+                  recipientEmail: s.recipientEmail,
+                  accepted: Boolean(s.recipientContactId),
+                  lastPushedAt: null,
+                  lastErrorCode: s.lastErrorCode,
+                }))}
+                vcardLinks={vcardLinks.map((l) => ({
+                  id: l.id,
+                  token: l.token,
+                  downloadCount: l.downloadCount,
+                  expiresAt: l.expiresAt ? l.expiresAt.toISOString() : null,
+                }))}
+              />
+            </div>
+          ) : null}
+          {detailTab === "history" ? (
+            <div className="px-4 py-4" id="contact-history">
+              <ContactHistory contactId={contact.id} />
+            </div>
+          ) : null}
+        </MobileContactDetail>
+      </div>
+
+      {/* ── DESKTOP layout (≥ md) ────────────────────────────────────── */}
+      <div className="hidden md:block">
       {/*
         Sub-header is a DIRECT child of the AppShell scroll container so that
         `sticky top-0` sticks for the entire scroll range. When it lives inside
@@ -901,6 +1016,8 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
           </main>
         </div>
       </div>
+      </div>{/* end desktop md:block */}
+
       </ContactEditProvider>
     </AppShell>
   );

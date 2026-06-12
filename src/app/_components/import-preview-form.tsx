@@ -273,7 +273,7 @@ export function ImportPreviewForm({
             </div>
           ) : (
             <button
-              className="flex min-h-[208px] flex-col items-center justify-center gap-3 rounded-[14px] border-2 border-dashed p-7 text-center transition"
+              className="flex flex-col items-center justify-center gap-3 rounded-[14px] border-2 border-dashed p-5 text-center transition min-h-[64px] md:min-h-[208px] md:p-7"
               onClick={() => inputRef.current?.click()}
               onDragLeave={() => setOver(false)}
               onDragOver={(e) => {
@@ -289,11 +289,12 @@ export function ImportPreviewForm({
                 <div className="text-[15px] font-semibold text-[#4158f4]">Release to upload</div>
               ) : (
                 <>
-                  <div className="text-[16px] font-semibold text-[#5c655e]">Drag &amp; drop your CSV file here</div>
+                  <div className="hidden text-[16px] font-semibold text-[#5c655e] md:block">Drag &amp; drop your CSV file here</div>
                   <div className="text-[14px] text-[#8b938c]">
-                    or <span className="font-semibold text-[#4158f4]">Browse files</span>
+                    <span className="font-semibold text-[#4158f4]">Choose file</span>
+                    <span className="hidden md:inline"> or drag &amp; drop</span>
                   </div>
-                  <div className="mt-1 text-[12px] text-[#8b938c]">CSV files only</div>
+                  <div className="text-[12px] text-[#8b938c]">CSV files only</div>
                 </>
               )}
             </button>

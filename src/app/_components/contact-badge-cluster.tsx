@@ -37,7 +37,7 @@ export function ContactBadgeCluster({
         <button
           aria-label={flags.isFavorite ? "Unfavorite" : "Favorite"}
           aria-pressed={flags.isFavorite}
-          className={`grid size-[22px] place-items-center rounded-md transition hover:bg-[rgba(0,0,0,0.06)] ${
+          className={`grid place-items-center rounded-md transition hover:bg-[rgba(0,0,0,0.06)] -m-[11px] size-[44px] md:m-0 md:size-[22px] ${
             flags.isFavorite
               ? "text-[#e0a31c]"
               : "text-[#c2c8bf] opacity-0 group-hover:opacity-100"

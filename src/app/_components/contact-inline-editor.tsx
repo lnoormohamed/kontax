@@ -421,7 +421,7 @@ type ContactEditCtx = {
 
 const ContactEditContext = createContext<ContactEditCtx | null>(null);
 
-function useContactEdit() {
+export function useContactEdit() {
   const ctx = useContext(ContactEditContext);
   if (!ctx) throw new Error("useContactEdit must be used within a ContactEditProvider");
   return ctx;

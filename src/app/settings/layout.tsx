@@ -1,12 +1,14 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { BottomNav } from "~/app/_components/bottom-nav";
 import { NotificationBellSlot } from "~/app/_components/notification-bell-slot";
 import { SearchInput } from "~/app/_components/search-input";
 import { SettingsSidebar } from "~/app/_components/settings-sidebar";
 import { UserMenu } from "~/app/_components/user-menu";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
+import { db } from "~/server/db";
 import { getUserPlanSummary } from "~/server/billing";
 import { getUserFamilyMembership } from "~/server/family-access";
 import { getUserTeamMembership } from "~/server/team-access";
@@ -35,6 +37,11 @@ export default async function SettingsLayout({ children }: { children: React.Rea
 
   const userLabel = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
 
+  const [unreadCount, syncErrorCount] = await Promise.all([
+    db.notification.count({ where: { userId, readAt: null, dismissedAt: null } }),
+    db.syncAccount.count({ where: { userId, status: { in: ["ERROR", "NEEDS_REAUTH"] } } }),
+  ]);
+
   // Show Family/Team entries when the user belongs to one (owner or member) or
   // is on the matching plan (so a plan owner who hasn't created the group yet
   // can still reach the setup flow). Otherwise a single muted upsell row.
@@ -47,7 +54,7 @@ export default async function SettingsLayout({ children }: { children: React.Rea
   }
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-white text-[#1d2823]">
+    <div className="flex h-dvh flex-col overflow-hidden bg-white text-[#1d2823]">
       {/* top header — shared workspace chrome */}
       <header className="shrink-0 border-b border-[#d8ddd6] bg-white">
         <div className="flex h-[60px] w-full items-center gap-4 px-4 lg:px-[18px]">
@@ -81,9 +88,13 @@ export default async function SettingsLayout({ children }: { children: React.Rea
           shared={shared}
         />
         <div className="flex min-w-0 flex-1 flex-col overflow-y-auto bg-[#f6f7f4]">
-          <div className="mx-auto w-full max-w-[1060px] px-6 py-7 lg:px-9 lg:py-8">{children}</div>
+          <div className="mx-auto w-full max-w-[1060px] px-6 py-7 pb-[calc(56px+env(safe-area-inset-bottom)+28px)] md:pb-7 lg:px-9 lg:py-8">
+            {children}
+          </div>
         </div>
       </div>
+
+      <BottomNav unreadCount={unreadCount} syncErrorCount={syncErrorCount} />
     </div>
   );
 }

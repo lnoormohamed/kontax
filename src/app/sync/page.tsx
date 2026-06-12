@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
+import { BottomNav } from "~/app/_components/bottom-nav";
 import { SettingsSidebar } from "~/app/_components/settings-sidebar";
 import { SearchInput } from "~/app/_components/search-input";
 import { UserMenu } from "~/app/_components/user-menu";
@@ -142,7 +143,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
     return null;
   })();
 
-  const [planSummary, familyMembership, teamMembership, incomingShares, rawAccounts] =
+  const [planSummary, familyMembership, teamMembership, incomingShares, syncErrorCount, rawAccounts] =
     await Promise.all([
       getUserPlanSummary(userId),
       getUserFamilyMembership(userId),
@@ -155,6 +156,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
           recipientContactId: null,
         },
       }),
+      db.syncAccount.count({ where: { userId, status: { in: ["ERROR", "NEEDS_REAUTH"] } } }),
       db.syncAccount.findMany({
         where: { userId },
         orderBy: [{ updatedAt: "desc" }],
@@ -263,7 +265,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
   }
 
   return (
-    <div className="flex h-screen flex-col overflow-hidden bg-[#f6f7f4]" style={{ fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif" }}>
+    <div className="flex h-dvh flex-col overflow-hidden bg-[#f6f7f4]" style={{ fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif" }}>
       {/* ── top header ── */}
       <header className="shrink-0 border-b border-[#d8ddd6] bg-white" style={{ zIndex: 20 }}>
         <div className="flex h-[60px] w-full items-center gap-4 px-4 lg:px-[18px]">
@@ -320,6 +322,8 @@ export default async function SyncPage({ searchParams }: PageProps) {
           flash={flashMsg}
         />
       </div>
+
+      <BottomNav syncErrorCount={syncErrorCount} />
     </div>
   );
 }
