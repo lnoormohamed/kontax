@@ -5,7 +5,6 @@ import {
   Head,
   Hr,
   Html,
-  Img,
   Link,
   Preview,
   Section,
@@ -60,12 +59,21 @@ export function EmailLayout({
       <Body style={bodyStyle}>
         <Container style={containerStyle}>
           <Section style={headerStyle}>
-            <Img
-              src={`${appUrl}/logo-email.png`}
-              width={120}
-              height={32}
-              alt="Kontax"
-            />
+            {/* Inline CSS wordmark — no hosted asset, renders in every client.
+                Table layout keeps the tile + text aligned in Outlook. */}
+            <table
+              role="presentation"
+              cellPadding={0}
+              cellSpacing={0}
+              style={{ borderCollapse: "collapse" }}
+            >
+              <tbody>
+                <tr>
+                  <td style={tileStyle}>K</td>
+                  <td style={wordmarkStyle}>Kontax</td>
+                </tr>
+              </tbody>
+            </table>
           </Section>
           <Hr style={dividerStyle} />
 
@@ -107,6 +115,27 @@ const containerStyle: React.CSSProperties = {
   overflow: "hidden",
 };
 const headerStyle: React.CSSProperties = { padding: "24px 32px" };
+const tileStyle: React.CSSProperties = {
+  width: "28px",
+  height: "28px",
+  borderRadius: "7px",
+  backgroundColor: tokens.brand,
+  color: tokens.brandTile,
+  fontSize: "16px",
+  fontWeight: 700,
+  textAlign: "center",
+  verticalAlign: "middle",
+  fontFamily: tokens.fontFamily,
+};
+const wordmarkStyle: React.CSSProperties = {
+  paddingLeft: "9px",
+  fontSize: "18px",
+  fontWeight: 600,
+  letterSpacing: "-0.018em",
+  color: tokens.brand,
+  verticalAlign: "middle",
+  fontFamily: tokens.fontFamily,
+};
 const contentStyle: React.CSSProperties = { padding: "24px 32px" };
 const footerStyle: React.CSSProperties = { padding: "16px 32px 24px" };
 const dividerStyle: React.CSSProperties = {
