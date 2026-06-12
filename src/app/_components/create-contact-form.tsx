@@ -127,6 +127,9 @@ export function CreateContactForm({
   const [mode, setMode] = useState<"person" | "org">("person");
   const [showMore, setShowMore] = useState(false);
   const [target, setTarget] = useState<string>("private");
+  const [showAddress, setShowAddress] = useState(false);
+  const [showBirthday, setShowBirthday] = useState(false);
+  const [showNotes, setShowNotes] = useState(false);
 
   const [first, setFirst] = useState("");
   const [last, setLast] = useState("");
@@ -330,43 +333,80 @@ export function CreateContactForm({
           </Group>
 
           {/* address */}
-          <Group icon="archive">
-            <select className={`${LABEL_SELECT} justify-self-start`} onChange={(e) => setAddrLabel(e.target.value)} value={addrLabel}>
-              {ADDR_LABELS.map((l) => (
-                <option key={l} value={l}>{l}</option>
-              ))}
-            </select>
-            <input className={FIELD} onChange={(e) => setStreet(e.target.value)} placeholder="Street address" value={street} />
-            <div className="grid grid-cols-2 gap-2">
-              <input className={FIELD} onChange={(e) => setCity(e.target.value)} placeholder="City" value={city} />
-              <input className={FIELD} onChange={(e) => setPostcode(e.target.value)} placeholder="Postcode" value={postcode} />
-            </div>
-            <input className={FIELD} onChange={(e) => setCountry(e.target.value)} placeholder="Country" value={country} />
-          </Group>
-
-          {/* birthday */}
-          <Group icon="star">
-            <div className="grid grid-cols-3 gap-2">
-              <select className={FIELD} onChange={(e) => setBMonth(e.target.value)} value={bMonth}>
-                <option value="">Month</option>
-                {MONTHS.map((m, i) => (
-                  <option key={m} value={String(i + 1)}>{m}</option>
+          {showAddress ? (
+            <Group icon="archive">
+              <select className={`${LABEL_SELECT} justify-self-start`} onChange={(e) => setAddrLabel(e.target.value)} value={addrLabel}>
+                {ADDR_LABELS.map((l) => (
+                  <option key={l} value={l}>{l}</option>
                 ))}
               </select>
-              <input className={FIELD} inputMode="numeric" onChange={(e) => setBDay(e.target.value)} placeholder="Day" value={bDay} />
-              <input className={FIELD} inputMode="numeric" onChange={(e) => setBYear(e.target.value)} placeholder="Year (optional)" value={bYear} />
-            </div>
-          </Group>
+              <input className={FIELD} onChange={(e) => setStreet(e.target.value)} placeholder="Street address" value={street} />
+              <div className="grid grid-cols-2 gap-2">
+                <input className={FIELD} onChange={(e) => setCity(e.target.value)} placeholder="City" value={city} />
+                <input className={FIELD} onChange={(e) => setPostcode(e.target.value)} placeholder="Postcode" value={postcode} />
+              </div>
+              <input className={FIELD} onChange={(e) => setCountry(e.target.value)} placeholder="Country" value={country} />
+            </Group>
+          ) : (
+            <Group icon="archive">
+              <button
+                className="justify-self-start text-sm font-medium text-[#4158f4]"
+                onClick={() => setShowAddress(true)}
+                type="button"
+              >
+                + Add address
+              </button>
+            </Group>
+          )}
+
+          {/* birthday */}
+          {showBirthday ? (
+            <Group icon="star">
+              <div className="grid grid-cols-3 gap-2">
+                <select className={FIELD} onChange={(e) => setBMonth(e.target.value)} value={bMonth}>
+                  <option value="">Month</option>
+                  {MONTHS.map((m, i) => (
+                    <option key={m} value={String(i + 1)}>{m}</option>
+                  ))}
+                </select>
+                <input className={FIELD} inputMode="numeric" onChange={(e) => setBDay(e.target.value)} placeholder="Day" value={bDay} />
+                <input className={FIELD} inputMode="numeric" onChange={(e) => setBYear(e.target.value)} placeholder="Year (optional)" value={bYear} />
+              </div>
+            </Group>
+          ) : (
+            <Group icon="star">
+              <button
+                className="justify-self-start text-sm font-medium text-[#4158f4]"
+                onClick={() => setShowBirthday(true)}
+                type="button"
+              >
+                + Add birthday
+              </button>
+            </Group>
+          )}
 
           {/* notes */}
-          <Group icon="more">
-            <textarea
-              className={`${FIELD} min-h-24 resize-y`}
-              onChange={(e) => setNotes(e.target.value)}
-              placeholder="Add any notes about this contact…"
-              value={notes}
-            />
-          </Group>
+          {showNotes ? (
+            <Group icon="more">
+              <textarea
+                autoFocus
+                className={`${FIELD} min-h-24 resize-y`}
+                onChange={(e) => setNotes(e.target.value)}
+                placeholder="Add any notes about this contact…"
+                value={notes}
+              />
+            </Group>
+          ) : (
+            <Group icon="more">
+              <button
+                className="justify-self-start text-sm font-medium text-[#4158f4]"
+                onClick={() => setShowNotes(true)}
+                type="button"
+              >
+                + Add notes
+              </button>
+            </Group>
+          )}
 
           {/* show more toggle */}
           <button
