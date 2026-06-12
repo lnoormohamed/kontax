@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef } from "react";
 
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 
@@ -15,28 +15,51 @@ const REVEAL_WIDTH = 168; // two 84px action buttons
 const SNAP_THRESHOLD = 0.4; // 40% of row width → snap open
 
 export function SwipeableRow({ onArchive, onToggleFavourite, isFavourite, children }: SwipeableRowProps) {
-  const [translateX, setTranslateX] = useState(0);
-  const [animating, setAnimating] = useState(false);
   const rowRef = useRef<HTMLDivElement>(null);
+  const foregroundRef = useRef<HTMLDivElement>(null);
   const startX = useRef(0);
   const startY = useRef(0);
   const baseX = useRef(0);
+  const currentX = useRef(0);
+  const pendingX = useRef(0);
+  const frame = useRef<number | null>(null);
   const intent = useRef<"none" | "swipe" | "scroll">("none");
   const pointerId = useRef<number | null>(null);
 
+  const applyTransform = (value: number, animate: boolean) => {
+    const foreground = foregroundRef.current;
+    if (!foreground) return;
+    foreground.style.transition = animate ? "transform 0.24s cubic-bezier(0.2,0.8,0.2,1)" : "none";
+    foreground.style.transform = value > 0 ? `translate3d(-${value}px,0,0)` : "translate3d(0,0,0)";
+    foreground.style.willChange = value > 0 || !animate ? "transform" : "auto";
+    currentX.current = value;
+  };
+
+  const scheduleTransform = (value: number) => {
+    pendingX.current = value;
+    if (frame.current !== null) return;
+    frame.current = requestAnimationFrame(() => {
+      frame.current = null;
+      applyTransform(pendingX.current, false);
+    });
+  };
+
   const snapTo = (target: number) => {
-    setAnimating(true);
-    setTranslateX(target);
+    if (frame.current !== null) {
+      cancelAnimationFrame(frame.current);
+      frame.current = null;
+    }
+    applyTransform(target, true);
   };
 
   const handlePointerDown = (e: React.PointerEvent) => {
     if (e.pointerType === "mouse") return; // desktop only uses hover actions
     startX.current = e.clientX;
     startY.current = e.clientY;
-    baseX.current = translateX;
+    baseX.current = currentX.current;
     intent.current = "none";
     pointerId.current = e.pointerId;
-    setAnimating(false);
+    applyTransform(currentX.current, false);
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
@@ -60,7 +83,7 @@ export function SwipeableRow({ onArchive, onToggleFavourite, isFavourite, childr
     next = Math.max(0, next);
     // Rubber-band past full reveal
     if (next > REVEAL_WIDTH) next = REVEAL_WIDTH + (next - REVEAL_WIDTH) * 0.28;
-    setTranslateX(next);
+    scheduleTransform(next);
   };
 
   const handlePointerUp = () => {
@@ -68,7 +91,7 @@ export function SwipeableRow({ onArchive, onToggleFavourite, isFavourite, childr
     intent.current = "none";
     pointerId.current = null;
     const rowW = rowRef.current?.offsetWidth ?? 375;
-    snapTo(translateX >= rowW * SNAP_THRESHOLD ? REVEAL_WIDTH : 0);
+    snapTo(currentX.current >= rowW * SNAP_THRESHOLD ? REVEAL_WIDTH : 0);
   };
 
   const vibrate = () => { try { navigator.vibrate?.(10); } catch (_) {} };
@@ -122,6 +145,7 @@ export function SwipeableRow({ onArchive, onToggleFavourite, isFavourite, childr
 
       {/* Sliding foreground */}
       <div
+        ref={foregroundRef}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
@@ -129,10 +153,10 @@ export function SwipeableRow({ onArchive, onToggleFavourite, isFavourite, childr
         style={{
           position: "relative",
           zIndex: 1,
-          transform: translateX > 0 ? `translateX(-${translateX}px)` : undefined,
-          transition: animating ? "transform 0.26s cubic-bezier(0.2,0.8,0.2,1)" : "none",
+          transform: "translate3d(0,0,0)",
+          transition: "none",
           touchAction: "pan-y",
-          willChange: translateX > 0 ? "transform" : "auto",
+          willChange: "auto",
         }}
       >
         {children}

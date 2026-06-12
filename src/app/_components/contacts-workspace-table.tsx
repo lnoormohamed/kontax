@@ -237,7 +237,7 @@ function ContactRow({
   selected: boolean;
   onToggleSelect: (id: string) => void;
   onArchived: (contactId: string) => void;
-  onOpenContact: () => void;
+  onOpenContact: (contactId: string) => void;
 }) {
   const [, startTransition] = useTransition();
   const displayName = getDisplayName(contact);
@@ -294,7 +294,7 @@ function ContactRow({
       {avatarSlot}
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
-          <Link className="min-w-0 truncate" href={`/contacts/${contact.id}`} onClick={onOpenContact} prefetch={false}>
+          <Link className="min-w-0 truncate" href={`/contacts/${contact.id}`} onClick={() => onOpenContact(contact.id)} prefetch={false}>
             <span className="truncate text-[14.5px] font-semibold text-[#1d2823]">
               <Highlight query={query} text={displayName} />
             </span>
@@ -346,7 +346,7 @@ function ContactRow({
       <div className={`hidden ${GRID} items-center gap-4 px-3 py-2 lg:grid`}>
         {avatarSlot}
         <div className="flex min-w-0 items-center gap-1.5">
-          <Link className="min-w-0 truncate" href={`/contacts/${contact.id}`} onClick={onOpenContact} prefetch={false}>
+          <Link className="min-w-0 truncate" href={`/contacts/${contact.id}`} onClick={() => onOpenContact(contact.id)} prefetch={false}>
             <span className="truncate text-sm font-semibold text-[#1d2823]">
               <Highlight query={query} text={displayName} />
             </span>
@@ -470,13 +470,14 @@ export function ContactsWorkspaceTable({
     [groupByLetter, mode, query, viewMode],
   );
 
-  const saveListScrollPosition = useCallback(() => {
+  const saveListScrollPosition = useCallback((contactId: string) => {
     if (typeof window === "undefined") return;
 
     sessionStorage.setItem(
       CONTACT_LIST_SCROLL_KEY,
       JSON.stringify({
         key: scrollMemoryKey,
+        contactId,
         scrollTop: scrollEl?.scrollTop ?? null,
         windowY: window.scrollY,
       }),
@@ -591,6 +592,7 @@ export function ContactsWorkspaceTable({
     try {
       const saved = JSON.parse(raw) as {
         key?: string;
+        contactId?: string;
         scrollTop?: number | null;
         windowY?: number;
       };
@@ -605,11 +607,17 @@ export function ContactsWorkspaceTable({
         if (typeof saved.windowY === "number") {
           window.scrollTo({ top: saved.windowY, behavior: "instant" });
         }
+        if (isMobileViewport && saved.contactId) {
+          const index = flatRows.findIndex((row) => row.type === "contact" && row.contact.id === saved.contactId);
+          if (index >= 0) {
+            virtualizer.scrollToIndex(index, { align: "center" });
+          }
+        }
       });
     } catch {
       sessionStorage.removeItem(CONTACT_LIST_SCROLL_KEY);
     }
-  }, [mounted, scrollEl, scrollMemoryKey]);
+  }, [flatRows, mounted, scrollEl, scrollMemoryKey, virtualizer]);
 
   if (contacts.length === 0) {
     return (
