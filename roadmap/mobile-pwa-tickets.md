@@ -55,7 +55,7 @@ Requirements** section; the paired build ticket builds to it.
 | P24B-01 | `MobilePlainHeader` (title + bell) — extract & adopt on Activity/Sync/Settings roots | B1 | P1 | ✅ | — |
 | P24B-02 | Settings layout: secondary-header back-nav on sub-pages (‹ Settings · <title>) | B1, E6 | **P0** | ✅ | — |
 | P24B-03 | Variance primitives: `UpsellCard`, `NearLimitBanner`, `ReadOnlyBanner`, `PendingChip`, `PermissionGate` | E0.4, C | **P0** | ✅ | P24B-DB14 |
-| P24B-04 | "Stack table → cards / h-scroll" helper | C, F | P1 | ☐ | — |
+| P24B-04 | "Stack table → cards / h-scroll" helper | C, F | P1 | ✅ | — |
 | P24B-05 | Confirm-dialog / action-sheet primitive | D4 | P1 | ☐ | — |
 | P24B-06 | `MobileInstallPrompt` (iOS steps / Android programmatic) | D5 | P2 | ☐ | — |
 
