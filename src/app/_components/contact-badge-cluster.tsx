@@ -38,7 +38,7 @@ export function ContactBadgeCluster({
           className={`grid place-items-center rounded-md transition hover:bg-[rgba(0,0,0,0.06)] -m-[11px] size-[44px] md:m-0 md:size-[22px] ${
             flags.isFavorite
               ? "text-[#e0a31c]"
-              : "text-[#c2c8bf] opacity-0 group-hover:opacity-100"
+              : "pointer-events-none text-[#c2c8bf] opacity-0 md:pointer-events-auto md:group-hover:opacity-100"
           }`}
           title={flags.isFavorite ? "Unfavorite" : "Favorite"}
           type="submit"

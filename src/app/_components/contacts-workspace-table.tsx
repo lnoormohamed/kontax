@@ -577,6 +577,14 @@ export function ContactsWorkspaceTable({
   useLayoutEffect(() => {
     if (!mounted || restoredScrollRef.current || typeof window === "undefined") return;
 
+    const isMobileViewport = window.matchMedia("(max-width: 1023px)").matches;
+    const navigationEntry = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
+    if (isMobileViewport && navigationEntry?.type === "reload") {
+      sessionStorage.removeItem(CONTACT_LIST_SCROLL_KEY);
+      restoredScrollRef.current = true;
+      return;
+    }
+
     const raw = sessionStorage.getItem(CONTACT_LIST_SCROLL_KEY);
     if (!raw) return;
 
@@ -614,7 +622,7 @@ export function ContactsWorkspaceTable({
   return (
     <div className="bg-white">
       {hasSelection ? (
-        <div className="flex flex-wrap items-center gap-3 border-b border-[#e9ece7] bg-[#edf0fe] px-4 py-2.5">
+        <div className="fixed left-3 right-3 top-[calc(env(safe-area-inset-top)+72px)] z-40 flex flex-wrap items-center gap-3 rounded-2xl border border-[#d8ddfb] bg-[#edf0fe] px-4 py-2.5 shadow-[0_12px_30px_rgba(36,54,130,0.18)] md:static md:rounded-none md:border-x-0 md:border-t-0 md:border-[#e9ece7] md:shadow-none">
           <button
             aria-label="Clear selection"
             className="grid h-7 w-7 place-items-center rounded-md text-slate-600 transition hover:bg-[rgba(0,0,0,0.06)]"
