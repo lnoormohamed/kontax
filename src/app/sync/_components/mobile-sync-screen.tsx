@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { ReadOnlyBanner, UpsellCard } from "~/app/_components/mobile-variance";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import type { SyncAccountData } from "./sync-page-client";
 
@@ -33,16 +34,52 @@ function statusVisual(a: SyncAccountData): StatusVisual {
 export function MobileSyncScreen({
   accounts,
   hidden,
+  cardDavEnabled,
+  syncAccountsLimit,
+  canWrite,
+  upgradePlan = "Pro",
 }: {
   accounts: SyncAccountData[];
   /** True when a connection is selected or the add form is open — the full
    *  SyncPageClient takes over the screen, so the summary is suppressed. */
   hidden: boolean;
+  /** Free plan can't use CardDAV sync at all → upsell (mirrors the server gate). */
+  cardDavEnabled: boolean;
+  /** Account ceiling for the plan (Pro = 5); Add disables at the cap. */
+  syncAccountsLimit: number;
+  /** Read-only lifecycle (GRACE/LOCKED) disables Add. */
+  canWrite: boolean;
+  upgradePlan?: string;
 }) {
   if (hidden) return null;
 
+  // Free: CardDAV sync is a paid feature — the whole screen is an upsell.
+  if (!cardDavEnabled) {
+    return (
+      <div className="flex w-full flex-col md:hidden" style={{ background: "#f6f7f4" }}>
+        <div style={{ padding: "28px 16px" }}>
+          <UpsellCard
+            feature="Sync"
+            plan={upgradePlan}
+            icon="sync"
+            body="Connect iCloud, Google, or any CardDAV account and keep your contacts in sync automatically."
+          />
+        </div>
+      </div>
+    );
+  }
+
+  const atCap = accounts.length >= syncAccountsLimit;
+  const addDisabled = !canWrite || atCap;
+  const addReason = !canWrite
+    ? "Your account is read-only."
+    : atCap
+      ? `You're using all ${syncAccountsLimit} sync ${syncAccountsLimit === 1 ? "account" : "accounts"}.`
+      : null;
+
   return (
     <div className="flex w-full flex-col md:hidden" style={{ background: "#f6f7f4" }}>
+      {!canWrite ? <ReadOnlyBanner variant="grace" /> : null}
       <div className="mob-scroll" style={{ flex: 1, padding: "16px 0 28px" }}>
         {accounts.length === 0 ? (
           <div style={{ margin: "0 16px", display: "flex", flexDirection: "column", alignItems: "center", gap: 14, padding: "40px 24px", textAlign: "center" }}>
@@ -93,27 +130,54 @@ export function MobileSyncScreen({
         )}
 
         <div style={{ padding: "0 16px" }}>
-          <Link
-            href="/sync?add=1"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 8,
-              height: 48,
-              borderRadius: 12,
-              border: "1.5px dashed #d8ddd6",
-              background: "#fff",
-              color: "#4158f4",
-              fontSize: 15,
-              fontWeight: 600,
-              textDecoration: "none",
-              WebkitTapHighlightColor: "transparent",
-            }}
-          >
-            <WorkspaceIcon name="plus" size={18} className="text-[#4158f4]" strokeWidth={2} />
-            Add connection
-          </Link>
+          {addDisabled ? (
+            <>
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  height: 48,
+                  borderRadius: 12,
+                  border: "1.5px dashed #e9ece7",
+                  background: "#fff",
+                  color: "#aeb4ac",
+                  fontSize: 15,
+                  fontWeight: 600,
+                  cursor: "not-allowed",
+                }}
+              >
+                <WorkspaceIcon name="plus" size={18} className="text-[#aeb4ac]" strokeWidth={2} />
+                Add connection
+              </div>
+              {addReason ? (
+                <p style={{ margin: "8px 2px 0", fontSize: 12, color: "#8b938c", textAlign: "center" }}>{addReason}</p>
+              ) : null}
+            </>
+          ) : (
+            <Link
+              href="/sync?add=1"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: 8,
+                height: 48,
+                borderRadius: 12,
+                border: "1.5px dashed #d8ddd6",
+                background: "#fff",
+                color: "#4158f4",
+                fontSize: 15,
+                fontWeight: 600,
+                textDecoration: "none",
+                WebkitTapHighlightColor: "transparent",
+              }}
+            >
+              <WorkspaceIcon name="plus" size={18} className="text-[#4158f4]" strokeWidth={2} />
+              Add connection
+            </Link>
+          )}
         </div>
       </div>
     </div>

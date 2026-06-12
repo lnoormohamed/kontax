@@ -330,7 +330,13 @@ export default async function SyncPage({ searchParams }: PageProps) {
 
         {/* Mobile summary — clean connection cards (md:hidden), suppressed once
             a connection/add takes over via SyncPageClient. */}
-        <MobileSyncScreen accounts={accounts} hidden={mobileClientActive} />
+        <MobileSyncScreen
+          accounts={accounts}
+          hidden={mobileClientActive}
+          cardDavEnabled={planSummary.entitlements.cardDavSyncEnabled}
+          syncAccountsLimit={planSummary.entitlements.syncAccountsLimit}
+          canWrite={planSummary.lifecyclePolicy.canWrite}
+        />
 
         {/* Rails 2+3: account list + detail (client-managed). Desktop always
             shows it; mobile only when a connection is selected or adding. */}

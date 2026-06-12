@@ -69,7 +69,7 @@ Requirements** section; the paired build ticket builds to it.
 | --- | --- | --- | --- | --- | --- |
 | P24B-08 | Contact detail: 4 green-tint **ActionPills** + scroll-aware compact header; Free history cap (last 3) + Sharing-tab gating | E2 | P1 | ✅ | P24B-03 |
 | P24B-09 | Activity: mobile **GroupCard event rows** + retention caption; keep Free upsell (distinct from empty) | E4 | P1 | ✅ | P24B-03 |
-| P24B-10 | Sync: confirm to spec + Free **CardDAV upsell / 1-account cap** variance | E5 | P2 | ☐ | P24B-03 |
+| P24B-10 | Sync: confirm to spec + Free **CardDAV upsell / 1-account cap** variance | E5 | P2 | ✅ | P24B-03 |
 | P24B-11 | Contacts list: sticky group headers (deferred from P24A) + limit/read-only variance | E1 | P2 | ☐ | P24B-03 |
 | P24B-22 | Mobile **search overlay** → to spec (results, recents, no-match, offline) | E13 | P1 | ☐ | P24B-DB18 |
 | P24B-23 | Mobile **notifications overlay** → to spec (category rows, security drawer, mark-all-read; cover bottom nav) | E14 | P1 | ☐ | P24B-DB18 |
@@ -175,3 +175,8 @@ Requirements** section; the paired build ticket builds to it.
   timestamp), with the retention caption at the footer and the Free upsell (P24A) correct. The one real
   fix: the FilterBar now h-scrolls as a single row on mobile (`flex-nowrap overflow-x-auto`,
   `md:flex-wrap`) instead of wrapping into 3 rows — reclaims vertical space per spec §E4.
+- 2026-06-13 — **P24B-10 done** — MobileSyncScreen plan variance, mirroring the server gates
+  (assertCanUseCardDavSync / assertCanCreateSyncAccount): **Free** (cardDavSyncEnabled=false) → UpsellCard
+  "Sync is a Pro feature"; **Pro+** → cards + Add, disabled at syncAccountsLimit (with reason);
+  **read-only** → ReadOnlyBanner + Add disabled. Verified Free (upsell) and Pro (enabled Add) at 375px
+  via the temp-Pro recipe.
