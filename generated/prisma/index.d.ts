@@ -168,6 +168,16 @@ export type SecurityAlert = $Result.DefaultSelection<Prisma.$SecurityAlertPayloa
  * 
  */
 export type NotificationSettings = $Result.DefaultSelection<Prisma.$NotificationSettingsPayload>
+/**
+ * Model FailedLoginAttempt
+ * 
+ */
+export type FailedLoginAttempt = $Result.DefaultSelection<Prisma.$FailedLoginAttemptPayload>
+/**
+ * Model BirthdayReminderState
+ * 
+ */
+export type BirthdayReminderState = $Result.DefaultSelection<Prisma.$BirthdayReminderStatePayload>
 
 /**
  * Enums
@@ -1086,6 +1096,26 @@ export class PrismaClient<
     * ```
     */
   get notificationSettings(): Prisma.NotificationSettingsDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.failedLoginAttempt`: Exposes CRUD operations for the **FailedLoginAttempt** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more FailedLoginAttempts
+    * const failedLoginAttempts = await prisma.failedLoginAttempt.findMany()
+    * ```
+    */
+  get failedLoginAttempt(): Prisma.FailedLoginAttemptDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.birthdayReminderState`: Exposes CRUD operations for the **BirthdayReminderState** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more BirthdayReminderStates
+    * const birthdayReminderStates = await prisma.birthdayReminderState.findMany()
+    * ```
+    */
+  get birthdayReminderState(): Prisma.BirthdayReminderStateDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1557,7 +1587,9 @@ export namespace Prisma {
     StripeWebhookEvent: 'StripeWebhookEvent',
     Notification: 'Notification',
     SecurityAlert: 'SecurityAlert',
-    NotificationSettings: 'NotificationSettings'
+    NotificationSettings: 'NotificationSettings',
+    FailedLoginAttempt: 'FailedLoginAttempt',
+    BirthdayReminderState: 'BirthdayReminderState'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1576,7 +1608,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "securityAlert" | "notificationSettings"
+      modelProps: "user" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -3874,6 +3906,154 @@ export namespace Prisma {
           }
         }
       }
+      FailedLoginAttempt: {
+        payload: Prisma.$FailedLoginAttemptPayload<ExtArgs>
+        fields: Prisma.FailedLoginAttemptFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.FailedLoginAttemptFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FailedLoginAttemptPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.FailedLoginAttemptFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FailedLoginAttemptPayload>
+          }
+          findFirst: {
+            args: Prisma.FailedLoginAttemptFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FailedLoginAttemptPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.FailedLoginAttemptFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FailedLoginAttemptPayload>
+          }
+          findMany: {
+            args: Prisma.FailedLoginAttemptFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FailedLoginAttemptPayload>[]
+          }
+          create: {
+            args: Prisma.FailedLoginAttemptCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FailedLoginAttemptPayload>
+          }
+          createMany: {
+            args: Prisma.FailedLoginAttemptCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.FailedLoginAttemptCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FailedLoginAttemptPayload>[]
+          }
+          delete: {
+            args: Prisma.FailedLoginAttemptDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FailedLoginAttemptPayload>
+          }
+          update: {
+            args: Prisma.FailedLoginAttemptUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FailedLoginAttemptPayload>
+          }
+          deleteMany: {
+            args: Prisma.FailedLoginAttemptDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.FailedLoginAttemptUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.FailedLoginAttemptUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FailedLoginAttemptPayload>[]
+          }
+          upsert: {
+            args: Prisma.FailedLoginAttemptUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$FailedLoginAttemptPayload>
+          }
+          aggregate: {
+            args: Prisma.FailedLoginAttemptAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateFailedLoginAttempt>
+          }
+          groupBy: {
+            args: Prisma.FailedLoginAttemptGroupByArgs<ExtArgs>
+            result: $Utils.Optional<FailedLoginAttemptGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.FailedLoginAttemptCountArgs<ExtArgs>
+            result: $Utils.Optional<FailedLoginAttemptCountAggregateOutputType> | number
+          }
+        }
+      }
+      BirthdayReminderState: {
+        payload: Prisma.$BirthdayReminderStatePayload<ExtArgs>
+        fields: Prisma.BirthdayReminderStateFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.BirthdayReminderStateFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BirthdayReminderStatePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.BirthdayReminderStateFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BirthdayReminderStatePayload>
+          }
+          findFirst: {
+            args: Prisma.BirthdayReminderStateFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BirthdayReminderStatePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.BirthdayReminderStateFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BirthdayReminderStatePayload>
+          }
+          findMany: {
+            args: Prisma.BirthdayReminderStateFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BirthdayReminderStatePayload>[]
+          }
+          create: {
+            args: Prisma.BirthdayReminderStateCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BirthdayReminderStatePayload>
+          }
+          createMany: {
+            args: Prisma.BirthdayReminderStateCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.BirthdayReminderStateCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BirthdayReminderStatePayload>[]
+          }
+          delete: {
+            args: Prisma.BirthdayReminderStateDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BirthdayReminderStatePayload>
+          }
+          update: {
+            args: Prisma.BirthdayReminderStateUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BirthdayReminderStatePayload>
+          }
+          deleteMany: {
+            args: Prisma.BirthdayReminderStateDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.BirthdayReminderStateUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.BirthdayReminderStateUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BirthdayReminderStatePayload>[]
+          }
+          upsert: {
+            args: Prisma.BirthdayReminderStateUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BirthdayReminderStatePayload>
+          }
+          aggregate: {
+            args: Prisma.BirthdayReminderStateAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateBirthdayReminderState>
+          }
+          groupBy: {
+            args: Prisma.BirthdayReminderStateGroupByArgs<ExtArgs>
+            result: $Utils.Optional<BirthdayReminderStateGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.BirthdayReminderStateCountArgs<ExtArgs>
+            result: $Utils.Optional<BirthdayReminderStateCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -4001,6 +4181,8 @@ export namespace Prisma {
     notification?: NotificationOmit
     securityAlert?: SecurityAlertOmit
     notificationSettings?: NotificationSettingsOmit
+    failedLoginAttempt?: FailedLoginAttemptOmit
+    birthdayReminderState?: BirthdayReminderStateOmit
   }
 
   /* Types for Logging */
@@ -4102,6 +4284,8 @@ export namespace Prisma {
     adminAuditEvents: number
     notifications: number
     securityAlerts: number
+    birthdayReminderStates: number
+    failedLoginAttempts: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4126,6 +4310,8 @@ export namespace Prisma {
     adminAuditEvents?: boolean | UserCountOutputTypeCountAdminAuditEventsArgs
     notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
     securityAlerts?: boolean | UserCountOutputTypeCountSecurityAlertsArgs
+    birthdayReminderStates?: boolean | UserCountOutputTypeCountBirthdayReminderStatesArgs
+    failedLoginAttempts?: boolean | UserCountOutputTypeCountFailedLoginAttemptsArgs
   }
 
   // Custom InputTypes
@@ -4286,6 +4472,20 @@ export namespace Prisma {
     where?: SecurityAlertWhereInput
   }
 
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountBirthdayReminderStatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BirthdayReminderStateWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountFailedLoginAttemptsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FailedLoginAttemptWhereInput
+  }
+
 
   /**
    * Count Type AppPasswordCountOutputType
@@ -4331,6 +4531,7 @@ export namespace Prisma {
     sharesFromContact: number
     sharesAsRecipientCopy: number
     groupContacts: number
+    birthdayReminderStates: number
     mergedChildren: number
   }
 
@@ -4343,6 +4544,7 @@ export namespace Prisma {
     sharesFromContact?: boolean | ContactCountOutputTypeCountSharesFromContactArgs
     sharesAsRecipientCopy?: boolean | ContactCountOutputTypeCountSharesAsRecipientCopyArgs
     groupContacts?: boolean | ContactCountOutputTypeCountGroupContactsArgs
+    birthdayReminderStates?: boolean | ContactCountOutputTypeCountBirthdayReminderStatesArgs
     mergedChildren?: boolean | ContactCountOutputTypeCountMergedChildrenArgs
   }
 
@@ -4411,6 +4613,13 @@ export namespace Prisma {
    */
   export type ContactCountOutputTypeCountGroupContactsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: GroupContactWhereInput
+  }
+
+  /**
+   * ContactCountOutputType without action
+   */
+  export type ContactCountOutputTypeCountBirthdayReminderStatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BirthdayReminderStateWhereInput
   }
 
   /**
@@ -4794,10 +5003,12 @@ export namespace Prisma {
 
   export type UserAvgAggregateOutputType = {
     sessionVersion: number | null
+    reminderLeadDays: number | null
   }
 
   export type UserSumAggregateOutputType = {
     sessionVersion: number | null
+    reminderLeadDays: number | null
   }
 
   export type UserMinAggregateOutputType = {
@@ -4820,6 +5031,8 @@ export namespace Prisma {
     role: $Enums.UserRole | null
     planOverrideReason: string | null
     planOverriddenAt: Date | null
+    reminderLeadDays: number | null
+    calToken: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4844,6 +5057,8 @@ export namespace Prisma {
     role: $Enums.UserRole | null
     planOverrideReason: string | null
     planOverriddenAt: Date | null
+    reminderLeadDays: number | null
+    calToken: string | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -4868,6 +5083,8 @@ export namespace Prisma {
     role: number
     planOverrideReason: number
     planOverriddenAt: number
+    reminderLeadDays: number
+    calToken: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -4876,10 +5093,12 @@ export namespace Prisma {
 
   export type UserAvgAggregateInputType = {
     sessionVersion?: true
+    reminderLeadDays?: true
   }
 
   export type UserSumAggregateInputType = {
     sessionVersion?: true
+    reminderLeadDays?: true
   }
 
   export type UserMinAggregateInputType = {
@@ -4902,6 +5121,8 @@ export namespace Prisma {
     role?: true
     planOverrideReason?: true
     planOverriddenAt?: true
+    reminderLeadDays?: true
+    calToken?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4926,6 +5147,8 @@ export namespace Prisma {
     role?: true
     planOverrideReason?: true
     planOverriddenAt?: true
+    reminderLeadDays?: true
+    calToken?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -4950,6 +5173,8 @@ export namespace Prisma {
     role?: true
     planOverrideReason?: true
     planOverriddenAt?: true
+    reminderLeadDays?: true
+    calToken?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -5061,6 +5286,8 @@ export namespace Prisma {
     role: $Enums.UserRole
     planOverrideReason: string | null
     planOverriddenAt: Date | null
+    reminderLeadDays: number
+    calToken: string | null
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
@@ -5104,6 +5331,8 @@ export namespace Prisma {
     role?: boolean
     planOverrideReason?: boolean
     planOverriddenAt?: boolean
+    reminderLeadDays?: boolean
+    calToken?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     appPasswords?: boolean | User$appPasswordsArgs<ExtArgs>
@@ -5129,6 +5358,8 @@ export namespace Prisma {
     notifications?: boolean | User$notificationsArgs<ExtArgs>
     securityAlerts?: boolean | User$securityAlertsArgs<ExtArgs>
     notificationSettings?: boolean | User$notificationSettingsArgs<ExtArgs>
+    birthdayReminderStates?: boolean | User$birthdayReminderStatesArgs<ExtArgs>
+    failedLoginAttempts?: boolean | User$failedLoginAttemptsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -5152,6 +5383,8 @@ export namespace Prisma {
     role?: boolean
     planOverrideReason?: boolean
     planOverriddenAt?: boolean
+    reminderLeadDays?: boolean
+    calToken?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -5176,6 +5409,8 @@ export namespace Prisma {
     role?: boolean
     planOverrideReason?: boolean
     planOverriddenAt?: boolean
+    reminderLeadDays?: boolean
+    calToken?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -5200,11 +5435,13 @@ export namespace Prisma {
     role?: boolean
     planOverrideReason?: boolean
     planOverriddenAt?: boolean
+    reminderLeadDays?: boolean
+    calToken?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "password" | "lifecycleState" | "autoFillPhoneticNames" | "sessionVersion" | "avatarUrl" | "emailVerified" | "emailPendingChange" | "emailPendingChangeRequestedAt" | "emailStatus" | "totpEnabled" | "totpSecret" | "totpVerifiedAt" | "scheduledDeleteAt" | "role" | "planOverrideReason" | "planOverriddenAt" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "password" | "lifecycleState" | "autoFillPhoneticNames" | "sessionVersion" | "avatarUrl" | "emailVerified" | "emailPendingChange" | "emailPendingChangeRequestedAt" | "emailStatus" | "totpEnabled" | "totpSecret" | "totpVerifiedAt" | "scheduledDeleteAt" | "role" | "planOverrideReason" | "planOverriddenAt" | "reminderLeadDays" | "calToken" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     appPasswords?: boolean | User$appPasswordsArgs<ExtArgs>
     contacts?: boolean | User$contactsArgs<ExtArgs>
@@ -5229,6 +5466,8 @@ export namespace Prisma {
     notifications?: boolean | User$notificationsArgs<ExtArgs>
     securityAlerts?: boolean | User$securityAlertsArgs<ExtArgs>
     notificationSettings?: boolean | User$notificationSettingsArgs<ExtArgs>
+    birthdayReminderStates?: boolean | User$birthdayReminderStatesArgs<ExtArgs>
+    failedLoginAttempts?: boolean | User$failedLoginAttemptsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -5260,6 +5499,8 @@ export namespace Prisma {
       notifications: Prisma.$NotificationPayload<ExtArgs>[]
       securityAlerts: Prisma.$SecurityAlertPayload<ExtArgs>[]
       notificationSettings: Prisma.$NotificationSettingsPayload<ExtArgs> | null
+      birthdayReminderStates: Prisma.$BirthdayReminderStatePayload<ExtArgs>[]
+      failedLoginAttempts: Prisma.$FailedLoginAttemptPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -5281,6 +5522,8 @@ export namespace Prisma {
       role: $Enums.UserRole
       planOverrideReason: string | null
       planOverriddenAt: Date | null
+      reminderLeadDays: number
+      calToken: string | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -5700,6 +5943,8 @@ export namespace Prisma {
     notifications<T extends User$notificationsArgs<ExtArgs> = {}>(args?: Subset<T, User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     securityAlerts<T extends User$securityAlertsArgs<ExtArgs> = {}>(args?: Subset<T, User$securityAlertsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SecurityAlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     notificationSettings<T extends User$notificationSettingsArgs<ExtArgs> = {}>(args?: Subset<T, User$notificationSettingsArgs<ExtArgs>>): Prisma__NotificationSettingsClient<$Result.GetResult<Prisma.$NotificationSettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    birthdayReminderStates<T extends User$birthdayReminderStatesArgs<ExtArgs> = {}>(args?: Subset<T, User$birthdayReminderStatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BirthdayReminderStatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    failedLoginAttempts<T extends User$failedLoginAttemptsArgs<ExtArgs> = {}>(args?: Subset<T, User$failedLoginAttemptsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FailedLoginAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5748,6 +5993,8 @@ export namespace Prisma {
     readonly role: FieldRef<"User", 'UserRole'>
     readonly planOverrideReason: FieldRef<"User", 'String'>
     readonly planOverriddenAt: FieldRef<"User", 'DateTime'>
+    readonly reminderLeadDays: FieldRef<"User", 'Int'>
+    readonly calToken: FieldRef<"User", 'String'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
   }
@@ -6677,6 +6924,54 @@ export namespace Prisma {
      */
     include?: NotificationSettingsInclude<ExtArgs> | null
     where?: NotificationSettingsWhereInput
+  }
+
+  /**
+   * User.birthdayReminderStates
+   */
+  export type User$birthdayReminderStatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BirthdayReminderState
+     */
+    select?: BirthdayReminderStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BirthdayReminderState
+     */
+    omit?: BirthdayReminderStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BirthdayReminderStateInclude<ExtArgs> | null
+    where?: BirthdayReminderStateWhereInput
+    orderBy?: BirthdayReminderStateOrderByWithRelationInput | BirthdayReminderStateOrderByWithRelationInput[]
+    cursor?: BirthdayReminderStateWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: BirthdayReminderStateScalarFieldEnum | BirthdayReminderStateScalarFieldEnum[]
+  }
+
+  /**
+   * User.failedLoginAttempts
+   */
+  export type User$failedLoginAttemptsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FailedLoginAttempt
+     */
+    select?: FailedLoginAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FailedLoginAttempt
+     */
+    omit?: FailedLoginAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FailedLoginAttemptInclude<ExtArgs> | null
+    where?: FailedLoginAttemptWhereInput
+    orderBy?: FailedLoginAttemptOrderByWithRelationInput | FailedLoginAttemptOrderByWithRelationInput[]
+    cursor?: FailedLoginAttemptWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: FailedLoginAttemptScalarFieldEnum | FailedLoginAttemptScalarFieldEnum[]
   }
 
   /**
@@ -7838,10 +8133,12 @@ export namespace Prisma {
   }
 
   export type ContactAvgAggregateOutputType = {
+    reminderLeadDaysOverride: number | null
     syncVersion: number | null
   }
 
   export type ContactSumAggregateOutputType = {
+    reminderLeadDaysOverride: number | null
     syncVersion: number | null
   }
 
@@ -7849,6 +8146,7 @@ export namespace Prisma {
     id: string | null
     userId: string | null
     importJobId: string | null
+    reminderLeadDaysOverride: number | null
     mergedIntoContactId: string | null
     syncUid: string | null
     syncVersion: number | null
@@ -7889,6 +8187,7 @@ export namespace Prisma {
     id: string | null
     userId: string | null
     importJobId: string | null
+    reminderLeadDaysOverride: number | null
     mergedIntoContactId: string | null
     syncUid: string | null
     syncVersion: number | null
@@ -7929,6 +8228,7 @@ export namespace Prisma {
     id: number
     userId: number
     importJobId: number
+    reminderLeadDaysOverride: number
     mergedIntoContactId: number
     syncUid: number
     syncVersion: number
@@ -7979,10 +8279,12 @@ export namespace Prisma {
 
 
   export type ContactAvgAggregateInputType = {
+    reminderLeadDaysOverride?: true
     syncVersion?: true
   }
 
   export type ContactSumAggregateInputType = {
+    reminderLeadDaysOverride?: true
     syncVersion?: true
   }
 
@@ -7990,6 +8292,7 @@ export namespace Prisma {
     id?: true
     userId?: true
     importJobId?: true
+    reminderLeadDaysOverride?: true
     mergedIntoContactId?: true
     syncUid?: true
     syncVersion?: true
@@ -8030,6 +8333,7 @@ export namespace Prisma {
     id?: true
     userId?: true
     importJobId?: true
+    reminderLeadDaysOverride?: true
     mergedIntoContactId?: true
     syncUid?: true
     syncVersion?: true
@@ -8070,6 +8374,7 @@ export namespace Prisma {
     id?: true
     userId?: true
     importJobId?: true
+    reminderLeadDaysOverride?: true
     mergedIntoContactId?: true
     syncUid?: true
     syncVersion?: true
@@ -8208,6 +8513,7 @@ export namespace Prisma {
     id: string
     userId: string
     importJobId: string | null
+    reminderLeadDaysOverride: number | null
     mergedIntoContactId: string | null
     syncUid: string
     syncVersion: number
@@ -8278,6 +8584,7 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     importJobId?: boolean
+    reminderLeadDaysOverride?: boolean
     mergedIntoContactId?: boolean
     syncUid?: boolean
     syncVersion?: boolean
@@ -8333,6 +8640,7 @@ export namespace Prisma {
     sharesFromContact?: boolean | Contact$sharesFromContactArgs<ExtArgs>
     sharesAsRecipientCopy?: boolean | Contact$sharesAsRecipientCopyArgs<ExtArgs>
     groupContacts?: boolean | Contact$groupContactsArgs<ExtArgs>
+    birthdayReminderStates?: boolean | Contact$birthdayReminderStatesArgs<ExtArgs>
     mergedIntoContact?: boolean | Contact$mergedIntoContactArgs<ExtArgs>
     mergedChildren?: boolean | Contact$mergedChildrenArgs<ExtArgs>
     book?: boolean | Contact$bookArgs<ExtArgs>
@@ -8343,6 +8651,7 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     importJobId?: boolean
+    reminderLeadDaysOverride?: boolean
     mergedIntoContactId?: boolean
     syncUid?: boolean
     syncVersion?: boolean
@@ -8398,6 +8707,7 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     importJobId?: boolean
+    reminderLeadDaysOverride?: boolean
     mergedIntoContactId?: boolean
     syncUid?: boolean
     syncVersion?: boolean
@@ -8453,6 +8763,7 @@ export namespace Prisma {
     id?: boolean
     userId?: boolean
     importJobId?: boolean
+    reminderLeadDaysOverride?: boolean
     mergedIntoContactId?: boolean
     syncUid?: boolean
     syncVersion?: boolean
@@ -8500,7 +8811,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ContactOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "importJobId" | "mergedIntoContactId" | "syncUid" | "syncVersion" | "syncTombstoneAt" | "fullName" | "firstName" | "middleName" | "lastName" | "phoneticFirstName" | "phoneticLastName" | "namePrefix" | "nameSuffix" | "nickname" | "email" | "phone" | "company" | "phoneticCompany" | "jobTitle" | "department" | "website" | "birthday" | "address" | "avatarUrl" | "isFavorite" | "isEmergency" | "labels" | "websiteEntries" | "emailAddresses" | "phoneNumbers" | "postalAddresses" | "emailEntries" | "phoneEntries" | "addressEntries" | "significantDates" | "relatedPeople" | "customFields" | "notes" | "sourceType" | "sourceDetail" | "lastMutatedBy" | "lastMutatedByDetail" | "archivedAt" | "bookId" | "createdAt" | "updatedAt", ExtArgs["result"]["contact"]>
+  export type ContactOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "importJobId" | "reminderLeadDaysOverride" | "mergedIntoContactId" | "syncUid" | "syncVersion" | "syncTombstoneAt" | "fullName" | "firstName" | "middleName" | "lastName" | "phoneticFirstName" | "phoneticLastName" | "namePrefix" | "nameSuffix" | "nickname" | "email" | "phone" | "company" | "phoneticCompany" | "jobTitle" | "department" | "website" | "birthday" | "address" | "avatarUrl" | "isFavorite" | "isEmergency" | "labels" | "websiteEntries" | "emailAddresses" | "phoneNumbers" | "postalAddresses" | "emailEntries" | "phoneEntries" | "addressEntries" | "significantDates" | "relatedPeople" | "customFields" | "notes" | "sourceType" | "sourceDetail" | "lastMutatedBy" | "lastMutatedByDetail" | "archivedAt" | "bookId" | "createdAt" | "updatedAt", ExtArgs["result"]["contact"]>
   export type ContactInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     importJob?: boolean | Contact$importJobArgs<ExtArgs>
@@ -8512,6 +8823,7 @@ export namespace Prisma {
     sharesFromContact?: boolean | Contact$sharesFromContactArgs<ExtArgs>
     sharesAsRecipientCopy?: boolean | Contact$sharesAsRecipientCopyArgs<ExtArgs>
     groupContacts?: boolean | Contact$groupContactsArgs<ExtArgs>
+    birthdayReminderStates?: boolean | Contact$birthdayReminderStatesArgs<ExtArgs>
     mergedIntoContact?: boolean | Contact$mergedIntoContactArgs<ExtArgs>
     mergedChildren?: boolean | Contact$mergedChildrenArgs<ExtArgs>
     book?: boolean | Contact$bookArgs<ExtArgs>
@@ -8543,6 +8855,7 @@ export namespace Prisma {
       sharesFromContact: Prisma.$ContactSharePayload<ExtArgs>[]
       sharesAsRecipientCopy: Prisma.$ContactSharePayload<ExtArgs>[]
       groupContacts: Prisma.$GroupContactPayload<ExtArgs>[]
+      birthdayReminderStates: Prisma.$BirthdayReminderStatePayload<ExtArgs>[]
       mergedIntoContact: Prisma.$ContactPayload<ExtArgs> | null
       mergedChildren: Prisma.$ContactPayload<ExtArgs>[]
       book: Prisma.$AddressBookPayload<ExtArgs> | null
@@ -8551,6 +8864,7 @@ export namespace Prisma {
       id: string
       userId: string
       importJobId: string | null
+      reminderLeadDaysOverride: number | null
       mergedIntoContactId: string | null
       syncUid: string
       syncVersion: number
@@ -9000,6 +9314,7 @@ export namespace Prisma {
     sharesFromContact<T extends Contact$sharesFromContactArgs<ExtArgs> = {}>(args?: Subset<T, Contact$sharesFromContactArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactSharePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     sharesAsRecipientCopy<T extends Contact$sharesAsRecipientCopyArgs<ExtArgs> = {}>(args?: Subset<T, Contact$sharesAsRecipientCopyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactSharePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     groupContacts<T extends Contact$groupContactsArgs<ExtArgs> = {}>(args?: Subset<T, Contact$groupContactsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GroupContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    birthdayReminderStates<T extends Contact$birthdayReminderStatesArgs<ExtArgs> = {}>(args?: Subset<T, Contact$birthdayReminderStatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BirthdayReminderStatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     mergedIntoContact<T extends Contact$mergedIntoContactArgs<ExtArgs> = {}>(args?: Subset<T, Contact$mergedIntoContactArgs<ExtArgs>>): Prisma__ContactClient<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     mergedChildren<T extends Contact$mergedChildrenArgs<ExtArgs> = {}>(args?: Subset<T, Contact$mergedChildrenArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     book<T extends Contact$bookArgs<ExtArgs> = {}>(args?: Subset<T, Contact$bookArgs<ExtArgs>>): Prisma__AddressBookClient<$Result.GetResult<Prisma.$AddressBookPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -9035,6 +9350,7 @@ export namespace Prisma {
     readonly id: FieldRef<"Contact", 'String'>
     readonly userId: FieldRef<"Contact", 'String'>
     readonly importJobId: FieldRef<"Contact", 'String'>
+    readonly reminderLeadDaysOverride: FieldRef<"Contact", 'Int'>
     readonly mergedIntoContactId: FieldRef<"Contact", 'String'>
     readonly syncUid: FieldRef<"Contact", 'String'>
     readonly syncVersion: FieldRef<"Contact", 'Int'>
@@ -9684,6 +10000,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: GroupContactScalarFieldEnum | GroupContactScalarFieldEnum[]
+  }
+
+  /**
+   * Contact.birthdayReminderStates
+   */
+  export type Contact$birthdayReminderStatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BirthdayReminderState
+     */
+    select?: BirthdayReminderStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BirthdayReminderState
+     */
+    omit?: BirthdayReminderStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BirthdayReminderStateInclude<ExtArgs> | null
+    where?: BirthdayReminderStateWhereInput
+    orderBy?: BirthdayReminderStateOrderByWithRelationInput | BirthdayReminderStateOrderByWithRelationInput[]
+    cursor?: BirthdayReminderStateWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: BirthdayReminderStateScalarFieldEnum | BirthdayReminderStateScalarFieldEnum[]
   }
 
   /**
@@ -43201,6 +43541,2164 @@ export namespace Prisma {
 
 
   /**
+   * Model FailedLoginAttempt
+   */
+
+  export type AggregateFailedLoginAttempt = {
+    _count: FailedLoginAttemptCountAggregateOutputType | null
+    _min: FailedLoginAttemptMinAggregateOutputType | null
+    _max: FailedLoginAttemptMaxAggregateOutputType | null
+  }
+
+  export type FailedLoginAttemptMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    ipAddress: string | null
+    createdAt: Date | null
+  }
+
+  export type FailedLoginAttemptMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    ipAddress: string | null
+    createdAt: Date | null
+  }
+
+  export type FailedLoginAttemptCountAggregateOutputType = {
+    id: number
+    userId: number
+    ipAddress: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type FailedLoginAttemptMinAggregateInputType = {
+    id?: true
+    userId?: true
+    ipAddress?: true
+    createdAt?: true
+  }
+
+  export type FailedLoginAttemptMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    ipAddress?: true
+    createdAt?: true
+  }
+
+  export type FailedLoginAttemptCountAggregateInputType = {
+    id?: true
+    userId?: true
+    ipAddress?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type FailedLoginAttemptAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FailedLoginAttempt to aggregate.
+     */
+    where?: FailedLoginAttemptWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FailedLoginAttempts to fetch.
+     */
+    orderBy?: FailedLoginAttemptOrderByWithRelationInput | FailedLoginAttemptOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: FailedLoginAttemptWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FailedLoginAttempts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FailedLoginAttempts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned FailedLoginAttempts
+    **/
+    _count?: true | FailedLoginAttemptCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: FailedLoginAttemptMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: FailedLoginAttemptMaxAggregateInputType
+  }
+
+  export type GetFailedLoginAttemptAggregateType<T extends FailedLoginAttemptAggregateArgs> = {
+        [P in keyof T & keyof AggregateFailedLoginAttempt]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateFailedLoginAttempt[P]>
+      : GetScalarType<T[P], AggregateFailedLoginAttempt[P]>
+  }
+
+
+
+
+  export type FailedLoginAttemptGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: FailedLoginAttemptWhereInput
+    orderBy?: FailedLoginAttemptOrderByWithAggregationInput | FailedLoginAttemptOrderByWithAggregationInput[]
+    by: FailedLoginAttemptScalarFieldEnum[] | FailedLoginAttemptScalarFieldEnum
+    having?: FailedLoginAttemptScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: FailedLoginAttemptCountAggregateInputType | true
+    _min?: FailedLoginAttemptMinAggregateInputType
+    _max?: FailedLoginAttemptMaxAggregateInputType
+  }
+
+  export type FailedLoginAttemptGroupByOutputType = {
+    id: string
+    userId: string
+    ipAddress: string | null
+    createdAt: Date
+    _count: FailedLoginAttemptCountAggregateOutputType | null
+    _min: FailedLoginAttemptMinAggregateOutputType | null
+    _max: FailedLoginAttemptMaxAggregateOutputType | null
+  }
+
+  type GetFailedLoginAttemptGroupByPayload<T extends FailedLoginAttemptGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<FailedLoginAttemptGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof FailedLoginAttemptGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], FailedLoginAttemptGroupByOutputType[P]>
+            : GetScalarType<T[P], FailedLoginAttemptGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type FailedLoginAttemptSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    ipAddress?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["failedLoginAttempt"]>
+
+  export type FailedLoginAttemptSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    ipAddress?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["failedLoginAttempt"]>
+
+  export type FailedLoginAttemptSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    ipAddress?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["failedLoginAttempt"]>
+
+  export type FailedLoginAttemptSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    ipAddress?: boolean
+    createdAt?: boolean
+  }
+
+  export type FailedLoginAttemptOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "ipAddress" | "createdAt", ExtArgs["result"]["failedLoginAttempt"]>
+  export type FailedLoginAttemptInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type FailedLoginAttemptIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type FailedLoginAttemptIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $FailedLoginAttemptPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "FailedLoginAttempt"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      ipAddress: string | null
+      createdAt: Date
+    }, ExtArgs["result"]["failedLoginAttempt"]>
+    composites: {}
+  }
+
+  type FailedLoginAttemptGetPayload<S extends boolean | null | undefined | FailedLoginAttemptDefaultArgs> = $Result.GetResult<Prisma.$FailedLoginAttemptPayload, S>
+
+  type FailedLoginAttemptCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<FailedLoginAttemptFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: FailedLoginAttemptCountAggregateInputType | true
+    }
+
+  export interface FailedLoginAttemptDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['FailedLoginAttempt'], meta: { name: 'FailedLoginAttempt' } }
+    /**
+     * Find zero or one FailedLoginAttempt that matches the filter.
+     * @param {FailedLoginAttemptFindUniqueArgs} args - Arguments to find a FailedLoginAttempt
+     * @example
+     * // Get one FailedLoginAttempt
+     * const failedLoginAttempt = await prisma.failedLoginAttempt.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends FailedLoginAttemptFindUniqueArgs>(args: SelectSubset<T, FailedLoginAttemptFindUniqueArgs<ExtArgs>>): Prisma__FailedLoginAttemptClient<$Result.GetResult<Prisma.$FailedLoginAttemptPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one FailedLoginAttempt that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {FailedLoginAttemptFindUniqueOrThrowArgs} args - Arguments to find a FailedLoginAttempt
+     * @example
+     * // Get one FailedLoginAttempt
+     * const failedLoginAttempt = await prisma.failedLoginAttempt.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends FailedLoginAttemptFindUniqueOrThrowArgs>(args: SelectSubset<T, FailedLoginAttemptFindUniqueOrThrowArgs<ExtArgs>>): Prisma__FailedLoginAttemptClient<$Result.GetResult<Prisma.$FailedLoginAttemptPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FailedLoginAttempt that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FailedLoginAttemptFindFirstArgs} args - Arguments to find a FailedLoginAttempt
+     * @example
+     * // Get one FailedLoginAttempt
+     * const failedLoginAttempt = await prisma.failedLoginAttempt.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends FailedLoginAttemptFindFirstArgs>(args?: SelectSubset<T, FailedLoginAttemptFindFirstArgs<ExtArgs>>): Prisma__FailedLoginAttemptClient<$Result.GetResult<Prisma.$FailedLoginAttemptPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first FailedLoginAttempt that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FailedLoginAttemptFindFirstOrThrowArgs} args - Arguments to find a FailedLoginAttempt
+     * @example
+     * // Get one FailedLoginAttempt
+     * const failedLoginAttempt = await prisma.failedLoginAttempt.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends FailedLoginAttemptFindFirstOrThrowArgs>(args?: SelectSubset<T, FailedLoginAttemptFindFirstOrThrowArgs<ExtArgs>>): Prisma__FailedLoginAttemptClient<$Result.GetResult<Prisma.$FailedLoginAttemptPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more FailedLoginAttempts that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FailedLoginAttemptFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all FailedLoginAttempts
+     * const failedLoginAttempts = await prisma.failedLoginAttempt.findMany()
+     * 
+     * // Get first 10 FailedLoginAttempts
+     * const failedLoginAttempts = await prisma.failedLoginAttempt.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const failedLoginAttemptWithIdOnly = await prisma.failedLoginAttempt.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends FailedLoginAttemptFindManyArgs>(args?: SelectSubset<T, FailedLoginAttemptFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FailedLoginAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a FailedLoginAttempt.
+     * @param {FailedLoginAttemptCreateArgs} args - Arguments to create a FailedLoginAttempt.
+     * @example
+     * // Create one FailedLoginAttempt
+     * const FailedLoginAttempt = await prisma.failedLoginAttempt.create({
+     *   data: {
+     *     // ... data to create a FailedLoginAttempt
+     *   }
+     * })
+     * 
+     */
+    create<T extends FailedLoginAttemptCreateArgs>(args: SelectSubset<T, FailedLoginAttemptCreateArgs<ExtArgs>>): Prisma__FailedLoginAttemptClient<$Result.GetResult<Prisma.$FailedLoginAttemptPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many FailedLoginAttempts.
+     * @param {FailedLoginAttemptCreateManyArgs} args - Arguments to create many FailedLoginAttempts.
+     * @example
+     * // Create many FailedLoginAttempts
+     * const failedLoginAttempt = await prisma.failedLoginAttempt.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends FailedLoginAttemptCreateManyArgs>(args?: SelectSubset<T, FailedLoginAttemptCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many FailedLoginAttempts and returns the data saved in the database.
+     * @param {FailedLoginAttemptCreateManyAndReturnArgs} args - Arguments to create many FailedLoginAttempts.
+     * @example
+     * // Create many FailedLoginAttempts
+     * const failedLoginAttempt = await prisma.failedLoginAttempt.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many FailedLoginAttempts and only return the `id`
+     * const failedLoginAttemptWithIdOnly = await prisma.failedLoginAttempt.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends FailedLoginAttemptCreateManyAndReturnArgs>(args?: SelectSubset<T, FailedLoginAttemptCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FailedLoginAttemptPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a FailedLoginAttempt.
+     * @param {FailedLoginAttemptDeleteArgs} args - Arguments to delete one FailedLoginAttempt.
+     * @example
+     * // Delete one FailedLoginAttempt
+     * const FailedLoginAttempt = await prisma.failedLoginAttempt.delete({
+     *   where: {
+     *     // ... filter to delete one FailedLoginAttempt
+     *   }
+     * })
+     * 
+     */
+    delete<T extends FailedLoginAttemptDeleteArgs>(args: SelectSubset<T, FailedLoginAttemptDeleteArgs<ExtArgs>>): Prisma__FailedLoginAttemptClient<$Result.GetResult<Prisma.$FailedLoginAttemptPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one FailedLoginAttempt.
+     * @param {FailedLoginAttemptUpdateArgs} args - Arguments to update one FailedLoginAttempt.
+     * @example
+     * // Update one FailedLoginAttempt
+     * const failedLoginAttempt = await prisma.failedLoginAttempt.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends FailedLoginAttemptUpdateArgs>(args: SelectSubset<T, FailedLoginAttemptUpdateArgs<ExtArgs>>): Prisma__FailedLoginAttemptClient<$Result.GetResult<Prisma.$FailedLoginAttemptPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more FailedLoginAttempts.
+     * @param {FailedLoginAttemptDeleteManyArgs} args - Arguments to filter FailedLoginAttempts to delete.
+     * @example
+     * // Delete a few FailedLoginAttempts
+     * const { count } = await prisma.failedLoginAttempt.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends FailedLoginAttemptDeleteManyArgs>(args?: SelectSubset<T, FailedLoginAttemptDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FailedLoginAttempts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FailedLoginAttemptUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many FailedLoginAttempts
+     * const failedLoginAttempt = await prisma.failedLoginAttempt.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends FailedLoginAttemptUpdateManyArgs>(args: SelectSubset<T, FailedLoginAttemptUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more FailedLoginAttempts and returns the data updated in the database.
+     * @param {FailedLoginAttemptUpdateManyAndReturnArgs} args - Arguments to update many FailedLoginAttempts.
+     * @example
+     * // Update many FailedLoginAttempts
+     * const failedLoginAttempt = await prisma.failedLoginAttempt.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more FailedLoginAttempts and only return the `id`
+     * const failedLoginAttemptWithIdOnly = await prisma.failedLoginAttempt.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends FailedLoginAttemptUpdateManyAndReturnArgs>(args: SelectSubset<T, FailedLoginAttemptUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FailedLoginAttemptPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one FailedLoginAttempt.
+     * @param {FailedLoginAttemptUpsertArgs} args - Arguments to update or create a FailedLoginAttempt.
+     * @example
+     * // Update or create a FailedLoginAttempt
+     * const failedLoginAttempt = await prisma.failedLoginAttempt.upsert({
+     *   create: {
+     *     // ... data to create a FailedLoginAttempt
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the FailedLoginAttempt we want to update
+     *   }
+     * })
+     */
+    upsert<T extends FailedLoginAttemptUpsertArgs>(args: SelectSubset<T, FailedLoginAttemptUpsertArgs<ExtArgs>>): Prisma__FailedLoginAttemptClient<$Result.GetResult<Prisma.$FailedLoginAttemptPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of FailedLoginAttempts.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FailedLoginAttemptCountArgs} args - Arguments to filter FailedLoginAttempts to count.
+     * @example
+     * // Count the number of FailedLoginAttempts
+     * const count = await prisma.failedLoginAttempt.count({
+     *   where: {
+     *     // ... the filter for the FailedLoginAttempts we want to count
+     *   }
+     * })
+    **/
+    count<T extends FailedLoginAttemptCountArgs>(
+      args?: Subset<T, FailedLoginAttemptCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], FailedLoginAttemptCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a FailedLoginAttempt.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FailedLoginAttemptAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends FailedLoginAttemptAggregateArgs>(args: Subset<T, FailedLoginAttemptAggregateArgs>): Prisma.PrismaPromise<GetFailedLoginAttemptAggregateType<T>>
+
+    /**
+     * Group by FailedLoginAttempt.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {FailedLoginAttemptGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends FailedLoginAttemptGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: FailedLoginAttemptGroupByArgs['orderBy'] }
+        : { orderBy?: FailedLoginAttemptGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, FailedLoginAttemptGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetFailedLoginAttemptGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the FailedLoginAttempt model
+   */
+  readonly fields: FailedLoginAttemptFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for FailedLoginAttempt.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__FailedLoginAttemptClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the FailedLoginAttempt model
+   */
+  interface FailedLoginAttemptFieldRefs {
+    readonly id: FieldRef<"FailedLoginAttempt", 'String'>
+    readonly userId: FieldRef<"FailedLoginAttempt", 'String'>
+    readonly ipAddress: FieldRef<"FailedLoginAttempt", 'String'>
+    readonly createdAt: FieldRef<"FailedLoginAttempt", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * FailedLoginAttempt findUnique
+   */
+  export type FailedLoginAttemptFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FailedLoginAttempt
+     */
+    select?: FailedLoginAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FailedLoginAttempt
+     */
+    omit?: FailedLoginAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FailedLoginAttemptInclude<ExtArgs> | null
+    /**
+     * Filter, which FailedLoginAttempt to fetch.
+     */
+    where: FailedLoginAttemptWhereUniqueInput
+  }
+
+  /**
+   * FailedLoginAttempt findUniqueOrThrow
+   */
+  export type FailedLoginAttemptFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FailedLoginAttempt
+     */
+    select?: FailedLoginAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FailedLoginAttempt
+     */
+    omit?: FailedLoginAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FailedLoginAttemptInclude<ExtArgs> | null
+    /**
+     * Filter, which FailedLoginAttempt to fetch.
+     */
+    where: FailedLoginAttemptWhereUniqueInput
+  }
+
+  /**
+   * FailedLoginAttempt findFirst
+   */
+  export type FailedLoginAttemptFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FailedLoginAttempt
+     */
+    select?: FailedLoginAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FailedLoginAttempt
+     */
+    omit?: FailedLoginAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FailedLoginAttemptInclude<ExtArgs> | null
+    /**
+     * Filter, which FailedLoginAttempt to fetch.
+     */
+    where?: FailedLoginAttemptWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FailedLoginAttempts to fetch.
+     */
+    orderBy?: FailedLoginAttemptOrderByWithRelationInput | FailedLoginAttemptOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FailedLoginAttempts.
+     */
+    cursor?: FailedLoginAttemptWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FailedLoginAttempts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FailedLoginAttempts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FailedLoginAttempts.
+     */
+    distinct?: FailedLoginAttemptScalarFieldEnum | FailedLoginAttemptScalarFieldEnum[]
+  }
+
+  /**
+   * FailedLoginAttempt findFirstOrThrow
+   */
+  export type FailedLoginAttemptFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FailedLoginAttempt
+     */
+    select?: FailedLoginAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FailedLoginAttempt
+     */
+    omit?: FailedLoginAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FailedLoginAttemptInclude<ExtArgs> | null
+    /**
+     * Filter, which FailedLoginAttempt to fetch.
+     */
+    where?: FailedLoginAttemptWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FailedLoginAttempts to fetch.
+     */
+    orderBy?: FailedLoginAttemptOrderByWithRelationInput | FailedLoginAttemptOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for FailedLoginAttempts.
+     */
+    cursor?: FailedLoginAttemptWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FailedLoginAttempts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FailedLoginAttempts.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of FailedLoginAttempts.
+     */
+    distinct?: FailedLoginAttemptScalarFieldEnum | FailedLoginAttemptScalarFieldEnum[]
+  }
+
+  /**
+   * FailedLoginAttempt findMany
+   */
+  export type FailedLoginAttemptFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FailedLoginAttempt
+     */
+    select?: FailedLoginAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FailedLoginAttempt
+     */
+    omit?: FailedLoginAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FailedLoginAttemptInclude<ExtArgs> | null
+    /**
+     * Filter, which FailedLoginAttempts to fetch.
+     */
+    where?: FailedLoginAttemptWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of FailedLoginAttempts to fetch.
+     */
+    orderBy?: FailedLoginAttemptOrderByWithRelationInput | FailedLoginAttemptOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing FailedLoginAttempts.
+     */
+    cursor?: FailedLoginAttemptWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` FailedLoginAttempts from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` FailedLoginAttempts.
+     */
+    skip?: number
+    distinct?: FailedLoginAttemptScalarFieldEnum | FailedLoginAttemptScalarFieldEnum[]
+  }
+
+  /**
+   * FailedLoginAttempt create
+   */
+  export type FailedLoginAttemptCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FailedLoginAttempt
+     */
+    select?: FailedLoginAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FailedLoginAttempt
+     */
+    omit?: FailedLoginAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FailedLoginAttemptInclude<ExtArgs> | null
+    /**
+     * The data needed to create a FailedLoginAttempt.
+     */
+    data: XOR<FailedLoginAttemptCreateInput, FailedLoginAttemptUncheckedCreateInput>
+  }
+
+  /**
+   * FailedLoginAttempt createMany
+   */
+  export type FailedLoginAttemptCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many FailedLoginAttempts.
+     */
+    data: FailedLoginAttemptCreateManyInput | FailedLoginAttemptCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * FailedLoginAttempt createManyAndReturn
+   */
+  export type FailedLoginAttemptCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FailedLoginAttempt
+     */
+    select?: FailedLoginAttemptSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FailedLoginAttempt
+     */
+    omit?: FailedLoginAttemptOmit<ExtArgs> | null
+    /**
+     * The data used to create many FailedLoginAttempts.
+     */
+    data: FailedLoginAttemptCreateManyInput | FailedLoginAttemptCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FailedLoginAttemptIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FailedLoginAttempt update
+   */
+  export type FailedLoginAttemptUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FailedLoginAttempt
+     */
+    select?: FailedLoginAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FailedLoginAttempt
+     */
+    omit?: FailedLoginAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FailedLoginAttemptInclude<ExtArgs> | null
+    /**
+     * The data needed to update a FailedLoginAttempt.
+     */
+    data: XOR<FailedLoginAttemptUpdateInput, FailedLoginAttemptUncheckedUpdateInput>
+    /**
+     * Choose, which FailedLoginAttempt to update.
+     */
+    where: FailedLoginAttemptWhereUniqueInput
+  }
+
+  /**
+   * FailedLoginAttempt updateMany
+   */
+  export type FailedLoginAttemptUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update FailedLoginAttempts.
+     */
+    data: XOR<FailedLoginAttemptUpdateManyMutationInput, FailedLoginAttemptUncheckedUpdateManyInput>
+    /**
+     * Filter which FailedLoginAttempts to update
+     */
+    where?: FailedLoginAttemptWhereInput
+    /**
+     * Limit how many FailedLoginAttempts to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * FailedLoginAttempt updateManyAndReturn
+   */
+  export type FailedLoginAttemptUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FailedLoginAttempt
+     */
+    select?: FailedLoginAttemptSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the FailedLoginAttempt
+     */
+    omit?: FailedLoginAttemptOmit<ExtArgs> | null
+    /**
+     * The data used to update FailedLoginAttempts.
+     */
+    data: XOR<FailedLoginAttemptUpdateManyMutationInput, FailedLoginAttemptUncheckedUpdateManyInput>
+    /**
+     * Filter which FailedLoginAttempts to update
+     */
+    where?: FailedLoginAttemptWhereInput
+    /**
+     * Limit how many FailedLoginAttempts to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FailedLoginAttemptIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * FailedLoginAttempt upsert
+   */
+  export type FailedLoginAttemptUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FailedLoginAttempt
+     */
+    select?: FailedLoginAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FailedLoginAttempt
+     */
+    omit?: FailedLoginAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FailedLoginAttemptInclude<ExtArgs> | null
+    /**
+     * The filter to search for the FailedLoginAttempt to update in case it exists.
+     */
+    where: FailedLoginAttemptWhereUniqueInput
+    /**
+     * In case the FailedLoginAttempt found by the `where` argument doesn't exist, create a new FailedLoginAttempt with this data.
+     */
+    create: XOR<FailedLoginAttemptCreateInput, FailedLoginAttemptUncheckedCreateInput>
+    /**
+     * In case the FailedLoginAttempt was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<FailedLoginAttemptUpdateInput, FailedLoginAttemptUncheckedUpdateInput>
+  }
+
+  /**
+   * FailedLoginAttempt delete
+   */
+  export type FailedLoginAttemptDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FailedLoginAttempt
+     */
+    select?: FailedLoginAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FailedLoginAttempt
+     */
+    omit?: FailedLoginAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FailedLoginAttemptInclude<ExtArgs> | null
+    /**
+     * Filter which FailedLoginAttempt to delete.
+     */
+    where: FailedLoginAttemptWhereUniqueInput
+  }
+
+  /**
+   * FailedLoginAttempt deleteMany
+   */
+  export type FailedLoginAttemptDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which FailedLoginAttempts to delete
+     */
+    where?: FailedLoginAttemptWhereInput
+    /**
+     * Limit how many FailedLoginAttempts to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * FailedLoginAttempt without action
+   */
+  export type FailedLoginAttemptDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the FailedLoginAttempt
+     */
+    select?: FailedLoginAttemptSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the FailedLoginAttempt
+     */
+    omit?: FailedLoginAttemptOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: FailedLoginAttemptInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model BirthdayReminderState
+   */
+
+  export type AggregateBirthdayReminderState = {
+    _count: BirthdayReminderStateCountAggregateOutputType | null
+    _avg: BirthdayReminderStateAvgAggregateOutputType | null
+    _sum: BirthdayReminderStateSumAggregateOutputType | null
+    _min: BirthdayReminderStateMinAggregateOutputType | null
+    _max: BirthdayReminderStateMaxAggregateOutputType | null
+  }
+
+  export type BirthdayReminderStateAvgAggregateOutputType = {
+    lastSentYear: number | null
+  }
+
+  export type BirthdayReminderStateSumAggregateOutputType = {
+    lastSentYear: number | null
+  }
+
+  export type BirthdayReminderStateMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    contactId: string | null
+    dateKey: string | null
+    lastSentYear: number | null
+    lastSentAt: Date | null
+  }
+
+  export type BirthdayReminderStateMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    contactId: string | null
+    dateKey: string | null
+    lastSentYear: number | null
+    lastSentAt: Date | null
+  }
+
+  export type BirthdayReminderStateCountAggregateOutputType = {
+    id: number
+    userId: number
+    contactId: number
+    dateKey: number
+    lastSentYear: number
+    lastSentAt: number
+    _all: number
+  }
+
+
+  export type BirthdayReminderStateAvgAggregateInputType = {
+    lastSentYear?: true
+  }
+
+  export type BirthdayReminderStateSumAggregateInputType = {
+    lastSentYear?: true
+  }
+
+  export type BirthdayReminderStateMinAggregateInputType = {
+    id?: true
+    userId?: true
+    contactId?: true
+    dateKey?: true
+    lastSentYear?: true
+    lastSentAt?: true
+  }
+
+  export type BirthdayReminderStateMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    contactId?: true
+    dateKey?: true
+    lastSentYear?: true
+    lastSentAt?: true
+  }
+
+  export type BirthdayReminderStateCountAggregateInputType = {
+    id?: true
+    userId?: true
+    contactId?: true
+    dateKey?: true
+    lastSentYear?: true
+    lastSentAt?: true
+    _all?: true
+  }
+
+  export type BirthdayReminderStateAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BirthdayReminderState to aggregate.
+     */
+    where?: BirthdayReminderStateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BirthdayReminderStates to fetch.
+     */
+    orderBy?: BirthdayReminderStateOrderByWithRelationInput | BirthdayReminderStateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: BirthdayReminderStateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BirthdayReminderStates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BirthdayReminderStates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned BirthdayReminderStates
+    **/
+    _count?: true | BirthdayReminderStateCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: BirthdayReminderStateAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: BirthdayReminderStateSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: BirthdayReminderStateMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: BirthdayReminderStateMaxAggregateInputType
+  }
+
+  export type GetBirthdayReminderStateAggregateType<T extends BirthdayReminderStateAggregateArgs> = {
+        [P in keyof T & keyof AggregateBirthdayReminderState]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateBirthdayReminderState[P]>
+      : GetScalarType<T[P], AggregateBirthdayReminderState[P]>
+  }
+
+
+
+
+  export type BirthdayReminderStateGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BirthdayReminderStateWhereInput
+    orderBy?: BirthdayReminderStateOrderByWithAggregationInput | BirthdayReminderStateOrderByWithAggregationInput[]
+    by: BirthdayReminderStateScalarFieldEnum[] | BirthdayReminderStateScalarFieldEnum
+    having?: BirthdayReminderStateScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: BirthdayReminderStateCountAggregateInputType | true
+    _avg?: BirthdayReminderStateAvgAggregateInputType
+    _sum?: BirthdayReminderStateSumAggregateInputType
+    _min?: BirthdayReminderStateMinAggregateInputType
+    _max?: BirthdayReminderStateMaxAggregateInputType
+  }
+
+  export type BirthdayReminderStateGroupByOutputType = {
+    id: string
+    userId: string
+    contactId: string
+    dateKey: string
+    lastSentYear: number
+    lastSentAt: Date
+    _count: BirthdayReminderStateCountAggregateOutputType | null
+    _avg: BirthdayReminderStateAvgAggregateOutputType | null
+    _sum: BirthdayReminderStateSumAggregateOutputType | null
+    _min: BirthdayReminderStateMinAggregateOutputType | null
+    _max: BirthdayReminderStateMaxAggregateOutputType | null
+  }
+
+  type GetBirthdayReminderStateGroupByPayload<T extends BirthdayReminderStateGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<BirthdayReminderStateGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof BirthdayReminderStateGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], BirthdayReminderStateGroupByOutputType[P]>
+            : GetScalarType<T[P], BirthdayReminderStateGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type BirthdayReminderStateSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    contactId?: boolean
+    dateKey?: boolean
+    lastSentYear?: boolean
+    lastSentAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["birthdayReminderState"]>
+
+  export type BirthdayReminderStateSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    contactId?: boolean
+    dateKey?: boolean
+    lastSentYear?: boolean
+    lastSentAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["birthdayReminderState"]>
+
+  export type BirthdayReminderStateSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    contactId?: boolean
+    dateKey?: boolean
+    lastSentYear?: boolean
+    lastSentAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["birthdayReminderState"]>
+
+  export type BirthdayReminderStateSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    contactId?: boolean
+    dateKey?: boolean
+    lastSentYear?: boolean
+    lastSentAt?: boolean
+  }
+
+  export type BirthdayReminderStateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "contactId" | "dateKey" | "lastSentYear" | "lastSentAt", ExtArgs["result"]["birthdayReminderState"]>
+  export type BirthdayReminderStateInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+  }
+  export type BirthdayReminderStateIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+  }
+  export type BirthdayReminderStateIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    contact?: boolean | ContactDefaultArgs<ExtArgs>
+  }
+
+  export type $BirthdayReminderStatePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "BirthdayReminderState"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+      contact: Prisma.$ContactPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      contactId: string
+      dateKey: string
+      lastSentYear: number
+      lastSentAt: Date
+    }, ExtArgs["result"]["birthdayReminderState"]>
+    composites: {}
+  }
+
+  type BirthdayReminderStateGetPayload<S extends boolean | null | undefined | BirthdayReminderStateDefaultArgs> = $Result.GetResult<Prisma.$BirthdayReminderStatePayload, S>
+
+  type BirthdayReminderStateCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<BirthdayReminderStateFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: BirthdayReminderStateCountAggregateInputType | true
+    }
+
+  export interface BirthdayReminderStateDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['BirthdayReminderState'], meta: { name: 'BirthdayReminderState' } }
+    /**
+     * Find zero or one BirthdayReminderState that matches the filter.
+     * @param {BirthdayReminderStateFindUniqueArgs} args - Arguments to find a BirthdayReminderState
+     * @example
+     * // Get one BirthdayReminderState
+     * const birthdayReminderState = await prisma.birthdayReminderState.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends BirthdayReminderStateFindUniqueArgs>(args: SelectSubset<T, BirthdayReminderStateFindUniqueArgs<ExtArgs>>): Prisma__BirthdayReminderStateClient<$Result.GetResult<Prisma.$BirthdayReminderStatePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one BirthdayReminderState that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {BirthdayReminderStateFindUniqueOrThrowArgs} args - Arguments to find a BirthdayReminderState
+     * @example
+     * // Get one BirthdayReminderState
+     * const birthdayReminderState = await prisma.birthdayReminderState.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends BirthdayReminderStateFindUniqueOrThrowArgs>(args: SelectSubset<T, BirthdayReminderStateFindUniqueOrThrowArgs<ExtArgs>>): Prisma__BirthdayReminderStateClient<$Result.GetResult<Prisma.$BirthdayReminderStatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BirthdayReminderState that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BirthdayReminderStateFindFirstArgs} args - Arguments to find a BirthdayReminderState
+     * @example
+     * // Get one BirthdayReminderState
+     * const birthdayReminderState = await prisma.birthdayReminderState.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends BirthdayReminderStateFindFirstArgs>(args?: SelectSubset<T, BirthdayReminderStateFindFirstArgs<ExtArgs>>): Prisma__BirthdayReminderStateClient<$Result.GetResult<Prisma.$BirthdayReminderStatePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BirthdayReminderState that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BirthdayReminderStateFindFirstOrThrowArgs} args - Arguments to find a BirthdayReminderState
+     * @example
+     * // Get one BirthdayReminderState
+     * const birthdayReminderState = await prisma.birthdayReminderState.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends BirthdayReminderStateFindFirstOrThrowArgs>(args?: SelectSubset<T, BirthdayReminderStateFindFirstOrThrowArgs<ExtArgs>>): Prisma__BirthdayReminderStateClient<$Result.GetResult<Prisma.$BirthdayReminderStatePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more BirthdayReminderStates that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BirthdayReminderStateFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all BirthdayReminderStates
+     * const birthdayReminderStates = await prisma.birthdayReminderState.findMany()
+     * 
+     * // Get first 10 BirthdayReminderStates
+     * const birthdayReminderStates = await prisma.birthdayReminderState.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const birthdayReminderStateWithIdOnly = await prisma.birthdayReminderState.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends BirthdayReminderStateFindManyArgs>(args?: SelectSubset<T, BirthdayReminderStateFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BirthdayReminderStatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a BirthdayReminderState.
+     * @param {BirthdayReminderStateCreateArgs} args - Arguments to create a BirthdayReminderState.
+     * @example
+     * // Create one BirthdayReminderState
+     * const BirthdayReminderState = await prisma.birthdayReminderState.create({
+     *   data: {
+     *     // ... data to create a BirthdayReminderState
+     *   }
+     * })
+     * 
+     */
+    create<T extends BirthdayReminderStateCreateArgs>(args: SelectSubset<T, BirthdayReminderStateCreateArgs<ExtArgs>>): Prisma__BirthdayReminderStateClient<$Result.GetResult<Prisma.$BirthdayReminderStatePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many BirthdayReminderStates.
+     * @param {BirthdayReminderStateCreateManyArgs} args - Arguments to create many BirthdayReminderStates.
+     * @example
+     * // Create many BirthdayReminderStates
+     * const birthdayReminderState = await prisma.birthdayReminderState.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends BirthdayReminderStateCreateManyArgs>(args?: SelectSubset<T, BirthdayReminderStateCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many BirthdayReminderStates and returns the data saved in the database.
+     * @param {BirthdayReminderStateCreateManyAndReturnArgs} args - Arguments to create many BirthdayReminderStates.
+     * @example
+     * // Create many BirthdayReminderStates
+     * const birthdayReminderState = await prisma.birthdayReminderState.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many BirthdayReminderStates and only return the `id`
+     * const birthdayReminderStateWithIdOnly = await prisma.birthdayReminderState.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends BirthdayReminderStateCreateManyAndReturnArgs>(args?: SelectSubset<T, BirthdayReminderStateCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BirthdayReminderStatePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a BirthdayReminderState.
+     * @param {BirthdayReminderStateDeleteArgs} args - Arguments to delete one BirthdayReminderState.
+     * @example
+     * // Delete one BirthdayReminderState
+     * const BirthdayReminderState = await prisma.birthdayReminderState.delete({
+     *   where: {
+     *     // ... filter to delete one BirthdayReminderState
+     *   }
+     * })
+     * 
+     */
+    delete<T extends BirthdayReminderStateDeleteArgs>(args: SelectSubset<T, BirthdayReminderStateDeleteArgs<ExtArgs>>): Prisma__BirthdayReminderStateClient<$Result.GetResult<Prisma.$BirthdayReminderStatePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one BirthdayReminderState.
+     * @param {BirthdayReminderStateUpdateArgs} args - Arguments to update one BirthdayReminderState.
+     * @example
+     * // Update one BirthdayReminderState
+     * const birthdayReminderState = await prisma.birthdayReminderState.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends BirthdayReminderStateUpdateArgs>(args: SelectSubset<T, BirthdayReminderStateUpdateArgs<ExtArgs>>): Prisma__BirthdayReminderStateClient<$Result.GetResult<Prisma.$BirthdayReminderStatePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more BirthdayReminderStates.
+     * @param {BirthdayReminderStateDeleteManyArgs} args - Arguments to filter BirthdayReminderStates to delete.
+     * @example
+     * // Delete a few BirthdayReminderStates
+     * const { count } = await prisma.birthdayReminderState.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends BirthdayReminderStateDeleteManyArgs>(args?: SelectSubset<T, BirthdayReminderStateDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BirthdayReminderStates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BirthdayReminderStateUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many BirthdayReminderStates
+     * const birthdayReminderState = await prisma.birthdayReminderState.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends BirthdayReminderStateUpdateManyArgs>(args: SelectSubset<T, BirthdayReminderStateUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BirthdayReminderStates and returns the data updated in the database.
+     * @param {BirthdayReminderStateUpdateManyAndReturnArgs} args - Arguments to update many BirthdayReminderStates.
+     * @example
+     * // Update many BirthdayReminderStates
+     * const birthdayReminderState = await prisma.birthdayReminderState.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more BirthdayReminderStates and only return the `id`
+     * const birthdayReminderStateWithIdOnly = await prisma.birthdayReminderState.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends BirthdayReminderStateUpdateManyAndReturnArgs>(args: SelectSubset<T, BirthdayReminderStateUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BirthdayReminderStatePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one BirthdayReminderState.
+     * @param {BirthdayReminderStateUpsertArgs} args - Arguments to update or create a BirthdayReminderState.
+     * @example
+     * // Update or create a BirthdayReminderState
+     * const birthdayReminderState = await prisma.birthdayReminderState.upsert({
+     *   create: {
+     *     // ... data to create a BirthdayReminderState
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the BirthdayReminderState we want to update
+     *   }
+     * })
+     */
+    upsert<T extends BirthdayReminderStateUpsertArgs>(args: SelectSubset<T, BirthdayReminderStateUpsertArgs<ExtArgs>>): Prisma__BirthdayReminderStateClient<$Result.GetResult<Prisma.$BirthdayReminderStatePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of BirthdayReminderStates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BirthdayReminderStateCountArgs} args - Arguments to filter BirthdayReminderStates to count.
+     * @example
+     * // Count the number of BirthdayReminderStates
+     * const count = await prisma.birthdayReminderState.count({
+     *   where: {
+     *     // ... the filter for the BirthdayReminderStates we want to count
+     *   }
+     * })
+    **/
+    count<T extends BirthdayReminderStateCountArgs>(
+      args?: Subset<T, BirthdayReminderStateCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], BirthdayReminderStateCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a BirthdayReminderState.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BirthdayReminderStateAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends BirthdayReminderStateAggregateArgs>(args: Subset<T, BirthdayReminderStateAggregateArgs>): Prisma.PrismaPromise<GetBirthdayReminderStateAggregateType<T>>
+
+    /**
+     * Group by BirthdayReminderState.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BirthdayReminderStateGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends BirthdayReminderStateGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: BirthdayReminderStateGroupByArgs['orderBy'] }
+        : { orderBy?: BirthdayReminderStateGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, BirthdayReminderStateGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetBirthdayReminderStateGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the BirthdayReminderState model
+   */
+  readonly fields: BirthdayReminderStateFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for BirthdayReminderState.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__BirthdayReminderStateClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    contact<T extends ContactDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ContactDefaultArgs<ExtArgs>>): Prisma__ContactClient<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the BirthdayReminderState model
+   */
+  interface BirthdayReminderStateFieldRefs {
+    readonly id: FieldRef<"BirthdayReminderState", 'String'>
+    readonly userId: FieldRef<"BirthdayReminderState", 'String'>
+    readonly contactId: FieldRef<"BirthdayReminderState", 'String'>
+    readonly dateKey: FieldRef<"BirthdayReminderState", 'String'>
+    readonly lastSentYear: FieldRef<"BirthdayReminderState", 'Int'>
+    readonly lastSentAt: FieldRef<"BirthdayReminderState", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * BirthdayReminderState findUnique
+   */
+  export type BirthdayReminderStateFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BirthdayReminderState
+     */
+    select?: BirthdayReminderStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BirthdayReminderState
+     */
+    omit?: BirthdayReminderStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BirthdayReminderStateInclude<ExtArgs> | null
+    /**
+     * Filter, which BirthdayReminderState to fetch.
+     */
+    where: BirthdayReminderStateWhereUniqueInput
+  }
+
+  /**
+   * BirthdayReminderState findUniqueOrThrow
+   */
+  export type BirthdayReminderStateFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BirthdayReminderState
+     */
+    select?: BirthdayReminderStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BirthdayReminderState
+     */
+    omit?: BirthdayReminderStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BirthdayReminderStateInclude<ExtArgs> | null
+    /**
+     * Filter, which BirthdayReminderState to fetch.
+     */
+    where: BirthdayReminderStateWhereUniqueInput
+  }
+
+  /**
+   * BirthdayReminderState findFirst
+   */
+  export type BirthdayReminderStateFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BirthdayReminderState
+     */
+    select?: BirthdayReminderStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BirthdayReminderState
+     */
+    omit?: BirthdayReminderStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BirthdayReminderStateInclude<ExtArgs> | null
+    /**
+     * Filter, which BirthdayReminderState to fetch.
+     */
+    where?: BirthdayReminderStateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BirthdayReminderStates to fetch.
+     */
+    orderBy?: BirthdayReminderStateOrderByWithRelationInput | BirthdayReminderStateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BirthdayReminderStates.
+     */
+    cursor?: BirthdayReminderStateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BirthdayReminderStates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BirthdayReminderStates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BirthdayReminderStates.
+     */
+    distinct?: BirthdayReminderStateScalarFieldEnum | BirthdayReminderStateScalarFieldEnum[]
+  }
+
+  /**
+   * BirthdayReminderState findFirstOrThrow
+   */
+  export type BirthdayReminderStateFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BirthdayReminderState
+     */
+    select?: BirthdayReminderStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BirthdayReminderState
+     */
+    omit?: BirthdayReminderStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BirthdayReminderStateInclude<ExtArgs> | null
+    /**
+     * Filter, which BirthdayReminderState to fetch.
+     */
+    where?: BirthdayReminderStateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BirthdayReminderStates to fetch.
+     */
+    orderBy?: BirthdayReminderStateOrderByWithRelationInput | BirthdayReminderStateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BirthdayReminderStates.
+     */
+    cursor?: BirthdayReminderStateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BirthdayReminderStates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BirthdayReminderStates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BirthdayReminderStates.
+     */
+    distinct?: BirthdayReminderStateScalarFieldEnum | BirthdayReminderStateScalarFieldEnum[]
+  }
+
+  /**
+   * BirthdayReminderState findMany
+   */
+  export type BirthdayReminderStateFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BirthdayReminderState
+     */
+    select?: BirthdayReminderStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BirthdayReminderState
+     */
+    omit?: BirthdayReminderStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BirthdayReminderStateInclude<ExtArgs> | null
+    /**
+     * Filter, which BirthdayReminderStates to fetch.
+     */
+    where?: BirthdayReminderStateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BirthdayReminderStates to fetch.
+     */
+    orderBy?: BirthdayReminderStateOrderByWithRelationInput | BirthdayReminderStateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing BirthdayReminderStates.
+     */
+    cursor?: BirthdayReminderStateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BirthdayReminderStates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BirthdayReminderStates.
+     */
+    skip?: number
+    distinct?: BirthdayReminderStateScalarFieldEnum | BirthdayReminderStateScalarFieldEnum[]
+  }
+
+  /**
+   * BirthdayReminderState create
+   */
+  export type BirthdayReminderStateCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BirthdayReminderState
+     */
+    select?: BirthdayReminderStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BirthdayReminderState
+     */
+    omit?: BirthdayReminderStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BirthdayReminderStateInclude<ExtArgs> | null
+    /**
+     * The data needed to create a BirthdayReminderState.
+     */
+    data: XOR<BirthdayReminderStateCreateInput, BirthdayReminderStateUncheckedCreateInput>
+  }
+
+  /**
+   * BirthdayReminderState createMany
+   */
+  export type BirthdayReminderStateCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many BirthdayReminderStates.
+     */
+    data: BirthdayReminderStateCreateManyInput | BirthdayReminderStateCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * BirthdayReminderState createManyAndReturn
+   */
+  export type BirthdayReminderStateCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BirthdayReminderState
+     */
+    select?: BirthdayReminderStateSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the BirthdayReminderState
+     */
+    omit?: BirthdayReminderStateOmit<ExtArgs> | null
+    /**
+     * The data used to create many BirthdayReminderStates.
+     */
+    data: BirthdayReminderStateCreateManyInput | BirthdayReminderStateCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BirthdayReminderStateIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * BirthdayReminderState update
+   */
+  export type BirthdayReminderStateUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BirthdayReminderState
+     */
+    select?: BirthdayReminderStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BirthdayReminderState
+     */
+    omit?: BirthdayReminderStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BirthdayReminderStateInclude<ExtArgs> | null
+    /**
+     * The data needed to update a BirthdayReminderState.
+     */
+    data: XOR<BirthdayReminderStateUpdateInput, BirthdayReminderStateUncheckedUpdateInput>
+    /**
+     * Choose, which BirthdayReminderState to update.
+     */
+    where: BirthdayReminderStateWhereUniqueInput
+  }
+
+  /**
+   * BirthdayReminderState updateMany
+   */
+  export type BirthdayReminderStateUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update BirthdayReminderStates.
+     */
+    data: XOR<BirthdayReminderStateUpdateManyMutationInput, BirthdayReminderStateUncheckedUpdateManyInput>
+    /**
+     * Filter which BirthdayReminderStates to update
+     */
+    where?: BirthdayReminderStateWhereInput
+    /**
+     * Limit how many BirthdayReminderStates to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * BirthdayReminderState updateManyAndReturn
+   */
+  export type BirthdayReminderStateUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BirthdayReminderState
+     */
+    select?: BirthdayReminderStateSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the BirthdayReminderState
+     */
+    omit?: BirthdayReminderStateOmit<ExtArgs> | null
+    /**
+     * The data used to update BirthdayReminderStates.
+     */
+    data: XOR<BirthdayReminderStateUpdateManyMutationInput, BirthdayReminderStateUncheckedUpdateManyInput>
+    /**
+     * Filter which BirthdayReminderStates to update
+     */
+    where?: BirthdayReminderStateWhereInput
+    /**
+     * Limit how many BirthdayReminderStates to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BirthdayReminderStateIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * BirthdayReminderState upsert
+   */
+  export type BirthdayReminderStateUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BirthdayReminderState
+     */
+    select?: BirthdayReminderStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BirthdayReminderState
+     */
+    omit?: BirthdayReminderStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BirthdayReminderStateInclude<ExtArgs> | null
+    /**
+     * The filter to search for the BirthdayReminderState to update in case it exists.
+     */
+    where: BirthdayReminderStateWhereUniqueInput
+    /**
+     * In case the BirthdayReminderState found by the `where` argument doesn't exist, create a new BirthdayReminderState with this data.
+     */
+    create: XOR<BirthdayReminderStateCreateInput, BirthdayReminderStateUncheckedCreateInput>
+    /**
+     * In case the BirthdayReminderState was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<BirthdayReminderStateUpdateInput, BirthdayReminderStateUncheckedUpdateInput>
+  }
+
+  /**
+   * BirthdayReminderState delete
+   */
+  export type BirthdayReminderStateDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BirthdayReminderState
+     */
+    select?: BirthdayReminderStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BirthdayReminderState
+     */
+    omit?: BirthdayReminderStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BirthdayReminderStateInclude<ExtArgs> | null
+    /**
+     * Filter which BirthdayReminderState to delete.
+     */
+    where: BirthdayReminderStateWhereUniqueInput
+  }
+
+  /**
+   * BirthdayReminderState deleteMany
+   */
+  export type BirthdayReminderStateDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BirthdayReminderStates to delete
+     */
+    where?: BirthdayReminderStateWhereInput
+    /**
+     * Limit how many BirthdayReminderStates to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * BirthdayReminderState without action
+   */
+  export type BirthdayReminderStateDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BirthdayReminderState
+     */
+    select?: BirthdayReminderStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BirthdayReminderState
+     */
+    omit?: BirthdayReminderStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: BirthdayReminderStateInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -43234,6 +45732,8 @@ export namespace Prisma {
     role: 'role',
     planOverrideReason: 'planOverrideReason',
     planOverriddenAt: 'planOverriddenAt',
+    reminderLeadDays: 'reminderLeadDays',
+    calToken: 'calToken',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -43259,6 +45759,7 @@ export namespace Prisma {
     id: 'id',
     userId: 'userId',
     importJobId: 'importJobId',
+    reminderLeadDaysOverride: 'reminderLeadDaysOverride',
     mergedIntoContactId: 'mergedIntoContactId',
     syncUid: 'syncUid',
     syncVersion: 'syncVersion',
@@ -43826,6 +46327,28 @@ export namespace Prisma {
   };
 
   export type NotificationSettingsScalarFieldEnum = (typeof NotificationSettingsScalarFieldEnum)[keyof typeof NotificationSettingsScalarFieldEnum]
+
+
+  export const FailedLoginAttemptScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    ipAddress: 'ipAddress',
+    createdAt: 'createdAt'
+  };
+
+  export type FailedLoginAttemptScalarFieldEnum = (typeof FailedLoginAttemptScalarFieldEnum)[keyof typeof FailedLoginAttemptScalarFieldEnum]
+
+
+  export const BirthdayReminderStateScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    contactId: 'contactId',
+    dateKey: 'dateKey',
+    lastSentYear: 'lastSentYear',
+    lastSentAt: 'lastSentAt'
+  };
+
+  export type BirthdayReminderStateScalarFieldEnum = (typeof BirthdayReminderStateScalarFieldEnum)[keyof typeof BirthdayReminderStateScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -44474,6 +46997,8 @@ export namespace Prisma {
     role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
     planOverrideReason?: StringNullableFilter<"User"> | string | null
     planOverriddenAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    reminderLeadDays?: IntFilter<"User"> | number
+    calToken?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     appPasswords?: AppPasswordListRelationFilter
@@ -44499,6 +47024,8 @@ export namespace Prisma {
     notifications?: NotificationListRelationFilter
     securityAlerts?: SecurityAlertListRelationFilter
     notificationSettings?: XOR<NotificationSettingsNullableScalarRelationFilter, NotificationSettingsWhereInput> | null
+    birthdayReminderStates?: BirthdayReminderStateListRelationFilter
+    failedLoginAttempts?: FailedLoginAttemptListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -44521,6 +47048,8 @@ export namespace Prisma {
     role?: SortOrder
     planOverrideReason?: SortOrderInput | SortOrder
     planOverriddenAt?: SortOrderInput | SortOrder
+    reminderLeadDays?: SortOrder
+    calToken?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     appPasswords?: AppPasswordOrderByRelationAggregateInput
@@ -44546,6 +47075,8 @@ export namespace Prisma {
     notifications?: NotificationOrderByRelationAggregateInput
     securityAlerts?: SecurityAlertOrderByRelationAggregateInput
     notificationSettings?: NotificationSettingsOrderByWithRelationInput
+    birthdayReminderStates?: BirthdayReminderStateOrderByRelationAggregateInput
+    failedLoginAttempts?: FailedLoginAttemptOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -44571,6 +47102,8 @@ export namespace Prisma {
     role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
     planOverrideReason?: StringNullableFilter<"User"> | string | null
     planOverriddenAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    reminderLeadDays?: IntFilter<"User"> | number
+    calToken?: StringNullableFilter<"User"> | string | null
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     appPasswords?: AppPasswordListRelationFilter
@@ -44596,6 +47129,8 @@ export namespace Prisma {
     notifications?: NotificationListRelationFilter
     securityAlerts?: SecurityAlertListRelationFilter
     notificationSettings?: XOR<NotificationSettingsNullableScalarRelationFilter, NotificationSettingsWhereInput> | null
+    birthdayReminderStates?: BirthdayReminderStateListRelationFilter
+    failedLoginAttempts?: FailedLoginAttemptListRelationFilter
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -44618,6 +47153,8 @@ export namespace Prisma {
     role?: SortOrder
     planOverrideReason?: SortOrderInput | SortOrder
     planOverriddenAt?: SortOrderInput | SortOrder
+    reminderLeadDays?: SortOrder
+    calToken?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -44650,6 +47187,8 @@ export namespace Prisma {
     role?: EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
     planOverrideReason?: StringNullableWithAggregatesFilter<"User"> | string | null
     planOverriddenAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+    reminderLeadDays?: IntWithAggregatesFilter<"User"> | number
+    calToken?: StringNullableWithAggregatesFilter<"User"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
@@ -44734,6 +47273,7 @@ export namespace Prisma {
     id?: StringFilter<"Contact"> | string
     userId?: StringFilter<"Contact"> | string
     importJobId?: StringNullableFilter<"Contact"> | string | null
+    reminderLeadDaysOverride?: IntNullableFilter<"Contact"> | number | null
     mergedIntoContactId?: StringNullableFilter<"Contact"> | string | null
     syncUid?: StringFilter<"Contact"> | string
     syncVersion?: IntFilter<"Contact"> | number
@@ -44789,6 +47329,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareListRelationFilter
     sharesAsRecipientCopy?: ContactShareListRelationFilter
     groupContacts?: GroupContactListRelationFilter
+    birthdayReminderStates?: BirthdayReminderStateListRelationFilter
     mergedIntoContact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
     mergedChildren?: ContactListRelationFilter
     book?: XOR<AddressBookNullableScalarRelationFilter, AddressBookWhereInput> | null
@@ -44798,6 +47339,7 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     importJobId?: SortOrderInput | SortOrder
+    reminderLeadDaysOverride?: SortOrderInput | SortOrder
     mergedIntoContactId?: SortOrderInput | SortOrder
     syncUid?: SortOrder
     syncVersion?: SortOrder
@@ -44853,6 +47395,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareOrderByRelationAggregateInput
     sharesAsRecipientCopy?: ContactShareOrderByRelationAggregateInput
     groupContacts?: GroupContactOrderByRelationAggregateInput
+    birthdayReminderStates?: BirthdayReminderStateOrderByRelationAggregateInput
     mergedIntoContact?: ContactOrderByWithRelationInput
     mergedChildren?: ContactOrderByRelationAggregateInput
     book?: AddressBookOrderByWithRelationInput
@@ -44866,6 +47409,7 @@ export namespace Prisma {
     NOT?: ContactWhereInput | ContactWhereInput[]
     userId?: StringFilter<"Contact"> | string
     importJobId?: StringNullableFilter<"Contact"> | string | null
+    reminderLeadDaysOverride?: IntNullableFilter<"Contact"> | number | null
     mergedIntoContactId?: StringNullableFilter<"Contact"> | string | null
     syncVersion?: IntFilter<"Contact"> | number
     syncTombstoneAt?: DateTimeNullableFilter<"Contact"> | Date | string | null
@@ -44920,6 +47464,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareListRelationFilter
     sharesAsRecipientCopy?: ContactShareListRelationFilter
     groupContacts?: GroupContactListRelationFilter
+    birthdayReminderStates?: BirthdayReminderStateListRelationFilter
     mergedIntoContact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
     mergedChildren?: ContactListRelationFilter
     book?: XOR<AddressBookNullableScalarRelationFilter, AddressBookWhereInput> | null
@@ -44929,6 +47474,7 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     importJobId?: SortOrderInput | SortOrder
+    reminderLeadDaysOverride?: SortOrderInput | SortOrder
     mergedIntoContactId?: SortOrderInput | SortOrder
     syncUid?: SortOrder
     syncVersion?: SortOrder
@@ -44988,6 +47534,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"Contact"> | string
     userId?: StringWithAggregatesFilter<"Contact"> | string
     importJobId?: StringNullableWithAggregatesFilter<"Contact"> | string | null
+    reminderLeadDaysOverride?: IntNullableWithAggregatesFilter<"Contact"> | number | null
     mergedIntoContactId?: StringNullableWithAggregatesFilter<"Contact"> | string | null
     syncUid?: StringWithAggregatesFilter<"Contact"> | string
     syncVersion?: IntWithAggregatesFilter<"Contact"> | number
@@ -47758,6 +50305,122 @@ export namespace Prisma {
     digest?: EnumDigestCadenceWithAggregatesFilter<"NotificationSettings"> | $Enums.DigestCadence
   }
 
+  export type FailedLoginAttemptWhereInput = {
+    AND?: FailedLoginAttemptWhereInput | FailedLoginAttemptWhereInput[]
+    OR?: FailedLoginAttemptWhereInput[]
+    NOT?: FailedLoginAttemptWhereInput | FailedLoginAttemptWhereInput[]
+    id?: StringFilter<"FailedLoginAttempt"> | string
+    userId?: StringFilter<"FailedLoginAttempt"> | string
+    ipAddress?: StringNullableFilter<"FailedLoginAttempt"> | string | null
+    createdAt?: DateTimeFilter<"FailedLoginAttempt"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type FailedLoginAttemptOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    ipAddress?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type FailedLoginAttemptWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: FailedLoginAttemptWhereInput | FailedLoginAttemptWhereInput[]
+    OR?: FailedLoginAttemptWhereInput[]
+    NOT?: FailedLoginAttemptWhereInput | FailedLoginAttemptWhereInput[]
+    userId?: StringFilter<"FailedLoginAttempt"> | string
+    ipAddress?: StringNullableFilter<"FailedLoginAttempt"> | string | null
+    createdAt?: DateTimeFilter<"FailedLoginAttempt"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type FailedLoginAttemptOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    ipAddress?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: FailedLoginAttemptCountOrderByAggregateInput
+    _max?: FailedLoginAttemptMaxOrderByAggregateInput
+    _min?: FailedLoginAttemptMinOrderByAggregateInput
+  }
+
+  export type FailedLoginAttemptScalarWhereWithAggregatesInput = {
+    AND?: FailedLoginAttemptScalarWhereWithAggregatesInput | FailedLoginAttemptScalarWhereWithAggregatesInput[]
+    OR?: FailedLoginAttemptScalarWhereWithAggregatesInput[]
+    NOT?: FailedLoginAttemptScalarWhereWithAggregatesInput | FailedLoginAttemptScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"FailedLoginAttempt"> | string
+    userId?: StringWithAggregatesFilter<"FailedLoginAttempt"> | string
+    ipAddress?: StringNullableWithAggregatesFilter<"FailedLoginAttempt"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"FailedLoginAttempt"> | Date | string
+  }
+
+  export type BirthdayReminderStateWhereInput = {
+    AND?: BirthdayReminderStateWhereInput | BirthdayReminderStateWhereInput[]
+    OR?: BirthdayReminderStateWhereInput[]
+    NOT?: BirthdayReminderStateWhereInput | BirthdayReminderStateWhereInput[]
+    id?: StringFilter<"BirthdayReminderState"> | string
+    userId?: StringFilter<"BirthdayReminderState"> | string
+    contactId?: StringFilter<"BirthdayReminderState"> | string
+    dateKey?: StringFilter<"BirthdayReminderState"> | string
+    lastSentYear?: IntFilter<"BirthdayReminderState"> | number
+    lastSentAt?: DateTimeFilter<"BirthdayReminderState"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    contact?: XOR<ContactScalarRelationFilter, ContactWhereInput>
+  }
+
+  export type BirthdayReminderStateOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    contactId?: SortOrder
+    dateKey?: SortOrder
+    lastSentYear?: SortOrder
+    lastSentAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+    contact?: ContactOrderByWithRelationInput
+  }
+
+  export type BirthdayReminderStateWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId_contactId_dateKey?: BirthdayReminderStateUserIdContactIdDateKeyCompoundUniqueInput
+    AND?: BirthdayReminderStateWhereInput | BirthdayReminderStateWhereInput[]
+    OR?: BirthdayReminderStateWhereInput[]
+    NOT?: BirthdayReminderStateWhereInput | BirthdayReminderStateWhereInput[]
+    userId?: StringFilter<"BirthdayReminderState"> | string
+    contactId?: StringFilter<"BirthdayReminderState"> | string
+    dateKey?: StringFilter<"BirthdayReminderState"> | string
+    lastSentYear?: IntFilter<"BirthdayReminderState"> | number
+    lastSentAt?: DateTimeFilter<"BirthdayReminderState"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    contact?: XOR<ContactScalarRelationFilter, ContactWhereInput>
+  }, "id" | "userId_contactId_dateKey">
+
+  export type BirthdayReminderStateOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    contactId?: SortOrder
+    dateKey?: SortOrder
+    lastSentYear?: SortOrder
+    lastSentAt?: SortOrder
+    _count?: BirthdayReminderStateCountOrderByAggregateInput
+    _avg?: BirthdayReminderStateAvgOrderByAggregateInput
+    _max?: BirthdayReminderStateMaxOrderByAggregateInput
+    _min?: BirthdayReminderStateMinOrderByAggregateInput
+    _sum?: BirthdayReminderStateSumOrderByAggregateInput
+  }
+
+  export type BirthdayReminderStateScalarWhereWithAggregatesInput = {
+    AND?: BirthdayReminderStateScalarWhereWithAggregatesInput | BirthdayReminderStateScalarWhereWithAggregatesInput[]
+    OR?: BirthdayReminderStateScalarWhereWithAggregatesInput[]
+    NOT?: BirthdayReminderStateScalarWhereWithAggregatesInput | BirthdayReminderStateScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"BirthdayReminderState"> | string
+    userId?: StringWithAggregatesFilter<"BirthdayReminderState"> | string
+    contactId?: StringWithAggregatesFilter<"BirthdayReminderState"> | string
+    dateKey?: StringWithAggregatesFilter<"BirthdayReminderState"> | string
+    lastSentYear?: IntWithAggregatesFilter<"BirthdayReminderState"> | number
+    lastSentAt?: DateTimeWithAggregatesFilter<"BirthdayReminderState"> | Date | string
+  }
+
   export type UserCreateInput = {
     id?: string
     name?: string | null
@@ -47778,6 +50441,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -47803,6 +50468,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -47825,6 +50492,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -47850,6 +50519,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -47872,6 +50543,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -47897,6 +50570,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -47919,6 +50594,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -47944,6 +50621,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -47966,6 +50645,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -47990,6 +50671,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -48014,6 +50697,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -48100,6 +50785,7 @@ export namespace Prisma {
 
   export type ContactCreateInput = {
     id?: string
+    reminderLeadDaysOverride?: number | null
     syncUid?: string
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
@@ -48153,6 +50839,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
     book?: AddressBookCreateNestedOneWithoutContactsInput
@@ -48162,6 +50849,7 @@ export namespace Prisma {
     id?: string
     userId: string
     importJobId?: string | null
+    reminderLeadDaysOverride?: number | null
     mergedIntoContactId?: string | null
     syncUid?: string
     syncVersion?: number
@@ -48215,11 +50903,13 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
   export type ContactUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -48273,6 +50963,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
     book?: AddressBookUpdateOneWithoutContactsNestedInput
@@ -48282,6 +50973,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
@@ -48335,6 +51027,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -48342,6 +51035,7 @@ export namespace Prisma {
     id?: string
     userId: string
     importJobId?: string | null
+    reminderLeadDaysOverride?: number | null
     mergedIntoContactId?: string | null
     syncUid?: string
     syncVersion?: number
@@ -48391,6 +51085,7 @@ export namespace Prisma {
 
   export type ContactUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -48440,6 +51135,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
@@ -51552,6 +54248,115 @@ export namespace Prisma {
     digest?: EnumDigestCadenceFieldUpdateOperationsInput | $Enums.DigestCadence
   }
 
+  export type FailedLoginAttemptCreateInput = {
+    id?: string
+    ipAddress?: string | null
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutFailedLoginAttemptsInput
+  }
+
+  export type FailedLoginAttemptUncheckedCreateInput = {
+    id?: string
+    userId: string
+    ipAddress?: string | null
+    createdAt?: Date | string
+  }
+
+  export type FailedLoginAttemptUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutFailedLoginAttemptsNestedInput
+  }
+
+  export type FailedLoginAttemptUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FailedLoginAttemptCreateManyInput = {
+    id?: string
+    userId: string
+    ipAddress?: string | null
+    createdAt?: Date | string
+  }
+
+  export type FailedLoginAttemptUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FailedLoginAttemptUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BirthdayReminderStateCreateInput = {
+    id?: string
+    dateKey: string
+    lastSentYear: number
+    lastSentAt?: Date | string
+    user: UserCreateNestedOneWithoutBirthdayReminderStatesInput
+    contact: ContactCreateNestedOneWithoutBirthdayReminderStatesInput
+  }
+
+  export type BirthdayReminderStateUncheckedCreateInput = {
+    id?: string
+    userId: string
+    contactId: string
+    dateKey: string
+    lastSentYear: number
+    lastSentAt?: Date | string
+  }
+
+  export type BirthdayReminderStateUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dateKey?: StringFieldUpdateOperationsInput | string
+    lastSentYear?: IntFieldUpdateOperationsInput | number
+    lastSentAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutBirthdayReminderStatesNestedInput
+    contact?: ContactUpdateOneRequiredWithoutBirthdayReminderStatesNestedInput
+  }
+
+  export type BirthdayReminderStateUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    contactId?: StringFieldUpdateOperationsInput | string
+    dateKey?: StringFieldUpdateOperationsInput | string
+    lastSentYear?: IntFieldUpdateOperationsInput | number
+    lastSentAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BirthdayReminderStateCreateManyInput = {
+    id?: string
+    userId: string
+    contactId: string
+    dateKey: string
+    lastSentYear: number
+    lastSentAt?: Date | string
+  }
+
+  export type BirthdayReminderStateUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dateKey?: StringFieldUpdateOperationsInput | string
+    lastSentYear?: IntFieldUpdateOperationsInput | number
+    lastSentAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BirthdayReminderStateUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    contactId?: StringFieldUpdateOperationsInput | string
+    dateKey?: StringFieldUpdateOperationsInput | string
+    lastSentYear?: IntFieldUpdateOperationsInput | number
+    lastSentAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -51771,6 +54576,18 @@ export namespace Prisma {
     isNot?: NotificationSettingsWhereInput | null
   }
 
+  export type BirthdayReminderStateListRelationFilter = {
+    every?: BirthdayReminderStateWhereInput
+    some?: BirthdayReminderStateWhereInput
+    none?: BirthdayReminderStateWhereInput
+  }
+
+  export type FailedLoginAttemptListRelationFilter = {
+    every?: FailedLoginAttemptWhereInput
+    some?: FailedLoginAttemptWhereInput
+    none?: FailedLoginAttemptWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -51856,6 +54673,14 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type BirthdayReminderStateOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type FailedLoginAttemptOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
@@ -51876,12 +54701,15 @@ export namespace Prisma {
     role?: SortOrder
     planOverrideReason?: SortOrder
     planOverriddenAt?: SortOrder
+    reminderLeadDays?: SortOrder
+    calToken?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type UserAvgOrderByAggregateInput = {
     sessionVersion?: SortOrder
+    reminderLeadDays?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -51904,6 +54732,8 @@ export namespace Prisma {
     role?: SortOrder
     planOverrideReason?: SortOrder
     planOverriddenAt?: SortOrder
+    reminderLeadDays?: SortOrder
+    calToken?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -51928,12 +54758,15 @@ export namespace Prisma {
     role?: SortOrder
     planOverrideReason?: SortOrder
     planOverriddenAt?: SortOrder
+    reminderLeadDays?: SortOrder
+    calToken?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type UserSumOrderByAggregateInput = {
     sessionVersion?: SortOrder
+    reminderLeadDays?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -52101,6 +54934,17 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
+
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
   export type JsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -52171,6 +55015,7 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     importJobId?: SortOrder
+    reminderLeadDaysOverride?: SortOrder
     mergedIntoContactId?: SortOrder
     syncUid?: SortOrder
     syncVersion?: SortOrder
@@ -52219,6 +55064,7 @@ export namespace Prisma {
   }
 
   export type ContactAvgOrderByAggregateInput = {
+    reminderLeadDaysOverride?: SortOrder
     syncVersion?: SortOrder
   }
 
@@ -52226,6 +55072,7 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     importJobId?: SortOrder
+    reminderLeadDaysOverride?: SortOrder
     mergedIntoContactId?: SortOrder
     syncUid?: SortOrder
     syncVersion?: SortOrder
@@ -52266,6 +55113,7 @@ export namespace Prisma {
     id?: SortOrder
     userId?: SortOrder
     importJobId?: SortOrder
+    reminderLeadDaysOverride?: SortOrder
     mergedIntoContactId?: SortOrder
     syncUid?: SortOrder
     syncVersion?: SortOrder
@@ -52303,7 +55151,24 @@ export namespace Prisma {
   }
 
   export type ContactSumOrderByAggregateInput = {
+    reminderLeadDaysOverride?: SortOrder
     syncVersion?: SortOrder
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
   }
   export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
     | PatchUndefined<
@@ -52413,17 +55278,6 @@ export namespace Prisma {
     in?: $Enums.SubscriptionInterval[] | ListEnumSubscriptionIntervalFieldRefInput<$PrismaModel>
     notIn?: $Enums.SubscriptionInterval[] | ListEnumSubscriptionIntervalFieldRefInput<$PrismaModel>
     not?: NestedEnumSubscriptionIntervalFilter<$PrismaModel> | $Enums.SubscriptionInterval
-  }
-
-  export type IntNullableFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
   export type SubscriptionCustomerScalarRelationFilter = {
@@ -52589,22 +55443,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumSubscriptionIntervalFilter<$PrismaModel>
     _max?: NestedEnumSubscriptionIntervalFilter<$PrismaModel>
-  }
-
-  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
   }
 
   export type EnumContactImportFormatFilter<$PrismaModel = never> = {
@@ -54512,6 +57350,68 @@ export namespace Prisma {
     _max?: NestedEnumDigestCadenceFilter<$PrismaModel>
   }
 
+  export type FailedLoginAttemptCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    ipAddress?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type FailedLoginAttemptMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    ipAddress?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type FailedLoginAttemptMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    ipAddress?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type BirthdayReminderStateUserIdContactIdDateKeyCompoundUniqueInput = {
+    userId: string
+    contactId: string
+    dateKey: string
+  }
+
+  export type BirthdayReminderStateCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    contactId?: SortOrder
+    dateKey?: SortOrder
+    lastSentYear?: SortOrder
+    lastSentAt?: SortOrder
+  }
+
+  export type BirthdayReminderStateAvgOrderByAggregateInput = {
+    lastSentYear?: SortOrder
+  }
+
+  export type BirthdayReminderStateMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    contactId?: SortOrder
+    dateKey?: SortOrder
+    lastSentYear?: SortOrder
+    lastSentAt?: SortOrder
+  }
+
+  export type BirthdayReminderStateMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    contactId?: SortOrder
+    dateKey?: SortOrder
+    lastSentYear?: SortOrder
+    lastSentAt?: SortOrder
+  }
+
+  export type BirthdayReminderStateSumOrderByAggregateInput = {
+    lastSentYear?: SortOrder
+  }
+
   export type AppPasswordCreateNestedManyWithoutUserInput = {
     create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
@@ -54671,6 +57571,20 @@ export namespace Prisma {
     connect?: NotificationSettingsWhereUniqueInput
   }
 
+  export type BirthdayReminderStateCreateNestedManyWithoutUserInput = {
+    create?: XOR<BirthdayReminderStateCreateWithoutUserInput, BirthdayReminderStateUncheckedCreateWithoutUserInput> | BirthdayReminderStateCreateWithoutUserInput[] | BirthdayReminderStateUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: BirthdayReminderStateCreateOrConnectWithoutUserInput | BirthdayReminderStateCreateOrConnectWithoutUserInput[]
+    createMany?: BirthdayReminderStateCreateManyUserInputEnvelope
+    connect?: BirthdayReminderStateWhereUniqueInput | BirthdayReminderStateWhereUniqueInput[]
+  }
+
+  export type FailedLoginAttemptCreateNestedManyWithoutUserInput = {
+    create?: XOR<FailedLoginAttemptCreateWithoutUserInput, FailedLoginAttemptUncheckedCreateWithoutUserInput> | FailedLoginAttemptCreateWithoutUserInput[] | FailedLoginAttemptUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: FailedLoginAttemptCreateOrConnectWithoutUserInput | FailedLoginAttemptCreateOrConnectWithoutUserInput[]
+    createMany?: FailedLoginAttemptCreateManyUserInputEnvelope
+    connect?: FailedLoginAttemptWhereUniqueInput | FailedLoginAttemptWhereUniqueInput[]
+  }
+
   export type AppPasswordUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
@@ -54828,6 +57742,20 @@ export namespace Prisma {
     create?: XOR<NotificationSettingsCreateWithoutUserInput, NotificationSettingsUncheckedCreateWithoutUserInput>
     connectOrCreate?: NotificationSettingsCreateOrConnectWithoutUserInput
     connect?: NotificationSettingsWhereUniqueInput
+  }
+
+  export type BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<BirthdayReminderStateCreateWithoutUserInput, BirthdayReminderStateUncheckedCreateWithoutUserInput> | BirthdayReminderStateCreateWithoutUserInput[] | BirthdayReminderStateUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: BirthdayReminderStateCreateOrConnectWithoutUserInput | BirthdayReminderStateCreateOrConnectWithoutUserInput[]
+    createMany?: BirthdayReminderStateCreateManyUserInputEnvelope
+    connect?: BirthdayReminderStateWhereUniqueInput | BirthdayReminderStateWhereUniqueInput[]
+  }
+
+  export type FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<FailedLoginAttemptCreateWithoutUserInput, FailedLoginAttemptUncheckedCreateWithoutUserInput> | FailedLoginAttemptCreateWithoutUserInput[] | FailedLoginAttemptUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: FailedLoginAttemptCreateOrConnectWithoutUserInput | FailedLoginAttemptCreateOrConnectWithoutUserInput[]
+    createMany?: FailedLoginAttemptCreateManyUserInputEnvelope
+    connect?: FailedLoginAttemptWhereUniqueInput | FailedLoginAttemptWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -55184,6 +58112,34 @@ export namespace Prisma {
     update?: XOR<XOR<NotificationSettingsUpdateToOneWithWhereWithoutUserInput, NotificationSettingsUpdateWithoutUserInput>, NotificationSettingsUncheckedUpdateWithoutUserInput>
   }
 
+  export type BirthdayReminderStateUpdateManyWithoutUserNestedInput = {
+    create?: XOR<BirthdayReminderStateCreateWithoutUserInput, BirthdayReminderStateUncheckedCreateWithoutUserInput> | BirthdayReminderStateCreateWithoutUserInput[] | BirthdayReminderStateUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: BirthdayReminderStateCreateOrConnectWithoutUserInput | BirthdayReminderStateCreateOrConnectWithoutUserInput[]
+    upsert?: BirthdayReminderStateUpsertWithWhereUniqueWithoutUserInput | BirthdayReminderStateUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: BirthdayReminderStateCreateManyUserInputEnvelope
+    set?: BirthdayReminderStateWhereUniqueInput | BirthdayReminderStateWhereUniqueInput[]
+    disconnect?: BirthdayReminderStateWhereUniqueInput | BirthdayReminderStateWhereUniqueInput[]
+    delete?: BirthdayReminderStateWhereUniqueInput | BirthdayReminderStateWhereUniqueInput[]
+    connect?: BirthdayReminderStateWhereUniqueInput | BirthdayReminderStateWhereUniqueInput[]
+    update?: BirthdayReminderStateUpdateWithWhereUniqueWithoutUserInput | BirthdayReminderStateUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: BirthdayReminderStateUpdateManyWithWhereWithoutUserInput | BirthdayReminderStateUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: BirthdayReminderStateScalarWhereInput | BirthdayReminderStateScalarWhereInput[]
+  }
+
+  export type FailedLoginAttemptUpdateManyWithoutUserNestedInput = {
+    create?: XOR<FailedLoginAttemptCreateWithoutUserInput, FailedLoginAttemptUncheckedCreateWithoutUserInput> | FailedLoginAttemptCreateWithoutUserInput[] | FailedLoginAttemptUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: FailedLoginAttemptCreateOrConnectWithoutUserInput | FailedLoginAttemptCreateOrConnectWithoutUserInput[]
+    upsert?: FailedLoginAttemptUpsertWithWhereUniqueWithoutUserInput | FailedLoginAttemptUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: FailedLoginAttemptCreateManyUserInputEnvelope
+    set?: FailedLoginAttemptWhereUniqueInput | FailedLoginAttemptWhereUniqueInput[]
+    disconnect?: FailedLoginAttemptWhereUniqueInput | FailedLoginAttemptWhereUniqueInput[]
+    delete?: FailedLoginAttemptWhereUniqueInput | FailedLoginAttemptWhereUniqueInput[]
+    connect?: FailedLoginAttemptWhereUniqueInput | FailedLoginAttemptWhereUniqueInput[]
+    update?: FailedLoginAttemptUpdateWithWhereUniqueWithoutUserInput | FailedLoginAttemptUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: FailedLoginAttemptUpdateManyWithWhereWithoutUserInput | FailedLoginAttemptUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: FailedLoginAttemptScalarWhereInput | FailedLoginAttemptScalarWhereInput[]
+  }
+
   export type AppPasswordUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
@@ -55498,6 +58454,34 @@ export namespace Prisma {
     update?: XOR<XOR<NotificationSettingsUpdateToOneWithWhereWithoutUserInput, NotificationSettingsUpdateWithoutUserInput>, NotificationSettingsUncheckedUpdateWithoutUserInput>
   }
 
+  export type BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<BirthdayReminderStateCreateWithoutUserInput, BirthdayReminderStateUncheckedCreateWithoutUserInput> | BirthdayReminderStateCreateWithoutUserInput[] | BirthdayReminderStateUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: BirthdayReminderStateCreateOrConnectWithoutUserInput | BirthdayReminderStateCreateOrConnectWithoutUserInput[]
+    upsert?: BirthdayReminderStateUpsertWithWhereUniqueWithoutUserInput | BirthdayReminderStateUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: BirthdayReminderStateCreateManyUserInputEnvelope
+    set?: BirthdayReminderStateWhereUniqueInput | BirthdayReminderStateWhereUniqueInput[]
+    disconnect?: BirthdayReminderStateWhereUniqueInput | BirthdayReminderStateWhereUniqueInput[]
+    delete?: BirthdayReminderStateWhereUniqueInput | BirthdayReminderStateWhereUniqueInput[]
+    connect?: BirthdayReminderStateWhereUniqueInput | BirthdayReminderStateWhereUniqueInput[]
+    update?: BirthdayReminderStateUpdateWithWhereUniqueWithoutUserInput | BirthdayReminderStateUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: BirthdayReminderStateUpdateManyWithWhereWithoutUserInput | BirthdayReminderStateUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: BirthdayReminderStateScalarWhereInput | BirthdayReminderStateScalarWhereInput[]
+  }
+
+  export type FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<FailedLoginAttemptCreateWithoutUserInput, FailedLoginAttemptUncheckedCreateWithoutUserInput> | FailedLoginAttemptCreateWithoutUserInput[] | FailedLoginAttemptUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: FailedLoginAttemptCreateOrConnectWithoutUserInput | FailedLoginAttemptCreateOrConnectWithoutUserInput[]
+    upsert?: FailedLoginAttemptUpsertWithWhereUniqueWithoutUserInput | FailedLoginAttemptUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: FailedLoginAttemptCreateManyUserInputEnvelope
+    set?: FailedLoginAttemptWhereUniqueInput | FailedLoginAttemptWhereUniqueInput[]
+    disconnect?: FailedLoginAttemptWhereUniqueInput | FailedLoginAttemptWhereUniqueInput[]
+    delete?: FailedLoginAttemptWhereUniqueInput | FailedLoginAttemptWhereUniqueInput[]
+    connect?: FailedLoginAttemptWhereUniqueInput | FailedLoginAttemptWhereUniqueInput[]
+    update?: FailedLoginAttemptUpdateWithWhereUniqueWithoutUserInput | FailedLoginAttemptUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: FailedLoginAttemptUpdateManyWithWhereWithoutUserInput | FailedLoginAttemptUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: FailedLoginAttemptScalarWhereInput | FailedLoginAttemptScalarWhereInput[]
+  }
+
   export type UserCreateNestedOneWithoutAppPasswordsInput = {
     create?: XOR<UserCreateWithoutAppPasswordsInput, UserUncheckedCreateWithoutAppPasswordsInput>
     connectOrCreate?: UserCreateOrConnectWithoutAppPasswordsInput
@@ -55622,6 +58606,13 @@ export namespace Prisma {
     connect?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
   }
 
+  export type BirthdayReminderStateCreateNestedManyWithoutContactInput = {
+    create?: XOR<BirthdayReminderStateCreateWithoutContactInput, BirthdayReminderStateUncheckedCreateWithoutContactInput> | BirthdayReminderStateCreateWithoutContactInput[] | BirthdayReminderStateUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: BirthdayReminderStateCreateOrConnectWithoutContactInput | BirthdayReminderStateCreateOrConnectWithoutContactInput[]
+    createMany?: BirthdayReminderStateCreateManyContactInputEnvelope
+    connect?: BirthdayReminderStateWhereUniqueInput | BirthdayReminderStateWhereUniqueInput[]
+  }
+
   export type ContactCreateNestedOneWithoutMergedChildrenInput = {
     create?: XOR<ContactCreateWithoutMergedChildrenInput, ContactUncheckedCreateWithoutMergedChildrenInput>
     connectOrCreate?: ContactCreateOrConnectWithoutMergedChildrenInput
@@ -55697,11 +58688,26 @@ export namespace Prisma {
     connect?: GroupContactWhereUniqueInput | GroupContactWhereUniqueInput[]
   }
 
+  export type BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput = {
+    create?: XOR<BirthdayReminderStateCreateWithoutContactInput, BirthdayReminderStateUncheckedCreateWithoutContactInput> | BirthdayReminderStateCreateWithoutContactInput[] | BirthdayReminderStateUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: BirthdayReminderStateCreateOrConnectWithoutContactInput | BirthdayReminderStateCreateOrConnectWithoutContactInput[]
+    createMany?: BirthdayReminderStateCreateManyContactInputEnvelope
+    connect?: BirthdayReminderStateWhereUniqueInput | BirthdayReminderStateWhereUniqueInput[]
+  }
+
   export type ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput = {
     create?: XOR<ContactCreateWithoutMergedIntoContactInput, ContactUncheckedCreateWithoutMergedIntoContactInput> | ContactCreateWithoutMergedIntoContactInput[] | ContactUncheckedCreateWithoutMergedIntoContactInput[]
     connectOrCreate?: ContactCreateOrConnectWithoutMergedIntoContactInput | ContactCreateOrConnectWithoutMergedIntoContactInput[]
     createMany?: ContactCreateManyMergedIntoContactInputEnvelope
     connect?: ContactWhereUniqueInput | ContactWhereUniqueInput[]
+  }
+
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
   }
 
   export type EnumSourceTypeFieldUpdateOperationsInput = {
@@ -55836,6 +58842,20 @@ export namespace Prisma {
     update?: GroupContactUpdateWithWhereUniqueWithoutContactInput | GroupContactUpdateWithWhereUniqueWithoutContactInput[]
     updateMany?: GroupContactUpdateManyWithWhereWithoutContactInput | GroupContactUpdateManyWithWhereWithoutContactInput[]
     deleteMany?: GroupContactScalarWhereInput | GroupContactScalarWhereInput[]
+  }
+
+  export type BirthdayReminderStateUpdateManyWithoutContactNestedInput = {
+    create?: XOR<BirthdayReminderStateCreateWithoutContactInput, BirthdayReminderStateUncheckedCreateWithoutContactInput> | BirthdayReminderStateCreateWithoutContactInput[] | BirthdayReminderStateUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: BirthdayReminderStateCreateOrConnectWithoutContactInput | BirthdayReminderStateCreateOrConnectWithoutContactInput[]
+    upsert?: BirthdayReminderStateUpsertWithWhereUniqueWithoutContactInput | BirthdayReminderStateUpsertWithWhereUniqueWithoutContactInput[]
+    createMany?: BirthdayReminderStateCreateManyContactInputEnvelope
+    set?: BirthdayReminderStateWhereUniqueInput | BirthdayReminderStateWhereUniqueInput[]
+    disconnect?: BirthdayReminderStateWhereUniqueInput | BirthdayReminderStateWhereUniqueInput[]
+    delete?: BirthdayReminderStateWhereUniqueInput | BirthdayReminderStateWhereUniqueInput[]
+    connect?: BirthdayReminderStateWhereUniqueInput | BirthdayReminderStateWhereUniqueInput[]
+    update?: BirthdayReminderStateUpdateWithWhereUniqueWithoutContactInput | BirthdayReminderStateUpdateWithWhereUniqueWithoutContactInput[]
+    updateMany?: BirthdayReminderStateUpdateManyWithWhereWithoutContactInput | BirthdayReminderStateUpdateManyWithWhereWithoutContactInput[]
+    deleteMany?: BirthdayReminderStateScalarWhereInput | BirthdayReminderStateScalarWhereInput[]
   }
 
   export type ContactUpdateOneWithoutMergedChildrenNestedInput = {
@@ -55984,6 +59004,20 @@ export namespace Prisma {
     deleteMany?: GroupContactScalarWhereInput | GroupContactScalarWhereInput[]
   }
 
+  export type BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput = {
+    create?: XOR<BirthdayReminderStateCreateWithoutContactInput, BirthdayReminderStateUncheckedCreateWithoutContactInput> | BirthdayReminderStateCreateWithoutContactInput[] | BirthdayReminderStateUncheckedCreateWithoutContactInput[]
+    connectOrCreate?: BirthdayReminderStateCreateOrConnectWithoutContactInput | BirthdayReminderStateCreateOrConnectWithoutContactInput[]
+    upsert?: BirthdayReminderStateUpsertWithWhereUniqueWithoutContactInput | BirthdayReminderStateUpsertWithWhereUniqueWithoutContactInput[]
+    createMany?: BirthdayReminderStateCreateManyContactInputEnvelope
+    set?: BirthdayReminderStateWhereUniqueInput | BirthdayReminderStateWhereUniqueInput[]
+    disconnect?: BirthdayReminderStateWhereUniqueInput | BirthdayReminderStateWhereUniqueInput[]
+    delete?: BirthdayReminderStateWhereUniqueInput | BirthdayReminderStateWhereUniqueInput[]
+    connect?: BirthdayReminderStateWhereUniqueInput | BirthdayReminderStateWhereUniqueInput[]
+    update?: BirthdayReminderStateUpdateWithWhereUniqueWithoutContactInput | BirthdayReminderStateUpdateWithWhereUniqueWithoutContactInput[]
+    updateMany?: BirthdayReminderStateUpdateManyWithWhereWithoutContactInput | BirthdayReminderStateUpdateManyWithWhereWithoutContactInput[]
+    deleteMany?: BirthdayReminderStateScalarWhereInput | BirthdayReminderStateScalarWhereInput[]
+  }
+
   export type ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput = {
     create?: XOR<ContactCreateWithoutMergedIntoContactInput, ContactUncheckedCreateWithoutMergedIntoContactInput> | ContactCreateWithoutMergedIntoContactInput[] | ContactUncheckedCreateWithoutMergedIntoContactInput[]
     connectOrCreate?: ContactCreateOrConnectWithoutMergedIntoContactInput | ContactCreateOrConnectWithoutMergedIntoContactInput[]
@@ -56094,14 +59128,6 @@ export namespace Prisma {
 
   export type EnumSubscriptionIntervalFieldUpdateOperationsInput = {
     set?: $Enums.SubscriptionInterval
-  }
-
-  export type NullableIntFieldUpdateOperationsInput = {
-    set?: number | null
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
   }
 
   export type UserUpdateOneRequiredWithoutSubscriptionsNestedInput = {
@@ -57439,6 +60465,48 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutNotificationSettingsInput, UserUpdateWithoutNotificationSettingsInput>, UserUncheckedUpdateWithoutNotificationSettingsInput>
   }
 
+  export type UserCreateNestedOneWithoutFailedLoginAttemptsInput = {
+    create?: XOR<UserCreateWithoutFailedLoginAttemptsInput, UserUncheckedCreateWithoutFailedLoginAttemptsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutFailedLoginAttemptsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutFailedLoginAttemptsNestedInput = {
+    create?: XOR<UserCreateWithoutFailedLoginAttemptsInput, UserUncheckedCreateWithoutFailedLoginAttemptsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutFailedLoginAttemptsInput
+    upsert?: UserUpsertWithoutFailedLoginAttemptsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutFailedLoginAttemptsInput, UserUpdateWithoutFailedLoginAttemptsInput>, UserUncheckedUpdateWithoutFailedLoginAttemptsInput>
+  }
+
+  export type UserCreateNestedOneWithoutBirthdayReminderStatesInput = {
+    create?: XOR<UserCreateWithoutBirthdayReminderStatesInput, UserUncheckedCreateWithoutBirthdayReminderStatesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutBirthdayReminderStatesInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type ContactCreateNestedOneWithoutBirthdayReminderStatesInput = {
+    create?: XOR<ContactCreateWithoutBirthdayReminderStatesInput, ContactUncheckedCreateWithoutBirthdayReminderStatesInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutBirthdayReminderStatesInput
+    connect?: ContactWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutBirthdayReminderStatesNestedInput = {
+    create?: XOR<UserCreateWithoutBirthdayReminderStatesInput, UserUncheckedCreateWithoutBirthdayReminderStatesInput>
+    connectOrCreate?: UserCreateOrConnectWithoutBirthdayReminderStatesInput
+    upsert?: UserUpsertWithoutBirthdayReminderStatesInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutBirthdayReminderStatesInput, UserUpdateWithoutBirthdayReminderStatesInput>, UserUncheckedUpdateWithoutBirthdayReminderStatesInput>
+  }
+
+  export type ContactUpdateOneRequiredWithoutBirthdayReminderStatesNestedInput = {
+    create?: XOR<ContactCreateWithoutBirthdayReminderStatesInput, ContactUncheckedCreateWithoutBirthdayReminderStatesInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutBirthdayReminderStatesInput
+    upsert?: ContactUpsertWithoutBirthdayReminderStatesInput
+    connect?: ContactWhereUniqueInput
+    update?: XOR<XOR<ContactUpdateToOneWithWhereWithoutBirthdayReminderStatesInput, ContactUpdateWithoutBirthdayReminderStatesInput>, ContactUncheckedUpdateWithoutBirthdayReminderStatesInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -57670,6 +60738,33 @@ export namespace Prisma {
     notIn?: $Enums.SourceType[] | ListEnumSourceTypeFieldRefInput<$PrismaModel>
     not?: NestedEnumSourceTypeFilter<$PrismaModel> | $Enums.SourceType
   }
+
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
   export type NestedJsonNullableFilter<$PrismaModel = never> =
     | PatchUndefined<
         Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
@@ -57770,33 +60865,6 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumSubscriptionIntervalFilter<$PrismaModel>
     _max?: NestedEnumSubscriptionIntervalFilter<$PrismaModel>
-  }
-
-  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | IntFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
-    lt?: number | IntFieldRefInput<$PrismaModel>
-    lte?: number | IntFieldRefInput<$PrismaModel>
-    gt?: number | IntFieldRefInput<$PrismaModel>
-    gte?: number | IntFieldRefInput<$PrismaModel>
-    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedIntNullableFilter<$PrismaModel>
-    _max?: NestedIntNullableFilter<$PrismaModel>
-  }
-
-  export type NestedFloatNullableFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
   }
 
   export type NestedEnumContactImportFormatFilter<$PrismaModel = never> = {
@@ -58315,6 +61383,7 @@ export namespace Prisma {
 
   export type ContactCreateWithoutUserInput = {
     id?: string
+    reminderLeadDaysOverride?: number | null
     syncUid?: string
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
@@ -58367,6 +61436,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
     book?: AddressBookCreateNestedOneWithoutContactsInput
@@ -58375,6 +61445,7 @@ export namespace Prisma {
   export type ContactUncheckedCreateWithoutUserInput = {
     id?: string
     importJobId?: string | null
+    reminderLeadDaysOverride?: number | null
     mergedIntoContactId?: string | null
     syncUid?: string
     syncVersion?: number
@@ -58428,6 +61499,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -59301,6 +62373,54 @@ export namespace Prisma {
     create: XOR<NotificationSettingsCreateWithoutUserInput, NotificationSettingsUncheckedCreateWithoutUserInput>
   }
 
+  export type BirthdayReminderStateCreateWithoutUserInput = {
+    id?: string
+    dateKey: string
+    lastSentYear: number
+    lastSentAt?: Date | string
+    contact: ContactCreateNestedOneWithoutBirthdayReminderStatesInput
+  }
+
+  export type BirthdayReminderStateUncheckedCreateWithoutUserInput = {
+    id?: string
+    contactId: string
+    dateKey: string
+    lastSentYear: number
+    lastSentAt?: Date | string
+  }
+
+  export type BirthdayReminderStateCreateOrConnectWithoutUserInput = {
+    where: BirthdayReminderStateWhereUniqueInput
+    create: XOR<BirthdayReminderStateCreateWithoutUserInput, BirthdayReminderStateUncheckedCreateWithoutUserInput>
+  }
+
+  export type BirthdayReminderStateCreateManyUserInputEnvelope = {
+    data: BirthdayReminderStateCreateManyUserInput | BirthdayReminderStateCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type FailedLoginAttemptCreateWithoutUserInput = {
+    id?: string
+    ipAddress?: string | null
+    createdAt?: Date | string
+  }
+
+  export type FailedLoginAttemptUncheckedCreateWithoutUserInput = {
+    id?: string
+    ipAddress?: string | null
+    createdAt?: Date | string
+  }
+
+  export type FailedLoginAttemptCreateOrConnectWithoutUserInput = {
+    where: FailedLoginAttemptWhereUniqueInput
+    create: XOR<FailedLoginAttemptCreateWithoutUserInput, FailedLoginAttemptUncheckedCreateWithoutUserInput>
+  }
+
+  export type FailedLoginAttemptCreateManyUserInputEnvelope = {
+    data: FailedLoginAttemptCreateManyUserInput | FailedLoginAttemptCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AppPasswordUpsertWithWhereUniqueWithoutUserInput = {
     where: AppPasswordWhereUniqueInput
     update: XOR<AppPasswordUpdateWithoutUserInput, AppPasswordUncheckedUpdateWithoutUserInput>
@@ -59354,6 +62474,7 @@ export namespace Prisma {
     id?: StringFilter<"Contact"> | string
     userId?: StringFilter<"Contact"> | string
     importJobId?: StringNullableFilter<"Contact"> | string | null
+    reminderLeadDaysOverride?: IntNullableFilter<"Contact"> | number | null
     mergedIntoContactId?: StringNullableFilter<"Contact"> | string | null
     syncUid?: StringFilter<"Contact"> | string
     syncVersion?: IntFilter<"Contact"> | number
@@ -60119,6 +63240,60 @@ export namespace Prisma {
     digest?: EnumDigestCadenceFieldUpdateOperationsInput | $Enums.DigestCadence
   }
 
+  export type BirthdayReminderStateUpsertWithWhereUniqueWithoutUserInput = {
+    where: BirthdayReminderStateWhereUniqueInput
+    update: XOR<BirthdayReminderStateUpdateWithoutUserInput, BirthdayReminderStateUncheckedUpdateWithoutUserInput>
+    create: XOR<BirthdayReminderStateCreateWithoutUserInput, BirthdayReminderStateUncheckedCreateWithoutUserInput>
+  }
+
+  export type BirthdayReminderStateUpdateWithWhereUniqueWithoutUserInput = {
+    where: BirthdayReminderStateWhereUniqueInput
+    data: XOR<BirthdayReminderStateUpdateWithoutUserInput, BirthdayReminderStateUncheckedUpdateWithoutUserInput>
+  }
+
+  export type BirthdayReminderStateUpdateManyWithWhereWithoutUserInput = {
+    where: BirthdayReminderStateScalarWhereInput
+    data: XOR<BirthdayReminderStateUpdateManyMutationInput, BirthdayReminderStateUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type BirthdayReminderStateScalarWhereInput = {
+    AND?: BirthdayReminderStateScalarWhereInput | BirthdayReminderStateScalarWhereInput[]
+    OR?: BirthdayReminderStateScalarWhereInput[]
+    NOT?: BirthdayReminderStateScalarWhereInput | BirthdayReminderStateScalarWhereInput[]
+    id?: StringFilter<"BirthdayReminderState"> | string
+    userId?: StringFilter<"BirthdayReminderState"> | string
+    contactId?: StringFilter<"BirthdayReminderState"> | string
+    dateKey?: StringFilter<"BirthdayReminderState"> | string
+    lastSentYear?: IntFilter<"BirthdayReminderState"> | number
+    lastSentAt?: DateTimeFilter<"BirthdayReminderState"> | Date | string
+  }
+
+  export type FailedLoginAttemptUpsertWithWhereUniqueWithoutUserInput = {
+    where: FailedLoginAttemptWhereUniqueInput
+    update: XOR<FailedLoginAttemptUpdateWithoutUserInput, FailedLoginAttemptUncheckedUpdateWithoutUserInput>
+    create: XOR<FailedLoginAttemptCreateWithoutUserInput, FailedLoginAttemptUncheckedCreateWithoutUserInput>
+  }
+
+  export type FailedLoginAttemptUpdateWithWhereUniqueWithoutUserInput = {
+    where: FailedLoginAttemptWhereUniqueInput
+    data: XOR<FailedLoginAttemptUpdateWithoutUserInput, FailedLoginAttemptUncheckedUpdateWithoutUserInput>
+  }
+
+  export type FailedLoginAttemptUpdateManyWithWhereWithoutUserInput = {
+    where: FailedLoginAttemptScalarWhereInput
+    data: XOR<FailedLoginAttemptUpdateManyMutationInput, FailedLoginAttemptUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type FailedLoginAttemptScalarWhereInput = {
+    AND?: FailedLoginAttemptScalarWhereInput | FailedLoginAttemptScalarWhereInput[]
+    OR?: FailedLoginAttemptScalarWhereInput[]
+    NOT?: FailedLoginAttemptScalarWhereInput | FailedLoginAttemptScalarWhereInput[]
+    id?: StringFilter<"FailedLoginAttempt"> | string
+    userId?: StringFilter<"FailedLoginAttempt"> | string
+    ipAddress?: StringNullableFilter<"FailedLoginAttempt"> | string | null
+    createdAt?: DateTimeFilter<"FailedLoginAttempt"> | Date | string
+  }
+
   export type UserCreateWithoutAppPasswordsInput = {
     id?: string
     name?: string | null
@@ -60139,6 +63314,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -60163,6 +63340,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAppPasswordsInput = {
@@ -60185,6 +63364,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -60209,6 +63390,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAppPasswordsInput = {
@@ -60301,6 +63484,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -60325,6 +63510,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAppPasswordsInput = {
@@ -60347,6 +63534,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -60371,6 +63560,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SyncConflictUpsertWithWhereUniqueWithoutAppPasswordInput = {
@@ -60435,6 +63626,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -60459,6 +63652,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutContactsInput = {
@@ -60481,6 +63676,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -60505,6 +63702,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutContactsInput = {
@@ -60915,8 +64114,35 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type BirthdayReminderStateCreateWithoutContactInput = {
+    id?: string
+    dateKey: string
+    lastSentYear: number
+    lastSentAt?: Date | string
+    user: UserCreateNestedOneWithoutBirthdayReminderStatesInput
+  }
+
+  export type BirthdayReminderStateUncheckedCreateWithoutContactInput = {
+    id?: string
+    userId: string
+    dateKey: string
+    lastSentYear: number
+    lastSentAt?: Date | string
+  }
+
+  export type BirthdayReminderStateCreateOrConnectWithoutContactInput = {
+    where: BirthdayReminderStateWhereUniqueInput
+    create: XOR<BirthdayReminderStateCreateWithoutContactInput, BirthdayReminderStateUncheckedCreateWithoutContactInput>
+  }
+
+  export type BirthdayReminderStateCreateManyContactInputEnvelope = {
+    data: BirthdayReminderStateCreateManyContactInput | BirthdayReminderStateCreateManyContactInput[]
+    skipDuplicates?: boolean
+  }
+
   export type ContactCreateWithoutMergedChildrenInput = {
     id?: string
+    reminderLeadDaysOverride?: number | null
     syncUid?: string
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
@@ -60970,6 +64196,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     book?: AddressBookCreateNestedOneWithoutContactsInput
   }
@@ -60978,6 +64205,7 @@ export namespace Prisma {
     id?: string
     userId: string
     importJobId?: string | null
+    reminderLeadDaysOverride?: number | null
     mergedIntoContactId?: string | null
     syncUid?: string
     syncVersion?: number
@@ -61031,6 +64259,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
   }
 
   export type ContactCreateOrConnectWithoutMergedChildrenInput = {
@@ -61040,6 +64269,7 @@ export namespace Prisma {
 
   export type ContactCreateWithoutMergedIntoContactInput = {
     id?: string
+    reminderLeadDaysOverride?: number | null
     syncUid?: string
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
@@ -61093,6 +64323,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
     book?: AddressBookCreateNestedOneWithoutContactsInput
   }
@@ -61101,6 +64332,7 @@ export namespace Prisma {
     id?: string
     userId: string
     importJobId?: string | null
+    reminderLeadDaysOverride?: number | null
     syncUid?: string
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
@@ -61153,6 +64385,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -61228,6 +64461,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -61252,6 +64487,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutContactsInput = {
@@ -61274,6 +64511,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -61298,6 +64537,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ImportJobUpsertWithoutContactsInput = {
@@ -61520,6 +64761,22 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"GroupContact"> | Date | string
   }
 
+  export type BirthdayReminderStateUpsertWithWhereUniqueWithoutContactInput = {
+    where: BirthdayReminderStateWhereUniqueInput
+    update: XOR<BirthdayReminderStateUpdateWithoutContactInput, BirthdayReminderStateUncheckedUpdateWithoutContactInput>
+    create: XOR<BirthdayReminderStateCreateWithoutContactInput, BirthdayReminderStateUncheckedCreateWithoutContactInput>
+  }
+
+  export type BirthdayReminderStateUpdateWithWhereUniqueWithoutContactInput = {
+    where: BirthdayReminderStateWhereUniqueInput
+    data: XOR<BirthdayReminderStateUpdateWithoutContactInput, BirthdayReminderStateUncheckedUpdateWithoutContactInput>
+  }
+
+  export type BirthdayReminderStateUpdateManyWithWhereWithoutContactInput = {
+    where: BirthdayReminderStateScalarWhereInput
+    data: XOR<BirthdayReminderStateUpdateManyMutationInput, BirthdayReminderStateUncheckedUpdateManyWithoutContactInput>
+  }
+
   export type ContactUpsertWithoutMergedChildrenInput = {
     update: XOR<ContactUpdateWithoutMergedChildrenInput, ContactUncheckedUpdateWithoutMergedChildrenInput>
     create: XOR<ContactCreateWithoutMergedChildrenInput, ContactUncheckedCreateWithoutMergedChildrenInput>
@@ -61533,6 +64790,7 @@ export namespace Prisma {
 
   export type ContactUpdateWithoutMergedChildrenInput = {
     id?: StringFieldUpdateOperationsInput | string
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -61586,6 +64844,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     book?: AddressBookUpdateOneWithoutContactsNestedInput
   }
@@ -61594,6 +64853,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
@@ -61647,6 +64907,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
   }
 
   export type ContactUpsertWithWhereUniqueWithoutMergedIntoContactInput = {
@@ -61722,6 +64983,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -61746,6 +65009,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSubscriptionCustomerInput = {
@@ -61768,6 +65033,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -61792,6 +65059,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSubscriptionCustomerInput = {
@@ -61910,6 +65179,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -61934,6 +65205,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSubscriptionCustomerInput = {
@@ -61956,6 +65229,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -61980,6 +65255,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SubscriptionUpsertWithWhereUniqueWithoutSubscriptionCustomerInput = {
@@ -62018,6 +65295,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -62042,6 +65321,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSubscriptionsInput = {
@@ -62064,6 +65345,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -62088,6 +65371,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSubscriptionsInput = {
@@ -62191,6 +65476,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -62215,6 +65502,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSubscriptionsInput = {
@@ -62237,6 +65526,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -62261,6 +65552,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SubscriptionCustomerUpsertWithoutSubscriptionsInput = {
@@ -62330,6 +65623,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -62354,6 +65649,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutImportJobsInput = {
@@ -62376,6 +65673,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -62400,6 +65699,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutImportJobsInput = {
@@ -62409,6 +65710,7 @@ export namespace Prisma {
 
   export type ContactCreateWithoutImportJobInput = {
     id?: string
+    reminderLeadDaysOverride?: number | null
     syncUid?: string
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
@@ -62461,6 +65763,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
     book?: AddressBookCreateNestedOneWithoutContactsInput
@@ -62469,6 +65772,7 @@ export namespace Prisma {
   export type ContactUncheckedCreateWithoutImportJobInput = {
     id?: string
     userId: string
+    reminderLeadDaysOverride?: number | null
     mergedIntoContactId?: string | null
     syncUid?: string
     syncVersion?: number
@@ -62522,6 +65826,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -62566,6 +65871,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -62590,6 +65897,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutImportJobsInput = {
@@ -62612,6 +65921,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -62636,6 +65947,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ContactUpsertWithWhereUniqueWithoutImportJobInput = {
@@ -62674,6 +65987,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -62698,6 +66013,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutExportJobsInput = {
@@ -62720,6 +66037,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -62744,6 +66063,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutExportJobsInput = {
@@ -62782,6 +66103,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -62806,6 +66129,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutExportJobsInput = {
@@ -62828,6 +66153,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -62852,6 +66179,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutMergeSuggestionsInput = {
@@ -62874,6 +66203,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -62898,6 +66229,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutMergeSuggestionsInput = {
@@ -62920,6 +66253,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -62944,6 +66279,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutMergeSuggestionsInput = {
@@ -62953,6 +66290,7 @@ export namespace Prisma {
 
   export type ContactCreateWithoutLeftMergeSuggestionsInput = {
     id?: string
+    reminderLeadDaysOverride?: number | null
     syncUid?: string
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
@@ -63005,6 +66343,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
     book?: AddressBookCreateNestedOneWithoutContactsInput
@@ -63014,6 +66353,7 @@ export namespace Prisma {
     id?: string
     userId: string
     importJobId?: string | null
+    reminderLeadDaysOverride?: number | null
     mergedIntoContactId?: string | null
     syncUid?: string
     syncVersion?: number
@@ -63066,6 +66406,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -63076,6 +66417,7 @@ export namespace Prisma {
 
   export type ContactCreateWithoutRightMergeSuggestionsInput = {
     id?: string
+    reminderLeadDaysOverride?: number | null
     syncUid?: string
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
@@ -63128,6 +66470,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
     book?: AddressBookCreateNestedOneWithoutContactsInput
@@ -63137,6 +66480,7 @@ export namespace Prisma {
     id?: string
     userId: string
     importJobId?: string | null
+    reminderLeadDaysOverride?: number | null
     mergedIntoContactId?: string | null
     syncUid?: string
     syncVersion?: number
@@ -63189,6 +66533,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -63266,6 +66611,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -63290,6 +66637,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMergeSuggestionsInput = {
@@ -63312,6 +66661,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -63336,6 +66687,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ContactUpsertWithoutLeftMergeSuggestionsInput = {
@@ -63351,6 +66704,7 @@ export namespace Prisma {
 
   export type ContactUpdateWithoutLeftMergeSuggestionsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -63403,6 +66757,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
     book?: AddressBookUpdateOneWithoutContactsNestedInput
@@ -63412,6 +66767,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
@@ -63464,6 +66820,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -63480,6 +66837,7 @@ export namespace Prisma {
 
   export type ContactUpdateWithoutRightMergeSuggestionsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -63532,6 +66890,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
     book?: AddressBookUpdateOneWithoutContactsNestedInput
@@ -63541,6 +66900,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
@@ -63593,6 +66953,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -63675,6 +67036,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -63699,6 +67062,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutMergeDecisionsInput = {
@@ -63721,6 +67086,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -63745,6 +67112,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutMergeDecisionsInput = {
@@ -63832,6 +67201,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -63856,6 +67227,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMergeDecisionsInput = {
@@ -63878,6 +67251,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -63902,6 +67277,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutSyncAccountsInput = {
@@ -63924,6 +67301,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -63948,6 +67327,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSyncAccountsInput = {
@@ -63970,6 +67351,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -63994,6 +67377,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSyncAccountsInput = {
@@ -64211,6 +67596,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -64235,6 +67622,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSyncAccountsInput = {
@@ -64257,6 +67646,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -64281,6 +67672,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SyncContactLinkUpsertWithWhereUniqueWithoutSyncAccountInput = {
@@ -64461,6 +67854,7 @@ export namespace Prisma {
 
   export type ContactCreateWithoutSyncLinksInput = {
     id?: string
+    reminderLeadDaysOverride?: number | null
     syncUid?: string
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
@@ -64513,6 +67907,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
     book?: AddressBookCreateNestedOneWithoutContactsInput
@@ -64522,6 +67917,7 @@ export namespace Prisma {
     id?: string
     userId: string
     importJobId?: string | null
+    reminderLeadDaysOverride?: number | null
     mergedIntoContactId?: string | null
     syncUid?: string
     syncVersion?: number
@@ -64574,6 +67970,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -64726,6 +68123,7 @@ export namespace Prisma {
 
   export type ContactUpdateWithoutSyncLinksInput = {
     id?: StringFieldUpdateOperationsInput | string
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -64778,6 +68176,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
     book?: AddressBookUpdateOneWithoutContactsNestedInput
@@ -64787,6 +68186,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
@@ -64839,6 +68239,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -65116,6 +68517,7 @@ export namespace Prisma {
 
   export type ContactCreateWithoutSyncConflictsInput = {
     id?: string
+    reminderLeadDaysOverride?: number | null
     syncUid?: string
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
@@ -65168,6 +68570,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
     book?: AddressBookCreateNestedOneWithoutContactsInput
@@ -65177,6 +68580,7 @@ export namespace Prisma {
     id?: string
     userId: string
     importJobId?: string | null
+    reminderLeadDaysOverride?: number | null
     mergedIntoContactId?: string | null
     syncUid?: string
     syncVersion?: number
@@ -65229,6 +68633,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -65397,6 +68802,7 @@ export namespace Prisma {
 
   export type ContactUpdateWithoutSyncConflictsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -65449,6 +68855,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
     book?: AddressBookUpdateOneWithoutContactsNestedInput
@@ -65458,6 +68865,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
@@ -65510,6 +68918,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -65566,6 +68975,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -65590,6 +69001,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutEmailVerificationTokensInput = {
@@ -65612,6 +69025,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -65636,6 +69051,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutEmailVerificationTokensInput = {
@@ -65674,6 +69091,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -65698,6 +69117,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEmailVerificationTokensInput = {
@@ -65720,6 +69141,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -65744,6 +69167,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutPasswordResetTokensInput = {
@@ -65766,6 +69191,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -65790,6 +69217,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
@@ -65812,6 +69241,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -65836,6 +69267,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutPasswordResetTokensInput = {
@@ -65874,6 +69307,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -65898,6 +69333,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
@@ -65920,6 +69357,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -65944,6 +69383,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutSessionsInput = {
@@ -65966,6 +69407,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -65990,6 +69433,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -66012,6 +69457,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -66036,6 +69483,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -66074,6 +69523,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -66098,6 +69549,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -66120,6 +69573,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -66144,6 +69599,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutTotpRecoveryCodesInput = {
@@ -66166,6 +69623,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -66190,6 +69649,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutTotpRecoveryCodesInput = {
@@ -66212,6 +69673,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -66236,6 +69699,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutTotpRecoveryCodesInput = {
@@ -66274,6 +69739,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -66298,6 +69765,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutTotpRecoveryCodesInput = {
@@ -66320,6 +69789,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -66344,6 +69815,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutActivityEventsInput = {
@@ -66366,6 +69839,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -66390,6 +69865,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutActivityEventsInput = {
@@ -66412,6 +69889,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -66436,6 +69915,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutActivityEventsInput = {
@@ -66445,6 +69926,7 @@ export namespace Prisma {
 
   export type ContactCreateWithoutActivityEventsInput = {
     id?: string
+    reminderLeadDaysOverride?: number | null
     syncUid?: string
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
@@ -66497,6 +69979,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
     book?: AddressBookCreateNestedOneWithoutContactsInput
@@ -66506,6 +69989,7 @@ export namespace Prisma {
     id?: string
     userId: string
     importJobId?: string | null
+    reminderLeadDaysOverride?: number | null
     mergedIntoContactId?: string | null
     syncUid?: string
     syncVersion?: number
@@ -66558,6 +70042,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -66597,6 +70082,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -66621,6 +70108,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutActivityEventsInput = {
@@ -66643,6 +70132,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -66667,6 +70158,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ContactUpsertWithoutActivityEventsInput = {
@@ -66682,6 +70175,7 @@ export namespace Prisma {
 
   export type ContactUpdateWithoutActivityEventsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -66734,6 +70228,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
     book?: AddressBookUpdateOneWithoutContactsNestedInput
@@ -66743,6 +70238,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
@@ -66795,6 +70291,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -66818,6 +70315,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -66842,6 +70341,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAdminAuditEventsInput = {
@@ -66864,6 +70365,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -66888,6 +70391,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAdminAuditEventsInput = {
@@ -66926,6 +70431,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -66950,6 +70457,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAdminAuditEventsInput = {
@@ -66972,6 +70481,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -66996,6 +70507,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutOwnedGroupsInput = {
@@ -67018,6 +70531,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -67042,6 +70557,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutOwnedGroupsInput = {
@@ -67064,6 +70581,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -67088,6 +70607,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutOwnedGroupsInput = {
@@ -67305,6 +70826,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -67329,6 +70852,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOwnedGroupsInput = {
@@ -67351,6 +70876,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -67375,6 +70902,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SubscriptionUpsertWithoutGroupsInput = {
@@ -67588,6 +71117,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -67612,6 +71143,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutGroupMembershipsInput = {
@@ -67634,6 +71167,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -67658,6 +71193,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutGroupMembershipsInput = {
@@ -67737,6 +71274,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -67761,6 +71300,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutGroupMembershipsInput = {
@@ -67783,6 +71324,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -67807,6 +71350,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type GroupCreateWithoutAddressBooksInput = {
@@ -67989,6 +71534,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -68013,6 +71560,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAddressBooksInput = {
@@ -68035,6 +71584,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -68059,6 +71610,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAddressBooksInput = {
@@ -68068,6 +71621,7 @@ export namespace Prisma {
 
   export type ContactCreateWithoutBookInput = {
     id?: string
+    reminderLeadDaysOverride?: number | null
     syncUid?: string
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
@@ -68121,6 +71675,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
   }
@@ -68129,6 +71684,7 @@ export namespace Prisma {
     id?: string
     userId: string
     importJobId?: string | null
+    reminderLeadDaysOverride?: number | null
     mergedIntoContactId?: string | null
     syncUid?: string
     syncVersion?: number
@@ -68181,6 +71737,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -68225,6 +71782,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -68249,6 +71808,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAddressBooksInput = {
@@ -68271,6 +71832,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -68295,6 +71858,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ContactUpsertWithWhereUniqueWithoutBookInput = {
@@ -68638,6 +72203,7 @@ export namespace Prisma {
 
   export type ContactCreateWithoutGroupContactsInput = {
     id?: string
+    reminderLeadDaysOverride?: number | null
     syncUid?: string
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
@@ -68690,6 +72256,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
     book?: AddressBookCreateNestedOneWithoutContactsInput
@@ -68699,6 +72266,7 @@ export namespace Prisma {
     id?: string
     userId: string
     importJobId?: string | null
+    reminderLeadDaysOverride?: number | null
     mergedIntoContactId?: string | null
     syncUid?: string
     syncVersion?: number
@@ -68751,6 +72319,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -68809,6 +72378,7 @@ export namespace Prisma {
 
   export type ContactUpdateWithoutGroupContactsInput = {
     id?: StringFieldUpdateOperationsInput | string
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -68861,6 +72431,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
     book?: AddressBookUpdateOneWithoutContactsNestedInput
@@ -68870,6 +72441,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
@@ -68922,6 +72494,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -68945,6 +72518,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -68969,6 +72544,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutContactSharesOwnedInput = {
@@ -68991,6 +72568,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -69015,6 +72594,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutContactSharesOwnedInput = {
@@ -69024,6 +72605,7 @@ export namespace Prisma {
 
   export type ContactCreateWithoutSharesFromContactInput = {
     id?: string
+    reminderLeadDaysOverride?: number | null
     syncUid?: string
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
@@ -69076,6 +72658,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
     book?: AddressBookCreateNestedOneWithoutContactsInput
@@ -69085,6 +72668,7 @@ export namespace Prisma {
     id?: string
     userId: string
     importJobId?: string | null
+    reminderLeadDaysOverride?: number | null
     mergedIntoContactId?: string | null
     syncUid?: string
     syncVersion?: number
@@ -69137,6 +72721,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -69165,6 +72750,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -69189,6 +72776,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutContactSharesReceivedInput = {
@@ -69211,6 +72800,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -69235,6 +72826,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutContactSharesReceivedInput = {
@@ -69244,6 +72837,7 @@ export namespace Prisma {
 
   export type ContactCreateWithoutSharesAsRecipientCopyInput = {
     id?: string
+    reminderLeadDaysOverride?: number | null
     syncUid?: string
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
@@ -69296,6 +72890,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
     groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
     mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
     mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
     book?: AddressBookCreateNestedOneWithoutContactsInput
@@ -69305,6 +72900,7 @@ export namespace Prisma {
     id?: string
     userId: string
     importJobId?: string | null
+    reminderLeadDaysOverride?: number | null
     mergedIntoContactId?: string | null
     syncUid?: string
     syncVersion?: number
@@ -69357,6 +72953,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
     groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
     mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
   }
 
@@ -69396,6 +72993,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -69420,6 +73019,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutContactSharesOwnedInput = {
@@ -69442,6 +73043,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -69466,6 +73069,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ContactUpsertWithoutSharesFromContactInput = {
@@ -69481,6 +73086,7 @@ export namespace Prisma {
 
   export type ContactUpdateWithoutSharesFromContactInput = {
     id?: StringFieldUpdateOperationsInput | string
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -69533,6 +73139,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
     book?: AddressBookUpdateOneWithoutContactsNestedInput
@@ -69542,6 +73149,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
@@ -69594,6 +73202,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -69628,6 +73237,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -69652,6 +73263,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutContactSharesReceivedInput = {
@@ -69674,6 +73287,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -69698,6 +73313,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ContactUpsertWithoutSharesAsRecipientCopyInput = {
@@ -69713,6 +73330,7 @@ export namespace Prisma {
 
   export type ContactUpdateWithoutSharesAsRecipientCopyInput = {
     id?: StringFieldUpdateOperationsInput | string
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -69765,6 +73383,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
     book?: AddressBookUpdateOneWithoutContactsNestedInput
@@ -69774,6 +73393,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
@@ -69826,6 +73446,7 @@ export namespace Prisma {
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -69849,6 +73470,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -69873,6 +73496,8 @@ export namespace Prisma {
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -69895,6 +73520,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -69919,6 +73546,8 @@ export namespace Prisma {
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -69986,6 +73615,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -70010,6 +73641,8 @@ export namespace Prisma {
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -70032,6 +73665,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -70056,6 +73691,8 @@ export namespace Prisma {
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SecurityAlertUpsertWithoutNotificationsInput = {
@@ -70113,6 +73750,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -70137,6 +73776,8 @@ export namespace Prisma {
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSecurityAlertsInput = {
@@ -70159,6 +73800,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -70183,6 +73826,8 @@ export namespace Prisma {
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSecurityAlertsInput = {
@@ -70257,6 +73902,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -70281,6 +73928,8 @@ export namespace Prisma {
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSecurityAlertsInput = {
@@ -70303,6 +73952,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -70327,6 +73978,8 @@ export namespace Prisma {
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type NotificationUpsertWithWhereUniqueWithoutSecurityAlertInput = {
@@ -70365,6 +74018,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -70389,6 +74044,8 @@ export namespace Prisma {
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutNotificationSettingsInput = {
@@ -70411,6 +74068,8 @@ export namespace Prisma {
     role?: $Enums.UserRole
     planOverrideReason?: string | null
     planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -70435,6 +74094,8 @@ export namespace Prisma {
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutNotificationSettingsInput = {
@@ -70473,6 +74134,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -70497,6 +74160,8 @@ export namespace Prisma {
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutNotificationSettingsInput = {
@@ -70519,6 +74184,8 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -70543,6 +74210,700 @@ export namespace Prisma {
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutFailedLoginAttemptsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutFailedLoginAttemptsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutFailedLoginAttemptsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutFailedLoginAttemptsInput, UserUncheckedCreateWithoutFailedLoginAttemptsInput>
+  }
+
+  export type UserUpsertWithoutFailedLoginAttemptsInput = {
+    update: XOR<UserUpdateWithoutFailedLoginAttemptsInput, UserUncheckedUpdateWithoutFailedLoginAttemptsInput>
+    create: XOR<UserCreateWithoutFailedLoginAttemptsInput, UserUncheckedCreateWithoutFailedLoginAttemptsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutFailedLoginAttemptsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutFailedLoginAttemptsInput, UserUncheckedUpdateWithoutFailedLoginAttemptsInput>
+  }
+
+  export type UserUpdateWithoutFailedLoginAttemptsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutFailedLoginAttemptsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutBirthdayReminderStatesInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutBirthdayReminderStatesInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutBirthdayReminderStatesInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutBirthdayReminderStatesInput, UserUncheckedCreateWithoutBirthdayReminderStatesInput>
+  }
+
+  export type ContactCreateWithoutBirthdayReminderStatesInput = {
+    id?: string
+    reminderLeadDaysOverride?: number | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
+    nickname?: string | null
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    phoneticCompany?: string | null
+    jobTitle?: string | null
+    department?: string | null
+    website?: string | null
+    birthday?: string | null
+    address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    isEmergency?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutContactsInput
+    importJob?: ImportJobCreateNestedOneWithoutContactsInput
+    leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
+    mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+    book?: AddressBookCreateNestedOneWithoutContactsInput
+  }
+
+  export type ContactUncheckedCreateWithoutBirthdayReminderStatesInput = {
+    id?: string
+    userId: string
+    importJobId?: string | null
+    reminderLeadDaysOverride?: number | null
+    mergedIntoContactId?: string | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
+    nickname?: string | null
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    phoneticCompany?: string | null
+    jobTitle?: string | null
+    department?: string | null
+    website?: string | null
+    birthday?: string | null
+    address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    isEmergency?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
+    archivedAt?: Date | string | null
+    bookId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactCreateOrConnectWithoutBirthdayReminderStatesInput = {
+    where: ContactWhereUniqueInput
+    create: XOR<ContactCreateWithoutBirthdayReminderStatesInput, ContactUncheckedCreateWithoutBirthdayReminderStatesInput>
+  }
+
+  export type UserUpsertWithoutBirthdayReminderStatesInput = {
+    update: XOR<UserUpdateWithoutBirthdayReminderStatesInput, UserUncheckedUpdateWithoutBirthdayReminderStatesInput>
+    create: XOR<UserCreateWithoutBirthdayReminderStatesInput, UserUncheckedCreateWithoutBirthdayReminderStatesInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutBirthdayReminderStatesInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutBirthdayReminderStatesInput, UserUncheckedUpdateWithoutBirthdayReminderStatesInput>
+  }
+
+  export type UserUpdateWithoutBirthdayReminderStatesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutBirthdayReminderStatesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type ContactUpsertWithoutBirthdayReminderStatesInput = {
+    update: XOR<ContactUpdateWithoutBirthdayReminderStatesInput, ContactUncheckedUpdateWithoutBirthdayReminderStatesInput>
+    create: XOR<ContactCreateWithoutBirthdayReminderStatesInput, ContactUncheckedCreateWithoutBirthdayReminderStatesInput>
+    where?: ContactWhereInput
+  }
+
+  export type ContactUpdateToOneWithWhereWithoutBirthdayReminderStatesInput = {
+    where?: ContactWhereInput
+    data: XOR<ContactUpdateWithoutBirthdayReminderStatesInput, ContactUncheckedUpdateWithoutBirthdayReminderStatesInput>
+  }
+
+  export type ContactUpdateWithoutBirthdayReminderStatesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
+    nickname?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    birthday?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutContactsNestedInput
+    importJob?: ImportJobUpdateOneWithoutContactsNestedInput
+    leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
+    mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+    book?: AddressBookUpdateOneWithoutContactsNestedInput
+  }
+
+  export type ContactUncheckedUpdateWithoutBirthdayReminderStatesInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
+    mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
+    nickname?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    birthday?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
   export type AppPasswordCreateManyUserInput = {
@@ -70558,6 +74919,7 @@ export namespace Prisma {
   export type ContactCreateManyUserInput = {
     id?: string
     importJobId?: string | null
+    reminderLeadDaysOverride?: number | null
     mergedIntoContactId?: string | null
     syncUid?: string
     syncVersion?: number
@@ -70901,6 +75263,20 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type BirthdayReminderStateCreateManyUserInput = {
+    id?: string
+    contactId: string
+    dateKey: string
+    lastSentYear: number
+    lastSentAt?: Date | string
+  }
+
+  export type FailedLoginAttemptCreateManyUserInput = {
+    id?: string
+    ipAddress?: string | null
+    createdAt?: Date | string
+  }
+
   export type AppPasswordUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     label?: StringFieldUpdateOperationsInput | string
@@ -70935,6 +75311,7 @@ export namespace Prisma {
 
   export type ContactUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -70987,6 +75364,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
     book?: AddressBookUpdateOneWithoutContactsNestedInput
@@ -70995,6 +75373,7 @@ export namespace Prisma {
   export type ContactUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
@@ -71048,12 +75427,14 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
   export type ContactUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
     importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
@@ -72013,6 +76394,48 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type BirthdayReminderStateUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dateKey?: StringFieldUpdateOperationsInput | string
+    lastSentYear?: IntFieldUpdateOperationsInput | number
+    lastSentAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contact?: ContactUpdateOneRequiredWithoutBirthdayReminderStatesNestedInput
+  }
+
+  export type BirthdayReminderStateUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contactId?: StringFieldUpdateOperationsInput | string
+    dateKey?: StringFieldUpdateOperationsInput | string
+    lastSentYear?: IntFieldUpdateOperationsInput | number
+    lastSentAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BirthdayReminderStateUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contactId?: StringFieldUpdateOperationsInput | string
+    dateKey?: StringFieldUpdateOperationsInput | string
+    lastSentYear?: IntFieldUpdateOperationsInput | number
+    lastSentAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FailedLoginAttemptUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FailedLoginAttemptUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type FailedLoginAttemptUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type SyncConflictCreateManyAppPasswordInput = {
     id?: string
     syncAccountId?: string | null
@@ -72232,10 +76655,19 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type BirthdayReminderStateCreateManyContactInput = {
+    id?: string
+    userId: string
+    dateKey: string
+    lastSentYear: number
+    lastSentAt?: Date | string
+  }
+
   export type ContactCreateManyMergedIntoContactInput = {
     id?: string
     userId: string
     importJobId?: string | null
+    reminderLeadDaysOverride?: number | null
     syncUid?: string
     syncVersion?: number
     syncTombstoneAt?: Date | string | null
@@ -72681,8 +77113,33 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type BirthdayReminderStateUpdateWithoutContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dateKey?: StringFieldUpdateOperationsInput | string
+    lastSentYear?: IntFieldUpdateOperationsInput | number
+    lastSentAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutBirthdayReminderStatesNestedInput
+  }
+
+  export type BirthdayReminderStateUncheckedUpdateWithoutContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    dateKey?: StringFieldUpdateOperationsInput | string
+    lastSentYear?: IntFieldUpdateOperationsInput | number
+    lastSentAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BirthdayReminderStateUncheckedUpdateManyWithoutContactInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    dateKey?: StringFieldUpdateOperationsInput | string
+    lastSentYear?: IntFieldUpdateOperationsInput | number
+    lastSentAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type ContactUpdateWithoutMergedIntoContactInput = {
     id?: StringFieldUpdateOperationsInput | string
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -72736,6 +77193,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
     book?: AddressBookUpdateOneWithoutContactsNestedInput
   }
@@ -72744,6 +77202,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -72796,6 +77255,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -72803,6 +77263,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -73044,6 +77505,7 @@ export namespace Prisma {
   export type ContactCreateManyImportJobInput = {
     id?: string
     userId: string
+    reminderLeadDaysOverride?: number | null
     mergedIntoContactId?: string | null
     syncUid?: string
     syncVersion?: number
@@ -73093,6 +77555,7 @@ export namespace Prisma {
 
   export type ContactUpdateWithoutImportJobInput = {
     id?: StringFieldUpdateOperationsInput | string
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -73145,6 +77608,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
     book?: AddressBookUpdateOneWithoutContactsNestedInput
@@ -73153,6 +77617,7 @@ export namespace Prisma {
   export type ContactUncheckedUpdateWithoutImportJobInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
@@ -73206,12 +77671,14 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
   export type ContactUncheckedUpdateManyWithoutImportJobInput = {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
@@ -73869,6 +78336,7 @@ export namespace Prisma {
     id?: string
     userId: string
     importJobId?: string | null
+    reminderLeadDaysOverride?: number | null
     mergedIntoContactId?: string | null
     syncUid?: string
     syncVersion?: number
@@ -73917,6 +78385,7 @@ export namespace Prisma {
 
   export type ContactUpdateWithoutBookInput = {
     id?: StringFieldUpdateOperationsInput | string
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
     syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -73970,6 +78439,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
     mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
     mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
   }
@@ -73978,6 +78448,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number
@@ -74030,6 +78501,7 @@ export namespace Prisma {
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
@@ -74037,6 +78509,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
     mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
     syncUid?: StringFieldUpdateOperationsInput | string
     syncVersion?: IntFieldUpdateOperationsInput | number

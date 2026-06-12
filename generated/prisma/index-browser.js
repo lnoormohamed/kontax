@@ -141,6 +141,8 @@ exports.Prisma.UserScalarFieldEnum = {
   role: 'role',
   planOverrideReason: 'planOverrideReason',
   planOverriddenAt: 'planOverriddenAt',
+  reminderLeadDays: 'reminderLeadDays',
+  calToken: 'calToken',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -160,6 +162,7 @@ exports.Prisma.ContactScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
   importJobId: 'importJobId',
+  reminderLeadDaysOverride: 'reminderLeadDaysOverride',
   mergedIntoContactId: 'mergedIntoContactId',
   syncUid: 'syncUid',
   syncVersion: 'syncVersion',
@@ -642,6 +645,22 @@ exports.Prisma.NotificationSettingsScalarFieldEnum = {
   digest: 'digest'
 };
 
+exports.Prisma.FailedLoginAttemptScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  ipAddress: 'ipAddress',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.BirthdayReminderStateScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  contactId: 'contactId',
+  dateKey: 'dateKey',
+  lastSentYear: 'lastSentYear',
+  lastSentAt: 'lastSentAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -942,7 +961,9 @@ exports.Prisma.ModelName = {
   StripeWebhookEvent: 'StripeWebhookEvent',
   Notification: 'Notification',
   SecurityAlert: 'SecurityAlert',
-  NotificationSettings: 'NotificationSettings'
+  NotificationSettings: 'NotificationSettings',
+  FailedLoginAttempt: 'FailedLoginAttempt',
+  BirthdayReminderState: 'BirthdayReminderState'
 };
 
 /**

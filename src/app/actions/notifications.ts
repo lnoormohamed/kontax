@@ -2,7 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 
+import { requestPasswordReset } from "~/app/actions/auth";
 import { auth } from "~/server/auth";
+import { db } from "~/server/db";
+import { generateCalToken } from "~/server/ical";
 import {
   dismissNotification,
   getSecurityAlert,
@@ -53,8 +56,20 @@ export const resolveSecurityAlertAction = async (
   alertId: string,
   resolution: "DISMISSED" | "SECURED",
 ) => {
-  const userId = await getRequiredUserId();
+  const session = await auth();
+  const userId = session?.user?.id;
+  if (!userId) {
+    throw new Error("You must be signed in.");
+  }
+  if (session?.impersonatedBy) {
+    throw new Error("This is a read-only impersonation session — changes are blocked.");
+  }
   await resolveSecurityAlert(userId, alertId, resolution);
+  // P22-06: after lockdown, email a password-reset link so the user must set a
+  // new password to sign back in. Their current session is already invalidated.
+  if (resolution === "SECURED" && session?.user?.email) {
+    await requestPasswordReset(session.user.email);
+  }
   revalidatePath("/contacts");
   return { ok: true, secured: resolution === "SECURED" };
 };
@@ -67,6 +82,29 @@ export const fetchSecurityAlertAction = async (
   const userId = session?.user?.id;
   if (!userId) return null;
   return getSecurityAlert(userId, alertId);
+};
+
+/** P22-11: create the iCal token if absent, returning it. Idempotent. */
+export const ensureCalTokenAction = async (): Promise<string> => {
+  const userId = await getRequiredUserId();
+  const existing = await db.user.findUnique({
+    where: { id: userId },
+    select: { calToken: true },
+  });
+  if (existing?.calToken) return existing.calToken;
+  const token = generateCalToken();
+  await db.user.update({ where: { id: userId }, data: { calToken: token } });
+  revalidatePath("/settings/notifications");
+  return token;
+};
+
+/** P22-11: revoke the old token and issue a new one (breaks existing subscriptions). */
+export const regenerateCalTokenAction = async (): Promise<string> => {
+  const userId = await getRequiredUserId();
+  const token = generateCalToken();
+  await db.user.update({ where: { id: userId }, data: { calToken: token } });
+  revalidatePath("/settings/notifications");
+  return token;
 };
 
 const DIGEST_VALUES: DigestCadence[] = ["NONE", "DAILY", "WEEKLY"];
@@ -96,6 +134,16 @@ export const updateNotificationPreferences = async (formData: FormData) => {
     productEmail: on("productEmail"),
     digest,
   });
+
+  // P22-10: reminder lead-time. Absent (disabled select) → leave unchanged.
+  const VALID_LEAD_DAYS = [1, 3, 7, 14, 30];
+  const rawLead = formData.get("reminderLeadDays");
+  if (typeof rawLead === "string" && VALID_LEAD_DAYS.includes(Number(rawLead))) {
+    await db.user.update({
+      where: { id: userId },
+      data: { reminderLeadDays: Number(rawLead) },
+    });
+  }
 
   revalidatePath("/settings/notifications");
 };

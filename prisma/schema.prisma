@@ -236,10 +236,22 @@ model User {
     notifications           Notification[]
     securityAlerts          SecurityAlert[]
     notificationSettings    NotificationSettings?
+    // P22-09/10: birthday reminders + lead-time preference
+    reminderLeadDays        Int                     @default(7)
+    birthdayReminderStates  BirthdayReminderState[]
+    // P22-11: subscribable iCal calendar token (revocable credential).
+    // NOT a DB @unique constraint: the startup `prisma db push --skip-generate`
+    // (Dockerfile) has no --accept-data-loss, so adding a unique index to a new
+    // column would crash-loop the deploy. Uniqueness is guaranteed by the 24-byte
+    // random token (generateCalToken) and looked up via findFirst. Indexed below.
+    calToken                String?
+    // P22-04: repeated failed-login detection
+    failedLoginAttempts     FailedLoginAttempt[]
     createdAt             DateTime                @default(now())
     updatedAt             DateTime                @updatedAt
 
     @@index([scheduledDeleteAt])
+    @@index([calToken])
 }
 
 model AppPassword {
@@ -272,6 +284,10 @@ model Contact {
     sharesFromContact     ContactShare[] @relation("ShareSourceContact")
     sharesAsRecipientCopy ContactShare[] @relation("ShareRecipientContact")
     groupContacts         GroupContact[]
+    // P22-10: per-contact reminder lead-time override (null = use User.reminderLeadDays)
+    reminderLeadDaysOverride Int?
+    // P22-09: dedup state for birthday/anniversary reminders
+    birthdayReminderStates   BirthdayReminderState[]
     mergedIntoContactId String?
     mergedIntoContact Contact? @relation("ContactMergeLineage", fields: [mergedIntoContactId], references: [id], onDelete: SetNull)
     mergedChildren Contact[] @relation("ContactMergeLineage")
@@ -1044,4 +1060,34 @@ model NotificationSettings {
     digest         DigestCadence @default(NONE)
 
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// P22-04: records failed sign-in attempts against an existing account so the
+// "repeated failed logins" rule (>5 in 1h) can fire a security alert.
+model FailedLoginAttempt {
+    id        String   @id @default(cuid())
+    userId    String
+    ipAddress String?
+    createdAt DateTime @default(now())
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId, createdAt(sort: Desc)])
+}
+
+// P22-09: dedup state for birthday/anniversary reminders — one row per
+// (user, contact, dateKey); lastSentYear prevents re-firing within a calendar year.
+model BirthdayReminderState {
+    id           String   @id @default(cuid())
+    userId       String
+    contactId    String
+    dateKey      String // "birthday" | "significant-<index>"
+    lastSentYear Int
+    lastSentAt   DateTime @default(now())
+
+    user    User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    contact Contact @relation(fields: [contactId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, contactId, dateKey])
+    @@index([userId, lastSentYear])
 }

@@ -310,9 +310,16 @@ export async function resolveSecurityAlert(
   ]);
 
   if (resolution === "SECURED") {
+    // P22-06 lockdown: invalidate every session token (sessionVersion) and revoke
+    // all UserSession rows. The password-reset email is sent by the action layer
+    // (resolveSecurityAlertAction) to avoid a server→actions import cycle.
     await db.user.update({
       where: { id: userId },
       data: { sessionVersion: { increment: 1 } },
+    });
+    await db.userSession.updateMany({
+      where: { userId, revokedAt: null },
+      data: { revokedAt: new Date() },
     });
   }
 }
@@ -406,6 +413,56 @@ export async function detectNewDeviceSignIn(params: {
   }
 }
 
+const FAILED_LOGIN_THRESHOLD = 5; // alert when MORE than this many in the window
+const FAILED_LOGIN_WINDOW_MS = 60 * 60 * 1000;
+
+/**
+ * P22-04 Rule 3: record a failed sign-in against an existing account and raise a
+ * SECURITY alert when more than 5 attempts occur within an hour. Called from the
+ * auth `authorize` callback on password mismatch. Never throws.
+ */
+export async function recordFailedLogin(
+  userId: string,
+  ipAddress: string | null,
+): Promise<void> {
+  try {
+    await db.failedLoginAttempt.create({ data: { userId, ipAddress } });
+    const since = new Date(Date.now() - FAILED_LOGIN_WINDOW_MS);
+    const count = await db.failedLoginAttempt.count({
+      where: { userId, createdAt: { gte: since } },
+    });
+    if (count <= FAILED_LOGIN_THRESHOLD) return;
+
+    // One active alert per window — don't re-fire on every subsequent attempt.
+    const existing = await db.securityAlert.findFirst({
+      where: {
+        userId,
+        kind: "device",
+        resolution: null,
+        title: "Repeated failed sign-in attempts",
+        createdAt: { gte: since },
+      },
+      select: { id: true },
+    });
+    if (existing) return;
+
+    await createSecurityAlert({
+      userId,
+      kind: "device",
+      title: "Repeated failed sign-in attempts",
+      summary: `${count} failed sign-in attempts on your account in the last hour. If this wasn't you, secure your account.`,
+      payload: {
+        Device: "Unknown device",
+        "IP address": ipAddress ?? "Unknown",
+        Time: formatWhen(new Date()),
+      },
+      ipAddress,
+    });
+  } catch (err) {
+    console.error("recordFailedLogin failed", err);
+  }
+}
+
 function formatClock(d: Date): string {
   return d.toLocaleTimeString("en-US", {
     hour: "numeric",
@@ -431,50 +488,8 @@ function formatWhen(d: Date): string {
   return `${date} at ${time} UTC`;
 }
 
-// ── reminders + product updates ──────────────────────────────────────────────
-
-// Birthdays are stored as "--MM-DD" (no year) or "YYYY-MM-DD"/"YYYYMMDD". Pull
-// the month-day so we can match against today regardless of format.
-function birthdayMonthDay(value: string): string | null {
-  const noYear = /^--(\d{2})-?(\d{2})$/.exec(value);
-  if (noYear) return `${noYear[1]}-${noYear[2]}`;
-  const full = /^(\d{4})-?(\d{2})-?(\d{2})$/.exec(value);
-  if (full) return `${full[2]}-${full[3]}`;
-  return null;
-}
-
-/**
- * Daily scan (called from the cron route): raise a REMINDERS notification for
- * each contact whose birthday is today (UTC). Honours the per-user in-app
- * preference via createNotification. Returns how many were raised.
- */
-export async function runBirthdayReminderScan(now = new Date()): Promise<number> {
-  const today = `${String(now.getUTCMonth() + 1).padStart(2, "0")}-${String(
-    now.getUTCDate(),
-  ).padStart(2, "0")}`;
-
-  const contacts = await db.contact.findMany({
-    where: { birthday: { not: null }, archivedAt: null },
-    select: { userId: true, fullName: true, firstName: true, birthday: true },
-  });
-
-  let raised = 0;
-  for (const c of contacts) {
-    if (!c.birthday || birthdayMonthDay(c.birthday) !== today) continue;
-    const full = c.fullName?.trim();
-    const first = c.firstName?.trim();
-    const name = full && full.length > 0 ? full : first && first.length > 0 ? first : "A contact";
-    await createNotification({
-      userId: c.userId,
-      category: "REMINDERS",
-      title: `${name}'s birthday`,
-      body: "Today — send a quick hello or schedule a call.",
-      actionUrl: "/contacts",
-    });
-    raised++;
-  }
-  return raised;
-}
+// ── product updates ──────────────────────────────────────────────────────────
+// (Birthday/anniversary reminders live in src/server/reminders.ts — P22-09.)
 
 /**
  * Broadcast a PRODUCT_UPDATES notification to every active user (admin-triggered).

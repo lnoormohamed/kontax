@@ -1,9 +1,21 @@
 import { redirect } from "next/navigation";
 
 import { updateNotificationPreferences } from "~/app/actions/notifications";
+import { CalendarFeedSection } from "~/app/_components/calendar-feed-section";
 import { SettingsCard, SettingsPageHead } from "~/app/_components/settings-ui";
 import { auth } from "~/server/auth";
+import { db } from "~/server/db";
+import { appUrl } from "~/server/email";
 import { getNotificationSettings } from "~/server/notifications";
+
+// P22-10: user-level reminder lead-time options.
+const LEAD_TIME_OPTIONS = [
+  { value: 1, label: "1 day before" },
+  { value: 3, label: "3 days before" },
+  { value: 7, label: "1 week before" },
+  { value: 14, label: "2 weeks before" },
+  { value: 30, label: "1 month before" },
+] as const;
 
 // 36×20 toggle. Locked rows (Security/Billing) render a disabled, checked switch
 // at 0.45 opacity with a tooltip — disabled inputs aren't submitted, which is
@@ -83,6 +95,11 @@ export default async function NotificationSettingsPage() {
     redirect("/login");
   }
   const prefs = await getNotificationSettings(session.user.id);
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { reminderLeadDays: true, calToken: true },
+  });
+  const leadDays = user?.reminderLeadDays ?? 7;
 
   return (
     <>
@@ -126,13 +143,31 @@ export default async function NotificationSettingsPage() {
               name="Billing"
               note="Always sent — cannot be disabled."
             />
-            <CategoryRow
-              email={prefs.remindersEmail}
-              emailName="remindersEmail"
-              inApp={prefs.remindersInApp}
-              inAppName="remindersInApp"
-              name="Birthday & anniversary reminders"
-            />
+            <div>
+              <CategoryRow
+                email={prefs.remindersEmail}
+                emailName="remindersEmail"
+                inApp={prefs.remindersInApp}
+                inAppName="remindersInApp"
+                name="Birthday & anniversary reminders"
+              />
+              {/* P22-10: lead-time preference */}
+              <div className="-mt-1 flex items-center gap-3 pb-4 pl-0.5">
+                <span className="text-[13px] text-[#5c655e]">Remind me</span>
+                <select
+                  className="h-9 rounded-lg border border-[#d8ddd6] bg-white px-2.5 text-[13px] text-[#1d2823] outline-none focus:border-[#4158f4] disabled:opacity-45"
+                  defaultValue={String(leadDays)}
+                  disabled={!prefs.remindersInApp}
+                  name="reminderLeadDays"
+                >
+                  {LEAD_TIME_OPTIONS.map((o) => (
+                    <option key={o.value} value={o.value}>
+                      {o.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
             <CategoryRow
               email={prefs.productEmail}
               emailName="productEmail"
@@ -174,6 +209,8 @@ export default async function NotificationSettingsPage() {
             </div>
           </SettingsCard>
         </div>
+
+        <CalendarFeedSection baseUrl={appUrl()} initialToken={user?.calToken ?? null} />
 
         <div>
           <button

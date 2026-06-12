@@ -5,7 +5,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { z } from "zod";
 
 import { db } from "~/server/db";
-import { detectNewDeviceSignIn } from "~/server/notifications";
+import { detectNewDeviceSignIn, recordFailedLogin } from "~/server/notifications";
 
 /**
  * Module augmentation for `next-auth` types.
@@ -78,6 +78,13 @@ export const authConfig = {
 
         if (!parsedCredentials.success) return null;
 
+        // Capture IP + UA for UserSession creation in JWT callback (P18-06) and
+        // for failed-login detection (P22-04).
+        const ip = request?.headers?.get("x-forwarded-for")?.split(",")[0]?.trim()
+          ?? request?.headers?.get("x-real-ip")
+          ?? null;
+        const ua = request?.headers?.get("user-agent") ?? null;
+
         const user = await db.user.findUnique({
           where: { email: parsedCredentials.data.email },
         });
@@ -88,13 +95,11 @@ export const authConfig = {
           parsedCredentials.data.password,
           user.password,
         );
-        if (!passwordMatches) return null;
-
-        // Capture IP + UA for UserSession creation in JWT callback (P18-06)
-        const ip = request?.headers?.get("x-forwarded-for")?.split(",")[0]?.trim()
-          ?? request?.headers?.get("x-real-ip")
-          ?? null;
-        const ua = request?.headers?.get("user-agent") ?? null;
+        if (!passwordMatches) {
+          // P22-04 Rule 3: track repeated failed logins against this account.
+          await recordFailedLogin(user.id, ip);
+          return null;
+        }
 
         return {
           id: user.id,

@@ -29,6 +29,7 @@ const PUBLIC_PREFIXES = [
   "/api/cron", // Protected separately by CRON_SECRET
   "/api/stripe/webhook", // Authenticated by Stripe signature, not session
   "/api/ses/events", // SNS bounce/complaint webhook (P20-10)
+  "/api/calendar", // P22-11: iCal feed authenticated by per-user calToken
 ];
 
 // Only the TOTP challenge page is reachable with a pendingTotp session (P18-07)
