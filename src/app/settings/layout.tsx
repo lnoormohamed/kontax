@@ -55,8 +55,8 @@ export default async function SettingsLayout({ children }: { children: React.Rea
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-white text-[#1d2823]">
-      {/* top header — shared workspace chrome */}
-      <header className="shrink-0 border-b border-[#d8ddd6] bg-white">
+      {/* Desktop header — hidden on mobile */}
+      <header className="hidden shrink-0 border-b border-[#d8ddd6] bg-white md:block">
         <div className="flex h-[60px] w-full items-center gap-4 px-4 lg:px-[18px]">
           <Link className="flex shrink-0 items-center gap-2.5 lg:w-[230px]" href="/contacts">
             <span className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-[#17352e] text-[17px] font-bold text-[#dff0e7]">
@@ -75,20 +75,31 @@ export default async function SettingsLayout({ children }: { children: React.Rea
               <WorkspaceIcon name="plus" size={18} strokeWidth={2} />
               <span className="hidden sm:inline">Create contact</span>
             </Link>
-            {/* P22-DB05: unified notification bell (replaces the legacy /shares bell). */}
             <NotificationBellSlot userId={userId} />
             <UserMenu email={session.user.email ?? ""} initials={getInitials(userLabel)} name={userLabel} />
           </div>
         </div>
       </header>
 
+      {/* Mobile header — "Settings" title, shown only on mobile */}
+      <header
+        className="flex shrink-0 items-center border-b border-[#d8ddd6] bg-white md:hidden"
+        style={{ height: 52, padding: "0 16px", gap: 12 }}
+      >
+        <span style={{ fontSize: 19, fontWeight: 700, color: "#1d2823", flex: 1 }}>Settings</span>
+        <NotificationBellSlot userId={userId} />
+      </header>
+
       <div className="flex min-h-0 flex-1">
-        <SettingsSidebar
-          account={{ name: userLabel, email: session.user.email ?? "", plan: planSummary.planLabel }}
-          shared={shared}
-        />
+        {/* Sidebar: hidden on mobile, visible on desktop */}
+        <div className="hidden md:flex">
+          <SettingsSidebar
+            account={{ name: userLabel, email: session.user.email ?? "", plan: planSummary.planLabel }}
+            shared={shared}
+          />
+        </div>
         <div className="flex min-w-0 flex-1 flex-col overflow-y-auto bg-[#f6f7f4]">
-          <div className="mx-auto w-full max-w-[1060px] px-6 py-7 pb-[calc(56px+env(safe-area-inset-bottom)+28px)] md:pb-7 lg:px-9 lg:py-8">
+          <div className="mx-auto w-full max-w-[1060px] px-0 py-0 pb-[calc(56px+env(safe-area-inset-bottom))] md:px-6 md:py-7 md:pb-7 lg:px-9 lg:py-8">
             {children}
           </div>
         </div>

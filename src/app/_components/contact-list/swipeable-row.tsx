@@ -11,163 +11,128 @@ interface SwipeableRowProps {
   children: React.ReactNode;
 }
 
-const REVEAL_WIDTH = 160;
-const SNAP_THRESHOLD = 0.4;
-const ACTIVATION_DELAY_MS = 150;
+const REVEAL_WIDTH = 168; // two 84px action buttons
+const SNAP_THRESHOLD = 0.4; // 40% of row width → snap open
 
 export function SwipeableRow({ onArchive, onToggleFavourite, isFavourite, children }: SwipeableRowProps) {
   const [translateX, setTranslateX] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-
+  const [animating, setAnimating] = useState(false);
+  const rowRef = useRef<HTMLDivElement>(null);
   const startX = useRef(0);
   const startY = useRef(0);
-  const capturedPointerId = useRef<number | null>(null);
-  const isActivated = useRef(false);
-  const activationTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
-  const rowRef = useRef<HTMLDivElement>(null);
+  const baseX = useRef(0);
+  const intent = useRef<"none" | "swipe" | "scroll">("none");
+  const pointerId = useRef<number | null>(null);
 
-  const close = () => setTranslateX(0);
-
-  const cancel = () => {
-    clearTimeout(activationTimer.current);
-    isActivated.current = false;
-    setIsDragging(false);
-    setTranslateX(0);
+  const snapTo = (target: number) => {
+    setAnimating(true);
+    setTranslateX(target);
   };
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    if (e.pointerType === "mouse" && e.button !== 0) return;
-
+    if (e.pointerType === "mouse") return; // desktop only uses hover actions
     startX.current = e.clientX;
     startY.current = e.clientY;
-    capturedPointerId.current = e.pointerId;
-    isActivated.current = false;
-
-    activationTimer.current = setTimeout(() => {
-      isActivated.current = true;
-      setIsDragging(true);
-      rowRef.current?.setPointerCapture(e.pointerId);
-    }, ACTIVATION_DELAY_MS);
+    baseX.current = translateX;
+    intent.current = "none";
+    pointerId.current = e.pointerId;
+    setAnimating(false);
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
-    if (e.pointerId !== capturedPointerId.current) return;
+    if (e.pointerId !== pointerId.current) return;
+    const dx = startX.current - e.clientX;
+    const dy = Math.abs(e.clientY - startY.current);
 
-    const deltaX = startX.current - e.clientX;
-    const deltaY = Math.abs(e.clientY - startY.current);
-
-    if (!isActivated.current) {
-      // Vertical movement dominates → user is scrolling, cancel the swipe
-      if (deltaY > Math.abs(deltaX) + 5) {
-        clearTimeout(activationTimer.current);
+    // Determine intent on first significant movement
+    if (intent.current === "none") {
+      if (Math.abs(dx) > 4 || dy > 4) {
+        intent.current = dy > Math.abs(dx) ? "scroll" : "swipe";
+        if (intent.current === "swipe") {
+          try { rowRef.current?.setPointerCapture(e.pointerId); } catch (_) {}
+        }
       }
       return;
     }
+    if (intent.current !== "swipe") return;
 
-    if (!isDragging) return;
-    setTranslateX(Math.max(0, Math.min(deltaX, REVEAL_WIDTH)));
+    let next = baseX.current + dx;
+    next = Math.max(0, next);
+    // Rubber-band past full reveal
+    if (next > REVEAL_WIDTH) next = REVEAL_WIDTH + (next - REVEAL_WIDTH) * 0.28;
+    setTranslateX(next);
   };
 
   const handlePointerUp = () => {
-    clearTimeout(activationTimer.current);
-    capturedPointerId.current = null;
-    isActivated.current = false;
-
-    if (!isDragging) return;
-    setIsDragging(false);
-
-    if (translateX > REVEAL_WIDTH * SNAP_THRESHOLD) {
-      setTranslateX(REVEAL_WIDTH);
-    } else {
-      setTranslateX(0);
-    }
+    if (intent.current !== "swipe") { intent.current = "none"; pointerId.current = null; return; }
+    intent.current = "none";
+    pointerId.current = null;
+    const rowW = rowRef.current?.offsetWidth ?? 375;
+    snapTo(translateX >= rowW * SNAP_THRESHOLD ? REVEAL_WIDTH : 0);
   };
 
-  const handleAction = (fn: () => void) => {
-    fn();
-    close();
-    navigator.vibrate?.(10);
+  const vibrate = () => { try { navigator.vibrate?.(10); } catch (_) {} };
+
+  const handleFav = () => {
+    vibrate();
+    onToggleFavourite();
+    snapTo(0);
+  };
+
+  const handleArchive = () => {
+    vibrate();
+    snapTo(rowRef.current?.offsetWidth ?? 375);
+    setTimeout(() => onArchive(), 200);
   };
 
   return (
-    <div style={{ position: "relative", overflow: "hidden" }}>
-      {/* Action buttons revealed behind the row on left swipe */}
+    <div ref={rowRef} style={{ position: "relative", overflow: "hidden" }}>
+      {/* Revealed actions */}
       <div
         aria-hidden
-        style={{
-          position: "absolute",
-          right: 0,
-          top: 0,
-          bottom: 0,
-          width: REVEAL_WIDTH,
-          display: "flex",
-        }}
+        style={{ position: "absolute", right: 0, top: 0, bottom: 0, width: REVEAL_WIDTH, display: "flex" }}
       >
         <button
-          aria-label={isFavourite ? "Unfavourite" : "Favourite"}
-          onClick={() => handleAction(onToggleFavourite)}
+          aria-label={isFavourite ? "Unstar" : "Favourite"}
+          onClick={handleFav}
           style={{
-            flex: 1,
-            background: "#17352e",
-            color: "#fff",
-            border: "none",
-            cursor: "pointer",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 4,
-            fontSize: 11,
-            fontWeight: 600,
+            flex: 1, background: "#17352e", color: "#fff", border: "none", cursor: "pointer",
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
+            fontSize: 11, fontWeight: 600,
           }}
           type="button"
         >
-          <WorkspaceIcon
-            fill={isFavourite ? "#e0a31c" : "none"}
-            name="star"
-            size={20}
-            strokeWidth={isFavourite ? 2 : 1.8}
-          />
-          {isFavourite ? "Unfav" : "Fav"}
+          <WorkspaceIcon fill={isFavourite ? "#fff" : "none"} name="star" size={21} strokeWidth={2} />
+          {isFavourite ? "Unstar" : "Favourite"}
         </button>
         <button
-          aria-label="Archive contact"
-          onClick={() => handleAction(onArchive)}
+          aria-label="Archive"
+          onClick={handleArchive}
           style={{
-            flex: 1,
-            background: "#b5472f",
-            color: "#fff",
-            border: "none",
-            cursor: "pointer",
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "center",
-            justifyContent: "center",
-            gap: 4,
-            fontSize: 11,
-            fontWeight: 600,
+            flex: 1, background: "#b5472f", color: "#fff", border: "none", cursor: "pointer",
+            display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
+            fontSize: 11, fontWeight: 600,
           }}
           type="button"
         >
-          <WorkspaceIcon name="archive" size={20} strokeWidth={1.8} />
+          <WorkspaceIcon name="archive" size={21} strokeWidth={1.8} />
           Archive
         </button>
       </div>
 
-      {/* Sliding row content — sits above the action buttons via z-index */}
+      {/* Sliding foreground */}
       <div
-        ref={rowRef}
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
-        onPointerCancel={cancel}
+        onPointerCancel={handlePointerUp}
         style={{
           position: "relative",
           zIndex: 1,
           transform: translateX > 0 ? `translateX(-${translateX}px)` : undefined,
-          transition: isDragging ? "none" : "transform 200ms ease",
+          transition: animating ? "transform 0.26s cubic-bezier(0.2,0.8,0.2,1)" : "none",
           touchAction: "pan-y",
-          willChange: translateX > 0 || isDragging ? "transform" : "auto",
+          willChange: translateX > 0 ? "transform" : "auto",
         }}
       >
         {children}

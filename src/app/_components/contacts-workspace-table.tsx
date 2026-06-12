@@ -379,12 +379,20 @@ function ContactRow({
 function GroupHeading({ label, favorites }: { label: string; favorites?: boolean }) {
   if (favorites) {
     return (
-      <div className="flex items-center gap-2 px-4 pb-1.5 pt-3.5">
-        <span style={{ fontSize: 14, color: "#c9960c" }}>★</span>
-        <span className="text-[12px] font-bold uppercase tracking-[0.06em] text-[#a07a10]">
+      <div
+        style={{
+          height: 28,
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          backgroundColor: "#f2f4f0",
+          paddingLeft: 16,
+        }}
+      >
+        <span style={{ fontSize: 12, color: "#c9960c", lineHeight: 1 }}>★</span>
+        <span style={{ fontSize: 11, fontWeight: 700, color: "#a07a10", letterSpacing: "0.04em", textTransform: "uppercase" }}>
           Favourites
         </span>
-        <span className="h-px flex-1 bg-[#e9ece7]" />
       </div>
     );
   }
@@ -409,7 +417,7 @@ type VRow =
   | { type: "group-header"; label: string; favorites?: boolean }
   | { type: "contact"; contact: WorkspaceContact };
 
-const FAVE_H = 44; // Favourites header has extra padding
+const FAVE_H = 28; // Favourites header — same height as letter headers
 const LETTER_H = 28; // Alphabetical letter headers per design spec
 
 export function ContactsWorkspaceTable({

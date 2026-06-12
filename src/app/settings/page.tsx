@@ -9,10 +9,13 @@ import {
 } from "~/app/_components/settings-ui";
 import { BillingSection } from "~/app/settings/_components/billing-section";
 import { BillingSuccessBanner } from "~/app/settings/_components/billing-success-banner";
+import { MobileSettingsNav } from "~/app/settings/_components/mobile-settings-nav";
 import { PortalReturnedBanner } from "~/app/settings/_components/portal-returned-banner";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
 import { getBillingSurface } from "~/server/billing-surface";
+import { getUserFamilyMembership } from "~/server/family-access";
+import { getUserTeamMembership } from "~/server/team-access";
 import { db } from "~/server/db";
 
 const PLAN_SUMMARY: Record<string, string> = {
@@ -38,7 +41,7 @@ export default async function SettingsPlanPage({
   const showPortalReturned = sp?.portal === "returned";
 
   const planSummary = await getUserPlanSummary(userId);
-  const [billingSurface, syncConnections, liveContacts, groupMembership, overrideInfo] = await Promise.all([
+  const [billingSurface, syncConnections, liveContacts, groupMembership, overrideInfo, familyMembership, teamMembership] = await Promise.all([
     getBillingSurface(userId),
     db.syncAccount.count({ where: { userId, status: "ACTIVE" } }),
     db.contactShare.count({
@@ -59,6 +62,8 @@ export default async function SettingsPlanPage({
       },
     }),
     db.user.findUnique({ where: { id: userId }, select: { planOverriddenAt: true } }),
+    getUserFamilyMembership(userId),
+    getUserTeamMembership(userId),
   ]);
 
   const isGroupPlan = planSummary.plan === "FAMILY" || planSummary.plan === "TEAMS";
@@ -76,8 +81,22 @@ export default async function SettingsPlanPage({
         : null,
   };
 
+  const userLabel = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
+
   return (
     <>
+      {/* Mobile settings nav — full-screen nav list, hidden on desktop */}
+      <MobileSettingsNav
+        email={session.user.email ?? ""}
+        hasFamily={!!(familyMembership || planSummary.plan === "FAMILY")}
+        hasTeam={!!(teamMembership || planSummary.plan === "TEAMS")}
+        name={userLabel}
+        plan={planSummary.planLabel}
+        syncActive={syncConnections}
+      />
+
+      {/* Billing content — full width on desktop, hidden on mobile */}
+      <div className="hidden md:block">
       {showBillingSuccess ? (
         <BillingSuccessBanner planLabel={planSummary.planLabel} />
       ) : null}
@@ -186,6 +205,7 @@ export default async function SettingsPlanPage({
           Activity log retained for 30 days on Free · 1 year on Pro · 90 days on Family · unlimited on Teams.
         </p>
       </div>
+      </div>{/* end hidden md:block billing wrapper */}
     </>
   );
 }
