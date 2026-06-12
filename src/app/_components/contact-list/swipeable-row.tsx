@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { useDrag } from "@use-gesture/react";
 
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 
@@ -14,84 +15,69 @@ interface SwipeableRowProps {
 const REVEAL_WIDTH = 168; // two 84px action buttons
 const SNAP_THRESHOLD = 0.4; // 40% of row width → snap open
 
+/**
+ * Swipe-to-reveal row (Favourite / Archive). Uses @use-gesture/react's useDrag
+ * with axis lock so the gesture is reliable inside the virtualized vertical
+ * scroll container — hand-rolled pointer/touch handling kept getting stolen by
+ * the scroll. `axis: "x"` + `touch-action: pan-y` lets vertical scrolling pass
+ * through while horizontal drags reveal the actions. `filterTaps` keeps taps
+ * navigating to the contact.
+ */
 export function SwipeableRow({ onArchive, onToggleFavourite, isFavourite, children }: SwipeableRowProps) {
-  // State-driven transform: React owns the offset so a re-render (e.g. the
-  // virtualizer's measureElement ResizeObserver) can't wipe an imperatively-set
-  // style mid-gesture. `offsetRef` mirrors it for the synchronous snap decision.
-  const [offset, setOffset] = useState(0);
+  const [offset, setOffset] = useState(0); // px revealed (0…REVEAL_WIDTH)
   const [animate, setAnimate] = useState(false);
   const offsetRef = useRef(0);
-
+  const baseRef = useRef(0);
   const rowRef = useRef<HTMLDivElement>(null);
-  const startX = useRef(0);
-  const startY = useRef(0);
-  const baseX = useRef(0);
-  const intent = useRef<"none" | "swipe" | "scroll">("none");
-  const pointerId = useRef<number | null>(null);
 
-  const move = (value: number, withAnim: boolean) => {
+  const apply = (value: number, withAnim: boolean) => {
     offsetRef.current = value;
     setAnimate(withAnim);
     setOffset(value);
   };
 
-  const handlePointerDown = (e: React.PointerEvent) => {
-    if (e.pointerType === "mouse") return; // desktop uses hover actions, not swipe
-    startX.current = e.clientX;
-    startY.current = e.clientY;
-    baseX.current = offsetRef.current;
-    intent.current = "none";
-    pointerId.current = e.pointerId;
-    setAnimate(false);
-  };
+  const bind = useDrag(
+    ({ first, last, movement: [mx], tap }) => {
+      if (tap) return;
+      if (first) baseRef.current = offsetRef.current;
 
-  const handlePointerMove = (e: React.PointerEvent) => {
-    if (e.pointerId !== pointerId.current) return;
-    const dx = startX.current - e.clientX;
-    const dy = Math.abs(e.clientY - startY.current);
+      // mx is negative when dragging left; revealing increases the offset.
+      let next = baseRef.current - mx;
+      next = Math.max(0, next);
+      if (next > REVEAL_WIDTH) next = REVEAL_WIDTH + (next - REVEAL_WIDTH) * 0.28; // rubber-band
 
-    // Commit to swipe vs scroll on the first significant movement.
-    if (intent.current === "none") {
-      if (Math.abs(dx) > 4 || dy > 4) {
-        intent.current = dy > Math.abs(dx) ? "scroll" : "swipe";
-        if (intent.current === "swipe") {
-          try { rowRef.current?.setPointerCapture(e.pointerId); } catch (_) {}
-        }
+      if (last) {
+        const rowW = rowRef.current?.offsetWidth ?? 375;
+        apply(next >= rowW * SNAP_THRESHOLD ? REVEAL_WIDTH : 0, true);
+      } else {
+        apply(next, false);
       }
-      return;
-    }
-    if (intent.current !== "swipe") return;
-
-    let next = baseX.current + dx;
-    next = Math.max(0, next);
-    if (next > REVEAL_WIDTH) next = REVEAL_WIDTH + (next - REVEAL_WIDTH) * 0.28; // rubber-band
-    move(next, false);
-  };
-
-  const handlePointerUp = () => {
-    if (intent.current !== "swipe") {
-      intent.current = "none";
-      pointerId.current = null;
-      return;
-    }
-    intent.current = "none";
-    pointerId.current = null;
-    const rowW = rowRef.current?.offsetWidth ?? 375;
-    move(offsetRef.current >= rowW * SNAP_THRESHOLD ? REVEAL_WIDTH : 0, true);
-  };
+    },
+    { axis: "x", filterTaps: true, pointer: { touch: true }, eventOptions: { passive: false } },
+  );
 
   const vibrate = () => { try { navigator.vibrate?.(10); } catch (_) {} };
 
   const handleFav = () => {
     vibrate();
     onToggleFavourite();
-    move(0, true);
+    apply(0, true);
   };
 
   const handleArchive = () => {
     vibrate();
-    move(rowRef.current?.offsetWidth ?? 375, true);
+    apply(rowRef.current?.offsetWidth ?? 375, true);
     setTimeout(() => onArchive(), 200);
+  };
+
+  // When the row is open, a tap on the foreground closes it instead of opening
+  // the contact. Capture phase so it runs before the inner Link.
+  const onForegroundClickCapture = (e: React.MouseEvent) => {
+    if (offsetRef.current > 4) {
+      e.preventDefault();
+      e.stopPropagation();
+      apply(0, true);
+    }
   };
 
   return (
@@ -129,12 +115,10 @@ export function SwipeableRow({ onArchive, onToggleFavourite, isFavourite, childr
         </button>
       </div>
 
-      {/* Sliding foreground — transform driven by React state */}
+      {/* Sliding foreground — drag-bound, transform driven by React state */}
       <div
-        onPointerDown={handlePointerDown}
-        onPointerMove={handlePointerMove}
-        onPointerUp={handlePointerUp}
-        onPointerCancel={handlePointerUp}
+        {...bind()}
+        onClickCapture={onForegroundClickCapture}
         style={{
           position: "relative",
           zIndex: 1,
