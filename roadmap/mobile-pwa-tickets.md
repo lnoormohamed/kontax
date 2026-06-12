@@ -1,0 +1,98 @@
+# Phase 24B — Mobile PWA Design Completion (tickets)
+
+**Created:** 2026-06-12 · **Tracks:** building every mobile page **strictly** to the design.
+**Design source of truth:** [`mobile-pwa-design-spec.md`](./mobile-pwa-design-spec.md) (language + per-page,
+derived from the `mob-*.jsx` modules behind **Mobile PWA.html / Mobile PWA Overview.html**).
+**Status audit:** [`mobile-design-brief.md`](./mobile-design-brief.md).
+
+> Lineage: **P24** initial PWA shell → **P24A** critical fixes (sync/activity/nav, shipped) →
+> **P24B** full design coverage of every route. We are **building on the existing P24 design language**,
+> not reinventing it.
+
+## How to use
+- Ticket IDs `P24B-NN`. Status: ☐ todo · ◑ in progress · ✅ done · ⬚ blocked.
+- Every ticket's **Definition of Done** is: matches the referenced spec §, covers the **Part E0
+  plan/role/lifecycle variants** that apply, and reproduces the relevant **Overview states**
+  (offline / empty / swipe-revealed / keyboard-aware / install / locked) where the Overview defines them.
+- Verify on a real 375px viewport (preview) before marking ✅. No "looks about right."
+
+## Global definition of done (applies to all tickets)
+1. **Strictly follows the spec** — tokens (A2), type (A3), spacing/radius/elevation/motion (A4),
+   components (Parts B–D). If a value isn't in the spec, derive from Part A; don't invent.
+2. **Variance covered** — every plan (FREE/PRO/FAMILY/TEAMS), lifecycle (read-only), and role
+   (OWNER/ADMIN/MEMBER) variant from Part E0 that applies to the page is designed and tested.
+3. **States covered** — loading / empty / error / offline / upsell, per Part F.
+4. **No regressions on desktop** (≥768px) and no duplicate chrome.
+5. **A11y** — tap targets ≥44px, inputs ≥16px (no iOS zoom), `prefers-reduced-motion` respected.
+
+---
+
+## Workstream A — Shared foundations (do first; unblock the rest)
+| Ticket | Title | Spec § | Priority | Status | Depends |
+| --- | --- | --- | --- | --- | --- |
+| P24B-01 | `MobilePlainHeader` (title + bell) — extract & adopt on Activity/Sync/Settings roots | B1 | P1 | ☐ | — |
+| P24B-02 | Settings layout: secondary-header back-nav on sub-pages (‹ Settings · <title>) | B1, E6 | **P0** | ☐ | — |
+| P24B-03 | Variance primitives: `UpsellCard`, `NearLimitBanner`, `ReadOnlyBanner`, `PendingChip`, `PermissionGate` | E0.4, C | **P0** | ☐ | — |
+| P24B-04 | "Stack table → cards / h-scroll" helper | C, F | P1 | ☐ | — |
+| P24B-05 | Confirm-dialog / action-sheet primitive | D4 | P1 | ☐ | — |
+| P24B-06 | `MobileInstallPrompt` (iOS steps / Android programmatic) | D5 | P2 | ☐ | — |
+
+## Workstream B — Core write flow
+| Ticket | Title | Spec § | Priority | Status | Depends |
+| --- | --- | --- | --- | --- | --- |
+| P24B-07 | Create/Edit as **bottom sheet** — collapsible sections, keyboard accessory bar, pinned Save; full page kept as `?full=1` fallback | E3, D1–D3 | **P0** | ☐ | P24B-03 |
+
+## Workstream C — Tab screens to spec
+| Ticket | Title | Spec § | Priority | Status | Depends |
+| --- | --- | --- | --- | --- | --- |
+| P24B-08 | Contact detail: 4 green-tint **ActionPills** + scroll-aware compact header; Free history cap (last 3) + Sharing-tab gating | E2 | P1 | ☐ | P24B-03 |
+| P24B-09 | Activity: mobile **GroupCard event rows** + retention caption; keep Free upsell (distinct from empty) | E4 | P1 | ☐ | P24B-03 |
+| P24B-10 | Sync: confirm to spec + Free **CardDAV upsell / 1-account cap** variance | E5 | P2 | ☐ | P24B-03 |
+| P24B-11 | Contacts list: sticky group headers (deferred from P24A) + limit/read-only variance | E1 | P2 | ☐ | P24B-03 |
+
+## Workstream D — Settings sub-pages
+| Ticket | Title | Spec § | Priority | Status | Depends |
+| --- | --- | --- | --- | --- | --- |
+| P24B-12 | Sub-page content pass: single-column; notifications/preferences toggle rows; verify account/devices/security | E6 | P1 | ☐ | P24B-02 |
+| P24B-13 | Family/Teams management: owner/admin vs member variance, roster cards, per-book permission **matrix → cards**, pending chips | E6, E0.3 | P1 | ☐ | P24B-02, P24B-04 |
+| P24B-14 | Teams/audit log — stacked rows / h-scroll | E6 | P2 | ☐ | P24B-04 |
+
+## Workstream E — Collaboration & data
+| Ticket | Title | Spec § | Priority | Status | Depends |
+| --- | --- | --- | --- | --- | --- |
+| P24B-15 | Import/export wizard responsive: single-column steps, 2×2 source chips, sticky-column preview; quota + export variance | E7 | P1 | ☐ | P24B-03, P24B-04 |
+| P24B-16 | Shares: confirm to spec + Free outbound-share gating (can still accept incoming) | E8 | P2 | ☐ | P24B-03 |
+| P24B-17 | **Merge pages restyle** to light system (off-brand today) + stacked A/B compare | E8 | **P1** | ☐ | — |
+
+## Workstream F — Public / pricing / auth
+| Ticket | Title | Spec § | Priority | Status | Depends |
+| --- | --- | --- | --- | --- | --- |
+| P24B-18 | Pricing: 1-col plan cards + stacked/scrollable comparison table | E10 | P2 | ☐ | P24B-04 |
+| P24B-19 | Auth/public verification pass (login/register/2fa/reset/verify · privacy/terms · join-token · account-status) | E9–E10 | P2 | ☐ | — |
+
+## Workstream G — Admin & cross-cutting QA
+| Ticket | Title | Spec § | Priority | Status | Depends |
+| --- | --- | --- | --- | --- | --- |
+| P24B-20 | Admin minimal mobile hardening (no break <768; h-scroll tables; ≥44px targets) | E11 | P3 | ☐ | — |
+| P24B-21 | **Variance QA pass** across all pages with seeded accounts: Pro, Family owner+member, Teams owner+admin+member, read-only (GRACE/LOCKED) | E0 | P1 | ☐ | most build tickets |
+
+---
+
+## Notes & sequencing
+- **P0 first:** P24B-02 (settings back-nav — navigation is broken today), P24B-03 (variance primitives —
+  everything else reuses them), P24B-07 (create/edit sheet — most-used write flow, wrong pattern).
+- **P24B-21 needs seeded data** — a Family owner, a Teams owner/admin, and a read-only (GRACE/LOCKED)
+  account. The verification sweep could only reach a Free family-member, so owner/admin/2FA/read-only
+  states are still unverified. Seed these before the QA pass. See [[db-and-verification-workflow]].
+- **P24B-17 (merge restyle)** is also a desktop fix — those pages are off-brand on every viewport.
+- A **design brief already exists** (the spec + status brief), so there is no separate `DB-` ticket;
+  this phase is build + verify only.
+
+## Suggested order
+1. P24B-02, P24B-03 (foundations, P0) → 2. P24B-07 (create/edit sheet, P0) →
+3. P24B-01, P24B-08, P24B-09 (header + tab polish) → 4. P24B-12, P24B-13 (settings + groups) →
+5. P24B-15, P24B-17 (import + merge) → 6. P24B-10, P24B-11, P24B-16, P24B-18, P24B-19 (remaining polish) →
+7. P24B-04/05/06 as needed by the above → 8. P24B-20 (admin) → 9. P24B-21 (variance QA, last).
+
+## Progress log
+- 2026-06-12 — Phase opened. P24A shipped (sync/activity/nav fixes). Spec + brief + variance model in place.
