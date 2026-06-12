@@ -181,6 +181,7 @@ export function ContactDashboard({
           : "font-medium text-[#5c655e] hover:bg-[#f2f4f0]"
       }`}
       href={href}
+      key={href}
     >
       <WorkspaceIcon name={icon} size={18} />
       <span className="flex-1">{label}</span>

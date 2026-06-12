@@ -9,12 +9,14 @@ const NAV = [
   { id: "users", label: "Users", icon: "users", href: "/admin/users" },
   { id: "metrics", label: "Metrics", icon: "metrics", href: "/admin/metrics" },
   { id: "flags", label: "Feature Flags", icon: "flag", href: "/admin/feature-flags" },
+  { id: "broadcast", label: "Broadcast", icon: "share", href: "/admin/broadcast" },
   { id: "audit", label: "Audit Log", icon: "audit", href: "/admin/audit" },
 ] as const;
 
 function activeId(pathname: string): string {
   if (pathname.startsWith("/admin/metrics")) return "metrics";
   if (pathname.startsWith("/admin/feature-flags")) return "flags";
+  if (pathname.startsWith("/admin/broadcast")) return "broadcast";
   if (pathname.startsWith("/admin/audit")) return "audit";
   // /admin/users, /admin/users/[id], and /admin all map to Users.
   return "users";

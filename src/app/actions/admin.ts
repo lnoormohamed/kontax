@@ -7,6 +7,7 @@ import { ADMIN_ACTIONS, emitAdminEvent } from "~/server/admin/audit";
 import { setImpersonation, clearImpersonation, readImpersonation } from "~/server/admin/impersonation";
 import { db } from "~/server/db";
 import { sendAccountSuspendedEmail } from "~/server/billing-emails";
+import { broadcastProductUpdate as broadcastProductUpdateToUsers } from "~/server/notifications";
 import type { SubscriptionPlan } from "../../../generated/prisma";
 
 type Result = { success: true } | { error: string };
@@ -239,4 +240,38 @@ export async function endImpersonation(): Promise<Result> {
   }
   await clearImpersonation();
   return { success: true };
+}
+
+// P22-DB05: broadcast a PRODUCT_UPDATES notification to every active user.
+// Honours each user's in-app product-update preference (handled in
+// broadcastProductUpdate → createNotification).
+export async function broadcastProductUpdate(input: {
+  title: string;
+  body: string;
+  actionUrl?: string;
+}): Promise<Result & { recipients?: number }> {
+  let admin;
+  try {
+    admin = await assertAdmin();
+  } catch (e) {
+    if (e instanceof AdminForbiddenError) return { error: "FORBIDDEN" };
+    throw e;
+  }
+
+  const title = input.title.trim();
+  const body = input.body.trim();
+  const trimmedUrl = input.actionUrl?.trim();
+  const actionUrl = trimmedUrl && trimmedUrl.length > 0 ? trimmedUrl : undefined;
+  if (!title) return { error: "TITLE_REQUIRED" };
+  if (!body) return { error: "BODY_REQUIRED" };
+
+  const recipients = await broadcastProductUpdateToUsers({ title, body, actionUrl });
+
+  await emitAdminEvent({
+    adminId: admin.adminId,
+    action: ADMIN_ACTIONS.PRODUCT_BROADCAST,
+    details: { title, recipients },
+  });
+
+  return { success: true, recipients };
 }

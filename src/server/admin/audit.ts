@@ -16,6 +16,7 @@ export const ADMIN_ACTIONS = {
   IMPERSONATION_START: "impersonation.start",
   IMPERSONATION_END: "impersonation.end",
   FEATURE_FLAG_CHANGED: "flag.update",
+  PRODUCT_BROADCAST: "product.broadcast",
 } as const;
 
 export type AdminActionKey = (typeof ADMIN_ACTIONS)[keyof typeof ADMIN_ACTIONS];
