@@ -76,6 +76,13 @@ const syncConflictResolved = z.object({
   resolutionStrategy: z.string().optional(),
 });
 
+// P23-06: audit record for a sync connection settings change. `changes` is a list
+// of field diffs (direction / conflictPolicy / syncFrequencyMinutes / bookAllowlist).
+const syncSettingsChanged = z.object({
+  syncAccountId: z.string(),
+  changes: z.array(fieldDiffSchema),
+});
+
 export const EVENT_PAYLOAD_SCHEMAS = {
   CONTACT_CREATED: empty,
   CONTACT_UPDATED: contactUpdated,
@@ -91,6 +98,7 @@ export const EVENT_PAYLOAD_SCHEMAS = {
   SYNC_PUSHED: syncMutation,
   SYNC_CONFLICT_DETECTED: syncConflictDetected,
   SYNC_CONFLICT_RESOLVED: syncConflictResolved,
+  SYNC_SETTINGS_CHANGED: syncSettingsChanged,
   ACCOUNT_UPDATED: z.object({ field: z.string() }).strict(),
 } satisfies Record<EventType, z.ZodTypeAny>;
 
