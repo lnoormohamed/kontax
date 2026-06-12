@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
 import {
@@ -411,9 +411,14 @@ export function ContactsWorkspaceTable({
   const undoTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const [, startUndoTransition] = useTransition();
 
-  // State (not ref) so the virtualizer re-renders when the scroll container is discovered.
   const listRef = useRef<HTMLDivElement>(null);
   const [scrollEl, setScrollEl] = useState<HTMLElement | null>(null);
+  // mounted is set in a layout effect so it becomes true before the first paint,
+  // allowing initialRect to use window.innerHeight without an SSR/hydration mismatch
+  // (server renders height=0 → 0 items; client layout effect immediately re-renders
+  // with actual viewport height so items appear before paint).
+  const [mounted, setMounted] = useState(false);
+  useLayoutEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
     let el: Element | null = listRef.current?.parentElement ?? null;
@@ -508,10 +513,10 @@ export function ContactsWorkspaceTable({
     getScrollElement: () => scrollEl,
     estimateSize: (i) => (flatRows[i]?.type === "group-header" ? GROUP_H : rowH),
     overscan: 12,
-    // Seed the viewport height so items render immediately (before the scroll
-    // container is discovered via useEffect). Without this, calculateRange
-    // guards on outerSize > 0 and returns null on the first render.
-    initialRect: { width: 0, height: typeof window !== "undefined" ? window.innerHeight : 900 },
+    // 0 during SSR so server and client render the same empty list (no hydration
+    // mismatch). The layout effect above sets mounted=true synchronously before
+    // the first paint, so the actual viewport height kicks in immediately on mount.
+    initialRect: { width: 0, height: mounted ? window.innerHeight : 0 },
     measureElement:
       typeof window !== "undefined" && !navigator.userAgent.includes("Firefox")
         ? (el) => el.getBoundingClientRect().height
