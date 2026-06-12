@@ -394,6 +394,29 @@ invited you, what you get, single clear Accept CTA + decline link.
 /admin/users/[id]` — **no mobile redesign.** Minimum hardening only: don't break below 768px — wrap
 dense tables in horizontal scroll, keep headers/controls readable and tap targets ≥44px. No bottom nav.
 
+## E13. Search overlay (Home header)
+**Opened from the Home header search button** · 🟡 (exists, to spec) · brief P24B-DB18 · build P24B-22
+- *Chrome:* full-screen overlay over the current screen; **covers the bottom nav**. Field row: `wash`
+  rounded field + search icon + "Search contacts…" (16px, autofocus) + "Cancel".
+- *Layout/states:* **recents/suggestions** (empty query) as list rows · **results** = 60px contact rows
+  (avatar, name with `#fff0bf` match highlight, secondary line, tap → detail, show count) · **no-match**
+  empty state · **offline** caption (searches the cached list).
+- *Interactions:* debounced query updates `?q=` (deep-link / back works); Cancel/back returns to the
+  prior screen. Scope = all contacts by default (confirm whether a book scope toggle appears).
+- *Variance:* works on all plans (Free searches the capped list, same UI).
+
+## E14. Notifications overlay (Home header bell)
+**Opened from the Home header bell** · 🟡 (exists, to spec) · brief P24B-DB18 · build P24B-23
+- *Chrome:* full-screen overlay (`< md`); **covers the bottom nav**. Header: "Notifications" (19/700) +
+  ✕ (44×44) + "Mark all read" (`blue`) when unread > 0.
+- *Layout:* feed rows — category tile (`CATEGORY_TILE` icon, rounded `wash`/tint) · title 14.5/600 +
+  body 13 `mute` + relative time · unread dot/tint; divider `line2`. Categories: SECURITY · SHARING ·
+  SYNC_STATUS · BILLING · REMINDERS · PRODUCT_UPDATES.
+- *Interactions:* tap marks read; **SECURITY** rows → security drawer; `actionUrl` rows → navigate +
+  mark read; link to `/settings/notifications`. Optional New/Earlier grouping.
+- *States:* loading skeletons · empty = bell + "No notifications" · error.
+- *Variance:* not plan-gated; read-only still shows notifications. Desktop keeps the dropdown.
+
 ## E12. Excluded
 `/wireframes/*` — internal design scaffolding, not production.
 
@@ -434,6 +457,8 @@ Shared pieces to implement once and reuse:
 | `/contacts/[id]` | E2 | 🟡 |
 | `/contacts/new` (+edit) | E3 | 🟠→sheet |
 | `/contacts?tab=activity` | E4 | 🟡 |
+| Search overlay (header) | E13 | 🟡 |
+| Notifications overlay (header) | E14 | 🟡 |
 | `/sync` (+`?account`/`?add`) | E5 | ✅ |
 | `/settings` | E6 | ✅ |
 | `/settings/profile` | E6 | ✅ /back-nav |

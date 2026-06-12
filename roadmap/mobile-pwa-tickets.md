@@ -45,6 +45,7 @@ Requirements** section; the paired build ticket builds to it.
 | P24B-DB15 | Family & Teams mobile management surfaces | P24B-13, P24B-14 | ☐ |
 | P24B-DB16 | Merge surfaces (restyle + mobile compare) | P24B-17 | ☐ |
 | P24B-DB17 | Pricing page mobile | P24B-18 | ☐ |
+| P24B-DB18 | Search & Notifications mobile overlays | P24B-22, P24B-23 | ☐ |
 
 ---
 
@@ -70,6 +71,8 @@ Requirements** section; the paired build ticket builds to it.
 | P24B-09 | Activity: mobile **GroupCard event rows** + retention caption; keep Free upsell (distinct from empty) | E4 | P1 | ☐ | P24B-03 |
 | P24B-10 | Sync: confirm to spec + Free **CardDAV upsell / 1-account cap** variance | E5 | P2 | ☐ | P24B-03 |
 | P24B-11 | Contacts list: sticky group headers (deferred from P24A) + limit/read-only variance | E1 | P2 | ☐ | P24B-03 |
+| P24B-22 | Mobile **search overlay** → to spec (results, recents, no-match, offline) | E13 | P1 | ☐ | P24B-DB18 |
+| P24B-23 | Mobile **notifications overlay** → to spec (category rows, security drawer, mark-all-read; cover bottom nav) | E14 | P1 | ☐ | P24B-DB18 |
 
 ## Workstream D — Settings sub-pages
 | Ticket | Title | Spec § | Priority | Status | Depends |
@@ -108,13 +111,32 @@ Requirements** section; the paired build ticket builds to it.
 - **P24B-17 (merge restyle)** is also a desktop fix — those pages are off-brand on every viewport.
 - **Design briefs** (`p24b-dbNN`) carry the design requirements and precede their build tickets; the
   `p24b-NN` files are the engineering builds. Core flows reuse `p24-db06` + the spec/prototype; the
-  four new briefs (DB14–DB17) cover the surfaces the prototype never drew. Build to the brief.
+  five new briefs (DB14–DB18) cover the surfaces the prototype never drew. Build to the brief.
 
-## Suggested order
-1. P24B-02, P24B-03 (foundations, P0) → 2. P24B-07 (create/edit sheet, P0) →
-3. P24B-01, P24B-08, P24B-09 (header + tab polish) → 4. P24B-12, P24B-13 (settings + groups) →
-5. P24B-15, P24B-17 (import + merge) → 6. P24B-10, P24B-11, P24B-16, P24B-18, P24B-19 (remaining polish) →
-7. P24B-04/05/06 as needed by the above → 8. P24B-20 (admin) → 9. P24B-21 (variance QA, last).
+## Suggested order (waves; design briefs ◀ sit just before the builds they gate)
+**Wave 1 — Foundations (P0)**
+1. **P24B-DB14** ◀ (variance design) · 2. **P24B-DB18** ◀ (search & notifications design) ·
+3. **P24B-02** (settings back-nav, P0) · 4. **P24B-03** (variance primitives, P0; needs DB14) ·
+5. P24B-01 (plain header) · 6. P24B-04 (table→cards) · 7. P24B-05 (confirm dialog)
+
+**Wave 2 — Write flow + tab/header polish** (need P24B-03 / DB18)
+8. **P24B-07** (create/edit sheet, P0) · 9. P24B-08 (detail pills) · 10. P24B-09 (activity rows) ·
+11. P24B-10 (sync variance) · 12. P24B-11 (sticky headers) ·
+13. P24B-22 (search overlay) · 14. P24B-23 (notifications overlay)
+
+**Wave 3 — Settings + groups**
+15. P24B-12 (settings sub-pages) · 16. **P24B-DB15** ◀ (family/teams design) ·
+17. P24B-13 (family/teams mgmt) · 18. P24B-14 (teams audit)
+
+**Wave 4 — Collaboration & data**
+19. P24B-15 (import responsive) · 20. P24B-16 (shares) ·
+21. **P24B-DB16** ◀ (merge design) · 22. P24B-17 (merge restyle)
+
+**Wave 5 — Public / pricing / auth**
+23. **P24B-DB17** ◀ (pricing design) · 24. P24B-18 (pricing) · 25. P24B-19 (auth/public verify)
+
+**Wave 6 — Tail**
+26. P24B-06 (install prompt) · 27. P24B-20 (admin hardening) · 28. **P24B-21** (variance QA — last)
 
 ## Progress log
 - 2026-06-12 — Phase opened. P24A shipped (sync/activity/nav fixes). Spec + brief + variance model in place.
