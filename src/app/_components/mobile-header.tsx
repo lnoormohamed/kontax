@@ -10,9 +10,12 @@ import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 
 interface MobileHomeHeaderProps {
   userId: string;
+  tab?: string;
 }
 
-export function MobileHomeHeader({ userId }: MobileHomeHeaderProps) {
+export function MobileHomeHeader({ userId, tab }: MobileHomeHeaderProps) {
+  const isActivity = tab === "activity";
+
   return (
     <header
       className="flex md:hidden"
@@ -29,47 +32,55 @@ export function MobileHomeHeader({ userId }: MobileHomeHeaderProps) {
         zIndex: 40,
       }}
     >
-      <Link
-        href="/contacts"
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: 9,
-          textDecoration: "none",
-        }}
-      >
-        <span
+      {isActivity ? (
+        <span style={{ fontSize: 19, fontWeight: 700, color: "#1d2823", flex: 1 }}>
+          Activity
+        </span>
+      ) : (
+        <Link
+          href="/contacts"
           style={{
-            width: 28,
-            height: 28,
-            borderRadius: 8,
-            backgroundColor: "#17352e",
-            color: "#dff0e7",
-            display: "grid",
-            placeItems: "center",
-            fontSize: 16,
-            fontWeight: 700,
+            display: "flex",
+            alignItems: "center",
+            gap: 9,
+            textDecoration: "none",
           }}
         >
-          K
-        </span>
-        <span
-          style={{
-            fontSize: 19,
-            fontWeight: 600,
-            letterSpacing: "-0.018em",
-            color: "#17352e",
-          }}
-        >
-          Kontax
-        </span>
-      </Link>
+          <span
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: 8,
+              backgroundColor: "#17352e",
+              color: "#dff0e7",
+              display: "grid",
+              placeItems: "center",
+              fontSize: 16,
+              fontWeight: 700,
+            }}
+          >
+            K
+          </span>
+          <span
+            style={{
+              fontSize: 19,
+              fontWeight: 600,
+              letterSpacing: "-0.018em",
+              color: "#17352e",
+            }}
+          >
+            Kontax
+          </span>
+        </Link>
+      )}
 
       <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 0 }}>
         <NotificationBellSlot userId={userId} />
-        <Suspense fallback={null}>
-          <MobileSearchButton />
-        </Suspense>
+        {!isActivity && (
+          <Suspense fallback={null}>
+            <MobileSearchButton />
+          </Suspense>
+        )}
       </div>
     </header>
   );

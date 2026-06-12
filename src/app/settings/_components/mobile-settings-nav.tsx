@@ -42,7 +42,12 @@ function NavRow({
           flexShrink: 0,
         }}
       >
-        <WorkspaceIcon name={icon as never} size={17} style={{ color: danger ? "#b5472f" : "#5c655e" }} />
+        <WorkspaceIcon
+          name={icon as never}
+          size={17}
+          className={danger ? "text-[#b5472f]" : "text-[#5c655e]"}
+          strokeWidth={1.7}
+        />
       </span>
       <span
         style={{
@@ -58,7 +63,7 @@ function NavRow({
       {detail && (
         <span style={{ fontSize: 13, color: "#8b938c", marginRight: 4 }}>{detail}</span>
       )}
-      <WorkspaceIcon name="chevronRight" size={17} style={{ color: "#d8ddd6", flexShrink: 0 }} />
+      <WorkspaceIcon name="chevronRight" size={17} className="shrink-0 text-[#d8ddd6]" strokeWidth={1.7} />
     </Link>
   );
 }

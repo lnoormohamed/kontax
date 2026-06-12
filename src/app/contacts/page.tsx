@@ -375,8 +375,8 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
 
   return (
     <main className="flex h-dvh flex-col overflow-hidden bg-white text-[#1d2823]">
-      {/* mobile home header — wordmark + bell */}
-      <MobileHomeHeader userId={session.user.id} />
+      {/* mobile home header — wordmark + bell (activity tab shows plain title) */}
+      <MobileHomeHeader userId={session.user.id} tab={selectedTab} />
 
       {/* desktop header */}
       <header className="hidden shrink-0 border-b border-[#d8ddd6] bg-white md:block">

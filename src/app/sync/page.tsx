@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { BottomNav } from "~/app/_components/bottom-nav";
+import { NotificationBellSlot } from "~/app/_components/notification-bell-slot";
 import { SettingsSidebar } from "~/app/_components/settings-sidebar";
 import { SearchInput } from "~/app/_components/search-input";
 import { UserMenu } from "~/app/_components/user-menu";
@@ -266,8 +267,8 @@ export default async function SyncPage({ searchParams }: PageProps) {
 
   return (
     <div className="flex h-dvh flex-col overflow-hidden bg-[#f6f7f4]" style={{ fontFamily: "Geist, ui-sans-serif, system-ui, sans-serif" }}>
-      {/* ── top header ── */}
-      <header className="shrink-0 border-b border-[#d8ddd6] bg-white" style={{ zIndex: 20 }}>
+      {/* ── Desktop header — hidden on mobile ── */}
+      <header className="hidden shrink-0 border-b border-[#d8ddd6] bg-white md:block" style={{ zIndex: 20 }}>
         <div className="flex h-[60px] w-full items-center gap-4 px-4 lg:px-[18px]">
           <Link className="flex shrink-0 items-center gap-2.5 lg:w-[230px]" href="/contacts">
             <span className="flex h-[30px] w-[30px] items-center justify-center rounded-lg bg-[#17352e] text-[17px] font-bold text-[#dff0e7]">
@@ -307,13 +308,24 @@ export default async function SyncPage({ searchParams }: PageProps) {
         </div>
       </header>
 
+      {/* ── Mobile header — "Sync" title, shown only on mobile ── */}
+      <header
+        className="flex shrink-0 items-center border-b border-[#d8ddd6] bg-white md:hidden"
+        style={{ height: 52, padding: "0 16px", gap: 12, zIndex: 20 }}
+      >
+        <span style={{ fontSize: 19, fontWeight: 700, color: "#1d2823", flex: 1 }}>Sync</span>
+        <NotificationBellSlot userId={userId} />
+      </header>
+
       {/* ── three-rail body ── */}
       <div className="flex min-h-0 flex-1">
-        {/* Rail 1: Settings sidebar */}
-        <SettingsSidebar
-          account={{ name: userLabel, email: session.user.email ?? "", plan: planSummary.planLabel }}
-          shared={shared}
-        />
+        {/* Rail 1: Settings sidebar — hidden on mobile */}
+        <div className="hidden md:flex">
+          <SettingsSidebar
+            account={{ name: userLabel, email: session.user.email ?? "", plan: planSummary.planLabel }}
+            shared={shared}
+          />
+        </div>
 
         {/* Rails 2+3: account list + detail (client-managed) */}
         <SyncPageClient
