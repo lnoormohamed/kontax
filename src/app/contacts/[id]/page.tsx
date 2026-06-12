@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation";
 import { AppShell } from "~/app/_components/app-shell";
 import { ContactHistory } from "~/app/_components/contact-history";
 import { ContactFamilyPanel } from "~/app/_components/contact-family-panel";
+import { ContactReminderOverride } from "~/app/_components/contact-reminder-override";
 import {
   ContactDetailHeaderBar,
   ContactEditProvider,
@@ -285,6 +286,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
       significantDates: true,
       relatedPeople: true,
       customFields: true,
+      reminderLeadDaysOverride: true,
       notes: true,
       sourceType: true,
       sourceDetail: true,
@@ -300,15 +302,21 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     notFound();
   }
 
-  const [shellPlan, shellPeople, shellFavorites, shellArchived, shellDuplicates] = await Promise.all(
-    [
+  const [shellPlan, shellPeople, shellFavorites, shellArchived, shellDuplicates, viewerForReminders] =
+    await Promise.all([
       getUserPlanSummary(session.user.id),
       db.contact.count({ where: { userId: session.user.id, archivedAt: null } }),
       db.contact.count({ where: { userId: session.user.id, archivedAt: null, isFavorite: true } }),
       db.contact.count({ where: { userId: session.user.id, NOT: { archivedAt: null } } }),
       db.mergeSuggestion.count({ where: { userId: session.user.id, status: "OPEN" } }),
-    ],
-  );
+      db.user.findUnique({ where: { id: session.user.id }, select: { reminderLeadDays: true } }),
+    ]);
+  // P22-10: show the per-contact reminder lead-time control when the contact has
+  // a date that can fire a reminder.
+  const reminderUserDefault = viewerForReminders?.reminderLeadDays ?? 7;
+  const reminderHasDate =
+    Boolean(contact.birthday) ||
+    (Array.isArray(contact.significantDates) && contact.significantDates.length > 0);
   const shellAccount = {
     name: session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax",
     email: session.user.email ?? "",
@@ -771,6 +779,14 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               />
             ) : null}
             <ContactInlineEditor />
+
+            {reminderHasDate ? (
+              <ContactReminderOverride
+                contactId={contact.id}
+                override={contact.reminderLeadDaysOverride}
+                userDefault={reminderUserDefault}
+              />
+            ) : null}
 
             <section className="overflow-hidden rounded-[14px] border border-[#d8ddd6] bg-white">
               <h3 className="px-5 pt-3.5 text-[11px] font-bold uppercase tracking-[0.13em] text-[#8b938c]">

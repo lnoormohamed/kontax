@@ -42,7 +42,7 @@ Let users control which events trigger notifications, deliver those notification
 | P22-07 | Activity anomaly detail drawer — flagged events, affected contacts, IP/device, timestamp | Complete | P1 | P22-05, P10-06 |
 | P22-08 | Notification digest email — daily/weekly summary; user-configurable frequency | Complete | P2 | P22-01, P20-09 |
 | P22-09 | Birthday & anniversary reminder detection — daily cron; upcoming date scanning; notification queuing | Complete | P1 | P22-01, P10-01 |
-| P22-10 | Reminder lead-time preferences — 1 day / 1 week / 1 month; per-contact override | Complete* | P2 | P22-09 |
+| P22-10 | Reminder lead-time preferences — 1 day / 1 week / 1 month; per-contact override | Complete | P2 | P22-09 |
 | P22-11 | iCal birthday/anniversary feed — `/api/calendar/birthdays.ics`; per-user `calToken`; RRULE:FREQ=YEARLY | Complete | P1 | P22-09 |
 
 > **Implementation notes (as built):**
@@ -54,9 +54,8 @@ Let users control which events trigger notifications, deliver those notification
 > - `calToken` is **not** a DB `@unique` constraint (a new unique column would crash-loop the
 >   Dockerfile's startup `prisma db push --skip-generate`, which has no `--accept-data-loss`);
 >   uniqueness comes from the 24-byte random token + `findFirst`.
-> - **P22-10\*** — user-level lead-time + per-contact `reminderLeadDaysOverride` (schema + cron
->   honour it) are done; the per-contact override **edit-form control** is deferred (the only
->   remaining sub-item) to avoid churn in the contact inline editor.
+> - **P22-10** — user-level lead-time (settings) + per-contact `reminderLeadDaysOverride` (a
+>   "Reminder" card on the contact detail page) are both implemented and the cron honours them.
 > - Crons need a daily 08:00 UTC schedule pointing at `/api/cron/birthday-reminders` and
 >   `/api/cron/digest` (with `x-cron-secret: $CRON_SECRET`).
 

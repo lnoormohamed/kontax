@@ -462,6 +462,23 @@ const contactDisplayName = (c: {
   return composed.length > 0 ? composed : "Unnamed contact";
 };
 
+// P22-10: set (or clear) the per-contact reminder lead-time override. Empty /
+// "default" clears it so the contact falls back to User.reminderLeadDays.
+export const setContactReminderOverride = async (formData: FormData) => {
+  const userId = await getRequiredUserId();
+  const contactId = parseContactId(formData);
+  const raw = formData.get("reminderLeadDays");
+  const num = typeof raw === "string" ? Number(raw) : NaN;
+  const value = [1, 3, 7, 14, 30].includes(num) ? num : null;
+
+  await db.contact.updateMany({
+    where: { id: contactId, userId },
+    data: { reminderLeadDaysOverride: value },
+  });
+
+  revalidatePath(`/contacts/${contactId}`);
+};
+
 const parseMergeDecisionId = (formData: FormData) => {
   const parsed = mergeDecisionSchema.safeParse({
     decisionId: formData.get("decisionId"),
