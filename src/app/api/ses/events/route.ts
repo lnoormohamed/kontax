@@ -40,7 +40,14 @@ type SesNotification =
  */
 export async function POST(req: NextRequest) {
   // SNS sets the message type in a header; fall back to the body's Type field.
-  const body = (await req.json()) as SnsEnvelope;
+  let body: SnsEnvelope;
+  try {
+    body = (await req.json()) as SnsEnvelope;
+  } catch {
+    // Empty or malformed body — never from real SNS. Return 400 (not 500) so it
+    // isn't treated as a server fault that SNS would keep retrying.
+    return NextResponse.json({ error: "invalid body" }, { status: 400 });
+  }
   const messageType =
     req.headers.get("x-amz-sns-message-type") ?? body.Type ?? "";
 
