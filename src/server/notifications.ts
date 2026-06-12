@@ -197,8 +197,9 @@ export type SecurityAlertView = {
 };
 
 /**
- * Persist an anomaly and raise its linked SECURITY notification (1:1, Resolution
- * 3). Returns the alert so callers can also fire the security email if desired.
+ * Persist an anomaly, raise its linked SECURITY notification (1:1, Resolution 3),
+ * and send the always-on security email (P20-07). SECURITY ignores preferences —
+ * both the in-app row and the email always go out. Returns the alert.
  */
 export async function createSecurityAlert(params: {
   userId: string;
@@ -206,6 +207,8 @@ export async function createSecurityAlert(params: {
   title: string;
   summary: string;
   payload: Prisma.InputJsonValue;
+  deviceHint?: string | null;
+  ipAddress?: string | null;
 }): Promise<{ id: string } | null> {
   try {
     const alert = await db.securityAlert.create({
@@ -227,6 +230,14 @@ export async function createSecurityAlert(params: {
         body: params.summary,
         securityAlertId: alert.id,
       },
+    });
+    // Always-on security email (never throws; fire-and-forget).
+    void sendSuspiciousActivityEmail({
+      userId: params.userId,
+      activityDescription: params.summary,
+      deviceHint: params.deviceHint ?? null,
+      ipAddress: params.ipAddress ?? null,
+      occurredAt: new Date(),
     });
     return alert;
   } catch (err) {
@@ -387,6 +398,8 @@ export async function detectNewDeviceSignIn(params: {
         "IP address": params.ipAddress ?? "Unknown",
         Time: formatWhen(new Date()),
       },
+      deviceHint: device,
+      ipAddress: params.ipAddress,
     });
   } catch (err) {
     console.error("detectNewDeviceSignIn failed", err);
