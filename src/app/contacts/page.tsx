@@ -467,7 +467,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         incomingShares={incomingSharesCount || undefined}
       />
 
-      <MobileCreateFab canWrite={planSummary.lifecyclePolicy.canWrite} />
+      <MobileCreateFab canWrite={planSummary.lifecyclePolicy.canWrite} show={selectedTab === "people"} />
       <BottomNav unreadCount={unreadCount} syncErrorCount={syncErrorCount} />
     </main>
   );

@@ -509,8 +509,8 @@ export function ActivityFeed({ retentionDays = 90 }: { retentionDays?: number | 
 // ── locked (Free plan) upsell ─────────────────────────────────────────────────
 export function ActivityLocked({ planLabel }: { planLabel: string }) {
   return (
-    <div className="grid flex-1 place-items-center p-10">
-      <div className="w-[460px] max-w-full overflow-hidden rounded-[18px] border border-[#d8ddd6] bg-white px-9 py-10 text-center shadow-[0_1px_2px_rgba(20,30,25,0.03)]">
+    <div className="grid flex-1 place-items-center p-4 sm:p-10">
+      <div className="w-full max-w-[460px] overflow-hidden rounded-[18px] border border-[#d8ddd6] bg-white px-6 py-8 text-center shadow-[0_1px_2px_rgba(20,30,25,0.03)] sm:px-9 sm:py-10">
         <span className="mx-auto mb-4 grid h-[60px] w-[60px] place-items-center rounded-full bg-[#e7efe9] text-[#17352e]">
           <WorkspaceIcon name="clock" size={28} strokeWidth={1.6} />
         </span>

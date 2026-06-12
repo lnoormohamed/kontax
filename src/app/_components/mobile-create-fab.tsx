@@ -10,6 +10,9 @@ import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 
 interface MobileCreateFabProps {
   canWrite: boolean;
+  /** Only the contacts (people) list shows the FAB — matches the mobile design,
+   *  which has no create FAB on Activity / Archived / Duplicates. */
+  show?: boolean;
 }
 
 const FIELD_STYLE: React.CSSProperties = {
@@ -34,7 +37,7 @@ const LABEL_STYLE: React.CSSProperties = {
   display: "block",
 };
 
-export function MobileCreateFab({ canWrite }: MobileCreateFabProps) {
+export function MobileCreateFab({ canWrite, show = true }: MobileCreateFabProps) {
   const [open, setOpen] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
@@ -72,7 +75,7 @@ export function MobileCreateFab({ canWrite }: MobileCreateFabProps) {
     });
   };
 
-  if (!canWrite) return null;
+  if (!canWrite || !show) return null;
 
   return (
     <>

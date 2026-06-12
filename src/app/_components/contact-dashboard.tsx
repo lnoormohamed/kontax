@@ -540,37 +540,10 @@ export function ContactDashboard({
           ) : null}
         </div>
       </section>
-
-      {/* mobile bottom nav */}
-      <nav className="fixed inset-x-0 bottom-0 z-30 flex items-stretch border-t border-[#d8ddd6] bg-white/95 backdrop-blur lg:hidden">
-        {(
-          [
-            ["people", "People", peopleActive, buildHref("people", { filter: "all" })],
-            ["star", "Favorites", isFavoritesView, buildHref("people", { filter: "favorites" })],
-            ["archive", "Archived", currentTab === "archived", buildHref("archived", { filter: "all" })],
-            ["people", "Duplicates", currentTab === "duplicates", buildHref("duplicates", { filter: "all" })],
-            ["clock", "Activity", currentTab === "activity", buildHref("activity")],
-          ] as const
-        ).map(([icon, label, active, href]) => (
-          <Link
-            className={`flex flex-1 flex-col items-center justify-center gap-1 py-2 text-[10px] font-medium ${
-              active ? "text-[#17352e]" : "text-[#8b938c]"
-            }`}
-            href={href}
-            key={label}
-          >
-            <WorkspaceIcon name={icon} size={19} />
-            {label}
-          </Link>
-        ))}
-        <Link
-          className="flex flex-1 flex-col items-center justify-center gap-1 py-2 text-[10px] font-medium text-[#8b938c]"
-          href="/settings"
-        >
-          <WorkspaceIcon name="more" size={19} />
-          More
-        </Link>
-      </nav>
+      {/* Mobile bottom nav is provided by the shared <BottomNav> in contacts/page.tsx
+          (Contacts · Activity · Sync · Settings). The legacy in-dashboard nav was
+          removed — it duplicated/conflicted with BottomNav and showed the wrong tabs
+          at tablet widths (768–1023px). */}
     </div>
   );
 }

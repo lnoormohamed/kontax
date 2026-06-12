@@ -22,6 +22,7 @@ import {
   type SyncJobRow,
   type SyncConflictData,
 } from "./_components/sync-page-client";
+import { MobileSyncScreen } from "./_components/mobile-sync-screen";
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 const getInitials = (value: string) =>
@@ -127,6 +128,11 @@ export default async function SyncPage({ searchParams }: PageProps) {
   };
 
   const initialAccountId = getParam("account") ?? null;
+  const addParam = getParam("add") === "1";
+  // On mobile the clean MobileSyncScreen owns the summary; the full SyncPageClient
+  // (detail / add form) only takes over the screen when a connection is selected
+  // or we're adding. On desktop both rails always show.
+  const mobileClientActive = Boolean(initialAccountId) || addParam;
 
   // Build flash message from redirect params
   const flashMsg = (() => {
@@ -327,12 +333,20 @@ export default async function SyncPage({ searchParams }: PageProps) {
           />
         </div>
 
-        {/* Rails 2+3: account list + detail (client-managed) */}
-        <SyncPageClient
-          accounts={accounts}
-          initialAccountId={initialAccountId}
-          flash={flashMsg}
-        />
+        {/* Mobile summary — clean connection cards (md:hidden), suppressed once
+            a connection/add takes over via SyncPageClient. */}
+        <MobileSyncScreen accounts={accounts} hidden={mobileClientActive} />
+
+        {/* Rails 2+3: account list + detail (client-managed). Desktop always
+            shows it; mobile only when a connection is selected or adding. */}
+        <div className={`min-w-0 flex-1 ${mobileClientActive ? "flex" : "hidden md:flex"}`}>
+          <SyncPageClient
+            accounts={accounts}
+            initialAccountId={initialAccountId}
+            initialAdd={addParam}
+            flash={flashMsg}
+          />
+        </div>
       </div>
 
       <BottomNav syncErrorCount={syncErrorCount} />

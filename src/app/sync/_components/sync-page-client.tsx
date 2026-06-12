@@ -2374,17 +2374,23 @@ function ConnectionSettings({
 export type SyncPageClientProps = {
   accounts: SyncAccountData[];
   initialAccountId: string | null;
+  // open the add-account form on mount (mobile deep-link from MobileSyncScreen)
+  initialAdd?: boolean;
   // flash message from URL params
   flash: string | null;
 };
 
-export function SyncPageClient({ accounts, initialAccountId, flash: initialFlash }: SyncPageClientProps) {
+export function SyncPageClient({ accounts, initialAccountId, initialAdd = false, flash: initialFlash }: SyncPageClientProps) {
   const [selectedId, setSelectedId] = useState<string | null>(
     initialAccountId ?? accounts[0]?.id ?? null,
   );
-  const [view, setView] = useState<"detail" | "add">("detail");
+  const [view, setView] = useState<"detail" | "add">(initialAdd ? "add" : "detail");
   const [editing, setEditing] = useState(false);
-  const [mobilePane, setMobilePane] = useState<"list" | "detail">("list");
+  // On mobile we deep-link straight into a connection or the add form, so the
+  // detail pane should be active from the start in those cases.
+  const [mobilePane, setMobilePane] = useState<"list" | "detail">(
+    initialAccountId || initialAdd ? "detail" : "list",
+  );
   // syncingId reserved for future optimistic in-progress indicator
   const syncingId: string | null = null;
   const [toast, setToast] = useState<string | null>(initialFlash);
@@ -2452,8 +2458,10 @@ export function SyncPageClient({ accounts, initialAccountId, flash: initialFlash
     : "healthy";
 
   const renderDetail = () => {
-    if (accounts.length === 0) return <EmptyState onAdd={openAdd} />;
+    // The add form must win over the empty state — otherwise a user with zero
+    // connections (the most common case for adding!) can never reach it.
     if (view === "add") return <AddAccountForm onCancel={() => setView("detail")} />;
+    if (accounts.length === 0) return <EmptyState onAdd={openAdd} />;
     if (!selectedAccount) return <EmptyState onAdd={openAdd} />;
     if (editing)
       return (
@@ -2747,7 +2755,15 @@ export function SyncPageClient({ accounts, initialAccountId, flash: initialFlash
         >
           <button
             type="button"
-            onClick={() => setMobilePane("list")}
+            onClick={() => {
+              // Desktop has the rail alongside; mobile returns to the summary
+              // (MobileSyncScreen) by clearing the deep-link params.
+              if (typeof window !== "undefined" && window.innerWidth < 768) {
+                router.push("/sync");
+              } else {
+                setMobilePane("list");
+              }
+            }}
             style={{
               display: "inline-flex",
               alignItems: "center",
