@@ -4,6 +4,7 @@ import { auth } from "~/server/auth";
 import { assertCanImportContacts } from "~/server/billing";
 import { parseCsvContacts } from "~/server/contact-portability";
 import { db } from "~/server/db";
+import type { ExplicitColumnMapping } from "~/server/contact-portability";
 
 const getOptionalJsonArray = <T>(value: T[] | null | undefined) =>
   value && value.length > 0 ? value : undefined;
@@ -14,6 +15,9 @@ const commitRequestSchema = z.object({
   sourceFileName: z.string().trim().optional(),
   sourceFileSizeBytes: z.number().int().nonnegative().optional(),
   jobId: z.string().trim().optional(),
+  columnMappings: z
+    .array(z.object({ index: z.number().int().nonnegative(), targetField: z.string() }))
+    .optional(),
 });
 
 export async function POST(request: Request) {
@@ -68,7 +72,11 @@ export async function POST(request: Request) {
       });
 
   try {
-    const preview = parseCsvContacts(parsedBody.data.csvText, parsedBody.data.profile);
+    const preview = parseCsvContacts(
+      parsedBody.data.csvText,
+      parsedBody.data.profile,
+      parsedBody.data.columnMappings as ExplicitColumnMapping[] | undefined,
+    );
     const warningCount = preview.issues.filter((issue) => issue.severity === "warning").length;
     const errorCount = preview.issues.filter((issue) => issue.severity === "error").length;
 

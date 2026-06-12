@@ -4,6 +4,11 @@ import Link from "next/link";
 import { useRef, useState, type ChangeEvent, type DragEvent } from "react";
 
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
+import {
+  FieldMappingStep,
+  type ApiColumnMapping,
+  type ResolvedMapping,
+} from "~/app/_components/import-field-mapping";
 
 type ImportProfile = "GENERIC" | "GOOGLE" | "APPLE" | "OUTLOOK";
 
@@ -26,6 +31,7 @@ type PreviewResponse = {
   profile: ImportProfile;
   canImport: boolean;
   blockingReasons: string[];
+  columnMappings: ApiColumnMapping[];
 };
 
 const SOURCES: Array<{ id: ImportProfile; label: string }> = [
@@ -71,20 +77,23 @@ function StepDot({ n, label, state }: { n: number; label: string; state: "active
   );
 }
 
-function StepIndicator({ step }: { step: 1 | 2 | 3 }) {
+function StepIndicator({ step }: { step: 1 | 2 | 3 | 4 }) {
   const states: Array<"active" | "done" | "future"> = [
     step > 1 ? "done" : "active",
     step === 2 ? "active" : step > 2 ? "done" : "future",
-    step === 3 ? "active" : "future",
+    step === 3 ? "active" : step > 3 ? "done" : "future",
+    step === 4 ? "active" : "future",
   ];
   const line = (i: number) => (states[i] === "done" ? "#1f8a5b" : "#d8ddd6");
   return (
     <div className="flex items-start justify-center px-2 pt-1">
       <StepDot n={1} label="Upload file" state={states[0]!} />
-      <span className="mt-[11px] h-0.5 w-full max-w-[96px] rounded" style={{ background: line(0) }} />
-      <StepDot n={2} label="Preview" state={states[1]!} />
-      <span className="mt-[11px] h-0.5 w-full max-w-[96px] rounded" style={{ background: line(1) }} />
-      <StepDot n={3} label="Done" state={states[2]!} />
+      <span className="mt-[11px] h-0.5 w-full max-w-[72px] rounded" style={{ background: line(0) }} />
+      <StepDot n={2} label="Map fields" state={states[1]!} />
+      <span className="mt-[11px] h-0.5 w-full max-w-[72px] rounded" style={{ background: line(1) }} />
+      <StepDot n={3} label="Preview" state={states[2]!} />
+      <span className="mt-[11px] h-0.5 w-full max-w-[72px] rounded" style={{ background: line(2) }} />
+      <StepDot n={4} label="Done" state={states[3]!} />
     </div>
   );
 }
@@ -97,7 +106,8 @@ export function ImportPreviewForm({
   gate: "none" | "near" | "limit";
   quota: { used: number; cap: number; reset: string };
 }) {
-  const [step, setStep] = useState<1 | 2 | 3>(1);
+  const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
+  const [resolvedMappings, setResolvedMappings] = useState<ResolvedMapping[]>([]);
   const [profile, setProfile] = useState<ImportProfile>("GENERIC");
   const [csvText, setCsvText] = useState("");
   const [fileName, setFileName] = useState<string | null>(null);
@@ -120,6 +130,7 @@ export function ImportPreviewForm({
     setFileSize(undefined);
     setPaste("");
     setPreview(null);
+    setResolvedMappings([]);
     setError("");
   };
 
@@ -175,7 +186,14 @@ export function ImportPreviewForm({
     const res = await fetch("/api/imports/contacts/commit", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ csvText, profile, sourceFileName: fileName ?? "import.csv", sourceFileSizeBytes: fileSize, jobId: preview.jobId }),
+      body: JSON.stringify({
+        csvText,
+        profile,
+        sourceFileName: fileName ?? "import.csv",
+        sourceFileSizeBytes: fileSize,
+        jobId: preview.jobId,
+        columnMappings: resolvedMappings.length > 0 ? resolvedMappings : undefined,
+      }),
     });
     const data = (await res.json().catch(() => null)) as { importedCount?: number; message?: string } | null;
     setBusy(false);
@@ -184,7 +202,7 @@ export function ImportPreviewForm({
       return;
     }
     setImportedCount(data?.importedCount ?? preview.contacts.length);
-    setStep(3);
+    setStep(4);
   };
 
   const doUndo = async () => {
@@ -370,8 +388,20 @@ export function ImportPreviewForm({
         </div>
       ) : null}
 
-      {/* ── Step 2 — preview ── */}
+      {/* ── Step 2 — map fields ── */}
       {step === 2 && preview ? (
+        <FieldMappingStep
+          initialMappings={preview.columnMappings}
+          onBack={() => setStep(1)}
+          onContinue={(mappings) => {
+            setResolvedMappings(mappings);
+            setStep(3);
+          }}
+        />
+      ) : null}
+
+      {/* ── Step 3 — preview ── */}
+      {step === 3 && preview ? (
         <div className="relative grid gap-4">
           <div>
             <div className="text-[13px] text-[#5c655e]">
@@ -446,7 +476,7 @@ export function ImportPreviewForm({
             <button
               className="h-11 rounded-[10px] border border-[#d8ddd6] bg-white px-[18px] text-[14.5px] font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0] disabled:opacity-50"
               disabled={busy}
-              onClick={() => setStep(1)}
+              onClick={() => setStep(2)}
               type="button"
             >
               ← Back
@@ -463,8 +493,8 @@ export function ImportPreviewForm({
         </div>
       ) : null}
 
-      {/* ── Step 3 — success ── */}
-      {step === 3 ? (
+      {/* ── Step 4 — success ── */}
+      {step === 4 ? (
         <div className="grid gap-[18px]">
           <div className="flex items-center gap-3.5">
             <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-[#e3efe7]">

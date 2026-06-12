@@ -1,3 +1,15 @@
+import { classifyColumn, type KontaxField, type ConfidenceTier } from "~/server/import/column-classifier";
+
+export type ColumnMapping = {
+  header: string;
+  index: number;
+  field: KontaxField | "custom";
+  confidence: number;
+  confidenceTier: ConfidenceTier;
+  source: "profile" | "classifier";
+  sampleValues: string[];
+};
+
 export type ContactPostalAddressInput = {
   label: string;
   formatted: string;
@@ -50,6 +62,11 @@ export type PortableContactInput = {
 
 export type CsvImportProfile = "GENERIC" | "GOOGLE" | "APPLE" | "OUTLOOK";
 
+export type ExplicitColumnMapping = {
+  index: number;
+  targetField: string; // KontaxField | "custom" | "skip"
+};
+
 export type ImportPreviewIssue = {
   rowNumber: number;
   severity: "error" | "warning";
@@ -76,6 +93,7 @@ type CsvParseResult = {
   duplicateGroups: ImportPreviewDuplicateGroup[];
   canImport: boolean;
   blockingReasons: string[];
+  columnMappings: ColumnMapping[];
 };
 
 const normalizeHeader = (value: string) => value.trim().toLowerCase();
@@ -463,6 +481,7 @@ const getAliasesForField = (
 export const parseCsvContacts = (
   csvText: string,
   profile: CsvImportProfile = "GENERIC",
+  explicitMappings?: ExplicitColumnMapping[],
 ): CsvParseResult => {
   const rows = splitCsvRows(csvText).filter((row) => row.some((field) => field.trim().length > 0));
 
@@ -476,21 +495,61 @@ export const parseCsvContacts = (
     (header, index) => header.length > 0 && normalizedHeaders.indexOf(header) !== index,
   );
   const blankHeaderCount = headers.filter((header) => header.trim() === "").length;
-  const fullNameIndexes = getIndexes(headers, getAliasesForField(profile, "fullName"));
-  const firstNameIndexes = getIndexes(headers, getAliasesForField(profile, "firstName"));
-  const lastNameIndexes = getIndexes(headers, getAliasesForField(profile, "lastName"));
-  const phoneticFirstNameIndexes = getIndexes(headers, getAliasesForField(profile, "phoneticFirstName"));
-  const phoneticLastNameIndexes = getIndexes(headers, getAliasesForField(profile, "phoneticLastName"));
-  const nicknameIndexes = getIndexes(headers, getAliasesForField(profile, "nickname"));
-  const emailIndexes = getIndexes(headers, getAliasesForField(profile, "email"));
-  const phoneIndexes = getIndexes(headers, getAliasesForField(profile, "phone"));
-  const companyIndexes = getIndexes(headers, getAliasesForField(profile, "company"));
-  const phoneticCompanyIndexes = getIndexes(headers, getAliasesForField(profile, "phoneticCompany"));
-  const jobTitleIndexes = getIndexes(headers, getAliasesForField(profile, "jobTitle"));
-  const websiteIndexes = getIndexes(headers, getAliasesForField(profile, "website"));
-  const birthdayIndexes = getIndexes(headers, getAliasesForField(profile, "birthday"));
-  const addressIndexes = getIndexes(headers, getAliasesForField(profile, "address"));
-  const notesIndexes = getIndexes(headers, getAliasesForField(profile, "notes"));
+  let fullNameIndexes = getIndexes(headers, getAliasesForField(profile, "fullName"));
+  let firstNameIndexes = getIndexes(headers, getAliasesForField(profile, "firstName"));
+  let lastNameIndexes = getIndexes(headers, getAliasesForField(profile, "lastName"));
+  let phoneticFirstNameIndexes = getIndexes(headers, getAliasesForField(profile, "phoneticFirstName"));
+  let phoneticLastNameIndexes = getIndexes(headers, getAliasesForField(profile, "phoneticLastName"));
+  let nicknameIndexes = getIndexes(headers, getAliasesForField(profile, "nickname"));
+  let emailIndexes = getIndexes(headers, getAliasesForField(profile, "email"));
+  let phoneIndexes = getIndexes(headers, getAliasesForField(profile, "phone"));
+  let companyIndexes = getIndexes(headers, getAliasesForField(profile, "company"));
+  let phoneticCompanyIndexes = getIndexes(headers, getAliasesForField(profile, "phoneticCompany"));
+  let jobTitleIndexes = getIndexes(headers, getAliasesForField(profile, "jobTitle"));
+  let websiteIndexes = getIndexes(headers, getAliasesForField(profile, "website"));
+  let birthdayIndexes = getIndexes(headers, getAliasesForField(profile, "birthday"));
+  let addressIndexes = getIndexes(headers, getAliasesForField(profile, "address"));
+  let notesIndexes = getIndexes(headers, getAliasesForField(profile, "notes"));
+
+  // When the user has confirmed a field mapping in the UI, override profile-based detection.
+  if (explicitMappings && explicitMappings.length > 0) {
+    fullNameIndexes = [];
+    firstNameIndexes = [];
+    lastNameIndexes = [];
+    phoneticFirstNameIndexes = [];
+    phoneticLastNameIndexes = [];
+    nicknameIndexes = [];
+    emailIndexes = [];
+    phoneIndexes = [];
+    companyIndexes = [];
+    phoneticCompanyIndexes = [];
+    jobTitleIndexes = [];
+    websiteIndexes = [];
+    birthdayIndexes = [];
+    addressIndexes = [];
+    notesIndexes = [];
+    for (const { index, targetField } of explicitMappings) {
+      switch (targetField) {
+        case "firstName": firstNameIndexes.push(index); break;
+        case "lastName": lastNameIndexes.push(index); break;
+        case "fullName": fullNameIndexes.push(index); break;
+        case "email": emailIndexes.push(index); break;
+        case "phone": phoneIndexes.push(index); break;
+        case "company": companyIndexes.push(index); break;
+        case "jobTitle": jobTitleIndexes.push(index); break;
+        case "address.street":
+        case "address.city":
+        case "address.state":
+        case "address.postalCode":
+        case "address.country":
+          addressIndexes.push(index); break;
+        case "birthday": birthdayIndexes.push(index); break;
+        case "website": websiteIndexes.push(index); break;
+        case "notes": notesIndexes.push(index); break;
+        default: break; // "skip" and "custom" are excluded
+      }
+    }
+  }
   const recognizedFieldIndexes = [
     ...fullNameIndexes,
     ...firstNameIndexes,
@@ -514,6 +573,68 @@ export const parseCsvContacts = (
       `We could not recognize any supported columns for the ${profile.toLowerCase()} CSV profile.`,
     );
   }
+
+  // Build index→field reverse map for profile-matched columns so we can
+  // report HIGH-confidence mappings without re-running the classifier on them.
+  const profileFieldMap = new Map<number, KontaxField>();
+  const profileIndexSets: Array<[KontaxField, number[]]> = [
+    ["fullName", fullNameIndexes],
+    ["firstName", firstNameIndexes],
+    ["lastName", lastNameIndexes],
+    ["email", emailIndexes],
+    ["phone", phoneIndexes],
+    ["company", companyIndexes],
+    ["jobTitle", jobTitleIndexes],
+    ["website", websiteIndexes],
+    ["birthday", birthdayIndexes],
+    ["notes", notesIndexes],
+    // Phonetic and nickname fields map to their closest consumer-visible field.
+    ["firstName", phoneticFirstNameIndexes],
+    ["lastName", phoneticLastNameIndexes],
+    ["fullName", nicknameIndexes],
+    ["company", phoneticCompanyIndexes],
+  ];
+  for (const [field, indexes] of profileIndexSets) {
+    for (const idx of indexes) {
+      if (!profileFieldMap.has(idx)) profileFieldMap.set(idx, field);
+    }
+  }
+
+  // address indexes are typed as a generic string field on the profile side;
+  // map them to the address.street classifier field for consistency.
+  for (const idx of addressIndexes) {
+    if (!profileFieldMap.has(idx)) profileFieldMap.set(idx, "address.street");
+  }
+
+  const dataRows = rows.slice(1);
+  const columnMappings: ColumnMapping[] = headers.map((header, index) => {
+    const sampleValues = dataRows
+      .slice(0, 5)
+      .map((r) => r[index]?.trim() ?? "")
+      .filter(Boolean);
+
+    const profileField = profileFieldMap.get(index);
+    if (profileField !== undefined) {
+      return {
+        header,
+        index,
+        field: profileField,
+        confidence: 1.0,
+        confidenceTier: "HIGH" as const,
+        source: "profile" as const,
+        sampleValues,
+      };
+    }
+
+    const classification = classifyColumn(header, sampleValues, index);
+    return {
+      header,
+      index,
+      ...classification,
+      source: "classifier" as const,
+      sampleValues,
+    };
+  });
 
   const contacts: ImportPreviewContact[] = [];
   const issues: ImportPreviewIssue[] = [];
@@ -759,6 +880,7 @@ export const parseCsvContacts = (
     duplicateGroups,
     canImport: blockingReasons.length === 0,
     blockingReasons,
+    columnMappings,
   };
 };
 
