@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { BottomNav } from "~/app/_components/bottom-nav";
 import { NotificationBellSlot } from "~/app/_components/notification-bell-slot";
 import { SearchInput } from "~/app/_components/search-input";
+import { MobileSettingsHeader } from "~/app/settings/_components/mobile-settings-header";
 import { SettingsSidebar } from "~/app/_components/settings-sidebar";
 import { UserMenu } from "~/app/_components/user-menu";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
@@ -81,14 +82,8 @@ export default async function SettingsLayout({ children }: { children: React.Rea
         </div>
       </header>
 
-      {/* Mobile header — "Settings" title, shown only on mobile */}
-      <header
-        className="flex shrink-0 items-center border-b border-[#d8ddd6] bg-white md:hidden"
-        style={{ height: 52, padding: "0 16px", gap: 12 }}
-      >
-        <span style={{ fontSize: 19, fontWeight: 700, color: "#1d2823", flex: 1 }}>Settings</span>
-        <NotificationBellSlot userId={userId} />
-      </header>
+      {/* Mobile header — "Settings" at the root, a back header on sub-pages (P24B-02) */}
+      <MobileSettingsHeader bell={<NotificationBellSlot userId={userId} />} />
 
       <div className="flex min-h-0 flex-1">
         {/* Sidebar: hidden on mobile, visible on desktop */}

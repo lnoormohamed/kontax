@@ -53,7 +53,7 @@ Requirements** section; the paired build ticket builds to it.
 | Ticket | Title | Spec § | Priority | Status | Depends |
 | --- | --- | --- | --- | --- | --- |
 | P24B-01 | `MobilePlainHeader` (title + bell) — extract & adopt on Activity/Sync/Settings roots | B1 | P1 | ☐ | — |
-| P24B-02 | Settings layout: secondary-header back-nav on sub-pages (‹ Settings · <title>) | B1, E6 | **P0** | ☐ | — |
+| P24B-02 | Settings layout: secondary-header back-nav on sub-pages (‹ Settings · <title>) | B1, E6 | **P0** | ✅ | — |
 | P24B-03 | Variance primitives: `UpsellCard`, `NearLimitBanner`, `ReadOnlyBanner`, `PendingChip`, `PermissionGate` | E0.4, C | **P0** | ☐ | — |
 | P24B-04 | "Stack table → cards / h-scroll" helper | C, F | P1 | ☐ | — |
 | P24B-05 | Confirm-dialog / action-sheet primitive | D4 | P1 | ☐ | — |
@@ -140,3 +140,7 @@ Requirements** section; the paired build ticket builds to it.
 
 ## Progress log
 - 2026-06-12 — Phase opened. P24A shipped (sync/activity/nav fixes). Spec + brief + variance model in place.
+- 2026-06-12 — DB14 + DB18 design briefs approved (real-IOSDevice frames, scale 0.6).
+- 2026-06-12 — **P24B-02 done** — settings sub-pages now get a back header (‹ Settings · title)
+  via `MobileSettingsHeader`; root keeps the plain title. Verified at 375px; desktop unchanged.
+  Follow-up for P24B-12: drop the redundant in-page "SETTINGS" kicker on mobile sub-pages.
