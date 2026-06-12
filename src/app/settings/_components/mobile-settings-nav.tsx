@@ -43,7 +43,7 @@ function NavRow({
         }}
       >
         <WorkspaceIcon
-          name={icon as never}
+          name={icon}
           size={17}
           className={danger ? "text-[#b5472f]" : "text-[#5c655e]"}
           strokeWidth={1.7}

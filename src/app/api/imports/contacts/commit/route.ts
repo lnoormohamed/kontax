@@ -75,7 +75,7 @@ export async function POST(request: Request) {
     const preview = parseCsvContacts(
       parsedBody.data.csvText,
       parsedBody.data.profile,
-      parsedBody.data.columnMappings as ExplicitColumnMapping[] | undefined,
+      parsedBody.data.columnMappings,
     );
     const warningCount = preview.issues.filter((issue) => issue.severity === "warning").length;
     const errorCount = preview.issues.filter((issue) => issue.severity === "error").length;

@@ -88,8 +88,8 @@ export default async function SettingsPlanPage({
       {/* Mobile settings nav — full-screen nav list, hidden on desktop */}
       <MobileSettingsNav
         email={session.user.email ?? ""}
-        hasFamily={!!(familyMembership || planSummary.plan === "FAMILY")}
-        hasTeam={!!(teamMembership || planSummary.plan === "TEAMS")}
+        hasFamily={!!(familyMembership ?? planSummary.plan === "FAMILY")}
+        hasTeam={!!(teamMembership ?? planSummary.plan === "TEAMS")}
         name={userLabel}
         plan={planSummary.planLabel}
         syncActive={syncConnections}
