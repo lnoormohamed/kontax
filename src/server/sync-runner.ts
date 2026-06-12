@@ -10,10 +10,13 @@ import { emitEvent } from "~/lib/activity";
 import { createNotification } from "~/server/notifications";
 import {
   AUTO_PAUSE_FAILURE_STREAK,
+  CONFLICT_QUEUE_FULL_CODE,
+  MANUAL_CONFLICT_QUEUE_LIMIT,
   getConsecutiveFailureStreak,
   getSyncErrorSupportBucket,
 } from "~/server/sync-health";
 import { decryptSyncCredentialPayload } from "~/server/sync-credentials";
+import { getEffectiveSyncAccountSettings } from "~/server/sync-settings";
 
 const createRetrySchedule = (attemptNumber: number) => {
   const backoffMinutes = [5, 15, 60, 180, 720];
@@ -353,6 +356,33 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
       continue;
     }
 
+    // P23-01: read the per-connection settings (falls back to platform defaults
+    // when no row exists yet). conflictPolicy routes the conflict branch below;
+    // bookAllowlist gates which books this account is allowed to sync.
+    const settings = await getEffectiveSyncAccountSettings(job.syncAccountId);
+
+    // Honor the book allowlist. The runner syncs one addressBookUrl per job, so
+    // when the allowlist is non-empty and excludes this book, complete the job as
+    // a no-op rather than a failure.
+    if (
+      settings.bookAllowlist.length > 0 &&
+      !settings.bookAllowlist.includes(job.syncAccount.addressBookUrl)
+    ) {
+      await db.syncJob.update({
+        where: { id: job.id },
+        data: {
+          status: "SUCCEEDED",
+          completedAt: new Date(),
+          leaseExpiresAt: null,
+          nextRetryAt: null,
+          errorCode: null,
+          errorSummary: "Skipped — this address book is excluded by the connection allowlist.",
+        },
+      });
+      summary.skipped += 1;
+      continue;
+    }
+
     // P14-06: resolve the sync scope. Team-linked accounts operate on a team
     // book's contacts (owned by the group owner); personal accounts unchanged.
     const teamLink = job.syncAccount.teamLink;
@@ -489,6 +519,16 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
         remoteSnapshot: unknown;
       }> = [];
       let deferredLocalChangesCount = 0;
+      // P23-05: audit trail for conflicts auto-resolved by SERVER_WINS / DEVICE_WINS.
+      const autoResolvedEntries: Array<{
+        linkId: string;
+        contactId: string;
+        localSyncVersion: number;
+        remoteETag: string | null;
+        localSnapshot: ReturnType<typeof buildLocalConflictSnapshot>;
+        remoteSnapshot: unknown;
+        strategy: "KEEP_REMOTE" | "KEEP_LOCAL";
+      }> = [];
 
       for (const link of existingLinks) {
         const remoteUid = link.remoteUid ?? link.contact.syncUid;
@@ -521,6 +561,44 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
         }
 
         if (localChanged && remoteChanged && remoteCard) {
+          // P23-01: resolve a local↔remote mutation by the connection's policy.
+          if (settings.conflictPolicy === "SERVER_WINS") {
+            // Remote wins: apply the remote snapshot over the local contact.
+            remoteApplyCandidates.push({
+              linkId: link.id,
+              contactId: link.contact.id,
+              remoteETag: remoteEntry.etag ?? null,
+              remoteSnapshot: remoteCard,
+            });
+            // P23-05: record an AUTO_RESOLVED audit row for the applied conflict.
+            autoResolvedEntries.push({
+              linkId: link.id,
+              contactId: link.contact.id,
+              localSyncVersion: link.contact.syncVersion,
+              remoteETag: remoteEntry.etag ?? null,
+              localSnapshot: buildLocalConflictSnapshot(link.contact),
+              remoteSnapshot: remoteCard,
+              strategy: "KEEP_REMOTE",
+            });
+            continue;
+          }
+          if (settings.conflictPolicy === "DEVICE_WINS") {
+            // Kontax wins: keep the local edit and let a later push carry it; do
+            // not overwrite with the remote snapshot on this pull.
+            deferredLocalChangesCount += 1;
+            // P23-05: record an AUTO_RESOLVED audit row for the kept-local conflict.
+            autoResolvedEntries.push({
+              linkId: link.id,
+              contactId: link.contact.id,
+              localSyncVersion: link.contact.syncVersion,
+              remoteETag: remoteEntry.etag ?? null,
+              localSnapshot: buildLocalConflictSnapshot(link.contact),
+              remoteSnapshot: remoteCard,
+              strategy: "KEEP_LOCAL",
+            });
+            continue;
+          }
+          // MANUAL: surface a SyncConflict row for the review queue (P23-05).
           conflictEntries.push({
             type: "LOCAL_REMOTE_MUTATION",
             linkId: link.id,
@@ -722,6 +800,35 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
           });
         }
 
+        // P23-05: persist AUTO_RESOLVED audit rows for policy-resolved conflicts.
+        for (const auto of autoResolvedEntries) {
+          await tx.syncConflict.create({
+            data: {
+              syncAccountId: job.syncAccountId,
+              syncContactLinkId: auto.linkId,
+              contactId: auto.contactId,
+              conflictType: "LOCAL_REMOTE_MUTATION",
+              status: "AUTO_RESOLVED",
+              resolutionStrategy: auto.strategy,
+              resolvedAt: now,
+              localSyncVersion: auto.localSyncVersion,
+              remoteETag: auto.remoteETag,
+              localSnapshot: auto.localSnapshot,
+              remoteSnapshot: auto.remoteSnapshot as Prisma.InputJsonValue,
+              resolutionNotes:
+                auto.strategy === "KEEP_REMOTE"
+                  ? "Auto-resolved by the Server-wins policy: remote change applied."
+                  : "Auto-resolved by the Kontax-wins policy: local change kept.",
+            },
+          });
+        }
+
+        // P23-05: auto-pause when the manual review queue fills up.
+        const openConflictCount = await tx.syncConflict.count({
+          where: { syncAccountId: job.syncAccountId, status: "OPEN" },
+        });
+        const queueFull = openConflictCount >= MANUAL_CONFLICT_QUEUE_LIMIT;
+
         await tx.syncJob.update({
           where: { id: job.id },
           data: {
@@ -754,15 +861,20 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
         await tx.syncAccount.update({
           where: { id: job.syncAccountId },
           data: {
-            status: job.syncAccount.status === "PAUSED" ? "PAUSED" : "ACTIVE",
+            status: queueFull || job.syncAccount.status === "PAUSED" ? "PAUSED" : "ACTIVE",
             remoteCTag: String(remoteEntries.length),
             lastSyncCursor: String(remoteEntries.length),
             lastSyncedAt: now,
             lastSucceededAt: now,
-            lastErrorAt: conflictEntries.length > 0 ? now : null,
-            lastErrorCode: conflictEntries.length > 0 ? "SYNC_CONFLICTS_OPEN" : null,
-            lastErrorMessage:
-              conflictEntries.length > 0
+            lastErrorAt: queueFull || conflictEntries.length > 0 ? now : null,
+            lastErrorCode: queueFull
+              ? CONFLICT_QUEUE_FULL_CODE
+              : conflictEntries.length > 0
+                ? "SYNC_CONFLICTS_OPEN"
+                : null,
+            lastErrorMessage: queueFull
+              ? `Sync paused — the manual conflict queue is full (${openConflictCount} open conflicts). Resolve conflicts to resume automatic sync.`
+              : conflictEntries.length > 0
                 ? `${conflictEntries.length} sync conflicts need review before the account is fully healthy again.`
                 : null,
           },

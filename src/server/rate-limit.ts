@@ -43,6 +43,9 @@ export const rateLimiters = {
 
   // Registration: new accounts per IP — 10 per hour
   registration: makeLimiter(10, 60 * 60, "rl:registration"),
+
+  // P23-06: sync settings re-auth (sudo) — 5 password attempts per 15 minutes
+  syncSettingsElevation: makeLimiter(5, 15 * 60, "rl:sync-elevation"),
 } as const;
 
 export interface RateLimitResult {

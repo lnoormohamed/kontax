@@ -1,5 +1,6 @@
 "use server";
 
+import bcrypt from "bcryptjs";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
@@ -11,13 +12,20 @@ import { CardDavPreflightError, discoverCardDavAccount, pushCardDavContact } fro
 import { parseContactPostalAddresses, parseContactStringArray } from "~/server/contact-portability";
 import { db } from "~/server/db";
 import { emitEvent } from "~/lib/activity";
+import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
 import {
   decryptSyncCredentialPayload,
   encryptSyncCredentialPayload,
   getSyncCredentialEncryptionStatus,
 } from "~/server/sync-credentials";
+import {
+  getCurrentElevationContext,
+  issueSyncSettingsElevation,
+  requireSyncSettingsElevation,
+} from "~/server/sync-elevation";
 
 const syncDirectionSchema = z.enum(["TWO_WAY", "IMPORT_ONLY", "EXPORT_ONLY"]);
+const conflictPolicySchema = z.enum(["SERVER_WINS", "DEVICE_WINS", "MANUAL"]);
 const syncResolutionStrategySchema = z.enum([
   "KEEP_LOCAL",
   "KEEP_REMOTE",
@@ -1633,4 +1641,309 @@ export const disconnectSyncAccount = async (formData: FormData) => {
 
   revalidateSyncViews();
   redirect(redirectTo);
+};
+
+// P23-06: confirm the user's password to gain a 15-minute "sudo" elevation for
+// editing sync settings. Returns { elevated } so the re-auth modal can react.
+export const confirmSyncSettingsPassword = async (
+  password: string,
+): Promise<{ elevated: boolean; error?: string }> => {
+  const context = await getCurrentElevationContext();
+  if (!context) {
+    return { elevated: false, error: "You must be signed in." };
+  }
+
+  const rl = await checkRateLimit(rateLimiters.syncSettingsElevation, `user:${context.userId}`);
+  if (!rl.allowed) {
+    return { elevated: false, error: "Too many attempts. Try again in a few minutes." };
+  }
+
+  const user = await db.user.findUnique({
+    where: { id: context.userId },
+    select: { password: true },
+  });
+  if (!user) {
+    return { elevated: false, error: "You must be signed in." };
+  }
+
+  const valid = await bcrypt.compare(password, user.password);
+  if (!valid) {
+    return { elevated: false };
+  }
+
+  await issueSyncSettingsElevation(context.userId, context.jti);
+  return { elevated: true };
+};
+
+// P23-02: update per-connection advanced settings (SyncAccountSettings, P23-01).
+// Object-input action consumed directly by the connection settings drawer so the
+// client can do an optimistic update and revert on the returned error. Note:
+// `syncFrequencyMinutes` uses the P23-01 convention — null = platform default,
+// 0 = "Manual only", otherwise a positive minute count.
+const updateSyncAccountSettingsSchema = z.object({
+  syncAccountId: z.string().min(1, "Sync account id is required."),
+  syncDirection: syncDirectionSchema.optional(),
+  conflictPolicy: conflictPolicySchema.optional(),
+  syncFrequencyMinutes: z.number().int().min(0).max(100_000).nullable().optional(),
+});
+
+export type UpdateSyncAccountSettingsInput = z.infer<typeof updateSyncAccountSettingsSchema>;
+
+export const updateSyncAccountSettings = async (
+  input: UpdateSyncAccountSettingsInput,
+): Promise<{ ok: true } | { ok: false; error: string }> => {
+  let userId: string;
+  try {
+    userId = await getRequiredUserId();
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Not signed in." };
+  }
+
+  const parsed = updateSyncAccountSettingsSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid settings." };
+  }
+  const { syncAccountId, syncDirection, conflictPolicy, syncFrequencyMinutes } = parsed.data;
+
+  // P23-06: require a valid re-auth elevation before changing settings.
+  const elevation = await requireSyncSettingsElevation();
+  if (!elevation.ok) return elevation;
+
+  // Verify ownership before touching anything. Select the fields P23-04 needs to
+  // decide whether a direction change should trigger a catch-up re-sync, plus the
+  // previous setting values for the P23-06 audit diff.
+  const account = await db.syncAccount.findFirst({
+    where: { id: syncAccountId, userId },
+    select: {
+      id: true,
+      status: true,
+      syncDirection: true,
+      addressBookUrl: true,
+      remoteCTag: true,
+      remoteAccountId: true,
+      credentialReference: true,
+      credentialRevokedAt: true,
+      settings: { select: { conflictPolicy: true, syncFrequencyMinutes: true } },
+    },
+  });
+  if (!account) {
+    return { ok: false, error: "Sync account not found." };
+  }
+
+  // P23-04: a change to a pulling direction (TWO_WAY / IMPORT_ONLY) may need to
+  // catch up on remote contacts skipped while the connection was EXPORT_ONLY.
+  const directionChanged = syncDirection != null && syncDirection !== account.syncDirection;
+  // P23-05: switching the conflict policy away from MANUAL should clear the
+  // existing review queue by auto-resolving open conflicts under the new policy.
+  const prevPolicy = account.settings?.conflictPolicy ?? "SERVER_WINS";
+  const leavingManual =
+    conflictPolicy != null && conflictPolicy !== "MANUAL" && prevPolicy === "MANUAL";
+
+  await db.$transaction(async (tx) => {
+    await tx.syncAccountSettings.upsert({
+      where: { syncAccountId },
+      create: {
+        syncAccountId,
+        ...(syncDirection ? { syncDirection } : {}),
+        ...(conflictPolicy ? { conflictPolicy } : {}),
+        ...(syncFrequencyMinutes !== undefined ? { syncFrequencyMinutes } : {}),
+      },
+      update: {
+        ...(syncDirection ? { syncDirection } : {}),
+        ...(conflictPolicy ? { conflictPolicy } : {}),
+        ...(syncFrequencyMinutes !== undefined ? { syncFrequencyMinutes } : {}),
+      },
+    });
+
+    // P23-01 reconcile: direction also lives on SyncAccount (copied onto each
+    // SyncJob and read by the engine). Keep the two in sync until the engine
+    // reads direction from settings directly.
+    if (syncDirection) {
+      await tx.syncAccount.update({
+        where: { id: syncAccountId },
+        data: { syncDirection },
+      });
+    }
+
+    // P23-04: on a direction change, queue a re-sync so the new direction applies
+    // on the next cycle and catches up any previously-skipped pulls. Only enqueue
+    // for pulling directions on a syncable account — EXPORT_ONLY has nothing to
+    // pull and is not yet runnable in the live CardDAV slice, so queuing it would
+    // just produce an immediate failure.
+    const syncable =
+      account.status === "ACTIVE" &&
+      !!account.credentialReference &&
+      !account.credentialRevokedAt &&
+      !!account.addressBookUrl;
+
+    if (directionChanged && syncDirection !== "EXPORT_ONLY" && syncable) {
+      await tx.syncJob.create({
+        data: {
+          syncAccountId,
+          status: "QUEUED",
+          trigger: "MANUAL",
+          syncDirection,
+          attemptCount: 1,
+          maxAttempts: 5,
+          nextRetryAt: new Date(),
+          cursorBefore: account.remoteCTag ?? account.remoteAccountId ?? account.addressBookUrl,
+          idempotencyKey: createIdempotencyKey([syncAccountId, "direction", syncDirection]),
+        },
+      });
+    }
+  });
+
+  // P23-05: clear the manual review queue when leaving the MANUAL policy. For
+  // SERVER_WINS, apply each remote snapshot over the local contact; for
+  // DEVICE_WINS, keep the local version. Either way the row becomes AUTO_RESOLVED.
+  if (leavingManual && conflictPolicy != null) {
+    const openConflicts = await db.syncConflict.findMany({
+      where: { syncAccountId, status: "OPEN", contactId: { not: null } },
+      select: {
+        id: true,
+        contactId: true,
+        remoteETag: true,
+        remoteSnapshot: true,
+        syncContactLinkId: true,
+      },
+    });
+    const resolvedAt = new Date();
+    const strategy = conflictPolicy === "SERVER_WINS" ? "KEEP_REMOTE" : "KEEP_LOCAL";
+
+    for (const conflict of openConflicts) {
+      if (conflictPolicy === "SERVER_WINS" && conflict.contactId && conflict.remoteSnapshot) {
+        try {
+          await db.contact.update({
+            where: { id: conflict.contactId },
+            data: {
+              ...buildContactWriteDataFromRemoteSnapshot(conflict.remoteSnapshot),
+              syncVersion: { increment: 1 },
+            },
+          });
+          if (conflict.syncContactLinkId) {
+            await db.syncContactLink.update({
+              where: { id: conflict.syncContactLinkId },
+              data: { remoteETag: conflict.remoteETag, lastSyncedAt: resolvedAt },
+            });
+          }
+        } catch {
+          // Snapshot may be incomplete (e.g. a delete conflict); still mark the
+          // row resolved so it leaves the queue rather than blocking forever.
+        }
+      }
+
+      await db.syncConflict.update({
+        where: { id: conflict.id },
+        data: {
+          status: "AUTO_RESOLVED",
+          resolutionStrategy: strategy,
+          resolvedAt,
+          resolutionNotes: `Auto-resolved when the conflict policy changed to ${conflictPolicy}.`,
+        },
+      });
+    }
+
+    // Resolving the queue may bring the account back under the auto-pause limit.
+    if (account.status === "PAUSED") {
+      await db.syncAccount.updateMany({
+        where: { id: syncAccountId, status: "PAUSED", lastErrorCode: "SYNC_CONFLICT_QUEUE_FULL" },
+        data: { status: "ACTIVE", lastErrorCode: null, lastErrorMessage: null, lastErrorAt: null },
+      });
+    }
+  }
+
+  // P23-06: audit the change. Record a field diff for each setting that moved.
+  const prevFreq = account.settings?.syncFrequencyMinutes ?? null;
+  const changes: Array<{ field: string; before: unknown; after: unknown }> = [];
+  if (syncDirection && syncDirection !== account.syncDirection) {
+    changes.push({ field: "syncDirection", before: account.syncDirection, after: syncDirection });
+  }
+  if (conflictPolicy && conflictPolicy !== prevPolicy) {
+    changes.push({ field: "conflictPolicy", before: prevPolicy, after: conflictPolicy });
+  }
+  if (syncFrequencyMinutes !== undefined && syncFrequencyMinutes !== prevFreq) {
+    changes.push({ field: "syncFrequencyMinutes", before: prevFreq, after: syncFrequencyMinutes });
+  }
+  if (changes.length > 0) {
+    await emitEvent(db, {
+      userId,
+      eventType: "SYNC_SETTINGS_CHANGED",
+      actor: "USER",
+      payload: { syncAccountId, changes },
+    });
+  }
+
+  revalidateSyncViews();
+  return { ok: true };
+};
+
+// P23-03: persist the remote address-book allowlist for a connection. Empty array
+// = sync all discovered books (default). The sync engine honors the allowlist by
+// skipping this account's book when the list is non-empty and excludes it
+// (see sync-runner). Re-scope archiving of contacts from excluded books is not
+// implemented: the engine syncs a single book per account and contacts do not
+// track a per-book source, so there is nothing to selectively archive yet.
+const updateBookAllowlistSchema = z.object({
+  syncAccountId: z.string().min(1, "Sync account id is required."),
+  allowlist: z.array(z.string().trim().url()).max(200),
+});
+
+export type UpdateBookAllowlistInput = z.infer<typeof updateBookAllowlistSchema>;
+
+export const updateBookAllowlist = async (
+  input: UpdateBookAllowlistInput,
+): Promise<{ ok: true } | { ok: false; error: string }> => {
+  let userId: string;
+  try {
+    userId = await getRequiredUserId();
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Not signed in." };
+  }
+
+  const parsed = updateBookAllowlistSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid book selection." };
+  }
+  const { syncAccountId, allowlist } = parsed.data;
+
+  // P23-06: require a valid re-auth elevation before changing settings.
+  const elevation = await requireSyncSettingsElevation();
+  if (!elevation.ok) return elevation;
+
+  const account = await db.syncAccount.findFirst({
+    where: { id: syncAccountId, userId },
+    select: { id: true, settings: { select: { bookAllowlist: true } } },
+  });
+  if (!account) {
+    return { ok: false, error: "Sync account not found." };
+  }
+
+  // Deduplicate before persisting.
+  const unique = Array.from(new Set(allowlist));
+  const prevAllowlist = account.settings?.bookAllowlist ?? [];
+
+  await db.syncAccountSettings.upsert({
+    where: { syncAccountId },
+    create: { syncAccountId, bookAllowlist: unique },
+    update: { bookAllowlist: unique },
+  });
+
+  // P23-06: audit the allowlist change when the set actually changed.
+  const changed =
+    prevAllowlist.length !== unique.length ||
+    [...prevAllowlist].sort().join("\n") !== [...unique].sort().join("\n");
+  if (changed) {
+    await emitEvent(db, {
+      userId,
+      eventType: "SYNC_SETTINGS_CHANGED",
+      actor: "USER",
+      payload: {
+        syncAccountId,
+        changes: [{ field: "bookAllowlist", before: prevAllowlist, after: unique }],
+      },
+    });
+  }
+
+  revalidateSyncViews();
+  return { ok: true };
 };

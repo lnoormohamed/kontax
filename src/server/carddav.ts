@@ -30,6 +30,14 @@ export type CardDavAddressBookEntry = {
   uid: string;
 };
 
+// P23-03: one discovered remote address book in a connection's allowlist picker.
+export type CardDavDiscoveredBook = {
+  url: string;
+  displayName: string | null;
+  ctag: string | null;
+  readOnly: boolean;
+};
+
 export type CardDavContactCard = CardDavAddressBookEntry & {
   fullName: string;
   firstName: string | null;
@@ -770,4 +778,75 @@ export const discoverCardDavAccount = async ({
     remoteCTag: resolvedRemoteCTag,
     addressBookDisplayName: resolvedDisplayName,
   };
+};
+
+// P23-03: enumerate every address book the remote exposes (not just the first),
+// for the connection settings allowlist picker. Resolves the address-book home
+// set the same way as discoverCardDavAccount, then PROPFIND depth:1 to list books.
+export const discoverCardDavAddressBooks = async ({
+  baseUrl,
+  principalUrl,
+  credentials,
+}: {
+  baseUrl: string;
+  principalUrl?: string | null;
+  credentials: CardDavCredentials;
+}): Promise<CardDavDiscoveredBook[]> => {
+  const normalizedBaseUrl = normalizeUrl(baseUrl);
+  const baseXml = await propfind({
+    url: normalizedBaseUrl,
+    credentials,
+    depth: 0,
+    body: BASE_DISCOVERY_BODY,
+  });
+  const baseSummary = getFirstSummary(baseXml, normalizedBaseUrl);
+
+  if (!baseSummary) {
+    throw new CardDavPreflightError(
+      "CARDDAV_DISCOVERY_EMPTY",
+      "CardDAV discovery received an empty response.",
+    );
+  }
+
+  let homeSetUrl = baseSummary.addressBookHomeSet;
+  const resolvedPrincipalUrl =
+    principalUrl != null ? normalizeUrl(principalUrl) : (baseSummary.currentUserPrincipal ?? null);
+
+  if (!homeSetUrl && resolvedPrincipalUrl) {
+    const principalXml = await propfind({
+      url: resolvedPrincipalUrl,
+      credentials,
+      depth: 0,
+      body: PRINCIPAL_BODY,
+    });
+    const principalSummary = getFirstSummary(principalXml, resolvedPrincipalUrl);
+    homeSetUrl = principalSummary?.addressBookHomeSet ?? null;
+  }
+
+  const collectionUrl = homeSetUrl ?? resolvedPrincipalUrl ?? normalizedBaseUrl;
+  const collectionXml = await propfind({
+    url: collectionUrl,
+    credentials,
+    depth: 1,
+    body: ADDRESS_BOOK_BODY,
+  });
+
+  const books: CardDavDiscoveredBook[] = [];
+  const seen = new Set<string>();
+  for (const block of getResponseBlocks(collectionXml)) {
+    const summary = summarizeResponse(block, collectionUrl);
+    if (!summary.resolvedHref || !isAddressBookResource(summary)) continue;
+    if (seen.has(summary.resolvedHref)) continue;
+    seen.add(summary.resolvedHref);
+    books.push({
+      url: summary.resolvedHref,
+      displayName: summary.displayName,
+      ctag: summary.ctag,
+      // Read-only detection needs a current-user-privilege-set PROPFIND, which the
+      // discovery body does not request yet; default to writable. (P23-03 risk note.)
+      readOnly: false,
+    });
+  }
+
+  return books;
 };

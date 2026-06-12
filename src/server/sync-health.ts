@@ -1,4 +1,9 @@
 export const AUTO_PAUSE_FAILURE_STREAK = 3;
+// P23-05: a connection auto-pauses once its manual conflict queue reaches this many
+// OPEN conflicts, to stop the queue flooding unattended.
+export const MANUAL_CONFLICT_QUEUE_LIMIT = 50;
+// lastErrorCode set on the account when it auto-pauses for a full conflict queue.
+export const CONFLICT_QUEUE_FULL_CODE = "SYNC_CONFLICT_QUEUE_FULL";
 
 export type SyncAccountStatus = "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR";
 export type SyncJobStatus = "QUEUED" | "RUNNING" | "SUCCEEDED" | "PARTIAL" | "FAILED";
@@ -101,6 +106,11 @@ export const getSyncAccountOperationalHealth = ({
 
   if (status === "NEEDS_REAUTH") {
     return "needs_reauth";
+  }
+
+  // P23-05: auto-pause for a full manual conflict queue is also a "safety" pause.
+  if (status === "PAUSED" && lastErrorCode === CONFLICT_QUEUE_FULL_CODE) {
+    return "paused_for_safety";
   }
 
   if (

@@ -228,3 +228,21 @@ Triggered when "Save settings" is clicked without a valid elevation token.
 - Auto-pause banner is specified.
 - Re-auth modal error state is specified.
 - Mobile: settings zone is full-width; conflict resolver rows stack field/local/remote vertically.
+
+---
+
+## As-Built Notes (Phase 23 implementation)
+
+Cross-checked against the shipped UI (`src/app/sync/_components/sync-page-client.tsx`) at the end of Phase 23. All 5 surfaces were built to spec; the items below are the only points where the implementation departs from this brief. Recorded here so the brief reflects what actually ships.
+
+### Deliberate deviations
+- **Book allowlist archive note** — brief copy "unchecked books will have their contacts archived in Kontax" was changed to "unchecked books will no longer sync into Kontax." The live CardDAV slice syncs one address book per account and contacts carry no per-book source, so nothing is actually archived (see P23-03). Copy follows the real behaviour.
+- **Allowlist has its own "Save books" button** — the brief mock implies the single "Save settings" commits book changes too. Implementation follows the P23-03 ticket, which defines a separate `updateBookAllowlist` server action, so the allowlist sub-section saves independently of direction/policy/frequency.
+- **Read-only remote books** — the lock + "(read-only on remote)" treatment and the auto-`IMPORT_ONLY` rule are wired, but remote read-only detection is stubbed `false` (needs a `current-user-privilege-set` PROPFIND not yet in the discovery body, per P23-03), so no discovered book currently reports as read-only.
+
+### Minor cosmetic trims (intentional, low-impact)
+- **"Settings saved" inline confirmation** is not held for the spec'd 2 seconds — saving triggers `router.refresh()`, which re-seeds the zone and clears the pill almost immediately. The bottom toast "Settings saved" (≈3.2s) already provides the feedback, so the inline pill is redundant rather than missing.
+- **Auto-pause banner headline** omits the literal "(50 conflicts)" count; the count surfaces in the account's health-detail line instead. Banner colours/shape match the brief exactly.
+
+### Conformance fix applied during review
+- **Gear tap target** was initially 28×28; corrected to the spec'd **36×36** (hover `#f2f4f0`, 14px `Settings` icon, `#8b938c`). Row right-padding bumped to 48px to clear it.

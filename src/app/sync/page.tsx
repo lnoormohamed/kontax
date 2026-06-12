@@ -184,6 +184,15 @@ export default async function SyncPage({ searchParams }: PageProps) {
               contact: { select: { id: true, fullName: true } },
             },
           },
+          // P23-02: per-connection advanced settings for the edit drawer.
+          settings: {
+            select: {
+              syncDirection: true,
+              conflictPolicy: true,
+              syncFrequencyMinutes: true,
+              bookAllowlist: true,
+            },
+          },
         },
       }),
     ]);
@@ -224,12 +233,20 @@ export default async function SyncPage({ searchParams }: PageProps) {
       id: acct.id,
       label: acct.label,
       baseUrl: acct.baseUrl,
-      direction: acct.syncDirection,
+      // P23-02: settings.syncDirection is the canonical home; fall back to the
+      // SyncAccount column when no settings row exists yet.
+      direction: acct.settings?.syncDirection ?? acct.syncDirection,
+      conflictPolicy: acct.settings?.conflictPolicy ?? "SERVER_WINS",
+      syncFrequencyMinutes: acct.settings?.syncFrequencyMinutes ?? null,
+      bookAllowlist: acct.settings?.bookAllowlist ?? [],
       status: acct.status,
       health,
       lastSyncedAtRelative: formatRelative(acct.lastSyncedAt),
       lastErrorMessage: acct.lastErrorMessage ?? null,
       consecutiveFailures: getConsecutiveFailureStreak(recentJobs),
+      // P23-05: surface the conflict-queue-full auto-pause to the detail panel.
+      conflictQueueFull:
+        acct.status === "PAUSED" && acct.lastErrorCode === "SYNC_CONFLICT_QUEUE_FULL",
       jobs,
       conflicts,
     };

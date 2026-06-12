@@ -253,6 +253,12 @@ const renderProp = (prop) => {
       return `<d:getetag>${escapeXml(prop.value)}</d:getetag>`;
     case "address-data":
       return `<card:address-data>${escapeXml(prop.value)}</card:address-data>`;
+    case "current-user-privilege-set":
+      // P23-07: read-only books advertise read-only privileges so iOS/macOS show a
+      // lock and block edits; writable books advertise read + write.
+      return prop.readOnly
+        ? "<d:current-user-privilege-set><d:privilege><d:read/></d:privilege></d:current-user-privilege-set>"
+        : "<d:current-user-privilege-set><d:privilege><d:read/></d:privilege><d:privilege><d:write/></d:privilege></d:current-user-privilege-set>";
     default:
       return "";
   }
@@ -325,12 +331,20 @@ const buildPropfindResponse = (responses) => {
 };
 
 // P18-11: CTag is now per-book (was per-user)
-const computeAddressBookCTag = async (userId, bookId) => {
-  const where = bookId
-    ? { bookId }
-    : { userId };
+// P23-07: resolve which contacts belong to a personal Kontax-server book. A book
+// with sourceBookIds aggregates contacts from those books; otherwise it scopes to
+// its own contacts (bookId = book.id). A null book means the legacy "all contacts".
+const bookScopeWhere = (userId, book) => {
+  if (!book) return { userId };
+  if (Array.isArray(book.sourceBookIds) && book.sourceBookIds.length > 0) {
+    return { bookId: { in: book.sourceBookIds } };
+  }
+  return { bookId: book.id };
+};
+
+const computeAddressBookCTag = async (userId, book) => {
   const mostRecent = await prisma.contact.findFirst({
-    where,
+    where: bookScopeWhere(userId, book),
     orderBy: { updatedAt: "desc" },
     select: { updatedAt: true },
   });
@@ -707,12 +721,11 @@ const parseVCardToContactFields = (text) => {
   return fields;
 };
 
-// P18-11: filter by bookId when available; fall back to userId for migration safety
-const fetchActiveContacts = (userId, bookId) =>
+// P18-11 / P23-07: contacts in a personal book — its own, or aggregated from
+// sourceBookIds. `book` may be null (legacy default = all of the user's contacts).
+const fetchActiveContacts = (userId, book) =>
   prisma.contact.findMany({
-    where: bookId
-      ? { bookId, archivedAt: null, syncTombstoneAt: null }
-      : { userId, archivedAt: null, syncTombstoneAt: null },
+    where: { ...bookScopeWhere(userId, book), archivedAt: null, syncTombstoneAt: null },
     orderBy: { syncUid: "asc" },
   });
 
@@ -1050,8 +1063,10 @@ const handleAddressBooks = async (req, res, requestUrl) => {
       const bookProps = [
         { name: "displayname", value: pb.name },
         { name: "resourcetype", types: ["collection", "addressbook"] },
-        { name: "getctag", value: await computeAddressBookCTag(user.id, pb.id) },
+        { name: "getctag", value: await computeAddressBookCTag(user.id, pb) },
         { name: "supported-address-data" },
+        // P23-07: signal read-only books so iOS/macOS show them as non-editable.
+        { name: "current-user-privilege-set", readOnly: pb.deviceWritable === false },
       ];
       responses.push({
         href: `${homeHref}${pb.slug}/`,
@@ -1067,6 +1082,7 @@ const handleAddressBooks = async (req, res, requestUrl) => {
         { name: "supported-address-data" },
       ];
       responses.push({ href: `${homeHref}default/`, ...splitDavProps(defaultProps, requestedNames) });
+      // (legacy default is always writable; no privilege-set override needed)
     }
 
     // P13-08: surface the shared family book as a second collection.
@@ -1563,13 +1579,15 @@ const handleAddressBookCollection = async (req, res, requestUrl) => {
     const collectionProps = [
       { name: "displayname", value: book.name },
       { name: "resourcetype", types: ["collection", "addressbook"] },
-      { name: "getctag", value: await computeAddressBookCTag(userId, book.id) },
+      { name: "getctag", value: await computeAddressBookCTag(userId, book) },
       { name: "supported-address-data" },
+      // P23-07: read-only signal for non-writable books.
+      { name: "current-user-privilege-set", readOnly: book.deviceWritable === false },
     ];
     const responses = [{ href: collectionHref, ...splitDavProps(collectionProps, requestedNames) }];
 
     if (depth === "1") {
-      const contacts = await fetchActiveContacts(userId, book.id);
+      const contacts = await fetchActiveContacts(userId, book);
       for (const contact of contacts) {
         responses.push({
           href: contactResourceHref(userId, contact.syncUid, bookSlug),
@@ -1582,7 +1600,7 @@ const handleAddressBookCollection = async (req, res, requestUrl) => {
 
   // REPORT
   await readRequestBody(req);
-  const contacts = await fetchActiveContacts(userId, book.id);
+  const contacts = await fetchActiveContacts(userId, book);
   const responses = contacts.map((contact) => ({
     href: contactResourceHref(userId, contact.syncUid, bookSlug),
     props: [
@@ -1621,6 +1639,11 @@ const handleContactResource = async (req, res, requestUrl) => {
   // P18-11: resolve book for scoping contact queries
   const book = await resolveAddressBook(userId, bookSlug ?? 'default');
   if (!book) return notFound(res);
+
+  // P23-07: reject device writes to read-only books.
+  if ((req.method === "PUT" || req.method === "DELETE") && book.deviceWritable === false) {
+    return forbidden(res);
+  }
 
   const existing = await prisma.contact.findFirst({
     where: { userId, syncUid: uid },
