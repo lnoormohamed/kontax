@@ -88,7 +88,7 @@ export function MobileCreateFab({ canWrite }: MobileCreateFabProps) {
           width: 52,
           height: 52,
           borderRadius: "50%",
-          backgroundColor: "#1d2823",
+          backgroundColor: "#17352e",
           color: "#fff",
           border: "none",
           cursor: "pointer",
