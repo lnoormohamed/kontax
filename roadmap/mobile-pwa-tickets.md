@@ -56,7 +56,7 @@ Requirements** section; the paired build ticket builds to it.
 | P24B-02 | Settings layout: secondary-header back-nav on sub-pages (‹ Settings · <title>) | B1, E6 | **P0** | ✅ | — |
 | P24B-03 | Variance primitives: `UpsellCard`, `NearLimitBanner`, `ReadOnlyBanner`, `PendingChip`, `PermissionGate` | E0.4, C | **P0** | ✅ | P24B-DB14 |
 | P24B-04 | "Stack table → cards / h-scroll" helper | C, F | P1 | ✅ | — |
-| P24B-05 | Confirm-dialog / action-sheet primitive | D4 | P1 | ☐ | — |
+| P24B-05 | Confirm-dialog / action-sheet primitive | D4 | P1 | ✅ | — |
 | P24B-06 | `MobileInstallPrompt` (iOS steps / Android programmatic) | D5 | P2 | ☐ | — |
 
 ## Workstream B — Core write flow
@@ -148,3 +148,8 @@ Requirements** section; the paired build ticket builds to it.
   `_components/mobile-variance.tsx` (UpsellCard, GenuineEmpty, NearLimitBanner, ReadOnlyBanner,
   PendingChip, PermissionGate). Server-compatible (Link nav, no hooks). Verified every state at
   375px against the design via `/wireframes/variance`. Ready for consumers (P24B-08/09/10/11/13…).
+- 2026-06-12 — **P24B-01/04/05 done** — Wave 1 foundations complete:
+  `MobilePlainHeader` (adopted on Sync/Settings-root/Activity, no visual change),
+  `MobileTable` (stack-to-cards + sticky-column scroll; demo `/wireframes/mobile-table`),
+  `ConfirmDialog` (portal, scrim/Escape dismiss, destructive/neutral; demo `/wireframes/confirm-dialog`).
+  **Wave 1 foundations all ✅** — next is the P0 P24B-07 (create/edit bottom sheet).
