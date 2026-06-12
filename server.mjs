@@ -149,6 +149,33 @@ const getRequestIp = (req) => {
   return forwardedFor ?? req.headers["x-real-ip"] ?? req.socket.remoteAddress ?? "unknown";
 };
 
+const getPublicRequestUrl = (req) => {
+  const configuredOrigin = process.env.APP_URL ?? process.env.AUTH_URL;
+
+  if (configuredOrigin) {
+    return new URL(req.url ?? "/", configuredOrigin);
+  }
+
+  const host = req.headers["x-forwarded-host"] ?? req.headers.host ?? `localhost:${port}`;
+  const forwardedProto = req.headers["x-forwarded-proto"]?.split(",")[0]?.trim();
+  const cloudflareScheme = (() => {
+    const value = req.headers["cf-visitor"];
+
+    if (!value) {
+      return null;
+    }
+
+    try {
+      return JSON.parse(value).scheme;
+    } catch {
+      return null;
+    }
+  })();
+  const proto = forwardedProto ?? cloudflareScheme ?? "http";
+
+  return new URL(req.url ?? "/", `${proto}://${host}`);
+};
+
 const verifyCardDavCredentials = async (email, plaintext) => {
   const normalizedEmail = email.trim().toLowerCase();
   const normalizedToken = normalizeToken(plaintext);
@@ -1779,9 +1806,7 @@ const handleContactResource = async (req, res, requestUrl) => {
 };
 
 const handleDavRequest = async (req, res) => {
-  const host = req.headers["x-forwarded-host"] ?? req.headers.host ?? `localhost:${port}`;
-  const proto = req.headers["x-forwarded-proto"]?.split(",")[0]?.trim() ?? "http";
-  const requestUrl = new URL(req.url ?? "/", `${proto}://${host}`);
+  const requestUrl = getPublicRequestUrl(req);
 
   if (await handleWellKnown(req, res, requestUrl)) {
     return true;
