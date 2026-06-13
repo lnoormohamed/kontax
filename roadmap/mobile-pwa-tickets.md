@@ -46,6 +46,9 @@ Requirements** section; the paired build ticket builds to it.
 | P24B-DB16 | Merge surfaces (restyle + mobile compare) | P24B-17 | ☐ |
 | P24B-DB17 | Pricing page mobile | P24B-18 | ☐ |
 | P24B-DB18 | Search & Notifications mobile overlays | P24B-22, P24B-23 | ☐ |
+| P24B-DB19 | Contact edit (mobile) — full-field edit sheet | P24B-07 (edit) | ☐ |
+| P24B-DB20 | Activity feed (mobile rows) | P24B-09 | ☐ |
+| P24B-DB21 | Sync (mobile) + plan variance | P24B-10 | ☐ |
 
 ---
 
@@ -62,14 +65,14 @@ Requirements** section; the paired build ticket builds to it.
 ## Workstream B — Core write flow
 | Ticket | Title | Spec § | Priority | Status | Depends |
 | --- | --- | --- | --- | --- | --- |
-| P24B-07 | Create/Edit as **bottom sheet** — collapsible sections, keyboard accessory bar, pinned Save; full page kept as `?full=1` fallback | E3, D1–D3 | **P0** | ✅ | P24B-03 |
+| P24B-07 | Create/Edit as **bottom sheet** — collapsible sections, keyboard accessory bar, pinned Save; full page kept as `?full=1` fallback | E3, D1–D3 | **P0** | ◑ create done · **edit redo → DB19** | P24B-03, P24B-DB19 |
 
 ## Workstream C — Tab screens to spec
 | Ticket | Title | Spec § | Priority | Status | Depends |
 | --- | --- | --- | --- | --- | --- |
 | P24B-08 | Contact detail: 4 green-tint **ActionPills** + scroll-aware compact header; Free history cap (last 3) + Sharing-tab gating | E2 | P1 | ✅ | P24B-03 |
-| P24B-09 | Activity: mobile **GroupCard event rows** + retention caption; keep Free upsell (distinct from empty) | E4 | P1 | ✅ | P24B-03 |
-| P24B-10 | Sync: confirm to spec + Free **CardDAV upsell / 1-account cap** variance | E5 | P2 | ✅ | P24B-03 |
+| P24B-09 | Activity: mobile **GroupCard event rows** + retention caption; keep Free upsell (distinct from empty) | E4 | P1 | ◑ **redo → DB20** | P24B-03, P24B-DB20 |
+| P24B-10 | Sync: confirm to spec + Free **CardDAV upsell / 1-account cap** variance | E5 | P2 | ◑ **redo → DB21** | P24B-03, P24B-DB21 |
 | P24B-11 | Contacts list: sticky group headers (deferred from P24A) + limit/read-only variance | E1 | P2 | ✅ | P24B-03 |
 | P24B-22 | Mobile **search overlay** → to spec (results, recents, no-match, offline) | E13 | P1 | ☐ | P24B-DB18 |
 | P24B-23 | Mobile **notifications overlay** → to spec (category rows, security drawer, mark-all-read; cover bottom nav) | E14 | P1 | ☐ | P24B-DB18 |
@@ -188,3 +191,7 @@ Requirements** section; the paired build ticket builds to it.
   `atLimit` prop so the create FAB hides at the contact cap (the near-limit banner explains + Upgrade).
   NOTE: ~60 random contacts were seeded into ngozi for scroll testing — re-run seed-demo-showcase for a
   clean demo. (Turbopack/SW staleness masked the working code mid-build; a clean .next + SW clear fixed it.)
+- 2026-06-13 — **Process correction:** three surfaces shipped without dedicated design briefs are being
+  redone brief-first. Added **DB19** (contact edit mobile — full-field edit sheet), **DB20** (activity
+  feed mobile rows), **DB21** (sync mobile + plan variance). Reset P24B-07 (edit portion → DB19),
+  P24B-09 (→ DB20), P24B-10 (→ DB21) to ◑ pending designer mockups, then rebuild to the briefs.
