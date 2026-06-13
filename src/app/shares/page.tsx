@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { AppShell } from "~/app/_components/app-shell";
@@ -13,7 +14,9 @@ type ShareSnapshot = { fullName?: string; ownerName?: string; email?: string | n
 export default async function SharesPage() {
   const session = await auth();
   if (!session?.user?.id) {
-    redirect("/login");
+    const h = await headers();
+    const next = h.get("x-pathname") ?? "/shares";
+    redirect(`/login?next=${encodeURIComponent(next)}`);
   }
   const userId = session.user.id;
 

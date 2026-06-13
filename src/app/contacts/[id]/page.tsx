@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 
 import { AppShell } from "~/app/_components/app-shell";
@@ -227,7 +228,9 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
   const session = await auth();
 
   if (!session?.user?.id) {
-    redirect("/login");
+    const h = await headers();
+    const next = h.get("x-pathname") ?? "/contacts";
+    redirect(`/login?next=${encodeURIComponent(next)}`);
   }
 
   const { id } = await params;

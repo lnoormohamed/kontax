@@ -1,3 +1,4 @@
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { AppShell } from "~/app/_components/app-shell";
@@ -58,7 +59,11 @@ const toReviewContact = (c: {
 
 export default async function ManualMergePage({ searchParams }: ManualMergePageProps) {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) {
+    const h = await headers();
+    const next = h.get("x-pathname") ?? "/merge/manual";
+    redirect(`/login?next=${encodeURIComponent(next)}`);
+  }
 
   const params = searchParams ? await searchParams : undefined;
   const leftId = getSingleValue(params?.left)?.trim() ?? "";

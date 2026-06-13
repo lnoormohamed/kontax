@@ -103,9 +103,10 @@ export async function changePassword(input: {
 
 // ─── Email Change (P18-03) ───────────────────────────────────────────────────
 
-export async function requestEmailChange(
-  newEmail: string,
-): Promise<{ success: true } | { error: string }> {
+export async function requestEmailChange(input: {
+  newEmail: string;
+  currentPassword: string;
+}): Promise<{ success: true } | { error: string }> {
   const session = await auth();
   if (!session?.user?.id) return { error: "UNAUTHORIZED" };
   if (session.impersonatedBy) return { error: "IMPERSONATION_READ_ONLY" };
@@ -116,7 +117,7 @@ export async function requestEmailChange(
     .toLowerCase()
     .email()
     .max(254)
-    .safeParse(newEmail);
+    .safeParse(input.newEmail);
   if (!parsed.success) return { error: "INVALID_EMAIL" };
   const email = parsed.data;
 
@@ -128,9 +129,15 @@ export async function requestEmailChange(
 
   const user = await db.user.findUnique({
     where: { id: session.user.id },
-    select: { email: true },
+    select: { email: true, password: true },
   });
   if (!user) return { error: "UNAUTHORIZED" };
+
+  // Step-up: require current password before allowing an email change.
+  if (!user.password) return { error: "NO_PASSWORD_SET" };
+  const passwordOk = await bcrypt.compare(input.currentPassword, user.password);
+  if (!passwordOk) return { error: "WRONG_PASSWORD" };
+
   if (email === user.email) return { error: "EMAIL_SAME_AS_CURRENT" };
 
   const conflict = await db.user.findFirst({
@@ -164,6 +171,28 @@ export async function requestEmailChange(
     },
   });
 
+  return { success: true };
+}
+
+// Resend the verification email for an already-pending email change.
+// Password not required — authorization happened when the change was first requested.
+export async function resendPendingEmailChange(): Promise<{ success: true } | { error: string }> {
+  const session = await auth();
+  if (!session?.user?.id) return { error: "UNAUTHORIZED" };
+
+  const rl = await checkRateLimit(
+    rateLimiters.emailResend,
+    `email-change-resend:${session.user.id}`,
+  );
+  if (!rl.allowed) return { error: "RATE_LIMIT_EXCEEDED" };
+
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { emailPendingChange: true },
+  });
+  if (!user?.emailPendingChange) return { error: "NO_PENDING_CHANGE" };
+
+  await sendVerificationEmail(session.user.id, "EMAIL_CHANGE", user.emailPendingChange);
   return { success: true };
 }
 

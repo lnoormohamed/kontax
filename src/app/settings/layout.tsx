@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { BottomNav } from "~/app/_components/bottom-nav";
@@ -26,7 +27,9 @@ const getInitials = (value: string) =>
 export default async function SettingsLayout({ children }: { children: React.ReactNode }) {
   const session = await auth();
   if (!session?.user?.id) {
-    redirect("/login");
+    const h = await headers();
+    const next = h.get("x-pathname") ?? "/settings";
+    redirect(`/login?next=${encodeURIComponent(next)}`);
   }
   const userId = session.user.id;
 

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { BottomNav } from "~/app/_components/bottom-nav";
@@ -119,7 +120,11 @@ type PageProps = {
 
 export default async function SyncPage({ searchParams }: PageProps) {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) {
+    const h = await headers();
+    const next = h.get("x-pathname") ?? "/sync";
+    redirect(`/login?next=${encodeURIComponent(next)}`);
+  }
   const userId = session.user.id;
 
   const resolvedParams = searchParams ? await searchParams : {};

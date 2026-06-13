@@ -342,6 +342,12 @@ export function AuthCard({
           Your email has been updated. Please sign in with your new address.
         </div>
       )}
+      {/* Show a context-aware nudge when redirected from an authenticated route */}
+      {!message && next && isLogin && (
+        <div className="mt-4 rounded-[1.2rem] border border-[#e6d3a3] bg-[#f6edd9] px-4 py-3 text-center text-[13.5px] text-[#7c5511]">
+          Your session ended — sign in to continue.
+        </div>
+      )}
 
       {/* Trial callout — register with ?plan=pro */}
       {!isLogin && plan === "pro" ? (

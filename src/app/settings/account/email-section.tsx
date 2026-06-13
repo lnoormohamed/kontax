@@ -5,6 +5,7 @@ import { useEffect, useState, useTransition } from "react";
 import {
   cancelEmailChange,
   requestEmailChange,
+  resendPendingEmailChange,
   resendVerificationEmail,
 } from "~/app/actions/account";
 
@@ -42,6 +43,8 @@ const ERROR_MESSAGES: Record<string, string> = {
   EMAIL_ALREADY_IN_USE: "That email address is already associated with another account.",
   RATE_LIMIT_EXCEEDED: "Too many requests. Please wait a few minutes.",
   INVALID_EMAIL: "Please enter a valid email address.",
+  WRONG_PASSWORD: "Incorrect password. Please try again.",
+  NO_PASSWORD_SET: "Your account has no password set. Use a social login instead.",
 };
 
 export function EmailSection({
@@ -58,6 +61,7 @@ export function EmailSection({
   // ── state ──────────────────────────────────────────────────────────────────
   const [open, setOpen] = useState(false);
   const [val, setVal] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
   const [sendErr, setSendErr] = useState("");
   const [isSending, startSend] = useTransition();
   const [isCancelling, startCancel] = useTransition();
@@ -74,7 +78,7 @@ export function EmailSection({
   const { cooldown: pendCooldown, setCooldown: setPendCooldown, mmss: pendMmss } = useCooldown(0);
 
   const differs = val.trim().toLowerCase() !== email.toLowerCase();
-  const canSend = validEmail(val) && differs && !isSending;
+  const canSend = validEmail(val) && differs && currentPassword.length > 0 && !isSending;
 
   // Is the pending token expired?
   const isExpired = pendingRequestedAt
@@ -87,9 +91,9 @@ export function EmailSection({
   const send = () => {
     setSendErr("");
     startSend(async () => {
-      const result = await requestEmailChange(val);
+      const result = await requestEmailChange({ newEmail: val, currentPassword });
       if ("success" in result) {
-        setOpen(false); setVal("");
+        setOpen(false); setVal(""); setCurrentPassword("");
         showToast(`Verification email sent to ${val.trim().toLowerCase()}`);
       } else {
         setSendErr(ERROR_MESSAGES[result.error] ?? "Something went wrong.");
@@ -97,11 +101,11 @@ export function EmailSection({
     });
   };
 
-  // ── resend for pending change ──────────────────────────────────────────────
+  // ── resend for pending change (no password required — already authorized) ──
   const resendPending = () => {
     if (!pendingEmail) return;
     startSend(async () => {
-      const result = await requestEmailChange(pendingEmail);
+      const result = await resendPendingEmailChange();
       if ("success" in result) {
         setPendCooldown(RESEND_COOLDOWN_SECONDS);
         showToast(`Verification re-sent to ${pendingEmail}`);
@@ -231,6 +235,18 @@ export function EmailSection({
               />
               {sendErr && <p className="mt-[6px] text-[12.5px] leading-[1.45] text-[#9a3a23]">{sendErr}</p>}
             </label>
+            <label className="mt-3 block">
+              <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">Current password</span>
+              <input
+                autoComplete="current-password"
+                className="mt-[6px] w-full rounded-[1.2rem] border border-[#d8ddd6] px-4 py-3 text-[16px] text-[#1d2823] outline-none transition focus:border-[#4158f4] md:text-[14px] focus:ring-[3px] focus:ring-[#edf0fe]"
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter") send(); }}
+                placeholder="Confirm with your password"
+                type="password"
+                value={currentPassword}
+              />
+            </label>
             <div className="mt-[14px] flex flex-wrap gap-2.5">
               <button
                 className="inline-flex items-center gap-2 rounded-[1.2rem] bg-[#17352e] px-[18px] py-3 text-[14px] font-semibold text-white transition hover:bg-[#20443b] disabled:cursor-default disabled:opacity-45"
@@ -242,7 +258,7 @@ export function EmailSection({
               </button>
               <button
                 className="rounded-[1.2rem] border border-[#d8ddd6] bg-white px-4 py-3 text-[14px] font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
-                onClick={() => { setOpen(false); setVal(""); setSendErr(""); }}
+                onClick={() => { setOpen(false); setVal(""); setCurrentPassword(""); setSendErr(""); }}
                 type="button"
               >
                 Cancel

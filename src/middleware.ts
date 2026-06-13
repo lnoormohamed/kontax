@@ -107,7 +107,11 @@ export default auth(
       // the login page's server auth sends /login -> /contacts. Let the server
       // page make the final auth decision whenever a session cookie is present.
       if (hasAuthSessionCookie(req)) {
-        return NextResponse.next();
+        // Pass to the page so its full Node.js auth() can make the final call.
+        // Forward the pathname so page-level redirects can reconstruct ?next=.
+        const res = NextResponse.next();
+        res.headers.set("x-pathname", pathname);
+        return res;
       }
 
       const loginUrl = new URL("/login", req.url);
