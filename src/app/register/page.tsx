@@ -1,7 +1,14 @@
+import { type Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { AuthCard } from "~/app/_components/auth-card";
 import { auth } from "~/server/auth";
+
+export const metadata: Metadata = {
+  title: "Create your account",
+  description: "Create a free Kontax account — up to 500 contacts, synced across every device over CardDAV.",
+  alternates: { canonical: "/register" },
+};
 
 export default async function RegisterPage({
   searchParams,

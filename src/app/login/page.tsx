@@ -1,7 +1,14 @@
+import { type Metadata } from "next";
 import { redirect } from "next/navigation";
 
 import { AuthCard } from "~/app/_components/auth-card";
 import { auth } from "~/server/auth";
+
+export const metadata: Metadata = {
+  title: "Log in",
+  description: "Log in to Kontax — your contacts, synced everywhere.",
+  alternates: { canonical: "/login" },
+};
 
 export default async function LoginPage({
   searchParams,

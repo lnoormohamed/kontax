@@ -5,8 +5,9 @@ import { PublicNav } from "~/app/_components/public-nav";
 import "~/app/_components/public-site.css";
 
 export const metadata: Metadata = {
-  title: "Kontax · Privacy Policy",
+  title: "Privacy Policy",
   description: "How Kontax collects, uses, and protects your data. Your contacts are yours — no selling, no profiling, full export at any time.",
+  alternates: { canonical: "/privacy" },
 };
 
 export default function PrivacyPage() {

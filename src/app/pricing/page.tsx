@@ -8,8 +8,9 @@ import { getUserBillingContext } from "~/server/billing";
 import "~/app/_components/public-site.css";
 
 export const metadata: Metadata = {
-  title: "Kontax · Pricing",
+  title: "Pricing",
   description: "Plans that grow with you. Start free for up to 500 contacts and upgrade when you need unlimited contacts, deeper history, or a shared address book.",
+  alternates: { canonical: "/pricing" },
 };
 
 export default async function PricingPage() {

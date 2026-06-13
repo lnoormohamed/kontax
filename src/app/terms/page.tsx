@@ -6,8 +6,9 @@ import { PublicNav } from "~/app/_components/public-nav";
 import "~/app/_components/public-site.css";
 
 export const metadata: Metadata = {
-  title: "Kontax · Terms of Service",
+  title: "Terms of Service",
   description: "The terms of service governing your use of Kontax — your account, acceptable use, plans and billing, your content, and data portability.",
+  alternates: { canonical: "/terms" },
 };
 
 export default function TermsPage() {
