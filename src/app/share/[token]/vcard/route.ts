@@ -6,7 +6,8 @@ import {
 import { db } from "~/server/db";
 
 // Public, unauthenticated vCard download for a share link (P12-02).
-// /share/{token} → resolves the token, validates the share, serves a .vcf.
+// /share/{token}/vcard → resolves the token, validates the share, serves a .vcf.
+// (P26-10 moved this under /vcard so /share/{token} can be a previewable page.)
 export async function GET(_request: Request, { params }: { params: Promise<{ token: string }> }) {
   const { token } = await params;
 
