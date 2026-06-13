@@ -719,13 +719,14 @@ export function ContactsWorkspaceTable({
       sessionStorage.removeItem(CONTACT_LIST_SCROLL_KEY);
       clearRestoreContactParam();
     }
-    return () => {
-      for (const timer of restoreTimersRef.current) {
-        clearTimeout(timer);
-      }
-      restoreTimersRef.current = [];
-    };
   }, [flatRows, mounted, scrollEl, scrollMemoryKey, virtualizer]);
+
+  useEffect(() => () => {
+    for (const timer of restoreTimersRef.current) {
+      clearTimeout(timer);
+    }
+    restoreTimersRef.current = [];
+  }, []);
 
   if (contacts.length === 0) {
     return (
