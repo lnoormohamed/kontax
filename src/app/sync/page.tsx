@@ -336,6 +336,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
           cardDavEnabled={planSummary.entitlements.cardDavSyncEnabled}
           syncAccountsLimit={planSummary.entitlements.syncAccountsLimit}
           canWrite={planSummary.lifecyclePolicy.canWrite}
+          lifecycleLabel={planSummary.lifecyclePolicy.label}
           planLabel={planSummary.planLabel}
           upgradeableAtCap={planSummary.plan === "FREE"}
         />

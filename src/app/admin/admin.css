@@ -342,8 +342,40 @@
   .ad-detail-actions { position: static; }
   .ad-stat-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
+/* Mobile horizontal nav strip — hidden on desktop */
+.ad-mob-nav {
+  display: none;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  border-bottom: 1px solid #e9ece7;
+  background: #fff;
+  gap: 2px;
+  padding: 0 12px;
+  flex-shrink: 0;
+}
+.ad-mob-nav::-webkit-scrollbar { display: none; }
+.ad-mob-nav__item {
+  display: inline-flex;
+  align-items: center;
+  height: 44px;
+  padding: 0 14px;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: #5c655e;
+  white-space: nowrap;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, border-color 0.15s;
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.ad-mob-nav__item[data-active="1"] { color: #1d2823; border-bottom-color: #4158f4; }
+.ad-mob-nav__item:hover:not([data-active="1"]) { color: #1d2823; background: #f6f7f4; }
+
 @media (max-width: 720px) {
   .ad-side { display: none; }
+  .ad-mob-nav { display: flex; }
+  .adm-content { padding: 16px; }
   .ad-stat-grid, .ad-err-grid, .ad-plan-legend, .ad-overview-rows, .ad-kv-grid { grid-template-columns: 1fr; }
   .ad-tr--users, .ad-tr--flags, .ad-tr--audit { display: flex; flex-wrap: wrap; gap: 8px 14px; }
   .ad-thead { display: none; }

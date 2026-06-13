@@ -41,6 +41,7 @@ export function MobileSyncScreen({
   cardDavEnabled,
   syncAccountsLimit,
   canWrite,
+  lifecycleLabel = "Active",
   planLabel = "Free",
   upgradeableAtCap = false,
   upgradePlan = "Pro",
@@ -57,6 +58,8 @@ export function MobileSyncScreen({
   syncAccountsLimit: number;
   /** Read-only lifecycle (GRACE/LOCKED) disables Add. */
   canWrite: boolean;
+  /** Lifecycle label used to pick ReadOnlyBanner variant ("Grace" → "grace", else "locked"). */
+  lifecycleLabel?: string;
   /** Plan name shown in the at-cap copy (e.g. "Free"). */
   planLabel?: string;
   /** True when a higher tier raises the cap (Free) → show an upgrade nudge at the cap. */
@@ -115,7 +118,7 @@ export function MobileSyncScreen({
 
   return (
     <div className="flex w-full flex-col md:hidden" style={{ background: "#f6f7f4" }}>
-      {!canWrite ? <ReadOnlyBanner variant="grace" /> : <OfflineBanner />}
+      {!canWrite ? <ReadOnlyBanner variant={lifecycleLabel === "Grace" ? "grace" : "locked"} /> : <OfflineBanner />}
       <div className="mob-scroll" style={{ flex: 1, padding: "16px 0 28px" }}>
         {accounts.length === 0 ? (
           <div style={{ margin: "0 16px", display: "flex", flexDirection: "column", alignItems: "center", gap: 14, padding: "40px 24px", textAlign: "center" }}>

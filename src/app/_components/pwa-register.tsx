@@ -35,6 +35,33 @@ const isInStandaloneMode = () =>
     ? (window.navigator as unknown as { standalone: boolean }).standalone
     : window.matchMedia("(display-mode: standalone)").matches);
 
+function AppTile() {
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
+      <div
+        style={{
+          width: 64,
+          height: 64,
+          borderRadius: 16,
+          background: "#17352e",
+          display: "grid",
+          placeItems: "center",
+          fontSize: 28,
+          fontWeight: 800,
+          color: "#dff0e7",
+          letterSpacing: "-0.02em",
+        }}
+      >
+        K
+      </div>
+      <div style={{ textAlign: "center" }}>
+        <div style={{ fontSize: 13, fontWeight: 700, color: "#1d2823" }}>Kontax</div>
+        <div style={{ fontSize: 12, color: "#8b938c" }}>kontax.app</div>
+      </div>
+    </div>
+  );
+}
+
 export function PwaRegister() {
   const router = useRouter();
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
@@ -110,80 +137,11 @@ export function PwaRegister() {
 
   return (
     <>
-      {/* Android/Chrome install prompt — capped to once every 30 days after dismissal. */}
+      {/* Android/Chrome install prompt — bottom sheet, capped to once every 30 days after dismissal. */}
       {installPrompt ? (
         <div
-          role="alert"
-          style={{
-            position: "fixed",
-            bottom: `calc(env(safe-area-inset-bottom) + 16px)`,
-            left: 16,
-            right: 16,
-            zIndex: 100,
-            background: "#17352e",
-            color: "#fff",
-            borderRadius: 16,
-            padding: "14px 16px",
-            display: "flex",
-            alignItems: "center",
-            gap: 12,
-            boxShadow: "0 8px 24px rgba(23,53,46,0.32)",
-            maxWidth: 420,
-            margin: "0 auto",
-          }}
-        >
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <p style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>Add to Home Screen</p>
-            <p style={{ margin: "2px 0 0", fontSize: 12, color: "rgba(255,255,255,0.7)" }}>
-              Install Kontax for quick, app-like access
-            </p>
-          </div>
-          <button
-            onClick={handleInstall}
-            style={{
-              flexShrink: 0,
-              height: 36,
-              padding: "0 14px",
-              borderRadius: 9,
-              background: "#fff",
-              color: "#17352e",
-              border: "none",
-              fontSize: 13,
-              fontWeight: 700,
-              cursor: "pointer",
-            }}
-            type="button"
-          >
-            Install
-          </button>
-          <button
-            aria-label="Dismiss install prompt"
-            onClick={handleDismissInstall}
-            style={{
-              flexShrink: 0,
-              width: 28,
-              height: 28,
-              borderRadius: "50%",
-              background: "rgba(255,255,255,0.15)",
-              color: "#fff",
-              border: "none",
-              fontSize: 14,
-              cursor: "pointer",
-              display: "grid",
-              placeItems: "center",
-            }}
-            type="button"
-          >
-            x
-          </button>
-        </div>
-      ) : null}
-
-      {/* iOS Safari install guide — manual instructions, capped to once every 30 days. */}
-      {showIosGuide ? (
-        <div
-          role="dialog"
           aria-modal="true"
+          role="dialog"
           style={{
             position: "fixed",
             inset: 0,
@@ -203,10 +161,81 @@ export function PwaRegister() {
             }}
           >
             <div style={{ width: 40, height: 4, borderRadius: 2, background: "#d8ddd6", margin: "0 auto 20px" }} />
-            <p style={{ margin: "0 0 4px", fontSize: 17, fontWeight: 700, color: "#1d2823" }}>
+            <AppTile />
+            <p style={{ margin: "16px 0 6px", fontSize: 17, fontWeight: 700, color: "#1d2823", textAlign: "center" }}>
               Add Kontax to your Home Screen
             </p>
-            <p style={{ margin: "0 0 20px", fontSize: 14, color: "#5c655e", lineHeight: 1.5 }}>
+            <p style={{ margin: "0 0 24px", fontSize: 14, color: "#5c655e", lineHeight: 1.5, textAlign: "center" }}>
+              Install for quick, app-like access to your contacts.
+            </p>
+            <button
+              onClick={handleInstall}
+              style={{
+                width: "100%",
+                height: 50,
+                borderRadius: 14,
+                background: "#4158f4",
+                color: "#fff",
+                border: "none",
+                fontSize: 15,
+                fontWeight: 700,
+                cursor: "pointer",
+                marginBottom: 10,
+              }}
+              type="button"
+            >
+              Install
+            </button>
+            <button
+              onClick={handleDismissInstall}
+              style={{
+                width: "100%",
+                height: 44,
+                borderRadius: 14,
+                background: "transparent",
+                color: "#5c655e",
+                border: "1.5px solid #d8ddd6",
+                fontSize: 14,
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+              type="button"
+            >
+              Not now
+            </button>
+          </div>
+        </div>
+      ) : null}
+
+      {/* iOS Safari install guide — manual instructions, capped to once every 30 days. */}
+      {showIosGuide ? (
+        <div
+          aria-modal="true"
+          role="dialog"
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 100,
+            background: "rgba(0,0,0,0.45)",
+            display: "flex",
+            alignItems: "flex-end",
+            padding: "0 0 env(safe-area-inset-bottom)",
+          }}
+        >
+          <div
+            style={{
+              width: "100%",
+              background: "#fff",
+              borderRadius: "20px 20px 0 0",
+              padding: "24px 24px 32px",
+            }}
+          >
+            <div style={{ width: 40, height: 4, borderRadius: 2, background: "#d8ddd6", margin: "0 auto 20px" }} />
+            <AppTile />
+            <p style={{ margin: "16px 0 6px", fontSize: 17, fontWeight: 700, color: "#1d2823", textAlign: "center" }}>
+              Add Kontax to your Home Screen
+            </p>
+            <p style={{ margin: "0 0 20px", fontSize: 14, color: "#5c655e", lineHeight: 1.5, textAlign: "center" }}>
               Open your contacts faster from the iPhone Home Screen.
             </p>
             <ol style={{ margin: "0 0 24px", padding: "0 0 0 20px", fontSize: 14, color: "#1d2823", lineHeight: 2 }}>
