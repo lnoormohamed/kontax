@@ -153,6 +153,8 @@ exports.Prisma.UserOnboardingStateScalarFieldEnum = {
   exploredAt: 'exploredAt',
   dismissedAt: 'dismissedAt',
   completedAt: 'completedAt',
+  upgradeOnboardingPlan: 'upgradeOnboardingPlan',
+  upgradeOnboardingCompletedAt: 'upgradeOnboardingCompletedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

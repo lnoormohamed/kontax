@@ -275,17 +275,21 @@ model User {
 // lifecycle need persisting here. One row per user, created lazily on first
 // dismiss/explore/complete.
 model UserOnboardingState {
-  id          String    @id @default(cuid())
-  userId      String    @unique
-  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                           String    @id @default(cuid())
+  userId                       String    @unique
+  user                         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
   // set the first time the user opens the contacts list with >= 1 contact
-  exploredAt  DateTime?
+  exploredAt                   DateTime?
   // set when the user dismisses the checklist (× or the completion "Dismiss")
-  dismissedAt DateTime?
+  dismissedAt                  DateTime?
   // set when all four steps are complete and the success card has been shown
-  completedAt DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  completedAt                  DateTime?
+  // P26-14: Family/Teams upgrade onboarding. Plan whose getting-started flow was
+  // completed ("FAMILY" | "TEAMS"), and when — so the wizard runs once per upgrade.
+  upgradeOnboardingPlan        String?
+  upgradeOnboardingCompletedAt DateTime?
+  createdAt                    DateTime  @default(now())
+  updatedAt                    DateTime  @updatedAt
 }
 
 model AppPassword {

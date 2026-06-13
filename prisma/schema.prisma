@@ -284,6 +284,10 @@ model UserOnboardingState {
     dismissedAt DateTime?
     // set when all four steps are complete and the success card has been shown
     completedAt DateTime?
+    // P26-14: Family/Teams upgrade onboarding. Plan whose getting-started flow was
+    // completed ("FAMILY" | "TEAMS"), and when — so the wizard runs once per upgrade.
+    upgradeOnboardingPlan        String?
+    upgradeOnboardingCompletedAt DateTime?
     createdAt   DateTime  @default(now())
     updatedAt   DateTime  @updatedAt
 }

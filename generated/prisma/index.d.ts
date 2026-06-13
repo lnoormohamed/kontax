@@ -7704,6 +7704,8 @@ export namespace Prisma {
     exploredAt: Date | null
     dismissedAt: Date | null
     completedAt: Date | null
+    upgradeOnboardingPlan: string | null
+    upgradeOnboardingCompletedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -7714,6 +7716,8 @@ export namespace Prisma {
     exploredAt: Date | null
     dismissedAt: Date | null
     completedAt: Date | null
+    upgradeOnboardingPlan: string | null
+    upgradeOnboardingCompletedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -7724,6 +7728,8 @@ export namespace Prisma {
     exploredAt: number
     dismissedAt: number
     completedAt: number
+    upgradeOnboardingPlan: number
+    upgradeOnboardingCompletedAt: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -7736,6 +7742,8 @@ export namespace Prisma {
     exploredAt?: true
     dismissedAt?: true
     completedAt?: true
+    upgradeOnboardingPlan?: true
+    upgradeOnboardingCompletedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -7746,6 +7754,8 @@ export namespace Prisma {
     exploredAt?: true
     dismissedAt?: true
     completedAt?: true
+    upgradeOnboardingPlan?: true
+    upgradeOnboardingCompletedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -7756,6 +7766,8 @@ export namespace Prisma {
     exploredAt?: true
     dismissedAt?: true
     completedAt?: true
+    upgradeOnboardingPlan?: true
+    upgradeOnboardingCompletedAt?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -7839,6 +7851,8 @@ export namespace Prisma {
     exploredAt: Date | null
     dismissedAt: Date | null
     completedAt: Date | null
+    upgradeOnboardingPlan: string | null
+    upgradeOnboardingCompletedAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: UserOnboardingStateCountAggregateOutputType | null
@@ -7866,6 +7880,8 @@ export namespace Prisma {
     exploredAt?: boolean
     dismissedAt?: boolean
     completedAt?: boolean
+    upgradeOnboardingPlan?: boolean
+    upgradeOnboardingCompletedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -7877,6 +7893,8 @@ export namespace Prisma {
     exploredAt?: boolean
     dismissedAt?: boolean
     completedAt?: boolean
+    upgradeOnboardingPlan?: boolean
+    upgradeOnboardingCompletedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -7888,6 +7906,8 @@ export namespace Prisma {
     exploredAt?: boolean
     dismissedAt?: boolean
     completedAt?: boolean
+    upgradeOnboardingPlan?: boolean
+    upgradeOnboardingCompletedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -7899,11 +7919,13 @@ export namespace Prisma {
     exploredAt?: boolean
     dismissedAt?: boolean
     completedAt?: boolean
+    upgradeOnboardingPlan?: boolean
+    upgradeOnboardingCompletedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOnboardingStateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "exploredAt" | "dismissedAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["userOnboardingState"]>
+  export type UserOnboardingStateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "exploredAt" | "dismissedAt" | "completedAt" | "upgradeOnboardingPlan" | "upgradeOnboardingCompletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["userOnboardingState"]>
   export type UserOnboardingStateInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
   }
@@ -7925,6 +7947,8 @@ export namespace Prisma {
       exploredAt: Date | null
       dismissedAt: Date | null
       completedAt: Date | null
+      upgradeOnboardingPlan: string | null
+      upgradeOnboardingCompletedAt: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["userOnboardingState"]>
@@ -8356,6 +8380,8 @@ export namespace Prisma {
     readonly exploredAt: FieldRef<"UserOnboardingState", 'DateTime'>
     readonly dismissedAt: FieldRef<"UserOnboardingState", 'DateTime'>
     readonly completedAt: FieldRef<"UserOnboardingState", 'DateTime'>
+    readonly upgradeOnboardingPlan: FieldRef<"UserOnboardingState", 'String'>
+    readonly upgradeOnboardingCompletedAt: FieldRef<"UserOnboardingState", 'DateTime'>
     readonly createdAt: FieldRef<"UserOnboardingState", 'DateTime'>
     readonly updatedAt: FieldRef<"UserOnboardingState", 'DateTime'>
   }
@@ -53019,6 +53045,8 @@ export namespace Prisma {
     exploredAt: 'exploredAt',
     dismissedAt: 'dismissedAt',
     completedAt: 'completedAt',
+    upgradeOnboardingPlan: 'upgradeOnboardingPlan',
+    upgradeOnboardingCompletedAt: 'upgradeOnboardingCompletedAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -54583,6 +54611,8 @@ export namespace Prisma {
     exploredAt?: DateTimeNullableFilter<"UserOnboardingState"> | Date | string | null
     dismissedAt?: DateTimeNullableFilter<"UserOnboardingState"> | Date | string | null
     completedAt?: DateTimeNullableFilter<"UserOnboardingState"> | Date | string | null
+    upgradeOnboardingPlan?: StringNullableFilter<"UserOnboardingState"> | string | null
+    upgradeOnboardingCompletedAt?: DateTimeNullableFilter<"UserOnboardingState"> | Date | string | null
     createdAt?: DateTimeFilter<"UserOnboardingState"> | Date | string
     updatedAt?: DateTimeFilter<"UserOnboardingState"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -54594,6 +54624,8 @@ export namespace Prisma {
     exploredAt?: SortOrderInput | SortOrder
     dismissedAt?: SortOrderInput | SortOrder
     completedAt?: SortOrderInput | SortOrder
+    upgradeOnboardingPlan?: SortOrderInput | SortOrder
+    upgradeOnboardingCompletedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -54608,6 +54640,8 @@ export namespace Prisma {
     exploredAt?: DateTimeNullableFilter<"UserOnboardingState"> | Date | string | null
     dismissedAt?: DateTimeNullableFilter<"UserOnboardingState"> | Date | string | null
     completedAt?: DateTimeNullableFilter<"UserOnboardingState"> | Date | string | null
+    upgradeOnboardingPlan?: StringNullableFilter<"UserOnboardingState"> | string | null
+    upgradeOnboardingCompletedAt?: DateTimeNullableFilter<"UserOnboardingState"> | Date | string | null
     createdAt?: DateTimeFilter<"UserOnboardingState"> | Date | string
     updatedAt?: DateTimeFilter<"UserOnboardingState"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -54619,6 +54653,8 @@ export namespace Prisma {
     exploredAt?: SortOrderInput | SortOrder
     dismissedAt?: SortOrderInput | SortOrder
     completedAt?: SortOrderInput | SortOrder
+    upgradeOnboardingPlan?: SortOrderInput | SortOrder
+    upgradeOnboardingCompletedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserOnboardingStateCountOrderByAggregateInput
@@ -54635,6 +54671,8 @@ export namespace Prisma {
     exploredAt?: DateTimeNullableWithAggregatesFilter<"UserOnboardingState"> | Date | string | null
     dismissedAt?: DateTimeNullableWithAggregatesFilter<"UserOnboardingState"> | Date | string | null
     completedAt?: DateTimeNullableWithAggregatesFilter<"UserOnboardingState"> | Date | string | null
+    upgradeOnboardingPlan?: StringNullableWithAggregatesFilter<"UserOnboardingState"> | string | null
+    upgradeOnboardingCompletedAt?: DateTimeNullableWithAggregatesFilter<"UserOnboardingState"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"UserOnboardingState"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"UserOnboardingState"> | Date | string
   }
@@ -58526,6 +58564,8 @@ export namespace Prisma {
     exploredAt?: Date | string | null
     dismissedAt?: Date | string | null
     completedAt?: Date | string | null
+    upgradeOnboardingPlan?: string | null
+    upgradeOnboardingCompletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutOnboardingStateInput
@@ -58537,6 +58577,8 @@ export namespace Prisma {
     exploredAt?: Date | string | null
     dismissedAt?: Date | string | null
     completedAt?: Date | string | null
+    upgradeOnboardingPlan?: string | null
+    upgradeOnboardingCompletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -58546,6 +58588,8 @@ export namespace Prisma {
     exploredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    upgradeOnboardingPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    upgradeOnboardingCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutOnboardingStateNestedInput
@@ -58557,6 +58601,8 @@ export namespace Prisma {
     exploredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    upgradeOnboardingPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    upgradeOnboardingCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -58567,6 +58613,8 @@ export namespace Prisma {
     exploredAt?: Date | string | null
     dismissedAt?: Date | string | null
     completedAt?: Date | string | null
+    upgradeOnboardingPlan?: string | null
+    upgradeOnboardingCompletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -58576,6 +58624,8 @@ export namespace Prisma {
     exploredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    upgradeOnboardingPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    upgradeOnboardingCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -58586,6 +58636,8 @@ export namespace Prisma {
     exploredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    upgradeOnboardingPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    upgradeOnboardingCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -63205,6 +63257,8 @@ export namespace Prisma {
     exploredAt?: SortOrder
     dismissedAt?: SortOrder
     completedAt?: SortOrder
+    upgradeOnboardingPlan?: SortOrder
+    upgradeOnboardingCompletedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -63215,6 +63269,8 @@ export namespace Prisma {
     exploredAt?: SortOrder
     dismissedAt?: SortOrder
     completedAt?: SortOrder
+    upgradeOnboardingPlan?: SortOrder
+    upgradeOnboardingCompletedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -63225,6 +63281,8 @@ export namespace Prisma {
     exploredAt?: SortOrder
     dismissedAt?: SortOrder
     completedAt?: SortOrder
+    upgradeOnboardingPlan?: SortOrder
+    upgradeOnboardingCompletedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -71361,6 +71419,8 @@ export namespace Prisma {
     exploredAt?: Date | string | null
     dismissedAt?: Date | string | null
     completedAt?: Date | string | null
+    upgradeOnboardingPlan?: string | null
+    upgradeOnboardingCompletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -71370,6 +71430,8 @@ export namespace Prisma {
     exploredAt?: Date | string | null
     dismissedAt?: Date | string | null
     completedAt?: Date | string | null
+    upgradeOnboardingPlan?: string | null
+    upgradeOnboardingCompletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -72360,6 +72422,8 @@ export namespace Prisma {
     exploredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    upgradeOnboardingPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    upgradeOnboardingCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -72369,6 +72433,8 @@ export namespace Prisma {
     exploredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    upgradeOnboardingPlan?: NullableStringFieldUpdateOperationsInput | string | null
+    upgradeOnboardingCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

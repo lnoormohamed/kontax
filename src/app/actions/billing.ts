@@ -61,12 +61,21 @@ export async function createCheckoutSession(input: {
   const stripe = getStripeClient();
   const appUrl = process.env.APP_URL ?? "http://localhost:3000";
 
+  // P26-14: Family/Teams checkouts land on the dedicated getting-started wizard;
+  // all other plans return to settings as before.
+  const successUrl =
+    plan === "FAMILY"
+      ? `${appUrl}/welcome/family?checkout=success`
+      : plan === "TEAMS"
+        ? `${appUrl}/welcome/teams?checkout=success`
+        : `${appUrl}/settings?billing=success&session_id={CHECKOUT_SESSION_ID}`;
+
   try {
     const checkoutSession = await stripe.checkout.sessions.create({
       customer: stripeCustomerId,
       mode: "subscription",
       line_items: [{ price: priceId, quantity: 1 }],
-      success_url: `${appUrl}/settings?billing=success&session_id={CHECKOUT_SESSION_ID}`,
+      success_url: successUrl,
       cancel_url: `${appUrl}/pricing?cancelled=1`,
       subscription_data: {
         trial_period_days: isFirstTimePro ? 14 : undefined,
