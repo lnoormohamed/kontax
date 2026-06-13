@@ -1,5 +1,7 @@
 import {
   classifyColumn,
+  detectMultiValue,
+  extractLabeledValues,
   generateSuggestions,
   type KontaxField,
   type ConfidenceTier,
@@ -16,6 +18,7 @@ export type ColumnMapping = {
   source: "profile" | "classifier";
   sampleValues: string[];
   suggestions: Suggestion[];
+  multiValue?: { detected: boolean; delimiter: string | null; exampleCount: number };
 };
 
 export type ContactPostalAddressInput = {
@@ -74,7 +77,9 @@ export type CsvImportProfile = "GENERIC" | "GOOGLE" | "APPLE" | "OUTLOOK";
 export type ExplicitColumnMapping = {
   index: number;
   targetField: string; // KontaxField | "custom" | "skip"
-  customFieldKey?: string; // when targetField === "custom"
+  customFieldKey?: string; // when targetField === "customField"
+  splitMultiValue?: boolean; // when targetField is "phone" or "email"
+  multiValueDelimiter?: string;
 };
 
 export type ImportPreviewIssue = {
@@ -718,11 +723,11 @@ export const parseCsvContacts = (
     const notes = getFirstValue(row, notesIndexes);
     const customFields: Record<string, string> | null =
       customFieldColumns.size > 0
-        ? (Object.fromEntries(
+        ? Object.fromEntries(
             [...customFieldColumns.entries()]
               .map(([colIdx, key]): [string, string] => [key, getValue(row, colIdx) ?? ""])
               .filter(([, v]) => v !== ""),
-          ) as Record<string, string>)
+          )
         : null;
     const fallbackName = [firstName, lastName].filter(Boolean).join(" ").trim();
     const usedFallbackIdentifier =
