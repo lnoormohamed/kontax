@@ -15,8 +15,14 @@ import {
 } from "@azure/msal-node";
 
 import type { ConflictPolicy } from "../../generated/prisma";
+import { emitEvent } from "~/lib/activity";
 import { env } from "~/env";
 import { db } from "~/server/db";
+import {
+  type GraphContact,
+  mapGraphContactToKontax,
+} from "~/server/microsoft-sync-mapping";
+import { mappedContactToWriteData } from "~/server/sync-contact-mapping";
 import {
   decryptMicrosoftSyncCredential,
   encryptMicrosoftSyncCredential,
@@ -218,17 +224,109 @@ const graphGet = async (accessToken: string, url: string): Promise<GraphDeltaRes
   return (await res.json()) as GraphDeltaResponse;
 };
 
-// ── Contact processing (STUB — field mapping is P27-05) ──────────────────────
-// P27-04 owns the OAuth + fetch + delta plumbing; mapGraphContactToKontax and
-// the DB writes land in P27-05. This stub counts the page without persisting.
+// ── Contact processing (P27-05) ──────────────────────────────────────────────
+// Maps each Graph contact to the canonical write shape and persists it, keyed
+// on SyncContactLink.remoteUid = Graph contact id, remoteETag = @odata.etag.
+// Remote-wins import happy path; conflict detection is P27-06.
 export const processMicrosoftContacts = async (
   contacts: unknown[],
-  _account: MicrosoftImportAccount,
+  account: MicrosoftImportAccount,
 ): Promise<MicrosoftImportSummary> => {
-  // P27-05 will map each Graph contact to a Contact and upsert via
-  // SyncContactLink (remoteUid = Graph id, remoteETag = @odata.etag).
-  void contacts;
-  return emptySummary();
+  const summary = emptySummary();
+  const now = new Date();
+
+  for (const raw of contacts) {
+    const contact = raw as GraphContact;
+    const remoteId = contact.id;
+    if (!remoteId) continue;
+    const etag = contact["@odata.etag"] ?? null;
+
+    // Delta tombstone — mark the link deleted (policy-based delete is P27-06).
+    if (contact["@removed"]) {
+      const res = await db.syncContactLink.updateMany({
+        where: { syncAccountId: account.id, remoteUid: remoteId },
+        data: { remoteDeletedAt: now, lastSyncedAt: now },
+      });
+      if (res.count > 0) summary.deleted += 1;
+      continue;
+    }
+
+    const mapped = mapGraphContactToKontax(contact);
+    if (!mapped) continue;
+    const data = mappedContactToWriteData(mapped);
+
+    const existing = await db.syncContactLink.findUnique({
+      where: {
+        syncAccountId_remoteUid: { syncAccountId: account.id, remoteUid: remoteId },
+      },
+      select: { id: true, contactId: true },
+    });
+
+    if (existing) {
+      await db.$transaction([
+        db.contact.update({
+          where: { id: existing.contactId },
+          data: {
+            ...data,
+            lastMutatedBy: "SYNC_MICROSOFT",
+            lastMutatedByDetail: account.label,
+            syncVersion: { increment: 1 },
+          },
+        }),
+        db.syncContactLink.update({
+          where: { id: existing.id },
+          data: {
+            remoteHref: remoteId,
+            remoteETag: etag,
+            remoteDeletedAt: null,
+            tombstonedAt: null,
+            lastErrorCode: null,
+            lastErrorMessage: null,
+            lastSyncedAt: now,
+          },
+        }),
+      ]);
+      summary.updated += 1;
+      continue;
+    }
+
+    // New contact. syncUid is left to default (cuid) — the Graph id lives on
+    // SyncContactLink.remoteUid, not the globally-unique Contact.syncUid.
+    await db.$transaction(async (tx) => {
+      const created = await tx.contact.create({
+        data: {
+          userId: account.userId,
+          ...data,
+          sourceType: "SYNC_MICROSOFT",
+          sourceDetail: account.label,
+          lastMutatedBy: "SYNC_MICROSOFT",
+          lastMutatedByDetail: account.label,
+        },
+        select: { id: true },
+      });
+      await tx.syncContactLink.create({
+        data: {
+          syncAccountId: account.id,
+          contactId: created.id,
+          remoteHref: remoteId,
+          remoteUid: remoteId,
+          remoteETag: etag,
+          lastSyncedAt: now,
+        },
+      });
+      await emitEvent(tx, {
+        userId: account.userId,
+        contactId: created.id,
+        eventType: "SYNC_PULLED",
+        actor: "SYNC",
+        actorDetail: account.label,
+        payload: { syncAccountId: account.id, syncAccountLabel: account.label },
+      });
+    });
+    summary.created += 1;
+  }
+
+  return summary;
 };
 
 // ── delta traversal (shared by full import + incremental) ────────────────────

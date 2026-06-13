@@ -13,10 +13,10 @@ import { env } from "~/env";
 import { db } from "~/server/db";
 import {
   type GoogleContactSource,
-  type GoogleMappedContact,
   mapContactToGooglePerson,
   mapGooglePersonToContact,
 } from "~/server/google-sync-mapping";
+import { mappedContactToWriteData } from "~/server/sync-contact-mapping";
 import {
   buildLocalConflictSnapshot,
   type ContactConflictSnapshotInput,
@@ -214,34 +214,8 @@ const getGoogleClientForAccount = async (account: GoogleSyncAccount) => {
 // contact's updatedAt against the link's lastSyncedAt, then applies the
 // connection's ConflictPolicy (SERVER_WINS / DEVICE_WINS / MANUAL).
 
-// GoogleMappedContact → Prisma contact write data (mirrors the CardDAV create).
-const contactWriteData = (m: GoogleMappedContact) => ({
-  fullName: m.fullName,
-  firstName: m.firstName,
-  middleName: m.middleName,
-  lastName: m.lastName,
-  namePrefix: m.namePrefix,
-  nameSuffix: m.nameSuffix,
-  nickname: m.nickname,
-  email: m.emailAddresses[0] ?? null,
-  emailAddresses: m.emailAddresses.length > 0 ? m.emailAddresses : undefined,
-  emailEntries: m.emailEntries.length > 0 ? m.emailEntries : undefined,
-  phone: m.phoneNumbers[0] ?? null,
-  phoneNumbers: m.phoneNumbers.length > 0 ? m.phoneNumbers : undefined,
-  phoneEntries: m.phoneEntries.length > 0 ? m.phoneEntries : undefined,
-  company: m.company,
-  jobTitle: m.jobTitle,
-  department: m.department,
-  website: m.website,
-  websiteEntries: m.websiteEntries.length > 0 ? m.websiteEntries : undefined,
-  birthday: m.birthday,
-  address: m.address,
-  postalAddresses: m.postalAddresses.length > 0 ? m.postalAddresses : undefined,
-  addressEntries: m.addressEntries.length > 0 ? m.addressEntries : undefined,
-  notes: m.notes,
-  relatedPeople: m.relatedPeople.length > 0 ? m.relatedPeople : undefined,
-  customFields: m.customFields.length > 0 ? m.customFields : undefined,
-});
+// MappedContact → Prisma write data is shared across connectors.
+const contactWriteData = mappedContactToWriteData;
 
 // Did the local contact change since we last synced this link?
 const isLocalChanged = (

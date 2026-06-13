@@ -5,48 +5,12 @@
 // and back again for the push phase. Pure functions — no DB, no network.
 import type { people_v1 } from "googleapis";
 
+import type { AddressEntry, MappedContact, ValueEntry } from "~/server/sync-contact-mapping";
+
 export type GooglePerson = people_v1.Schema$Person;
 
-type ValueEntry = { label: string; value: string; isPrimary: boolean };
-type AddressEntry = {
-  label: string;
-  formatted: string;
-  isPrimary: boolean;
-  countryOrRegion?: string;
-  streetLine1?: string;
-  streetLine2?: string;
-  cityOrTown?: string;
-  postcode?: string;
-  poBox?: string;
-};
-
-// The contact write shape the importer persists (subset of the Contact model
-// that the sync runner sets, matching the CardDAV create path).
-export type GoogleMappedContact = {
-  fullName: string;
-  firstName: string | null;
-  middleName: string | null;
-  lastName: string | null;
-  namePrefix: string | null;
-  nameSuffix: string | null;
-  nickname: string | null;
-  emailAddresses: string[];
-  emailEntries: ValueEntry[];
-  phoneNumbers: string[];
-  phoneEntries: ValueEntry[];
-  company: string | null;
-  jobTitle: string | null;
-  department: string | null;
-  website: string | null;
-  websiteEntries: ValueEntry[];
-  birthday: string | null;
-  address: string | null;
-  postalAddresses: Array<{ label: string; formatted: string }>;
-  addressEntries: AddressEntry[];
-  notes: string | null;
-  relatedPeople: Array<{ relationship: string; name: string }>;
-  customFields: Array<{ label: string; value: string }>;
-};
+// Connector mappers all produce the canonical MappedContact (shared shape).
+export type GoogleMappedContact = MappedContact;
 
 // ── label normalisation ──────────────────────────────────────────────────────
 
