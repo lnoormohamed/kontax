@@ -480,7 +480,7 @@ export function MobileContactSheet({
       <style>{STYLES}</style>
 
       <Section id="basic" title="Basic Info" locked open onToggle={toggle}>
-        <Field label="First name" value={first} onChange={setFirst} placeholder="First name" autoFocus={!isEdit} error={errors.name} refCb={(n) => (errRefs.current.name = n)} />
+        <Field label="First name" value={first} onChange={setFirst} placeholder="First name" error={errors.name} refCb={(n) => (errRefs.current.name = n)} />
         <Field label="Last name" value={last} onChange={setLast} placeholder="Last name" />
         <Field label="Company" value={company} onChange={setCompany} placeholder="Company" />
       </Section>
