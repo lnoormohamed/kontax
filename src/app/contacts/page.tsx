@@ -282,9 +282,20 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
 
   const sortOrder =
     selectedSort === "name" ? { isFavorite: "desc" as const } : { updatedAt: "desc" as const };
+  const shouldLoadArchivedContacts = selectedTab === "archived";
+  const shouldLoadDuplicateDetails = selectedTab === "duplicates";
 
-  const [privateActive, familyActive, teamActive, archivedContacts, mergeSuggestions, planSummary] =
-    await Promise.all([
+  const [
+    privateActive,
+    familyActive,
+    teamActive,
+    archivedContacts,
+    mergeSuggestions,
+    mergeSuggestionCount,
+    highConfidenceSuggestionCount,
+    recentMerges,
+    planSummary,
+  ] = await Promise.all([
       includePrivate
         ? db.contact.findMany({
             where: { userId: session.user.id, archivedAt: null, groupContacts: { none: {} }, ...searchConditions, ...filterConditions },
@@ -306,20 +317,33 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
             select: contactListSelect,
           })
         : Promise.resolve([]),
-      db.contact.findMany({
-        where: {
-          userId: session.user.id,
-          NOT: { archivedAt: null },
-          ...searchConditions,
-          ...filterConditions,
-        },
-        orderBy:
-          selectedSort === "name"
-            ? [{ isFavorite: "desc" as const }, { archivedAt: "desc" as const }]
-            : { archivedAt: "desc" },
-        select: contactListSelect,
-      }),
-      getOpenMergeSuggestionsForUser(session.user.id),
+      shouldLoadArchivedContacts
+        ? db.contact.findMany({
+            where: {
+              userId: session.user.id,
+              NOT: { archivedAt: null },
+              ...searchConditions,
+              ...filterConditions,
+            },
+            orderBy:
+              selectedSort === "name"
+                ? [{ isFavorite: "desc" as const }, { archivedAt: "desc" as const }]
+                : { archivedAt: "desc" },
+            select: contactListSelect,
+          })
+        : Promise.resolve([]),
+      shouldLoadDuplicateDetails ? getOpenMergeSuggestionsForUser(session.user.id) : Promise.resolve([]),
+      shouldLoadDuplicateDetails
+        ? Promise.resolve(null)
+        : db.mergeSuggestion.count({
+            where: { userId: session.user.id, status: "OPEN" },
+          }),
+      shouldLoadDuplicateDetails
+        ? Promise.resolve(null)
+        : db.mergeSuggestion.count({
+            where: { userId: session.user.id, status: "OPEN", confidence: "HIGH" },
+          }),
+      shouldLoadDuplicateDetails ? getRecentMergesForUser(session.user.id) : Promise.resolve([]),
       getUserPlanSummary(session.user.id),
     ]);
 
@@ -353,9 +377,9 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
     ]);
   const peopleCount = privatePeopleCount + sharedPeopleCount;
 
-  const highConfidenceCount = mergeSuggestions.filter((s) => s.confidence === "high").length;
-  const recentMerges =
-    selectedTab === "duplicates" ? await getRecentMergesForUser(session.user.id) : [];
+  const duplicatesCount = mergeSuggestionCount ?? mergeSuggestions.length;
+  const highConfidenceCount =
+    highConfidenceSuggestionCount ?? mergeSuggestions.filter((s) => s.confidence === "high").length;
 
   const archivedWithFlag = archivedContacts.map((c) => ({
     ...c,
@@ -458,7 +482,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
           favorites: favoritesCount,
           emergency: emergencyCount,
           archived: archivedCount,
-          duplicates: mergeSuggestions.length,
+          duplicates: duplicatesCount,
         }}
         account={{ name: userLabel, email: session.user.email ?? "" }}
         syncState="ok"

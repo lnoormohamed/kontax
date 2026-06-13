@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState, useTransition } from "react";
+
 import { toggleFavoriteContact } from "~/app/actions/contacts";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { ROW_BADGE_CAP, resolveContactBadges } from "~/lib/contact-badges";
@@ -24,32 +26,52 @@ export function ContactBadgeCluster({
   /** @deprecated favorite toggles no longer redirect in the PWA flow */
   redirectTo?: string;
 }) {
-  const badges = resolveContactBadges(flags);
+  const [, startTransition] = useTransition();
+  const [optimisticFavorite, setOptimisticFavorite] = useState(flags.isFavorite);
+  const optimisticFlags = { ...flags, isFavorite: optimisticFavorite };
+  const badges = resolveContactBadges(optimisticFlags);
   const visible = badges.slice(0, ROW_BADGE_CAP);
   const overflow = badges.length - visible.length;
 
+  useEffect(() => {
+    setOptimisticFavorite(flags.isFavorite);
+  }, [flags.isFavorite]);
+
+  const handleFavoriteToggle = () => {
+    setOptimisticFavorite((current) => !current);
+    startTransition(async () => {
+      const fd = new FormData();
+      fd.set("contactId", contactId);
+      await toggleFavoriteContact(fd);
+    });
+  };
+
   return (
     <span className="inline-flex shrink-0 items-center gap-1">
-      <form action={toggleFavoriteContact} className="inline-flex">
-        <input name="contactId" type="hidden" value={contactId} />
+      <span className="inline-flex">
         <button
-          aria-label={flags.isFavorite ? "Unfavorite" : "Favorite"}
-          aria-pressed={flags.isFavorite}
+          aria-label={optimisticFavorite ? "Unfavorite" : "Favorite"}
+          aria-pressed={optimisticFavorite}
           className={`grid place-items-center rounded-md transition hover:bg-[rgba(0,0,0,0.06)] -m-[11px] size-[44px] md:m-0 md:size-[22px] ${
-            flags.isFavorite
+            optimisticFavorite
               ? "text-[#e0a31c]"
               : "pointer-events-none text-[#c2c8bf] opacity-0 md:pointer-events-auto md:group-hover:opacity-100"
           }`}
-          title={flags.isFavorite ? "Unfavorite" : "Favorite"}
-          type="submit"
+          onClick={(event) => {
+            event.preventDefault();
+            event.stopPropagation();
+            handleFavoriteToggle();
+          }}
+          title={optimisticFavorite ? "Unfavorite" : "Favorite"}
+          type="button"
         >
           <WorkspaceIcon
-            fill={flags.isFavorite ? "#e0a31c" : "none"}
+            fill={optimisticFavorite ? "#e0a31c" : "none"}
             name="star"
             size={14}
           />
         </button>
-      </form>
+      </span>
 
       {visible.map((badge) => (
         <span

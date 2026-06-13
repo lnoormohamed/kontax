@@ -240,8 +240,13 @@ const ContactRow = memo(function ContactRow({
   onOpenContact: (contactId: string) => void;
 }) {
   const [, startTransition] = useTransition();
+  const [optimisticFavorite, setOptimisticFavorite] = useState(contact.isFavorite);
   const displayName = getDisplayName(contact);
   const avatarSize = viewMode === "compact" ? 32 : 40;
+
+  useEffect(() => {
+    setOptimisticFavorite(contact.isFavorite);
+  }, [contact.isFavorite]);
 
   const handleSwipeArchive = () => {
     onArchived(contact.id);
@@ -253,6 +258,7 @@ const ContactRow = memo(function ContactRow({
   };
 
   const handleSwipeFavourite = () => {
+    setOptimisticFavorite((current) => !current);
     startTransition(async () => {
       const fd = new FormData();
       fd.set("contactId", contact.id);
@@ -320,7 +326,7 @@ const ContactRow = memo(function ContactRow({
   if (viewMode === "cozy") {
     return (
       <SwipeableRow
-        isFavourite={contact.isFavorite}
+        isFavourite={optimisticFavorite}
         onArchive={handleSwipeArchive}
         onToggleFavourite={handleSwipeFavourite}
       >
@@ -366,7 +372,7 @@ const ContactRow = memo(function ContactRow({
       </div>
       <div className="lg:hidden">
         <SwipeableRow
-          isFavourite={contact.isFavorite}
+          isFavourite={optimisticFavorite}
           onArchive={handleSwipeArchive}
           onToggleFavourite={handleSwipeFavourite}
         >
@@ -423,6 +429,19 @@ type VRow =
 const FAVE_H = 28; // Favourites header — same height as letter headers
 const LETTER_H = 28; // Alphabetical letter headers per design spec
 const CONTACT_LIST_SCROLL_KEY = "kontax:contacts:list-scroll";
+const CONTACT_LIST_SCROLL_MAX_AGE = 10 * 60 * 1000;
+
+const getScrollParent = (node: HTMLElement | null) => {
+  let el: Element | null = node?.parentElement ?? null;
+  while (el && el !== document.documentElement) {
+    const oy = getComputedStyle(el).overflowY;
+    if (oy === "auto" || oy === "scroll") {
+      return el as HTMLElement;
+    }
+    el = el.parentElement;
+  }
+  return null;
+};
 
 export function ContactsWorkspaceTable({
   contacts,
@@ -449,15 +468,7 @@ export function ContactsWorkspaceTable({
   useLayoutEffect(() => { setMounted(true); }, []);
 
   useEffect(() => {
-    let el: Element | null = listRef.current?.parentElement ?? null;
-    while (el && el !== document.documentElement) {
-      const oy = getComputedStyle(el).overflowY;
-      if (oy === "auto" || oy === "scroll") {
-        setScrollEl(el as HTMLElement);
-        break;
-      }
-      el = el.parentElement;
-    }
+    setScrollEl(getScrollParent(listRef.current));
   }, []);
 
   const visibleContacts = useMemo(
@@ -472,13 +483,15 @@ export function ContactsWorkspaceTable({
 
   const saveListScrollPosition = useCallback((contactId: string) => {
     if (typeof window === "undefined") return;
+    const activeScrollEl = scrollEl ?? getScrollParent(listRef.current);
 
     sessionStorage.setItem(
       CONTACT_LIST_SCROLL_KEY,
       JSON.stringify({
+        createdAt: Date.now(),
         key: scrollMemoryKey,
         contactId,
-        scrollTop: scrollEl?.scrollTop ?? null,
+        scrollTop: activeScrollEl?.scrollTop ?? null,
         windowY: window.scrollY,
       }),
     );
@@ -624,14 +637,20 @@ export function ContactsWorkspaceTable({
     try {
       const saved = JSON.parse(raw) as {
         key?: string;
+        createdAt?: number;
         contactId?: string;
         scrollTop?: number | null;
         windowY?: number;
       };
 
+      if (typeof saved.createdAt !== "number" || Date.now() - saved.createdAt > CONTACT_LIST_SCROLL_MAX_AGE) {
+        sessionStorage.removeItem(CONTACT_LIST_SCROLL_KEY);
+        return;
+      }
       if (saved.key !== scrollMemoryKey) return;
 
       restoredScrollRef.current = true;
+      sessionStorage.removeItem(CONTACT_LIST_SCROLL_KEY);
       requestAnimationFrame(() => {
         if (scrollEl && typeof saved.scrollTop === "number") {
           scrollEl.scrollTop = saved.scrollTop;

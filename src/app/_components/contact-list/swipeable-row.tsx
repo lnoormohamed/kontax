@@ -95,6 +95,8 @@ export function SwipeableRow({ onArchive, onToggleFavourite, isFavourite, childr
         <button
           aria-label={isFavourite ? "Unstar" : "Favourite"}
           onClick={handleFav}
+          onPointerDown={(event) => event.stopPropagation()}
+          onTouchStart={(event) => event.stopPropagation()}
           style={{
             flex: 1, background: "#17352e", color: "#fff", border: "none", cursor: "pointer",
             display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
@@ -108,6 +110,8 @@ export function SwipeableRow({ onArchive, onToggleFavourite, isFavourite, childr
         <button
           aria-label="Archive"
           onClick={handleArchive}
+          onPointerDown={(event) => event.stopPropagation()}
+          onTouchStart={(event) => event.stopPropagation()}
           style={{
             flex: 1, background: "#b5472f", color: "#fff", border: "none", cursor: "pointer",
             display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 4,
