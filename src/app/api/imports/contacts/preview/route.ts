@@ -118,9 +118,15 @@ export async function POST(request: Request) {
       },
     });
 
+    const matchedPreset = await db.importMappingPreset.findUnique({
+      where: { userId_headerHash: { userId: session.user.id, headerHash: preview.headerHash } },
+      select: { id: true, name: true, lastUsedAt: true, columnMappings: true },
+    });
+
     return Response.json({
       ...preview,
       jobId: job.id,
+      matchedPreset: matchedPreset ?? null,
     });
   } catch (error) {
     return Response.json(

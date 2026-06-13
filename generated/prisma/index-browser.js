@@ -685,6 +685,28 @@ exports.Prisma.BirthdayReminderStateScalarFieldEnum = {
   lastSentAt: 'lastSentAt'
 };
 
+exports.Prisma.ImportMappingSuggestionFeedbackScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  columnHeader: 'columnHeader',
+  suggestedField: 'suggestedField',
+  chosenField: 'chosenField',
+  sampleValue: 'sampleValue',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.ImportMappingPresetScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  headerHash: 'headerHash',
+  columnMappings: 'columnMappings',
+  sourceProfile: 'sourceProfile',
+  usageCount: 'usageCount',
+  lastUsedAt: 'lastUsedAt',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -997,7 +1019,9 @@ exports.Prisma.ModelName = {
   SecurityAlert: 'SecurityAlert',
   NotificationSettings: 'NotificationSettings',
   FailedLoginAttempt: 'FailedLoginAttempt',
-  BirthdayReminderState: 'BirthdayReminderState'
+  BirthdayReminderState: 'BirthdayReminderState',
+  ImportMappingSuggestionFeedback: 'ImportMappingSuggestionFeedback',
+  ImportMappingPreset: 'ImportMappingPreset'
 };
 
 /**

@@ -1,3 +1,27 @@
+export const FIELD_LABELS: Record<string, string> = {
+  firstName: "First name",
+  lastName: "Last name",
+  fullName: "Full name",
+  email: "Email address",
+  phone: "Phone",
+  company: "Company",
+  jobTitle: "Job title",
+  "address.street": "Street address",
+  "address.city": "City",
+  "address.state": "State / Province",
+  "address.postalCode": "Postal code",
+  "address.country": "Country",
+  birthday: "Birthday",
+  website: "Website",
+  notes: "Notes",
+};
+
+export type Suggestion = {
+  field: KontaxField;
+  confidence: number;
+  label: string;
+};
+
 export type KontaxField =
   | "firstName"
   | "lastName"
@@ -137,4 +161,29 @@ export function classifyColumn(
     bestScore > 0.85 ? "HIGH" : bestScore > 0.5 ? "MEDIUM" : "LOW";
 
   return { field, confidence: bestScore, confidenceTier };
+}
+
+export function generateSuggestions(
+  header: string,
+  sampleValues: string[],
+  columnIndex: number,
+): Suggestion[] {
+  const allScores = COLUMN_PATTERNS.map((pattern) => {
+    const headerScore = pattern.patterns.some((p) => p.test(header.trim())) ? 0.6 : 0;
+    const validCount = pattern.valueValidator
+      ? sampleValues.filter(pattern.valueValidator).length
+      : 0;
+    const valueScore = sampleValues.length > 0 ? (validCount / sampleValues.length) * 0.3 : 0;
+    const positionScore = getPositionScore(pattern.field, columnIndex) * 0.1;
+    return {
+      field: pattern.field,
+      confidence: headerScore + valueScore + positionScore,
+      label: FIELD_LABELS[pattern.field] ?? pattern.field,
+    };
+  });
+
+  return allScores
+    .filter((s) => s.confidence > 0.1)
+    .sort((a, b) => b.confidence - a.confidence)
+    .slice(0, 5);
 }

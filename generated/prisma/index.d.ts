@@ -188,6 +188,16 @@ export type FailedLoginAttempt = $Result.DefaultSelection<Prisma.$FailedLoginAtt
  * 
  */
 export type BirthdayReminderState = $Result.DefaultSelection<Prisma.$BirthdayReminderStatePayload>
+/**
+ * Model ImportMappingSuggestionFeedback
+ * 
+ */
+export type ImportMappingSuggestionFeedback = $Result.DefaultSelection<Prisma.$ImportMappingSuggestionFeedbackPayload>
+/**
+ * Model ImportMappingPreset
+ * 
+ */
+export type ImportMappingPreset = $Result.DefaultSelection<Prisma.$ImportMappingPresetPayload>
 
 /**
  * Enums
@@ -1161,6 +1171,26 @@ export class PrismaClient<
     * ```
     */
   get birthdayReminderState(): Prisma.BirthdayReminderStateDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.importMappingSuggestionFeedback`: Exposes CRUD operations for the **ImportMappingSuggestionFeedback** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ImportMappingSuggestionFeedbacks
+    * const importMappingSuggestionFeedbacks = await prisma.importMappingSuggestionFeedback.findMany()
+    * ```
+    */
+  get importMappingSuggestionFeedback(): Prisma.ImportMappingSuggestionFeedbackDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.importMappingPreset`: Exposes CRUD operations for the **ImportMappingPreset** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ImportMappingPresets
+    * const importMappingPresets = await prisma.importMappingPreset.findMany()
+    * ```
+    */
+  get importMappingPreset(): Prisma.ImportMappingPresetDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1636,7 +1666,9 @@ export namespace Prisma {
     SecurityAlert: 'SecurityAlert',
     NotificationSettings: 'NotificationSettings',
     FailedLoginAttempt: 'FailedLoginAttempt',
-    BirthdayReminderState: 'BirthdayReminderState'
+    BirthdayReminderState: 'BirthdayReminderState',
+    ImportMappingSuggestionFeedback: 'ImportMappingSuggestionFeedback',
+    ImportMappingPreset: 'ImportMappingPreset'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1655,7 +1687,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState"
+      modelProps: "user" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -4249,6 +4281,154 @@ export namespace Prisma {
           }
         }
       }
+      ImportMappingSuggestionFeedback: {
+        payload: Prisma.$ImportMappingSuggestionFeedbackPayload<ExtArgs>
+        fields: Prisma.ImportMappingSuggestionFeedbackFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ImportMappingSuggestionFeedbackFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ImportMappingSuggestionFeedbackPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ImportMappingSuggestionFeedbackFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ImportMappingSuggestionFeedbackPayload>
+          }
+          findFirst: {
+            args: Prisma.ImportMappingSuggestionFeedbackFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ImportMappingSuggestionFeedbackPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ImportMappingSuggestionFeedbackFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ImportMappingSuggestionFeedbackPayload>
+          }
+          findMany: {
+            args: Prisma.ImportMappingSuggestionFeedbackFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ImportMappingSuggestionFeedbackPayload>[]
+          }
+          create: {
+            args: Prisma.ImportMappingSuggestionFeedbackCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ImportMappingSuggestionFeedbackPayload>
+          }
+          createMany: {
+            args: Prisma.ImportMappingSuggestionFeedbackCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ImportMappingSuggestionFeedbackCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ImportMappingSuggestionFeedbackPayload>[]
+          }
+          delete: {
+            args: Prisma.ImportMappingSuggestionFeedbackDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ImportMappingSuggestionFeedbackPayload>
+          }
+          update: {
+            args: Prisma.ImportMappingSuggestionFeedbackUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ImportMappingSuggestionFeedbackPayload>
+          }
+          deleteMany: {
+            args: Prisma.ImportMappingSuggestionFeedbackDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ImportMappingSuggestionFeedbackUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ImportMappingSuggestionFeedbackUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ImportMappingSuggestionFeedbackPayload>[]
+          }
+          upsert: {
+            args: Prisma.ImportMappingSuggestionFeedbackUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ImportMappingSuggestionFeedbackPayload>
+          }
+          aggregate: {
+            args: Prisma.ImportMappingSuggestionFeedbackAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateImportMappingSuggestionFeedback>
+          }
+          groupBy: {
+            args: Prisma.ImportMappingSuggestionFeedbackGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ImportMappingSuggestionFeedbackGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ImportMappingSuggestionFeedbackCountArgs<ExtArgs>
+            result: $Utils.Optional<ImportMappingSuggestionFeedbackCountAggregateOutputType> | number
+          }
+        }
+      }
+      ImportMappingPreset: {
+        payload: Prisma.$ImportMappingPresetPayload<ExtArgs>
+        fields: Prisma.ImportMappingPresetFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ImportMappingPresetFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ImportMappingPresetPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ImportMappingPresetFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ImportMappingPresetPayload>
+          }
+          findFirst: {
+            args: Prisma.ImportMappingPresetFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ImportMappingPresetPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ImportMappingPresetFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ImportMappingPresetPayload>
+          }
+          findMany: {
+            args: Prisma.ImportMappingPresetFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ImportMappingPresetPayload>[]
+          }
+          create: {
+            args: Prisma.ImportMappingPresetCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ImportMappingPresetPayload>
+          }
+          createMany: {
+            args: Prisma.ImportMappingPresetCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ImportMappingPresetCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ImportMappingPresetPayload>[]
+          }
+          delete: {
+            args: Prisma.ImportMappingPresetDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ImportMappingPresetPayload>
+          }
+          update: {
+            args: Prisma.ImportMappingPresetUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ImportMappingPresetPayload>
+          }
+          deleteMany: {
+            args: Prisma.ImportMappingPresetDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ImportMappingPresetUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ImportMappingPresetUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ImportMappingPresetPayload>[]
+          }
+          upsert: {
+            args: Prisma.ImportMappingPresetUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ImportMappingPresetPayload>
+          }
+          aggregate: {
+            args: Prisma.ImportMappingPresetAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateImportMappingPreset>
+          }
+          groupBy: {
+            args: Prisma.ImportMappingPresetGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ImportMappingPresetGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ImportMappingPresetCountArgs<ExtArgs>
+            result: $Utils.Optional<ImportMappingPresetCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -4380,6 +4560,8 @@ export namespace Prisma {
     notificationSettings?: NotificationSettingsOmit
     failedLoginAttempt?: FailedLoginAttemptOmit
     birthdayReminderState?: BirthdayReminderStateOmit
+    importMappingSuggestionFeedback?: ImportMappingSuggestionFeedbackOmit
+    importMappingPreset?: ImportMappingPresetOmit
   }
 
   /* Types for Logging */
@@ -4482,6 +4664,8 @@ export namespace Prisma {
     notifications: number
     securityAlerts: number
     birthdayReminderStates: number
+    importMappingSuggestionFeedbacks: number
+    importMappingPresets: number
     failedLoginAttempts: number
   }
 
@@ -4508,6 +4692,8 @@ export namespace Prisma {
     notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
     securityAlerts?: boolean | UserCountOutputTypeCountSecurityAlertsArgs
     birthdayReminderStates?: boolean | UserCountOutputTypeCountBirthdayReminderStatesArgs
+    importMappingSuggestionFeedbacks?: boolean | UserCountOutputTypeCountImportMappingSuggestionFeedbacksArgs
+    importMappingPresets?: boolean | UserCountOutputTypeCountImportMappingPresetsArgs
     failedLoginAttempts?: boolean | UserCountOutputTypeCountFailedLoginAttemptsArgs
   }
 
@@ -4674,6 +4860,20 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountBirthdayReminderStatesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: BirthdayReminderStateWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountImportMappingSuggestionFeedbacksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ImportMappingSuggestionFeedbackWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountImportMappingPresetsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ImportMappingPresetWhereInput
   }
 
   /**
@@ -5556,6 +5756,8 @@ export namespace Prisma {
     securityAlerts?: boolean | User$securityAlertsArgs<ExtArgs>
     notificationSettings?: boolean | User$notificationSettingsArgs<ExtArgs>
     birthdayReminderStates?: boolean | User$birthdayReminderStatesArgs<ExtArgs>
+    importMappingSuggestionFeedbacks?: boolean | User$importMappingSuggestionFeedbacksArgs<ExtArgs>
+    importMappingPresets?: boolean | User$importMappingPresetsArgs<ExtArgs>
     failedLoginAttempts?: boolean | User$failedLoginAttemptsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
@@ -5664,6 +5866,8 @@ export namespace Prisma {
     securityAlerts?: boolean | User$securityAlertsArgs<ExtArgs>
     notificationSettings?: boolean | User$notificationSettingsArgs<ExtArgs>
     birthdayReminderStates?: boolean | User$birthdayReminderStatesArgs<ExtArgs>
+    importMappingSuggestionFeedbacks?: boolean | User$importMappingSuggestionFeedbacksArgs<ExtArgs>
+    importMappingPresets?: boolean | User$importMappingPresetsArgs<ExtArgs>
     failedLoginAttempts?: boolean | User$failedLoginAttemptsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -5697,6 +5901,8 @@ export namespace Prisma {
       securityAlerts: Prisma.$SecurityAlertPayload<ExtArgs>[]
       notificationSettings: Prisma.$NotificationSettingsPayload<ExtArgs> | null
       birthdayReminderStates: Prisma.$BirthdayReminderStatePayload<ExtArgs>[]
+      importMappingSuggestionFeedbacks: Prisma.$ImportMappingSuggestionFeedbackPayload<ExtArgs>[]
+      importMappingPresets: Prisma.$ImportMappingPresetPayload<ExtArgs>[]
       failedLoginAttempts: Prisma.$FailedLoginAttemptPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -6141,6 +6347,8 @@ export namespace Prisma {
     securityAlerts<T extends User$securityAlertsArgs<ExtArgs> = {}>(args?: Subset<T, User$securityAlertsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SecurityAlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     notificationSettings<T extends User$notificationSettingsArgs<ExtArgs> = {}>(args?: Subset<T, User$notificationSettingsArgs<ExtArgs>>): Prisma__NotificationSettingsClient<$Result.GetResult<Prisma.$NotificationSettingsPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     birthdayReminderStates<T extends User$birthdayReminderStatesArgs<ExtArgs> = {}>(args?: Subset<T, User$birthdayReminderStatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BirthdayReminderStatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    importMappingSuggestionFeedbacks<T extends User$importMappingSuggestionFeedbacksArgs<ExtArgs> = {}>(args?: Subset<T, User$importMappingSuggestionFeedbacksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ImportMappingSuggestionFeedbackPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    importMappingPresets<T extends User$importMappingPresetsArgs<ExtArgs> = {}>(args?: Subset<T, User$importMappingPresetsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ImportMappingPresetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     failedLoginAttempts<T extends User$failedLoginAttemptsArgs<ExtArgs> = {}>(args?: Subset<T, User$failedLoginAttemptsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FailedLoginAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -7145,6 +7353,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: BirthdayReminderStateScalarFieldEnum | BirthdayReminderStateScalarFieldEnum[]
+  }
+
+  /**
+   * User.importMappingSuggestionFeedbacks
+   */
+  export type User$importMappingSuggestionFeedbacksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingSuggestionFeedback
+     */
+    select?: ImportMappingSuggestionFeedbackSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingSuggestionFeedback
+     */
+    omit?: ImportMappingSuggestionFeedbackOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingSuggestionFeedbackInclude<ExtArgs> | null
+    where?: ImportMappingSuggestionFeedbackWhereInput
+    orderBy?: ImportMappingSuggestionFeedbackOrderByWithRelationInput | ImportMappingSuggestionFeedbackOrderByWithRelationInput[]
+    cursor?: ImportMappingSuggestionFeedbackWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ImportMappingSuggestionFeedbackScalarFieldEnum | ImportMappingSuggestionFeedbackScalarFieldEnum[]
+  }
+
+  /**
+   * User.importMappingPresets
+   */
+  export type User$importMappingPresetsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingPreset
+     */
+    select?: ImportMappingPresetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingPreset
+     */
+    omit?: ImportMappingPresetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingPresetInclude<ExtArgs> | null
+    where?: ImportMappingPresetWhereInput
+    orderBy?: ImportMappingPresetOrderByWithRelationInput | ImportMappingPresetOrderByWithRelationInput[]
+    cursor?: ImportMappingPresetWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ImportMappingPresetScalarFieldEnum | ImportMappingPresetScalarFieldEnum[]
   }
 
   /**
@@ -48098,6 +48354,2230 @@ export namespace Prisma {
 
 
   /**
+   * Model ImportMappingSuggestionFeedback
+   */
+
+  export type AggregateImportMappingSuggestionFeedback = {
+    _count: ImportMappingSuggestionFeedbackCountAggregateOutputType | null
+    _min: ImportMappingSuggestionFeedbackMinAggregateOutputType | null
+    _max: ImportMappingSuggestionFeedbackMaxAggregateOutputType | null
+  }
+
+  export type ImportMappingSuggestionFeedbackMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    columnHeader: string | null
+    suggestedField: string | null
+    chosenField: string | null
+    sampleValue: string | null
+    createdAt: Date | null
+  }
+
+  export type ImportMappingSuggestionFeedbackMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    columnHeader: string | null
+    suggestedField: string | null
+    chosenField: string | null
+    sampleValue: string | null
+    createdAt: Date | null
+  }
+
+  export type ImportMappingSuggestionFeedbackCountAggregateOutputType = {
+    id: number
+    userId: number
+    columnHeader: number
+    suggestedField: number
+    chosenField: number
+    sampleValue: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type ImportMappingSuggestionFeedbackMinAggregateInputType = {
+    id?: true
+    userId?: true
+    columnHeader?: true
+    suggestedField?: true
+    chosenField?: true
+    sampleValue?: true
+    createdAt?: true
+  }
+
+  export type ImportMappingSuggestionFeedbackMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    columnHeader?: true
+    suggestedField?: true
+    chosenField?: true
+    sampleValue?: true
+    createdAt?: true
+  }
+
+  export type ImportMappingSuggestionFeedbackCountAggregateInputType = {
+    id?: true
+    userId?: true
+    columnHeader?: true
+    suggestedField?: true
+    chosenField?: true
+    sampleValue?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type ImportMappingSuggestionFeedbackAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ImportMappingSuggestionFeedback to aggregate.
+     */
+    where?: ImportMappingSuggestionFeedbackWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ImportMappingSuggestionFeedbacks to fetch.
+     */
+    orderBy?: ImportMappingSuggestionFeedbackOrderByWithRelationInput | ImportMappingSuggestionFeedbackOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ImportMappingSuggestionFeedbackWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ImportMappingSuggestionFeedbacks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ImportMappingSuggestionFeedbacks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ImportMappingSuggestionFeedbacks
+    **/
+    _count?: true | ImportMappingSuggestionFeedbackCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ImportMappingSuggestionFeedbackMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ImportMappingSuggestionFeedbackMaxAggregateInputType
+  }
+
+  export type GetImportMappingSuggestionFeedbackAggregateType<T extends ImportMappingSuggestionFeedbackAggregateArgs> = {
+        [P in keyof T & keyof AggregateImportMappingSuggestionFeedback]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateImportMappingSuggestionFeedback[P]>
+      : GetScalarType<T[P], AggregateImportMappingSuggestionFeedback[P]>
+  }
+
+
+
+
+  export type ImportMappingSuggestionFeedbackGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ImportMappingSuggestionFeedbackWhereInput
+    orderBy?: ImportMappingSuggestionFeedbackOrderByWithAggregationInput | ImportMappingSuggestionFeedbackOrderByWithAggregationInput[]
+    by: ImportMappingSuggestionFeedbackScalarFieldEnum[] | ImportMappingSuggestionFeedbackScalarFieldEnum
+    having?: ImportMappingSuggestionFeedbackScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ImportMappingSuggestionFeedbackCountAggregateInputType | true
+    _min?: ImportMappingSuggestionFeedbackMinAggregateInputType
+    _max?: ImportMappingSuggestionFeedbackMaxAggregateInputType
+  }
+
+  export type ImportMappingSuggestionFeedbackGroupByOutputType = {
+    id: string
+    userId: string
+    columnHeader: string
+    suggestedField: string
+    chosenField: string
+    sampleValue: string | null
+    createdAt: Date
+    _count: ImportMappingSuggestionFeedbackCountAggregateOutputType | null
+    _min: ImportMappingSuggestionFeedbackMinAggregateOutputType | null
+    _max: ImportMappingSuggestionFeedbackMaxAggregateOutputType | null
+  }
+
+  type GetImportMappingSuggestionFeedbackGroupByPayload<T extends ImportMappingSuggestionFeedbackGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ImportMappingSuggestionFeedbackGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ImportMappingSuggestionFeedbackGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ImportMappingSuggestionFeedbackGroupByOutputType[P]>
+            : GetScalarType<T[P], ImportMappingSuggestionFeedbackGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ImportMappingSuggestionFeedbackSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    columnHeader?: boolean
+    suggestedField?: boolean
+    chosenField?: boolean
+    sampleValue?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["importMappingSuggestionFeedback"]>
+
+  export type ImportMappingSuggestionFeedbackSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    columnHeader?: boolean
+    suggestedField?: boolean
+    chosenField?: boolean
+    sampleValue?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["importMappingSuggestionFeedback"]>
+
+  export type ImportMappingSuggestionFeedbackSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    columnHeader?: boolean
+    suggestedField?: boolean
+    chosenField?: boolean
+    sampleValue?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["importMappingSuggestionFeedback"]>
+
+  export type ImportMappingSuggestionFeedbackSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    columnHeader?: boolean
+    suggestedField?: boolean
+    chosenField?: boolean
+    sampleValue?: boolean
+    createdAt?: boolean
+  }
+
+  export type ImportMappingSuggestionFeedbackOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "columnHeader" | "suggestedField" | "chosenField" | "sampleValue" | "createdAt", ExtArgs["result"]["importMappingSuggestionFeedback"]>
+  export type ImportMappingSuggestionFeedbackInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type ImportMappingSuggestionFeedbackIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type ImportMappingSuggestionFeedbackIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $ImportMappingSuggestionFeedbackPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ImportMappingSuggestionFeedback"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      columnHeader: string
+      suggestedField: string
+      chosenField: string
+      sampleValue: string | null
+      createdAt: Date
+    }, ExtArgs["result"]["importMappingSuggestionFeedback"]>
+    composites: {}
+  }
+
+  type ImportMappingSuggestionFeedbackGetPayload<S extends boolean | null | undefined | ImportMappingSuggestionFeedbackDefaultArgs> = $Result.GetResult<Prisma.$ImportMappingSuggestionFeedbackPayload, S>
+
+  type ImportMappingSuggestionFeedbackCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ImportMappingSuggestionFeedbackFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ImportMappingSuggestionFeedbackCountAggregateInputType | true
+    }
+
+  export interface ImportMappingSuggestionFeedbackDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ImportMappingSuggestionFeedback'], meta: { name: 'ImportMappingSuggestionFeedback' } }
+    /**
+     * Find zero or one ImportMappingSuggestionFeedback that matches the filter.
+     * @param {ImportMappingSuggestionFeedbackFindUniqueArgs} args - Arguments to find a ImportMappingSuggestionFeedback
+     * @example
+     * // Get one ImportMappingSuggestionFeedback
+     * const importMappingSuggestionFeedback = await prisma.importMappingSuggestionFeedback.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ImportMappingSuggestionFeedbackFindUniqueArgs>(args: SelectSubset<T, ImportMappingSuggestionFeedbackFindUniqueArgs<ExtArgs>>): Prisma__ImportMappingSuggestionFeedbackClient<$Result.GetResult<Prisma.$ImportMappingSuggestionFeedbackPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ImportMappingSuggestionFeedback that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ImportMappingSuggestionFeedbackFindUniqueOrThrowArgs} args - Arguments to find a ImportMappingSuggestionFeedback
+     * @example
+     * // Get one ImportMappingSuggestionFeedback
+     * const importMappingSuggestionFeedback = await prisma.importMappingSuggestionFeedback.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ImportMappingSuggestionFeedbackFindUniqueOrThrowArgs>(args: SelectSubset<T, ImportMappingSuggestionFeedbackFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ImportMappingSuggestionFeedbackClient<$Result.GetResult<Prisma.$ImportMappingSuggestionFeedbackPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ImportMappingSuggestionFeedback that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ImportMappingSuggestionFeedbackFindFirstArgs} args - Arguments to find a ImportMappingSuggestionFeedback
+     * @example
+     * // Get one ImportMappingSuggestionFeedback
+     * const importMappingSuggestionFeedback = await prisma.importMappingSuggestionFeedback.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ImportMappingSuggestionFeedbackFindFirstArgs>(args?: SelectSubset<T, ImportMappingSuggestionFeedbackFindFirstArgs<ExtArgs>>): Prisma__ImportMappingSuggestionFeedbackClient<$Result.GetResult<Prisma.$ImportMappingSuggestionFeedbackPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ImportMappingSuggestionFeedback that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ImportMappingSuggestionFeedbackFindFirstOrThrowArgs} args - Arguments to find a ImportMappingSuggestionFeedback
+     * @example
+     * // Get one ImportMappingSuggestionFeedback
+     * const importMappingSuggestionFeedback = await prisma.importMappingSuggestionFeedback.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ImportMappingSuggestionFeedbackFindFirstOrThrowArgs>(args?: SelectSubset<T, ImportMappingSuggestionFeedbackFindFirstOrThrowArgs<ExtArgs>>): Prisma__ImportMappingSuggestionFeedbackClient<$Result.GetResult<Prisma.$ImportMappingSuggestionFeedbackPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ImportMappingSuggestionFeedbacks that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ImportMappingSuggestionFeedbackFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ImportMappingSuggestionFeedbacks
+     * const importMappingSuggestionFeedbacks = await prisma.importMappingSuggestionFeedback.findMany()
+     * 
+     * // Get first 10 ImportMappingSuggestionFeedbacks
+     * const importMappingSuggestionFeedbacks = await prisma.importMappingSuggestionFeedback.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const importMappingSuggestionFeedbackWithIdOnly = await prisma.importMappingSuggestionFeedback.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ImportMappingSuggestionFeedbackFindManyArgs>(args?: SelectSubset<T, ImportMappingSuggestionFeedbackFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ImportMappingSuggestionFeedbackPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ImportMappingSuggestionFeedback.
+     * @param {ImportMappingSuggestionFeedbackCreateArgs} args - Arguments to create a ImportMappingSuggestionFeedback.
+     * @example
+     * // Create one ImportMappingSuggestionFeedback
+     * const ImportMappingSuggestionFeedback = await prisma.importMappingSuggestionFeedback.create({
+     *   data: {
+     *     // ... data to create a ImportMappingSuggestionFeedback
+     *   }
+     * })
+     * 
+     */
+    create<T extends ImportMappingSuggestionFeedbackCreateArgs>(args: SelectSubset<T, ImportMappingSuggestionFeedbackCreateArgs<ExtArgs>>): Prisma__ImportMappingSuggestionFeedbackClient<$Result.GetResult<Prisma.$ImportMappingSuggestionFeedbackPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ImportMappingSuggestionFeedbacks.
+     * @param {ImportMappingSuggestionFeedbackCreateManyArgs} args - Arguments to create many ImportMappingSuggestionFeedbacks.
+     * @example
+     * // Create many ImportMappingSuggestionFeedbacks
+     * const importMappingSuggestionFeedback = await prisma.importMappingSuggestionFeedback.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ImportMappingSuggestionFeedbackCreateManyArgs>(args?: SelectSubset<T, ImportMappingSuggestionFeedbackCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ImportMappingSuggestionFeedbacks and returns the data saved in the database.
+     * @param {ImportMappingSuggestionFeedbackCreateManyAndReturnArgs} args - Arguments to create many ImportMappingSuggestionFeedbacks.
+     * @example
+     * // Create many ImportMappingSuggestionFeedbacks
+     * const importMappingSuggestionFeedback = await prisma.importMappingSuggestionFeedback.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ImportMappingSuggestionFeedbacks and only return the `id`
+     * const importMappingSuggestionFeedbackWithIdOnly = await prisma.importMappingSuggestionFeedback.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ImportMappingSuggestionFeedbackCreateManyAndReturnArgs>(args?: SelectSubset<T, ImportMappingSuggestionFeedbackCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ImportMappingSuggestionFeedbackPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ImportMappingSuggestionFeedback.
+     * @param {ImportMappingSuggestionFeedbackDeleteArgs} args - Arguments to delete one ImportMappingSuggestionFeedback.
+     * @example
+     * // Delete one ImportMappingSuggestionFeedback
+     * const ImportMappingSuggestionFeedback = await prisma.importMappingSuggestionFeedback.delete({
+     *   where: {
+     *     // ... filter to delete one ImportMappingSuggestionFeedback
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ImportMappingSuggestionFeedbackDeleteArgs>(args: SelectSubset<T, ImportMappingSuggestionFeedbackDeleteArgs<ExtArgs>>): Prisma__ImportMappingSuggestionFeedbackClient<$Result.GetResult<Prisma.$ImportMappingSuggestionFeedbackPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ImportMappingSuggestionFeedback.
+     * @param {ImportMappingSuggestionFeedbackUpdateArgs} args - Arguments to update one ImportMappingSuggestionFeedback.
+     * @example
+     * // Update one ImportMappingSuggestionFeedback
+     * const importMappingSuggestionFeedback = await prisma.importMappingSuggestionFeedback.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ImportMappingSuggestionFeedbackUpdateArgs>(args: SelectSubset<T, ImportMappingSuggestionFeedbackUpdateArgs<ExtArgs>>): Prisma__ImportMappingSuggestionFeedbackClient<$Result.GetResult<Prisma.$ImportMappingSuggestionFeedbackPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ImportMappingSuggestionFeedbacks.
+     * @param {ImportMappingSuggestionFeedbackDeleteManyArgs} args - Arguments to filter ImportMappingSuggestionFeedbacks to delete.
+     * @example
+     * // Delete a few ImportMappingSuggestionFeedbacks
+     * const { count } = await prisma.importMappingSuggestionFeedback.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ImportMappingSuggestionFeedbackDeleteManyArgs>(args?: SelectSubset<T, ImportMappingSuggestionFeedbackDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ImportMappingSuggestionFeedbacks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ImportMappingSuggestionFeedbackUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ImportMappingSuggestionFeedbacks
+     * const importMappingSuggestionFeedback = await prisma.importMappingSuggestionFeedback.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ImportMappingSuggestionFeedbackUpdateManyArgs>(args: SelectSubset<T, ImportMappingSuggestionFeedbackUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ImportMappingSuggestionFeedbacks and returns the data updated in the database.
+     * @param {ImportMappingSuggestionFeedbackUpdateManyAndReturnArgs} args - Arguments to update many ImportMappingSuggestionFeedbacks.
+     * @example
+     * // Update many ImportMappingSuggestionFeedbacks
+     * const importMappingSuggestionFeedback = await prisma.importMappingSuggestionFeedback.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ImportMappingSuggestionFeedbacks and only return the `id`
+     * const importMappingSuggestionFeedbackWithIdOnly = await prisma.importMappingSuggestionFeedback.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ImportMappingSuggestionFeedbackUpdateManyAndReturnArgs>(args: SelectSubset<T, ImportMappingSuggestionFeedbackUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ImportMappingSuggestionFeedbackPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ImportMappingSuggestionFeedback.
+     * @param {ImportMappingSuggestionFeedbackUpsertArgs} args - Arguments to update or create a ImportMappingSuggestionFeedback.
+     * @example
+     * // Update or create a ImportMappingSuggestionFeedback
+     * const importMappingSuggestionFeedback = await prisma.importMappingSuggestionFeedback.upsert({
+     *   create: {
+     *     // ... data to create a ImportMappingSuggestionFeedback
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ImportMappingSuggestionFeedback we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ImportMappingSuggestionFeedbackUpsertArgs>(args: SelectSubset<T, ImportMappingSuggestionFeedbackUpsertArgs<ExtArgs>>): Prisma__ImportMappingSuggestionFeedbackClient<$Result.GetResult<Prisma.$ImportMappingSuggestionFeedbackPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ImportMappingSuggestionFeedbacks.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ImportMappingSuggestionFeedbackCountArgs} args - Arguments to filter ImportMappingSuggestionFeedbacks to count.
+     * @example
+     * // Count the number of ImportMappingSuggestionFeedbacks
+     * const count = await prisma.importMappingSuggestionFeedback.count({
+     *   where: {
+     *     // ... the filter for the ImportMappingSuggestionFeedbacks we want to count
+     *   }
+     * })
+    **/
+    count<T extends ImportMappingSuggestionFeedbackCountArgs>(
+      args?: Subset<T, ImportMappingSuggestionFeedbackCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ImportMappingSuggestionFeedbackCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ImportMappingSuggestionFeedback.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ImportMappingSuggestionFeedbackAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ImportMappingSuggestionFeedbackAggregateArgs>(args: Subset<T, ImportMappingSuggestionFeedbackAggregateArgs>): Prisma.PrismaPromise<GetImportMappingSuggestionFeedbackAggregateType<T>>
+
+    /**
+     * Group by ImportMappingSuggestionFeedback.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ImportMappingSuggestionFeedbackGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ImportMappingSuggestionFeedbackGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ImportMappingSuggestionFeedbackGroupByArgs['orderBy'] }
+        : { orderBy?: ImportMappingSuggestionFeedbackGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ImportMappingSuggestionFeedbackGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetImportMappingSuggestionFeedbackGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ImportMappingSuggestionFeedback model
+   */
+  readonly fields: ImportMappingSuggestionFeedbackFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ImportMappingSuggestionFeedback.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ImportMappingSuggestionFeedbackClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ImportMappingSuggestionFeedback model
+   */
+  interface ImportMappingSuggestionFeedbackFieldRefs {
+    readonly id: FieldRef<"ImportMappingSuggestionFeedback", 'String'>
+    readonly userId: FieldRef<"ImportMappingSuggestionFeedback", 'String'>
+    readonly columnHeader: FieldRef<"ImportMappingSuggestionFeedback", 'String'>
+    readonly suggestedField: FieldRef<"ImportMappingSuggestionFeedback", 'String'>
+    readonly chosenField: FieldRef<"ImportMappingSuggestionFeedback", 'String'>
+    readonly sampleValue: FieldRef<"ImportMappingSuggestionFeedback", 'String'>
+    readonly createdAt: FieldRef<"ImportMappingSuggestionFeedback", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ImportMappingSuggestionFeedback findUnique
+   */
+  export type ImportMappingSuggestionFeedbackFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingSuggestionFeedback
+     */
+    select?: ImportMappingSuggestionFeedbackSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingSuggestionFeedback
+     */
+    omit?: ImportMappingSuggestionFeedbackOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingSuggestionFeedbackInclude<ExtArgs> | null
+    /**
+     * Filter, which ImportMappingSuggestionFeedback to fetch.
+     */
+    where: ImportMappingSuggestionFeedbackWhereUniqueInput
+  }
+
+  /**
+   * ImportMappingSuggestionFeedback findUniqueOrThrow
+   */
+  export type ImportMappingSuggestionFeedbackFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingSuggestionFeedback
+     */
+    select?: ImportMappingSuggestionFeedbackSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingSuggestionFeedback
+     */
+    omit?: ImportMappingSuggestionFeedbackOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingSuggestionFeedbackInclude<ExtArgs> | null
+    /**
+     * Filter, which ImportMappingSuggestionFeedback to fetch.
+     */
+    where: ImportMappingSuggestionFeedbackWhereUniqueInput
+  }
+
+  /**
+   * ImportMappingSuggestionFeedback findFirst
+   */
+  export type ImportMappingSuggestionFeedbackFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingSuggestionFeedback
+     */
+    select?: ImportMappingSuggestionFeedbackSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingSuggestionFeedback
+     */
+    omit?: ImportMappingSuggestionFeedbackOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingSuggestionFeedbackInclude<ExtArgs> | null
+    /**
+     * Filter, which ImportMappingSuggestionFeedback to fetch.
+     */
+    where?: ImportMappingSuggestionFeedbackWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ImportMappingSuggestionFeedbacks to fetch.
+     */
+    orderBy?: ImportMappingSuggestionFeedbackOrderByWithRelationInput | ImportMappingSuggestionFeedbackOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ImportMappingSuggestionFeedbacks.
+     */
+    cursor?: ImportMappingSuggestionFeedbackWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ImportMappingSuggestionFeedbacks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ImportMappingSuggestionFeedbacks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ImportMappingSuggestionFeedbacks.
+     */
+    distinct?: ImportMappingSuggestionFeedbackScalarFieldEnum | ImportMappingSuggestionFeedbackScalarFieldEnum[]
+  }
+
+  /**
+   * ImportMappingSuggestionFeedback findFirstOrThrow
+   */
+  export type ImportMappingSuggestionFeedbackFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingSuggestionFeedback
+     */
+    select?: ImportMappingSuggestionFeedbackSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingSuggestionFeedback
+     */
+    omit?: ImportMappingSuggestionFeedbackOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingSuggestionFeedbackInclude<ExtArgs> | null
+    /**
+     * Filter, which ImportMappingSuggestionFeedback to fetch.
+     */
+    where?: ImportMappingSuggestionFeedbackWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ImportMappingSuggestionFeedbacks to fetch.
+     */
+    orderBy?: ImportMappingSuggestionFeedbackOrderByWithRelationInput | ImportMappingSuggestionFeedbackOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ImportMappingSuggestionFeedbacks.
+     */
+    cursor?: ImportMappingSuggestionFeedbackWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ImportMappingSuggestionFeedbacks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ImportMappingSuggestionFeedbacks.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ImportMappingSuggestionFeedbacks.
+     */
+    distinct?: ImportMappingSuggestionFeedbackScalarFieldEnum | ImportMappingSuggestionFeedbackScalarFieldEnum[]
+  }
+
+  /**
+   * ImportMappingSuggestionFeedback findMany
+   */
+  export type ImportMappingSuggestionFeedbackFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingSuggestionFeedback
+     */
+    select?: ImportMappingSuggestionFeedbackSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingSuggestionFeedback
+     */
+    omit?: ImportMappingSuggestionFeedbackOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingSuggestionFeedbackInclude<ExtArgs> | null
+    /**
+     * Filter, which ImportMappingSuggestionFeedbacks to fetch.
+     */
+    where?: ImportMappingSuggestionFeedbackWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ImportMappingSuggestionFeedbacks to fetch.
+     */
+    orderBy?: ImportMappingSuggestionFeedbackOrderByWithRelationInput | ImportMappingSuggestionFeedbackOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ImportMappingSuggestionFeedbacks.
+     */
+    cursor?: ImportMappingSuggestionFeedbackWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ImportMappingSuggestionFeedbacks from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ImportMappingSuggestionFeedbacks.
+     */
+    skip?: number
+    distinct?: ImportMappingSuggestionFeedbackScalarFieldEnum | ImportMappingSuggestionFeedbackScalarFieldEnum[]
+  }
+
+  /**
+   * ImportMappingSuggestionFeedback create
+   */
+  export type ImportMappingSuggestionFeedbackCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingSuggestionFeedback
+     */
+    select?: ImportMappingSuggestionFeedbackSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingSuggestionFeedback
+     */
+    omit?: ImportMappingSuggestionFeedbackOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingSuggestionFeedbackInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ImportMappingSuggestionFeedback.
+     */
+    data: XOR<ImportMappingSuggestionFeedbackCreateInput, ImportMappingSuggestionFeedbackUncheckedCreateInput>
+  }
+
+  /**
+   * ImportMappingSuggestionFeedback createMany
+   */
+  export type ImportMappingSuggestionFeedbackCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ImportMappingSuggestionFeedbacks.
+     */
+    data: ImportMappingSuggestionFeedbackCreateManyInput | ImportMappingSuggestionFeedbackCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ImportMappingSuggestionFeedback createManyAndReturn
+   */
+  export type ImportMappingSuggestionFeedbackCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingSuggestionFeedback
+     */
+    select?: ImportMappingSuggestionFeedbackSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingSuggestionFeedback
+     */
+    omit?: ImportMappingSuggestionFeedbackOmit<ExtArgs> | null
+    /**
+     * The data used to create many ImportMappingSuggestionFeedbacks.
+     */
+    data: ImportMappingSuggestionFeedbackCreateManyInput | ImportMappingSuggestionFeedbackCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingSuggestionFeedbackIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ImportMappingSuggestionFeedback update
+   */
+  export type ImportMappingSuggestionFeedbackUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingSuggestionFeedback
+     */
+    select?: ImportMappingSuggestionFeedbackSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingSuggestionFeedback
+     */
+    omit?: ImportMappingSuggestionFeedbackOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingSuggestionFeedbackInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ImportMappingSuggestionFeedback.
+     */
+    data: XOR<ImportMappingSuggestionFeedbackUpdateInput, ImportMappingSuggestionFeedbackUncheckedUpdateInput>
+    /**
+     * Choose, which ImportMappingSuggestionFeedback to update.
+     */
+    where: ImportMappingSuggestionFeedbackWhereUniqueInput
+  }
+
+  /**
+   * ImportMappingSuggestionFeedback updateMany
+   */
+  export type ImportMappingSuggestionFeedbackUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ImportMappingSuggestionFeedbacks.
+     */
+    data: XOR<ImportMappingSuggestionFeedbackUpdateManyMutationInput, ImportMappingSuggestionFeedbackUncheckedUpdateManyInput>
+    /**
+     * Filter which ImportMappingSuggestionFeedbacks to update
+     */
+    where?: ImportMappingSuggestionFeedbackWhereInput
+    /**
+     * Limit how many ImportMappingSuggestionFeedbacks to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ImportMappingSuggestionFeedback updateManyAndReturn
+   */
+  export type ImportMappingSuggestionFeedbackUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingSuggestionFeedback
+     */
+    select?: ImportMappingSuggestionFeedbackSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingSuggestionFeedback
+     */
+    omit?: ImportMappingSuggestionFeedbackOmit<ExtArgs> | null
+    /**
+     * The data used to update ImportMappingSuggestionFeedbacks.
+     */
+    data: XOR<ImportMappingSuggestionFeedbackUpdateManyMutationInput, ImportMappingSuggestionFeedbackUncheckedUpdateManyInput>
+    /**
+     * Filter which ImportMappingSuggestionFeedbacks to update
+     */
+    where?: ImportMappingSuggestionFeedbackWhereInput
+    /**
+     * Limit how many ImportMappingSuggestionFeedbacks to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingSuggestionFeedbackIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ImportMappingSuggestionFeedback upsert
+   */
+  export type ImportMappingSuggestionFeedbackUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingSuggestionFeedback
+     */
+    select?: ImportMappingSuggestionFeedbackSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingSuggestionFeedback
+     */
+    omit?: ImportMappingSuggestionFeedbackOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingSuggestionFeedbackInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ImportMappingSuggestionFeedback to update in case it exists.
+     */
+    where: ImportMappingSuggestionFeedbackWhereUniqueInput
+    /**
+     * In case the ImportMappingSuggestionFeedback found by the `where` argument doesn't exist, create a new ImportMappingSuggestionFeedback with this data.
+     */
+    create: XOR<ImportMappingSuggestionFeedbackCreateInput, ImportMappingSuggestionFeedbackUncheckedCreateInput>
+    /**
+     * In case the ImportMappingSuggestionFeedback was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ImportMappingSuggestionFeedbackUpdateInput, ImportMappingSuggestionFeedbackUncheckedUpdateInput>
+  }
+
+  /**
+   * ImportMappingSuggestionFeedback delete
+   */
+  export type ImportMappingSuggestionFeedbackDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingSuggestionFeedback
+     */
+    select?: ImportMappingSuggestionFeedbackSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingSuggestionFeedback
+     */
+    omit?: ImportMappingSuggestionFeedbackOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingSuggestionFeedbackInclude<ExtArgs> | null
+    /**
+     * Filter which ImportMappingSuggestionFeedback to delete.
+     */
+    where: ImportMappingSuggestionFeedbackWhereUniqueInput
+  }
+
+  /**
+   * ImportMappingSuggestionFeedback deleteMany
+   */
+  export type ImportMappingSuggestionFeedbackDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ImportMappingSuggestionFeedbacks to delete
+     */
+    where?: ImportMappingSuggestionFeedbackWhereInput
+    /**
+     * Limit how many ImportMappingSuggestionFeedbacks to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ImportMappingSuggestionFeedback without action
+   */
+  export type ImportMappingSuggestionFeedbackDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingSuggestionFeedback
+     */
+    select?: ImportMappingSuggestionFeedbackSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingSuggestionFeedback
+     */
+    omit?: ImportMappingSuggestionFeedbackOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingSuggestionFeedbackInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ImportMappingPreset
+   */
+
+  export type AggregateImportMappingPreset = {
+    _count: ImportMappingPresetCountAggregateOutputType | null
+    _avg: ImportMappingPresetAvgAggregateOutputType | null
+    _sum: ImportMappingPresetSumAggregateOutputType | null
+    _min: ImportMappingPresetMinAggregateOutputType | null
+    _max: ImportMappingPresetMaxAggregateOutputType | null
+  }
+
+  export type ImportMappingPresetAvgAggregateOutputType = {
+    usageCount: number | null
+  }
+
+  export type ImportMappingPresetSumAggregateOutputType = {
+    usageCount: number | null
+  }
+
+  export type ImportMappingPresetMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    name: string | null
+    headerHash: string | null
+    sourceProfile: string | null
+    usageCount: number | null
+    lastUsedAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type ImportMappingPresetMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    name: string | null
+    headerHash: string | null
+    sourceProfile: string | null
+    usageCount: number | null
+    lastUsedAt: Date | null
+    createdAt: Date | null
+  }
+
+  export type ImportMappingPresetCountAggregateOutputType = {
+    id: number
+    userId: number
+    name: number
+    headerHash: number
+    columnMappings: number
+    sourceProfile: number
+    usageCount: number
+    lastUsedAt: number
+    createdAt: number
+    _all: number
+  }
+
+
+  export type ImportMappingPresetAvgAggregateInputType = {
+    usageCount?: true
+  }
+
+  export type ImportMappingPresetSumAggregateInputType = {
+    usageCount?: true
+  }
+
+  export type ImportMappingPresetMinAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    headerHash?: true
+    sourceProfile?: true
+    usageCount?: true
+    lastUsedAt?: true
+    createdAt?: true
+  }
+
+  export type ImportMappingPresetMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    headerHash?: true
+    sourceProfile?: true
+    usageCount?: true
+    lastUsedAt?: true
+    createdAt?: true
+  }
+
+  export type ImportMappingPresetCountAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    headerHash?: true
+    columnMappings?: true
+    sourceProfile?: true
+    usageCount?: true
+    lastUsedAt?: true
+    createdAt?: true
+    _all?: true
+  }
+
+  export type ImportMappingPresetAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ImportMappingPreset to aggregate.
+     */
+    where?: ImportMappingPresetWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ImportMappingPresets to fetch.
+     */
+    orderBy?: ImportMappingPresetOrderByWithRelationInput | ImportMappingPresetOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ImportMappingPresetWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ImportMappingPresets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ImportMappingPresets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ImportMappingPresets
+    **/
+    _count?: true | ImportMappingPresetCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ImportMappingPresetAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ImportMappingPresetSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ImportMappingPresetMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ImportMappingPresetMaxAggregateInputType
+  }
+
+  export type GetImportMappingPresetAggregateType<T extends ImportMappingPresetAggregateArgs> = {
+        [P in keyof T & keyof AggregateImportMappingPreset]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateImportMappingPreset[P]>
+      : GetScalarType<T[P], AggregateImportMappingPreset[P]>
+  }
+
+
+
+
+  export type ImportMappingPresetGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ImportMappingPresetWhereInput
+    orderBy?: ImportMappingPresetOrderByWithAggregationInput | ImportMappingPresetOrderByWithAggregationInput[]
+    by: ImportMappingPresetScalarFieldEnum[] | ImportMappingPresetScalarFieldEnum
+    having?: ImportMappingPresetScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ImportMappingPresetCountAggregateInputType | true
+    _avg?: ImportMappingPresetAvgAggregateInputType
+    _sum?: ImportMappingPresetSumAggregateInputType
+    _min?: ImportMappingPresetMinAggregateInputType
+    _max?: ImportMappingPresetMaxAggregateInputType
+  }
+
+  export type ImportMappingPresetGroupByOutputType = {
+    id: string
+    userId: string
+    name: string
+    headerHash: string
+    columnMappings: JsonValue
+    sourceProfile: string | null
+    usageCount: number
+    lastUsedAt: Date
+    createdAt: Date
+    _count: ImportMappingPresetCountAggregateOutputType | null
+    _avg: ImportMappingPresetAvgAggregateOutputType | null
+    _sum: ImportMappingPresetSumAggregateOutputType | null
+    _min: ImportMappingPresetMinAggregateOutputType | null
+    _max: ImportMappingPresetMaxAggregateOutputType | null
+  }
+
+  type GetImportMappingPresetGroupByPayload<T extends ImportMappingPresetGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ImportMappingPresetGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ImportMappingPresetGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ImportMappingPresetGroupByOutputType[P]>
+            : GetScalarType<T[P], ImportMappingPresetGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ImportMappingPresetSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    headerHash?: boolean
+    columnMappings?: boolean
+    sourceProfile?: boolean
+    usageCount?: boolean
+    lastUsedAt?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["importMappingPreset"]>
+
+  export type ImportMappingPresetSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    headerHash?: boolean
+    columnMappings?: boolean
+    sourceProfile?: boolean
+    usageCount?: boolean
+    lastUsedAt?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["importMappingPreset"]>
+
+  export type ImportMappingPresetSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    headerHash?: boolean
+    columnMappings?: boolean
+    sourceProfile?: boolean
+    usageCount?: boolean
+    lastUsedAt?: boolean
+    createdAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["importMappingPreset"]>
+
+  export type ImportMappingPresetSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    headerHash?: boolean
+    columnMappings?: boolean
+    sourceProfile?: boolean
+    usageCount?: boolean
+    lastUsedAt?: boolean
+    createdAt?: boolean
+  }
+
+  export type ImportMappingPresetOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "name" | "headerHash" | "columnMappings" | "sourceProfile" | "usageCount" | "lastUsedAt" | "createdAt", ExtArgs["result"]["importMappingPreset"]>
+  export type ImportMappingPresetInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type ImportMappingPresetIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type ImportMappingPresetIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $ImportMappingPresetPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ImportMappingPreset"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      name: string
+      headerHash: string
+      columnMappings: Prisma.JsonValue
+      sourceProfile: string | null
+      usageCount: number
+      lastUsedAt: Date
+      createdAt: Date
+    }, ExtArgs["result"]["importMappingPreset"]>
+    composites: {}
+  }
+
+  type ImportMappingPresetGetPayload<S extends boolean | null | undefined | ImportMappingPresetDefaultArgs> = $Result.GetResult<Prisma.$ImportMappingPresetPayload, S>
+
+  type ImportMappingPresetCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ImportMappingPresetFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ImportMappingPresetCountAggregateInputType | true
+    }
+
+  export interface ImportMappingPresetDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ImportMappingPreset'], meta: { name: 'ImportMappingPreset' } }
+    /**
+     * Find zero or one ImportMappingPreset that matches the filter.
+     * @param {ImportMappingPresetFindUniqueArgs} args - Arguments to find a ImportMappingPreset
+     * @example
+     * // Get one ImportMappingPreset
+     * const importMappingPreset = await prisma.importMappingPreset.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ImportMappingPresetFindUniqueArgs>(args: SelectSubset<T, ImportMappingPresetFindUniqueArgs<ExtArgs>>): Prisma__ImportMappingPresetClient<$Result.GetResult<Prisma.$ImportMappingPresetPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ImportMappingPreset that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ImportMappingPresetFindUniqueOrThrowArgs} args - Arguments to find a ImportMappingPreset
+     * @example
+     * // Get one ImportMappingPreset
+     * const importMappingPreset = await prisma.importMappingPreset.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ImportMappingPresetFindUniqueOrThrowArgs>(args: SelectSubset<T, ImportMappingPresetFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ImportMappingPresetClient<$Result.GetResult<Prisma.$ImportMappingPresetPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ImportMappingPreset that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ImportMappingPresetFindFirstArgs} args - Arguments to find a ImportMappingPreset
+     * @example
+     * // Get one ImportMappingPreset
+     * const importMappingPreset = await prisma.importMappingPreset.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ImportMappingPresetFindFirstArgs>(args?: SelectSubset<T, ImportMappingPresetFindFirstArgs<ExtArgs>>): Prisma__ImportMappingPresetClient<$Result.GetResult<Prisma.$ImportMappingPresetPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ImportMappingPreset that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ImportMappingPresetFindFirstOrThrowArgs} args - Arguments to find a ImportMappingPreset
+     * @example
+     * // Get one ImportMappingPreset
+     * const importMappingPreset = await prisma.importMappingPreset.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ImportMappingPresetFindFirstOrThrowArgs>(args?: SelectSubset<T, ImportMappingPresetFindFirstOrThrowArgs<ExtArgs>>): Prisma__ImportMappingPresetClient<$Result.GetResult<Prisma.$ImportMappingPresetPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ImportMappingPresets that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ImportMappingPresetFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ImportMappingPresets
+     * const importMappingPresets = await prisma.importMappingPreset.findMany()
+     * 
+     * // Get first 10 ImportMappingPresets
+     * const importMappingPresets = await prisma.importMappingPreset.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const importMappingPresetWithIdOnly = await prisma.importMappingPreset.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ImportMappingPresetFindManyArgs>(args?: SelectSubset<T, ImportMappingPresetFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ImportMappingPresetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ImportMappingPreset.
+     * @param {ImportMappingPresetCreateArgs} args - Arguments to create a ImportMappingPreset.
+     * @example
+     * // Create one ImportMappingPreset
+     * const ImportMappingPreset = await prisma.importMappingPreset.create({
+     *   data: {
+     *     // ... data to create a ImportMappingPreset
+     *   }
+     * })
+     * 
+     */
+    create<T extends ImportMappingPresetCreateArgs>(args: SelectSubset<T, ImportMappingPresetCreateArgs<ExtArgs>>): Prisma__ImportMappingPresetClient<$Result.GetResult<Prisma.$ImportMappingPresetPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ImportMappingPresets.
+     * @param {ImportMappingPresetCreateManyArgs} args - Arguments to create many ImportMappingPresets.
+     * @example
+     * // Create many ImportMappingPresets
+     * const importMappingPreset = await prisma.importMappingPreset.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ImportMappingPresetCreateManyArgs>(args?: SelectSubset<T, ImportMappingPresetCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ImportMappingPresets and returns the data saved in the database.
+     * @param {ImportMappingPresetCreateManyAndReturnArgs} args - Arguments to create many ImportMappingPresets.
+     * @example
+     * // Create many ImportMappingPresets
+     * const importMappingPreset = await prisma.importMappingPreset.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ImportMappingPresets and only return the `id`
+     * const importMappingPresetWithIdOnly = await prisma.importMappingPreset.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ImportMappingPresetCreateManyAndReturnArgs>(args?: SelectSubset<T, ImportMappingPresetCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ImportMappingPresetPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ImportMappingPreset.
+     * @param {ImportMappingPresetDeleteArgs} args - Arguments to delete one ImportMappingPreset.
+     * @example
+     * // Delete one ImportMappingPreset
+     * const ImportMappingPreset = await prisma.importMappingPreset.delete({
+     *   where: {
+     *     // ... filter to delete one ImportMappingPreset
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ImportMappingPresetDeleteArgs>(args: SelectSubset<T, ImportMappingPresetDeleteArgs<ExtArgs>>): Prisma__ImportMappingPresetClient<$Result.GetResult<Prisma.$ImportMappingPresetPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ImportMappingPreset.
+     * @param {ImportMappingPresetUpdateArgs} args - Arguments to update one ImportMappingPreset.
+     * @example
+     * // Update one ImportMappingPreset
+     * const importMappingPreset = await prisma.importMappingPreset.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ImportMappingPresetUpdateArgs>(args: SelectSubset<T, ImportMappingPresetUpdateArgs<ExtArgs>>): Prisma__ImportMappingPresetClient<$Result.GetResult<Prisma.$ImportMappingPresetPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ImportMappingPresets.
+     * @param {ImportMappingPresetDeleteManyArgs} args - Arguments to filter ImportMappingPresets to delete.
+     * @example
+     * // Delete a few ImportMappingPresets
+     * const { count } = await prisma.importMappingPreset.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ImportMappingPresetDeleteManyArgs>(args?: SelectSubset<T, ImportMappingPresetDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ImportMappingPresets.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ImportMappingPresetUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ImportMappingPresets
+     * const importMappingPreset = await prisma.importMappingPreset.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ImportMappingPresetUpdateManyArgs>(args: SelectSubset<T, ImportMappingPresetUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ImportMappingPresets and returns the data updated in the database.
+     * @param {ImportMappingPresetUpdateManyAndReturnArgs} args - Arguments to update many ImportMappingPresets.
+     * @example
+     * // Update many ImportMappingPresets
+     * const importMappingPreset = await prisma.importMappingPreset.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ImportMappingPresets and only return the `id`
+     * const importMappingPresetWithIdOnly = await prisma.importMappingPreset.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ImportMappingPresetUpdateManyAndReturnArgs>(args: SelectSubset<T, ImportMappingPresetUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ImportMappingPresetPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ImportMappingPreset.
+     * @param {ImportMappingPresetUpsertArgs} args - Arguments to update or create a ImportMappingPreset.
+     * @example
+     * // Update or create a ImportMappingPreset
+     * const importMappingPreset = await prisma.importMappingPreset.upsert({
+     *   create: {
+     *     // ... data to create a ImportMappingPreset
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ImportMappingPreset we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ImportMappingPresetUpsertArgs>(args: SelectSubset<T, ImportMappingPresetUpsertArgs<ExtArgs>>): Prisma__ImportMappingPresetClient<$Result.GetResult<Prisma.$ImportMappingPresetPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ImportMappingPresets.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ImportMappingPresetCountArgs} args - Arguments to filter ImportMappingPresets to count.
+     * @example
+     * // Count the number of ImportMappingPresets
+     * const count = await prisma.importMappingPreset.count({
+     *   where: {
+     *     // ... the filter for the ImportMappingPresets we want to count
+     *   }
+     * })
+    **/
+    count<T extends ImportMappingPresetCountArgs>(
+      args?: Subset<T, ImportMappingPresetCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ImportMappingPresetCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ImportMappingPreset.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ImportMappingPresetAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ImportMappingPresetAggregateArgs>(args: Subset<T, ImportMappingPresetAggregateArgs>): Prisma.PrismaPromise<GetImportMappingPresetAggregateType<T>>
+
+    /**
+     * Group by ImportMappingPreset.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ImportMappingPresetGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ImportMappingPresetGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ImportMappingPresetGroupByArgs['orderBy'] }
+        : { orderBy?: ImportMappingPresetGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ImportMappingPresetGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetImportMappingPresetGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ImportMappingPreset model
+   */
+  readonly fields: ImportMappingPresetFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ImportMappingPreset.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ImportMappingPresetClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ImportMappingPreset model
+   */
+  interface ImportMappingPresetFieldRefs {
+    readonly id: FieldRef<"ImportMappingPreset", 'String'>
+    readonly userId: FieldRef<"ImportMappingPreset", 'String'>
+    readonly name: FieldRef<"ImportMappingPreset", 'String'>
+    readonly headerHash: FieldRef<"ImportMappingPreset", 'String'>
+    readonly columnMappings: FieldRef<"ImportMappingPreset", 'Json'>
+    readonly sourceProfile: FieldRef<"ImportMappingPreset", 'String'>
+    readonly usageCount: FieldRef<"ImportMappingPreset", 'Int'>
+    readonly lastUsedAt: FieldRef<"ImportMappingPreset", 'DateTime'>
+    readonly createdAt: FieldRef<"ImportMappingPreset", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ImportMappingPreset findUnique
+   */
+  export type ImportMappingPresetFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingPreset
+     */
+    select?: ImportMappingPresetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingPreset
+     */
+    omit?: ImportMappingPresetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingPresetInclude<ExtArgs> | null
+    /**
+     * Filter, which ImportMappingPreset to fetch.
+     */
+    where: ImportMappingPresetWhereUniqueInput
+  }
+
+  /**
+   * ImportMappingPreset findUniqueOrThrow
+   */
+  export type ImportMappingPresetFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingPreset
+     */
+    select?: ImportMappingPresetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingPreset
+     */
+    omit?: ImportMappingPresetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingPresetInclude<ExtArgs> | null
+    /**
+     * Filter, which ImportMappingPreset to fetch.
+     */
+    where: ImportMappingPresetWhereUniqueInput
+  }
+
+  /**
+   * ImportMappingPreset findFirst
+   */
+  export type ImportMappingPresetFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingPreset
+     */
+    select?: ImportMappingPresetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingPreset
+     */
+    omit?: ImportMappingPresetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingPresetInclude<ExtArgs> | null
+    /**
+     * Filter, which ImportMappingPreset to fetch.
+     */
+    where?: ImportMappingPresetWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ImportMappingPresets to fetch.
+     */
+    orderBy?: ImportMappingPresetOrderByWithRelationInput | ImportMappingPresetOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ImportMappingPresets.
+     */
+    cursor?: ImportMappingPresetWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ImportMappingPresets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ImportMappingPresets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ImportMappingPresets.
+     */
+    distinct?: ImportMappingPresetScalarFieldEnum | ImportMappingPresetScalarFieldEnum[]
+  }
+
+  /**
+   * ImportMappingPreset findFirstOrThrow
+   */
+  export type ImportMappingPresetFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingPreset
+     */
+    select?: ImportMappingPresetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingPreset
+     */
+    omit?: ImportMappingPresetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingPresetInclude<ExtArgs> | null
+    /**
+     * Filter, which ImportMappingPreset to fetch.
+     */
+    where?: ImportMappingPresetWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ImportMappingPresets to fetch.
+     */
+    orderBy?: ImportMappingPresetOrderByWithRelationInput | ImportMappingPresetOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ImportMappingPresets.
+     */
+    cursor?: ImportMappingPresetWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ImportMappingPresets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ImportMappingPresets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ImportMappingPresets.
+     */
+    distinct?: ImportMappingPresetScalarFieldEnum | ImportMappingPresetScalarFieldEnum[]
+  }
+
+  /**
+   * ImportMappingPreset findMany
+   */
+  export type ImportMappingPresetFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingPreset
+     */
+    select?: ImportMappingPresetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingPreset
+     */
+    omit?: ImportMappingPresetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingPresetInclude<ExtArgs> | null
+    /**
+     * Filter, which ImportMappingPresets to fetch.
+     */
+    where?: ImportMappingPresetWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ImportMappingPresets to fetch.
+     */
+    orderBy?: ImportMappingPresetOrderByWithRelationInput | ImportMappingPresetOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ImportMappingPresets.
+     */
+    cursor?: ImportMappingPresetWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ImportMappingPresets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ImportMappingPresets.
+     */
+    skip?: number
+    distinct?: ImportMappingPresetScalarFieldEnum | ImportMappingPresetScalarFieldEnum[]
+  }
+
+  /**
+   * ImportMappingPreset create
+   */
+  export type ImportMappingPresetCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingPreset
+     */
+    select?: ImportMappingPresetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingPreset
+     */
+    omit?: ImportMappingPresetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingPresetInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ImportMappingPreset.
+     */
+    data: XOR<ImportMappingPresetCreateInput, ImportMappingPresetUncheckedCreateInput>
+  }
+
+  /**
+   * ImportMappingPreset createMany
+   */
+  export type ImportMappingPresetCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ImportMappingPresets.
+     */
+    data: ImportMappingPresetCreateManyInput | ImportMappingPresetCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ImportMappingPreset createManyAndReturn
+   */
+  export type ImportMappingPresetCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingPreset
+     */
+    select?: ImportMappingPresetSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingPreset
+     */
+    omit?: ImportMappingPresetOmit<ExtArgs> | null
+    /**
+     * The data used to create many ImportMappingPresets.
+     */
+    data: ImportMappingPresetCreateManyInput | ImportMappingPresetCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingPresetIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ImportMappingPreset update
+   */
+  export type ImportMappingPresetUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingPreset
+     */
+    select?: ImportMappingPresetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingPreset
+     */
+    omit?: ImportMappingPresetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingPresetInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ImportMappingPreset.
+     */
+    data: XOR<ImportMappingPresetUpdateInput, ImportMappingPresetUncheckedUpdateInput>
+    /**
+     * Choose, which ImportMappingPreset to update.
+     */
+    where: ImportMappingPresetWhereUniqueInput
+  }
+
+  /**
+   * ImportMappingPreset updateMany
+   */
+  export type ImportMappingPresetUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ImportMappingPresets.
+     */
+    data: XOR<ImportMappingPresetUpdateManyMutationInput, ImportMappingPresetUncheckedUpdateManyInput>
+    /**
+     * Filter which ImportMappingPresets to update
+     */
+    where?: ImportMappingPresetWhereInput
+    /**
+     * Limit how many ImportMappingPresets to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ImportMappingPreset updateManyAndReturn
+   */
+  export type ImportMappingPresetUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingPreset
+     */
+    select?: ImportMappingPresetSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingPreset
+     */
+    omit?: ImportMappingPresetOmit<ExtArgs> | null
+    /**
+     * The data used to update ImportMappingPresets.
+     */
+    data: XOR<ImportMappingPresetUpdateManyMutationInput, ImportMappingPresetUncheckedUpdateManyInput>
+    /**
+     * Filter which ImportMappingPresets to update
+     */
+    where?: ImportMappingPresetWhereInput
+    /**
+     * Limit how many ImportMappingPresets to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingPresetIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ImportMappingPreset upsert
+   */
+  export type ImportMappingPresetUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingPreset
+     */
+    select?: ImportMappingPresetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingPreset
+     */
+    omit?: ImportMappingPresetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingPresetInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ImportMappingPreset to update in case it exists.
+     */
+    where: ImportMappingPresetWhereUniqueInput
+    /**
+     * In case the ImportMappingPreset found by the `where` argument doesn't exist, create a new ImportMappingPreset with this data.
+     */
+    create: XOR<ImportMappingPresetCreateInput, ImportMappingPresetUncheckedCreateInput>
+    /**
+     * In case the ImportMappingPreset was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ImportMappingPresetUpdateInput, ImportMappingPresetUncheckedUpdateInput>
+  }
+
+  /**
+   * ImportMappingPreset delete
+   */
+  export type ImportMappingPresetDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingPreset
+     */
+    select?: ImportMappingPresetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingPreset
+     */
+    omit?: ImportMappingPresetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingPresetInclude<ExtArgs> | null
+    /**
+     * Filter which ImportMappingPreset to delete.
+     */
+    where: ImportMappingPresetWhereUniqueInput
+  }
+
+  /**
+   * ImportMappingPreset deleteMany
+   */
+  export type ImportMappingPresetDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ImportMappingPresets to delete
+     */
+    where?: ImportMappingPresetWhereInput
+    /**
+     * Limit how many ImportMappingPresets to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ImportMappingPreset without action
+   */
+  export type ImportMappingPresetDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ImportMappingPreset
+     */
+    select?: ImportMappingPresetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ImportMappingPreset
+     */
+    omit?: ImportMappingPresetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ImportMappingPresetInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -48778,6 +51258,34 @@ export namespace Prisma {
   };
 
   export type BirthdayReminderStateScalarFieldEnum = (typeof BirthdayReminderStateScalarFieldEnum)[keyof typeof BirthdayReminderStateScalarFieldEnum]
+
+
+  export const ImportMappingSuggestionFeedbackScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    columnHeader: 'columnHeader',
+    suggestedField: 'suggestedField',
+    chosenField: 'chosenField',
+    sampleValue: 'sampleValue',
+    createdAt: 'createdAt'
+  };
+
+  export type ImportMappingSuggestionFeedbackScalarFieldEnum = (typeof ImportMappingSuggestionFeedbackScalarFieldEnum)[keyof typeof ImportMappingSuggestionFeedbackScalarFieldEnum]
+
+
+  export const ImportMappingPresetScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    name: 'name',
+    headerHash: 'headerHash',
+    columnMappings: 'columnMappings',
+    sourceProfile: 'sourceProfile',
+    usageCount: 'usageCount',
+    lastUsedAt: 'lastUsedAt',
+    createdAt: 'createdAt'
+  };
+
+  export type ImportMappingPresetScalarFieldEnum = (typeof ImportMappingPresetScalarFieldEnum)[keyof typeof ImportMappingPresetScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -49468,6 +51976,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertListRelationFilter
     notificationSettings?: XOR<NotificationSettingsNullableScalarRelationFilter, NotificationSettingsWhereInput> | null
     birthdayReminderStates?: BirthdayReminderStateListRelationFilter
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackListRelationFilter
+    importMappingPresets?: ImportMappingPresetListRelationFilter
     failedLoginAttempts?: FailedLoginAttemptListRelationFilter
   }
 
@@ -49519,6 +52029,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertOrderByRelationAggregateInput
     notificationSettings?: NotificationSettingsOrderByWithRelationInput
     birthdayReminderStates?: BirthdayReminderStateOrderByRelationAggregateInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackOrderByRelationAggregateInput
+    importMappingPresets?: ImportMappingPresetOrderByRelationAggregateInput
     failedLoginAttempts?: FailedLoginAttemptOrderByRelationAggregateInput
   }
 
@@ -49573,6 +52085,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertListRelationFilter
     notificationSettings?: XOR<NotificationSettingsNullableScalarRelationFilter, NotificationSettingsWhereInput> | null
     birthdayReminderStates?: BirthdayReminderStateListRelationFilter
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackListRelationFilter
+    importMappingPresets?: ImportMappingPresetListRelationFilter
     failedLoginAttempts?: FailedLoginAttemptListRelationFilter
   }, "id" | "email">
 
@@ -53017,6 +55531,149 @@ export namespace Prisma {
     lastSentAt?: DateTimeWithAggregatesFilter<"BirthdayReminderState"> | Date | string
   }
 
+  export type ImportMappingSuggestionFeedbackWhereInput = {
+    AND?: ImportMappingSuggestionFeedbackWhereInput | ImportMappingSuggestionFeedbackWhereInput[]
+    OR?: ImportMappingSuggestionFeedbackWhereInput[]
+    NOT?: ImportMappingSuggestionFeedbackWhereInput | ImportMappingSuggestionFeedbackWhereInput[]
+    id?: StringFilter<"ImportMappingSuggestionFeedback"> | string
+    userId?: StringFilter<"ImportMappingSuggestionFeedback"> | string
+    columnHeader?: StringFilter<"ImportMappingSuggestionFeedback"> | string
+    suggestedField?: StringFilter<"ImportMappingSuggestionFeedback"> | string
+    chosenField?: StringFilter<"ImportMappingSuggestionFeedback"> | string
+    sampleValue?: StringNullableFilter<"ImportMappingSuggestionFeedback"> | string | null
+    createdAt?: DateTimeFilter<"ImportMappingSuggestionFeedback"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type ImportMappingSuggestionFeedbackOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    columnHeader?: SortOrder
+    suggestedField?: SortOrder
+    chosenField?: SortOrder
+    sampleValue?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type ImportMappingSuggestionFeedbackWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: ImportMappingSuggestionFeedbackWhereInput | ImportMappingSuggestionFeedbackWhereInput[]
+    OR?: ImportMappingSuggestionFeedbackWhereInput[]
+    NOT?: ImportMappingSuggestionFeedbackWhereInput | ImportMappingSuggestionFeedbackWhereInput[]
+    userId?: StringFilter<"ImportMappingSuggestionFeedback"> | string
+    columnHeader?: StringFilter<"ImportMappingSuggestionFeedback"> | string
+    suggestedField?: StringFilter<"ImportMappingSuggestionFeedback"> | string
+    chosenField?: StringFilter<"ImportMappingSuggestionFeedback"> | string
+    sampleValue?: StringNullableFilter<"ImportMappingSuggestionFeedback"> | string | null
+    createdAt?: DateTimeFilter<"ImportMappingSuggestionFeedback"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type ImportMappingSuggestionFeedbackOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    columnHeader?: SortOrder
+    suggestedField?: SortOrder
+    chosenField?: SortOrder
+    sampleValue?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    _count?: ImportMappingSuggestionFeedbackCountOrderByAggregateInput
+    _max?: ImportMappingSuggestionFeedbackMaxOrderByAggregateInput
+    _min?: ImportMappingSuggestionFeedbackMinOrderByAggregateInput
+  }
+
+  export type ImportMappingSuggestionFeedbackScalarWhereWithAggregatesInput = {
+    AND?: ImportMappingSuggestionFeedbackScalarWhereWithAggregatesInput | ImportMappingSuggestionFeedbackScalarWhereWithAggregatesInput[]
+    OR?: ImportMappingSuggestionFeedbackScalarWhereWithAggregatesInput[]
+    NOT?: ImportMappingSuggestionFeedbackScalarWhereWithAggregatesInput | ImportMappingSuggestionFeedbackScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ImportMappingSuggestionFeedback"> | string
+    userId?: StringWithAggregatesFilter<"ImportMappingSuggestionFeedback"> | string
+    columnHeader?: StringWithAggregatesFilter<"ImportMappingSuggestionFeedback"> | string
+    suggestedField?: StringWithAggregatesFilter<"ImportMappingSuggestionFeedback"> | string
+    chosenField?: StringWithAggregatesFilter<"ImportMappingSuggestionFeedback"> | string
+    sampleValue?: StringNullableWithAggregatesFilter<"ImportMappingSuggestionFeedback"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"ImportMappingSuggestionFeedback"> | Date | string
+  }
+
+  export type ImportMappingPresetWhereInput = {
+    AND?: ImportMappingPresetWhereInput | ImportMappingPresetWhereInput[]
+    OR?: ImportMappingPresetWhereInput[]
+    NOT?: ImportMappingPresetWhereInput | ImportMappingPresetWhereInput[]
+    id?: StringFilter<"ImportMappingPreset"> | string
+    userId?: StringFilter<"ImportMappingPreset"> | string
+    name?: StringFilter<"ImportMappingPreset"> | string
+    headerHash?: StringFilter<"ImportMappingPreset"> | string
+    columnMappings?: JsonFilter<"ImportMappingPreset">
+    sourceProfile?: StringNullableFilter<"ImportMappingPreset"> | string | null
+    usageCount?: IntFilter<"ImportMappingPreset"> | number
+    lastUsedAt?: DateTimeFilter<"ImportMappingPreset"> | Date | string
+    createdAt?: DateTimeFilter<"ImportMappingPreset"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type ImportMappingPresetOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    headerHash?: SortOrder
+    columnMappings?: SortOrder
+    sourceProfile?: SortOrderInput | SortOrder
+    usageCount?: SortOrder
+    lastUsedAt?: SortOrder
+    createdAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type ImportMappingPresetWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId_headerHash?: ImportMappingPresetUserIdHeaderHashCompoundUniqueInput
+    AND?: ImportMappingPresetWhereInput | ImportMappingPresetWhereInput[]
+    OR?: ImportMappingPresetWhereInput[]
+    NOT?: ImportMappingPresetWhereInput | ImportMappingPresetWhereInput[]
+    userId?: StringFilter<"ImportMappingPreset"> | string
+    name?: StringFilter<"ImportMappingPreset"> | string
+    headerHash?: StringFilter<"ImportMappingPreset"> | string
+    columnMappings?: JsonFilter<"ImportMappingPreset">
+    sourceProfile?: StringNullableFilter<"ImportMappingPreset"> | string | null
+    usageCount?: IntFilter<"ImportMappingPreset"> | number
+    lastUsedAt?: DateTimeFilter<"ImportMappingPreset"> | Date | string
+    createdAt?: DateTimeFilter<"ImportMappingPreset"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "userId_headerHash">
+
+  export type ImportMappingPresetOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    headerHash?: SortOrder
+    columnMappings?: SortOrder
+    sourceProfile?: SortOrderInput | SortOrder
+    usageCount?: SortOrder
+    lastUsedAt?: SortOrder
+    createdAt?: SortOrder
+    _count?: ImportMappingPresetCountOrderByAggregateInput
+    _avg?: ImportMappingPresetAvgOrderByAggregateInput
+    _max?: ImportMappingPresetMaxOrderByAggregateInput
+    _min?: ImportMappingPresetMinOrderByAggregateInput
+    _sum?: ImportMappingPresetSumOrderByAggregateInput
+  }
+
+  export type ImportMappingPresetScalarWhereWithAggregatesInput = {
+    AND?: ImportMappingPresetScalarWhereWithAggregatesInput | ImportMappingPresetScalarWhereWithAggregatesInput[]
+    OR?: ImportMappingPresetScalarWhereWithAggregatesInput[]
+    NOT?: ImportMappingPresetScalarWhereWithAggregatesInput | ImportMappingPresetScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ImportMappingPreset"> | string
+    userId?: StringWithAggregatesFilter<"ImportMappingPreset"> | string
+    name?: StringWithAggregatesFilter<"ImportMappingPreset"> | string
+    headerHash?: StringWithAggregatesFilter<"ImportMappingPreset"> | string
+    columnMappings?: JsonWithAggregatesFilter<"ImportMappingPreset">
+    sourceProfile?: StringNullableWithAggregatesFilter<"ImportMappingPreset"> | string | null
+    usageCount?: IntWithAggregatesFilter<"ImportMappingPreset"> | number
+    lastUsedAt?: DateTimeWithAggregatesFilter<"ImportMappingPreset"> | Date | string
+    createdAt?: DateTimeWithAggregatesFilter<"ImportMappingPreset"> | Date | string
+  }
+
   export type UserCreateInput = {
     id?: string
     name?: string | null
@@ -53065,6 +55722,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -53116,6 +55775,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -53167,6 +55828,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -53218,6 +55881,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -57124,6 +59789,158 @@ export namespace Prisma {
     lastSentAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ImportMappingSuggestionFeedbackCreateInput = {
+    id?: string
+    columnHeader: string
+    suggestedField: string
+    chosenField: string
+    sampleValue?: string | null
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutImportMappingSuggestionFeedbacksInput
+  }
+
+  export type ImportMappingSuggestionFeedbackUncheckedCreateInput = {
+    id?: string
+    userId: string
+    columnHeader: string
+    suggestedField: string
+    chosenField: string
+    sampleValue?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ImportMappingSuggestionFeedbackUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    columnHeader?: StringFieldUpdateOperationsInput | string
+    suggestedField?: StringFieldUpdateOperationsInput | string
+    chosenField?: StringFieldUpdateOperationsInput | string
+    sampleValue?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutImportMappingSuggestionFeedbacksNestedInput
+  }
+
+  export type ImportMappingSuggestionFeedbackUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    columnHeader?: StringFieldUpdateOperationsInput | string
+    suggestedField?: StringFieldUpdateOperationsInput | string
+    chosenField?: StringFieldUpdateOperationsInput | string
+    sampleValue?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ImportMappingSuggestionFeedbackCreateManyInput = {
+    id?: string
+    userId: string
+    columnHeader: string
+    suggestedField: string
+    chosenField: string
+    sampleValue?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ImportMappingSuggestionFeedbackUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    columnHeader?: StringFieldUpdateOperationsInput | string
+    suggestedField?: StringFieldUpdateOperationsInput | string
+    chosenField?: StringFieldUpdateOperationsInput | string
+    sampleValue?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ImportMappingSuggestionFeedbackUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    columnHeader?: StringFieldUpdateOperationsInput | string
+    suggestedField?: StringFieldUpdateOperationsInput | string
+    chosenField?: StringFieldUpdateOperationsInput | string
+    sampleValue?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ImportMappingPresetCreateInput = {
+    id?: string
+    name: string
+    headerHash: string
+    columnMappings: JsonNullValueInput | InputJsonValue
+    sourceProfile?: string | null
+    usageCount?: number
+    lastUsedAt?: Date | string
+    createdAt?: Date | string
+    user: UserCreateNestedOneWithoutImportMappingPresetsInput
+  }
+
+  export type ImportMappingPresetUncheckedCreateInput = {
+    id?: string
+    userId: string
+    name: string
+    headerHash: string
+    columnMappings: JsonNullValueInput | InputJsonValue
+    sourceProfile?: string | null
+    usageCount?: number
+    lastUsedAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type ImportMappingPresetUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    headerHash?: StringFieldUpdateOperationsInput | string
+    columnMappings?: JsonNullValueInput | InputJsonValue
+    sourceProfile?: NullableStringFieldUpdateOperationsInput | string | null
+    usageCount?: IntFieldUpdateOperationsInput | number
+    lastUsedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutImportMappingPresetsNestedInput
+  }
+
+  export type ImportMappingPresetUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    headerHash?: StringFieldUpdateOperationsInput | string
+    columnMappings?: JsonNullValueInput | InputJsonValue
+    sourceProfile?: NullableStringFieldUpdateOperationsInput | string | null
+    usageCount?: IntFieldUpdateOperationsInput | number
+    lastUsedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ImportMappingPresetCreateManyInput = {
+    id?: string
+    userId: string
+    name: string
+    headerHash: string
+    columnMappings: JsonNullValueInput | InputJsonValue
+    sourceProfile?: string | null
+    usageCount?: number
+    lastUsedAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type ImportMappingPresetUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    headerHash?: StringFieldUpdateOperationsInput | string
+    columnMappings?: JsonNullValueInput | InputJsonValue
+    sourceProfile?: NullableStringFieldUpdateOperationsInput | string | null
+    usageCount?: IntFieldUpdateOperationsInput | number
+    lastUsedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ImportMappingPresetUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    headerHash?: StringFieldUpdateOperationsInput | string
+    columnMappings?: JsonNullValueInput | InputJsonValue
+    sourceProfile?: NullableStringFieldUpdateOperationsInput | string | null
+    usageCount?: IntFieldUpdateOperationsInput | number
+    lastUsedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -57349,6 +60166,18 @@ export namespace Prisma {
     none?: BirthdayReminderStateWhereInput
   }
 
+  export type ImportMappingSuggestionFeedbackListRelationFilter = {
+    every?: ImportMappingSuggestionFeedbackWhereInput
+    some?: ImportMappingSuggestionFeedbackWhereInput
+    none?: ImportMappingSuggestionFeedbackWhereInput
+  }
+
+  export type ImportMappingPresetListRelationFilter = {
+    every?: ImportMappingPresetWhereInput
+    some?: ImportMappingPresetWhereInput
+    none?: ImportMappingPresetWhereInput
+  }
+
   export type FailedLoginAttemptListRelationFilter = {
     every?: FailedLoginAttemptWhereInput
     some?: FailedLoginAttemptWhereInput
@@ -57441,6 +60270,14 @@ export namespace Prisma {
   }
 
   export type BirthdayReminderStateOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ImportMappingSuggestionFeedbackOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ImportMappingPresetOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -60280,6 +63117,83 @@ export namespace Prisma {
     lastSentYear?: SortOrder
   }
 
+  export type ImportMappingSuggestionFeedbackCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    columnHeader?: SortOrder
+    suggestedField?: SortOrder
+    chosenField?: SortOrder
+    sampleValue?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ImportMappingSuggestionFeedbackMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    columnHeader?: SortOrder
+    suggestedField?: SortOrder
+    chosenField?: SortOrder
+    sampleValue?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ImportMappingSuggestionFeedbackMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    columnHeader?: SortOrder
+    suggestedField?: SortOrder
+    chosenField?: SortOrder
+    sampleValue?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ImportMappingPresetUserIdHeaderHashCompoundUniqueInput = {
+    userId: string
+    headerHash: string
+  }
+
+  export type ImportMappingPresetCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    headerHash?: SortOrder
+    columnMappings?: SortOrder
+    sourceProfile?: SortOrder
+    usageCount?: SortOrder
+    lastUsedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ImportMappingPresetAvgOrderByAggregateInput = {
+    usageCount?: SortOrder
+  }
+
+  export type ImportMappingPresetMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    headerHash?: SortOrder
+    sourceProfile?: SortOrder
+    usageCount?: SortOrder
+    lastUsedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ImportMappingPresetMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    headerHash?: SortOrder
+    sourceProfile?: SortOrder
+    usageCount?: SortOrder
+    lastUsedAt?: SortOrder
+    createdAt?: SortOrder
+  }
+
+  export type ImportMappingPresetSumOrderByAggregateInput = {
+    usageCount?: SortOrder
+  }
+
   export type AppPasswordCreateNestedManyWithoutUserInput = {
     create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
@@ -60444,6 +63358,20 @@ export namespace Prisma {
     connectOrCreate?: BirthdayReminderStateCreateOrConnectWithoutUserInput | BirthdayReminderStateCreateOrConnectWithoutUserInput[]
     createMany?: BirthdayReminderStateCreateManyUserInputEnvelope
     connect?: BirthdayReminderStateWhereUniqueInput | BirthdayReminderStateWhereUniqueInput[]
+  }
+
+  export type ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput = {
+    create?: XOR<ImportMappingSuggestionFeedbackCreateWithoutUserInput, ImportMappingSuggestionFeedbackUncheckedCreateWithoutUserInput> | ImportMappingSuggestionFeedbackCreateWithoutUserInput[] | ImportMappingSuggestionFeedbackUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ImportMappingSuggestionFeedbackCreateOrConnectWithoutUserInput | ImportMappingSuggestionFeedbackCreateOrConnectWithoutUserInput[]
+    createMany?: ImportMappingSuggestionFeedbackCreateManyUserInputEnvelope
+    connect?: ImportMappingSuggestionFeedbackWhereUniqueInput | ImportMappingSuggestionFeedbackWhereUniqueInput[]
+  }
+
+  export type ImportMappingPresetCreateNestedManyWithoutUserInput = {
+    create?: XOR<ImportMappingPresetCreateWithoutUserInput, ImportMappingPresetUncheckedCreateWithoutUserInput> | ImportMappingPresetCreateWithoutUserInput[] | ImportMappingPresetUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ImportMappingPresetCreateOrConnectWithoutUserInput | ImportMappingPresetCreateOrConnectWithoutUserInput[]
+    createMany?: ImportMappingPresetCreateManyUserInputEnvelope
+    connect?: ImportMappingPresetWhereUniqueInput | ImportMappingPresetWhereUniqueInput[]
   }
 
   export type FailedLoginAttemptCreateNestedManyWithoutUserInput = {
@@ -60617,6 +63545,20 @@ export namespace Prisma {
     connectOrCreate?: BirthdayReminderStateCreateOrConnectWithoutUserInput | BirthdayReminderStateCreateOrConnectWithoutUserInput[]
     createMany?: BirthdayReminderStateCreateManyUserInputEnvelope
     connect?: BirthdayReminderStateWhereUniqueInput | BirthdayReminderStateWhereUniqueInput[]
+  }
+
+  export type ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<ImportMappingSuggestionFeedbackCreateWithoutUserInput, ImportMappingSuggestionFeedbackUncheckedCreateWithoutUserInput> | ImportMappingSuggestionFeedbackCreateWithoutUserInput[] | ImportMappingSuggestionFeedbackUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ImportMappingSuggestionFeedbackCreateOrConnectWithoutUserInput | ImportMappingSuggestionFeedbackCreateOrConnectWithoutUserInput[]
+    createMany?: ImportMappingSuggestionFeedbackCreateManyUserInputEnvelope
+    connect?: ImportMappingSuggestionFeedbackWhereUniqueInput | ImportMappingSuggestionFeedbackWhereUniqueInput[]
+  }
+
+  export type ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<ImportMappingPresetCreateWithoutUserInput, ImportMappingPresetUncheckedCreateWithoutUserInput> | ImportMappingPresetCreateWithoutUserInput[] | ImportMappingPresetUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ImportMappingPresetCreateOrConnectWithoutUserInput | ImportMappingPresetCreateOrConnectWithoutUserInput[]
+    createMany?: ImportMappingPresetCreateManyUserInputEnvelope
+    connect?: ImportMappingPresetWhereUniqueInput | ImportMappingPresetWhereUniqueInput[]
   }
 
   export type FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput = {
@@ -60994,6 +63936,34 @@ export namespace Prisma {
     deleteMany?: BirthdayReminderStateScalarWhereInput | BirthdayReminderStateScalarWhereInput[]
   }
 
+  export type ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ImportMappingSuggestionFeedbackCreateWithoutUserInput, ImportMappingSuggestionFeedbackUncheckedCreateWithoutUserInput> | ImportMappingSuggestionFeedbackCreateWithoutUserInput[] | ImportMappingSuggestionFeedbackUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ImportMappingSuggestionFeedbackCreateOrConnectWithoutUserInput | ImportMappingSuggestionFeedbackCreateOrConnectWithoutUserInput[]
+    upsert?: ImportMappingSuggestionFeedbackUpsertWithWhereUniqueWithoutUserInput | ImportMappingSuggestionFeedbackUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ImportMappingSuggestionFeedbackCreateManyUserInputEnvelope
+    set?: ImportMappingSuggestionFeedbackWhereUniqueInput | ImportMappingSuggestionFeedbackWhereUniqueInput[]
+    disconnect?: ImportMappingSuggestionFeedbackWhereUniqueInput | ImportMappingSuggestionFeedbackWhereUniqueInput[]
+    delete?: ImportMappingSuggestionFeedbackWhereUniqueInput | ImportMappingSuggestionFeedbackWhereUniqueInput[]
+    connect?: ImportMappingSuggestionFeedbackWhereUniqueInput | ImportMappingSuggestionFeedbackWhereUniqueInput[]
+    update?: ImportMappingSuggestionFeedbackUpdateWithWhereUniqueWithoutUserInput | ImportMappingSuggestionFeedbackUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ImportMappingSuggestionFeedbackUpdateManyWithWhereWithoutUserInput | ImportMappingSuggestionFeedbackUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ImportMappingSuggestionFeedbackScalarWhereInput | ImportMappingSuggestionFeedbackScalarWhereInput[]
+  }
+
+  export type ImportMappingPresetUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ImportMappingPresetCreateWithoutUserInput, ImportMappingPresetUncheckedCreateWithoutUserInput> | ImportMappingPresetCreateWithoutUserInput[] | ImportMappingPresetUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ImportMappingPresetCreateOrConnectWithoutUserInput | ImportMappingPresetCreateOrConnectWithoutUserInput[]
+    upsert?: ImportMappingPresetUpsertWithWhereUniqueWithoutUserInput | ImportMappingPresetUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ImportMappingPresetCreateManyUserInputEnvelope
+    set?: ImportMappingPresetWhereUniqueInput | ImportMappingPresetWhereUniqueInput[]
+    disconnect?: ImportMappingPresetWhereUniqueInput | ImportMappingPresetWhereUniqueInput[]
+    delete?: ImportMappingPresetWhereUniqueInput | ImportMappingPresetWhereUniqueInput[]
+    connect?: ImportMappingPresetWhereUniqueInput | ImportMappingPresetWhereUniqueInput[]
+    update?: ImportMappingPresetUpdateWithWhereUniqueWithoutUserInput | ImportMappingPresetUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ImportMappingPresetUpdateManyWithWhereWithoutUserInput | ImportMappingPresetUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ImportMappingPresetScalarWhereInput | ImportMappingPresetScalarWhereInput[]
+  }
+
   export type FailedLoginAttemptUpdateManyWithoutUserNestedInput = {
     create?: XOR<FailedLoginAttemptCreateWithoutUserInput, FailedLoginAttemptUncheckedCreateWithoutUserInput> | FailedLoginAttemptCreateWithoutUserInput[] | FailedLoginAttemptUncheckedCreateWithoutUserInput[]
     connectOrCreate?: FailedLoginAttemptCreateOrConnectWithoutUserInput | FailedLoginAttemptCreateOrConnectWithoutUserInput[]
@@ -61334,6 +64304,34 @@ export namespace Prisma {
     update?: BirthdayReminderStateUpdateWithWhereUniqueWithoutUserInput | BirthdayReminderStateUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: BirthdayReminderStateUpdateManyWithWhereWithoutUserInput | BirthdayReminderStateUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: BirthdayReminderStateScalarWhereInput | BirthdayReminderStateScalarWhereInput[]
+  }
+
+  export type ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ImportMappingSuggestionFeedbackCreateWithoutUserInput, ImportMappingSuggestionFeedbackUncheckedCreateWithoutUserInput> | ImportMappingSuggestionFeedbackCreateWithoutUserInput[] | ImportMappingSuggestionFeedbackUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ImportMappingSuggestionFeedbackCreateOrConnectWithoutUserInput | ImportMappingSuggestionFeedbackCreateOrConnectWithoutUserInput[]
+    upsert?: ImportMappingSuggestionFeedbackUpsertWithWhereUniqueWithoutUserInput | ImportMappingSuggestionFeedbackUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ImportMappingSuggestionFeedbackCreateManyUserInputEnvelope
+    set?: ImportMappingSuggestionFeedbackWhereUniqueInput | ImportMappingSuggestionFeedbackWhereUniqueInput[]
+    disconnect?: ImportMappingSuggestionFeedbackWhereUniqueInput | ImportMappingSuggestionFeedbackWhereUniqueInput[]
+    delete?: ImportMappingSuggestionFeedbackWhereUniqueInput | ImportMappingSuggestionFeedbackWhereUniqueInput[]
+    connect?: ImportMappingSuggestionFeedbackWhereUniqueInput | ImportMappingSuggestionFeedbackWhereUniqueInput[]
+    update?: ImportMappingSuggestionFeedbackUpdateWithWhereUniqueWithoutUserInput | ImportMappingSuggestionFeedbackUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ImportMappingSuggestionFeedbackUpdateManyWithWhereWithoutUserInput | ImportMappingSuggestionFeedbackUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ImportMappingSuggestionFeedbackScalarWhereInput | ImportMappingSuggestionFeedbackScalarWhereInput[]
+  }
+
+  export type ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ImportMappingPresetCreateWithoutUserInput, ImportMappingPresetUncheckedCreateWithoutUserInput> | ImportMappingPresetCreateWithoutUserInput[] | ImportMappingPresetUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ImportMappingPresetCreateOrConnectWithoutUserInput | ImportMappingPresetCreateOrConnectWithoutUserInput[]
+    upsert?: ImportMappingPresetUpsertWithWhereUniqueWithoutUserInput | ImportMappingPresetUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ImportMappingPresetCreateManyUserInputEnvelope
+    set?: ImportMappingPresetWhereUniqueInput | ImportMappingPresetWhereUniqueInput[]
+    disconnect?: ImportMappingPresetWhereUniqueInput | ImportMappingPresetWhereUniqueInput[]
+    delete?: ImportMappingPresetWhereUniqueInput | ImportMappingPresetWhereUniqueInput[]
+    connect?: ImportMappingPresetWhereUniqueInput | ImportMappingPresetWhereUniqueInput[]
+    update?: ImportMappingPresetUpdateWithWhereUniqueWithoutUserInput | ImportMappingPresetUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ImportMappingPresetUpdateManyWithWhereWithoutUserInput | ImportMappingPresetUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ImportMappingPresetScalarWhereInput | ImportMappingPresetScalarWhereInput[]
   }
 
   export type FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput = {
@@ -63443,6 +66441,34 @@ export namespace Prisma {
     update?: XOR<XOR<ContactUpdateToOneWithWhereWithoutBirthdayReminderStatesInput, ContactUpdateWithoutBirthdayReminderStatesInput>, ContactUncheckedUpdateWithoutBirthdayReminderStatesInput>
   }
 
+  export type UserCreateNestedOneWithoutImportMappingSuggestionFeedbacksInput = {
+    create?: XOR<UserCreateWithoutImportMappingSuggestionFeedbacksInput, UserUncheckedCreateWithoutImportMappingSuggestionFeedbacksInput>
+    connectOrCreate?: UserCreateOrConnectWithoutImportMappingSuggestionFeedbacksInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutImportMappingSuggestionFeedbacksNestedInput = {
+    create?: XOR<UserCreateWithoutImportMappingSuggestionFeedbacksInput, UserUncheckedCreateWithoutImportMappingSuggestionFeedbacksInput>
+    connectOrCreate?: UserCreateOrConnectWithoutImportMappingSuggestionFeedbacksInput
+    upsert?: UserUpsertWithoutImportMappingSuggestionFeedbacksInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutImportMappingSuggestionFeedbacksInput, UserUpdateWithoutImportMappingSuggestionFeedbacksInput>, UserUncheckedUpdateWithoutImportMappingSuggestionFeedbacksInput>
+  }
+
+  export type UserCreateNestedOneWithoutImportMappingPresetsInput = {
+    create?: XOR<UserCreateWithoutImportMappingPresetsInput, UserUncheckedCreateWithoutImportMappingPresetsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutImportMappingPresetsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutImportMappingPresetsNestedInput = {
+    create?: XOR<UserCreateWithoutImportMappingPresetsInput, UserUncheckedCreateWithoutImportMappingPresetsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutImportMappingPresetsInput
+    upsert?: UserUpsertWithoutImportMappingPresetsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutImportMappingPresetsInput, UserUpdateWithoutImportMappingPresetsInput>, UserUncheckedUpdateWithoutImportMappingPresetsInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -65362,6 +68388,66 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ImportMappingSuggestionFeedbackCreateWithoutUserInput = {
+    id?: string
+    columnHeader: string
+    suggestedField: string
+    chosenField: string
+    sampleValue?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ImportMappingSuggestionFeedbackUncheckedCreateWithoutUserInput = {
+    id?: string
+    columnHeader: string
+    suggestedField: string
+    chosenField: string
+    sampleValue?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ImportMappingSuggestionFeedbackCreateOrConnectWithoutUserInput = {
+    where: ImportMappingSuggestionFeedbackWhereUniqueInput
+    create: XOR<ImportMappingSuggestionFeedbackCreateWithoutUserInput, ImportMappingSuggestionFeedbackUncheckedCreateWithoutUserInput>
+  }
+
+  export type ImportMappingSuggestionFeedbackCreateManyUserInputEnvelope = {
+    data: ImportMappingSuggestionFeedbackCreateManyUserInput | ImportMappingSuggestionFeedbackCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ImportMappingPresetCreateWithoutUserInput = {
+    id?: string
+    name: string
+    headerHash: string
+    columnMappings: JsonNullValueInput | InputJsonValue
+    sourceProfile?: string | null
+    usageCount?: number
+    lastUsedAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type ImportMappingPresetUncheckedCreateWithoutUserInput = {
+    id?: string
+    name: string
+    headerHash: string
+    columnMappings: JsonNullValueInput | InputJsonValue
+    sourceProfile?: string | null
+    usageCount?: number
+    lastUsedAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type ImportMappingPresetCreateOrConnectWithoutUserInput = {
+    where: ImportMappingPresetWhereUniqueInput
+    create: XOR<ImportMappingPresetCreateWithoutUserInput, ImportMappingPresetUncheckedCreateWithoutUserInput>
+  }
+
+  export type ImportMappingPresetCreateManyUserInputEnvelope = {
+    data: ImportMappingPresetCreateManyUserInput | ImportMappingPresetCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type FailedLoginAttemptCreateWithoutUserInput = {
     id?: string
     ipAddress?: string | null
@@ -66235,6 +69321,66 @@ export namespace Prisma {
     lastSentAt?: DateTimeFilter<"BirthdayReminderState"> | Date | string
   }
 
+  export type ImportMappingSuggestionFeedbackUpsertWithWhereUniqueWithoutUserInput = {
+    where: ImportMappingSuggestionFeedbackWhereUniqueInput
+    update: XOR<ImportMappingSuggestionFeedbackUpdateWithoutUserInput, ImportMappingSuggestionFeedbackUncheckedUpdateWithoutUserInput>
+    create: XOR<ImportMappingSuggestionFeedbackCreateWithoutUserInput, ImportMappingSuggestionFeedbackUncheckedCreateWithoutUserInput>
+  }
+
+  export type ImportMappingSuggestionFeedbackUpdateWithWhereUniqueWithoutUserInput = {
+    where: ImportMappingSuggestionFeedbackWhereUniqueInput
+    data: XOR<ImportMappingSuggestionFeedbackUpdateWithoutUserInput, ImportMappingSuggestionFeedbackUncheckedUpdateWithoutUserInput>
+  }
+
+  export type ImportMappingSuggestionFeedbackUpdateManyWithWhereWithoutUserInput = {
+    where: ImportMappingSuggestionFeedbackScalarWhereInput
+    data: XOR<ImportMappingSuggestionFeedbackUpdateManyMutationInput, ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type ImportMappingSuggestionFeedbackScalarWhereInput = {
+    AND?: ImportMappingSuggestionFeedbackScalarWhereInput | ImportMappingSuggestionFeedbackScalarWhereInput[]
+    OR?: ImportMappingSuggestionFeedbackScalarWhereInput[]
+    NOT?: ImportMappingSuggestionFeedbackScalarWhereInput | ImportMappingSuggestionFeedbackScalarWhereInput[]
+    id?: StringFilter<"ImportMappingSuggestionFeedback"> | string
+    userId?: StringFilter<"ImportMappingSuggestionFeedback"> | string
+    columnHeader?: StringFilter<"ImportMappingSuggestionFeedback"> | string
+    suggestedField?: StringFilter<"ImportMappingSuggestionFeedback"> | string
+    chosenField?: StringFilter<"ImportMappingSuggestionFeedback"> | string
+    sampleValue?: StringNullableFilter<"ImportMappingSuggestionFeedback"> | string | null
+    createdAt?: DateTimeFilter<"ImportMappingSuggestionFeedback"> | Date | string
+  }
+
+  export type ImportMappingPresetUpsertWithWhereUniqueWithoutUserInput = {
+    where: ImportMappingPresetWhereUniqueInput
+    update: XOR<ImportMappingPresetUpdateWithoutUserInput, ImportMappingPresetUncheckedUpdateWithoutUserInput>
+    create: XOR<ImportMappingPresetCreateWithoutUserInput, ImportMappingPresetUncheckedCreateWithoutUserInput>
+  }
+
+  export type ImportMappingPresetUpdateWithWhereUniqueWithoutUserInput = {
+    where: ImportMappingPresetWhereUniqueInput
+    data: XOR<ImportMappingPresetUpdateWithoutUserInput, ImportMappingPresetUncheckedUpdateWithoutUserInput>
+  }
+
+  export type ImportMappingPresetUpdateManyWithWhereWithoutUserInput = {
+    where: ImportMappingPresetScalarWhereInput
+    data: XOR<ImportMappingPresetUpdateManyMutationInput, ImportMappingPresetUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type ImportMappingPresetScalarWhereInput = {
+    AND?: ImportMappingPresetScalarWhereInput | ImportMappingPresetScalarWhereInput[]
+    OR?: ImportMappingPresetScalarWhereInput[]
+    NOT?: ImportMappingPresetScalarWhereInput | ImportMappingPresetScalarWhereInput[]
+    id?: StringFilter<"ImportMappingPreset"> | string
+    userId?: StringFilter<"ImportMappingPreset"> | string
+    name?: StringFilter<"ImportMappingPreset"> | string
+    headerHash?: StringFilter<"ImportMappingPreset"> | string
+    columnMappings?: JsonFilter<"ImportMappingPreset">
+    sourceProfile?: StringNullableFilter<"ImportMappingPreset"> | string | null
+    usageCount?: IntFilter<"ImportMappingPreset"> | number
+    lastUsedAt?: DateTimeFilter<"ImportMappingPreset"> | Date | string
+    createdAt?: DateTimeFilter<"ImportMappingPreset"> | Date | string
+  }
+
   export type FailedLoginAttemptUpsertWithWhereUniqueWithoutUserInput = {
     where: FailedLoginAttemptWhereUniqueInput
     update: XOR<FailedLoginAttemptUpdateWithoutUserInput, FailedLoginAttemptUncheckedUpdateWithoutUserInput>
@@ -66308,6 +69454,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -66358,6 +69506,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -66478,6 +69628,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -66528,6 +69680,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -66620,6 +69774,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -66670,6 +69826,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -67459,6 +70617,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -67509,6 +70669,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -67985,6 +71147,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -68035,6 +71199,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -68181,6 +71347,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -68231,6 +71399,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -68297,6 +71467,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -68347,6 +71519,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -68478,6 +71652,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -68528,6 +71704,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -68625,6 +71803,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -68675,6 +71855,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -68873,6 +72055,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -68923,6 +72107,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -68989,6 +72175,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -69039,6 +72227,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -69105,6 +72295,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -69155,6 +72347,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -69205,6 +72399,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -69255,6 +72451,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -69613,6 +72811,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -69663,6 +72863,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -70038,6 +73240,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -70088,6 +73292,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -70203,6 +73409,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -70253,6 +73461,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -70303,6 +73513,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -70353,6 +73565,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -70625,6 +73839,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -70675,6 +73891,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -72233,6 +75451,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -72283,6 +75503,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -72349,6 +75571,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -72399,6 +75623,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -72449,6 +75675,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -72499,6 +75727,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -72565,6 +75795,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -72615,6 +75847,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -72665,6 +75899,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -72715,6 +75951,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -72781,6 +76019,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -72831,6 +76071,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -72881,6 +76123,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -72931,6 +76175,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -72997,6 +76243,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -73047,6 +76295,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -73097,6 +76347,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -73147,6 +76399,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -73340,6 +76594,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -73390,6 +76646,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -73573,6 +76831,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -73623,6 +76883,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -73689,6 +76951,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -73739,6 +77003,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -73789,6 +77055,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -73839,6 +77107,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -74084,6 +77354,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -74134,6 +77406,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -74375,6 +77649,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -74425,6 +77701,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -74532,6 +77810,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -74582,6 +77862,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -74792,6 +78074,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -74842,6 +78126,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -75040,6 +78326,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -75090,6 +78378,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -75788,6 +79078,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -75838,6 +79130,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -76020,6 +79314,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -76070,6 +79366,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -76263,6 +79561,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -76313,6 +79613,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -76507,6 +79809,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -76557,6 +79861,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -76740,6 +80046,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -76790,6 +80098,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -76885,6 +80195,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -76935,6 +80247,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -77020,6 +80334,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -77070,6 +80386,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -77172,6 +80490,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -77222,6 +80542,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -77288,6 +80610,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -77338,6 +80662,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -77404,6 +80730,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -77454,6 +80782,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -77505,6 +80835,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutFailedLoginAttemptsInput = {
@@ -77555,6 +80887,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutFailedLoginAttemptsInput = {
@@ -77621,6 +80955,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutFailedLoginAttemptsInput = {
@@ -77671,6 +81007,8 @@ export namespace Prisma {
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutBirthdayReminderStatesInput = {
@@ -77720,6 +81058,8 @@ export namespace Prisma {
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -77770,6 +81110,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -77963,6 +81305,8 @@ export namespace Prisma {
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -78013,6 +81357,8 @@ export namespace Prisma {
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -78147,6 +81493,454 @@ export namespace Prisma {
     sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
     groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
     mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
+  }
+
+  export type UserCreateWithoutImportMappingSuggestionFeedbacksInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutImportMappingSuggestionFeedbacksInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutImportMappingSuggestionFeedbacksInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutImportMappingSuggestionFeedbacksInput, UserUncheckedCreateWithoutImportMappingSuggestionFeedbacksInput>
+  }
+
+  export type UserUpsertWithoutImportMappingSuggestionFeedbacksInput = {
+    update: XOR<UserUpdateWithoutImportMappingSuggestionFeedbacksInput, UserUncheckedUpdateWithoutImportMappingSuggestionFeedbacksInput>
+    create: XOR<UserCreateWithoutImportMappingSuggestionFeedbacksInput, UserUncheckedCreateWithoutImportMappingSuggestionFeedbacksInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutImportMappingSuggestionFeedbacksInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutImportMappingSuggestionFeedbacksInput, UserUncheckedUpdateWithoutImportMappingSuggestionFeedbacksInput>
+  }
+
+  export type UserUpdateWithoutImportMappingSuggestionFeedbacksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutImportMappingSuggestionFeedbacksInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutImportMappingPresetsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutImportMappingPresetsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutImportMappingPresetsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutImportMappingPresetsInput, UserUncheckedCreateWithoutImportMappingPresetsInput>
+  }
+
+  export type UserUpsertWithoutImportMappingPresetsInput = {
+    update: XOR<UserUpdateWithoutImportMappingPresetsInput, UserUncheckedUpdateWithoutImportMappingPresetsInput>
+    create: XOR<UserCreateWithoutImportMappingPresetsInput, UserUncheckedCreateWithoutImportMappingPresetsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutImportMappingPresetsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutImportMappingPresetsInput, UserUncheckedUpdateWithoutImportMappingPresetsInput>
+  }
+
+  export type UserUpdateWithoutImportMappingPresetsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutImportMappingPresetsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type AppPasswordCreateManyUserInput = {
@@ -78516,6 +82310,26 @@ export namespace Prisma {
     dateKey: string
     lastSentYear: number
     lastSentAt?: Date | string
+  }
+
+  export type ImportMappingSuggestionFeedbackCreateManyUserInput = {
+    id?: string
+    columnHeader: string
+    suggestedField: string
+    chosenField: string
+    sampleValue?: string | null
+    createdAt?: Date | string
+  }
+
+  export type ImportMappingPresetCreateManyUserInput = {
+    id?: string
+    name: string
+    headerHash: string
+    columnMappings: JsonNullValueInput | InputJsonValue
+    sourceProfile?: string | null
+    usageCount?: number
+    lastUsedAt?: Date | string
+    createdAt?: Date | string
   }
 
   export type FailedLoginAttemptCreateManyUserInput = {
@@ -79677,6 +83491,66 @@ export namespace Prisma {
     dateKey?: StringFieldUpdateOperationsInput | string
     lastSentYear?: IntFieldUpdateOperationsInput | number
     lastSentAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ImportMappingSuggestionFeedbackUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    columnHeader?: StringFieldUpdateOperationsInput | string
+    suggestedField?: StringFieldUpdateOperationsInput | string
+    chosenField?: StringFieldUpdateOperationsInput | string
+    sampleValue?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ImportMappingSuggestionFeedbackUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    columnHeader?: StringFieldUpdateOperationsInput | string
+    suggestedField?: StringFieldUpdateOperationsInput | string
+    chosenField?: StringFieldUpdateOperationsInput | string
+    sampleValue?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    columnHeader?: StringFieldUpdateOperationsInput | string
+    suggestedField?: StringFieldUpdateOperationsInput | string
+    chosenField?: StringFieldUpdateOperationsInput | string
+    sampleValue?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ImportMappingPresetUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    headerHash?: StringFieldUpdateOperationsInput | string
+    columnMappings?: JsonNullValueInput | InputJsonValue
+    sourceProfile?: NullableStringFieldUpdateOperationsInput | string | null
+    usageCount?: IntFieldUpdateOperationsInput | number
+    lastUsedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ImportMappingPresetUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    headerHash?: StringFieldUpdateOperationsInput | string
+    columnMappings?: JsonNullValueInput | InputJsonValue
+    sourceProfile?: NullableStringFieldUpdateOperationsInput | string | null
+    usageCount?: IntFieldUpdateOperationsInput | number
+    lastUsedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ImportMappingPresetUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    headerHash?: StringFieldUpdateOperationsInput | string
+    columnMappings?: JsonNullValueInput | InputJsonValue
+    sourceProfile?: NullableStringFieldUpdateOperationsInput | string | null
+    usageCount?: IntFieldUpdateOperationsInput | number
+    lastUsedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type FailedLoginAttemptUpdateWithoutUserInput = {

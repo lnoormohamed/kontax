@@ -16,7 +16,13 @@ const commitRequestSchema = z.object({
   sourceFileSizeBytes: z.number().int().nonnegative().optional(),
   jobId: z.string().trim().optional(),
   columnMappings: z
-    .array(z.object({ index: z.number().int().nonnegative(), targetField: z.string() }))
+    .array(
+      z.object({
+        index: z.number().int().nonnegative(),
+        targetField: z.string(),
+        customFieldKey: z.string().trim().max(50).optional(),
+      }),
+    )
     .optional(),
 });
 
@@ -114,6 +120,7 @@ export async function POST(request: Request) {
         address: contact.address,
         postalAddresses: getOptionalJsonArray(contact.postalAddresses),
         notes: contact.notes,
+        customFields: contact.customFields ?? undefined,
         sourceType: "IMPORT_CSV" as const,
         sourceDetail: sourceFileName,
         lastMutatedBy: "IMPORT_CSV" as const,

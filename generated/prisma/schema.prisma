@@ -194,71 +194,73 @@ enum SourceType {
 }
 
 model User {
-  id                            String                   @id @default(cuid())
-  name                          String?
-  email                         String                   @unique
-  password                      String
-  lifecycleState                AccountLifecycleState    @default(ACTIVE)
-  autoFillPhoneticNames         Boolean                  @default(false)
+  id                               String                            @id @default(cuid())
+  name                             String?
+  email                            String                            @unique
+  password                         String
+  lifecycleState                   AccountLifecycleState             @default(ACTIVE)
+  autoFillPhoneticNames            Boolean                           @default(false)
   // P18-02: incremented on password change / session revoke; JWT must match or is rejected
-  sessionVersion                Int                      @default(1)
+  sessionVersion                   Int                               @default(1)
   // P18-01: optional profile photo URL (served from MinIO)
-  avatarUrl                     String?
+  avatarUrl                        String?
   // P18-04: null = unverified; set to now() on token consumption
-  emailVerified                 DateTime?
+  emailVerified                    DateTime?
   // P18-03: pending email change (cleared on activation or cancellation)
-  emailPendingChange            String?
-  emailPendingChangeRequestedAt DateTime?
+  emailPendingChange               String?
+  emailPendingChangeRequestedAt    DateTime?
   // P20-10: SES bounce/complaint status — suppresses sends when not OK
-  emailStatus                   EmailStatus              @default(OK)
+  emailStatus                      EmailStatus                       @default(OK)
   // P18-07: TOTP two-factor authentication
-  totpEnabled                   Boolean                  @default(false)
-  totpSecret                    String? // AES-256-GCM encrypted
-  totpVerifiedAt                DateTime?
+  totpEnabled                      Boolean                           @default(false)
+  totpSecret                       String? // AES-256-GCM encrypted
+  totpVerifiedAt                   DateTime?
   // P18-09: scheduled hard-delete (30-day grace period after user confirms deletion)
-  scheduledDeleteAt             DateTime?
+  scheduledDeleteAt                DateTime?
   // P21-01: platform admin role (default USER). Gates the /admin surfaces.
-  role                          UserRole                 @default(USER)
+  role                             UserRole                          @default(USER)
   // P21-04: admin plan override — set the local plan without touching Stripe.
-  planOverrideReason            String?
-  planOverriddenAt              DateTime?
-  appPasswords                  AppPassword[]
-  contacts                      Contact[]
-  importJobs                    ImportJob[]
-  exportJobs                    ExportJob[]
-  mergeSuggestions              MergeSuggestion[]
-  mergeDecisions                MergeDecision[]
-  syncAccounts                  SyncAccount[]
-  subscriptionCustomer          SubscriptionCustomer?
-  subscriptions                 Subscription[]
-  activityEvents                ActivityEvent[]
-  ownedGroups                   Group[]                  @relation("GroupOwner")
-  groupMemberships              GroupMember[]
-  contactSharesOwned            ContactShare[]           @relation("ShareOwner")
-  contactSharesReceived         ContactShare[]           @relation("ShareRecipient")
-  emailVerificationTokens       EmailVerificationToken[]
-  passwordResetTokens           PasswordResetToken[]
-  sessions                      UserSession[]
-  totpRecoveryCodes             TotpRecoveryCode[]
-  addressBooks                  AddressBook[]
-  adminAuditEvents              AdminAuditEvent[]        @relation("AdminActor")
+  planOverrideReason               String?
+  planOverriddenAt                 DateTime?
+  appPasswords                     AppPassword[]
+  contacts                         Contact[]
+  importJobs                       ImportJob[]
+  exportJobs                       ExportJob[]
+  mergeSuggestions                 MergeSuggestion[]
+  mergeDecisions                   MergeDecision[]
+  syncAccounts                     SyncAccount[]
+  subscriptionCustomer             SubscriptionCustomer?
+  subscriptions                    Subscription[]
+  activityEvents                   ActivityEvent[]
+  ownedGroups                      Group[]                           @relation("GroupOwner")
+  groupMemberships                 GroupMember[]
+  contactSharesOwned               ContactShare[]                    @relation("ShareOwner")
+  contactSharesReceived            ContactShare[]                    @relation("ShareRecipient")
+  emailVerificationTokens          EmailVerificationToken[]
+  passwordResetTokens              PasswordResetToken[]
+  sessions                         UserSession[]
+  totpRecoveryCodes                TotpRecoveryCode[]
+  addressBooks                     AddressBook[]
+  adminAuditEvents                 AdminAuditEvent[]                 @relation("AdminActor")
   // P22-DB05: in-app notification layer
-  notifications                 Notification[]
-  securityAlerts                SecurityAlert[]
-  notificationSettings          NotificationSettings?
+  notifications                    Notification[]
+  securityAlerts                   SecurityAlert[]
+  notificationSettings             NotificationSettings?
   // P22-09/10: birthday reminders + lead-time preference
-  reminderLeadDays              Int                      @default(7)
-  birthdayReminderStates        BirthdayReminderState[]
+  reminderLeadDays                 Int                               @default(7)
+  birthdayReminderStates           BirthdayReminderState[]
+  importMappingSuggestionFeedbacks ImportMappingSuggestionFeedback[]
+  importMappingPresets             ImportMappingPreset[]
   // P22-11: subscribable iCal calendar token (revocable credential).
   // NOT a DB @unique constraint: the startup `prisma db push --skip-generate`
   // (Dockerfile) has no --accept-data-loss, so adding a unique index to a new
   // column would crash-loop the deploy. Uniqueness is guaranteed by the 24-byte
   // random token (generateCalToken) and looked up via findFirst. Indexed below.
-  calToken                      String?
+  calToken                         String?
   // P22-04: repeated failed-login detection
-  failedLoginAttempts           FailedLoginAttempt[]
-  createdAt                     DateTime                 @default(now())
-  updatedAt                     DateTime                 @updatedAt
+  failedLoginAttempts              FailedLoginAttempt[]
+  createdAt                        DateTime                          @default(now())
+  updatedAt                        DateTime                          @updatedAt
 
   @@index([scheduledDeleteAt])
   @@index([calToken])
@@ -1149,4 +1151,39 @@ model BirthdayReminderState {
 
   @@unique([userId, contactId, dateKey])
   @@index([userId, lastSentYear])
+}
+
+// P25-03: records when a user accepts a non-top suggestion or rejects a chip — used
+// offline to improve classifier patterns.
+model ImportMappingSuggestionFeedback {
+  id             String   @id @default(cuid())
+  userId         String
+  columnHeader   String
+  suggestedField String
+  chosenField    String
+  sampleValue    String?
+  createdAt      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([columnHeader])
+  @@index([userId])
+}
+
+// P25-04: saved column-mapping presets; matched by SHA-256 of sorted header names.
+model ImportMappingPreset {
+  id             String   @id @default(cuid())
+  userId         String
+  name           String
+  headerHash     String
+  columnMappings Json
+  sourceProfile  String?
+  usageCount     Int      @default(1)
+  lastUsedAt     DateTime @default(now())
+  createdAt      DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, headerHash])
+  @@index([userId, lastUsedAt(sort: Desc)])
 }

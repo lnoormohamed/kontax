@@ -172,7 +172,8 @@ export function MobileSettingsNav({
           href={groupHref}
           detailColor={groupDetailColor}
         />
-        <NavRow icon="upload" label="Import & export" href="/import-export" last />
+        <NavRow icon="upload" label="Import & export" href="/import-export" />
+        <NavRow icon="upload" label="Import presets" href="/settings/import-presets" last />
       </GroupCard>
 
       <GroupCard>

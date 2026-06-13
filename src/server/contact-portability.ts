@@ -1,4 +1,11 @@
-import { classifyColumn, type KontaxField, type ConfidenceTier } from "~/server/import/column-classifier";
+import {
+  classifyColumn,
+  generateSuggestions,
+  type KontaxField,
+  type ConfidenceTier,
+  type Suggestion,
+} from "~/server/import/column-classifier";
+import { computeHeaderHash } from "~/server/import/header-hash";
 
 export type ColumnMapping = {
   header: string;
@@ -8,6 +15,7 @@ export type ColumnMapping = {
   confidenceTier: ConfidenceTier;
   source: "profile" | "classifier";
   sampleValues: string[];
+  suggestions: Suggestion[];
 };
 
 export type ContactPostalAddressInput = {
@@ -58,6 +66,7 @@ export type PortableContactInput = {
   address?: string | null;
   postalAddresses?: ContactPostalAddressInput[] | null;
   notes?: string | null;
+  customFields?: Record<string, string> | null;
 };
 
 export type CsvImportProfile = "GENERIC" | "GOOGLE" | "APPLE" | "OUTLOOK";
@@ -65,6 +74,7 @@ export type CsvImportProfile = "GENERIC" | "GOOGLE" | "APPLE" | "OUTLOOK";
 export type ExplicitColumnMapping = {
   index: number;
   targetField: string; // KontaxField | "custom" | "skip"
+  customFieldKey?: string; // when targetField === "custom"
 };
 
 export type ImportPreviewIssue = {
@@ -94,6 +104,7 @@ type CsvParseResult = {
   canImport: boolean;
   blockingReasons: string[];
   columnMappings: ColumnMapping[];
+  headerHash: string;
 };
 
 const normalizeHeader = (value: string) => value.trim().toLowerCase();
@@ -490,6 +501,7 @@ export const parseCsvContacts = (
   }
 
   const headers = rows[0] ?? [];
+  const headerHash = computeHeaderHash(headers);
   const normalizedHeaders = headers.map(normalizeHeader);
   const duplicateHeaders = normalizedHeaders.filter(
     (header, index) => header.length > 0 && normalizedHeaders.indexOf(header) !== index,
@@ -512,6 +524,7 @@ export const parseCsvContacts = (
   let notesIndexes = getIndexes(headers, getAliasesForField(profile, "notes"));
 
   // When the user has confirmed a field mapping in the UI, override profile-based detection.
+  const customFieldColumns = new Map<number, string>(); // index → customFieldKey
   if (explicitMappings && explicitMappings.length > 0) {
     fullNameIndexes = [];
     firstNameIndexes = [];
@@ -528,7 +541,7 @@ export const parseCsvContacts = (
     birthdayIndexes = [];
     addressIndexes = [];
     notesIndexes = [];
-    for (const { index, targetField } of explicitMappings) {
+    for (const { index, targetField, customFieldKey } of explicitMappings) {
       switch (targetField) {
         case "firstName": firstNameIndexes.push(index); break;
         case "lastName": lastNameIndexes.push(index); break;
@@ -546,7 +559,10 @@ export const parseCsvContacts = (
         case "birthday": birthdayIndexes.push(index); break;
         case "website": websiteIndexes.push(index); break;
         case "notes": notesIndexes.push(index); break;
-        default: break; // "skip" and "custom" are excluded
+        case "customField":
+          if (customFieldKey?.trim()) customFieldColumns.set(index, customFieldKey.trim());
+          break;
+        default: break; // "skip" excluded
       }
     }
   }
@@ -623,16 +639,22 @@ export const parseCsvContacts = (
         confidenceTier: "HIGH" as const,
         source: "profile" as const,
         sampleValues,
+        suggestions: [],
       };
     }
 
     const classification = classifyColumn(header, sampleValues, index);
+    const suggestions =
+      classification.confidenceTier !== "HIGH"
+        ? generateSuggestions(header, sampleValues, index)
+        : [];
     return {
       header,
       index,
       ...classification,
       source: "classifier" as const,
       sampleValues,
+      suggestions,
     };
   });
 
@@ -694,6 +716,14 @@ export const parseCsvContacts = (
     const address = getFirstValue(row, addressIndexes);
     const postalAddressValues = getAllValues(row, addressIndexes);
     const notes = getFirstValue(row, notesIndexes);
+    const customFields: Record<string, string> | null =
+      customFieldColumns.size > 0
+        ? Object.fromEntries(
+            [...customFieldColumns.entries()]
+              .map(([colIdx, key]) => [key, getValue(row, colIdx) ?? ""])
+              .filter(([, v]) => v !== ""),
+          )
+        : null;
     const fallbackName = [firstName, lastName].filter(Boolean).join(" ").trim();
     const usedFallbackIdentifier =
       explicitFullName == null &&
@@ -826,6 +856,7 @@ export const parseCsvContacts = (
             }))
           : undefined,
       notes,
+      customFields,
     });
   });
 
@@ -881,6 +912,7 @@ export const parseCsvContacts = (
     canImport: blockingReasons.length === 0,
     blockingReasons,
     columnMappings,
+    headerHash,
   };
 };
 

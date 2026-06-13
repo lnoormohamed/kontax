@@ -22,6 +22,13 @@ type PreviewContact = {
   company?: string | null;
 };
 
+type MatchedPreset = {
+  id: string;
+  name: string;
+  lastUsedAt: string;
+  columnMappings: ResolvedMapping[];
+};
+
 type PreviewResponse = {
   jobId: string;
   contacts: PreviewContact[];
@@ -32,6 +39,8 @@ type PreviewResponse = {
   canImport: boolean;
   blockingReasons: string[];
   columnMappings: ApiColumnMapping[];
+  headerHash: string;
+  matchedPreset: MatchedPreset | null;
 };
 
 const SOURCES: Array<{ id: ImportProfile; label: string }> = [
@@ -56,6 +65,16 @@ function DocGlyph() {
       <path d="M9 13h6M9 16.5h6" />
     </svg>
   );
+}
+
+function relativeDate(iso: string): string {
+  const diff = Date.now() - new Date(iso).getTime();
+  const days = Math.floor(diff / 86400000);
+  if (days < 1) return "today";
+  if (days === 1) return "yesterday";
+  if (days < 7) return `${days} days ago`;
+  const weeks = Math.floor(days / 7);
+  return `${weeks} week${weeks === 1 ? "" : "s"} ago`;
 }
 
 function StepDot({ n, label, state }: { n: number; label: string; state: "active" | "done" | "future" }) {
@@ -124,6 +143,10 @@ export function ImportPreviewForm({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [confirmUndo, setConfirmUndo] = useState(false);
+  const [presetApplied, setPresetApplied] = useState(false);
+  const [presetSaved, setPresetSaved] = useState(false);
+  const [presetName, setPresetName] = useState("");
+  const [presetSaving, setPresetSaving] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const reset = () => {
@@ -134,6 +157,9 @@ export function ImportPreviewForm({
     setPaste("");
     setPreview(null);
     setResolvedMappings([]);
+    setPresetApplied(false);
+    setPresetSaved(false);
+    setPresetName("");
     setError("");
   };
 
@@ -179,6 +205,9 @@ export function ImportPreviewForm({
       return;
     }
     setPreview(data);
+    // Default preset name = filename stem (no extension)
+    const stem = (fileName ?? "import.csv").replace(/\.[^.]+$/, "");
+    setPresetName(stem);
     setStep(2);
   };
 
@@ -223,6 +252,24 @@ export function ImportPreviewForm({
     }
     setBusy(false);
     setError("Couldn't undo the import. Try again from the history below.");
+  };
+
+  const savePreset = async (overwrite: boolean) => {
+    if (!preview) return;
+    setPresetSaving(true);
+    await fetch("/api/imports/presets", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        name: presetName.trim() || (fileName ?? "import").replace(/\.[^.]+$/, ""),
+        headerHash: preview.headerHash,
+        columnMappings: resolvedMappings,
+        sourceProfile: profile.toLowerCase(),
+      }),
+    });
+    setPresetSaving(false);
+    setPresetSaved(true);
+    void overwrite; // used by caller to distinguish update vs. new — upsert handles both
   };
 
   const warnings = preview?.issues.filter((i) => i.severity === "warning") ?? [];
@@ -406,14 +453,52 @@ export function ImportPreviewForm({
 
       {/* ── Step 2 — map fields ── */}
       {step === 2 && preview ? (
-        <FieldMappingStep
-          initialMappings={preview.columnMappings}
-          onBack={() => setStep(1)}
-          onContinue={(mappings) => {
-            setResolvedMappings(mappings);
-            setStep(3);
-          }}
-        />
+        <div className="grid gap-4">
+          {preview.matchedPreset ? (
+            <div className="flex flex-col gap-3 rounded-[12px] border border-[#c5d9cc] bg-[#edf5f0] px-4 py-3.5">
+              <div className="flex items-start gap-2.5">
+                <span className="mt-0.5 text-[16px]">✨</span>
+                <div className="min-w-0 flex-1">
+                  <div className="text-[14px] font-semibold text-[#17352e]">
+                    We found a saved mapping for this file format
+                  </div>
+                  <div className="mt-0.5 text-[13px] text-[#5c655e]">
+                    &ldquo;{preview.matchedPreset.name}&rdquo; · last used{" "}
+                    {relativeDate(preview.matchedPreset.lastUsedAt)}
+                  </div>
+                </div>
+              </div>
+              <div className="flex gap-2">
+                <button
+                  className="h-9 rounded-[8px] bg-[#1f8a5b] px-4 text-[13.5px] font-semibold text-white transition hover:bg-[#196e49]"
+                  onClick={() => {
+                    setResolvedMappings(preview.matchedPreset!.columnMappings);
+                    setPresetApplied(true);
+                    setStep(3);
+                  }}
+                  type="button"
+                >
+                  Apply saved mapping
+                </button>
+                <button
+                  className="h-9 rounded-[8px] border border-[#c5d9cc] bg-white px-4 text-[13.5px] font-semibold text-[#5c655e] transition hover:bg-[#f2f4f0]"
+                  onClick={() => setPreview({ ...preview, matchedPreset: null })}
+                  type="button"
+                >
+                  Map manually
+                </button>
+              </div>
+            </div>
+          ) : null}
+          <FieldMappingStep
+            initialMappings={preview.columnMappings}
+            onBack={() => setStep(1)}
+            onContinue={(mappings) => {
+              setResolvedMappings(mappings);
+              setStep(3);
+            }}
+          />
+        </div>
       ) : null}
 
       {/* ── Step 3 — preview ── */}
@@ -554,6 +639,42 @@ export function ImportPreviewForm({
               </div>
             ) : null}
           </div>
+          {/* Save-as-preset prompt — hidden when preset was auto-applied or already saved */}
+          {!presetApplied && !presetSaved ? (
+            <div className="rounded-[12px] border border-[#d8ddd6] bg-[#f9faf8] p-4">
+              <div className="mb-3 text-[13.5px] font-semibold text-[#1d2823]">
+                {preview?.matchedPreset
+                  ? `Update preset “${preview.matchedPreset.name}” with this mapping?`
+                  : "💾 Save this column mapping for future imports?"}
+              </div>
+              <input
+                className="mb-3 w-full rounded-[8px] border border-[#d8ddd6] bg-white px-3 py-2 text-[13.5px] text-[#1d2823] focus:outline-none focus:ring-2 focus:ring-[#4158f4]/20"
+                maxLength={100}
+                onChange={(e) => setPresetName(e.target.value)}
+                placeholder="Preset name…"
+                type="text"
+                value={presetName}
+              />
+              <div className="flex gap-2">
+                <button
+                  className="h-9 rounded-[8px] bg-[#1d2823] px-4 text-[13px] font-semibold text-white transition hover:bg-[#2e3d35] disabled:opacity-50"
+                  disabled={presetSaving || !presetName.trim()}
+                  onClick={() => void savePreset(!!preview?.matchedPreset)}
+                  type="button"
+                >
+                  {presetSaving ? "Saving…" : preview?.matchedPreset ? "Update preset" : "Save preset"}
+                </button>
+                <button
+                  className="h-9 rounded-[8px] border border-[#d8ddd6] bg-white px-4 text-[13px] font-semibold text-[#5c655e] transition hover:bg-[#f2f4f0]"
+                  onClick={() => setPresetSaved(true)}
+                  type="button"
+                >
+                  Skip
+                </button>
+              </div>
+            </div>
+          ) : null}
+
           <div className="flex flex-col-reverse gap-2.5 sm:flex-row">
             <Link
               className="flex h-11 items-center justify-center rounded-[10px] bg-[#4158f4] px-[18px] text-[14.5px] font-semibold text-white transition hover:bg-[#3347d8]"
