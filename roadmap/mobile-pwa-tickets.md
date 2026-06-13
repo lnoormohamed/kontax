@@ -46,7 +46,7 @@ Requirements** section; the paired build ticket builds to it.
 | P24B-DB16 | Merge surfaces (restyle + mobile compare) | P24B-17 | ☐ |
 | P24B-DB17 | Pricing page mobile | P24B-18 | ☐ |
 | P24B-DB18 | Search & Notifications mobile overlays | P24B-22, P24B-23 | ☐ |
-| P24B-DB19 | Contact edit (mobile) — full-field edit sheet | P24B-07 (edit) | ☐ |
+| P24B-DB19 | Contact edit (mobile) — full-field edit sheet | P24B-07 (edit) | ✅ |
 | P24B-DB20 | Activity feed (mobile rows) | P24B-09 | ☐ |
 | P24B-DB21 | Sync (mobile) + plan variance | P24B-10 | ☐ |
 
@@ -65,7 +65,7 @@ Requirements** section; the paired build ticket builds to it.
 ## Workstream B — Core write flow
 | Ticket | Title | Spec § | Priority | Status | Depends |
 | --- | --- | --- | --- | --- | --- |
-| P24B-07 | Create/Edit as **bottom sheet** — collapsible sections, keyboard accessory bar, pinned Save; full page kept as `?full=1` fallback | E3, D1–D3 | **P0** | ◑ create done · **edit redo → DB19** | P24B-03, P24B-DB19 |
+| P24B-07 | Create/Edit as **bottom sheet** — collapsible sections, keyboard accessory bar, pinned Save; full page kept as `?full=1` fallback | E3, D1–D3 | **P0** | ✅ create + edit (DB19) | P24B-03, P24B-DB19 |
 
 ## Workstream C — Tab screens to spec
 | Ticket | Title | Spec § | Priority | Status | Depends |
@@ -203,3 +203,19 @@ Requirements** section; the paired build ticket builds to it.
 - 2026-06-13 — **P24B-23 done** — mobile notifications overlay to DB18: 52px full-screen mobile
   chrome above bottom nav, category rows with unread state, New/Earlier grouping, SECURITY drawer
   behavior, actionUrl navigation, mark-all-read, empty/loading states, and settings footer.
+- 2026-06-13 — **P24B-07 edit redo done (DB19)** — `MobileContactSheet` rebuilt as ONE sheet for both
+  create and edit, full field coverage vs the desktop editor: Basic (always-on) · Phones · Emails ·
+  Websites · Address (multi sub-cards) · Dates (birthday + significant, native date inputs) · Related
+  people · More (notes, name-details accordion, job title, **department**, custom fields). Count pills,
+  data-bearing sections open by default / empty optional collapsed, label pills + add/remove, inline
+  per-field validation under the field, pinned Save. Mobile detail now opens the sheet (replacing the
+  in-place inline editor); prefill built server-side in `contacts/[id]/page.tsx`. Save path =
+  `updateContact` per the brief — added `department` to the FormData contract so it round-trips, and
+  made `updateContact` **shared-aware** (`resolveContactEditAccess` + `editableContactWhere`) so
+  family/team-editable contacts save through the sheet (and the `?full=1` form) without the old
+  owner-scoped failure. Variance gating: `isEditable` now uses `resolveContactEditAccess.allowed`, so
+  view-only shared contacts show a **Read-only chip + no FAB** instead of a dead Edit affordance.
+  Verified at 375px: full sheet renders, inline validation blocks save, owned-contact save round-trips
+  (incl. department persist + prefill), shared-editable saves, view-only shared shows Read-only chip.
+  Known limit (accepted per brief): 2+ structured addresses degrade extra addresses to formatted
+  strings on save (matches the `?full=1` form). `?full=1` remains the fallback.

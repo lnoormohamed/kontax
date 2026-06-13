@@ -1,5 +1,12 @@
 # P24B-DB19 — Design Brief: Contact edit (mobile)
 
+## Status
+
+Implemented in P24B-07 (edit redo) — 2026-06-13. `MobileContactSheet` rebuilt as one sheet for create
+and edit with full field coverage; mobile detail opens the sheet (replacing the in-place inline editor);
+`updateContact` made shared-aware + `department` added to the contract; edit entry point gated by real
+edit access (Read-only chip for view-only shared). Verified at 375px. `?full=1` remains the fallback.
+
 ## Purpose
 
 Design the mobile **edit-contact** experience properly. P24B-07 shipped a create *sheet* but punted

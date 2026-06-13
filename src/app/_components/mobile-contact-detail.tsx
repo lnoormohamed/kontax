@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { useContactEdit } from "~/app/_components/contact-inline-editor";
 import { MobileBottomSheet } from "~/app/_components/mobile-bottom-sheet";
+import { MobileContactSheet, type ContactSheetInitial } from "~/app/_components/mobile-contact-sheet";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 
 interface MobileContactDetailProps {
@@ -20,6 +21,8 @@ interface MobileContactDetailProps {
   isFavorite: boolean;
   isArchived: boolean;
   isEditable: boolean;
+  /** Prefill payload for the edit sheet (P24B-DB19). */
+  editInitial: ContactSheetInitial;
   detailTab: "details" | "sharing" | "history";
   toggleFavoriteAction: (formData: FormData) => Promise<void>;
   archiveOrRestoreAction: (formData: FormData) => Promise<void>;
@@ -45,14 +48,18 @@ export function MobileContactDetail({
   isFavorite,
   isArchived,
   isEditable,
+  editInitial,
   detailTab,
   toggleFavoriteAction,
   archiveOrRestoreAction,
   children,
 }: MobileContactDetailProps) {
-  const { mode, saving, enterEdit, cancel, save } = useContactEdit();
+  // Inline-edit machinery is retained for the dormant read view; editing now
+  // happens in the bottom sheet (P24B-DB19), so mode stays "read" on mobile.
+  const { mode, saving, cancel, save } = useContactEdit();
   const editing = mode === "edit";
   const [moreOpen, setMoreOpen] = useState(false);
+  const [sheetOpen, setSheetOpen] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [heroVisible, setHeroVisible] = useState(true);
@@ -249,7 +256,7 @@ export function MobileContactDetail({
           </button>
         ) : isEditable ? (
           <button
-            onClick={enterEdit}
+            onClick={() => setSheetOpen(true)}
             style={{
               height: 44,
               padding: "0 12px",
@@ -265,7 +272,7 @@ export function MobileContactDetail({
             Edit
           </button>
         ) : (
-          <div style={{ width: 44 }} />
+          <ReadOnlyChip />
         )}
       </div>
 
@@ -305,9 +312,9 @@ export function MobileContactDetail({
               <WorkspaceIcon name="back" size={20} />
               Contacts
             </Link>
-            {isEditable && !editing && (
+            {isEditable && !editing ? (
               <button
-                onClick={enterEdit}
+                onClick={() => setSheetOpen(true)}
                 style={{
                   height: 44,
                   padding: "0 8px",
@@ -323,7 +330,9 @@ export function MobileContactDetail({
               >
                 Edit
               </button>
-            )}
+            ) : !isEditable ? (
+              <ReadOnlyChip />
+            ) : null}
           </div>
         )}
 
@@ -466,11 +475,11 @@ export function MobileContactDetail({
       {/* Tab content */}
       <div>{children}</div>
 
-      {/* FAB — pencil/save, hidden when editing (compact header handles save) */}
+      {/* FAB — opens the edit sheet; hidden when not editable (variance gating) */}
       {isEditable && !editing && (
         <button
           aria-label="Edit contact"
-          onClick={enterEdit}
+          onClick={() => setSheetOpen(true)}
           style={{
             position: "fixed",
             bottom: `calc(72px + env(safe-area-inset-bottom))`,
@@ -493,7 +502,38 @@ export function MobileContactDetail({
           <WorkspaceIcon name="pencil" size={22} />
         </button>
       )}
+
+      {/* Edit sheet (P24B-DB19) — only mountable when editable */}
+      {isEditable ? (
+        <MobileContactSheet isOpen={sheetOpen} onClose={() => setSheetOpen(false)} initial={editInitial} />
+      ) : null}
     </div>
+  );
+}
+
+// Read-only chip shown in place of Edit when the viewer can't edit this contact
+// (shared contact without canEdit, or a read-only billing lifecycle).
+function ReadOnlyChip() {
+  return (
+    <span
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 5,
+        height: 28,
+        padding: "0 11px",
+        marginRight: 4,
+        borderRadius: 8,
+        background: "#f2f4f0",
+        color: "#8b938c",
+        fontSize: 12.5,
+        fontWeight: 600,
+        whiteSpace: "nowrap",
+      }}
+    >
+      <WorkspaceIcon name="lock" size={13} className="text-[#8b938c]" />
+      Read-only
+    </span>
   );
 }
 

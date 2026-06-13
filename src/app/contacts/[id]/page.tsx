@@ -29,6 +29,7 @@ import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
 import { db } from "~/server/db";
 import { getContactFamilyContext, getUserFamilyMembership } from "~/server/family-access";
+import { resolveContactEditAccess } from "~/server/shared-access";
 import { getAccessibleTeamBooks, getContactTeamContext } from "~/server/team-access";
 import { getPublicOrigin } from "~/lib/public-origin";
 
@@ -387,6 +388,12 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     getContactTeamContext(contact.id),
   ]);
   const isSharedContact = Boolean(familyContext);
+  // Can the viewer actually edit this contact? Mirrors the server gate used by
+  // updateContact / the inline editor, so the mobile edit entry point (Edit /
+  // FAB) is shown only when a save would succeed — view-only shared contacts get
+  // a Read-only chip instead (P24B-DB19 variance gating).
+  const editAccess = await resolveContactEditAccess(session.user.id, contact.id);
+  const canEditContact = !isLiveReceived && editAccess.allowed;
   const teamBookLabel = teamContext ? `${teamContext.teamName} · ${teamContext.bookName}` : null;
   const canAddToFamily =
     Boolean(familyMembership?.canEdit) && !isSharedContact && !teamContext;
@@ -494,6 +501,42 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     related: normaliseRelated(contact.relatedPeople),
   };
 
+  // P24B-DB19: prefill payload for the mobile edit sheet (full field coverage).
+  const sheetInitial = {
+    id: contact.id,
+    firstName: contact.firstName,
+    lastName: contact.lastName,
+    company: contact.company,
+    phones: editorEntries.phones,
+    emails: editorEntries.emails,
+    websites: editorEntries.websites,
+    addresses: editorEntries.addresses.map((a) => ({
+      label: a.label,
+      street: a.street,
+      city: a.city,
+      postcode: a.postcode,
+      country: a.country,
+    })),
+    birthday: contact.birthday,
+    significantDates: editorEntries.dates.filter(
+      (d) => d.label.toLowerCase() !== "birthday" && d.value !== contact.birthday,
+    ),
+    relatedPeople: editorEntries.related,
+    notes: contact.notes,
+    middleName: contact.middleName,
+    namePrefix: contact.namePrefix,
+    nameSuffix: contact.nameSuffix,
+    nickname: contact.nickname,
+    phoneticFirstName: contact.phoneticFirstName,
+    phoneticLastName: contact.phoneticLastName,
+    phoneticCompany: contact.phoneticCompany,
+    jobTitle: contact.jobTitle,
+    department: contact.department,
+    customFields: asArray(contact.customFields)
+      .map((e) => ({ label: str(e.label), value: str(e.value) }))
+      .filter((e) => e.label.length > 0 || e.value.length > 0),
+  };
+
   const [avatarBg, avatarFg] = tintForName(contact.fullName);
 
   return (
@@ -517,10 +560,11 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
           contactId={contact.id}
           contactName={contact.fullName}
           detailTab={detailTab}
+          editInitial={sheetInitial}
           email={contact.email}
           initials={getInitials(contact.fullName)}
           isArchived={Boolean(contact.archivedAt)}
-          isEditable={!isLiveReceived}
+          isEditable={canEditContact}
           isFavorite={contact.isFavorite}
           phone={contact.phone}
           subtitle={[contact.jobTitle, contact.company].filter(Boolean).join(" · ") || null}

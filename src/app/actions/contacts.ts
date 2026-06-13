@@ -46,6 +46,7 @@ const contactSchema = z.object({
   company: z.string().trim().max(120).optional(),
   phoneticCompany: z.string().trim().max(120).optional(),
   jobTitle: z.string().trim().max(120).optional(),
+  department: z.string().trim().max(120).optional(),
   website: z.string().trim().url("Enter a valid website URL.").max(500).optional(),
   websiteLabel: z.string().trim().max(40).optional(),
   secondaryWebsite: z.string().trim().url("Enter a valid secondary website URL.").max(500).optional(),
@@ -245,6 +246,7 @@ const parseContactInput = (formData: FormData) => {
     company: getOptionalString(formData, "company"),
     phoneticCompany: getOptionalString(formData, "phoneticCompany"),
     jobTitle: getOptionalString(formData, "jobTitle"),
+    department: getOptionalString(formData, "department"),
     website: getOptionalString(formData, "website"),
     websiteLabel: getOptionalString(formData, "websiteLabel"),
     secondaryWebsite: getOptionalString(formData, "secondaryWebsite"),
@@ -408,6 +410,7 @@ const parseContactInput = (formData: FormData) => {
     company: parsed.data.company,
     phoneticCompany: parsed.data.phoneticCompany,
     jobTitle: parsed.data.jobTitle,
+    department: parsed.data.department,
     website: parsed.data.website,
     websiteEntries,
     birthday: parsed.data.birthday,
@@ -619,9 +622,17 @@ export const updateContact = async (formData: FormData) => {
   });
   const phoneticFields = applyAutoFilledPhoneticFields(input, userSettings?.autoFillPhoneticNames ?? false);
 
+  // Shared-aware edit access: members editing a family/team contact go through
+  // the same gate as the inline editor, so the mobile edit sheet and the full
+  // page form can both save shared-but-editable contacts (not just owned ones).
+  const access = await resolveContactEditAccess(userId, contactId);
+  if (access.shared && !access.allowed) {
+    throw new Error("You don't have edit access to this contact.");
+  }
+
   await db.$transaction(async (tx) => {
     const before = await tx.contact.findFirst({
-      where: { id: contactId, userId },
+      where: editableContactWhere(userId, contactId),
     });
 
     if (!before) {
@@ -649,7 +660,8 @@ export const updateContact = async (formData: FormData) => {
         userId,
         contactId,
         eventType: "CONTACT_UPDATED",
-        actor: "USER",
+        actor: access.attribution?.actor ?? "USER",
+        actorDetail: access.attribution?.actorDetail,
         payload: { diffs },
       });
     }
