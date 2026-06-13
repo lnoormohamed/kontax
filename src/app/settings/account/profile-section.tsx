@@ -123,6 +123,7 @@ export function ProfileSection({
               <Spinner size={22} light={false} />
             </div>
           ) : photo ? (
+            // eslint-disable-next-line @next/next/no-img-element
             <img alt="Profile photo" className="h-[88px] w-[88px] rounded-full object-cover" src={photo} />
           ) : (
             <span className="grid h-[88px] w-[88px] place-items-center rounded-full text-[32px] font-semibold"

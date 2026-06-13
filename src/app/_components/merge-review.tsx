@@ -502,6 +502,7 @@ function SurvivorSelector({
         The other contact is archived after the merge — you can undo it for 30 days.
       </p>
       <div
+        className="mg-two-col"
         style={{
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
@@ -774,6 +775,7 @@ function UnionPanel({
         removed.
       </p>
       <div
+        className="mg-two-col"
         style={{
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
@@ -1187,12 +1189,12 @@ function DismissCard({ suggestionId }: { suggestionId: string }) {
 
 // ── Main component ────────────────────────────────────────────────────────────
 export type MergeReviewProps = {
-  suggestionId: string;
+  suggestionId?: string;
   mergeSource: string;
-  confidence: string;
-  score: number;
-  contributions: MergeContribution[];
-  warnings: string[];
+  confidence?: string;
+  score?: number;
+  contributions?: MergeContribution[];
+  warnings?: string[];
   contactA: MergeReviewContact;
   contactB: MergeReviewContact;
   unionsA: MergeReviewUnions;
@@ -1204,8 +1206,8 @@ export function MergeReview({
   mergeSource,
   confidence,
   score,
-  contributions,
-  warnings,
+  contributions = [],
+  warnings = [],
   contactA,
   contactB,
   unionsA,
@@ -1277,9 +1279,11 @@ export function MergeReview({
         }
       `}</style>
 
-      <PageHeader confidence={confidence} score={score} />
+      {confidence != null && score != null && (
+        <PageHeader confidence={confidence} score={score} />
+      )}
 
-      <WhyPanel contributions={contributions} warnings={warnings} score={score} />
+      <WhyPanel contributions={contributions} warnings={warnings} score={score ?? 0} />
 
       <SurvivorSelector
         contactA={contactA}
@@ -1374,7 +1378,7 @@ export function MergeReview({
       <form action={handleSubmit} ref={formRef}>
         <input name="primaryContactId" type="hidden" value={survivorContact.id} />
         <input name="secondaryContactId" type="hidden" value={otherContact.id} />
-        <input name="suggestionId" type="hidden" value={suggestionId} />
+        {suggestionId && <input name="suggestionId" type="hidden" value={suggestionId} />}
         <input name="mergeSource" type="hidden" value={mergeSource} />
         <input
           name="redirectTo"
@@ -1401,7 +1405,7 @@ export function MergeReview({
         />
       </form>
 
-      <DismissCard suggestionId={suggestionId} />
+      {suggestionId && <DismissCard suggestionId={suggestionId} />}
     </>
   );
 }
