@@ -1,8 +1,13 @@
 # P24B-10 — Sync: plan variance (Free CardDAV upsell / account cap)
 
-Status: Done — built against P24B-DB21. Free → pure `UpsellCard` (mirrors the
-server gate `cardDavSyncEnabled=false`); Pro+ caps at `syncAccountsLimit` with a
-reason; read-only and offline both disable Add with their own reason + banner.
+Status: Done — built against P24B-DB21. **Free includes 1 sync account**
+(`cardDavSyncEnabled=true`, `syncAccountsLimit=1`): at 1/1 the Add is disabled with
+"Free includes 1 sync account. Upgrade to Pro for up to 5." (→ `/pricing`). Pro+
+caps at 5 with "You're using all N sync accounts."; read-only and offline both
+disable Add with their own reason + banner. (Reverses the earlier pure-`UpsellCard`
+treatment — product decision: Free gets one included account, matching the original
+`Sync (Mobile) Spec` design. The `cardDavEnabled=false` upsell branch is retained as
+a defensive fallback for a hypothetical fully-gated plan.)
 
 Mobile flow extension (beyond the original DB21 summary scope — the brief had
 deferred the detail/add/edit internals to the desktop client; that left an

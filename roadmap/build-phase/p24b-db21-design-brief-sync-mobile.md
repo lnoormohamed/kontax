@@ -46,10 +46,13 @@ with a reason caption when at the cap or read-only.
 - **Offline:** offline banner; Add disabled.
 
 ### Variance (per DB14) — the crux
-- **Free (`cardDavSyncEnabled = false`):** the whole screen is an **`UpsellCard`** ("Sync is a <Plan>
-  feature") — no card list, no add. Mirror the server gate exactly.
-- **Pro+:** up to `syncAccountsLimit` accounts; **Add disabled at the cap** with "You're using all N
-  sync accounts." caption.
+- **Free (`cardDavSyncEnabled = true`, `syncAccountsLimit = 1`):** Free **includes 1 sync account** —
+  show the normal card list + Add. At 1/1 the Add is **disabled** with "Free includes 1 sync account."
+  + an **"Upgrade to Pro for up to 5."** link (→ `/pricing`). (Product decision, implemented in
+  P24B-10: Free gets one included account, not a blanket upsell. A pure `UpsellCard` is retained only
+  as a defensive fallback should a plan ever set `cardDavSyncEnabled = false`.)
+- **Pro+:** up to `syncAccountsLimit` (5) accounts; **Add disabled at the cap** with "You're using all N
+  sync accounts." caption (no upgrade nudge — already top tier).
 - **Read-only (GRACE/LOCKED):** `ReadOnlyBanner` at top; Add disabled with "Your account is read-only."
 
 ### Interactions

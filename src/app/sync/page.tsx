@@ -336,6 +336,8 @@ export default async function SyncPage({ searchParams }: PageProps) {
           cardDavEnabled={planSummary.entitlements.cardDavSyncEnabled}
           syncAccountsLimit={planSummary.entitlements.syncAccountsLimit}
           canWrite={planSummary.lifecyclePolicy.canWrite}
+          planLabel={planSummary.planLabel}
+          upgradeableAtCap={planSummary.plan === "FREE"}
         />
 
         {/* Rails 2+3: account list + detail (client-managed). Desktop always

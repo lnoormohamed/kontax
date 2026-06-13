@@ -41,18 +41,26 @@ export function MobileSyncScreen({
   cardDavEnabled,
   syncAccountsLimit,
   canWrite,
+  planLabel = "Free",
+  upgradeableAtCap = false,
   upgradePlan = "Pro",
 }: {
   accounts: SyncAccountData[];
   /** True when a connection is selected or the add form is open — the full
    *  SyncPageClient takes over the screen, so the summary is suppressed. */
   hidden: boolean;
-  /** Free plan can't use CardDAV sync at all → upsell (mirrors the server gate). */
+  /** Whether CardDAV sync is available at all. Data-driven gate: every current
+   *  plan enables it (Free includes 1 account), so this is a defensive upsell
+   *  fallback for a hypothetical fully-gated plan. */
   cardDavEnabled: boolean;
-  /** Account ceiling for the plan (Pro = 5); Add disables at the cap. */
+  /** Account ceiling for the plan (Free = 1, Pro = 5); Add disables at the cap. */
   syncAccountsLimit: number;
   /** Read-only lifecycle (GRACE/LOCKED) disables Add. */
   canWrite: boolean;
+  /** Plan name shown in the at-cap copy (e.g. "Free"). */
+  planLabel?: string;
+  /** True when a higher tier raises the cap (Free) → show an upgrade nudge at the cap. */
+  upgradeableAtCap?: boolean;
   upgradePlan?: string;
 }) {
   // Offline state (DB21): when offline we show the offline banner and disable
@@ -72,7 +80,7 @@ export function MobileSyncScreen({
 
   if (hidden) return null;
 
-  // Free: CardDAV sync is a paid feature — the whole screen is an upsell.
+  // Defensive: a fully-gated plan (none today) shows the upsell instead of the list.
   if (!cardDavEnabled) {
     return (
       <div className="flex w-full flex-col md:hidden" style={{ background: "#f6f7f4" }}>
@@ -90,13 +98,19 @@ export function MobileSyncScreen({
 
   const atCap = accounts.length >= syncAccountsLimit;
   const addDisabled = !canWrite || offline || atCap;
+  const acctWord = syncAccountsLimit === 1 ? "account" : "accounts";
+  // At cap on an upgradeable plan (Free), frame it as an inclusion + upgrade nudge
+  // rather than a hard wall.
+  const capUpgrade = atCap && canWrite && !offline && upgradeableAtCap;
   // Reason priority mirrors the design: read-only → offline → at-cap.
   const addReason = !canWrite
     ? "Your account is read-only."
     : offline
       ? "Connect to add a new account."
       : atCap
-        ? `You're using all ${syncAccountsLimit} sync ${syncAccountsLimit === 1 ? "account" : "accounts"}.`
+        ? capUpgrade
+          ? `${planLabel} includes ${syncAccountsLimit} sync ${acctWord}.`
+          : `You're using all ${syncAccountsLimit} sync ${acctWord}.`
         : null;
 
   return (
@@ -174,7 +188,17 @@ export function MobileSyncScreen({
                 Add connection
               </div>
               {addReason ? (
-                <p style={{ margin: "8px 2px 0", fontSize: 12, color: "#8b938c", textAlign: "center" }}>{addReason}</p>
+                <p style={{ margin: "8px 2px 0", fontSize: 12, color: "#8b938c", textAlign: "center", lineHeight: 1.45 }}>
+                  {addReason}
+                  {capUpgrade ? (
+                    <>
+                      {" "}
+                      <Link href="/pricing" style={{ color: "#4158f4", fontWeight: 700, textDecoration: "none", WebkitTapHighlightColor: "transparent" }}>
+                        Upgrade to {upgradePlan} for up to 5.
+                      </Link>
+                    </>
+                  ) : null}
+                </p>
               ) : null}
             </>
           ) : (

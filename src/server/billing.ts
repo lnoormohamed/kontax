@@ -139,11 +139,15 @@ const PLAN_DEFAULTS: Record<SubscriptionPlan, PlanEntitlements> = {
   FREE: {
     contactsLimit: 500,
     monthlyImportLimit: 3,
+    // Free includes 1 CardDAV sync account; Pro+ raises the cap to 5. The whole
+    // feature is enabled (cardDavSyncEnabled) and the ceiling is enforced by
+    // syncAccountsLimit, so the UI shows a 1-account cap with an upgrade nudge
+    // rather than a blanket upsell.
     syncAccountsLimit: 1,
     appPasswordsLimit: 1,
     advancedMergeEnabled: false,
     premiumExportEnabled: false,
-    cardDavSyncEnabled: false,
+    cardDavSyncEnabled: true,
     familyGroupEnabled: false,
     teamsEnabled: false,
     sharedAddressBooksLimit: 0,
