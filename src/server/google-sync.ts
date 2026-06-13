@@ -5,8 +5,6 @@
 // plumbing with syncToken incremental sync + 410 fallback (P27-01), field
 // mapping + contact persistence (P27-02), and conflict detection/resolution
 // with policy enforcement + tombstone handling (P27-03).
-import { createHmac, randomBytes, timingSafeEqual } from "node:crypto";
-
 import { google, type people_v1 } from "googleapis";
 
 import type { ConflictPolicy, Prisma } from "../../generated/prisma";
@@ -47,7 +45,6 @@ export const GOOGLE_CONTACTS_SCOPES = [
 export const GOOGLE_PERSON_FIELDS =
   "names,emailAddresses,phoneNumbers,organizations,addresses,birthdays,urls,biographies,relations,metadata";
 
-const OAUTH_STATE_TTL_MS = 10 * 60 * 1000; // 10 minutes
 const ACCESS_TOKEN_REFRESH_SKEW_MS = 60_000; // refresh 60s before expiry
 
 export const isGoogleSyncConfigured = () =>
@@ -82,66 +79,9 @@ export const createGoogleOAuthClient = (): GoogleOAuthClient => {
   );
 };
 
-// ── OAuth state (CSRF + userId binding) ──────────────────────────────────────
-// The `state` round-trips through Google's consent screen, so it must be
-// tamper-proof. HMAC-SHA256 over { userId, returnTo, nonce, iat } with
-// AUTH_SECRET, short TTL on verify.
-
-type OAuthStatePayload = {
-  userId: string;
-  returnTo: string;
-  nonce: string;
-  iat: number;
-};
-
-const getStateSecret = () => {
-  if (!env.AUTH_SECRET) {
-    throw new GoogleSyncConfigError(
-      "AUTH_SECRET must be set to sign Google OAuth state.",
-    );
-  }
-  return env.AUTH_SECRET;
-};
-
-const signState = (body: string) =>
-  createHmac("sha256", getStateSecret()).update(body).digest("base64url");
-
-export const encodeOAuthState = (input: { userId: string; returnTo: string }) => {
-  const payload: OAuthStatePayload = {
-    userId: input.userId,
-    returnTo: input.returnTo,
-    nonce: randomBytes(16).toString("base64url"),
-    iat: Date.now(),
-  };
-  const body = Buffer.from(JSON.stringify(payload), "utf8").toString("base64url");
-  return `${body}.${signState(body)}`;
-};
-
-export const decodeOAuthState = (
-  token: string,
-): { userId: string; returnTo: string } => {
-  const [body, sig] = token.split(".", 2);
-  if (!body || !sig) {
-    throw new GoogleSyncError("OAUTH_STATE_INVALID", "Malformed OAuth state.");
-  }
-
-  const expected = signState(body);
-  const sigBuf = Buffer.from(sig);
-  const expectedBuf = Buffer.from(expected);
-  if (sigBuf.length !== expectedBuf.length || !timingSafeEqual(sigBuf, expectedBuf)) {
-    throw new GoogleSyncError("OAUTH_STATE_INVALID", "OAuth state signature mismatch.");
-  }
-
-  const payload = JSON.parse(
-    Buffer.from(body, "base64url").toString("utf8"),
-  ) as OAuthStatePayload;
-
-  if (Date.now() - payload.iat > OAUTH_STATE_TTL_MS) {
-    throw new GoogleSyncError("OAUTH_STATE_EXPIRED", "OAuth state has expired.");
-  }
-
-  return { userId: payload.userId, returnTo: payload.returnTo };
-};
+// OAuth state signing is shared across connectors — re-exported for the Google
+// connect/callback routes that import it from here.
+export { encodeOAuthState, decodeOAuthState } from "~/server/sync-oauth-state";
 
 // ── Authenticated client per account (with refresh) ──────────────────────────
 

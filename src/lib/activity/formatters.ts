@@ -19,6 +19,8 @@ export function formatSourceBadge(
       return detail ? `Synced from ${detail}` : "Synced";
     case "SYNC_GOOGLE":
       return detail ? `Synced from ${detail}` : "Synced from Google";
+    case "SYNC_MICROSOFT":
+      return detail ? `Synced from ${detail}` : "Synced from Outlook";
     case "SHARED_STATIC":
       return detail ? `Shared by ${detail}` : "Shared with you";
     case "SHARED_LIVE":
@@ -47,6 +49,8 @@ export function formatLastMutatedBy(
       return detail ? `${detail} sync` : "sync";
     case "SYNC_GOOGLE":
       return detail ? `${detail} sync` : "Google sync";
+    case "SYNC_MICROSOFT":
+      return detail ? `${detail} sync` : "Outlook sync";
     case "SHARED_STATIC":
     case "SHARED_LIVE":
       return detail ? `${detail} (share)` : "a share";

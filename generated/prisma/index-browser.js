@@ -781,6 +781,7 @@ exports.SourceType = exports.$Enums.SourceType = {
   IMPORT_CSV: 'IMPORT_CSV',
   SYNC_CARDDAV: 'SYNC_CARDDAV',
   SYNC_GOOGLE: 'SYNC_GOOGLE',
+  SYNC_MICROSOFT: 'SYNC_MICROSOFT',
   SHARED_STATIC: 'SHARED_STATIC',
   SHARED_LIVE: 'SHARED_LIVE',
   API: 'API'
@@ -856,7 +857,8 @@ exports.MergeDecisionStatus = exports.$Enums.MergeDecisionStatus = {
 
 exports.SyncProvider = exports.$Enums.SyncProvider = {
   CARDDAV: 'CARDDAV',
-  GOOGLE: 'GOOGLE'
+  GOOGLE: 'GOOGLE',
+  MICROSOFT: 'MICROSOFT'
 };
 
 exports.SyncAccountStatus = exports.$Enums.SyncAccountStatus = {

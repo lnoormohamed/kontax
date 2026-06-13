@@ -37,6 +37,23 @@ export type GoogleSyncCredentialPayload = {
   scope: string;
 };
 
+// P27-04: Microsoft Outlook/Graph OAuth credential. MSAL-node hides raw refresh
+// tokens, so we persist its serialized token cache (which holds the refresh
+// token) and use acquireTokenSilent to auto-refresh. Stored in the same column
+// + AES envelope as CardDAV/Google, different JSON shape.
+export type MicrosoftSyncCredentialPayload = {
+  provider: "MICROSOFT";
+  version: 1;
+  // Serialized MSAL token cache (contains the rotating refresh token).
+  cacheBlob: string;
+  // MSAL account identifier, used to select the account from the cache.
+  homeAccountId: string;
+  // The connected Microsoft account email (mail ?? userPrincipalName).
+  microsoftEmail: string;
+  // Granted scopes, space-delimited.
+  scope: string;
+};
+
 type SyncCredentialEncryptionStatus = {
   available: boolean;
   keyRef: string | null;
@@ -174,3 +191,12 @@ export const decryptGoogleSyncCredential = (
   credentialReference: string,
 ): GoogleSyncCredentialPayload =>
   decryptCredentialJson<GoogleSyncCredentialPayload>(credentialReference);
+
+// P27-04: Microsoft OAuth token envelope wrappers.
+export const encryptMicrosoftSyncCredential = (payload: MicrosoftSyncCredentialPayload) =>
+  encryptCredentialJson(payload);
+
+export const decryptMicrosoftSyncCredential = (
+  credentialReference: string,
+): MicrosoftSyncCredentialPayload =>
+  decryptCredentialJson<MicrosoftSyncCredentialPayload>(credentialReference);

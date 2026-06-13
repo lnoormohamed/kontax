@@ -9,6 +9,7 @@ import { formatRelativeTime } from "~/lib/activity/time";
 const ACTOR_ICON: Partial<Record<SourceType, string>> = {
   SYNC_CARDDAV: "sync",
   SYNC_GOOGLE: "sync",
+  SYNC_MICROSOFT: "sync",
   IMPORT_CSV: "upload",
   SHARED_STATIC: "download",
   SHARED_LIVE: "live",

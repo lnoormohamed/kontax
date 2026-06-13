@@ -371,7 +371,8 @@ export type MergeDecisionStatus = (typeof MergeDecisionStatus)[keyof typeof Merg
 
 export const SyncProvider: {
   CARDDAV: 'CARDDAV',
-  GOOGLE: 'GOOGLE'
+  GOOGLE: 'GOOGLE',
+  MICROSOFT: 'MICROSOFT'
 };
 
 export type SyncProvider = (typeof SyncProvider)[keyof typeof SyncProvider]
@@ -470,6 +471,7 @@ export const SourceType: {
   IMPORT_CSV: 'IMPORT_CSV',
   SYNC_CARDDAV: 'SYNC_CARDDAV',
   SYNC_GOOGLE: 'SYNC_GOOGLE',
+  SYNC_MICROSOFT: 'SYNC_MICROSOFT',
   SHARED_STATIC: 'SHARED_STATIC',
   SHARED_LIVE: 'SHARED_LIVE',
   API: 'API'

@@ -121,6 +121,9 @@ enum SyncProvider {
   // P27-01: Google Contacts via OAuth 2.0 + People API. Credentials hold an
   // OAuth token envelope (access/refresh/expiry) instead of username/password.
   GOOGLE
+  // P27-04: Microsoft Outlook/Exchange via OAuth 2.0 + Graph API. Same OAuth
+  // token envelope; lastSyncCursor stores the Graph delta link.
+  MICROSOFT
 }
 
 enum SyncDirection {
@@ -193,6 +196,8 @@ enum SourceType {
   SYNC_CARDDAV
   // P27-02: contacts imported via the Google Contacts OAuth connector.
   SYNC_GOOGLE
+  // P27-04: contacts imported via the Microsoft Outlook/Graph connector.
+  SYNC_MICROSOFT
   SHARED_STATIC
   SHARED_LIVE
   API

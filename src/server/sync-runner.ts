@@ -16,6 +16,7 @@ import {
 } from "~/server/sync-health";
 import { decryptSyncCredentialPayload } from "~/server/sync-credentials";
 import { GoogleSyncError, runGoogleSync } from "~/server/google-sync";
+import { MicrosoftSyncError, runMicrosoftSync } from "~/server/microsoft-sync";
 import { buildLocalConflictSnapshot } from "~/server/sync-conflict-snapshot";
 import { getEffectiveSyncAccountSettings } from "~/server/sync-settings";
 
@@ -79,6 +80,7 @@ const getFailureStatus = (
   if (
     errorCode === "CARDDAV_AUTH_FAILED" ||
     errorCode === "GOOGLE_AUTH_FAILED" ||
+    errorCode === "MICROSOFT_AUTH_FAILED" ||
     errorCode === "CREDENTIALS_MISSING" ||
     errorCode === "CREDENTIALS_UNREADABLE"
   ) {
@@ -241,6 +243,95 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
     skipped: 0,
   };
 
+  // P27-01/04: shared bookkeeping for OAuth provider jobs (Google, Microsoft).
+  // The connector's run() returns the import tally + queueFull; this records the
+  // job/account state identically across providers. Returns the summary bucket
+  // to increment.
+  type OAuthSyncResult = {
+    created: number;
+    updated: number;
+    deleted: number;
+    conflicts: number;
+    queueFull: boolean;
+  };
+  const runOAuthSyncJob = async (
+    job: (typeof queuedJobs)[number],
+    run: () => Promise<OAuthSyncResult>,
+    toErrorCode: (error: unknown) => string,
+  ): Promise<"succeeded" | "partial" | "failed"> => {
+    if (!job.syncAccount.credentialReference || job.syncAccount.credentialRevokedAt) {
+      await markJobFailed({
+        jobId: job.id,
+        syncAccountId: job.syncAccountId,
+        _syncDirection: job.syncDirection,
+        attemptCount: job.attemptCount,
+        maxAttempts: job.maxAttempts,
+        accountStatus: job.syncAccount.status,
+        errorCode: "CREDENTIALS_MISSING",
+        errorSummary:
+          "The sync account is missing active credentials. Reconnect to restore syncing.",
+      });
+      return "failed";
+    }
+
+    try {
+      const result = await run();
+      const now = new Date();
+      const hasConflicts = result.conflicts > 0;
+      await db.$transaction([
+        db.syncJob.update({
+          where: { id: job.id },
+          data: {
+            status: hasConflicts ? "PARTIAL" : "SUCCEEDED",
+            completedAt: now,
+            leaseExpiresAt: null,
+            nextRetryAt: null,
+            errorCode: hasConflicts ? "SYNC_CONFLICTS_OPEN" : null,
+            errorSummary: hasConflicts
+              ? `${result.conflicts} sync conflicts need review before this account is fully healthy again.`
+              : null,
+            createdCount: result.created,
+            updatedCount: result.updated,
+            deletedCount: result.deleted,
+            conflictCount: result.conflicts,
+          },
+        }),
+        db.syncAccount.update({
+          where: { id: job.syncAccountId },
+          data: {
+            status: result.queueFull ? "PAUSED" : "ACTIVE",
+            lastSucceededAt: now,
+            lastSyncedAt: now,
+            lastErrorAt: result.queueFull || hasConflicts ? now : null,
+            lastErrorCode: result.queueFull
+              ? CONFLICT_QUEUE_FULL_CODE
+              : hasConflicts
+                ? "SYNC_CONFLICTS_OPEN"
+                : null,
+            lastErrorMessage: result.queueFull
+              ? "Sync paused — the manual conflict queue is full. Resolve conflicts to resume automatic sync."
+              : hasConflicts
+                ? `${result.conflicts} sync conflicts need review before the account is fully healthy again.`
+                : null,
+          },
+        }),
+      ]);
+      return hasConflicts ? "partial" : "succeeded";
+    } catch (error) {
+      await markJobFailed({
+        jobId: job.id,
+        syncAccountId: job.syncAccountId,
+        _syncDirection: job.syncDirection,
+        attemptCount: job.attemptCount,
+        maxAttempts: job.maxAttempts,
+        accountStatus: job.syncAccount.status,
+        errorCode: toErrorCode(error),
+        errorSummary: error instanceof Error ? error.message : "Sync failed.",
+      });
+      return "failed";
+    }
+  };
+
   for (const job of queuedJobs) {
     const leaseExpiresAt = new Date(Date.now() + 10 * 60 * 1000);
     const claim = await db.syncJob.updateMany({
@@ -278,96 +369,46 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
       continue;
     }
 
-    // P27-01: Google connector. OAuth accounts have no addressBookUrl/CardDAV
-    // credentials, so they branch out before the CardDAV-specific guards below.
-    // The connector handles full vs incremental (syncToken) internally.
+    // P27-01/04: OAuth connectors (Google, Microsoft). These accounts have no
+    // addressBookUrl/CardDAV credentials, so they branch out before the
+    // CardDAV-specific guards below. Each connector handles full vs incremental
+    // (syncToken / delta link) internally.
     if (job.syncAccount.provider === "GOOGLE") {
-      if (!job.syncAccount.credentialReference || job.syncAccount.credentialRevokedAt) {
-        await markJobFailed({
-          jobId: job.id,
-          syncAccountId: job.syncAccountId,
-          _syncDirection: job.syncDirection,
-          attemptCount: job.attemptCount,
-          maxAttempts: job.maxAttempts,
-          accountStatus: job.syncAccount.status,
-          errorCode: "CREDENTIALS_MISSING",
-          errorSummary:
-            "The Google sync account is missing active credentials. Reconnect to restore syncing.",
-        });
-        summary.failed += 1;
-        continue;
-      }
+      // P27-03: conflict policy drives both-changed + tombstone resolution.
+      const settings = await getEffectiveSyncAccountSettings(job.syncAccountId);
+      const outcome = await runOAuthSyncJob(
+        job,
+        () =>
+          runGoogleSync({
+            id: job.syncAccount.id,
+            userId: job.syncAccount.userId,
+            label: job.syncAccount.label,
+            credentialReference: job.syncAccount.credentialReference,
+            lastSyncCursor: job.syncAccount.lastSyncCursor,
+            conflictPolicy: settings.conflictPolicy,
+          }),
+        (error) => (error instanceof GoogleSyncError ? error.code : "GOOGLE_SYNC_FAILED"),
+      );
+      summary[outcome] += 1;
+      continue;
+    }
 
-      try {
-        // P27-03: conflict policy drives both-changed + tombstone resolution.
-        const googleSettings = await getEffectiveSyncAccountSettings(job.syncAccountId);
-        const result = await runGoogleSync({
-          id: job.syncAccount.id,
-          userId: job.syncAccount.userId,
-          label: job.syncAccount.label,
-          credentialReference: job.syncAccount.credentialReference,
-          lastSyncCursor: job.syncAccount.lastSyncCursor,
-          conflictPolicy: googleSettings.conflictPolicy,
-        });
-        const now = new Date();
-        const hasConflicts = result.conflicts > 0;
-        await db.$transaction([
-          db.syncJob.update({
-            where: { id: job.id },
-            data: {
-              status: hasConflicts ? "PARTIAL" : "SUCCEEDED",
-              completedAt: now,
-              leaseExpiresAt: null,
-              nextRetryAt: null,
-              errorCode: hasConflicts ? "SYNC_CONFLICTS_OPEN" : null,
-              errorSummary: hasConflicts
-                ? `${result.conflicts} sync conflicts need review before this account is fully healthy again.`
-                : null,
-              createdCount: result.created,
-              updatedCount: result.updated,
-              deletedCount: result.deleted,
-              conflictCount: result.conflicts,
-            },
+    if (job.syncAccount.provider === "MICROSOFT") {
+      const settings = await getEffectiveSyncAccountSettings(job.syncAccountId);
+      const outcome = await runOAuthSyncJob(
+        job,
+        () =>
+          runMicrosoftSync({
+            id: job.syncAccount.id,
+            userId: job.syncAccount.userId,
+            label: job.syncAccount.label,
+            credentialReference: job.syncAccount.credentialReference,
+            lastSyncCursor: job.syncAccount.lastSyncCursor,
+            conflictPolicy: settings.conflictPolicy,
           }),
-          db.syncAccount.update({
-            where: { id: job.syncAccountId },
-            data: {
-              status: result.queueFull ? "PAUSED" : "ACTIVE",
-              lastSucceededAt: now,
-              lastSyncedAt: now,
-              lastErrorAt: result.queueFull || hasConflicts ? now : null,
-              lastErrorCode: result.queueFull
-                ? CONFLICT_QUEUE_FULL_CODE
-                : hasConflicts
-                  ? "SYNC_CONFLICTS_OPEN"
-                  : null,
-              lastErrorMessage: result.queueFull
-                ? "Sync paused — the manual conflict queue is full. Resolve conflicts to resume automatic sync."
-                : hasConflicts
-                  ? `${result.conflicts} sync conflicts need review before the account is fully healthy again.`
-                  : null,
-            },
-          }),
-        ]);
-        if (hasConflicts) summary.partial += 1;
-        else summary.succeeded += 1;
-      } catch (error) {
-        const errorCode =
-          error instanceof GoogleSyncError ? error.code : "GOOGLE_SYNC_FAILED";
-        const errorSummary =
-          error instanceof Error ? error.message : "Google sync failed.";
-        await markJobFailed({
-          jobId: job.id,
-          syncAccountId: job.syncAccountId,
-          _syncDirection: job.syncDirection,
-          attemptCount: job.attemptCount,
-          maxAttempts: job.maxAttempts,
-          accountStatus: job.syncAccount.status,
-          errorCode,
-          errorSummary,
-        });
-        summary.failed += 1;
-      }
+        (error) => (error instanceof MicrosoftSyncError ? error.code : "MICROSOFT_SYNC_FAILED"),
+      );
+      summary[outcome] += 1;
       continue;
     }
 

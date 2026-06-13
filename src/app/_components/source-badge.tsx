@@ -10,6 +10,7 @@ const ICON_BY_SOURCE: Record<SourceType, string> = {
   IMPORT_CSV: "upload",
   SYNC_CARDDAV: "sync",
   SYNC_GOOGLE: "sync",
+  SYNC_MICROSOFT: "sync",
   SHARED_STATIC: "download",
   SHARED_LIVE: "live",
   API: "gear",

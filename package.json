@@ -28,6 +28,7 @@
     "@auth/prisma-adapter": "^2.7.2",
     "@aws-sdk/client-s3": "^3.1066.0",
     "@aws-sdk/client-sesv2": "^3.1065.0",
+    "@azure/msal-node": "^5.2.4",
     "@paralleldrive/cuid2": "^3.3.0",
     "@prisma/client": "^6.6.0",
     "@react-email/components": "^1.0.12",
