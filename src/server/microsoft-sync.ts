@@ -14,15 +14,28 @@ import {
   type Configuration,
 } from "@azure/msal-node";
 
-import type { ConflictPolicy } from "../../generated/prisma";
-import { emitEvent } from "~/lib/activity";
+import type { ConflictPolicy, Prisma } from "../../generated/prisma";
 import { env } from "~/env";
 import { db } from "~/server/db";
 import {
   type GraphContact,
+  type GraphContactSource,
   mapGraphContactToKontax,
+  mapKontaxContactToGraph,
 } from "~/server/microsoft-sync-mapping";
-import { mappedContactToWriteData } from "~/server/sync-contact-mapping";
+import type { ContactConflictSnapshotInput } from "~/server/sync-conflict-snapshot";
+import {
+  addImportBatch,
+  applyRemoteToContact,
+  emptyImportBatch,
+  type ImportBatchSummary,
+  type ImportEngineAccount,
+  importRemoteContactBatch,
+  isConflictQueueFull,
+  openMutationConflict,
+  recordAutoResolved,
+  type RemoteContactItem,
+} from "~/server/sync-import-engine";
 import {
   decryptMicrosoftSyncCredential,
   encryptMicrosoftSyncCredential,
@@ -121,24 +134,20 @@ export type MicrosoftImportAccount = MicrosoftSyncAccount & {
   userId: string;
   label: string;
   lastSyncCursor: string | null;
-  // Used by P27-06 conflict handling; ignored by the P27-04 stub.
   conflictPolicy: ConflictPolicy;
 };
 
-export type MicrosoftImportSummary = {
-  created: number;
-  updated: number;
-  deleted: number;
-  conflicts: number;
-  queueFull: boolean;
-};
+// Whole-import result the runner records; queueFull drives the auto-pause.
+export type MicrosoftImportSummary = ImportBatchSummary & { queueFull: boolean };
 
-const emptySummary = (): MicrosoftImportSummary => ({
-  created: 0,
-  updated: 0,
-  deleted: 0,
-  conflicts: 0,
-  queueFull: false,
+// Engine account context for Microsoft (adds source/provider provenance).
+const toEngineAccount = (account: MicrosoftImportAccount): ImportEngineAccount => ({
+  id: account.id,
+  userId: account.userId,
+  label: account.label,
+  conflictPolicy: account.conflictPolicy,
+  sourceType: "SYNC_MICROSOFT",
+  providerName: "Outlook",
 });
 
 // ── token acquisition (refresh via MSAL token cache) ─────────────────────────
@@ -224,109 +233,27 @@ const graphGet = async (accessToken: string, url: string): Promise<GraphDeltaRes
   return (await res.json()) as GraphDeltaResponse;
 };
 
-// ── Contact processing (P27-05) ──────────────────────────────────────────────
-// Maps each Graph contact to the canonical write shape and persists it, keyed
-// on SyncContactLink.remoteUid = Graph contact id, remoteETag = @odata.etag.
-// Remote-wins import happy path; conflict detection is P27-06.
+// ── Contact processing (P27-05 mapping + P27-06 conflicts) ───────────────────
+// Normalise each Graph contact into a RemoteContactItem and hand the batch to
+// the shared import engine, which owns create/update/conflict/tombstone logic.
 export const processMicrosoftContacts = async (
   contacts: unknown[],
   account: MicrosoftImportAccount,
-): Promise<MicrosoftImportSummary> => {
-  const summary = emptySummary();
-  const now = new Date();
-
+): Promise<ImportBatchSummary> => {
+  const items: RemoteContactItem[] = [];
   for (const raw of contacts) {
     const contact = raw as GraphContact;
-    const remoteId = contact.id;
-    if (!remoteId) continue;
-    const etag = contact["@odata.etag"] ?? null;
-
-    // Delta tombstone — mark the link deleted (policy-based delete is P27-06).
-    if (contact["@removed"]) {
-      const res = await db.syncContactLink.updateMany({
-        where: { syncAccountId: account.id, remoteUid: remoteId },
-        data: { remoteDeletedAt: now, lastSyncedAt: now },
-      });
-      if (res.count > 0) summary.deleted += 1;
-      continue;
-    }
-
-    const mapped = mapGraphContactToKontax(contact);
-    if (!mapped) continue;
-    const data = mappedContactToWriteData(mapped);
-
-    const existing = await db.syncContactLink.findUnique({
-      where: {
-        syncAccountId_remoteUid: { syncAccountId: account.id, remoteUid: remoteId },
-      },
-      select: { id: true, contactId: true },
+    const remoteUid = contact.id;
+    if (!remoteUid) continue;
+    items.push({
+      remoteUid,
+      etag: contact["@odata.etag"] ?? null,
+      deleted: Boolean(contact["@removed"]),
+      mapped: mapGraphContactToKontax(contact),
+      remoteSnapshot: contact,
     });
-
-    if (existing) {
-      await db.$transaction([
-        db.contact.update({
-          where: { id: existing.contactId },
-          data: {
-            ...data,
-            lastMutatedBy: "SYNC_MICROSOFT",
-            lastMutatedByDetail: account.label,
-            syncVersion: { increment: 1 },
-          },
-        }),
-        db.syncContactLink.update({
-          where: { id: existing.id },
-          data: {
-            remoteHref: remoteId,
-            remoteETag: etag,
-            remoteDeletedAt: null,
-            tombstonedAt: null,
-            lastErrorCode: null,
-            lastErrorMessage: null,
-            lastSyncedAt: now,
-          },
-        }),
-      ]);
-      summary.updated += 1;
-      continue;
-    }
-
-    // New contact. syncUid is left to default (cuid) — the Graph id lives on
-    // SyncContactLink.remoteUid, not the globally-unique Contact.syncUid.
-    await db.$transaction(async (tx) => {
-      const created = await tx.contact.create({
-        data: {
-          userId: account.userId,
-          ...data,
-          sourceType: "SYNC_MICROSOFT",
-          sourceDetail: account.label,
-          lastMutatedBy: "SYNC_MICROSOFT",
-          lastMutatedByDetail: account.label,
-        },
-        select: { id: true },
-      });
-      await tx.syncContactLink.create({
-        data: {
-          syncAccountId: account.id,
-          contactId: created.id,
-          remoteHref: remoteId,
-          remoteUid: remoteId,
-          remoteETag: etag,
-          lastSyncedAt: now,
-        },
-      });
-      await emitEvent(tx, {
-        userId: account.userId,
-        contactId: created.id,
-        eventType: "SYNC_PULLED",
-        actor: "SYNC",
-        actorDetail: account.label,
-        payload: { syncAccountId: account.id, syncAccountLabel: account.label },
-      });
-    });
-    summary.created += 1;
   }
-
-  return summary;
+  return importRemoteContactBatch(toEngineAccount(account), items);
 };
 
 // ── delta traversal (shared by full import + incremental) ────────────────────
@@ -336,22 +263,15 @@ export const processMicrosoftContacts = async (
 const traverseDelta = async (
   account: MicrosoftImportAccount,
   startUrl: string,
-): Promise<{ summary: MicrosoftImportSummary; deltaLink: string | null }> => {
+): Promise<{ summary: ImportBatchSummary; deltaLink: string | null }> => {
   const accessToken = await getMicrosoftAccessToken(account);
-  let summary = emptySummary();
+  let summary = emptyImportBatch();
   let url: string | undefined = startUrl;
   let deltaLink: string | null = null;
 
   while (url) {
     const page = await graphGet(accessToken, url);
-    const batch = await processMicrosoftContacts(page.value ?? [], account);
-    summary = {
-      created: summary.created + batch.created,
-      updated: summary.updated + batch.updated,
-      deleted: summary.deleted + batch.deleted,
-      conflicts: summary.conflicts + batch.conflicts,
-      queueFull: summary.queueFull || batch.queueFull,
-    };
+    summary = addImportBatch(summary, await processMicrosoftContacts(page.value ?? [], account));
     if (page["@odata.nextLink"]) {
       url = page["@odata.nextLink"];
     } else {
@@ -361,6 +281,14 @@ const traverseDelta = async (
   }
 
   return { summary, deltaLink };
+};
+
+// Attach the queue-full flag by counting OPEN manual conflicts post-import.
+const finalizeImportSummary = async (
+  account: MicrosoftImportAccount,
+  batch: ImportBatchSummary,
+): Promise<MicrosoftImportSummary> => {
+  return { ...batch, queueFull: await isConflictQueueFull(account.id) };
 };
 
 // ── full import ──────────────────────────────────────────────────────────────
@@ -379,7 +307,7 @@ export const microsoftFullImport = async (
     data: { lastSyncCursor: deltaLink, lastSyncedAt: new Date() },
   });
 
-  return summary;
+  return finalizeImportSummary(account, summary);
 };
 
 // ── incremental sync (resumes from the stored delta link) ─────────────────────
@@ -392,7 +320,7 @@ export const microsoftIncrementalSync = async (
   }
 
   // A 410 Gone on a stale delta link means a full re-sync is required.
-  let result: { summary: MicrosoftImportSummary; deltaLink: string | null };
+  let result: { summary: ImportBatchSummary; deltaLink: string | null };
   try {
     result = await traverseDelta(account, account.lastSyncCursor);
   } catch (error) {
@@ -410,7 +338,7 @@ export const microsoftIncrementalSync = async (
     },
   });
 
-  return result.summary;
+  return finalizeImportSummary(account, result.summary);
 };
 
 // Runner entrypoint: pick full vs incremental based on stored cursor.
@@ -418,6 +346,110 @@ export const runMicrosoftSync = async (
   account: MicrosoftImportAccount,
 ): Promise<MicrosoftImportSummary> =>
   account.lastSyncCursor ? microsoftIncrementalSync(account) : microsoftFullImport(account);
+
+// ── Push phase (P27-06) ──────────────────────────────────────────────────────
+// PATCH /me/contacts/{id} with an If-Match etag header. A 412 Precondition
+// Failed means the remote changed since our etag → fetch the latest and resolve
+// by policy. Not yet wired into the runner (no provider has push scheduling).
+export type MicrosoftPushContact = GraphContactSource & ContactConflictSnapshotInput;
+
+export type MicrosoftPushLink = {
+  id: string;
+  contactId: string;
+  remoteUid: string;
+  remoteETag: string | null;
+};
+
+export type MicrosoftPushResult =
+  | { ok: true }
+  | { ok: false; conflict: true; strategy: "KEEP_REMOTE" | "KEEP_LOCAL" | "MANUAL" };
+
+const graphPatchContact = async (
+  accessToken: string,
+  remoteUid: string,
+  ifMatch: string,
+  body: string,
+): Promise<{ etag: string | null } | { status: number; message: string }> => {
+  const res = await fetch(`${GRAPH_BASE}/me/contacts/${remoteUid}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+      "If-Match": ifMatch,
+    },
+    body,
+  });
+  if (!res.ok) {
+    return { status: res.status, message: await res.text().catch(() => "") };
+  }
+  const updated = (await res.json()) as { "@odata.etag"?: string };
+  return { etag: updated["@odata.etag"] ?? null };
+};
+
+export const pushMicrosoftContact = async (
+  account: MicrosoftImportAccount,
+  link: MicrosoftPushLink,
+  contact: MicrosoftPushContact,
+): Promise<MicrosoftPushResult> => {
+  const accessToken = await getMicrosoftAccessToken(account);
+  const body = JSON.stringify(mapKontaxContactToGraph(contact));
+
+  const patched = await graphPatchContact(accessToken, link.remoteUid, link.remoteETag ?? "*", body);
+  if ("etag" in patched) {
+    await db.syncContactLink.update({
+      where: { id: link.id },
+      data: { remoteETag: patched.etag, lastSyncedAt: new Date() },
+    });
+    return { ok: true };
+  }
+  if (patched.status !== 412) {
+    throw normaliseMicrosoftError({ statusCode: patched.status, message: patched.message });
+  }
+
+  // 412 — remote changed under us. Fetch the latest and resolve by policy.
+  const latestRes = await fetch(
+    `${GRAPH_BASE}/me/contacts/${link.remoteUid}?$select=${encodeURIComponent(MICROSOFT_CONTACT_FIELDS)}`,
+    { headers: { Authorization: `Bearer ${accessToken}`, Accept: "application/json" } },
+  );
+  if (!latestRes.ok) {
+    throw normaliseMicrosoftError({
+      statusCode: latestRes.status,
+      message: await latestRes.text().catch(() => ""),
+    });
+  }
+  const latest = (await latestRes.json()) as GraphContact;
+
+  const now = new Date();
+  const engineAccount = toEngineAccount(account);
+  const latestEtag = latest["@odata.etag"] ?? null;
+  const remoteSnapshot = latest as unknown as Prisma.InputJsonValue;
+
+  if (account.conflictPolicy === "SERVER_WINS") {
+    const mapped = mapGraphContactToKontax(latest);
+    if (mapped) {
+      await applyRemoteToContact(engineAccount, link.id, link.contactId, mapped, link.remoteUid, latestEtag, now);
+    }
+    await recordAutoResolved(engineAccount, { id: link.id }, contact, remoteSnapshot, latestEtag, "KEEP_REMOTE", now);
+    return { ok: false, conflict: true, strategy: "KEEP_REMOTE" };
+  }
+
+  if (account.conflictPolicy === "DEVICE_WINS") {
+    // Kontax wins — retry the PATCH with the fresh etag to overwrite remote.
+    const retry = await graphPatchContact(accessToken, link.remoteUid, latestEtag ?? "*", body);
+    if (!("etag" in retry)) {
+      throw normaliseMicrosoftError({ statusCode: retry.status, message: retry.message });
+    }
+    await db.syncContactLink.update({
+      where: { id: link.id },
+      data: { remoteETag: retry.etag, lastSyncedAt: now },
+    });
+    await recordAutoResolved(engineAccount, { id: link.id }, contact, remoteSnapshot, latestEtag, "KEEP_LOCAL", now);
+    return { ok: false, conflict: true, strategy: "KEEP_LOCAL" };
+  }
+
+  await openMutationConflict(engineAccount, { id: link.id }, contact, remoteSnapshot, latestEtag);
+  return { ok: false, conflict: true, strategy: "MANUAL" };
+};
 
 // ── connected-account email (used by the callback) ───────────────────────────
 
