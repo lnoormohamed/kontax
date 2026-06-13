@@ -1,5 +1,6 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
@@ -16,11 +17,13 @@ import {
   type NotificationCategory,
   relativeTime,
 } from "~/app/_components/notification-categories";
-import {
-  SecurityAlertDrawer,
-  type SecurityAlertView,
-} from "~/app/_components/security-alert-drawer";
+import type { SecurityAlertView } from "~/app/_components/security-alert-drawer";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
+
+const SecurityAlertDrawer = dynamic(
+  () => import("~/app/_components/security-alert-drawer").then((mod) => mod.SecurityAlertDrawer),
+  { ssr: false },
+);
 
 export type FeedItem = {
   id: string;

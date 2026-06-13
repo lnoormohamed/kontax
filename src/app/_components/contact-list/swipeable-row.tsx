@@ -14,6 +14,7 @@ interface SwipeableRowProps {
 
 const REVEAL_WIDTH = 168; // two 84px action buttons
 const SNAP_THRESHOLD = 0.4; // 40% of row width → snap open
+const OFFSET_EPSILON = 0.5;
 
 /**
  * Swipe-to-reveal row (Favourite / Archive). Uses @use-gesture/react's useDrag
@@ -28,9 +29,11 @@ export function SwipeableRow({ onArchive, onToggleFavourite, isFavourite, childr
   const [animate, setAnimate] = useState(false);
   const offsetRef = useRef(0);
   const baseRef = useRef(0);
+  const rowWidthRef = useRef(375);
   const rowRef = useRef<HTMLDivElement>(null);
 
   const apply = (value: number, withAnim: boolean) => {
+    if (Math.abs(offsetRef.current - value) < OFFSET_EPSILON && animate === withAnim) return;
     offsetRef.current = value;
     setAnimate(withAnim);
     setOffset(value);
@@ -39,7 +42,10 @@ export function SwipeableRow({ onArchive, onToggleFavourite, isFavourite, childr
   const bind = useDrag(
     ({ first, last, movement: [mx], tap }) => {
       if (tap) return;
-      if (first) baseRef.current = offsetRef.current;
+      if (first) {
+        baseRef.current = offsetRef.current;
+        rowWidthRef.current = rowRef.current?.offsetWidth ?? 375;
+      }
 
       // mx is negative when dragging left; revealing increases the offset.
       let next = baseRef.current - mx;
@@ -47,8 +53,7 @@ export function SwipeableRow({ onArchive, onToggleFavourite, isFavourite, childr
       if (next > REVEAL_WIDTH) next = REVEAL_WIDTH + (next - REVEAL_WIDTH) * 0.28; // rubber-band
 
       if (last) {
-        const rowW = rowRef.current?.offsetWidth ?? 375;
-        apply(next >= rowW * SNAP_THRESHOLD ? REVEAL_WIDTH : 0, true);
+        apply(next >= rowWidthRef.current * SNAP_THRESHOLD ? REVEAL_WIDTH : 0, true);
       } else {
         apply(next, false);
       }
@@ -56,7 +61,7 @@ export function SwipeableRow({ onArchive, onToggleFavourite, isFavourite, childr
     { axis: "x", filterTaps: true, pointer: { touch: true }, eventOptions: { passive: false } },
   );
 
-  const vibrate = () => { try { navigator.vibrate?.(10); } catch (_) {} };
+  const vibrate = () => { try { navigator.vibrate?.(10); } catch { /* ignore */ } };
 
   const handleFav = () => {
     vibrate();
@@ -66,7 +71,7 @@ export function SwipeableRow({ onArchive, onToggleFavourite, isFavourite, childr
 
   const handleArchive = () => {
     vibrate();
-    apply(rowRef.current?.offsetWidth ?? 375, true);
+    apply(rowWidthRef.current, true);
     setTimeout(() => onArchive(), 200);
   };
 

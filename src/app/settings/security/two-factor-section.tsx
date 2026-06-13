@@ -1,9 +1,14 @@
 "use client";
 
+import dynamic from "next/dynamic";
 import { useEffect, useState, useTransition } from "react";
 
 import { disableTotpAuth, getTotpStatus, regenerateRecoveryCodes } from "~/app/actions/totp";
-import { TwoFactorModal } from "./two-factor-modal";
+
+const TwoFactorModal = dynamic(
+  () => import("./two-factor-modal").then((mod) => mod.TwoFactorModal),
+  { ssr: false },
+);
 
 function Spinner({ size = 15, light = true }: { size?: number; light?: boolean }) {
   return <span className="st-spin inline-block rounded-full" style={{ width: size, height: size, border: `2px solid ${light ? "rgba(255,255,255,.35)" : "rgba(23,53,46,.2)"}`, borderTopColor: light ? "#fff" : "#17352e" }} />;

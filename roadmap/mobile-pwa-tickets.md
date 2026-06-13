@@ -89,6 +89,8 @@ Requirements** section; the paired build ticket builds to it.
 | Ticket | Title | Spec § | Priority | Status | Depends |
 | --- | --- | --- | --- | --- | --- |
 | P24B-PERF-01 | Contacts list render performance: memoized rows, derived list data, sticky-section cleanup | E1 | P0 | ◑ | P24B-11 |
+| P24B-PERF-02 | Mobile gesture performance: swipe hot-path cleanup, scroll-vs-swipe stability | E1 | P0 | ◑ | P24B-PERF-01 |
+| P24B-PERF-03 | Route bundle reduction: lazy-load modal/drawer surfaces and trim initial JS | All | P1 | ◑ | P24B-PERF-01 |
 
 ## Workstream E — Collaboration & data
 | Ticket | Title | Spec § | Priority | Status | Depends |
@@ -218,6 +220,10 @@ Requirements** section; the paired build ticket builds to it.
 - 2026-06-13 — **P24B-PERF-01 started** — contacts list render pass: memoized row subcomponents,
   memoized visible IDs/selection state and favorite/rest partitions, stable selection callbacks, and
   sticky section lookup moved out of inline JSX.
+- 2026-06-13 — **P24B-PERF-02 started** — mobile gesture pass: cached swipe row width on gesture
+  start, skipped no-op drag state updates, and removed the unused catch binding warning.
+- 2026-06-13 — **P24B-PERF-03 started** — route bundle pass: lazy-loaded the notification security
+  alert drawer and security settings 2FA enrolment modal so they load only when opened.
 - 2026-06-13 — **P24B-07 edit redo done (DB19)** — `MobileContactSheet` rebuilt as ONE sheet for both
   create and edit, full field coverage vs the desktop editor: Basic (always-on) · Phones · Emails ·
   Websites · Address (multi sub-cards) · Dates (birthday + significant, native date inputs) · Related
