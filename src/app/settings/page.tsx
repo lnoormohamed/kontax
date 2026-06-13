@@ -95,8 +95,8 @@ export default async function SettingsPlanPage({
         syncActive={syncConnections}
       />
 
-      {/* Billing content — full width on desktop, hidden on mobile */}
-      <div className="hidden md:block">
+      {/* Billing content — P24B-12a keeps plan/billing usable on mobile too. */}
+      <div id="plan-billing" className="mt-2 md:mt-0">
       {showBillingSuccess ? (
         <BillingSuccessBanner planLabel={planSummary.planLabel} />
       ) : null}
@@ -205,7 +205,7 @@ export default async function SettingsPlanPage({
           Activity log retained for 30 days on Free · 1 year on Pro · 90 days on Family · unlimited on Teams.
         </p>
       </div>
-      </div>{/* end hidden md:block billing wrapper */}
+      </div>{/* end billing wrapper */}
     </>
   );
 }

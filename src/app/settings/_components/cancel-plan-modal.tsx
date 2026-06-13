@@ -81,7 +81,7 @@ export function CancelPlanModal({
     <>
       {!isControlled ? (
         <button
-          className="border-none bg-transparent p-1 text-[13px] font-semibold text-[#8b938c] transition hover:text-[#5c655e] hover:underline"
+          className="h-11 w-full rounded-2xl border border-[#d8ddd6] bg-white px-[18px] text-[13px] font-semibold text-[#8b938c] transition hover:text-[#5c655e] hover:underline md:h-auto md:w-auto md:border-none md:bg-transparent md:p-1"
           onClick={() => setOpen(true)}
           type="button"
         >
@@ -91,11 +91,11 @@ export function CancelPlanModal({
 
       {open ? (
         <div
-          className="fixed inset-0 z-[300] grid place-items-center bg-[rgba(20,30,25,0.42)] p-5"
+          className="fixed inset-0 z-[300] grid items-end bg-[rgba(20,30,25,0.42)] p-0 md:place-items-center md:p-5"
           onClick={() => setOpen(false)}
         >
           <div
-            className="flex max-h-[calc(100%-40px)] w-full max-w-[400px] flex-col overflow-hidden rounded-[1.4rem] bg-white shadow-[0_24px_60px_rgba(20,30,25,0.32)]"
+            className="flex max-h-[calc(100dvh-18px)] w-full flex-col overflow-hidden rounded-t-[1.4rem] bg-white shadow-[0_24px_60px_rgba(20,30,25,0.32)] md:max-h-[calc(100%-40px)] md:max-w-[400px] md:rounded-[1.4rem]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-start justify-between gap-3 px-[22px] pb-3.5 pt-[22px]">

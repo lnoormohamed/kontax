@@ -148,7 +148,7 @@ export function MobileSettingsNav({
         <NavRow icon="bell" label="Notifications" href="/settings/notifications" />
         <NavRow icon="phone" label="Devices & app passwords" href="/settings/devices" />
         <NavRow icon="emergency" label="Security" href="/settings/security" />
-        <NavRow icon="briefcase" label="Plan & billing" href="/settings" last />
+        <NavRow icon="briefcase" label="Plan & billing" href="/settings#plan-billing" last />
       </GroupCard>
 
       <div style={{ textAlign: "center", fontSize: 12, color: "#aeb4ac", padding: "4px 0 16px" }}>

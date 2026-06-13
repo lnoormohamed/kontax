@@ -60,7 +60,7 @@ export function BillingPortalButton({
   return (
     <div className={className}>
       <button
-        className={`inline-flex h-11 items-center justify-center gap-2 rounded-2xl px-[18px] text-sm font-semibold transition disabled:opacity-75 ${VARIANT_CLASS[variant]}`}
+        className={`inline-flex h-11 w-full items-center justify-center gap-2 rounded-2xl px-[18px] text-sm font-semibold transition disabled:opacity-75 md:w-auto ${VARIANT_CLASS[variant]}`}
         disabled={isPending}
         onClick={handleClick}
         type="button"

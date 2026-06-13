@@ -137,9 +137,9 @@ export function BillingSection({
   const isFamily = state === "familyOwner";
 
   return (
-    <section className="rounded-[1.4rem] border border-[#d8ddd6] bg-white p-6 shadow-[0_1px_2px_rgba(20,30,25,0.04)]">
+    <section className="rounded-[1.4rem] border border-[#d8ddd6] bg-white p-4 shadow-[0_1px_2px_rgba(20,30,25,0.04)] md:p-6">
       {/* header */}
-      <div className="flex items-start gap-3.5">
+      <div className="flex flex-wrap items-start gap-3.5">
         <span
           className="grid h-11 w-11 shrink-0 place-items-center rounded-[12px]"
           style={{ background: TILE_BG[tone] }}
@@ -162,7 +162,7 @@ export function BillingSection({
           </span>
         </div>
         {surface.price ? (
-          <div className="ml-auto whitespace-nowrap text-right">
+          <div className="ml-auto whitespace-nowrap text-right max-[420px]:ml-[58px] max-[420px]:w-[calc(100%-58px)] max-[420px]:text-left">
             <span className="text-[22px] font-semibold tabular-nums tracking-[-0.01em] text-[#1d2823]">
               {surface.price}
             </span>
@@ -251,10 +251,10 @@ export function BillingSection({
       ) : null}
 
       {/* CTA row */}
-      <div className="mt-[22px] flex flex-wrap items-center gap-4">
+      <div className="mt-[22px] grid gap-3 md:flex md:flex-wrap md:items-center md:gap-4">
         {state === "free" ? (
           <Link
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-2xl bg-[#4158f4] px-[18px] text-sm font-semibold text-white transition hover:bg-[#3347d8]"
+            className="inline-flex h-11 w-full items-center justify-center gap-2 rounded-2xl bg-[#4158f4] px-[18px] text-sm font-semibold text-white transition hover:bg-[#3347d8] md:w-auto"
             href="/pricing"
           >
             Upgrade to Pro
