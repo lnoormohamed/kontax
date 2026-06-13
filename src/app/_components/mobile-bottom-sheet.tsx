@@ -15,6 +15,9 @@ interface MobileBottomSheetProps {
 
 export function MobileBottomSheet({ isOpen, onClose, title, children, footer }: MobileBottomSheetProps) {
   const [keyboardOffset, setKeyboardOffset] = useState(0);
+  // Visible (visual-viewport) height while the keyboard is up, so the sheet can
+  // be capped to fit on-screen instead of overflowing above the viewport.
+  const [visibleHeight, setVisibleHeight] = useState(0);
   const [mounted, setMounted] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
 
@@ -36,6 +39,7 @@ export function MobileBottomSheet({ isOpen, onClose, title, children, footer }: 
       // Keyboard height = distance the visual viewport has shifted upward
       const offset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
       setKeyboardOffset(offset);
+      setVisibleHeight(vv.height);
 
       // Scroll focused element into view within the sheet content
       const focused = document.activeElement as HTMLElement | null;
@@ -51,6 +55,7 @@ export function MobileBottomSheet({ isOpen, onClose, title, children, footer }: 
       window.visualViewport?.removeEventListener("resize", update);
       window.visualViewport?.removeEventListener("scroll", update);
       setKeyboardOffset(0);
+      setVisibleHeight(0);
     };
   }, [isOpen]);
 
@@ -98,7 +103,9 @@ export function MobileBottomSheet({ isOpen, onClose, title, children, footer }: 
           boxShadow: "0 -4px 32px rgba(0,0,0,0.16)",
           display: "flex",
           flexDirection: "column",
-          maxHeight: "90svh",
+          // Keyboard up: fit within the visual viewport so the header stays
+          // on-screen. Keyboard down: the usual 90% cap.
+          maxHeight: keyboardOffset > 0 && visibleHeight > 0 ? `${visibleHeight - 8}px` : "90svh",
           transform: mounted ? "translateY(0)" : "translateY(100%)",
           transition: "transform 280ms cubic-bezier(0.34,1.02,0.64,1), bottom 150ms ease",
         }}
