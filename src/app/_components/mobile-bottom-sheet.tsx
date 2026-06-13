@@ -71,6 +71,8 @@ export function MobileBottomSheet({ isOpen, onClose, title, children, footer }: 
 
   if (!isOpen) return null;
 
+  const keyboardUp = keyboardOffset > 0 && visibleHeight > 0;
+
   return (
     <>
       {/* Backdrop */}
@@ -96,18 +98,22 @@ export function MobileBottomSheet({ isOpen, onClose, title, children, footer }: 
           position: "fixed",
           left: 0,
           right: 0,
-          bottom: keyboardOffset,
           zIndex: 61,
           background: "#fff",
-          borderRadius: "20px 20px 0 0",
           boxShadow: "0 -4px 32px rgba(0,0,0,0.16)",
           display: "flex",
           flexDirection: "column",
-          // Keyboard up: fit within the visual viewport so the header stays
-          // on-screen. Keyboard down: the usual 90% cap.
-          maxHeight: keyboardOffset > 0 && visibleHeight > 0 ? `${visibleHeight - 8}px` : "90svh",
+          // Keyboard up: anchor to the TOP and fill the visual viewport, so the
+          // header stays on-screen. Anchoring the top is robust across iOS (fixed
+          // = visual-viewport-relative, so top:0 = viewport top) and Android
+          // (layout-relative, offsetTop ~ 0 on these overflow-hidden pages);
+          // anchoring the bottom diverges between them and floats the sheet
+          // mid-screen on iOS. Keyboard down: a normal bottom sheet capped at 90%.
+          ...(keyboardUp
+            ? { top: 0, bottom: "auto" as const, height: `${visibleHeight}px`, borderRadius: 0 }
+            : { top: "auto" as const, bottom: 0, maxHeight: "90svh", borderRadius: "20px 20px 0 0" }),
           transform: mounted ? "translateY(0)" : "translateY(100%)",
-          transition: "transform 280ms cubic-bezier(0.34,1.02,0.64,1), bottom 150ms ease",
+          transition: "transform 280ms cubic-bezier(0.34,1.02,0.64,1), height 150ms ease",
         }}
       >
         {/* Drag handle (visual affordance only) */}
