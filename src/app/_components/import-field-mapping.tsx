@@ -11,17 +11,21 @@ export type ApiColumnMapping = {
   source: "profile" | "classifier";
   sampleValues: string[];
   suggestions: Array<{ field: string; confidence: number; label: string }>;
+  multiValue?: { detected: boolean; delimiter: string | null; exampleCount: number };
 };
 
 export type ResolvedMapping = {
   index: number;
   targetField: string;
   customFieldKey?: string;
+  splitMultiValue?: boolean;
+  multiValueDelimiter?: string;
 };
 
 type MappedCol = ApiColumnMapping & {
   userOverride: string | null;
   customFieldKey: string;
+  splitMultiValue: boolean;
   flash: boolean;
 };
 
@@ -212,6 +216,78 @@ function FieldSelect({
   );
 }
 
+function SplitToggle({
+  col,
+  onToggle,
+}: {
+  col: MappedCol;
+  onToggle: (index: number, on: boolean) => void;
+}) {
+  const mv = col.multiValue;
+  if (!mv?.detected || !mv.delimiter) return null;
+  const eff = col.userOverride ?? col.field;
+  if (eff !== "phone" && eff !== "email") return null;
+
+  const label = eff === "phone" ? "phone numbers" : "email addresses";
+  const delimLabel =
+    mv.delimiter === ";" ? '"; "' :
+    mv.delimiter === "|" ? '"  |  "' :
+    mv.delimiter === "\n" ? "newline" :
+    `"${mv.delimiter}"`;
+
+  const firstSample = col.sampleValues[0];
+  const exampleParts = firstSample
+    ? firstSample.split(mv.delimiter).map((p) => p.trim()).filter(Boolean).slice(0, 3)
+    : [];
+
+  return (
+    <div className="mt-1.5 rounded-[8px] border border-[#c5d9cc] bg-[#edf5f0] px-3 py-2">
+      <div className="flex items-start gap-2">
+        <span className="mt-px shrink-0 text-[14px]">🔀</span>
+        <div className="flex-1 min-w-0">
+          <div className="text-[12.5px] font-medium text-[#17352e]">
+            This column contains multiple {label}
+          </div>
+          <label className="mt-1.5 flex cursor-pointer items-center gap-2">
+            <span
+              className="grid h-[16px] w-[16px] shrink-0 place-items-center rounded"
+              style={{
+                border: `1.5px solid ${col.splitMultiValue ? "#1f8a5b" : "#8b938c"}`,
+                background: col.splitMultiValue ? "#1f8a5b" : "#fff",
+              }}
+            >
+              {col.splitMultiValue ? (
+                <svg fill="none" height={10} stroke="#fff" strokeLinecap="round" strokeWidth={2.2} viewBox="0 0 12 12" width={10}>
+                  <path d="M2 6l3 3 5-5" />
+                </svg>
+              ) : null}
+            </span>
+            <input
+              checked={col.splitMultiValue}
+              className="hidden"
+              onChange={(e) => onToggle(col.index, e.target.checked)}
+              type="checkbox"
+            />
+            <span className="text-[12.5px] text-[#1d2823]">
+              Split into separate {label} (separated by {delimLabel})
+            </span>
+          </label>
+          {col.splitMultiValue && exampleParts.length > 1 ? (
+            <div className="mt-1 text-[12px] text-[#5c655e]">
+              Example: {exampleParts.map((p, i) => (
+                <span key={i}>
+                  {i > 0 ? " and " : ""}
+                  &ldquo;{p}&rdquo;
+                </span>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function MappingRow({
   col,
   dupField,
@@ -219,6 +295,7 @@ function MappingRow({
   onChange,
   onCustomKeyChange,
   onChipAccept,
+  onSplitToggle,
 }: {
   col: MappedCol;
   dupField: boolean;
@@ -226,6 +303,7 @@ function MappingRow({
   onChange: (index: number, value: string) => void;
   onCustomKeyChange: (index: number, key: string) => void;
   onChipAccept: (index: number, field: string) => void;
+  onSplitToggle: (index: number, on: boolean) => void;
 }) {
   const eff = col.userOverride ?? col.field;
   const isSkip = eff === "skip";
@@ -282,6 +360,7 @@ function MappingRow({
               onAccept={(field) => onChipAccept(col.index, field)}
             />
           ) : null}
+          <SplitToggle col={col} onToggle={onSplitToggle} />
           {dupField ? (
             <div className="mt-1 text-[12px] text-[#b5472f]">
               Two columns map to &ldquo;{FIELD_LABEL[eff] ?? eff}&rdquo;. Change one.
@@ -331,6 +410,7 @@ function MappingRow({
             onAccept={(field) => onChipAccept(col.index, field)}
           />
         ) : null}
+        <SplitToggle col={col} onToggle={onSplitToggle} />
         {dupField ? (
           <div className="text-[12px] text-[#b5472f]">
             Two columns map to &ldquo;{FIELD_LABEL[eff] ?? eff}&rdquo;. Change one.
@@ -355,6 +435,7 @@ export function FieldMappingStep({
       ...m,
       userOverride: null,
       customFieldKey: m.header.slice(0, 50),
+      splitMultiValue: m.multiValue?.detected ?? false,
       flash: false,
     })),
   );
@@ -428,6 +509,10 @@ export function FieldMappingStep({
     setCols((prev) => prev.map((c) => (c.index === index ? { ...c, customFieldKey: key } : c)));
   };
 
+  const handleSplitToggle = (index: number, on: boolean) => {
+    setCols((prev) => prev.map((c) => (c.index === index ? { ...c, splitMultiValue: on } : c)));
+  };
+
   const handleChipAccept = (index: number, field: string) => {
     const col = cols.find((c) => c.index === index);
     if (!col) return;
@@ -449,11 +534,15 @@ export function FieldMappingStep({
     onContinue(
       cols.map((c) => {
         const targetField = c.userOverride ?? c.field;
+        const isSplittable = (targetField === "phone" || targetField === "email") &&
+          c.multiValue?.detected &&
+          c.multiValue.delimiter != null;
         return {
           index: c.index,
           targetField,
-          customFieldKey:
-            targetField === "customField" ? c.customFieldKey.trim() : undefined,
+          customFieldKey: targetField === "customField" ? c.customFieldKey.trim() : undefined,
+          splitMultiValue: isSplittable ? c.splitMultiValue : undefined,
+          multiValueDelimiter: isSplittable && c.splitMultiValue ? (c.multiValue?.delimiter ?? undefined) : undefined,
         };
       }),
     );
@@ -504,6 +593,7 @@ export function FieldMappingStep({
             onChange={handleChange}
             onChipAccept={handleChipAccept}
             onCustomKeyChange={handleCustomKeyChange}
+            onSplitToggle={handleSplitToggle}
           />
         );
       })}

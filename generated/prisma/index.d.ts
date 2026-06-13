@@ -198,6 +198,11 @@ export type ImportMappingSuggestionFeedback = $Result.DefaultSelection<Prisma.$I
  * 
  */
 export type ImportMappingPreset = $Result.DefaultSelection<Prisma.$ImportMappingPresetPayload>
+/**
+ * Model ExportPreset
+ * 
+ */
+export type ExportPreset = $Result.DefaultSelection<Prisma.$ExportPresetPayload>
 
 /**
  * Enums
@@ -1191,6 +1196,16 @@ export class PrismaClient<
     * ```
     */
   get importMappingPreset(): Prisma.ImportMappingPresetDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.exportPreset`: Exposes CRUD operations for the **ExportPreset** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ExportPresets
+    * const exportPresets = await prisma.exportPreset.findMany()
+    * ```
+    */
+  get exportPreset(): Prisma.ExportPresetDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1668,7 +1683,8 @@ export namespace Prisma {
     FailedLoginAttempt: 'FailedLoginAttempt',
     BirthdayReminderState: 'BirthdayReminderState',
     ImportMappingSuggestionFeedback: 'ImportMappingSuggestionFeedback',
-    ImportMappingPreset: 'ImportMappingPreset'
+    ImportMappingPreset: 'ImportMappingPreset',
+    ExportPreset: 'ExportPreset'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1687,7 +1703,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset"
+      modelProps: "user" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset" | "exportPreset"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -4429,6 +4445,80 @@ export namespace Prisma {
           }
         }
       }
+      ExportPreset: {
+        payload: Prisma.$ExportPresetPayload<ExtArgs>
+        fields: Prisma.ExportPresetFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ExportPresetFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExportPresetPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ExportPresetFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExportPresetPayload>
+          }
+          findFirst: {
+            args: Prisma.ExportPresetFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExportPresetPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ExportPresetFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExportPresetPayload>
+          }
+          findMany: {
+            args: Prisma.ExportPresetFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExportPresetPayload>[]
+          }
+          create: {
+            args: Prisma.ExportPresetCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExportPresetPayload>
+          }
+          createMany: {
+            args: Prisma.ExportPresetCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ExportPresetCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExportPresetPayload>[]
+          }
+          delete: {
+            args: Prisma.ExportPresetDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExportPresetPayload>
+          }
+          update: {
+            args: Prisma.ExportPresetUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExportPresetPayload>
+          }
+          deleteMany: {
+            args: Prisma.ExportPresetDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ExportPresetUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ExportPresetUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExportPresetPayload>[]
+          }
+          upsert: {
+            args: Prisma.ExportPresetUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ExportPresetPayload>
+          }
+          aggregate: {
+            args: Prisma.ExportPresetAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateExportPreset>
+          }
+          groupBy: {
+            args: Prisma.ExportPresetGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ExportPresetGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ExportPresetCountArgs<ExtArgs>
+            result: $Utils.Optional<ExportPresetCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -4562,6 +4652,7 @@ export namespace Prisma {
     birthdayReminderState?: BirthdayReminderStateOmit
     importMappingSuggestionFeedback?: ImportMappingSuggestionFeedbackOmit
     importMappingPreset?: ImportMappingPresetOmit
+    exportPreset?: ExportPresetOmit
   }
 
   /* Types for Logging */
@@ -4666,6 +4757,7 @@ export namespace Prisma {
     birthdayReminderStates: number
     importMappingSuggestionFeedbacks: number
     importMappingPresets: number
+    exportPresets: number
     failedLoginAttempts: number
   }
 
@@ -4694,6 +4786,7 @@ export namespace Prisma {
     birthdayReminderStates?: boolean | UserCountOutputTypeCountBirthdayReminderStatesArgs
     importMappingSuggestionFeedbacks?: boolean | UserCountOutputTypeCountImportMappingSuggestionFeedbacksArgs
     importMappingPresets?: boolean | UserCountOutputTypeCountImportMappingPresetsArgs
+    exportPresets?: boolean | UserCountOutputTypeCountExportPresetsArgs
     failedLoginAttempts?: boolean | UserCountOutputTypeCountFailedLoginAttemptsArgs
   }
 
@@ -4874,6 +4967,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountImportMappingPresetsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ImportMappingPresetWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountExportPresetsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ExportPresetWhereInput
   }
 
   /**
@@ -5758,6 +5858,7 @@ export namespace Prisma {
     birthdayReminderStates?: boolean | User$birthdayReminderStatesArgs<ExtArgs>
     importMappingSuggestionFeedbacks?: boolean | User$importMappingSuggestionFeedbacksArgs<ExtArgs>
     importMappingPresets?: boolean | User$importMappingPresetsArgs<ExtArgs>
+    exportPresets?: boolean | User$exportPresetsArgs<ExtArgs>
     failedLoginAttempts?: boolean | User$failedLoginAttemptsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
@@ -5868,6 +5969,7 @@ export namespace Prisma {
     birthdayReminderStates?: boolean | User$birthdayReminderStatesArgs<ExtArgs>
     importMappingSuggestionFeedbacks?: boolean | User$importMappingSuggestionFeedbacksArgs<ExtArgs>
     importMappingPresets?: boolean | User$importMappingPresetsArgs<ExtArgs>
+    exportPresets?: boolean | User$exportPresetsArgs<ExtArgs>
     failedLoginAttempts?: boolean | User$failedLoginAttemptsArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
@@ -5903,6 +6005,7 @@ export namespace Prisma {
       birthdayReminderStates: Prisma.$BirthdayReminderStatePayload<ExtArgs>[]
       importMappingSuggestionFeedbacks: Prisma.$ImportMappingSuggestionFeedbackPayload<ExtArgs>[]
       importMappingPresets: Prisma.$ImportMappingPresetPayload<ExtArgs>[]
+      exportPresets: Prisma.$ExportPresetPayload<ExtArgs>[]
       failedLoginAttempts: Prisma.$FailedLoginAttemptPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
@@ -6349,6 +6452,7 @@ export namespace Prisma {
     birthdayReminderStates<T extends User$birthdayReminderStatesArgs<ExtArgs> = {}>(args?: Subset<T, User$birthdayReminderStatesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BirthdayReminderStatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     importMappingSuggestionFeedbacks<T extends User$importMappingSuggestionFeedbacksArgs<ExtArgs> = {}>(args?: Subset<T, User$importMappingSuggestionFeedbacksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ImportMappingSuggestionFeedbackPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     importMappingPresets<T extends User$importMappingPresetsArgs<ExtArgs> = {}>(args?: Subset<T, User$importMappingPresetsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ImportMappingPresetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    exportPresets<T extends User$exportPresetsArgs<ExtArgs> = {}>(args?: Subset<T, User$exportPresetsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExportPresetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     failedLoginAttempts<T extends User$failedLoginAttemptsArgs<ExtArgs> = {}>(args?: Subset<T, User$failedLoginAttemptsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FailedLoginAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -7401,6 +7505,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ImportMappingPresetScalarFieldEnum | ImportMappingPresetScalarFieldEnum[]
+  }
+
+  /**
+   * User.exportPresets
+   */
+  export type User$exportPresetsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExportPreset
+     */
+    select?: ExportPresetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExportPreset
+     */
+    omit?: ExportPresetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExportPresetInclude<ExtArgs> | null
+    where?: ExportPresetWhereInput
+    orderBy?: ExportPresetOrderByWithRelationInput | ExportPresetOrderByWithRelationInput[]
+    cursor?: ExportPresetWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ExportPresetScalarFieldEnum | ExportPresetScalarFieldEnum[]
   }
 
   /**
@@ -50578,6 +50706,1073 @@ export namespace Prisma {
 
 
   /**
+   * Model ExportPreset
+   */
+
+  export type AggregateExportPreset = {
+    _count: ExportPresetCountAggregateOutputType | null
+    _min: ExportPresetMinAggregateOutputType | null
+    _max: ExportPresetMaxAggregateOutputType | null
+  }
+
+  export type ExportPresetMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    name: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ExportPresetMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    name: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type ExportPresetCountAggregateOutputType = {
+    id: number
+    userId: number
+    name: number
+    fieldSelection: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type ExportPresetMinAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ExportPresetMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type ExportPresetCountAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    fieldSelection?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type ExportPresetAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ExportPreset to aggregate.
+     */
+    where?: ExportPresetWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ExportPresets to fetch.
+     */
+    orderBy?: ExportPresetOrderByWithRelationInput | ExportPresetOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ExportPresetWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ExportPresets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ExportPresets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ExportPresets
+    **/
+    _count?: true | ExportPresetCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ExportPresetMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ExportPresetMaxAggregateInputType
+  }
+
+  export type GetExportPresetAggregateType<T extends ExportPresetAggregateArgs> = {
+        [P in keyof T & keyof AggregateExportPreset]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateExportPreset[P]>
+      : GetScalarType<T[P], AggregateExportPreset[P]>
+  }
+
+
+
+
+  export type ExportPresetGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ExportPresetWhereInput
+    orderBy?: ExportPresetOrderByWithAggregationInput | ExportPresetOrderByWithAggregationInput[]
+    by: ExportPresetScalarFieldEnum[] | ExportPresetScalarFieldEnum
+    having?: ExportPresetScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ExportPresetCountAggregateInputType | true
+    _min?: ExportPresetMinAggregateInputType
+    _max?: ExportPresetMaxAggregateInputType
+  }
+
+  export type ExportPresetGroupByOutputType = {
+    id: string
+    userId: string
+    name: string
+    fieldSelection: JsonValue
+    createdAt: Date
+    updatedAt: Date
+    _count: ExportPresetCountAggregateOutputType | null
+    _min: ExportPresetMinAggregateOutputType | null
+    _max: ExportPresetMaxAggregateOutputType | null
+  }
+
+  type GetExportPresetGroupByPayload<T extends ExportPresetGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ExportPresetGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ExportPresetGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ExportPresetGroupByOutputType[P]>
+            : GetScalarType<T[P], ExportPresetGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ExportPresetSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    fieldSelection?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["exportPreset"]>
+
+  export type ExportPresetSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    fieldSelection?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["exportPreset"]>
+
+  export type ExportPresetSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    fieldSelection?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["exportPreset"]>
+
+  export type ExportPresetSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    fieldSelection?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type ExportPresetOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "name" | "fieldSelection" | "createdAt" | "updatedAt", ExtArgs["result"]["exportPreset"]>
+  export type ExportPresetInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type ExportPresetIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type ExportPresetIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $ExportPresetPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ExportPreset"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      name: string
+      fieldSelection: Prisma.JsonValue
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["exportPreset"]>
+    composites: {}
+  }
+
+  type ExportPresetGetPayload<S extends boolean | null | undefined | ExportPresetDefaultArgs> = $Result.GetResult<Prisma.$ExportPresetPayload, S>
+
+  type ExportPresetCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ExportPresetFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ExportPresetCountAggregateInputType | true
+    }
+
+  export interface ExportPresetDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ExportPreset'], meta: { name: 'ExportPreset' } }
+    /**
+     * Find zero or one ExportPreset that matches the filter.
+     * @param {ExportPresetFindUniqueArgs} args - Arguments to find a ExportPreset
+     * @example
+     * // Get one ExportPreset
+     * const exportPreset = await prisma.exportPreset.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ExportPresetFindUniqueArgs>(args: SelectSubset<T, ExportPresetFindUniqueArgs<ExtArgs>>): Prisma__ExportPresetClient<$Result.GetResult<Prisma.$ExportPresetPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ExportPreset that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ExportPresetFindUniqueOrThrowArgs} args - Arguments to find a ExportPreset
+     * @example
+     * // Get one ExportPreset
+     * const exportPreset = await prisma.exportPreset.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ExportPresetFindUniqueOrThrowArgs>(args: SelectSubset<T, ExportPresetFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ExportPresetClient<$Result.GetResult<Prisma.$ExportPresetPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ExportPreset that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExportPresetFindFirstArgs} args - Arguments to find a ExportPreset
+     * @example
+     * // Get one ExportPreset
+     * const exportPreset = await prisma.exportPreset.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ExportPresetFindFirstArgs>(args?: SelectSubset<T, ExportPresetFindFirstArgs<ExtArgs>>): Prisma__ExportPresetClient<$Result.GetResult<Prisma.$ExportPresetPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ExportPreset that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExportPresetFindFirstOrThrowArgs} args - Arguments to find a ExportPreset
+     * @example
+     * // Get one ExportPreset
+     * const exportPreset = await prisma.exportPreset.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ExportPresetFindFirstOrThrowArgs>(args?: SelectSubset<T, ExportPresetFindFirstOrThrowArgs<ExtArgs>>): Prisma__ExportPresetClient<$Result.GetResult<Prisma.$ExportPresetPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ExportPresets that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExportPresetFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ExportPresets
+     * const exportPresets = await prisma.exportPreset.findMany()
+     * 
+     * // Get first 10 ExportPresets
+     * const exportPresets = await prisma.exportPreset.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const exportPresetWithIdOnly = await prisma.exportPreset.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ExportPresetFindManyArgs>(args?: SelectSubset<T, ExportPresetFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExportPresetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ExportPreset.
+     * @param {ExportPresetCreateArgs} args - Arguments to create a ExportPreset.
+     * @example
+     * // Create one ExportPreset
+     * const ExportPreset = await prisma.exportPreset.create({
+     *   data: {
+     *     // ... data to create a ExportPreset
+     *   }
+     * })
+     * 
+     */
+    create<T extends ExportPresetCreateArgs>(args: SelectSubset<T, ExportPresetCreateArgs<ExtArgs>>): Prisma__ExportPresetClient<$Result.GetResult<Prisma.$ExportPresetPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ExportPresets.
+     * @param {ExportPresetCreateManyArgs} args - Arguments to create many ExportPresets.
+     * @example
+     * // Create many ExportPresets
+     * const exportPreset = await prisma.exportPreset.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ExportPresetCreateManyArgs>(args?: SelectSubset<T, ExportPresetCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ExportPresets and returns the data saved in the database.
+     * @param {ExportPresetCreateManyAndReturnArgs} args - Arguments to create many ExportPresets.
+     * @example
+     * // Create many ExportPresets
+     * const exportPreset = await prisma.exportPreset.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ExportPresets and only return the `id`
+     * const exportPresetWithIdOnly = await prisma.exportPreset.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ExportPresetCreateManyAndReturnArgs>(args?: SelectSubset<T, ExportPresetCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExportPresetPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ExportPreset.
+     * @param {ExportPresetDeleteArgs} args - Arguments to delete one ExportPreset.
+     * @example
+     * // Delete one ExportPreset
+     * const ExportPreset = await prisma.exportPreset.delete({
+     *   where: {
+     *     // ... filter to delete one ExportPreset
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ExportPresetDeleteArgs>(args: SelectSubset<T, ExportPresetDeleteArgs<ExtArgs>>): Prisma__ExportPresetClient<$Result.GetResult<Prisma.$ExportPresetPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ExportPreset.
+     * @param {ExportPresetUpdateArgs} args - Arguments to update one ExportPreset.
+     * @example
+     * // Update one ExportPreset
+     * const exportPreset = await prisma.exportPreset.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ExportPresetUpdateArgs>(args: SelectSubset<T, ExportPresetUpdateArgs<ExtArgs>>): Prisma__ExportPresetClient<$Result.GetResult<Prisma.$ExportPresetPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ExportPresets.
+     * @param {ExportPresetDeleteManyArgs} args - Arguments to filter ExportPresets to delete.
+     * @example
+     * // Delete a few ExportPresets
+     * const { count } = await prisma.exportPreset.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ExportPresetDeleteManyArgs>(args?: SelectSubset<T, ExportPresetDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ExportPresets.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExportPresetUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ExportPresets
+     * const exportPreset = await prisma.exportPreset.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ExportPresetUpdateManyArgs>(args: SelectSubset<T, ExportPresetUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ExportPresets and returns the data updated in the database.
+     * @param {ExportPresetUpdateManyAndReturnArgs} args - Arguments to update many ExportPresets.
+     * @example
+     * // Update many ExportPresets
+     * const exportPreset = await prisma.exportPreset.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ExportPresets and only return the `id`
+     * const exportPresetWithIdOnly = await prisma.exportPreset.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ExportPresetUpdateManyAndReturnArgs>(args: SelectSubset<T, ExportPresetUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExportPresetPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ExportPreset.
+     * @param {ExportPresetUpsertArgs} args - Arguments to update or create a ExportPreset.
+     * @example
+     * // Update or create a ExportPreset
+     * const exportPreset = await prisma.exportPreset.upsert({
+     *   create: {
+     *     // ... data to create a ExportPreset
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ExportPreset we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ExportPresetUpsertArgs>(args: SelectSubset<T, ExportPresetUpsertArgs<ExtArgs>>): Prisma__ExportPresetClient<$Result.GetResult<Prisma.$ExportPresetPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ExportPresets.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExportPresetCountArgs} args - Arguments to filter ExportPresets to count.
+     * @example
+     * // Count the number of ExportPresets
+     * const count = await prisma.exportPreset.count({
+     *   where: {
+     *     // ... the filter for the ExportPresets we want to count
+     *   }
+     * })
+    **/
+    count<T extends ExportPresetCountArgs>(
+      args?: Subset<T, ExportPresetCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ExportPresetCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ExportPreset.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExportPresetAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ExportPresetAggregateArgs>(args: Subset<T, ExportPresetAggregateArgs>): Prisma.PrismaPromise<GetExportPresetAggregateType<T>>
+
+    /**
+     * Group by ExportPreset.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ExportPresetGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ExportPresetGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ExportPresetGroupByArgs['orderBy'] }
+        : { orderBy?: ExportPresetGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ExportPresetGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetExportPresetGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ExportPreset model
+   */
+  readonly fields: ExportPresetFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ExportPreset.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ExportPresetClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ExportPreset model
+   */
+  interface ExportPresetFieldRefs {
+    readonly id: FieldRef<"ExportPreset", 'String'>
+    readonly userId: FieldRef<"ExportPreset", 'String'>
+    readonly name: FieldRef<"ExportPreset", 'String'>
+    readonly fieldSelection: FieldRef<"ExportPreset", 'Json'>
+    readonly createdAt: FieldRef<"ExportPreset", 'DateTime'>
+    readonly updatedAt: FieldRef<"ExportPreset", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ExportPreset findUnique
+   */
+  export type ExportPresetFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExportPreset
+     */
+    select?: ExportPresetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExportPreset
+     */
+    omit?: ExportPresetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExportPresetInclude<ExtArgs> | null
+    /**
+     * Filter, which ExportPreset to fetch.
+     */
+    where: ExportPresetWhereUniqueInput
+  }
+
+  /**
+   * ExportPreset findUniqueOrThrow
+   */
+  export type ExportPresetFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExportPreset
+     */
+    select?: ExportPresetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExportPreset
+     */
+    omit?: ExportPresetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExportPresetInclude<ExtArgs> | null
+    /**
+     * Filter, which ExportPreset to fetch.
+     */
+    where: ExportPresetWhereUniqueInput
+  }
+
+  /**
+   * ExportPreset findFirst
+   */
+  export type ExportPresetFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExportPreset
+     */
+    select?: ExportPresetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExportPreset
+     */
+    omit?: ExportPresetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExportPresetInclude<ExtArgs> | null
+    /**
+     * Filter, which ExportPreset to fetch.
+     */
+    where?: ExportPresetWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ExportPresets to fetch.
+     */
+    orderBy?: ExportPresetOrderByWithRelationInput | ExportPresetOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ExportPresets.
+     */
+    cursor?: ExportPresetWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ExportPresets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ExportPresets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ExportPresets.
+     */
+    distinct?: ExportPresetScalarFieldEnum | ExportPresetScalarFieldEnum[]
+  }
+
+  /**
+   * ExportPreset findFirstOrThrow
+   */
+  export type ExportPresetFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExportPreset
+     */
+    select?: ExportPresetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExportPreset
+     */
+    omit?: ExportPresetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExportPresetInclude<ExtArgs> | null
+    /**
+     * Filter, which ExportPreset to fetch.
+     */
+    where?: ExportPresetWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ExportPresets to fetch.
+     */
+    orderBy?: ExportPresetOrderByWithRelationInput | ExportPresetOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ExportPresets.
+     */
+    cursor?: ExportPresetWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ExportPresets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ExportPresets.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ExportPresets.
+     */
+    distinct?: ExportPresetScalarFieldEnum | ExportPresetScalarFieldEnum[]
+  }
+
+  /**
+   * ExportPreset findMany
+   */
+  export type ExportPresetFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExportPreset
+     */
+    select?: ExportPresetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExportPreset
+     */
+    omit?: ExportPresetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExportPresetInclude<ExtArgs> | null
+    /**
+     * Filter, which ExportPresets to fetch.
+     */
+    where?: ExportPresetWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ExportPresets to fetch.
+     */
+    orderBy?: ExportPresetOrderByWithRelationInput | ExportPresetOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ExportPresets.
+     */
+    cursor?: ExportPresetWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ExportPresets from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ExportPresets.
+     */
+    skip?: number
+    distinct?: ExportPresetScalarFieldEnum | ExportPresetScalarFieldEnum[]
+  }
+
+  /**
+   * ExportPreset create
+   */
+  export type ExportPresetCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExportPreset
+     */
+    select?: ExportPresetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExportPreset
+     */
+    omit?: ExportPresetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExportPresetInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ExportPreset.
+     */
+    data: XOR<ExportPresetCreateInput, ExportPresetUncheckedCreateInput>
+  }
+
+  /**
+   * ExportPreset createMany
+   */
+  export type ExportPresetCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ExportPresets.
+     */
+    data: ExportPresetCreateManyInput | ExportPresetCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ExportPreset createManyAndReturn
+   */
+  export type ExportPresetCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExportPreset
+     */
+    select?: ExportPresetSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExportPreset
+     */
+    omit?: ExportPresetOmit<ExtArgs> | null
+    /**
+     * The data used to create many ExportPresets.
+     */
+    data: ExportPresetCreateManyInput | ExportPresetCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExportPresetIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ExportPreset update
+   */
+  export type ExportPresetUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExportPreset
+     */
+    select?: ExportPresetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExportPreset
+     */
+    omit?: ExportPresetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExportPresetInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ExportPreset.
+     */
+    data: XOR<ExportPresetUpdateInput, ExportPresetUncheckedUpdateInput>
+    /**
+     * Choose, which ExportPreset to update.
+     */
+    where: ExportPresetWhereUniqueInput
+  }
+
+  /**
+   * ExportPreset updateMany
+   */
+  export type ExportPresetUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ExportPresets.
+     */
+    data: XOR<ExportPresetUpdateManyMutationInput, ExportPresetUncheckedUpdateManyInput>
+    /**
+     * Filter which ExportPresets to update
+     */
+    where?: ExportPresetWhereInput
+    /**
+     * Limit how many ExportPresets to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ExportPreset updateManyAndReturn
+   */
+  export type ExportPresetUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExportPreset
+     */
+    select?: ExportPresetSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExportPreset
+     */
+    omit?: ExportPresetOmit<ExtArgs> | null
+    /**
+     * The data used to update ExportPresets.
+     */
+    data: XOR<ExportPresetUpdateManyMutationInput, ExportPresetUncheckedUpdateManyInput>
+    /**
+     * Filter which ExportPresets to update
+     */
+    where?: ExportPresetWhereInput
+    /**
+     * Limit how many ExportPresets to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExportPresetIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ExportPreset upsert
+   */
+  export type ExportPresetUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExportPreset
+     */
+    select?: ExportPresetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExportPreset
+     */
+    omit?: ExportPresetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExportPresetInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ExportPreset to update in case it exists.
+     */
+    where: ExportPresetWhereUniqueInput
+    /**
+     * In case the ExportPreset found by the `where` argument doesn't exist, create a new ExportPreset with this data.
+     */
+    create: XOR<ExportPresetCreateInput, ExportPresetUncheckedCreateInput>
+    /**
+     * In case the ExportPreset was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ExportPresetUpdateInput, ExportPresetUncheckedUpdateInput>
+  }
+
+  /**
+   * ExportPreset delete
+   */
+  export type ExportPresetDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExportPreset
+     */
+    select?: ExportPresetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExportPreset
+     */
+    omit?: ExportPresetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExportPresetInclude<ExtArgs> | null
+    /**
+     * Filter which ExportPreset to delete.
+     */
+    where: ExportPresetWhereUniqueInput
+  }
+
+  /**
+   * ExportPreset deleteMany
+   */
+  export type ExportPresetDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ExportPresets to delete
+     */
+    where?: ExportPresetWhereInput
+    /**
+     * Limit how many ExportPresets to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ExportPreset without action
+   */
+  export type ExportPresetDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ExportPreset
+     */
+    select?: ExportPresetSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ExportPreset
+     */
+    omit?: ExportPresetOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ExportPresetInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -51288,6 +52483,18 @@ export namespace Prisma {
   export type ImportMappingPresetScalarFieldEnum = (typeof ImportMappingPresetScalarFieldEnum)[keyof typeof ImportMappingPresetScalarFieldEnum]
 
 
+  export const ExportPresetScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    name: 'name',
+    fieldSelection: 'fieldSelection',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type ExportPresetScalarFieldEnum = (typeof ExportPresetScalarFieldEnum)[keyof typeof ExportPresetScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -51978,6 +53185,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateListRelationFilter
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackListRelationFilter
     importMappingPresets?: ImportMappingPresetListRelationFilter
+    exportPresets?: ExportPresetListRelationFilter
     failedLoginAttempts?: FailedLoginAttemptListRelationFilter
   }
 
@@ -52031,6 +53239,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateOrderByRelationAggregateInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackOrderByRelationAggregateInput
     importMappingPresets?: ImportMappingPresetOrderByRelationAggregateInput
+    exportPresets?: ExportPresetOrderByRelationAggregateInput
     failedLoginAttempts?: FailedLoginAttemptOrderByRelationAggregateInput
   }
 
@@ -52087,6 +53296,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateListRelationFilter
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackListRelationFilter
     importMappingPresets?: ImportMappingPresetListRelationFilter
+    exportPresets?: ExportPresetListRelationFilter
     failedLoginAttempts?: FailedLoginAttemptListRelationFilter
   }, "id" | "email">
 
@@ -55674,6 +56884,66 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"ImportMappingPreset"> | Date | string
   }
 
+  export type ExportPresetWhereInput = {
+    AND?: ExportPresetWhereInput | ExportPresetWhereInput[]
+    OR?: ExportPresetWhereInput[]
+    NOT?: ExportPresetWhereInput | ExportPresetWhereInput[]
+    id?: StringFilter<"ExportPreset"> | string
+    userId?: StringFilter<"ExportPreset"> | string
+    name?: StringFilter<"ExportPreset"> | string
+    fieldSelection?: JsonFilter<"ExportPreset">
+    createdAt?: DateTimeFilter<"ExportPreset"> | Date | string
+    updatedAt?: DateTimeFilter<"ExportPreset"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type ExportPresetOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    fieldSelection?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type ExportPresetWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: ExportPresetWhereInput | ExportPresetWhereInput[]
+    OR?: ExportPresetWhereInput[]
+    NOT?: ExportPresetWhereInput | ExportPresetWhereInput[]
+    userId?: StringFilter<"ExportPreset"> | string
+    name?: StringFilter<"ExportPreset"> | string
+    fieldSelection?: JsonFilter<"ExportPreset">
+    createdAt?: DateTimeFilter<"ExportPreset"> | Date | string
+    updatedAt?: DateTimeFilter<"ExportPreset"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type ExportPresetOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    fieldSelection?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: ExportPresetCountOrderByAggregateInput
+    _max?: ExportPresetMaxOrderByAggregateInput
+    _min?: ExportPresetMinOrderByAggregateInput
+  }
+
+  export type ExportPresetScalarWhereWithAggregatesInput = {
+    AND?: ExportPresetScalarWhereWithAggregatesInput | ExportPresetScalarWhereWithAggregatesInput[]
+    OR?: ExportPresetScalarWhereWithAggregatesInput[]
+    NOT?: ExportPresetScalarWhereWithAggregatesInput | ExportPresetScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ExportPreset"> | string
+    userId?: StringWithAggregatesFilter<"ExportPreset"> | string
+    name?: StringWithAggregatesFilter<"ExportPreset"> | string
+    fieldSelection?: JsonWithAggregatesFilter<"ExportPreset">
+    createdAt?: DateTimeWithAggregatesFilter<"ExportPreset"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"ExportPreset"> | Date | string
+  }
+
   export type UserCreateInput = {
     id?: string
     name?: string | null
@@ -55724,6 +56994,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -55777,6 +57048,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -55830,6 +57102,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -55883,6 +57156,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -59941,6 +61215,68 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type ExportPresetCreateInput = {
+    id?: string
+    name: string
+    fieldSelection: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutExportPresetsInput
+  }
+
+  export type ExportPresetUncheckedCreateInput = {
+    id?: string
+    userId: string
+    name: string
+    fieldSelection: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ExportPresetUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    fieldSelection?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutExportPresetsNestedInput
+  }
+
+  export type ExportPresetUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    fieldSelection?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ExportPresetCreateManyInput = {
+    id?: string
+    userId: string
+    name: string
+    fieldSelection: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ExportPresetUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    fieldSelection?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ExportPresetUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    fieldSelection?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -60178,6 +61514,12 @@ export namespace Prisma {
     none?: ImportMappingPresetWhereInput
   }
 
+  export type ExportPresetListRelationFilter = {
+    every?: ExportPresetWhereInput
+    some?: ExportPresetWhereInput
+    none?: ExportPresetWhereInput
+  }
+
   export type FailedLoginAttemptListRelationFilter = {
     every?: FailedLoginAttemptWhereInput
     some?: FailedLoginAttemptWhereInput
@@ -60278,6 +61620,10 @@ export namespace Prisma {
   }
 
   export type ImportMappingPresetOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ExportPresetOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -63194,6 +64540,31 @@ export namespace Prisma {
     usageCount?: SortOrder
   }
 
+  export type ExportPresetCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    fieldSelection?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ExportPresetMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type ExportPresetMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
   export type AppPasswordCreateNestedManyWithoutUserInput = {
     create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
@@ -63372,6 +64743,13 @@ export namespace Prisma {
     connectOrCreate?: ImportMappingPresetCreateOrConnectWithoutUserInput | ImportMappingPresetCreateOrConnectWithoutUserInput[]
     createMany?: ImportMappingPresetCreateManyUserInputEnvelope
     connect?: ImportMappingPresetWhereUniqueInput | ImportMappingPresetWhereUniqueInput[]
+  }
+
+  export type ExportPresetCreateNestedManyWithoutUserInput = {
+    create?: XOR<ExportPresetCreateWithoutUserInput, ExportPresetUncheckedCreateWithoutUserInput> | ExportPresetCreateWithoutUserInput[] | ExportPresetUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ExportPresetCreateOrConnectWithoutUserInput | ExportPresetCreateOrConnectWithoutUserInput[]
+    createMany?: ExportPresetCreateManyUserInputEnvelope
+    connect?: ExportPresetWhereUniqueInput | ExportPresetWhereUniqueInput[]
   }
 
   export type FailedLoginAttemptCreateNestedManyWithoutUserInput = {
@@ -63559,6 +64937,13 @@ export namespace Prisma {
     connectOrCreate?: ImportMappingPresetCreateOrConnectWithoutUserInput | ImportMappingPresetCreateOrConnectWithoutUserInput[]
     createMany?: ImportMappingPresetCreateManyUserInputEnvelope
     connect?: ImportMappingPresetWhereUniqueInput | ImportMappingPresetWhereUniqueInput[]
+  }
+
+  export type ExportPresetUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<ExportPresetCreateWithoutUserInput, ExportPresetUncheckedCreateWithoutUserInput> | ExportPresetCreateWithoutUserInput[] | ExportPresetUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ExportPresetCreateOrConnectWithoutUserInput | ExportPresetCreateOrConnectWithoutUserInput[]
+    createMany?: ExportPresetCreateManyUserInputEnvelope
+    connect?: ExportPresetWhereUniqueInput | ExportPresetWhereUniqueInput[]
   }
 
   export type FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput = {
@@ -63964,6 +65349,20 @@ export namespace Prisma {
     deleteMany?: ImportMappingPresetScalarWhereInput | ImportMappingPresetScalarWhereInput[]
   }
 
+  export type ExportPresetUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ExportPresetCreateWithoutUserInput, ExportPresetUncheckedCreateWithoutUserInput> | ExportPresetCreateWithoutUserInput[] | ExportPresetUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ExportPresetCreateOrConnectWithoutUserInput | ExportPresetCreateOrConnectWithoutUserInput[]
+    upsert?: ExportPresetUpsertWithWhereUniqueWithoutUserInput | ExportPresetUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ExportPresetCreateManyUserInputEnvelope
+    set?: ExportPresetWhereUniqueInput | ExportPresetWhereUniqueInput[]
+    disconnect?: ExportPresetWhereUniqueInput | ExportPresetWhereUniqueInput[]
+    delete?: ExportPresetWhereUniqueInput | ExportPresetWhereUniqueInput[]
+    connect?: ExportPresetWhereUniqueInput | ExportPresetWhereUniqueInput[]
+    update?: ExportPresetUpdateWithWhereUniqueWithoutUserInput | ExportPresetUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ExportPresetUpdateManyWithWhereWithoutUserInput | ExportPresetUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ExportPresetScalarWhereInput | ExportPresetScalarWhereInput[]
+  }
+
   export type FailedLoginAttemptUpdateManyWithoutUserNestedInput = {
     create?: XOR<FailedLoginAttemptCreateWithoutUserInput, FailedLoginAttemptUncheckedCreateWithoutUserInput> | FailedLoginAttemptCreateWithoutUserInput[] | FailedLoginAttemptUncheckedCreateWithoutUserInput[]
     connectOrCreate?: FailedLoginAttemptCreateOrConnectWithoutUserInput | FailedLoginAttemptCreateOrConnectWithoutUserInput[]
@@ -64332,6 +65731,20 @@ export namespace Prisma {
     update?: ImportMappingPresetUpdateWithWhereUniqueWithoutUserInput | ImportMappingPresetUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: ImportMappingPresetUpdateManyWithWhereWithoutUserInput | ImportMappingPresetUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: ImportMappingPresetScalarWhereInput | ImportMappingPresetScalarWhereInput[]
+  }
+
+  export type ExportPresetUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ExportPresetCreateWithoutUserInput, ExportPresetUncheckedCreateWithoutUserInput> | ExportPresetCreateWithoutUserInput[] | ExportPresetUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ExportPresetCreateOrConnectWithoutUserInput | ExportPresetCreateOrConnectWithoutUserInput[]
+    upsert?: ExportPresetUpsertWithWhereUniqueWithoutUserInput | ExportPresetUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ExportPresetCreateManyUserInputEnvelope
+    set?: ExportPresetWhereUniqueInput | ExportPresetWhereUniqueInput[]
+    disconnect?: ExportPresetWhereUniqueInput | ExportPresetWhereUniqueInput[]
+    delete?: ExportPresetWhereUniqueInput | ExportPresetWhereUniqueInput[]
+    connect?: ExportPresetWhereUniqueInput | ExportPresetWhereUniqueInput[]
+    update?: ExportPresetUpdateWithWhereUniqueWithoutUserInput | ExportPresetUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ExportPresetUpdateManyWithWhereWithoutUserInput | ExportPresetUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ExportPresetScalarWhereInput | ExportPresetScalarWhereInput[]
   }
 
   export type FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput = {
@@ -66469,6 +67882,20 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutImportMappingPresetsInput, UserUpdateWithoutImportMappingPresetsInput>, UserUncheckedUpdateWithoutImportMappingPresetsInput>
   }
 
+  export type UserCreateNestedOneWithoutExportPresetsInput = {
+    create?: XOR<UserCreateWithoutExportPresetsInput, UserUncheckedCreateWithoutExportPresetsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutExportPresetsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutExportPresetsNestedInput = {
+    create?: XOR<UserCreateWithoutExportPresetsInput, UserUncheckedCreateWithoutExportPresetsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutExportPresetsInput
+    upsert?: UserUpsertWithoutExportPresetsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutExportPresetsInput, UserUpdateWithoutExportPresetsInput>, UserUncheckedUpdateWithoutExportPresetsInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -68448,6 +69875,32 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type ExportPresetCreateWithoutUserInput = {
+    id?: string
+    name: string
+    fieldSelection: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ExportPresetUncheckedCreateWithoutUserInput = {
+    id?: string
+    name: string
+    fieldSelection: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type ExportPresetCreateOrConnectWithoutUserInput = {
+    where: ExportPresetWhereUniqueInput
+    create: XOR<ExportPresetCreateWithoutUserInput, ExportPresetUncheckedCreateWithoutUserInput>
+  }
+
+  export type ExportPresetCreateManyUserInputEnvelope = {
+    data: ExportPresetCreateManyUserInput | ExportPresetCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type FailedLoginAttemptCreateWithoutUserInput = {
     id?: string
     ipAddress?: string | null
@@ -69381,6 +70834,34 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"ImportMappingPreset"> | Date | string
   }
 
+  export type ExportPresetUpsertWithWhereUniqueWithoutUserInput = {
+    where: ExportPresetWhereUniqueInput
+    update: XOR<ExportPresetUpdateWithoutUserInput, ExportPresetUncheckedUpdateWithoutUserInput>
+    create: XOR<ExportPresetCreateWithoutUserInput, ExportPresetUncheckedCreateWithoutUserInput>
+  }
+
+  export type ExportPresetUpdateWithWhereUniqueWithoutUserInput = {
+    where: ExportPresetWhereUniqueInput
+    data: XOR<ExportPresetUpdateWithoutUserInput, ExportPresetUncheckedUpdateWithoutUserInput>
+  }
+
+  export type ExportPresetUpdateManyWithWhereWithoutUserInput = {
+    where: ExportPresetScalarWhereInput
+    data: XOR<ExportPresetUpdateManyMutationInput, ExportPresetUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type ExportPresetScalarWhereInput = {
+    AND?: ExportPresetScalarWhereInput | ExportPresetScalarWhereInput[]
+    OR?: ExportPresetScalarWhereInput[]
+    NOT?: ExportPresetScalarWhereInput | ExportPresetScalarWhereInput[]
+    id?: StringFilter<"ExportPreset"> | string
+    userId?: StringFilter<"ExportPreset"> | string
+    name?: StringFilter<"ExportPreset"> | string
+    fieldSelection?: JsonFilter<"ExportPreset">
+    createdAt?: DateTimeFilter<"ExportPreset"> | Date | string
+    updatedAt?: DateTimeFilter<"ExportPreset"> | Date | string
+  }
+
   export type FailedLoginAttemptUpsertWithWhereUniqueWithoutUserInput = {
     where: FailedLoginAttemptWhereUniqueInput
     update: XOR<FailedLoginAttemptUpdateWithoutUserInput, FailedLoginAttemptUncheckedUpdateWithoutUserInput>
@@ -69456,6 +70937,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -69508,6 +70990,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -69630,6 +71113,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -69682,6 +71166,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -69776,6 +71261,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -69828,6 +71314,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -70619,6 +72106,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -70671,6 +72159,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -71149,6 +72638,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -71201,6 +72691,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -71349,6 +72840,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -71401,6 +72893,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -71469,6 +72962,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -71521,6 +73015,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -71654,6 +73149,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -71706,6 +73202,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -71805,6 +73302,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -71857,6 +73355,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -72057,6 +73556,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -72109,6 +73609,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -72177,6 +73678,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -72229,6 +73731,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -72297,6 +73800,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -72349,6 +73853,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -72401,6 +73906,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -72453,6 +73959,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -72813,6 +74320,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -72865,6 +74373,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -73242,6 +74751,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -73294,6 +74804,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -73411,6 +74922,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -73463,6 +74975,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -73515,6 +75028,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -73567,6 +75081,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -73841,6 +75356,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -73893,6 +75409,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -75453,6 +76970,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -75505,6 +77023,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -75573,6 +77092,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -75625,6 +77145,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -75677,6 +77198,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -75729,6 +77251,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -75797,6 +77320,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -75849,6 +77373,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -75901,6 +77426,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -75953,6 +77479,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -76021,6 +77548,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -76073,6 +77601,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -76125,6 +77654,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -76177,6 +77707,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -76245,6 +77776,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -76297,6 +77829,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -76349,6 +77882,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -76401,6 +77935,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -76596,6 +78131,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -76648,6 +78184,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -76833,6 +78370,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -76885,6 +78423,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -76953,6 +78492,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -77005,6 +78545,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -77057,6 +78598,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -77109,6 +78651,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -77356,6 +78899,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -77408,6 +78952,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -77651,6 +79196,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -77703,6 +79249,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -77812,6 +79359,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -77864,6 +79412,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -78076,6 +79625,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -78128,6 +79678,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -78328,6 +79879,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -78380,6 +79932,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -79080,6 +80633,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -79132,6 +80686,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -79316,6 +80871,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -79368,6 +80924,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -79563,6 +81120,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -79615,6 +81173,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -79811,6 +81370,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -79863,6 +81423,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -80048,6 +81609,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -80100,6 +81662,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -80197,6 +81760,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -80249,6 +81813,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -80336,6 +81901,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -80388,6 +81954,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -80492,6 +82059,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -80544,6 +82112,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -80612,6 +82181,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -80664,6 +82234,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -80732,6 +82303,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -80784,6 +82356,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -80837,6 +82410,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutFailedLoginAttemptsInput = {
@@ -80889,6 +82463,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutFailedLoginAttemptsInput = {
@@ -80957,6 +82532,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutFailedLoginAttemptsInput = {
@@ -81009,6 +82585,7 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutBirthdayReminderStatesInput = {
@@ -81060,6 +82637,7 @@ export namespace Prisma {
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -81112,6 +82690,7 @@ export namespace Prisma {
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -81307,6 +82886,7 @@ export namespace Prisma {
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -81359,6 +82939,7 @@ export namespace Prisma {
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -81544,6 +83125,7 @@ export namespace Prisma {
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -81596,6 +83178,7 @@ export namespace Prisma {
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -81664,6 +83247,7 @@ export namespace Prisma {
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -81716,6 +83300,7 @@ export namespace Prisma {
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -81768,6 +83353,7 @@ export namespace Prisma {
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -81820,6 +83406,7 @@ export namespace Prisma {
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -81888,6 +83475,7 @@ export namespace Prisma {
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -81940,6 +83528,235 @@ export namespace Prisma {
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutExportPresetsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutExportPresetsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutExportPresetsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutExportPresetsInput, UserUncheckedCreateWithoutExportPresetsInput>
+  }
+
+  export type UserUpsertWithoutExportPresetsInput = {
+    update: XOR<UserUpdateWithoutExportPresetsInput, UserUncheckedUpdateWithoutExportPresetsInput>
+    create: XOR<UserCreateWithoutExportPresetsInput, UserUncheckedCreateWithoutExportPresetsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutExportPresetsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutExportPresetsInput, UserUncheckedUpdateWithoutExportPresetsInput>
+  }
+
+  export type UserUpdateWithoutExportPresetsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutExportPresetsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -82330,6 +84147,14 @@ export namespace Prisma {
     usageCount?: number
     lastUsedAt?: Date | string
     createdAt?: Date | string
+  }
+
+  export type ExportPresetCreateManyUserInput = {
+    id?: string
+    name: string
+    fieldSelection: JsonNullValueInput | InputJsonValue
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type FailedLoginAttemptCreateManyUserInput = {
@@ -83551,6 +85376,30 @@ export namespace Prisma {
     usageCount?: IntFieldUpdateOperationsInput | number
     lastUsedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ExportPresetUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    fieldSelection?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ExportPresetUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    fieldSelection?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type ExportPresetUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    fieldSelection?: JsonNullValueInput | InputJsonValue
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type FailedLoginAttemptUpdateWithoutUserInput = {

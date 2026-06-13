@@ -530,6 +530,8 @@ export const parseCsvContacts = (
 
   // When the user has confirmed a field mapping in the UI, override profile-based detection.
   const customFieldColumns = new Map<number, string>(); // index → customFieldKey
+  const splitPhoneColumns = new Map<number, string>(); // index → delimiter
+  const splitEmailColumns = new Map<number, string>(); // index → delimiter
   if (explicitMappings && explicitMappings.length > 0) {
     fullNameIndexes = [];
     firstNameIndexes = [];
@@ -546,13 +548,19 @@ export const parseCsvContacts = (
     birthdayIndexes = [];
     addressIndexes = [];
     notesIndexes = [];
-    for (const { index, targetField, customFieldKey } of explicitMappings) {
+    for (const { index, targetField, customFieldKey, splitMultiValue, multiValueDelimiter } of explicitMappings) {
       switch (targetField) {
         case "firstName": firstNameIndexes.push(index); break;
         case "lastName": lastNameIndexes.push(index); break;
         case "fullName": fullNameIndexes.push(index); break;
-        case "email": emailIndexes.push(index); break;
-        case "phone": phoneIndexes.push(index); break;
+        case "email":
+          emailIndexes.push(index);
+          if (splitMultiValue && multiValueDelimiter) splitEmailColumns.set(index, multiValueDelimiter);
+          break;
+        case "phone":
+          phoneIndexes.push(index);
+          if (splitMultiValue && multiValueDelimiter) splitPhoneColumns.set(index, multiValueDelimiter);
+          break;
         case "company": companyIndexes.push(index); break;
         case "jobTitle": jobTitleIndexes.push(index); break;
         case "address.street":
@@ -628,6 +636,32 @@ export const parseCsvContacts = (
   }
 
   const dataRows = rows.slice(1);
+
+  const collectSplitOrRaw = (
+    row: string[],
+    indexes: number[],
+    splitMap: Map<number, string>,
+  ): string[] => {
+    const seen = new Set<string>();
+    const values: string[] = [];
+    for (const idx of indexes) {
+      const raw = getValue(row, idx);
+      if (!raw) continue;
+      const delim = splitMap.get(idx);
+      const parts = delim
+        ? extractLabeledValues(raw, delim).map((p) => p.value).filter(Boolean)
+        : [raw];
+      for (const part of parts.slice(0, 10)) {
+        const key = part.toLowerCase();
+        if (!seen.has(key)) {
+          seen.add(key);
+          values.push(part);
+        }
+      }
+    }
+    return values;
+  };
+
   const columnMappings: ColumnMapping[] = headers.map((header, index) => {
     const sampleValues = dataRows
       .slice(0, 5)
@@ -636,6 +670,7 @@ export const parseCsvContacts = (
 
     const profileField = profileFieldMap.get(index);
     if (profileField !== undefined) {
+      const mv = detectMultiValue(sampleValues, profileField);
       return {
         header,
         index,
@@ -645,6 +680,7 @@ export const parseCsvContacts = (
         source: "profile" as const,
         sampleValues,
         suggestions: [],
+        multiValue: mv,
       };
     }
 
@@ -653,6 +689,7 @@ export const parseCsvContacts = (
       classification.confidenceTier !== "HIGH"
         ? generateSuggestions(header, sampleValues, index)
         : [];
+    const mv = detectMultiValue(sampleValues, classification.field);
     return {
       header,
       index,
@@ -660,6 +697,7 @@ export const parseCsvContacts = (
       source: "classifier" as const,
       sampleValues,
       suggestions,
+      multiValue: mv,
     };
   });
 
@@ -709,10 +747,14 @@ export const parseCsvContacts = (
     const phoneticFirstName = getFirstValue(row, phoneticFirstNameIndexes);
     const phoneticLastName = getFirstValue(row, phoneticLastNameIndexes);
     const nickname = getFirstValue(row, nicknameIndexes);
-    const email = getFirstValue(row, emailIndexes)?.toLowerCase();
-    const emailAddresses = getAllValues(row, emailIndexes).map((value) => value.toLowerCase());
-    const phone = getFirstValue(row, phoneIndexes);
-    const phoneNumbers = getAllValues(row, phoneIndexes);
+    const emailValues = collectSplitOrRaw(row, emailIndexes, splitEmailColumns).map((v) =>
+      v.toLowerCase(),
+    );
+    const email = emailValues[0];
+    const emailAddresses = emailValues;
+    const phoneValues = collectSplitOrRaw(row, phoneIndexes, splitPhoneColumns);
+    const phone = phoneValues[0];
+    const phoneNumbers = phoneValues;
     const company = getFirstValue(row, companyIndexes);
     const phoneticCompany = getFirstValue(row, phoneticCompanyIndexes);
     const jobTitle = getFirstValue(row, jobTitleIndexes);
@@ -919,6 +961,120 @@ export const parseCsvContacts = (
     columnMappings,
     headerHash,
   };
+};
+
+export type ExportFieldSelection = {
+  key: string;
+  included: boolean;
+  headerOverride?: string;
+};
+
+export const EXPORT_FIELD_GROUPS: Array<{
+  group: string;
+  fields: Array<{ key: string; label: string }>;
+}> = [
+  {
+    group: "Basic",
+    fields: [
+      { key: "fullName", label: "Full name" },
+      { key: "firstName", label: "First name" },
+      { key: "lastName", label: "Last name" },
+      { key: "nickname", label: "Nickname" },
+      { key: "email", label: "Email" },
+      { key: "company", label: "Company" },
+      { key: "jobTitle", label: "Job title" },
+    ],
+  },
+  {
+    group: "Contact info",
+    fields: [
+      { key: "phone", label: "Phone" },
+      { key: "address", label: "Address" },
+      { key: "website", label: "Website" },
+    ],
+  },
+  {
+    group: "Other",
+    fields: [
+      { key: "birthday", label: "Birthday" },
+      { key: "notes", label: "Notes" },
+      { key: "phoneticFirstName", label: "Phonetic first name" },
+      { key: "phoneticLastName", label: "Phonetic last name" },
+      { key: "phoneticCompany", label: "Phonetic company" },
+      { key: "emailAddresses", label: "Additional emails" },
+      { key: "phoneNumbers", label: "Additional phones" },
+      { key: "postalAddresses", label: "Additional addresses" },
+      { key: "customFields", label: "Custom fields" },
+    ],
+  },
+];
+
+const DEFAULT_FIELD_LABELS: Record<string, string> = Object.fromEntries(
+  EXPORT_FIELD_GROUPS.flatMap((g) => g.fields.map((f) => [f.key, f.label])),
+);
+
+function extractExportValue(contact: PortableContactInput, key: string): string {
+  switch (key) {
+    case "fullName": return contact.fullName;
+    case "firstName": return contact.firstName ?? "";
+    case "lastName": return contact.lastName ?? "";
+    case "phoneticFirstName": return contact.phoneticFirstName ?? "";
+    case "phoneticLastName": return contact.phoneticLastName ?? "";
+    case "nickname": return contact.nickname ?? "";
+    case "email": return contact.email ?? "";
+    case "emailAddresses":
+      return (contact.emailAddresses ?? []).filter((e) => e !== contact.email).join(" | ");
+    case "phone": return contact.phone ?? "";
+    case "phoneNumbers":
+      return (contact.phoneNumbers ?? []).filter((p) => p !== contact.phone).join(" | ");
+    case "company": return contact.company ?? "";
+    case "phoneticCompany": return contact.phoneticCompany ?? "";
+    case "jobTitle": return contact.jobTitle ?? "";
+    case "website": return contact.website ?? "";
+    case "birthday": return contact.birthday ?? "";
+    case "address": return contact.address ?? "";
+    case "postalAddresses":
+      return (contact.postalAddresses ?? [])
+        .filter((a) => a.formatted !== contact.address)
+        .map((a) => a.formatted)
+        .join(" | ");
+    case "notes": return contact.notes ?? "";
+    default: return "";
+  }
+}
+
+export const contactsToCsvFiltered = (
+  contacts: PortableContactInput[],
+  fieldSelection: ExportFieldSelection[],
+): string => {
+  const selected = fieldSelection.filter((f) => f.included);
+
+  // Expand customFields into one column per unique key across all contacts
+  const customFieldKeys: string[] = [];
+  const customFieldsEntry = selected.find((f) => f.key === "customFields");
+  if (customFieldsEntry) {
+    const keySet = new Set<string>();
+    for (const c of contacts) {
+      if (c.customFields) for (const k of Object.keys(c.customFields)) keySet.add(k);
+    }
+    customFieldKeys.push(...keySet);
+  }
+
+  const headers = selected.flatMap((f) => {
+    if (f.key === "customFields") return customFieldKeys;
+    return [f.headerOverride?.trim() || (DEFAULT_FIELD_LABELS[f.key] ?? f.key)];
+  });
+
+  const rows = contacts.map((contact) =>
+    selected.flatMap((f) => {
+      if (f.key === "customFields") {
+        return customFieldKeys.map((k) => escapeCsv(contact.customFields?.[k] ?? ""));
+      }
+      return [escapeCsv(extractExportValue(contact, f.key))];
+    }),
+  );
+
+  return [headers.map(escapeCsv).join(","), ...rows.map((r) => r.join(","))].join("\n");
 };
 
 export const contactsToCsv = (contacts: PortableContactInput[]) => {

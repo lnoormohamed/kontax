@@ -251,6 +251,7 @@ model User {
     birthdayReminderStates              BirthdayReminderState[]
     importMappingSuggestionFeedbacks    ImportMappingSuggestionFeedback[]
     importMappingPresets                ImportMappingPreset[]
+    exportPresets                       ExportPreset[]
     // P22-11: subscribable iCal calendar token (revocable credential).
     // NOT a DB @unique constraint: the startup `prisma db push --skip-generate`
     // (Dockerfile) has no --accept-data-loss, so adding a unique index to a new
@@ -1186,4 +1187,18 @@ model ImportMappingPreset {
 
     @@unique([userId, headerHash])
     @@index([userId, lastUsedAt(sort: Desc)])
+}
+
+// P25-06: saved export field selections
+model ExportPreset {
+    id             String   @id @default(cuid())
+    userId         String
+    name           String
+    fieldSelection Json
+    createdAt      DateTime @default(now())
+    updatedAt      DateTime @updatedAt
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@index([userId, createdAt(sort: Desc)])
 }

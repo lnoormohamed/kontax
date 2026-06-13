@@ -21,6 +21,8 @@ const commitRequestSchema = z.object({
         index: z.number().int().nonnegative(),
         targetField: z.string(),
         customFieldKey: z.string().trim().max(50).optional(),
+        splitMultiValue: z.boolean().optional(),
+        multiValueDelimiter: z.string().max(10).optional(),
       }),
     )
     .optional(),

@@ -163,6 +163,55 @@ export function classifyColumn(
   return { field, confidence: bestScore, confidenceTier };
 }
 
+export const PHONE_LABEL_ALIASES: Record<string, string> = {
+  mobile: "Mobile", cell: "Mobile", cellular: "Mobile",
+  work: "Work", office: "Work", business: "Work",
+  home: "Home", personal: "Home",
+  fax: "Fax",
+};
+
+export function normalizeLabelAlias(label: string | null): string | null {
+  if (!label) return null;
+  return PHONE_LABEL_ALIASES[label.toLowerCase()] ?? label;
+}
+
+export function detectMultiValue(
+  sampleValues: string[],
+  field: KontaxField | "custom",
+): { detected: boolean; delimiter: string | null; exampleCount: number } {
+  if (field !== "phone" && field !== "email") {
+    return { detected: false, delimiter: null, exampleCount: 0 };
+  }
+  const DELIMITERS = [";", "|", "\n", " :: "];
+  for (const delimiter of DELIMITERS) {
+    const multiValueCount = sampleValues.filter(
+      (v) => v.includes(delimiter) && v.split(delimiter).length > 1,
+    ).length;
+    if (sampleValues.length > 0 && multiValueCount >= Math.ceil(sampleValues.length * 0.3)) {
+      const maxCount = Math.max(...sampleValues.map((v) => v.split(delimiter).length));
+      return { detected: true, delimiter, exampleCount: maxCount };
+    }
+  }
+  return { detected: false, delimiter: null, exampleCount: 0 };
+}
+
+export function extractLabeledValues(
+  rawValue: string,
+  delimiter: string,
+): Array<{ label: string | null; value: string }> {
+  return rawValue
+    .split(delimiter)
+    .map((part) => {
+      const trimmed = part.trim();
+      const labelMatch = trimmed.match(/^([A-Za-z\s]+):\s*(.+)$/);
+      if (labelMatch) {
+        return { label: labelMatch[1]!.trim(), value: labelMatch[2]!.trim() };
+      }
+      return { label: null, value: trimmed };
+    })
+    .filter((p) => p.value.length > 0);
+}
+
 export function generateSuggestions(
   header: string,
   sampleValues: string[],

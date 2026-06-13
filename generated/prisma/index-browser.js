@@ -707,6 +707,15 @@ exports.Prisma.ImportMappingPresetScalarFieldEnum = {
   createdAt: 'createdAt'
 };
 
+exports.Prisma.ExportPresetScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  fieldSelection: 'fieldSelection',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1021,7 +1030,8 @@ exports.Prisma.ModelName = {
   FailedLoginAttempt: 'FailedLoginAttempt',
   BirthdayReminderState: 'BirthdayReminderState',
   ImportMappingSuggestionFeedback: 'ImportMappingSuggestionFeedback',
-  ImportMappingPreset: 'ImportMappingPreset'
+  ImportMappingPreset: 'ImportMappingPreset',
+  ExportPreset: 'ExportPreset'
 };
 
 /**
