@@ -8,7 +8,6 @@ import {
   CATEGORY_OPTIONS,
   eventMeta,
   getDiffs,
-  renderValue,
   useActivityFeed,
   type ActivityEventRow,
   type FieldDiff,
@@ -27,18 +26,28 @@ import { dayGroupLabel, formatAbsoluteTime, formatRelativeTime } from "~/lib/act
 
 const DAY_ORDER = ["Today", "Yesterday", "Earlier"] as const;
 
+// Full diff value — like the shared `renderValue` but without its 80-char
+// scalar cap, so the expanded mobile diff shows the complete before/after.
+function scalar(v: unknown): string {
+  if (v === null || v === undefined) return "";
+  if (typeof v === "object") return JSON.stringify(v);
+  return typeof v === "symbol" ? v.toString() : `${v as string | number | boolean | bigint}`;
+}
+function fullValue(v: unknown): string {
+  if (v === null || v === undefined || v === "") return "—";
+  if (Array.isArray(v)) return v.length > 0 ? v.map(scalar).join(", ") : "—";
+  if (typeof v === "object") return JSON.stringify(v);
+  return scalar(v);
+}
+
 // ── compact stacked field-diff (no wide table) ───────────────────────────────
 function DiffStack({ diffs }: { diffs: FieldDiff[] }) {
   const Val = ({ raw, color }: { raw: unknown; color: string }) => {
-    const text = renderValue(raw);
+    const text = fullValue(raw);
     return text === "—" ? (
       <span className="font-sans text-[#aeb4ac]">—</span>
     ) : (
-      <span
-        className="max-w-[30ch] overflow-hidden text-ellipsis whitespace-nowrap font-mono text-[12px]"
-        style={{ color }}
-        title={text}
-      >
+      <span className="min-w-0 whitespace-pre-wrap break-words font-mono text-[12px] [overflow-wrap:anywhere]" style={{ color }}>
         {text}
       </span>
     );
