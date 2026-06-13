@@ -4,7 +4,6 @@ import {
   fetchCardDavAddressBookCards,
   fetchCardDavAddressBookIndex,
 } from "~/server/carddav";
-import { parseContactPostalAddresses, parseContactStringArray } from "~/server/contact-portability";
 import { db } from "~/server/db";
 import { emitEvent } from "~/lib/activity";
 import { createNotification } from "~/server/notifications";
@@ -17,6 +16,7 @@ import {
 } from "~/server/sync-health";
 import { decryptSyncCredentialPayload } from "~/server/sync-credentials";
 import { GoogleSyncError, runGoogleSync } from "~/server/google-sync";
+import { buildLocalConflictSnapshot } from "~/server/sync-conflict-snapshot";
 import { getEffectiveSyncAccountSettings } from "~/server/sync-settings";
 
 const createRetrySchedule = (attemptNumber: number) => {
@@ -27,52 +27,6 @@ const createRetrySchedule = (attemptNumber: number) => {
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
-
-const buildLocalConflictSnapshot = (contact: {
-  id: string;
-  syncUid: string;
-  syncVersion: number;
-  fullName: string;
-  firstName: string | null;
-  middleName: string | null;
-  lastName: string | null;
-  namePrefix: string | null;
-  nameSuffix: string | null;
-  nickname: string | null;
-  email: string | null;
-  emailAddresses: unknown;
-  phone: string | null;
-  phoneNumbers: unknown;
-  company: string | null;
-  jobTitle: string | null;
-  website: string | null;
-  birthday: string | null;
-  address: string | null;
-  postalAddresses: unknown;
-  notes: string | null;
-}) => ({
-  id: contact.id,
-  syncUid: contact.syncUid,
-  syncVersion: contact.syncVersion,
-  fullName: contact.fullName,
-  firstName: contact.firstName,
-  middleName: contact.middleName,
-  lastName: contact.lastName,
-  namePrefix: contact.namePrefix,
-  nameSuffix: contact.nameSuffix,
-  nickname: contact.nickname,
-  email: contact.email,
-  emailAddresses: parseContactStringArray(contact.emailAddresses),
-  phone: contact.phone,
-  phoneNumbers: parseContactStringArray(contact.phoneNumbers),
-  company: contact.company,
-  jobTitle: contact.jobTitle,
-  website: contact.website,
-  birthday: contact.birthday,
-  address: contact.address,
-  postalAddresses: parseContactPostalAddresses(contact.postalAddresses),
-  notes: contact.notes,
-});
 
 const buildContactWriteDataFromRemoteSnapshot = (snapshot: unknown) => {
   if (!isRecord(snapshot)) {
@@ -345,41 +299,58 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
       }
 
       try {
+        // P27-03: conflict policy drives both-changed + tombstone resolution.
+        const googleSettings = await getEffectiveSyncAccountSettings(job.syncAccountId);
         const result = await runGoogleSync({
           id: job.syncAccount.id,
           userId: job.syncAccount.userId,
           label: job.syncAccount.label,
           credentialReference: job.syncAccount.credentialReference,
           lastSyncCursor: job.syncAccount.lastSyncCursor,
+          conflictPolicy: googleSettings.conflictPolicy,
         });
         const now = new Date();
+        const hasConflicts = result.conflicts > 0;
         await db.$transaction([
           db.syncJob.update({
             where: { id: job.id },
             data: {
-              status: "SUCCEEDED",
+              status: hasConflicts ? "PARTIAL" : "SUCCEEDED",
               completedAt: now,
               leaseExpiresAt: null,
               nextRetryAt: null,
-              errorCode: null,
-              errorSummary: null,
+              errorCode: hasConflicts ? "SYNC_CONFLICTS_OPEN" : null,
+              errorSummary: hasConflicts
+                ? `${result.conflicts} sync conflicts need review before this account is fully healthy again.`
+                : null,
               createdCount: result.created,
               updatedCount: result.updated,
               deletedCount: result.deleted,
+              conflictCount: result.conflicts,
             },
           }),
           db.syncAccount.update({
             where: { id: job.syncAccountId },
             data: {
-              status: "ACTIVE",
+              status: result.queueFull ? "PAUSED" : "ACTIVE",
               lastSucceededAt: now,
-              lastErrorAt: null,
-              lastErrorCode: null,
-              lastErrorMessage: null,
+              lastSyncedAt: now,
+              lastErrorAt: result.queueFull || hasConflicts ? now : null,
+              lastErrorCode: result.queueFull
+                ? CONFLICT_QUEUE_FULL_CODE
+                : hasConflicts
+                  ? "SYNC_CONFLICTS_OPEN"
+                  : null,
+              lastErrorMessage: result.queueFull
+                ? "Sync paused — the manual conflict queue is full. Resolve conflicts to resume automatic sync."
+                : hasConflicts
+                  ? `${result.conflicts} sync conflicts need review before the account is fully healthy again.`
+                  : null,
             },
           }),
         ]);
-        summary.succeeded += 1;
+        if (hasConflicts) summary.partial += 1;
+        else summary.succeeded += 1;
       } catch (error) {
         const errorCode =
           error instanceof GoogleSyncError ? error.code : "GOOGLE_SYNC_FAILED";
