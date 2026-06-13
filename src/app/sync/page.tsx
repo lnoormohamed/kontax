@@ -341,7 +341,14 @@ export default async function SyncPage({ searchParams }: PageProps) {
         {/* Rails 2+3: account list + detail (client-managed). Desktop always
             shows it; mobile only when a connection is selected or adding. */}
         <div className={`min-w-0 flex-1 ${mobileClientActive ? "flex" : "hidden md:flex"}`}>
+          {/* Key on the deep-link target so a mobile nav (summary → connection →
+              back → Add) remounts the client with fresh view state. Next's client
+              Router Cache doesn't key /sync by searchParams, so without this the
+              stale view (e.g. the last connection's detail) is shown until a hard
+              refresh. Desktop selection is internal state (URL stays /sync), so
+              the key is stable there and the rail keeps working without remounts. */}
           <SyncPageClient
+            key={addParam ? "add" : initialAccountId ? `account-${initialAccountId}` : "summary"}
             accounts={accounts}
             initialAccountId={initialAccountId}
             initialAdd={addParam}

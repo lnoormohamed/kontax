@@ -2363,12 +2363,13 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
   const detailRef = useRef<HTMLElement>(null);
   const router = useRouter();
 
-  // Keep selection in sync with the deep-link param. On mobile the summary
-  // (MobileSyncScreen) navigates here by changing ?account; this component
-  // persists in the tree, so without this its selectedId could stay stale.
-  useEffect(() => {
-    if (initialAccountId) setSelectedId(initialAccountId);
-  }, [initialAccountId]);
+  // NB: this component is remounted whenever the deep-link target changes (the
+  // parent keys it on ?account / ?add) — Next's client Router Cache doesn't key
+  // by searchParams, so without that key the same /sync tree (and this client's
+  // view state) is reused across navigations and goes stale (e.g. tapping Add
+  // after viewing a connection re-shows that connection until a hard refresh).
+  // The remount lets the useState initializers above resolve the view from the
+  // fresh props, so no prop-sync effect is needed here.
 
   // After a gear click selects + expands settings, scroll the zone into view.
   useEffect(() => {
