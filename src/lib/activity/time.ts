@@ -14,6 +14,16 @@ export function formatRelativeTime(value: string | Date): string {
   return new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "short", year: "numeric" }).format(date);
 }
 
+// Day bucket label for grouped mobile feeds: "Today" / "Yesterday" / "Earlier".
+export function dayGroupLabel(value: string | Date): "Today" | "Yesterday" | "Earlier" {
+  const date = typeof value === "string" ? new Date(value) : value;
+  const startOf = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+  const diffDays = Math.round((startOf(new Date()) - startOf(date)) / 86_400_000);
+  if (diffDays <= 0) return "Today";
+  if (diffDays === 1) return "Yesterday";
+  return "Earlier";
+}
+
 export function formatAbsoluteTime(value: string | Date): string {
   const date = typeof value === "string" ? new Date(value) : value;
   return new Intl.DateTimeFormat("en-GB", {

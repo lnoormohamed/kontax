@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ActivityFeed, ActivityLocked } from "~/app/_components/activity-feed";
 import { ContactsWorkspaceTable } from "~/app/_components/contacts-workspace-table";
 import { BulkMergeButton, UndoMergeButton } from "~/app/_components/merge-actions";
+import { MobileActivityFeed } from "~/app/_components/mobile-activity-feed";
 import { MergeSuggestionDismissButton } from "~/app/_components/merge-suggestion-dismiss-button";
 import { MergeSuggestionRefreshButton } from "~/app/_components/merge-suggestion-refresh-button";
 import { SortMenu } from "~/app/_components/sort-menu";
@@ -534,7 +535,13 @@ export function ContactDashboard({
 
           {currentTab === "activity" ? (
             planSummary.activityEnabled ? (
-              <ActivityFeed />
+              <>
+                {/* desktop feed (unchanged); mobile renders purpose-built rows (P24B-09) */}
+                <div className="hidden md:block">
+                  <ActivityFeed />
+                </div>
+                <MobileActivityFeed />
+              </>
             ) : (
               <ActivityLocked planLabel={planSummary.planLabel} />
             )

@@ -7,9 +7,9 @@ import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { formatFieldLabel } from "~/lib/activity/field-labels";
 import { formatAbsoluteTime, formatRelativeTime } from "~/lib/activity/time";
 
-type FieldDiff = { field: string; before: unknown; after: unknown };
+export type FieldDiff = { field: string; before: unknown; after: unknown };
 
-type ActivityEventRow = {
+export type ActivityEventRow = {
   id: string;
   eventType: string;
   actor: string;
@@ -24,7 +24,7 @@ type ActivityEventRow = {
 };
 
 // ── filter options ────────────────────────────────────────────────────────────
-const CATEGORY_OPTIONS = [
+export const CATEGORY_OPTIONS = [
   { key: "all", label: "All" },
   { key: "edits", label: "Edits" },
   { key: "sync", label: "Sync" },
@@ -33,7 +33,7 @@ const CATEGORY_OPTIONS = [
   { key: "shares", label: "Shares" },
 ] as const;
 
-const ACTOR_OPTIONS = [
+export const ACTOR_OPTIONS = [
   { key: "all", label: "Anyone" },
   { key: "you", label: "You" },
   { key: "sync", label: "Sync" },
@@ -59,7 +59,7 @@ const EVENT_META: Record<string, EventMeta> = {
   SYNC_CONFLICT_DETECTED: { icon: "warning", color: "#a8741f" },
   SYNC_CONFLICT_RESOLVED: { icon: "check", color: "#17352e" },
 };
-const eventMeta = (t: string): EventMeta =>
+export const eventMeta = (t: string): EventMeta =>
   EVENT_META[t] ?? { icon: "pencil", color: "#4158f4" };
 
 // ── value rendering ───────────────────────────────────────────────────────────
@@ -69,7 +69,7 @@ const stringifyScalar = (v: unknown): string => {
   return typeof v === "symbol" ? v.toString() : `${v as string | number | boolean | bigint}`;
 };
 
-const renderValue = (v: unknown): string => {
+export const renderValue = (v: unknown): string => {
   if (v === null || v === undefined || v === "") return "—";
   if (Array.isArray(v)) return v.length > 0 ? v.map(stringifyScalar).join(", ") : "—";
   if (typeof v === "object") return JSON.stringify(v);
@@ -77,7 +77,7 @@ const renderValue = (v: unknown): string => {
   return text.length > 80 ? `${text.slice(0, 80)}…` : text;
 };
 
-const getDiffs = (payload: unknown): FieldDiff[] => {
+export const getDiffs = (payload: unknown): FieldDiff[] => {
   if (payload && typeof payload === "object" && Array.isArray((payload as { diffs?: unknown }).diffs)) {
     return (payload as { diffs: FieldDiff[] }).diffs;
   }
@@ -379,15 +379,20 @@ function EmptyState({
   );
 }
 
-// ── main feed ─────────────────────────────────────────────────────────────────
-export function ActivityFeed({ retentionDays = 90 }: { retentionDays?: number | null }) {
+// ── shared data hook ──────────────────────────────────────────────────────────
+// One data path for the desktop feed and the mobile event rows (P24B-09): cursor
+// pagination, category/actor filters, and plan-driven retention all live here so
+// the two presentational layers never diverge.
+export type ActivityFeedStatus = "idle" | "loading" | "loadingMore" | "error" | "done";
+
+export function useActivityFeed(retentionDays: number | null = 90) {
   const [events, setEvents] = useState<ActivityEventRow[]>([]);
   const [cursor, setCursor] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(false);
   const [retention, setRetention] = useState<number | null>(retentionDays);
   const [category, setCategory] = useState("all");
   const [actor, setActor] = useState("all");
-  const [status, setStatus] = useState<"idle" | "loading" | "loadingMore" | "error" | "done">("idle");
+  const [status, setStatus] = useState<ActivityFeedStatus>("idle");
 
   const load = useCallback(
     async (nextCursor: string | null, nextCategory: string, nextActor: string) => {
@@ -420,13 +425,47 @@ export function ActivityFeed({ retentionDays = 90 }: { retentionDays?: number | 
   useEffect(() => { void load(null, category, actor); }, [load, category, actor]);
 
   const filtering = category !== "all" || actor !== "all";
-
-  const handleClear = () => { setCategory("all"); setActor("all"); };
+  const clearFilters = useCallback(() => { setCategory("all"); setActor("all"); }, []);
+  const loadMore = useCallback(() => { void load(cursor, category, actor); }, [load, cursor, category, actor]);
+  const reload = useCallback(() => { void load(null, category, actor); }, [load, category, actor]);
 
   const retentionLabel =
-    retention === null
-      ? "Showing all activity"
-      : `Showing the last ${retention} days`;
+    retention === null ? "Showing all activity" : `Showing the last ${retention} days`;
+
+  return {
+    events,
+    status,
+    hasMore,
+    retention,
+    retentionLabel,
+    category,
+    actor,
+    filtering,
+    setCategory,
+    setActor,
+    clearFilters,
+    loadMore,
+    reload,
+  };
+}
+
+// ── main feed ─────────────────────────────────────────────────────────────────
+export function ActivityFeed({ retentionDays = 90 }: { retentionDays?: number | null }) {
+  const {
+    events,
+    status,
+    hasMore,
+    retention,
+    retentionLabel,
+    category,
+    actor,
+    filtering,
+    setCategory,
+    setActor,
+    clearFilters: handleClear,
+    loadMore,
+    reload,
+  } = useActivityFeed(retentionDays);
 
   return (
     <div className="flex flex-col" style={{ minHeight: 0 }}>
@@ -447,7 +486,7 @@ export function ActivityFeed({ retentionDays = 90 }: { retentionDays?: number | 
 
         {/* error (no events loaded) */}
         {status === "error" && events.length === 0 && (
-          <EmptyState kind="error" onRetry={() => void load(null, category, actor)} />
+          <EmptyState kind="error" onRetry={reload} />
         )}
 
         {/* empty */}
@@ -491,7 +530,7 @@ export function ActivityFeed({ retentionDays = 90 }: { retentionDays?: number | 
                 <button
                   className="rounded-[10px] border border-[#d8ddd6] bg-white px-[18px] py-[9px] text-[13px] font-semibold text-[#5c655e] transition hover:bg-[#f2f4f0] disabled:opacity-50"
                   disabled={status === "loadingMore"}
-                  onClick={() => void load(cursor, category, actor)}
+                  onClick={loadMore}
                   type="button"
                 >
                   {status === "loadingMore" ? "Loading…" : "Load more"}
