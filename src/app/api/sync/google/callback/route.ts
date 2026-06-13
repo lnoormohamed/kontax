@@ -3,7 +3,7 @@
 // email, stores an encrypted SyncAccount, and queues the initial import.
 import { NextResponse, type NextRequest } from "next/server";
 
-import { google } from "googleapis";
+import { people } from "@googleapis/people";
 
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
@@ -66,8 +66,8 @@ export async function GET(req: NextRequest) {
   // Resolve the connected account email for the label and detail panel.
   let googleEmail = "";
   try {
-    const people = google.people({ version: "v1", auth: client });
-    const me = await people.people.get({
+    const peopleApi = people({ version: "v1", auth: client });
+    const me = await peopleApi.people.get({
       resourceName: "people/me",
       personFields: "emailAddresses",
     });

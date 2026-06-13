@@ -5,7 +5,7 @@
 // plumbing with syncToken incremental sync + 410 fallback (P27-01), field
 // mapping + contact persistence (P27-02), and conflict detection/resolution
 // with policy enforcement + tombstone handling (P27-03).
-import { google, type people_v1 } from "googleapis";
+import { auth as googleAuth, people, type people_v1 } from "@googleapis/people";
 
 import type { ConflictPolicy, Prisma } from "../../generated/prisma";
 import { env } from "~/env";
@@ -34,11 +34,10 @@ import {
   type GoogleSyncCredentialPayload,
 } from "~/server/sync-credentials";
 
-// Use the OAuth2 client type that google.auth.OAuth2 actually produces. The
-// standalone `google-auth-library` export is a structurally-distinct duplicate
-// of the copy bundled under googleapis-common, so importing it causes type
-// mismatches when passed to google.people({ auth }).
-type GoogleOAuthClient = InstanceType<typeof google.auth.OAuth2>;
+// Use the OAuth2 client type from @googleapis/people's own auth namespace so it
+// matches what people({ auth }) expects (importing OAuth2Client from the
+// top-level google-auth-library is a structurally-distinct duplicate).
+type GoogleOAuthClient = InstanceType<typeof googleAuth.OAuth2>;
 
 // OAuth scopes: contacts (read & write) + email for the connected-account label.
 export const GOOGLE_CONTACTS_SCOPES = [
@@ -77,7 +76,7 @@ export const createGoogleOAuthClient = (): GoogleOAuthClient => {
   if (!isGoogleSyncConfigured()) {
     throw new GoogleSyncConfigError();
   }
-  return new google.auth.OAuth2(
+  return new googleAuth.OAuth2(
     env.GOOGLE_CLIENT_ID,
     env.GOOGLE_CLIENT_SECRET,
     env.GOOGLE_REDIRECT_URI,
@@ -237,7 +236,7 @@ export const googleFullImport = async (
   account: GoogleImportAccount,
 ): Promise<GoogleImportSummary> => {
   const { client } = await getGoogleClientForAccount(account);
-  const people = google.people({ version: "v1", auth: client });
+  const peopleApi = people({ version: "v1", auth: client });
 
   let pageToken: string | undefined;
   let syncToken: string | undefined;
@@ -245,7 +244,7 @@ export const googleFullImport = async (
 
   try {
     do {
-      const response = await people.people.connections.list({
+      const response = await peopleApi.people.connections.list({
         resourceName: "people/me",
         pageSize: 1000,
         personFields: GOOGLE_PERSON_FIELDS,
@@ -282,11 +281,11 @@ export const googleIncrementalSync = async (
   }
 
   const { client } = await getGoogleClientForAccount(account);
-  const people = google.people({ version: "v1", auth: client });
+  const peopleApi = people({ version: "v1", auth: client });
 
   let response: people_v1.Schema$ListConnectionsResponse;
   try {
-    const result = await people.people.connections.list({
+    const result = await peopleApi.people.connections.list({
       resourceName: "people/me",
       personFields: GOOGLE_PERSON_FIELDS,
       syncToken: account.lastSyncCursor,
@@ -353,14 +352,14 @@ export const pushGoogleContact = async (
   contact: GooglePushContact,
 ): Promise<GooglePushResult> => {
   const { client } = await getGoogleClientForAccount(account);
-  const people = google.people({ version: "v1", auth: client });
+  const peopleApi = people({ version: "v1", auth: client });
 
   const body = mapContactToGooglePerson(contact);
   // Google requires the current etag in the body for optimistic concurrency.
   body.etag = link.remoteETag ?? undefined;
 
   try {
-    const res = await people.people.updateContact({
+    const res = await peopleApi.people.updateContact({
       resourceName: link.remoteUid,
       updatePersonFields: GOOGLE_UPDATE_PERSON_FIELDS,
       requestBody: body,
@@ -382,7 +381,7 @@ export const pushGoogleContact = async (
   // Remote changed under us — fetch the latest and resolve by policy.
   let latest: people_v1.Schema$Person;
   try {
-    const got = await people.people.get({
+    const got = await peopleApi.people.get({
       resourceName: link.remoteUid,
       personFields: GOOGLE_PERSON_FIELDS,
     });
@@ -417,7 +416,7 @@ export const pushGoogleContact = async (
     // Kontax wins — retry the push with the fresh etag to overwrite remote.
     const retryBody = mapContactToGooglePerson(contact);
     retryBody.etag = latestEtag ?? undefined;
-    const res = await people.people.updateContact({
+    const res = await peopleApi.people.updateContact({
       resourceName: link.remoteUid,
       updatePersonFields: GOOGLE_UPDATE_PERSON_FIELDS,
       requestBody: retryBody,

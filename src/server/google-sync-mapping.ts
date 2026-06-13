@@ -3,7 +3,7 @@
 // Translates Google `Person` objects to the canonical Kontax contact write
 // shape used by the sync importer (mirrors CardDavContactCard's contact fields)
 // and back again for the push phase. Pure functions — no DB, no network.
-import type { people_v1 } from "googleapis";
+import type { people_v1 } from "@googleapis/people";
 
 import type { AddressEntry, MappedContact, ValueEntry } from "~/server/sync-contact-mapping";
 
