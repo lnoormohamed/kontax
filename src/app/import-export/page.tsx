@@ -75,11 +75,19 @@ export default async function ImportExportPage({ searchParams }: ImportExportPag
   const used = planSummary.importedThisMonth;
   const remaining = cap === null ? Infinity : cap - used;
   const gate: "none" | "near" | "limit" = cap === null ? "none" : remaining <= 0 ? "limit" : remaining === 1 ? "near" : "none";
+  const readOnly =
+    planSummary.lifecyclePolicy.label === "Grace" ||
+    planSummary.lifecyclePolicy.label === "Locked";
 
   const now = new Date();
   const resetDate = new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "long" }).format(
     new Date(now.getFullYear(), now.getMonth() + 1, 1),
   );
+
+  const activeTab =
+    ((Array.isArray(params?.tab) ? params?.tab[0] : params?.tab) ?? "import") === "export"
+      ? "export"
+      : "import";
 
   const userLabel = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
   const account = { name: userLabel, email: session.user.email ?? "", plan: planSummary.planLabel };
@@ -104,10 +112,38 @@ export default async function ImportExportPage({ searchParams }: ImportExportPag
             </div>
           ) : null}
 
-          <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.85fr)_minmax(0,1fr)]">
-            <ImportPreviewForm gate={gate} quota={{ used, cap: cap ?? 0, reset: resetDate }} />
+          {/* Mobile Import / Export segmented tab (hidden on xl where both columns show) */}
+          <div className="flex overflow-hidden rounded-[11px] border border-[#d8ddd6] bg-white xl:hidden">
+            <a
+              aria-current={activeTab === "import" ? "page" : undefined}
+              className={`flex h-10 flex-1 items-center justify-center text-[14px] font-semibold transition ${
+                activeTab === "import"
+                  ? "bg-[#4158f4] text-white"
+                  : "text-[#5c655e] hover:bg-[#f2f4f0]"
+              }`}
+              href="?tab=import"
+            >
+              Import
+            </a>
+            <a
+              aria-current={activeTab === "export" ? "page" : undefined}
+              className={`flex h-10 flex-1 items-center justify-center text-[14px] font-semibold transition ${
+                activeTab === "export"
+                  ? "bg-[#4158f4] text-white"
+                  : "text-[#5c655e] hover:bg-[#f2f4f0]"
+              }`}
+              href="?tab=export"
+            >
+              Export
+            </a>
+          </div>
 
-            <div className="grid content-start gap-4">
+          <div className="grid items-start gap-4 xl:grid-cols-[minmax(0,1.85fr)_minmax(0,1fr)]">
+            <div className={activeTab === "export" ? "hidden xl:block" : undefined}>
+              <ImportPreviewForm gate={gate} quota={{ used, cap: cap ?? 0, reset: resetDate }} readOnly={readOnly} />
+            </div>
+
+            <div className={`grid content-start gap-4 ${activeTab === "import" ? "hidden xl:grid" : ""}`}>
               <ExportCard hasContacts={contactsCount > 0} premiumExport={planSummary.entitlements.premiumExportEnabled} />
               <QuotaStat cap={cap} reset={resetDate} used={used} />
             </div>

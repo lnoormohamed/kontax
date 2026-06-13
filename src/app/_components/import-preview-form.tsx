@@ -101,10 +101,13 @@ function StepIndicator({ step }: { step: 1 | 2 | 3 | 4 }) {
 export function ImportPreviewForm({
   gate,
   quota,
+  readOnly = false,
 }: {
   /** Free-plan import quota gate. */
   gate: "none" | "near" | "limit";
   quota: { used: number; cap: number; reset: string };
+  /** Grace/Locked lifecycle — import disabled, show banner. */
+  readOnly?: boolean;
 }) {
   const [step, setStep] = useState<1 | 2 | 3 | 4>(1);
   const [resolvedMappings, setResolvedMappings] = useState<ResolvedMapping[]>([]);
@@ -225,9 +228,22 @@ export function ImportPreviewForm({
   const warnings = preview?.issues.filter((i) => i.severity === "warning") ?? [];
   const warnRows = new Set(warnings.map((w) => w.rowNumber));
   const limited = gate === "limit";
+  const blocked = limited || readOnly;
 
   return (
     <section className="rounded-2xl border border-[#d8ddd6] bg-white p-6 shadow-[0_1px_2px_rgba(20,30,25,0.03)]">
+      {readOnly ? (
+        <div className="mb-5 flex items-start gap-2.5 rounded-[10px] border border-[#ecd0c7] bg-[#f7e9e4] px-3.5 py-3 text-[13px]">
+          <WorkspaceIcon name="warning" size={16} strokeWidth={1.9} className="mt-px shrink-0 text-[#b5472f]" />
+          <div>
+            <span className="font-semibold text-[#7c2f1d]">Import is disabled.</span>{" "}
+            <span className="text-[#9a5240]">Your account is read-only. </span>
+            <Link className="font-semibold text-[#b5472f]" href="/settings">
+              Manage plan →
+            </Link>
+          </div>
+        </div>
+      ) : null}
       <StepIndicator step={step} />
       <div className="my-[18px] h-px bg-[#e9ece7]" />
 
@@ -253,7 +269,7 @@ export function ImportPreviewForm({
             </div>
           ) : null}
 
-          {limited ? (
+          {limited && !readOnly ? (
             <div className="grid gap-3 rounded-xl border-2 border-dashed border-[#bf8526] bg-[#f6edd9] px-5 py-6 text-center">
               <div className="text-[14px] font-medium text-[#1d2823]">
                 You&rsquo;ve used <b>{quota.used} of {quota.cap}</b> imports this month.
@@ -325,7 +341,7 @@ export function ImportPreviewForm({
             type="file"
           />
 
-          {!limited ? (
+          {!blocked ? (
             <div>
               <button
                 className="inline-flex items-center gap-1.5 text-[13.5px] font-medium text-[#5c655e]"
@@ -348,10 +364,10 @@ export function ImportPreviewForm({
             </div>
           ) : null}
 
-          {/* source format */}
-          <div className="grid gap-2.5" style={{ opacity: limited ? 0.45 : 1, pointerEvents: limited ? "none" : "auto" }}>
+          {/* source format — 2×2 on mobile, 4-col on sm+ */}
+          <div className="grid gap-2.5" style={{ opacity: blocked ? 0.45 : 1, pointerEvents: blocked ? "none" : "auto" }}>
             <div className="text-[11px] font-bold uppercase tracking-[0.1em] text-[#8b938c]">Source format</div>
-            <div className="grid grid-cols-4 gap-2.5">
+            <div className="grid grid-cols-2 gap-2.5 sm:grid-cols-4">
               {SOURCES.map((s) => {
                 const on = profile === s.id;
                 return (
@@ -375,9 +391,9 @@ export function ImportPreviewForm({
             </div>
           </div>
 
-          {!limited ? (
+          {!blocked ? (
             <button
-              className="flex h-11 items-center justify-center rounded-[10px] bg-[#4158f4] text-[14.5px] font-semibold text-white transition hover:bg-[#3347d8] disabled:cursor-not-allowed disabled:opacity-50"
+              className="flex h-11 w-full items-center justify-center rounded-[10px] bg-[#4158f4] text-[14.5px] font-semibold text-white transition hover:bg-[#3347d8] disabled:cursor-not-allowed disabled:opacity-50"
               disabled={!canContinue || busy}
               onClick={() => void goPreview()}
               type="button"
@@ -416,33 +432,59 @@ export function ImportPreviewForm({
             </div>
           </div>
 
-          <div style={{ opacity: busy ? 0.4 : 1, pointerEvents: busy ? "none" : "auto" }}>
-            <div className="grid grid-cols-[1.3fr_1.6fr_1.2fr_0.9fr] gap-x-3.5 pb-2.5 text-[11px] font-bold uppercase tracking-[0.05em] text-[#8b938c]">
-              <span>Name</span>
-              <span>Email</span>
-              <span>Phone</span>
-              <span>Company</span>
-            </div>
-            {preview.contacts.slice(0, 10).map((r) => {
-              const warn = warnRows.has(r.rowNumber);
-              return (
-                <div
-                  className="grid grid-cols-[1.3fr_1.6fr_1.2fr_0.9fr] items-center gap-x-3.5 border-b border-[#e9ece7] py-2.5 text-[14px]"
-                  key={r.rowNumber}
-                  style={warn ? { borderLeft: "3px solid #bf8526", paddingLeft: 10, marginLeft: -10 } : undefined}
-                >
-                  <span className="flex min-w-0 items-center gap-1.5 truncate font-medium text-[#1d2823]">
-                    {warn ? <WorkspaceIcon name="warning" size={14} /> : null}
-                    {r.fullName}
-                  </span>
-                  <span className="truncate text-[#5c655e]">{r.email ?? "—"}</span>
-                  <span className="truncate text-[#5c655e]">{r.phone ?? "—"}</span>
-                  <span className="truncate text-[#5c655e]">{r.company ?? "—"}</span>
-                </div>
-              );
-            })}
+          {/* Preview table: h-scrolls on mobile; Name + Email columns are sticky */}
+          <div
+            className="-mx-6 overflow-x-auto px-0"
+            style={{ opacity: busy ? 0.4 : 1, pointerEvents: busy ? "none" : "auto" }}
+          >
+            <table className="w-full min-w-[480px] border-collapse text-[13.5px]">
+              <thead>
+                <tr className="text-left text-[11px] font-bold uppercase tracking-[0.05em] text-[#8b938c]">
+                  <th className="sticky left-0 z-10 bg-white pb-2.5 pl-6 pr-3">Name</th>
+                  <th className="sticky left-[184px] z-10 bg-white pb-2.5 pr-3">Email</th>
+                  <th className="pb-2.5 pr-3">Phone</th>
+                  <th className="pb-2.5 pr-6">Company</th>
+                </tr>
+              </thead>
+              <tbody>
+                {preview.contacts.slice(0, 10).map((r) => {
+                  const warn = warnRows.has(r.rowNumber);
+                  return (
+                    <tr className="border-b border-[#e9ece7]" key={r.rowNumber}>
+                      <td
+                        className="sticky left-0 z-10 bg-white py-2.5 pl-6 pr-3 font-medium text-[#1d2823]"
+                        style={{
+                          minWidth: 160,
+                          maxWidth: 160,
+                          boxShadow: warn ? "inset 3px 0 0 #bf8526" : undefined,
+                        }}
+                      >
+                        <span className="flex items-center gap-1.5 truncate">
+                          {warn ? <WorkspaceIcon name="warning" size={13} /> : null}
+                          {r.fullName}
+                        </span>
+                      </td>
+                      <td
+                        className="sticky left-[184px] z-10 truncate bg-white py-2.5 pr-3 text-[#5c655e]"
+                        style={{ minWidth: 160, maxWidth: 160 }}
+                      >
+                        {r.email ?? "—"}
+                      </td>
+                      <td className="py-2.5 pr-3 text-[#5c655e]" style={{ minWidth: 120 }}>
+                        {r.phone ?? "—"}
+                      </td>
+                      <td className="py-2.5 pr-6 text-[#5c655e]" style={{ minWidth: 100 }}>
+                        {r.company ?? "—"}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
             {preview.contacts.length > 10 ? (
-              <div className="pt-2.5 text-[12.5px] text-[#8b938c]">Showing first 10 of {preview.contacts.length}</div>
+              <div className="px-6 pt-2.5 text-[12.5px] text-[#8b938c]">
+                Showing first 10 of {preview.contacts.length}
+              </div>
             ) : null}
           </div>
 

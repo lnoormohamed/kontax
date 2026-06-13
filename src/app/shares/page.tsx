@@ -2,6 +2,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { AppShell } from "~/app/_components/app-shell";
+import { UpsellCard } from "~/app/_components/mobile-variance";
 import { acceptLiveShare, acceptStaticShare, declineStaticShare } from "~/app/actions/shares";
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
@@ -57,6 +58,11 @@ export default async function SharesPage() {
 
   const name = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
 
+  const outboundGated =
+    !plan.entitlements.staticShareEnabled && !plan.entitlements.liveShareEnabled;
+  const readOnly =
+    plan.lifecyclePolicy.label === "Grace" || plan.lifecyclePolicy.label === "Locked";
+
   const relativeTime = (date: Date) => {
     const diff = Date.now() - date.getTime();
     const days = Math.floor(diff / 86_400_000);
@@ -77,6 +83,19 @@ export default async function SharesPage() {
         <p className="mt-1 text-sm text-[#5c655e]">
           Contacts other Kontax users have shared with you. Accept to add a copy to your account.
         </p>
+
+        {/* ── Outbound upsell (Free plan) ── */}
+        {outboundGated && (
+          <div className="mt-6">
+            <UpsellCard
+              feature="Contact sharing"
+              plan="Pro"
+              icon="people"
+              body="Share any contact with other Kontax users. They receive a live-synced copy that updates when you make changes."
+              currentPlan={plan.planLabel}
+            />
+          </div>
+        )}
 
         {/* ── Pending ── */}
         {pending.length === 0 ? (
@@ -124,26 +143,32 @@ export default async function SharesPage() {
                       ) : null}
                     </p>
                   </div>
-                  <div className="flex shrink-0 items-center gap-2">
-                    <form action={declineStaticShare}>
-                      <input name="shareId" type="hidden" value={share.id} />
-                      <button
-                        className="rounded-[0.8rem] border border-[#d8ddd6] bg-white px-3.5 py-2 text-sm font-semibold text-[#5c655e] transition hover:bg-[#f2f4f0]"
-                        type="submit"
-                      >
-                        Decline
-                      </button>
-                    </form>
-                    <form action={isLive ? acceptLiveShare : acceptStaticShare}>
-                      <input name="shareId" type="hidden" value={share.id} />
-                      <button
-                        className="rounded-[0.8rem] bg-[#17352e] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#20443b]"
-                        type="submit"
-                      >
-                        Accept
-                      </button>
-                    </form>
-                  </div>
+                  {readOnly ? (
+                    <span className="shrink-0 rounded-[0.8rem] border border-[#d8ddd6] bg-[#f2f4f0] px-3.5 py-2 text-sm font-semibold text-[#8b938c]">
+                      Read-only
+                    </span>
+                  ) : (
+                    <div className="flex shrink-0 items-center gap-2">
+                      <form action={declineStaticShare}>
+                        <input name="shareId" type="hidden" value={share.id} />
+                        <button
+                          className="rounded-[0.8rem] border border-[#d8ddd6] bg-white px-3.5 py-2 text-sm font-semibold text-[#5c655e] transition hover:bg-[#f2f4f0]"
+                          type="submit"
+                        >
+                          Decline
+                        </button>
+                      </form>
+                      <form action={isLive ? acceptLiveShare : acceptStaticShare}>
+                        <input name="shareId" type="hidden" value={share.id} />
+                        <button
+                          className="rounded-[0.8rem] bg-[#17352e] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#20443b]"
+                          type="submit"
+                        >
+                          Accept
+                        </button>
+                      </form>
+                    </div>
+                  )}
                 </li>
               );
             })}
