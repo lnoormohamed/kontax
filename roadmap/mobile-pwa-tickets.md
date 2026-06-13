@@ -219,3 +219,10 @@ Requirements** section; the paired build ticket builds to it.
   (incl. department persist + prefill), shared-editable saves, view-only shared shows Read-only chip.
   Known limit (accepted per brief): 2+ structured addresses degrade extra addresses to formatted
   strings on save (matches the `?full=1` form). `?full=1` remains the fallback.
+- 2026-06-13 — **P24B-07 keyboard UX fix (sheet)** — `MobileBottomSheet` header was pushed off-screen
+  when the soft keyboard opened: the sheet lifted its bottom above the keyboard but kept `maxHeight:
+  90svh`, so it stayed ~full-height while shifted up. Fix: when the keyboard is up, anchor the sheet to
+  the **top** and fill the visual viewport (`top:0; height: visibleHeight`) rather than offsetting the
+  bottom — robust across iOS (fixed = visual-viewport-relative) and Android (layout-relative), where
+  anchoring the bottom diverged and floated the sheet mid-screen on iOS. Keyboard-down (bottom sheet,
+  90svh) unchanged; confirmed on device (Android + iPhone). **P24B-07 / DB19 complete.**
