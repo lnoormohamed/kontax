@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useTransition } from "react";
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
 import {
@@ -94,7 +94,7 @@ const getGroupLetter = (contact: WorkspaceContact) => {
   return /[A-Z]/.test(first) ? first : "#";
 };
 
-function Highlight({ text, query }: { text: string; query: string }) {
+const Highlight = memo(function Highlight({ text, query }: { text: string; query: string }) {
   if (!query) {
     return <>{text}</>;
   }
@@ -111,9 +111,9 @@ function Highlight({ text, query }: { text: string; query: string }) {
       {text.slice(index + query.length)}
     </>
   );
-}
+});
 
-function Avatar({ name, size }: { name: string; size: number }) {
+const Avatar = memo(function Avatar({ name, size }: { name: string; size: number }) {
   const [bg, fg] = tintForName(name);
   return (
     <span
@@ -123,12 +123,12 @@ function Avatar({ name, size }: { name: string; size: number }) {
       {getInitials(name)}
     </span>
   );
-}
+});
 
 // Inline cluster after the name: favorite toggle + governed status badges.
 // Delegates to the shared ContactBadgeCluster (P15-01) so the icon vocabulary
 // is identical across rows, the detail page, and future sidebar groupings.
-function RowBadges({ contact, mode }: { contact: WorkspaceContact; mode: "active" | "archived" }) {
+const RowBadges = memo(function RowBadges({ contact, mode }: { contact: WorkspaceContact; mode: "active" | "archived" }) {
   return (
     <ContactBadgeCluster
       contactId={contact.id}
@@ -141,7 +141,7 @@ function RowBadges({ contact, mode }: { contact: WorkspaceContact; mode: "active
       redirectTo={mode === "active" ? "/contacts?tab=people" : "/contacts?tab=archived"}
     />
   );
-}
+});
 
 function RowActions({ contact, mode }: { contact: WorkspaceContact; mode: "active" | "archived" }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -220,7 +220,7 @@ function Cell({ value, query }: { value: string | null; query: string }) {
   return <Highlight query={query} text={value} />;
 }
 
-function ContactRow({
+const ContactRow = memo(function ContactRow({
   contact,
   mode,
   viewMode,
@@ -377,9 +377,9 @@ function ContactRow({
       </div>
     </div>
   );
-}
+});
 
-function GroupHeading({ label, favorites }: { label: string; favorites?: boolean }) {
+const GroupHeading = memo(function GroupHeading({ label, favorites }: { label: string; favorites?: boolean }) {
   if (favorites) {
     return (
       <div
@@ -414,7 +414,7 @@ function GroupHeading({ label, favorites }: { label: string; favorites?: boolean
       </span>
     </div>
   );
-}
+});
 
 type VRow =
   | { type: "group-header"; label: string; favorites?: boolean }
@@ -511,17 +511,33 @@ export function ContactsWorkspaceTable({
   const isSearching = query.trim().length > 0;
   const selectedSet = useMemo(() => new Set(selectedIds), [selectedIds]);
   const hasSelection = selectedIds.length > 0;
-  const visibleIds = visibleContacts.map((contact) => contact.id);
-  const allSelected = visibleIds.length > 0 && visibleIds.every((id) => selectedSet.has(id));
+  const visibleIds = useMemo(() => visibleContacts.map((contact) => contact.id), [visibleContacts]);
+  const allSelected = useMemo(
+    () => visibleIds.length > 0 && visibleIds.every((id) => selectedSet.has(id)),
+    [selectedSet, visibleIds],
+  );
 
-  const toggleSelect = (id: string) =>
+  const toggleSelect = useCallback((id: string) =>
     setSelectedIds((current) =>
       current.includes(id) ? current.filter((value) => value !== id) : [...current, id],
-    );
-  const toggleSelectAll = () => setSelectedIds(allSelected ? [] : visibleIds);
+    ), []);
+  const toggleSelectAll = useCallback(
+    () => setSelectedIds(allSelected ? [] : visibleIds),
+    [allSelected, visibleIds],
+  );
 
-  const favorites = !isSearching && mode === "active" ? visibleContacts.filter((c) => c.isFavorite) : [];
-  const rest = !isSearching && mode === "active" ? visibleContacts.filter((c) => !c.isFavorite) : visibleContacts;
+  const { favorites, rest } = useMemo(() => {
+    if (isSearching || mode !== "active") {
+      return { favorites: [] as WorkspaceContact[], rest: visibleContacts };
+    }
+    const nextFavorites: WorkspaceContact[] = [];
+    const nextRest: WorkspaceContact[] = [];
+    for (const contact of visibleContacts) {
+      if (contact.isFavorite) nextFavorites.push(contact);
+      else nextRest.push(contact);
+    }
+    return { favorites: nextFavorites, rest: nextRest };
+  }, [isSearching, mode, visibleContacts]);
 
   const groups = useMemo(() => {
     if (!groupByLetter || isSearching) return null;
@@ -573,6 +589,22 @@ export function ContactsWorkspaceTable({
         ? (el) => el.getBoundingClientRect().height
         : undefined,
   });
+  const virtualItems = virtualizer.getVirtualItems();
+  const stickySection = useMemo(() => {
+    if (virtualItems.length === 0) return null;
+    const listOffsetTop = listRef.current?.offsetTop ?? 0;
+    const offset = Math.max(0, (scrollEl?.scrollTop ?? 0) - listOffsetTop + 2);
+    let topIndex = virtualItems[0]!.index;
+    for (const item of virtualItems) {
+      if (item.start <= offset) topIndex = item.index;
+      else break;
+    }
+    for (let index = topIndex; index >= 0; index -= 1) {
+      const row = flatRows[index];
+      if (row?.type === "group-header") return row;
+    }
+    return null;
+  }, [flatRows, scrollEl?.scrollTop, virtualItems]);
 
   const restoredScrollRef = useRef(false);
   useLayoutEffect(() => {
@@ -742,32 +774,12 @@ export function ContactsWorkspaceTable({
         {/* Sticky group header (mobile) — native sticky can't pin the absolutely
             positioned virtual rows, so we overlay the current section's header at
             the top of the scroll viewport, recomputed each scroll-driven render. */}
-        {(() => {
-          const items = virtualizer.getVirtualItems();
-          if (items.length === 0) return null;
-          const listOffsetTop = listRef.current?.offsetTop ?? 0;
-          const offset = Math.max(0, (scrollEl?.scrollTop ?? 0) - listOffsetTop + 2);
-          let topIndex = items[0]!.index;
-          for (const it of items) {
-            if (it.start <= offset) topIndex = it.index;
-            else break;
-          }
-          let section: (typeof flatRows)[number] | null = null;
-          for (let i = topIndex; i >= 0; i--) {
-            const r = flatRows[i];
-            if (r?.type === "group-header") {
-              section = r;
-              break;
-            }
-          }
-          if (section?.type !== "group-header") return null;
-          return (
-            <div className="md:hidden" style={{ position: "sticky", top: 0, zIndex: 5 }}>
-              <GroupHeading favorites={section.favorites} label={section.label} />
-            </div>
-          );
-        })()}
-        {virtualizer.getVirtualItems().map((vItem) => {
+        {stickySection ? (
+          <div className="md:hidden" style={{ position: "sticky", top: 0, zIndex: 5 }}>
+            <GroupHeading favorites={stickySection.favorites} label={stickySection.label} />
+          </div>
+        ) : null}
+        {virtualItems.map((vItem) => {
           const row = flatRows[vItem.index]!;
           return (
             <div

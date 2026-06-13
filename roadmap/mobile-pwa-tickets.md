@@ -85,6 +85,11 @@ Requirements** section; the paired build ticket builds to it.
 | P24B-13 | Family/Teams management: owner/admin vs member variance, roster cards, per-book permission **matrix → cards**, pending chips | E6, E0.3 | P1 | ☐ | P24B-02, P24B-04 |
 | P24B-14 | Teams/audit log — stacked rows / h-scroll | E6 | P2 | ☐ | P24B-04 |
 
+## Workstream D2 — Performance follow-ups
+| Ticket | Title | Spec § | Priority | Status | Depends |
+| --- | --- | --- | --- | --- | --- |
+| P24B-PERF-01 | Contacts list render performance: memoized rows, derived list data, sticky-section cleanup | E1 | P0 | ◑ | P24B-11 |
+
 ## Workstream E — Collaboration & data
 | Ticket | Title | Spec § | Priority | Status | Depends |
 | --- | --- | --- | --- | --- | --- |
@@ -210,6 +215,9 @@ Requirements** section; the paired build ticket builds to it.
 - 2026-06-13 — **P24B-12a done** — plan & billing settings mobile pass: `/settings` now exposes
   plan/billing content on mobile, the nav anchors to it, portal/cancel actions are full-width touch
   targets, and cancellation opens as a mobile bottom sheet while desktop stays modal.
+- 2026-06-13 — **P24B-PERF-01 started** — contacts list render pass: memoized row subcomponents,
+  memoized visible IDs/selection state and favorite/rest partitions, stable selection callbacks, and
+  sticky section lookup moved out of inline JSX.
 - 2026-06-13 — **P24B-07 edit redo done (DB19)** — `MobileContactSheet` rebuilt as ONE sheet for both
   create and edit, full field coverage vs the desktop editor: Basic (always-on) · Phones · Emails ·
   Websites · Address (multi sub-cards) · Dates (birthday + significant, native date inputs) · Related
