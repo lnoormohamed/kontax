@@ -300,7 +300,13 @@ const ContactRow = memo(function ContactRow({
       {avatarSlot}
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-1.5">
-          <Link className="min-w-0 truncate" href={`/contacts/${contact.id}`} onClick={() => onOpenContact(contact.id)} prefetch={false}>
+          <Link
+            className="min-w-0 truncate"
+            href={`/contacts/${contact.id}`}
+            onClick={() => onOpenContact(contact.id)}
+            onPointerDown={() => onOpenContact(contact.id)}
+            prefetch={false}
+          >
             <span className="truncate text-[14.5px] font-semibold text-[#1d2823]">
               <Highlight query={query} text={displayName} />
             </span>
@@ -352,7 +358,13 @@ const ContactRow = memo(function ContactRow({
       <div className={`hidden ${GRID} items-center gap-4 px-3 py-2 lg:grid`}>
         {avatarSlot}
         <div className="flex min-w-0 items-center gap-1.5">
-          <Link className="min-w-0 truncate" href={`/contacts/${contact.id}`} onClick={() => onOpenContact(contact.id)} prefetch={false}>
+          <Link
+            className="min-w-0 truncate"
+            href={`/contacts/${contact.id}`}
+            onClick={() => onOpenContact(contact.id)}
+            onPointerDown={() => onOpenContact(contact.id)}
+            prefetch={false}
+          >
             <span className="truncate text-sm font-semibold text-[#1d2823]">
               <Highlight query={query} text={displayName} />
             </span>
@@ -633,6 +645,7 @@ export function ContactsWorkspaceTable({
 
     const raw = sessionStorage.getItem(CONTACT_LIST_SCROLL_KEY);
     if (!raw) return;
+    if (!scrollEl) return;
 
     try {
       const saved = JSON.parse(raw) as {
