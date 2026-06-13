@@ -1,7 +1,7 @@
 // @ts-nocheck
-const SHELL_CACHE = "kontax-shell-v4";
-const PAGE_CACHE = "kontax-pages-v4";
-const ASSET_CACHE = "kontax-assets-v4";
+const SHELL_CACHE = "kontax-shell-v5";
+const PAGE_CACHE = "kontax-pages-v5";
+const ASSET_CACHE = "kontax-assets-v5";
 const OFFLINE_URL = "/offline.html";
 
 const ALL_CACHES = [SHELL_CACHE, PAGE_CACHE, ASSET_CACHE];
@@ -50,25 +50,16 @@ self.addEventListener("fetch", (event) => {
     return;
   }
 
-  // Navigation requests — network first, cache fallback, offline page last.
+  // Navigation requests — network only, offline page last. Authenticated app
+  // pages such as /contacts are stateful and scroll-sensitive; caching them in
+  // the service worker can replay stale shells after back/refresh and fight the
+  // contact-list restore logic.
   if (event.request.mode === "navigate") {
     event.respondWith(
       fetch(event.request)
-        .then((response) => {
-          // Only cache a clean 200 for this exact URL. Never cache a redirected
-          // response (e.g. an auth redirect to /login) — caching that under the
-          // requested page URL would later serve the login screen for an
-          // authenticated route.
-          if (response.ok && !response.redirected) {
-            const clone = response.clone();
-            caches.open(PAGE_CACHE).then((c) => c.put(event.request, clone));
-          }
-          return response;
-        })
         .catch(() =>
           caches
-            .match(event.request)
-            .then((cached) => cached ?? caches.match(OFFLINE_URL))
+            .match(OFFLINE_URL)
             .then((res) => res ?? Response.error())
         )
     );

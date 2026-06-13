@@ -690,7 +690,6 @@ export function ContactsWorkspaceTable({
       if (saved.key !== scrollMemoryKey) return;
 
       restoredScrollRef.current = true;
-      sessionStorage.removeItem(CONTACT_LIST_SCROLL_KEY);
       const restorePosition = () => {
         if (scrollEl && typeof saved.scrollTop === "number") {
           scrollEl.scrollTop = saved.scrollTop;
@@ -705,15 +704,16 @@ export function ContactsWorkspaceTable({
           }
         }
       };
-      const restoreDelays = [0, 80, 180, 360, 700, 1200, 2200, 3600];
+      const restoreDelays = [0, 80, 180, 360, 700, 1200, 2200, 3600, 5200, 7600, 10000];
       restoreTimersRef.current = restoreDelays.map((delay) =>
         setTimeout(() => requestAnimationFrame(restorePosition), delay),
       );
       restoreTimersRef.current.push(
         setTimeout(() => {
+          sessionStorage.removeItem(CONTACT_LIST_SCROLL_KEY);
           clearRestoreContactParam();
           restoreTimersRef.current = [];
-        }, 4200),
+        }, 10500),
       );
     } catch {
       sessionStorage.removeItem(CONTACT_LIST_SCROLL_KEY);
