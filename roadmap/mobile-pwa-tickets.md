@@ -92,6 +92,8 @@ Requirements** section; the paired build ticket builds to it.
 | P24B-PERF-02 | Mobile gesture performance: swipe hot-path cleanup, scroll-vs-swipe stability | E1 | P0 | ◑ | P24B-PERF-01 |
 | P24B-PERF-03 | Route bundle reduction: lazy-load modal/drawer surfaces and trim initial JS | All | P1 | ◑ | P24B-PERF-01 |
 | P24B-PERF-04 | Server data query performance: defer archived and duplicate detail hydration to active tabs | All | P1 | ◑ | P24B-PERF-03 |
+| P24B-PERF-05 | Mobile search request performance: abort stale lookups and ignore out-of-order responses | E1 | P1 | ◑ | P24B-PERF-04 |
+| P24B-PERF-06 | Mobile viewport listener performance: rAF-batch scroll and keyboard viewport updates | E1, E6 | P1 | ◑ | P24B-PERF-05 |
 
 ## Workstream E — Collaboration & data
 | Ticket | Title | Spec § | Priority | Status | Depends |
@@ -227,6 +229,10 @@ Requirements** section; the paired build ticket builds to it.
   alert drawer and security settings 2FA enrolment modal so they load only when opened.
 - 2026-06-13 — **P24B-PERF-04 started** — server data query pass: deferred archived contacts and
   duplicate detail hydration to their active tabs while preserving lightweight badge counts.
+- 2026-06-13 — **P24B-PERF-05 started** — mobile search request pass: abort stale contact searches
+  and ignore out-of-order responses so fast typing does not churn results.
+- 2026-06-13 — **P24B-PERF-06 started** — mobile viewport listener pass: rAF-batched scroll and
+  visual-viewport handlers to reduce keyboard/header repaint churn.
 - 2026-06-13 — **P24B-07 edit redo done (DB19)** — `MobileContactSheet` rebuilt as ONE sheet for both
   create and edit, full field coverage vs the desktop editor: Basic (always-on) · Phones · Emails ·
   Websites · Address (multi sub-cards) · Dates (birthday + significant, native date inputs) · Related

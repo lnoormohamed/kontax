@@ -20,6 +20,8 @@ export function MobileBottomSheet({ isOpen, onClose, title, children, footer }: 
   const [visibleHeight, setVisibleHeight] = useState(0);
   const [mounted, setMounted] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
+  const viewportFrameRef = useRef<number | null>(null);
+  const viewportStateRef = useRef({ keyboardOffset: 0, visibleHeight: 0 });
 
   // Two-frame mount so the slide-in CSS transition fires
   useEffect(() => {
@@ -34,12 +36,18 @@ export function MobileBottomSheet({ isOpen, onClose, title, children, footer }: 
   useEffect(() => {
     if (!isOpen || typeof window === "undefined" || !window.visualViewport) return;
 
-    const update = () => {
+    const updateNow = () => {
       const vv = window.visualViewport!;
       // Keyboard height = distance the visual viewport has shifted upward
       const offset = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
-      setKeyboardOffset(offset);
-      setVisibleHeight(vv.height);
+      if (
+        viewportStateRef.current.keyboardOffset !== offset ||
+        viewportStateRef.current.visibleHeight !== vv.height
+      ) {
+        viewportStateRef.current = { keyboardOffset: offset, visibleHeight: vv.height };
+        setKeyboardOffset(offset);
+        setVisibleHeight(vv.height);
+      }
 
       // Scroll focused element into view within the sheet content
       const focused = document.activeElement as HTMLElement | null;
@@ -47,13 +55,25 @@ export function MobileBottomSheet({ isOpen, onClose, title, children, footer }: 
         setTimeout(() => focused.scrollIntoView({ block: "nearest", behavior: "smooth" }), 50);
       }
     };
+    const update = () => {
+      if (viewportFrameRef.current !== null) return;
+      viewportFrameRef.current = requestAnimationFrame(() => {
+        viewportFrameRef.current = null;
+        updateNow();
+      });
+    };
 
     window.visualViewport.addEventListener("resize", update, { passive: true });
     window.visualViewport.addEventListener("scroll", update, { passive: true });
-    update();
+    updateNow();
     return () => {
+      if (viewportFrameRef.current !== null) {
+        cancelAnimationFrame(viewportFrameRef.current);
+        viewportFrameRef.current = null;
+      }
       window.visualViewport?.removeEventListener("resize", update);
       window.visualViewport?.removeEventListener("scroll", update);
+      viewportStateRef.current = { keyboardOffset: 0, visibleHeight: 0 };
       setKeyboardOffset(0);
       setVisibleHeight(0);
     };

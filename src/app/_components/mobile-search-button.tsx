@@ -87,6 +87,8 @@ export function MobileSearchButton() {
   const [mounted, setMounted] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const searchAbortRef = useRef<AbortController | null>(null);
+  const latestQueryRef = useRef("");
   const router = useRouter();
 
   useEffect(() => setMounted(true), []);
@@ -114,19 +116,26 @@ export function MobileSearchButton() {
 
   const runSearch = (q: string) => {
     const query = q.trim();
+    latestQueryRef.current = query;
+    searchAbortRef.current?.abort();
     if (query.length === 0) {
       setResults([]);
       setStatus("idle");
       return;
     }
+    const controller = new AbortController();
+    searchAbortRef.current = controller;
     setStatus("loading");
-    fetch(`/api/contacts/search?q=${encodeURIComponent(query)}`, { cache: "no-store" })
+    fetch(`/api/contacts/search?q=${encodeURIComponent(query)}`, { cache: "no-store", signal: controller.signal })
       .then((r) => (r.ok ? r.json() : { results: [] }))
       .then((data: { results: SearchResult[] }) => {
+        if (latestQueryRef.current !== query || controller.signal.aborted) return;
         setResults(data.results ?? []);
         setStatus("done");
       })
-      .catch(() => {
+      .catch((error: unknown) => {
+        if (controller.signal.aborted || (error instanceof DOMException && error.name === "AbortError")) return;
+        if (latestQueryRef.current !== query) return;
         setResults([]);
         setStatus("done");
       });
@@ -137,6 +146,14 @@ export function MobileSearchButton() {
     if (timer.current) clearTimeout(timer.current);
     timer.current = setTimeout(() => runSearch(next), 220);
   };
+
+  useEffect(() => {
+    if (open) return;
+    if (timer.current) clearTimeout(timer.current);
+    searchAbortRef.current?.abort();
+    searchAbortRef.current = null;
+    latestQueryRef.current = "";
+  }, [open]);
 
   const close = () => {
     setOpen(false);

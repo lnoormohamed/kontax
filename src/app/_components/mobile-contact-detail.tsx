@@ -63,6 +63,9 @@ export function MobileContactDetail({
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [heroVisible, setHeroVisible] = useState(true);
+  const heroVisibleRef = useRef(true);
+  const scrollFrameRef = useRef<number | null>(null);
+  const viewportFrameRef = useRef<number | null>(null);
 
   // Walk up the DOM once to find the nearest scroll container
   const findScrollContainer = () => {
@@ -79,12 +82,30 @@ export function MobileContactDetail({
   useEffect(() => {
     const container = findScrollContainer();
     const scrollTarget = container ?? window;
-    const handleScroll = () => {
+    const updateHeroVisibility = () => {
       const top = container ? container.scrollTop : window.scrollY;
-      setHeroVisible(top < 80);
+      const next = top < 80;
+      if (heroVisibleRef.current !== next) {
+        heroVisibleRef.current = next;
+        setHeroVisible(next);
+      }
+    };
+    const handleScroll = () => {
+      if (scrollFrameRef.current !== null) return;
+      scrollFrameRef.current = requestAnimationFrame(() => {
+        scrollFrameRef.current = null;
+        updateHeroVisibility();
+      });
     };
     scrollTarget.addEventListener("scroll", handleScroll, { passive: true });
-    return () => scrollTarget.removeEventListener("scroll", handleScroll);
+    updateHeroVisibility();
+    return () => {
+      if (scrollFrameRef.current !== null) {
+        cancelAnimationFrame(scrollFrameRef.current);
+        scrollFrameRef.current = null;
+      }
+      scrollTarget.removeEventListener("scroll", handleScroll);
+    };
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -97,7 +118,7 @@ export function MobileContactDetail({
 
     const BASE_PB = `calc(56px + env(safe-area-inset-bottom))`;
 
-    const handleVV = () => {
+    const handleVVNow = () => {
       const vv = window.visualViewport!;
       const kh = Math.max(0, window.innerHeight - vv.height - vv.offsetTop);
       container.style.paddingBottom = kh > 0 ? `${kh + 16}px` : BASE_PB;
@@ -107,12 +128,23 @@ export function MobileContactDetail({
         setTimeout(() => focused.scrollIntoView({ block: "nearest", behavior: "smooth" }), 80);
       }
     };
+    const handleVV = () => {
+      if (viewportFrameRef.current !== null) return;
+      viewportFrameRef.current = requestAnimationFrame(() => {
+        viewportFrameRef.current = null;
+        handleVVNow();
+      });
+    };
 
     window.visualViewport.addEventListener("resize", handleVV, { passive: true });
     window.visualViewport.addEventListener("scroll", handleVV, { passive: true });
-    handleVV();
+    handleVVNow();
 
     return () => {
+      if (viewportFrameRef.current !== null) {
+        cancelAnimationFrame(viewportFrameRef.current);
+        viewportFrameRef.current = null;
+      }
       window.visualViewport?.removeEventListener("resize", handleVV);
       window.visualViewport?.removeEventListener("scroll", handleVV);
       if (container) container.style.paddingBottom = "";
