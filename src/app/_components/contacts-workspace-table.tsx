@@ -442,6 +442,7 @@ const FAVE_H = 28; // Favourites header — same height as letter headers
 const LETTER_H = 28; // Alphabetical letter headers per design spec
 const CONTACT_LIST_SCROLL_KEY = "kontax:contacts:list-scroll";
 const CONTACT_LIST_SCROLL_MAX_AGE = 10 * 60 * 1000;
+const CONTACT_LIST_RESTORE_PARAM = "restoreContact";
 
 const getScrollParent = (node: HTMLElement | null) => {
   let el: Element | null = node?.parentElement ?? null;
@@ -453,6 +454,14 @@ const getScrollParent = (node: HTMLElement | null) => {
     el = el.parentElement;
   }
   return null;
+};
+
+const clearRestoreContactParam = () => {
+  if (typeof window === "undefined") return;
+  const url = new URL(window.location.href);
+  if (!url.searchParams.has(CONTACT_LIST_RESTORE_PARAM)) return;
+  url.searchParams.delete(CONTACT_LIST_RESTORE_PARAM);
+  window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`);
 };
 
 export function ContactsWorkspaceTable({
@@ -496,6 +505,9 @@ export function ContactsWorkspaceTable({
   const saveListScrollPosition = useCallback((contactId: string) => {
     if (typeof window === "undefined") return;
     const activeScrollEl = scrollEl ?? getScrollParent(listRef.current);
+    const url = new URL(window.location.href);
+    url.searchParams.set(CONTACT_LIST_RESTORE_PARAM, contactId);
+    window.history.replaceState(window.history.state, "", `${url.pathname}${url.search}${url.hash}`);
 
     sessionStorage.setItem(
       CONTACT_LIST_SCROLL_KEY,
@@ -639,31 +651,46 @@ export function ContactsWorkspaceTable({
     const navigationEntry = performance.getEntriesByType("navigation")[0] as PerformanceNavigationTiming | undefined;
     if (isMobileViewport && navigationEntry?.type === "reload") {
       sessionStorage.removeItem(CONTACT_LIST_SCROLL_KEY);
+      clearRestoreContactParam();
       restoredScrollRef.current = true;
       return;
     }
 
+    const restoreContactId = new URL(window.location.href).searchParams.get(CONTACT_LIST_RESTORE_PARAM);
     const raw = sessionStorage.getItem(CONTACT_LIST_SCROLL_KEY);
-    if (!raw) return;
+    if (!raw && !restoreContactId) return;
     if (!scrollEl) return;
 
     try {
-      const saved = JSON.parse(raw) as {
-        key?: string;
-        createdAt?: number;
-        contactId?: string;
-        scrollTop?: number | null;
-        windowY?: number;
-      };
+      const saved = raw
+        ? JSON.parse(raw) as {
+            key?: string;
+            createdAt?: number;
+            contactId?: string;
+            scrollTop?: number | null;
+            windowY?: number;
+          }
+        : {
+            key: scrollMemoryKey,
+            createdAt: Date.now(),
+            contactId: restoreContactId,
+            scrollTop: null,
+            windowY: undefined,
+          };
 
       if (typeof saved.createdAt !== "number" || Date.now() - saved.createdAt > CONTACT_LIST_SCROLL_MAX_AGE) {
         sessionStorage.removeItem(CONTACT_LIST_SCROLL_KEY);
-        return;
+        if (!restoreContactId) return;
+        saved.createdAt = Date.now();
+        saved.contactId = restoreContactId;
+        saved.key = scrollMemoryKey;
+        saved.scrollTop = null;
       }
       if (saved.key !== scrollMemoryKey) return;
 
       restoredScrollRef.current = true;
       sessionStorage.removeItem(CONTACT_LIST_SCROLL_KEY);
+      clearRestoreContactParam();
       requestAnimationFrame(() => {
         if (scrollEl && typeof saved.scrollTop === "number") {
           scrollEl.scrollTop = saved.scrollTop;
@@ -680,6 +707,7 @@ export function ContactsWorkspaceTable({
       });
     } catch {
       sessionStorage.removeItem(CONTACT_LIST_SCROLL_KEY);
+      clearRestoreContactParam();
     }
   }, [flatRows, mounted, scrollEl, scrollMemoryKey, virtualizer]);
 
