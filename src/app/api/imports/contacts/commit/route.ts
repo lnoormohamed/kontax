@@ -4,7 +4,6 @@ import { auth } from "~/server/auth";
 import { assertCanImportContacts } from "~/server/billing";
 import { parseCsvContacts } from "~/server/contact-portability";
 import { db } from "~/server/db";
-import type { ExplicitColumnMapping } from "~/server/contact-portability";
 
 const getOptionalJsonArray = <T>(value: T[] | null | undefined) =>
   value && value.length > 0 ? value : undefined;

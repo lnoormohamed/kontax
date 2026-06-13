@@ -202,7 +202,7 @@ export function ExportCard({
     } else {
       // Field-selection export via POST → blob download
       const sel = fieldSelection.some((f) => f.included) ? fieldSelection : buildDefaultSelection();
-      fetch("/api/exports/contacts/csv", {
+      void fetch("/api/exports/contacts/csv", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ fieldSelection: sel, includeArchived: archived }),
