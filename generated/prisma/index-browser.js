@@ -428,6 +428,7 @@ exports.Prisma.SyncJobScalarFieldEnum = {
   updatedCount: 'updatedCount',
   deletedCount: 'deletedCount',
   conflictCount: 'conflictCount',
+  duplicatesDetectedCount: 'duplicatesDetectedCount',
   skippedCount: 'skippedCount',
   errorCode: 'errorCode',
   errorSummary: 'errorSummary',

@@ -186,6 +186,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
               createdCount: true,
               updatedCount: true,
               deletedCount: true,
+              duplicatesDetectedCount: true,
               createdAt: true,
               completedAt: true,
               startedAt: true,
@@ -262,6 +263,9 @@ export default async function SyncPage({ searchParams }: PageProps) {
       // P23-05: surface the conflict-queue-full auto-pause to the detail panel.
       conflictQueueFull:
         acct.status === "PAUSED" && acct.lastErrorCode === "SYNC_CONFLICT_QUEUE_FULL",
+      // P27-08: duplicates found by the most recent completed import (0 hides the banner).
+      duplicatesDetected:
+        acct.syncJobs.find((j) => j.completedAt)?.duplicatesDetectedCount ?? 0,
       jobs,
       conflicts,
     };

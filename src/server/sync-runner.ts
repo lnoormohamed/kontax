@@ -18,6 +18,7 @@ import { decryptSyncCredentialPayload } from "~/server/sync-credentials";
 import { GoogleSyncError, runGoogleSync } from "~/server/google-sync";
 import { MicrosoftSyncError, runMicrosoftSync } from "~/server/microsoft-sync";
 import { buildLocalConflictSnapshot } from "~/server/sync-conflict-snapshot";
+import { runPostImportDeduplication } from "~/server/sync-dedup";
 import { getEffectiveSyncAccountSettings } from "~/server/sync-settings";
 
 const createRetrySchedule = (attemptNumber: number) => {
@@ -193,6 +194,21 @@ const markJobFailed = async ({
         actionUrl: "/sync",
       });
     }
+  }
+};
+
+// P27-08: best-effort post-import dedup. Never throws — the sync job has
+// already succeeded; a dedup failure must not flip it to failed.
+const runPostImportDedupSafely = async (
+  userId: string,
+  syncAccountId: string,
+  syncJobId: string,
+  source: string,
+) => {
+  try {
+    await runPostImportDeduplication({ userId, syncAccountId, syncJobId, source });
+  } catch {
+    // swallow — dedup is advisory; the import already committed.
   }
 };
 
@@ -376,6 +392,8 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
     if (job.syncAccount.provider === "GOOGLE") {
       // P27-03: conflict policy drives both-changed + tombstone resolution.
       const settings = await getEffectiveSyncAccountSettings(job.syncAccountId);
+      // P27-08: dedup runs only on the initial full import (no stored cursor).
+      const wasFullImport = !job.syncAccount.lastSyncCursor;
       const outcome = await runOAuthSyncJob(
         job,
         () =>
@@ -390,11 +408,15 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
         (error) => (error instanceof GoogleSyncError ? error.code : "GOOGLE_SYNC_FAILED"),
       );
       summary[outcome] += 1;
+      if (wasFullImport && outcome !== "failed") {
+        await runPostImportDedupSafely(job.syncAccount.userId, job.syncAccountId, job.id, "google-import");
+      }
       continue;
     }
 
     if (job.syncAccount.provider === "MICROSOFT") {
       const settings = await getEffectiveSyncAccountSettings(job.syncAccountId);
+      const wasFullImport = !job.syncAccount.lastSyncCursor;
       const outcome = await runOAuthSyncJob(
         job,
         () =>
@@ -409,6 +431,9 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
         (error) => (error instanceof MicrosoftSyncError ? error.code : "MICROSOFT_SYNC_FAILED"),
       );
       summary[outcome] += 1;
+      if (wasFullImport && outcome !== "failed") {
+        await runPostImportDedupSafely(job.syncAccount.userId, job.syncAccountId, job.id, "outlook-import");
+      }
       continue;
     }
 

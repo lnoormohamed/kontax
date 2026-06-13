@@ -650,31 +650,33 @@ model SyncContactLink {
 }
 
 model SyncJob {
-  id             String         @id @default(cuid())
-  syncAccountId  String
-  status         SyncJobStatus  @default(QUEUED)
-  trigger        SyncJobTrigger @default(MANUAL)
-  syncDirection  SyncDirection
-  attemptCount   Int            @default(0)
-  maxAttempts    Int            @default(5)
-  nextRetryAt    DateTime?
-  leaseExpiresAt DateTime?
-  workerId       String?
-  idempotencyKey String?
-  cursorBefore   String?
-  cursorAfter    String?
-  createdCount   Int            @default(0)
-  updatedCount   Int            @default(0)
-  deletedCount   Int            @default(0)
-  conflictCount  Int            @default(0)
-  skippedCount   Int            @default(0)
-  errorCode      String?
-  errorSummary   String?
-  startedAt      DateTime?
-  completedAt    DateTime?
-  createdAt      DateTime       @default(now())
-  updatedAt      DateTime       @updatedAt
-  syncAccount    SyncAccount    @relation(fields: [syncAccountId], references: [id], onDelete: Cascade)
+  id                      String         @id @default(cuid())
+  syncAccountId           String
+  status                  SyncJobStatus  @default(QUEUED)
+  trigger                 SyncJobTrigger @default(MANUAL)
+  syncDirection           SyncDirection
+  attemptCount            Int            @default(0)
+  maxAttempts             Int            @default(5)
+  nextRetryAt             DateTime?
+  leaseExpiresAt          DateTime?
+  workerId                String?
+  idempotencyKey          String?
+  cursorBefore            String?
+  cursorAfter             String?
+  createdCount            Int            @default(0)
+  updatedCount            Int            @default(0)
+  deletedCount            Int            @default(0)
+  conflictCount           Int            @default(0)
+  // P27-08: merge suggestions detected after an initial OAuth full import.
+  duplicatesDetectedCount Int            @default(0)
+  skippedCount            Int            @default(0)
+  errorCode               String?
+  errorSummary            String?
+  startedAt               DateTime?
+  completedAt             DateTime?
+  createdAt               DateTime       @default(now())
+  updatedAt               DateTime       @updatedAt
+  syncAccount             SyncAccount    @relation(fields: [syncAccountId], references: [id], onDelete: Cascade)
 
   @@unique([syncAccountId, idempotencyKey])
   @@index([syncAccountId, status, createdAt])

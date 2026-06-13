@@ -84,6 +84,8 @@ export type SyncAccountData = {
   consecutiveFailures: number;
   // P23-05: account auto-paused because the manual conflict queue is full.
   conflictQueueFull: boolean;
+  // P27-08: potential duplicates found by the most recent completed import.
+  duplicatesDetected: number;
   jobs: SyncJobRow[];
   conflicts: SyncConflictData[];
 };
@@ -805,6 +807,52 @@ function AutoPauseBanner() {
           Review and resolve the open conflicts below to resume automatic sync.
         </div>
       </div>
+    </div>
+  );
+}
+
+// ── P27-08: post-import duplicates banner ─────────────────────────────────────
+function DuplicatesBanner({ count }: { count: number }) {
+  return (
+    <div
+      style={{
+        display: "flex",
+        gap: 12,
+        alignItems: "center",
+        background: "#f6edd9",
+        border: "1px solid #e9c87b",
+        borderRadius: 10,
+        padding: "12px 16px",
+        marginBottom: 22,
+      }}
+    >
+      <svg
+        width="18"
+        height="18"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="#bf8526"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        style={{ flexShrink: 0 }}
+      >
+        <path d="M12 4l9 16H3z" />
+        <path d="M12 10v4" />
+        <path d="M12 17h.01" />
+      </svg>
+      <div style={{ fontSize: 13, color: "#7a5a1a" }}>
+        <strong>
+          {count} potential duplicate{count === 1 ? "" : "s"}
+        </strong>{" "}
+        found from this import.
+      </div>
+      <a
+        href="/merge/manual"
+        style={{ fontSize: 13, fontWeight: 600, color: "#4158f4", marginLeft: "auto", whiteSpace: "nowrap" }}
+      >
+        Review suggestions →
+      </a>
     </div>
   );
 }
@@ -2477,6 +2525,9 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
       <div>
         {vHealth === "auth" && <ReauthBanner onFix={() => setEditing(true)} />}
         {selectedAccount.conflictQueueFull && <AutoPauseBanner />}
+        {selectedAccount.duplicatesDetected > 0 && (
+          <DuplicatesBanner count={selectedAccount.duplicatesDetected} />
+        )}
         <AccountHeader
           account={selectedAccount}
           vHealth={vHealth}
