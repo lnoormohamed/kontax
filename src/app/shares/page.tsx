@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
 import { AppShell } from "~/app/_components/app-shell";
+import { EmptyState } from "~/app/_components/empty-state";
 import { UpsellCard } from "~/app/_components/mobile-variance";
 import { acceptLiveShare, acceptStaticShare, declineStaticShare } from "~/app/actions/shares";
 import { auth } from "~/server/auth";
@@ -102,19 +103,16 @@ export default async function SharesPage() {
 
         {/* ── Pending ── */}
         {pending.length === 0 ? (
-          <div className="mt-6 rounded-[1.4rem] border border-dashed border-[#d8ddd6] bg-white px-6 py-12 text-center">
-            <span className="mx-auto mb-3 grid size-[46px] place-items-center rounded-full border border-[#e9ece7] bg-[#f6f7f4]">
-              <svg fill="none" height="20" stroke="#aeb4ac" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.6" viewBox="0 0 24 24" width="20">
-                <path d="M12 4v12M7 11l5 5 5-5M5 20h14" />
-              </svg>
-            </span>
-            <p className="text-sm font-semibold text-[#1d2823]">No pending shares</p>
-            <p className="mx-auto mt-2 max-w-md text-sm leading-6 text-[#5c655e]">
-              When someone shares a contact with you, it&apos;ll show up here to accept or decline.
-            </p>
-            <Link className="mt-4 inline-block text-[13px] font-semibold text-[#4158f4]" href="/contacts">
-              ← Back to contacts
-            </Link>
+          <div className="mt-6">
+            <EmptyState
+              icon="arrowDownLeft"
+              title="Nothing shared with you yet"
+              body="When someone shares a contact with you on Kontax, it will appear here."
+            >
+              <Link className="text-[13px] font-medium text-[#4158f4] hover:underline" href="/contacts">
+                ← Back to contacts
+              </Link>
+            </EmptyState>
           </div>
         ) : (
           <ul className="mt-6 grid gap-3">

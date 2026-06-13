@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 
+import { EmptyState as SurfaceEmptyState } from "~/app/_components/empty-state";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { formatFieldLabel } from "~/lib/activity/field-labels";
 import { formatAbsoluteTime, formatRelativeTime } from "~/lib/activity/time";
@@ -306,12 +307,10 @@ function FilterBar({
 // ── state blocks ──────────────────────────────────────────────────────────────
 function EmptyState({
   kind,
-  retention,
   onClear,
   onRetry,
 }: {
   kind: "empty" | "filtered" | "error";
-  retention?: number | null;
   onClear?: () => void;
   onRetry?: () => void;
 }) {
@@ -363,19 +362,21 @@ function EmptyState({
     );
   }
 
-  // empty (no activity at all)
+  // empty (no activity at all) — P26-05 contextual empty state
   return (
-    <div className="mx-[18px] my-5 rounded-[14px] border border-[#d8ddd6] px-7 py-[52px] text-center">
-      <span className="mx-auto mb-3.5 grid h-11 w-11 place-items-center rounded-full bg-[#f2f4f0] text-[#c8cfc6]">
-        <WorkspaceIcon name="clock" size={22} strokeWidth={1.6} />
-      </span>
-      <p className="text-[15px] font-semibold text-[#1d2823]">No activity yet</p>
-      <p className="mx-auto mt-1.5 max-w-[380px] text-[13px] leading-[1.55] text-[#5c655e]">
-        {retention === null
-          ? "Edits, syncs, imports, merges, and shares show up here."
-          : `Edits, syncs, imports, merges, and shares from the last ${retention ?? 365} days show up here.`}
-      </p>
-    </div>
+    <SurfaceEmptyState
+      icon="activity"
+      title="No activity yet"
+      body="Start by adding or importing contacts — every change will be recorded here."
+    >
+      <Link
+        className="inline-flex h-10 items-center gap-1.5 rounded-[10px] bg-[#4158f4] px-4 text-[13.5px] font-semibold text-white transition hover:bg-[#3347d8]"
+        href="/contacts/new"
+      >
+        Add your first contact
+        <span aria-hidden>→</span>
+      </Link>
+    </SurfaceEmptyState>
   );
 }
 
@@ -455,7 +456,6 @@ export function ActivityFeed({ retentionDays = 90 }: { retentionDays?: number | 
     events,
     status,
     hasMore,
-    retention,
     retentionLabel,
     category,
     actor,
@@ -494,7 +494,6 @@ export function ActivityFeed({ retentionDays = 90 }: { retentionDays?: number | 
           <EmptyState
             kind={filtering ? "filtered" : "empty"}
             onClear={handleClear}
-            retention={retention}
           />
         )}
 

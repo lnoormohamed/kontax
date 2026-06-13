@@ -90,6 +90,13 @@ const PATHS: Record<string, string[]> = {
     "M12 15.6h.01",
   ],
   arrowDownLeft: ["M17 7L7 17", "M16.5 17H7V7.5"],
+  // P26-05: empty-state glyph for the contacts list (add-a-person).
+  personPlus: [
+    "M10 11.2a3.4 3.4 0 100-6.8 3.4 3.4 0 000 6.8z",
+    "M3.6 20c0-3.3 2.9-5.4 6.4-5.4 1.2 0 2.3.2 3.3.7",
+    "M18 13.5v5",
+    "M15.5 16h5",
+  ],
   creditCard: [
     "M3.5 5.5h17A1.5 1.5 0 0122 7v10a1.5 1.5 0 01-1.5 1.5h-17A1.5 1.5 0 012 17V7a1.5 1.5 0 011.5-1.5z",
     "M2 9.8h20",
