@@ -759,7 +759,7 @@ export function ContactsWorkspaceTable({
               break;
             }
           }
-          if (!section || section.type !== "group-header") return null;
+          if (section?.type !== "group-header") return null;
           return (
             <div className="md:hidden" style={{ position: "sticky", top: 0, zIndex: 5 }}>
               <GroupHeading favorites={section.favorites} label={section.label} />

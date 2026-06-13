@@ -1,5 +1,9 @@
 # P24B-23 — Mobile notifications overlay → to spec
 
+## Status
+
+Done — implemented 2026-06-13.
+
 ## Purpose
 
 Bring the existing mobile notifications overlay (`notification-bell.tsx`, full-screen `< md`) to the

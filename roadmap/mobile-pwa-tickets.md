@@ -75,7 +75,7 @@ Requirements** section; the paired build ticket builds to it.
 | P24B-10 | Sync: confirm to spec + Free **CardDAV upsell / 1-account cap** variance | E5 | P2 | ◑ **redo → DB21** | P24B-03, P24B-DB21 |
 | P24B-11 | Contacts list: sticky group headers (deferred from P24A) + limit/read-only variance | E1 | P2 | ✅ | P24B-03 |
 | P24B-22 | Mobile **search overlay** → to spec (results, recents, no-match, offline) | E13 | P1 | ✅ | P24B-DB18 |
-| P24B-23 | Mobile **notifications overlay** → to spec (category rows, security drawer, mark-all-read; cover bottom nav) | E14 | P1 | ☐ | P24B-DB18 |
+| P24B-23 | Mobile **notifications overlay** → to spec (category rows, security drawer, mark-all-read; cover bottom nav) | E14 | P1 | ✅ | P24B-DB18 |
 
 ## Workstream D — Settings sub-pages
 | Ticket | Title | Spec § | Priority | Status | Depends |
@@ -200,3 +200,6 @@ Requirements** section; the paired build ticket builds to it.
   `/api/contacts/search` (owned + shared books, name/company/email/phone/nickname), match highlight
   (#fff0bf), recents (localStorage), no-match, and offline note. Verified results/no-match/recents +
   nav coverage at 375px.
+- 2026-06-13 — **P24B-23 done** — mobile notifications overlay to DB18: 52px full-screen mobile
+  chrome above bottom nav, category rows with unread state, New/Earlier grouping, SECURITY drawer
+  behavior, actionUrl navigation, mark-all-read, empty/loading states, and settings footer.
