@@ -74,7 +74,7 @@ Requirements** section; the paired build ticket builds to it.
 | P24B-09 | Activity: mobile **GroupCard event rows** + retention caption; keep Free upsell (distinct from empty) | E4 | P1 | ◑ **redo → DB20** | P24B-03, P24B-DB20 |
 | P24B-10 | Sync: confirm to spec + Free **CardDAV upsell / 1-account cap** variance | E5 | P2 | ◑ **redo → DB21** | P24B-03, P24B-DB21 |
 | P24B-11 | Contacts list: sticky group headers (deferred from P24A) + limit/read-only variance | E1 | P2 | ✅ | P24B-03 |
-| P24B-22 | Mobile **search overlay** → to spec (results, recents, no-match, offline) | E13 | P1 | ☐ | P24B-DB18 |
+| P24B-22 | Mobile **search overlay** → to spec (results, recents, no-match, offline) | E13 | P1 | ✅ | P24B-DB18 |
 | P24B-23 | Mobile **notifications overlay** → to spec (category rows, security drawer, mark-all-read; cover bottom nav) | E14 | P1 | ☐ | P24B-DB18 |
 
 ## Workstream D — Settings sub-pages
@@ -195,3 +195,8 @@ Requirements** section; the paired build ticket builds to it.
   redone brief-first. Added **DB19** (contact edit mobile — full-field edit sheet), **DB20** (activity
   feed mobile rows), **DB21** (sync mobile + plan variance). Reset P24B-07 (edit portion → DB19),
   P24B-09 (→ DB20), P24B-10 (→ DB21) to ◑ pending designer mockups, then rebuild to the briefs.
+- 2026-06-13 — **P24B-22 done** — mobile search overlay to DB18: full-screen (portaled to body so it
+  covers the bottom nav), search field + Cancel, debounced inline results via new
+  `/api/contacts/search` (owned + shared books, name/company/email/phone/nickname), match highlight
+  (#fff0bf), recents (localStorage), no-match, and offline note. Verified results/no-match/recents +
+  nav coverage at 375px.
