@@ -2,14 +2,17 @@ import Link from "next/link";
 
 import { ActivityFeed, ActivityLocked } from "~/app/_components/activity-feed";
 import { ContactsWorkspaceTable } from "~/app/_components/contacts-workspace-table";
+import { EmptyState } from "~/app/_components/empty-state";
 import { BulkMergeButton, UndoMergeButton } from "~/app/_components/merge-actions";
 import { MobileActivityFeed } from "~/app/_components/mobile-activity-feed";
 import { MergeSuggestionDismissButton } from "~/app/_components/merge-suggestion-dismiss-button";
 import { MergeSuggestionRefreshButton } from "~/app/_components/merge-suggestion-refresh-button";
+import { OnboardingChecklist } from "~/app/_components/onboarding-checklist";
 import { SortMenu } from "~/app/_components/sort-menu";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import type { BillingLifecycleState } from "~/server/billing";
 import type { PersistedMergeSuggestion, RecentMerge } from "~/server/contact-merge";
+import type { OnboardingChecklist as OnboardingChecklistData } from "~/server/onboarding";
 
 type DashboardContact = {
   id: string;
@@ -81,6 +84,7 @@ type ContactDashboardProps = {
   syncState: "ok" | "warning" | "error";
   highConfidenceCount: number;
   recentMerges: RecentMerge[];
+  onboarding: OnboardingChecklistData;
 };
 
 const getInitials = (value: string) =>
@@ -113,7 +117,25 @@ export function ContactDashboard({
   highConfidenceCount,
   recentMerges,
   incomingShares,
+  onboarding,
 }: ContactDashboardProps) {
+  // P26-04: show the first-run checklist only on the default people list —
+  // not inside favorites/emergency views, a shared book, or a search.
+  const showOnboarding =
+    onboarding.show &&
+    currentTab === "people" &&
+    currentFilter === "all" &&
+    !currentBook &&
+    !query;
+
+  // P26-05: the contextual "no contacts at all" empty state — only on the
+  // default people list (not a filter view, search, or shared book).
+  const contactsTrulyEmpty =
+    counts.people === 0 &&
+    currentFilter === "all" &&
+    !currentBook &&
+    currentScope !== "shared" &&
+    !query;
   const mergeDateFormatter = new Intl.DateTimeFormat("en-GB", {
     day: "2-digit",
     month: "short",
@@ -408,25 +430,66 @@ export function ContactDashboard({
         )}
 
         <div className="flex-1 overflow-y-auto pb-24 lg:pb-0">
+          {showOnboarding ? (
+            <div className="px-4 pt-3">
+              <OnboardingChecklist
+                steps={onboarding.steps}
+                doneCount={onboarding.doneCount}
+                total={onboarding.total}
+                allDone={onboarding.allDone}
+                needsExploreRecord={onboarding.needsExploreRecord}
+              />
+            </div>
+          ) : null}
           {currentTab === "people" ? (
-            <ContactsWorkspaceTable
-              contacts={activeContacts}
-              emptyState={
-                query
-                  ? `No contacts match “${query}”.`
-                  : isFavoritesView
-                    ? "No favorites yet. Star a contact to pin it here."
-                    : isEmergencyView
-                      ? "No emergency contacts yet. Mark a contact as emergency to pull it up fast."
-                      : currentFilter === "incomplete"
-                        ? "No contacts are missing details."
-                        : "Your contacts list is empty. Add your first contact or import from Google, Apple, or Outlook."
-              }
-              groupByLetter={groupByLetter}
-              mode="active"
-              query={query}
-              viewMode={viewMode}
-            />
+            contactsTrulyEmpty ? (
+              <EmptyState
+                icon="personPlus"
+                title="Your contacts will appear here"
+                body="Import from Google or Apple, add one by one, or connect a sync account to get started."
+              >
+                <div className="flex flex-wrap items-center justify-center gap-2.5">
+                  <Link
+                    className="inline-flex h-10 items-center rounded-[10px] bg-[#4158f4] px-4 text-[13.5px] font-semibold text-white transition hover:bg-[#3347d8]"
+                    href="/import-export"
+                  >
+                    Import contacts
+                  </Link>
+                  <Link
+                    className="inline-flex h-10 items-center gap-1.5 rounded-[10px] border border-[#d8ddd6] bg-white px-4 text-[13.5px] font-medium text-[#1d2823] transition hover:bg-[#f2f4f0]"
+                    href="/contacts/new"
+                  >
+                    <WorkspaceIcon name="plus" size={16} strokeWidth={2} />
+                    Add manually
+                  </Link>
+                </div>
+                <p className="text-[13px] text-[#5c655e]">
+                  Or{" "}
+                  <Link className="font-medium text-[#4158f4] hover:underline" href="/sync">
+                    connect a sync account&nbsp;→
+                  </Link>
+                </p>
+              </EmptyState>
+            ) : (
+              <ContactsWorkspaceTable
+                contacts={activeContacts}
+                emptyState={
+                  query
+                    ? `No contacts match “${query}”.`
+                    : isFavoritesView
+                      ? "No favorites yet. Star a contact to pin it here."
+                      : isEmergencyView
+                        ? "No emergency contacts yet. Mark a contact as emergency to pull it up fast."
+                        : currentFilter === "incomplete"
+                          ? "No contacts are missing details."
+                          : "Your contacts list is empty. Add your first contact or import from Google, Apple, or Outlook."
+                }
+                groupByLetter={groupByLetter}
+                mode="active"
+                query={query}
+                viewMode={viewMode}
+              />
+            )
           ) : null}
 
           {currentTab === "archived" ? (

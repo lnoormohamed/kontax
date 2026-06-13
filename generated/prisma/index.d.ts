@@ -19,6 +19,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
 /**
+ * Model UserOnboardingState
+ * 
+ */
+export type UserOnboardingState = $Result.DefaultSelection<Prisma.$UserOnboardingStatePayload>
+/**
  * Model AppPassword
  * 
  */
@@ -838,6 +843,16 @@ export class PrismaClient<
   get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.userOnboardingState`: Exposes CRUD operations for the **UserOnboardingState** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more UserOnboardingStates
+    * const userOnboardingStates = await prisma.userOnboardingState.findMany()
+    * ```
+    */
+  get userOnboardingState(): Prisma.UserOnboardingStateDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.appPassword`: Exposes CRUD operations for the **AppPassword** model.
     * Example usage:
     * ```ts
@@ -1648,6 +1663,7 @@ export namespace Prisma {
 
   export const ModelName: {
     User: 'User',
+    UserOnboardingState: 'UserOnboardingState',
     AppPassword: 'AppPassword',
     Contact: 'Contact',
     SubscriptionCustomer: 'SubscriptionCustomer',
@@ -1703,7 +1719,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset" | "exportPreset"
+      modelProps: "user" | "userOnboardingState" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset" | "exportPreset"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1778,6 +1794,80 @@ export namespace Prisma {
           count: {
             args: Prisma.UserCountArgs<ExtArgs>
             result: $Utils.Optional<UserCountAggregateOutputType> | number
+          }
+        }
+      }
+      UserOnboardingState: {
+        payload: Prisma.$UserOnboardingStatePayload<ExtArgs>
+        fields: Prisma.UserOnboardingStateFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.UserOnboardingStateFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserOnboardingStatePayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.UserOnboardingStateFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserOnboardingStatePayload>
+          }
+          findFirst: {
+            args: Prisma.UserOnboardingStateFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserOnboardingStatePayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.UserOnboardingStateFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserOnboardingStatePayload>
+          }
+          findMany: {
+            args: Prisma.UserOnboardingStateFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserOnboardingStatePayload>[]
+          }
+          create: {
+            args: Prisma.UserOnboardingStateCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserOnboardingStatePayload>
+          }
+          createMany: {
+            args: Prisma.UserOnboardingStateCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.UserOnboardingStateCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserOnboardingStatePayload>[]
+          }
+          delete: {
+            args: Prisma.UserOnboardingStateDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserOnboardingStatePayload>
+          }
+          update: {
+            args: Prisma.UserOnboardingStateUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserOnboardingStatePayload>
+          }
+          deleteMany: {
+            args: Prisma.UserOnboardingStateDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.UserOnboardingStateUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.UserOnboardingStateUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserOnboardingStatePayload>[]
+          }
+          upsert: {
+            args: Prisma.UserOnboardingStateUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$UserOnboardingStatePayload>
+          }
+          aggregate: {
+            args: Prisma.UserOnboardingStateAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateUserOnboardingState>
+          }
+          groupBy: {
+            args: Prisma.UserOnboardingStateGroupByArgs<ExtArgs>
+            result: $Utils.Optional<UserOnboardingStateGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.UserOnboardingStateCountArgs<ExtArgs>
+            result: $Utils.Optional<UserOnboardingStateCountAggregateOutputType> | number
           }
         }
       }
@@ -4616,6 +4706,7 @@ export namespace Prisma {
   }
   export type GlobalOmitConfig = {
     user?: UserOmit
+    userOnboardingState?: UserOnboardingStateOmit
     appPassword?: AppPasswordOmit
     contact?: ContactOmit
     subscriptionCustomer?: SubscriptionCustomerOmit
@@ -5860,6 +5951,7 @@ export namespace Prisma {
     importMappingPresets?: boolean | User$importMappingPresetsArgs<ExtArgs>
     exportPresets?: boolean | User$exportPresetsArgs<ExtArgs>
     failedLoginAttempts?: boolean | User$failedLoginAttemptsArgs<ExtArgs>
+    onboardingState?: boolean | User$onboardingStateArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -5971,6 +6063,7 @@ export namespace Prisma {
     importMappingPresets?: boolean | User$importMappingPresetsArgs<ExtArgs>
     exportPresets?: boolean | User$exportPresetsArgs<ExtArgs>
     failedLoginAttempts?: boolean | User$failedLoginAttemptsArgs<ExtArgs>
+    onboardingState?: boolean | User$onboardingStateArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -6007,6 +6100,7 @@ export namespace Prisma {
       importMappingPresets: Prisma.$ImportMappingPresetPayload<ExtArgs>[]
       exportPresets: Prisma.$ExportPresetPayload<ExtArgs>[]
       failedLoginAttempts: Prisma.$FailedLoginAttemptPayload<ExtArgs>[]
+      onboardingState: Prisma.$UserOnboardingStatePayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -6454,6 +6548,7 @@ export namespace Prisma {
     importMappingPresets<T extends User$importMappingPresetsArgs<ExtArgs> = {}>(args?: Subset<T, User$importMappingPresetsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ImportMappingPresetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     exportPresets<T extends User$exportPresetsArgs<ExtArgs> = {}>(args?: Subset<T, User$exportPresetsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExportPresetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     failedLoginAttempts<T extends User$failedLoginAttemptsArgs<ExtArgs> = {}>(args?: Subset<T, User$failedLoginAttemptsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FailedLoginAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    onboardingState<T extends User$onboardingStateArgs<ExtArgs> = {}>(args?: Subset<T, User$onboardingStateArgs<ExtArgs>>): Prisma__UserOnboardingStateClient<$Result.GetResult<Prisma.$UserOnboardingStatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -7556,6 +7651,25 @@ export namespace Prisma {
   }
 
   /**
+   * User.onboardingState
+   */
+  export type User$onboardingStateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnboardingState
+     */
+    select?: UserOnboardingStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserOnboardingState
+     */
+    omit?: UserOnboardingStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserOnboardingStateInclude<ExtArgs> | null
+    where?: UserOnboardingStateWhereInput
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -7571,6 +7685,1090 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: UserInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model UserOnboardingState
+   */
+
+  export type AggregateUserOnboardingState = {
+    _count: UserOnboardingStateCountAggregateOutputType | null
+    _min: UserOnboardingStateMinAggregateOutputType | null
+    _max: UserOnboardingStateMaxAggregateOutputType | null
+  }
+
+  export type UserOnboardingStateMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    exploredAt: Date | null
+    dismissedAt: Date | null
+    completedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type UserOnboardingStateMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    exploredAt: Date | null
+    dismissedAt: Date | null
+    completedAt: Date | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type UserOnboardingStateCountAggregateOutputType = {
+    id: number
+    userId: number
+    exploredAt: number
+    dismissedAt: number
+    completedAt: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type UserOnboardingStateMinAggregateInputType = {
+    id?: true
+    userId?: true
+    exploredAt?: true
+    dismissedAt?: true
+    completedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type UserOnboardingStateMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    exploredAt?: true
+    dismissedAt?: true
+    completedAt?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type UserOnboardingStateCountAggregateInputType = {
+    id?: true
+    userId?: true
+    exploredAt?: true
+    dismissedAt?: true
+    completedAt?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type UserOnboardingStateAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which UserOnboardingState to aggregate.
+     */
+    where?: UserOnboardingStateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserOnboardingStates to fetch.
+     */
+    orderBy?: UserOnboardingStateOrderByWithRelationInput | UserOnboardingStateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: UserOnboardingStateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserOnboardingStates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserOnboardingStates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned UserOnboardingStates
+    **/
+    _count?: true | UserOnboardingStateCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: UserOnboardingStateMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: UserOnboardingStateMaxAggregateInputType
+  }
+
+  export type GetUserOnboardingStateAggregateType<T extends UserOnboardingStateAggregateArgs> = {
+        [P in keyof T & keyof AggregateUserOnboardingState]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateUserOnboardingState[P]>
+      : GetScalarType<T[P], AggregateUserOnboardingState[P]>
+  }
+
+
+
+
+  export type UserOnboardingStateGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: UserOnboardingStateWhereInput
+    orderBy?: UserOnboardingStateOrderByWithAggregationInput | UserOnboardingStateOrderByWithAggregationInput[]
+    by: UserOnboardingStateScalarFieldEnum[] | UserOnboardingStateScalarFieldEnum
+    having?: UserOnboardingStateScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: UserOnboardingStateCountAggregateInputType | true
+    _min?: UserOnboardingStateMinAggregateInputType
+    _max?: UserOnboardingStateMaxAggregateInputType
+  }
+
+  export type UserOnboardingStateGroupByOutputType = {
+    id: string
+    userId: string
+    exploredAt: Date | null
+    dismissedAt: Date | null
+    completedAt: Date | null
+    createdAt: Date
+    updatedAt: Date
+    _count: UserOnboardingStateCountAggregateOutputType | null
+    _min: UserOnboardingStateMinAggregateOutputType | null
+    _max: UserOnboardingStateMaxAggregateOutputType | null
+  }
+
+  type GetUserOnboardingStateGroupByPayload<T extends UserOnboardingStateGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<UserOnboardingStateGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof UserOnboardingStateGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], UserOnboardingStateGroupByOutputType[P]>
+            : GetScalarType<T[P], UserOnboardingStateGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type UserOnboardingStateSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    exploredAt?: boolean
+    dismissedAt?: boolean
+    completedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["userOnboardingState"]>
+
+  export type UserOnboardingStateSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    exploredAt?: boolean
+    dismissedAt?: boolean
+    completedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["userOnboardingState"]>
+
+  export type UserOnboardingStateSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    exploredAt?: boolean
+    dismissedAt?: boolean
+    completedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["userOnboardingState"]>
+
+  export type UserOnboardingStateSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    exploredAt?: boolean
+    dismissedAt?: boolean
+    completedAt?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type UserOnboardingStateOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "exploredAt" | "dismissedAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["userOnboardingState"]>
+  export type UserOnboardingStateInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type UserOnboardingStateIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type UserOnboardingStateIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $UserOnboardingStatePayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "UserOnboardingState"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      exploredAt: Date | null
+      dismissedAt: Date | null
+      completedAt: Date | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["userOnboardingState"]>
+    composites: {}
+  }
+
+  type UserOnboardingStateGetPayload<S extends boolean | null | undefined | UserOnboardingStateDefaultArgs> = $Result.GetResult<Prisma.$UserOnboardingStatePayload, S>
+
+  type UserOnboardingStateCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<UserOnboardingStateFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: UserOnboardingStateCountAggregateInputType | true
+    }
+
+  export interface UserOnboardingStateDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['UserOnboardingState'], meta: { name: 'UserOnboardingState' } }
+    /**
+     * Find zero or one UserOnboardingState that matches the filter.
+     * @param {UserOnboardingStateFindUniqueArgs} args - Arguments to find a UserOnboardingState
+     * @example
+     * // Get one UserOnboardingState
+     * const userOnboardingState = await prisma.userOnboardingState.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends UserOnboardingStateFindUniqueArgs>(args: SelectSubset<T, UserOnboardingStateFindUniqueArgs<ExtArgs>>): Prisma__UserOnboardingStateClient<$Result.GetResult<Prisma.$UserOnboardingStatePayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one UserOnboardingState that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {UserOnboardingStateFindUniqueOrThrowArgs} args - Arguments to find a UserOnboardingState
+     * @example
+     * // Get one UserOnboardingState
+     * const userOnboardingState = await prisma.userOnboardingState.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends UserOnboardingStateFindUniqueOrThrowArgs>(args: SelectSubset<T, UserOnboardingStateFindUniqueOrThrowArgs<ExtArgs>>): Prisma__UserOnboardingStateClient<$Result.GetResult<Prisma.$UserOnboardingStatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first UserOnboardingState that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserOnboardingStateFindFirstArgs} args - Arguments to find a UserOnboardingState
+     * @example
+     * // Get one UserOnboardingState
+     * const userOnboardingState = await prisma.userOnboardingState.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends UserOnboardingStateFindFirstArgs>(args?: SelectSubset<T, UserOnboardingStateFindFirstArgs<ExtArgs>>): Prisma__UserOnboardingStateClient<$Result.GetResult<Prisma.$UserOnboardingStatePayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first UserOnboardingState that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserOnboardingStateFindFirstOrThrowArgs} args - Arguments to find a UserOnboardingState
+     * @example
+     * // Get one UserOnboardingState
+     * const userOnboardingState = await prisma.userOnboardingState.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends UserOnboardingStateFindFirstOrThrowArgs>(args?: SelectSubset<T, UserOnboardingStateFindFirstOrThrowArgs<ExtArgs>>): Prisma__UserOnboardingStateClient<$Result.GetResult<Prisma.$UserOnboardingStatePayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more UserOnboardingStates that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserOnboardingStateFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all UserOnboardingStates
+     * const userOnboardingStates = await prisma.userOnboardingState.findMany()
+     * 
+     * // Get first 10 UserOnboardingStates
+     * const userOnboardingStates = await prisma.userOnboardingState.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const userOnboardingStateWithIdOnly = await prisma.userOnboardingState.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends UserOnboardingStateFindManyArgs>(args?: SelectSubset<T, UserOnboardingStateFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserOnboardingStatePayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a UserOnboardingState.
+     * @param {UserOnboardingStateCreateArgs} args - Arguments to create a UserOnboardingState.
+     * @example
+     * // Create one UserOnboardingState
+     * const UserOnboardingState = await prisma.userOnboardingState.create({
+     *   data: {
+     *     // ... data to create a UserOnboardingState
+     *   }
+     * })
+     * 
+     */
+    create<T extends UserOnboardingStateCreateArgs>(args: SelectSubset<T, UserOnboardingStateCreateArgs<ExtArgs>>): Prisma__UserOnboardingStateClient<$Result.GetResult<Prisma.$UserOnboardingStatePayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many UserOnboardingStates.
+     * @param {UserOnboardingStateCreateManyArgs} args - Arguments to create many UserOnboardingStates.
+     * @example
+     * // Create many UserOnboardingStates
+     * const userOnboardingState = await prisma.userOnboardingState.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends UserOnboardingStateCreateManyArgs>(args?: SelectSubset<T, UserOnboardingStateCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many UserOnboardingStates and returns the data saved in the database.
+     * @param {UserOnboardingStateCreateManyAndReturnArgs} args - Arguments to create many UserOnboardingStates.
+     * @example
+     * // Create many UserOnboardingStates
+     * const userOnboardingState = await prisma.userOnboardingState.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many UserOnboardingStates and only return the `id`
+     * const userOnboardingStateWithIdOnly = await prisma.userOnboardingState.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends UserOnboardingStateCreateManyAndReturnArgs>(args?: SelectSubset<T, UserOnboardingStateCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserOnboardingStatePayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a UserOnboardingState.
+     * @param {UserOnboardingStateDeleteArgs} args - Arguments to delete one UserOnboardingState.
+     * @example
+     * // Delete one UserOnboardingState
+     * const UserOnboardingState = await prisma.userOnboardingState.delete({
+     *   where: {
+     *     // ... filter to delete one UserOnboardingState
+     *   }
+     * })
+     * 
+     */
+    delete<T extends UserOnboardingStateDeleteArgs>(args: SelectSubset<T, UserOnboardingStateDeleteArgs<ExtArgs>>): Prisma__UserOnboardingStateClient<$Result.GetResult<Prisma.$UserOnboardingStatePayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one UserOnboardingState.
+     * @param {UserOnboardingStateUpdateArgs} args - Arguments to update one UserOnboardingState.
+     * @example
+     * // Update one UserOnboardingState
+     * const userOnboardingState = await prisma.userOnboardingState.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends UserOnboardingStateUpdateArgs>(args: SelectSubset<T, UserOnboardingStateUpdateArgs<ExtArgs>>): Prisma__UserOnboardingStateClient<$Result.GetResult<Prisma.$UserOnboardingStatePayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more UserOnboardingStates.
+     * @param {UserOnboardingStateDeleteManyArgs} args - Arguments to filter UserOnboardingStates to delete.
+     * @example
+     * // Delete a few UserOnboardingStates
+     * const { count } = await prisma.userOnboardingState.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends UserOnboardingStateDeleteManyArgs>(args?: SelectSubset<T, UserOnboardingStateDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more UserOnboardingStates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserOnboardingStateUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many UserOnboardingStates
+     * const userOnboardingState = await prisma.userOnboardingState.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends UserOnboardingStateUpdateManyArgs>(args: SelectSubset<T, UserOnboardingStateUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more UserOnboardingStates and returns the data updated in the database.
+     * @param {UserOnboardingStateUpdateManyAndReturnArgs} args - Arguments to update many UserOnboardingStates.
+     * @example
+     * // Update many UserOnboardingStates
+     * const userOnboardingState = await prisma.userOnboardingState.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more UserOnboardingStates and only return the `id`
+     * const userOnboardingStateWithIdOnly = await prisma.userOnboardingState.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends UserOnboardingStateUpdateManyAndReturnArgs>(args: SelectSubset<T, UserOnboardingStateUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserOnboardingStatePayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one UserOnboardingState.
+     * @param {UserOnboardingStateUpsertArgs} args - Arguments to update or create a UserOnboardingState.
+     * @example
+     * // Update or create a UserOnboardingState
+     * const userOnboardingState = await prisma.userOnboardingState.upsert({
+     *   create: {
+     *     // ... data to create a UserOnboardingState
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the UserOnboardingState we want to update
+     *   }
+     * })
+     */
+    upsert<T extends UserOnboardingStateUpsertArgs>(args: SelectSubset<T, UserOnboardingStateUpsertArgs<ExtArgs>>): Prisma__UserOnboardingStateClient<$Result.GetResult<Prisma.$UserOnboardingStatePayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of UserOnboardingStates.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserOnboardingStateCountArgs} args - Arguments to filter UserOnboardingStates to count.
+     * @example
+     * // Count the number of UserOnboardingStates
+     * const count = await prisma.userOnboardingState.count({
+     *   where: {
+     *     // ... the filter for the UserOnboardingStates we want to count
+     *   }
+     * })
+    **/
+    count<T extends UserOnboardingStateCountArgs>(
+      args?: Subset<T, UserOnboardingStateCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], UserOnboardingStateCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a UserOnboardingState.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserOnboardingStateAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends UserOnboardingStateAggregateArgs>(args: Subset<T, UserOnboardingStateAggregateArgs>): Prisma.PrismaPromise<GetUserOnboardingStateAggregateType<T>>
+
+    /**
+     * Group by UserOnboardingState.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {UserOnboardingStateGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends UserOnboardingStateGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: UserOnboardingStateGroupByArgs['orderBy'] }
+        : { orderBy?: UserOnboardingStateGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, UserOnboardingStateGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetUserOnboardingStateGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the UserOnboardingState model
+   */
+  readonly fields: UserOnboardingStateFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for UserOnboardingState.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__UserOnboardingStateClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the UserOnboardingState model
+   */
+  interface UserOnboardingStateFieldRefs {
+    readonly id: FieldRef<"UserOnboardingState", 'String'>
+    readonly userId: FieldRef<"UserOnboardingState", 'String'>
+    readonly exploredAt: FieldRef<"UserOnboardingState", 'DateTime'>
+    readonly dismissedAt: FieldRef<"UserOnboardingState", 'DateTime'>
+    readonly completedAt: FieldRef<"UserOnboardingState", 'DateTime'>
+    readonly createdAt: FieldRef<"UserOnboardingState", 'DateTime'>
+    readonly updatedAt: FieldRef<"UserOnboardingState", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * UserOnboardingState findUnique
+   */
+  export type UserOnboardingStateFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnboardingState
+     */
+    select?: UserOnboardingStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserOnboardingState
+     */
+    omit?: UserOnboardingStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserOnboardingStateInclude<ExtArgs> | null
+    /**
+     * Filter, which UserOnboardingState to fetch.
+     */
+    where: UserOnboardingStateWhereUniqueInput
+  }
+
+  /**
+   * UserOnboardingState findUniqueOrThrow
+   */
+  export type UserOnboardingStateFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnboardingState
+     */
+    select?: UserOnboardingStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserOnboardingState
+     */
+    omit?: UserOnboardingStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserOnboardingStateInclude<ExtArgs> | null
+    /**
+     * Filter, which UserOnboardingState to fetch.
+     */
+    where: UserOnboardingStateWhereUniqueInput
+  }
+
+  /**
+   * UserOnboardingState findFirst
+   */
+  export type UserOnboardingStateFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnboardingState
+     */
+    select?: UserOnboardingStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserOnboardingState
+     */
+    omit?: UserOnboardingStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserOnboardingStateInclude<ExtArgs> | null
+    /**
+     * Filter, which UserOnboardingState to fetch.
+     */
+    where?: UserOnboardingStateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserOnboardingStates to fetch.
+     */
+    orderBy?: UserOnboardingStateOrderByWithRelationInput | UserOnboardingStateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for UserOnboardingStates.
+     */
+    cursor?: UserOnboardingStateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserOnboardingStates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserOnboardingStates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of UserOnboardingStates.
+     */
+    distinct?: UserOnboardingStateScalarFieldEnum | UserOnboardingStateScalarFieldEnum[]
+  }
+
+  /**
+   * UserOnboardingState findFirstOrThrow
+   */
+  export type UserOnboardingStateFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnboardingState
+     */
+    select?: UserOnboardingStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserOnboardingState
+     */
+    omit?: UserOnboardingStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserOnboardingStateInclude<ExtArgs> | null
+    /**
+     * Filter, which UserOnboardingState to fetch.
+     */
+    where?: UserOnboardingStateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserOnboardingStates to fetch.
+     */
+    orderBy?: UserOnboardingStateOrderByWithRelationInput | UserOnboardingStateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for UserOnboardingStates.
+     */
+    cursor?: UserOnboardingStateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserOnboardingStates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserOnboardingStates.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of UserOnboardingStates.
+     */
+    distinct?: UserOnboardingStateScalarFieldEnum | UserOnboardingStateScalarFieldEnum[]
+  }
+
+  /**
+   * UserOnboardingState findMany
+   */
+  export type UserOnboardingStateFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnboardingState
+     */
+    select?: UserOnboardingStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserOnboardingState
+     */
+    omit?: UserOnboardingStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserOnboardingStateInclude<ExtArgs> | null
+    /**
+     * Filter, which UserOnboardingStates to fetch.
+     */
+    where?: UserOnboardingStateWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of UserOnboardingStates to fetch.
+     */
+    orderBy?: UserOnboardingStateOrderByWithRelationInput | UserOnboardingStateOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing UserOnboardingStates.
+     */
+    cursor?: UserOnboardingStateWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` UserOnboardingStates from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` UserOnboardingStates.
+     */
+    skip?: number
+    distinct?: UserOnboardingStateScalarFieldEnum | UserOnboardingStateScalarFieldEnum[]
+  }
+
+  /**
+   * UserOnboardingState create
+   */
+  export type UserOnboardingStateCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnboardingState
+     */
+    select?: UserOnboardingStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserOnboardingState
+     */
+    omit?: UserOnboardingStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserOnboardingStateInclude<ExtArgs> | null
+    /**
+     * The data needed to create a UserOnboardingState.
+     */
+    data: XOR<UserOnboardingStateCreateInput, UserOnboardingStateUncheckedCreateInput>
+  }
+
+  /**
+   * UserOnboardingState createMany
+   */
+  export type UserOnboardingStateCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many UserOnboardingStates.
+     */
+    data: UserOnboardingStateCreateManyInput | UserOnboardingStateCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * UserOnboardingState createManyAndReturn
+   */
+  export type UserOnboardingStateCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnboardingState
+     */
+    select?: UserOnboardingStateSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserOnboardingState
+     */
+    omit?: UserOnboardingStateOmit<ExtArgs> | null
+    /**
+     * The data used to create many UserOnboardingStates.
+     */
+    data: UserOnboardingStateCreateManyInput | UserOnboardingStateCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserOnboardingStateIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * UserOnboardingState update
+   */
+  export type UserOnboardingStateUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnboardingState
+     */
+    select?: UserOnboardingStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserOnboardingState
+     */
+    omit?: UserOnboardingStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserOnboardingStateInclude<ExtArgs> | null
+    /**
+     * The data needed to update a UserOnboardingState.
+     */
+    data: XOR<UserOnboardingStateUpdateInput, UserOnboardingStateUncheckedUpdateInput>
+    /**
+     * Choose, which UserOnboardingState to update.
+     */
+    where: UserOnboardingStateWhereUniqueInput
+  }
+
+  /**
+   * UserOnboardingState updateMany
+   */
+  export type UserOnboardingStateUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update UserOnboardingStates.
+     */
+    data: XOR<UserOnboardingStateUpdateManyMutationInput, UserOnboardingStateUncheckedUpdateManyInput>
+    /**
+     * Filter which UserOnboardingStates to update
+     */
+    where?: UserOnboardingStateWhereInput
+    /**
+     * Limit how many UserOnboardingStates to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * UserOnboardingState updateManyAndReturn
+   */
+  export type UserOnboardingStateUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnboardingState
+     */
+    select?: UserOnboardingStateSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserOnboardingState
+     */
+    omit?: UserOnboardingStateOmit<ExtArgs> | null
+    /**
+     * The data used to update UserOnboardingStates.
+     */
+    data: XOR<UserOnboardingStateUpdateManyMutationInput, UserOnboardingStateUncheckedUpdateManyInput>
+    /**
+     * Filter which UserOnboardingStates to update
+     */
+    where?: UserOnboardingStateWhereInput
+    /**
+     * Limit how many UserOnboardingStates to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserOnboardingStateIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * UserOnboardingState upsert
+   */
+  export type UserOnboardingStateUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnboardingState
+     */
+    select?: UserOnboardingStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserOnboardingState
+     */
+    omit?: UserOnboardingStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserOnboardingStateInclude<ExtArgs> | null
+    /**
+     * The filter to search for the UserOnboardingState to update in case it exists.
+     */
+    where: UserOnboardingStateWhereUniqueInput
+    /**
+     * In case the UserOnboardingState found by the `where` argument doesn't exist, create a new UserOnboardingState with this data.
+     */
+    create: XOR<UserOnboardingStateCreateInput, UserOnboardingStateUncheckedCreateInput>
+    /**
+     * In case the UserOnboardingState was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<UserOnboardingStateUpdateInput, UserOnboardingStateUncheckedUpdateInput>
+  }
+
+  /**
+   * UserOnboardingState delete
+   */
+  export type UserOnboardingStateDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnboardingState
+     */
+    select?: UserOnboardingStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserOnboardingState
+     */
+    omit?: UserOnboardingStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserOnboardingStateInclude<ExtArgs> | null
+    /**
+     * Filter which UserOnboardingState to delete.
+     */
+    where: UserOnboardingStateWhereUniqueInput
+  }
+
+  /**
+   * UserOnboardingState deleteMany
+   */
+  export type UserOnboardingStateDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which UserOnboardingStates to delete
+     */
+    where?: UserOnboardingStateWhereInput
+    /**
+     * Limit how many UserOnboardingStates to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * UserOnboardingState without action
+   */
+  export type UserOnboardingStateDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the UserOnboardingState
+     */
+    select?: UserOnboardingStateSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the UserOnboardingState
+     */
+    omit?: UserOnboardingStateOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserOnboardingStateInclude<ExtArgs> | null
   }
 
 
@@ -51815,6 +53013,19 @@ export namespace Prisma {
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
 
 
+  export const UserOnboardingStateScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    exploredAt: 'exploredAt',
+    dismissedAt: 'dismissedAt',
+    completedAt: 'completedAt',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type UserOnboardingStateScalarFieldEnum = (typeof UserOnboardingStateScalarFieldEnum)[keyof typeof UserOnboardingStateScalarFieldEnum]
+
+
   export const AppPasswordScalarFieldEnum: {
     id: 'id',
     userId: 'userId',
@@ -53187,6 +54398,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetListRelationFilter
     exportPresets?: ExportPresetListRelationFilter
     failedLoginAttempts?: FailedLoginAttemptListRelationFilter
+    onboardingState?: XOR<UserOnboardingStateNullableScalarRelationFilter, UserOnboardingStateWhereInput> | null
   }
 
   export type UserOrderByWithRelationInput = {
@@ -53241,6 +54453,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetOrderByRelationAggregateInput
     exportPresets?: ExportPresetOrderByRelationAggregateInput
     failedLoginAttempts?: FailedLoginAttemptOrderByRelationAggregateInput
+    onboardingState?: UserOnboardingStateOrderByWithRelationInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -53298,6 +54511,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetListRelationFilter
     exportPresets?: ExportPresetListRelationFilter
     failedLoginAttempts?: FailedLoginAttemptListRelationFilter
+    onboardingState?: XOR<UserOnboardingStateNullableScalarRelationFilter, UserOnboardingStateWhereInput> | null
   }, "id" | "email">
 
   export type UserOrderByWithAggregationInput = {
@@ -53358,6 +54572,71 @@ export namespace Prisma {
     calToken?: StringNullableWithAggregatesFilter<"User"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
+  }
+
+  export type UserOnboardingStateWhereInput = {
+    AND?: UserOnboardingStateWhereInput | UserOnboardingStateWhereInput[]
+    OR?: UserOnboardingStateWhereInput[]
+    NOT?: UserOnboardingStateWhereInput | UserOnboardingStateWhereInput[]
+    id?: StringFilter<"UserOnboardingState"> | string
+    userId?: StringFilter<"UserOnboardingState"> | string
+    exploredAt?: DateTimeNullableFilter<"UserOnboardingState"> | Date | string | null
+    dismissedAt?: DateTimeNullableFilter<"UserOnboardingState"> | Date | string | null
+    completedAt?: DateTimeNullableFilter<"UserOnboardingState"> | Date | string | null
+    createdAt?: DateTimeFilter<"UserOnboardingState"> | Date | string
+    updatedAt?: DateTimeFilter<"UserOnboardingState"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type UserOnboardingStateOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    exploredAt?: SortOrderInput | SortOrder
+    dismissedAt?: SortOrderInput | SortOrder
+    completedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type UserOnboardingStateWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId?: string
+    AND?: UserOnboardingStateWhereInput | UserOnboardingStateWhereInput[]
+    OR?: UserOnboardingStateWhereInput[]
+    NOT?: UserOnboardingStateWhereInput | UserOnboardingStateWhereInput[]
+    exploredAt?: DateTimeNullableFilter<"UserOnboardingState"> | Date | string | null
+    dismissedAt?: DateTimeNullableFilter<"UserOnboardingState"> | Date | string | null
+    completedAt?: DateTimeNullableFilter<"UserOnboardingState"> | Date | string | null
+    createdAt?: DateTimeFilter<"UserOnboardingState"> | Date | string
+    updatedAt?: DateTimeFilter<"UserOnboardingState"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "userId">
+
+  export type UserOnboardingStateOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    exploredAt?: SortOrderInput | SortOrder
+    dismissedAt?: SortOrderInput | SortOrder
+    completedAt?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: UserOnboardingStateCountOrderByAggregateInput
+    _max?: UserOnboardingStateMaxOrderByAggregateInput
+    _min?: UserOnboardingStateMinOrderByAggregateInput
+  }
+
+  export type UserOnboardingStateScalarWhereWithAggregatesInput = {
+    AND?: UserOnboardingStateScalarWhereWithAggregatesInput | UserOnboardingStateScalarWhereWithAggregatesInput[]
+    OR?: UserOnboardingStateScalarWhereWithAggregatesInput[]
+    NOT?: UserOnboardingStateScalarWhereWithAggregatesInput | UserOnboardingStateScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"UserOnboardingState"> | string
+    userId?: StringWithAggregatesFilter<"UserOnboardingState"> | string
+    exploredAt?: DateTimeNullableWithAggregatesFilter<"UserOnboardingState"> | Date | string | null
+    dismissedAt?: DateTimeNullableWithAggregatesFilter<"UserOnboardingState"> | Date | string | null
+    completedAt?: DateTimeNullableWithAggregatesFilter<"UserOnboardingState"> | Date | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"UserOnboardingState"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"UserOnboardingState"> | Date | string
   }
 
   export type AppPasswordWhereInput = {
@@ -56996,6 +58275,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -57050,6 +58330,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -57104,6 +58385,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -57158,6 +58440,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -57234,6 +58517,75 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserOnboardingStateCreateInput = {
+    id?: string
+    exploredAt?: Date | string | null
+    dismissedAt?: Date | string | null
+    completedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutOnboardingStateInput
+  }
+
+  export type UserOnboardingStateUncheckedCreateInput = {
+    id?: string
+    userId: string
+    exploredAt?: Date | string | null
+    dismissedAt?: Date | string | null
+    completedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type UserOnboardingStateUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    exploredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutOnboardingStateNestedInput
+  }
+
+  export type UserOnboardingStateUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    exploredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserOnboardingStateCreateManyInput = {
+    id?: string
+    userId: string
+    exploredAt?: Date | string | null
+    dismissedAt?: Date | string | null
+    completedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type UserOnboardingStateUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    exploredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserOnboardingStateUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    exploredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -61526,6 +62878,11 @@ export namespace Prisma {
     none?: FailedLoginAttemptWhereInput
   }
 
+  export type UserOnboardingStateNullableScalarRelationFilter = {
+    is?: UserOnboardingStateWhereInput | null
+    isNot?: UserOnboardingStateWhereInput | null
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -61840,6 +63197,36 @@ export namespace Prisma {
   export type UserScalarRelationFilter = {
     is?: UserWhereInput
     isNot?: UserWhereInput
+  }
+
+  export type UserOnboardingStateCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    exploredAt?: SortOrder
+    dismissedAt?: SortOrder
+    completedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type UserOnboardingStateMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    exploredAt?: SortOrder
+    dismissedAt?: SortOrder
+    completedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type UserOnboardingStateMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    exploredAt?: SortOrder
+    dismissedAt?: SortOrder
+    completedAt?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
   }
 
   export type SyncConflictListRelationFilter = {
@@ -64759,6 +66146,12 @@ export namespace Prisma {
     connect?: FailedLoginAttemptWhereUniqueInput | FailedLoginAttemptWhereUniqueInput[]
   }
 
+  export type UserOnboardingStateCreateNestedOneWithoutUserInput = {
+    create?: XOR<UserOnboardingStateCreateWithoutUserInput, UserOnboardingStateUncheckedCreateWithoutUserInput>
+    connectOrCreate?: UserOnboardingStateCreateOrConnectWithoutUserInput
+    connect?: UserOnboardingStateWhereUniqueInput
+  }
+
   export type AppPasswordUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
@@ -64951,6 +66344,12 @@ export namespace Prisma {
     connectOrCreate?: FailedLoginAttemptCreateOrConnectWithoutUserInput | FailedLoginAttemptCreateOrConnectWithoutUserInput[]
     createMany?: FailedLoginAttemptCreateManyUserInputEnvelope
     connect?: FailedLoginAttemptWhereUniqueInput | FailedLoginAttemptWhereUniqueInput[]
+  }
+
+  export type UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput = {
+    create?: XOR<UserOnboardingStateCreateWithoutUserInput, UserOnboardingStateUncheckedCreateWithoutUserInput>
+    connectOrCreate?: UserOnboardingStateCreateOrConnectWithoutUserInput
+    connect?: UserOnboardingStateWhereUniqueInput
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -65377,6 +66776,16 @@ export namespace Prisma {
     deleteMany?: FailedLoginAttemptScalarWhereInput | FailedLoginAttemptScalarWhereInput[]
   }
 
+  export type UserOnboardingStateUpdateOneWithoutUserNestedInput = {
+    create?: XOR<UserOnboardingStateCreateWithoutUserInput, UserOnboardingStateUncheckedCreateWithoutUserInput>
+    connectOrCreate?: UserOnboardingStateCreateOrConnectWithoutUserInput
+    upsert?: UserOnboardingStateUpsertWithoutUserInput
+    disconnect?: UserOnboardingStateWhereInput | boolean
+    delete?: UserOnboardingStateWhereInput | boolean
+    connect?: UserOnboardingStateWhereUniqueInput
+    update?: XOR<XOR<UserOnboardingStateUpdateToOneWithWhereWithoutUserInput, UserOnboardingStateUpdateWithoutUserInput>, UserOnboardingStateUncheckedUpdateWithoutUserInput>
+  }
+
   export type AppPasswordUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
@@ -65759,6 +67168,30 @@ export namespace Prisma {
     update?: FailedLoginAttemptUpdateWithWhereUniqueWithoutUserInput | FailedLoginAttemptUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: FailedLoginAttemptUpdateManyWithWhereWithoutUserInput | FailedLoginAttemptUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: FailedLoginAttemptScalarWhereInput | FailedLoginAttemptScalarWhereInput[]
+  }
+
+  export type UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput = {
+    create?: XOR<UserOnboardingStateCreateWithoutUserInput, UserOnboardingStateUncheckedCreateWithoutUserInput>
+    connectOrCreate?: UserOnboardingStateCreateOrConnectWithoutUserInput
+    upsert?: UserOnboardingStateUpsertWithoutUserInput
+    disconnect?: UserOnboardingStateWhereInput | boolean
+    delete?: UserOnboardingStateWhereInput | boolean
+    connect?: UserOnboardingStateWhereUniqueInput
+    update?: XOR<XOR<UserOnboardingStateUpdateToOneWithWhereWithoutUserInput, UserOnboardingStateUpdateWithoutUserInput>, UserOnboardingStateUncheckedUpdateWithoutUserInput>
+  }
+
+  export type UserCreateNestedOneWithoutOnboardingStateInput = {
+    create?: XOR<UserCreateWithoutOnboardingStateInput, UserUncheckedCreateWithoutOnboardingStateInput>
+    connectOrCreate?: UserCreateOrConnectWithoutOnboardingStateInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutOnboardingStateNestedInput = {
+    create?: XOR<UserCreateWithoutOnboardingStateInput, UserUncheckedCreateWithoutOnboardingStateInput>
+    connectOrCreate?: UserCreateOrConnectWithoutOnboardingStateInput
+    upsert?: UserUpsertWithoutOnboardingStateInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutOnboardingStateInput, UserUpdateWithoutOnboardingStateInput>, UserUncheckedUpdateWithoutOnboardingStateInput>
   }
 
   export type UserCreateNestedOneWithoutAppPasswordsInput = {
@@ -69923,6 +71356,29 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type UserOnboardingStateCreateWithoutUserInput = {
+    id?: string
+    exploredAt?: Date | string | null
+    dismissedAt?: Date | string | null
+    completedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type UserOnboardingStateUncheckedCreateWithoutUserInput = {
+    id?: string
+    exploredAt?: Date | string | null
+    dismissedAt?: Date | string | null
+    completedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type UserOnboardingStateCreateOrConnectWithoutUserInput = {
+    where: UserOnboardingStateWhereUniqueInput
+    create: XOR<UserOnboardingStateCreateWithoutUserInput, UserOnboardingStateUncheckedCreateWithoutUserInput>
+  }
+
   export type AppPasswordUpsertWithWhereUniqueWithoutUserInput = {
     where: AppPasswordWhereUniqueInput
     update: XOR<AppPasswordUpdateWithoutUserInput, AppPasswordUncheckedUpdateWithoutUserInput>
@@ -70888,6 +72344,267 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"FailedLoginAttempt"> | Date | string
   }
 
+  export type UserOnboardingStateUpsertWithoutUserInput = {
+    update: XOR<UserOnboardingStateUpdateWithoutUserInput, UserOnboardingStateUncheckedUpdateWithoutUserInput>
+    create: XOR<UserOnboardingStateCreateWithoutUserInput, UserOnboardingStateUncheckedCreateWithoutUserInput>
+    where?: UserOnboardingStateWhereInput
+  }
+
+  export type UserOnboardingStateUpdateToOneWithWhereWithoutUserInput = {
+    where?: UserOnboardingStateWhereInput
+    data: XOR<UserOnboardingStateUpdateWithoutUserInput, UserOnboardingStateUncheckedUpdateWithoutUserInput>
+  }
+
+  export type UserOnboardingStateUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    exploredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserOnboardingStateUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    exploredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    dismissedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserCreateWithoutOnboardingStateInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutOnboardingStateInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutOnboardingStateInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutOnboardingStateInput, UserUncheckedCreateWithoutOnboardingStateInput>
+  }
+
+  export type UserUpsertWithoutOnboardingStateInput = {
+    update: XOR<UserUpdateWithoutOnboardingStateInput, UserUncheckedUpdateWithoutOnboardingStateInput>
+    create: XOR<UserCreateWithoutOnboardingStateInput, UserUncheckedCreateWithoutOnboardingStateInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutOnboardingStateInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutOnboardingStateInput, UserUncheckedUpdateWithoutOnboardingStateInput>
+  }
+
+  export type UserUpdateWithoutOnboardingStateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutOnboardingStateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+  }
+
   export type UserCreateWithoutAppPasswordsInput = {
     id?: string
     name?: string | null
@@ -70939,6 +72656,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAppPasswordsInput = {
@@ -70992,6 +72710,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAppPasswordsInput = {
@@ -71115,6 +72834,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAppPasswordsInput = {
@@ -71168,6 +72888,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type SyncConflictUpsertWithWhereUniqueWithoutAppPasswordInput = {
@@ -71263,6 +72984,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutContactsInput = {
@@ -71316,6 +73038,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutContactsInput = {
@@ -72108,6 +73831,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutContactsInput = {
@@ -72161,6 +73885,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type ImportJobUpsertWithoutContactsInput = {
@@ -72640,6 +74365,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSubscriptionCustomerInput = {
@@ -72693,6 +74419,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSubscriptionCustomerInput = {
@@ -72842,6 +74569,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSubscriptionCustomerInput = {
@@ -72895,6 +74623,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type SubscriptionUpsertWithWhereUniqueWithoutSubscriptionCustomerInput = {
@@ -72964,6 +74693,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSubscriptionsInput = {
@@ -73017,6 +74747,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSubscriptionsInput = {
@@ -73151,6 +74882,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSubscriptionsInput = {
@@ -73204,6 +74936,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type SubscriptionCustomerUpsertWithoutSubscriptionsInput = {
@@ -73304,6 +75037,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutImportJobsInput = {
@@ -73357,6 +75091,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutImportJobsInput = {
@@ -73558,6 +75293,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutImportJobsInput = {
@@ -73611,6 +75347,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type ContactUpsertWithWhereUniqueWithoutImportJobInput = {
@@ -73680,6 +75417,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutExportJobsInput = {
@@ -73733,6 +75471,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutExportJobsInput = {
@@ -73802,6 +75541,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutExportJobsInput = {
@@ -73855,6 +75595,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type UserCreateWithoutMergeSuggestionsInput = {
@@ -73908,6 +75649,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutMergeSuggestionsInput = {
@@ -73961,6 +75703,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutMergeSuggestionsInput = {
@@ -74322,6 +76065,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMergeSuggestionsInput = {
@@ -74375,6 +76119,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type ContactUpsertWithoutLeftMergeSuggestionsInput = {
@@ -74753,6 +76498,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutMergeDecisionsInput = {
@@ -74806,6 +76552,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutMergeDecisionsInput = {
@@ -74924,6 +76671,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMergeDecisionsInput = {
@@ -74977,6 +76725,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type UserCreateWithoutSyncAccountsInput = {
@@ -75030,6 +76779,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSyncAccountsInput = {
@@ -75083,6 +76833,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSyncAccountsInput = {
@@ -75358,6 +77109,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSyncAccountsInput = {
@@ -75411,6 +77163,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type SyncContactLinkUpsertWithWhereUniqueWithoutSyncAccountInput = {
@@ -76972,6 +78725,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutEmailVerificationTokensInput = {
@@ -77025,6 +78779,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutEmailVerificationTokensInput = {
@@ -77094,6 +78849,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEmailVerificationTokensInput = {
@@ -77147,6 +78903,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type UserCreateWithoutPasswordResetTokensInput = {
@@ -77200,6 +78957,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
@@ -77253,6 +79011,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutPasswordResetTokensInput = {
@@ -77322,6 +79081,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
@@ -77375,6 +79135,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type UserCreateWithoutSessionsInput = {
@@ -77428,6 +79189,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -77481,6 +79243,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -77550,6 +79313,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -77603,6 +79367,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type UserCreateWithoutTotpRecoveryCodesInput = {
@@ -77656,6 +79421,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutTotpRecoveryCodesInput = {
@@ -77709,6 +79475,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutTotpRecoveryCodesInput = {
@@ -77778,6 +79545,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutTotpRecoveryCodesInput = {
@@ -77831,6 +79599,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type UserCreateWithoutActivityEventsInput = {
@@ -77884,6 +79653,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutActivityEventsInput = {
@@ -77937,6 +79707,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutActivityEventsInput = {
@@ -78133,6 +79904,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutActivityEventsInput = {
@@ -78186,6 +79958,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type ContactUpsertWithoutActivityEventsInput = {
@@ -78372,6 +80145,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAdminAuditEventsInput = {
@@ -78425,6 +80199,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAdminAuditEventsInput = {
@@ -78494,6 +80269,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAdminAuditEventsInput = {
@@ -78547,6 +80323,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type UserCreateWithoutOwnedGroupsInput = {
@@ -78600,6 +80377,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutOwnedGroupsInput = {
@@ -78653,6 +80431,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutOwnedGroupsInput = {
@@ -78901,6 +80680,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOwnedGroupsInput = {
@@ -78954,6 +80734,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type SubscriptionUpsertWithoutGroupsInput = {
@@ -79198,6 +80979,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutGroupMembershipsInput = {
@@ -79251,6 +81033,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutGroupMembershipsInput = {
@@ -79361,6 +81144,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutGroupMembershipsInput = {
@@ -79414,6 +81198,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type GroupCreateWithoutAddressBooksInput = {
@@ -79627,6 +81412,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAddressBooksInput = {
@@ -79680,6 +81466,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAddressBooksInput = {
@@ -79881,6 +81668,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAddressBooksInput = {
@@ -79934,6 +81722,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type ContactUpsertWithWhereUniqueWithoutBookInput = {
@@ -80635,6 +82424,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutContactSharesOwnedInput = {
@@ -80688,6 +82478,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutContactSharesOwnedInput = {
@@ -80873,6 +82664,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutContactSharesReceivedInput = {
@@ -80926,6 +82718,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutContactSharesReceivedInput = {
@@ -81122,6 +82915,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutContactSharesOwnedInput = {
@@ -81175,6 +82969,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type ContactUpsertWithoutSharesFromContactInput = {
@@ -81372,6 +83167,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutContactSharesReceivedInput = {
@@ -81425,6 +83221,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type ContactUpsertWithoutSharesAsRecipientCopyInput = {
@@ -81611,6 +83408,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -81664,6 +83462,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -81762,6 +83561,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -81815,6 +83615,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type SecurityAlertUpsertWithoutNotificationsInput = {
@@ -81903,6 +83704,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSecurityAlertsInput = {
@@ -81956,6 +83758,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSecurityAlertsInput = {
@@ -82061,6 +83864,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSecurityAlertsInput = {
@@ -82114,6 +83918,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type NotificationUpsertWithWhereUniqueWithoutSecurityAlertInput = {
@@ -82183,6 +83988,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutNotificationSettingsInput = {
@@ -82236,6 +84042,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutNotificationSettingsInput = {
@@ -82305,6 +84112,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutNotificationSettingsInput = {
@@ -82358,6 +84166,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type UserCreateWithoutFailedLoginAttemptsInput = {
@@ -82411,6 +84220,7 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutFailedLoginAttemptsInput = {
@@ -82464,6 +84274,7 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutFailedLoginAttemptsInput = {
@@ -82533,6 +84344,7 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutFailedLoginAttemptsInput = {
@@ -82586,6 +84398,7 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type UserCreateWithoutBirthdayReminderStatesInput = {
@@ -82639,6 +84452,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutBirthdayReminderStatesInput = {
@@ -82692,6 +84506,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutBirthdayReminderStatesInput = {
@@ -82888,6 +84703,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBirthdayReminderStatesInput = {
@@ -82941,6 +84757,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type ContactUpsertWithoutBirthdayReminderStatesInput = {
@@ -83127,6 +84944,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutImportMappingSuggestionFeedbacksInput = {
@@ -83180,6 +84998,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutImportMappingSuggestionFeedbacksInput = {
@@ -83249,6 +85068,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutImportMappingSuggestionFeedbacksInput = {
@@ -83302,6 +85122,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type UserCreateWithoutImportMappingPresetsInput = {
@@ -83355,6 +85176,7 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutImportMappingPresetsInput = {
@@ -83408,6 +85230,7 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutImportMappingPresetsInput = {
@@ -83477,6 +85300,7 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutImportMappingPresetsInput = {
@@ -83530,6 +85354,7 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type UserCreateWithoutExportPresetsInput = {
@@ -83583,6 +85408,7 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutExportPresetsInput = {
@@ -83636,6 +85462,7 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutExportPresetsInput = {
@@ -83705,6 +85532,7 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutExportPresetsInput = {
@@ -83758,6 +85586,7 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type AppPasswordCreateManyUserInput = {

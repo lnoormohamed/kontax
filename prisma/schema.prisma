@@ -260,11 +260,32 @@ model User {
     calToken                String?
     // P22-04: repeated failed-login detection
     failedLoginAttempts     FailedLoginAttempt[]
+    // P26-04: first-run onboarding checklist state
+    onboardingState         UserOnboardingState?
     createdAt             DateTime                @default(now())
     updatedAt             DateTime                @updatedAt
 
     @@index([scheduledDeleteAt])
     @@index([calToken])
+}
+
+// P26-04: first-run onboarding checklist state. The "create account", "add a
+// contact", and "connect a sync account" steps are derived live from existing
+// data; only the route-visit ("explore") trigger and the dismiss/complete
+// lifecycle need persisting here. One row per user, created lazily on first
+// dismiss/explore/complete.
+model UserOnboardingState {
+    id          String    @id @default(cuid())
+    userId      String    @unique
+    user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+    // set the first time the user opens the contacts list with >= 1 contact
+    exploredAt  DateTime?
+    // set when the user dismisses the checklist (× or the completion "Dismiss")
+    dismissedAt DateTime?
+    // set when all four steps are complete and the success card has been shown
+    completedAt DateTime?
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
 }
 
 model AppPassword {

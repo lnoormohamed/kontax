@@ -147,6 +147,16 @@ exports.Prisma.UserScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.UserOnboardingStateScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  exploredAt: 'exploredAt',
+  dismissedAt: 'dismissedAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.AppPasswordScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -995,6 +1005,7 @@ exports.DigestCadence = exports.$Enums.DigestCadence = {
 
 exports.Prisma.ModelName = {
   User: 'User',
+  UserOnboardingState: 'UserOnboardingState',
   AppPassword: 'AppPassword',
   Contact: 'Contact',
   SubscriptionCustomer: 'SubscriptionCustomer',

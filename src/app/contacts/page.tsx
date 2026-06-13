@@ -17,6 +17,7 @@ import { getUserPlanSummary, isActivityLogEnabled } from "~/server/billing";
 import { getOpenMergeSuggestionsForUser, getRecentMergesForUser } from "~/server/contact-merge";
 import { getUserFamilyMembership } from "~/server/family-access";
 import { getAccessibleTeamBooks } from "~/server/team-access";
+import { getOnboardingChecklist } from "~/server/onboarding";
 import { db } from "~/server/db";
 
 type ContactsPageProps = {
@@ -353,7 +354,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
     ...teamActive.map((c) => ({ ...c, sharedKind: "team" as const })),
   ];
 
-  const [privatePeopleCount, sharedPeopleCount, favoritesCount, emergencyCount, archivedCount, incomingSharesCount, unreadCount, syncErrorCount] =
+  const [privatePeopleCount, sharedPeopleCount, favoritesCount, emergencyCount, archivedCount, incomingSharesCount, unreadCount, syncErrorCount, connectedSyncCount] =
     await Promise.all([
       db.contact.count({ where: { userId: session.user.id, archivedAt: null, groupContacts: { none: {} } } }),
       sharedBooks.length > 0
@@ -374,8 +375,16 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
       }),
       db.notification.count({ where: { userId: session.user.id, readAt: null, dismissedAt: null } }),
       db.syncAccount.count({ where: { userId: session.user.id, status: { in: ["ERROR", "NEEDS_REAUTH"] } } }),
+      db.syncAccount.count({ where: { userId: session.user.id, status: "ACTIVE" } }),
     ]);
   const peopleCount = privatePeopleCount + sharedPeopleCount;
+
+  // P26-04: first-run onboarding checklist (shown above the people list).
+  const onboarding = await getOnboardingChecklist({
+    userId: session.user.id,
+    hasContact: privatePeopleCount > 0,
+    hasSync: connectedSyncCount > 0,
+  });
 
   const duplicatesCount = mergeSuggestionCount ?? mergeSuggestions.length;
   const highConfidenceCount =
@@ -489,6 +498,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         highConfidenceCount={highConfidenceCount}
         recentMerges={recentMerges}
         incomingShares={incomingSharesCount || undefined}
+        onboarding={onboarding}
       />
 
       <MobileCreateFab
