@@ -203,7 +203,7 @@ export function extractLabeledValues(
     .split(delimiter)
     .map((part) => {
       const trimmed = part.trim();
-      const labelMatch = trimmed.match(/^([A-Za-z\s]+):\s*(.+)$/);
+      const labelMatch = /^([A-Za-z\s]+):\s*(.+)$/.exec(trimmed);
       if (labelMatch) {
         return { label: labelMatch[1]!.trim(), value: labelMatch[2]!.trim() };
       }

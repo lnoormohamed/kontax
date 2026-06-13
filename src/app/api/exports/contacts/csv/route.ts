@@ -7,7 +7,6 @@ import {
   contactsToCsvFiltered,
   parseContactPostalAddresses,
   parseContactStringArray,
-  type ExportFieldSelection,
 } from "~/server/contact-portability";
 
 export async function GET(request: Request) {
@@ -159,13 +158,15 @@ export async function POST(request: Request) {
   const selectedIds = ids ?? [];
   const resultFileName = `kontax-contacts-${new Date().toISOString().slice(0, 10)}.csv`;
 
+  const filterQuery = query ?? null;
+
   const job = await db.exportJob.create({
     data: {
       userId,
       format: "CSV_GENERIC",
       status: "PROCESSING",
       includeArchived: includeArchived ?? false,
-      filterQuery: query || null,
+      filterQuery,
       resultFileName,
     },
   });
@@ -206,11 +207,12 @@ export async function POST(request: Request) {
         emailAddresses: parseContactStringArray(c.emailAddresses),
         phoneNumbers: parseContactStringArray(c.phoneNumbers),
         postalAddresses: parseContactPostalAddresses(c.postalAddresses),
-        customFields: c.customFields && typeof c.customFields === "object" && !Array.isArray(c.customFields)
-          ? (c.customFields as Record<string, string>)
-          : null,
+        customFields:
+          c.customFields && typeof c.customFields === "object" && !Array.isArray(c.customFields)
+            ? (c.customFields as Record<string, string>)
+            : null,
       })),
-      fieldSelection as ExportFieldSelection[],
+      fieldSelection,
     );
 
     await db.exportJob.update({
@@ -218,7 +220,7 @@ export async function POST(request: Request) {
       data: {
         status: "COMPLETED",
         exportedCount: contacts.length,
-        filterQuery: query || null,
+        filterQuery,
         resultFileName,
         completedAt: new Date(),
       },
@@ -236,7 +238,7 @@ export async function POST(request: Request) {
       where: { id: job.id },
       data: {
         status: "FAILED",
-        filterQuery: query || null,
+        filterQuery,
         resultFileName,
         errorSummary: error instanceof Error ? error.message : "CSV export failed.",
         completedAt: new Date(),

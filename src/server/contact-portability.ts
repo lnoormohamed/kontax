@@ -1062,7 +1062,8 @@ export const contactsToCsvFiltered = (
 
   const headers = selected.flatMap((f) => {
     if (f.key === "customFields") return customFieldKeys;
-    return [f.headerOverride?.trim() || (DEFAULT_FIELD_LABELS[f.key] ?? f.key)];
+    const h = f.headerOverride?.trim();
+    return [h !== undefined && h !== "" ? h : (DEFAULT_FIELD_LABELS[f.key] ?? f.key)];
   });
 
   const rows = contacts.map((contact) =>
