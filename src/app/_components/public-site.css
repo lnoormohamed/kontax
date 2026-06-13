@@ -393,7 +393,48 @@
 .kx .pfoot-note { max-width: 760px; margin: 36px auto 0; text-align: center; font-size: 12.5px; line-height: 1.6; color: var(--mute); }
 .kx .pfoot-note a { color: var(--accent); font-weight: 500; }
 
+/* ─────────────────────────── pricing mobile accordion ─────────────────────────── */
+.kx .pr-mob { display: none; }
+
+.kx .mob-plan { border: 1px solid var(--line); border-radius: 14px; margin-bottom: 12px; overflow: hidden; }
+.kx .mob-plan--rec { border-color: var(--green); background: linear-gradient(180deg, rgba(23,53,46,.04), transparent 30%); }
+
+.kx .mob-plan__hd { width: 100%; display: flex; align-items: center; gap: 12px; padding: 16px; border: none; background: transparent; text-align: left; cursor: pointer; }
+.kx .mob-plan__hd-left { flex: 1; min-width: 0; }
+.kx .mob-plan__hd-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+.kx .mob-plan__name { font-size: 16px; font-weight: 700; color: var(--ink); }
+.kx .mob-plan__who { display: block; font-size: 12px; color: var(--mute); margin-top: 2px; }
+.kx .mob-plan__price { font-size: 19px; font-weight: 700; color: var(--ink); flex-shrink: 0; }
+.kx .mob-plan__chev { color: var(--mute); flex-shrink: 0; transition: transform .18s ease; }
+.kx .mob-plan__chev--open { transform: rotate(180deg); }
+
+.kx .mob-plan__body { padding: 0 16px 16px; }
+.kx .mob-plan__period { margin: 0 0 14px; font-size: 11.5px; color: var(--mute); }
+
+.kx .mob-plan__group { margin-bottom: 14px; }
+.kx .mob-plan__cat { font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--green); margin-bottom: 6px; }
+.kx .mob-plan__cat-note { font-weight: 500; letter-spacing: .01em; text-transform: none; color: var(--mute); font-size: 10px; }
+.kx .mob-plan__row { display: flex; justify-content: space-between; align-items: flex-start; gap: 14px; padding: 7px 0; border-bottom: 1px solid var(--line2); font-size: 13px; }
+.kx .mob-plan__row:last-child { border-bottom: none; }
+.kx .mob-plan__feat { color: var(--ink2); flex: 1; min-width: 0; }
+.kx .mob-plan__val { flex-shrink: 0; text-align: right; }
+.kx .mob-plan__val .val { font-weight: 500; color: var(--ink); }
+.kx .mob-plan__val .cell-note { font-size: 11px; color: var(--mute); }
+.kx .mob-plan__val .ck { color: #3f7d6a; }
+.kx .mob-plan__val .dash { color: var(--faint); }
+
+.kx .mob-plan__cta { margin-top: 14px; }
+.kx .mob-plan__cta .plan-cta { margin-top: 0; }
+
+/* chip variants for mobile plan cards */
+.kx .chip--current { background: var(--green-t); color: var(--green); }
+
 /* ─────────────────────────── responsive ─────────────────────────── */
+@media (max-width: 860px) {
+  .kx .ptable-scroll { display: none; }
+  .kx .pr-mob { display: block; }
+}
+
 @media (max-width: 980px) {
   .kx .doc-layout { grid-template-columns: 1fr; gap: 0; }
   .kx .doc-toc { display: none; }

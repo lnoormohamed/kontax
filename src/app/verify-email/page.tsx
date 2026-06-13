@@ -21,7 +21,7 @@ export default async function VerifyEmailPage({
     }
     // Only SIGNUP reaches here
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#f6f7f4]">
+      <div className="flex min-h-screen items-center justify-center bg-[#f6f7f4] px-5 py-10">
         <div className="w-full max-w-[420px] rounded-2xl border border-[#d8ddd6] bg-white p-8 text-center shadow-sm">
           <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#e7efe9]">
             <svg className="h-6 w-6 text-[#17352e]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
@@ -45,7 +45,7 @@ export default async function VerifyEmailPage({
 
   const isExpired = result.error === "TOKEN_EXPIRED";
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#f6f7f4]">
+    <div className="flex min-h-screen items-center justify-center bg-[#f6f7f4] px-5 py-10">
       <div className="w-full max-w-[420px] rounded-2xl border border-[#d8ddd6] bg-white p-8 text-center shadow-sm">
         <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#fdf3e7]">
           <svg className="h-6 w-6 text-[#bf8526]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">

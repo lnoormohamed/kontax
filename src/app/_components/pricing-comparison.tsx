@@ -7,6 +7,48 @@ import { createBillingPortalSession, createCheckoutSession, getDowngradeSummary 
 import { CancelPlanModal, type CancelPlanDetails } from "~/app/settings/_components/cancel-plan-modal";
 
 type PlanCol = "FREE" | "PRO" | "FAMILY" | "TEAMS";
+type MobCell = boolean | string | { v: string; note: string };
+
+const PLAN_ORDER: PlanCol[] = ["FREE", "PRO", "FAMILY", "TEAMS"];
+
+const PLAN_META: Record<PlanCol, { name: string; who: string; rec?: boolean }> = {
+  FREE:   { name: "Free",   who: "For getting started and small libraries" },
+  PRO:    { name: "Pro",    who: "For individual power users", rec: true },
+  FAMILY: { name: "Family", who: "For households up to 6 people" },
+  TEAMS:  { name: "Teams",  who: "For organisations up to 25" },
+};
+
+const MOBILE_MATRIX: Array<{ cat: string; note?: string; rows: Array<{ label: string; vals: Record<PlanCol, MobCell> }> }> = [
+  { cat: "Contacts", rows: [
+    { label: "Contacts",        vals: { FREE: "500",           PRO: "Unlimited",  FAMILY: { v: "Unlimited", note: "per member" }, TEAMS: { v: "Unlimited", note: "per member" } } },
+    { label: "Monthly imports", vals: { FREE: "3 / mo",        PRO: "Unlimited",  FAMILY: "Unlimited",  TEAMS: "Unlimited" } },
+    { label: "Export formats",  vals: { FREE: "CSV, vCard",    PRO: "All formats", FAMILY: "All formats", TEAMS: "All formats" } },
+    { label: "Duplicate merge", vals: { FREE: "Basic",         PRO: { v: "Advanced", note: "field-level, bulk, 30-day undo" }, FAMILY: "Advanced", TEAMS: "Advanced" } },
+  ]},
+  { cat: "Sync", rows: [
+    { label: "CardDAV sync accounts",   vals: { FREE: "1", PRO: "5", FAMILY: { v: "5", note: "per member" }, TEAMS: { v: "5", note: "per member" } } },
+    { label: "Device app passwords",    vals: { FREE: "1", PRO: "5", FAMILY: "5", TEAMS: "5" } },
+    { label: "Team-level CardDAV sync", vals: { FREE: false, PRO: false, FAMILY: false, TEAMS: true } },
+  ]},
+  { cat: "Sharing", rows: [
+    { label: "vCard share links",      vals: { FREE: "Expire after 7 days", PRO: "No expiry, revocable", FAMILY: "No expiry, revocable", TEAMS: "No expiry, revocable" } },
+    { label: "Static contact sharing", vals: { FREE: false, PRO: true, FAMILY: true, TEAMS: true } },
+    { label: "Live contact sharing",   vals: { FREE: false, PRO: true, FAMILY: true, TEAMS: true } },
+  ]},
+  { cat: "Collaboration", note: "shared books — Phase 13+", rows: [
+    { label: "Members",               vals: { FREE: false, PRO: false, FAMILY: "Up to 6", TEAMS: "Up to 25" } },
+    { label: "Shared address books",  vals: { FREE: false, PRO: false, FAMILY: "1 shared book", TEAMS: "Multiple" } },
+    { label: "Roles & admin controls", vals: { FREE: false, PRO: false, FAMILY: "Admin controls", TEAMS: "Roles per book" } },
+    { label: "Audit log",             vals: { FREE: false, PRO: false, FAMILY: false, TEAMS: "Unlimited retention" } },
+  ]},
+  { cat: "Activity", rows: [
+    { label: "Global activity feed", vals: { FREE: false, PRO: "365 days", FAMILY: "90 days", TEAMS: "Unlimited" } },
+    { label: "Per-contact history",  vals: { FREE: "Last 3 shown", PRO: "Full · 365 days", FAMILY: "Full · 90 days", TEAMS: "Full · unlimited" } },
+  ]},
+  { cat: "Support", rows: [
+    { label: "Support", vals: { FREE: "Community", PRO: "Priority", FAMILY: "Priority", TEAMS: "Dedicated manager" } },
+  ]},
+];
 type CtaKind = "current" | "primary" | "secondary" | "destructive";
 type Cell = "current" | { label: string; kind: CtaKind; sub?: string };
 
@@ -47,6 +89,79 @@ function Check() {
 }
 
 const Dash = () => <span className="dash">—</span>;
+
+function MobVal({ v }: { v: MobCell }) {
+  if (v === true) return <Check />;
+  if (v === false) return <Dash />;
+  if (typeof v === "object") return <span><span className="val">{v.v}</span><span className="cell-note"> · {v.note}</span></span>;
+  return <span className="val">{v}</span>;
+}
+
+function ChevDown() {
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  );
+}
+
+function MobilePlanCard({
+  plan,
+  currentPlan,
+  annual,
+  priceLabel,
+  openDefault,
+  PlanCtaEl,
+}: {
+  plan: PlanCol;
+  currentPlan: string | null | undefined;
+  annual: boolean;
+  priceLabel: string;
+  openDefault: boolean;
+  PlanCtaEl: React.ReactNode;
+}) {
+  const [open, setOpen] = useState(openDefault);
+  const meta = PLAN_META[plan];
+  const isCurrent = currentPlan === plan;
+  const period = annual ? "per month · billed yearly" : plan === "TEAMS" ? "per seat / month" : plan === "FREE" ? "Free forever" : "per month";
+
+  return (
+    <div className={"mob-plan" + (meta.rec ? " mob-plan--rec" : "")}>
+      <button className="mob-plan__hd" onClick={() => setOpen((o) => !o)} type="button">
+        <div className="mob-plan__hd-left">
+          <div className="mob-plan__hd-row">
+            <span className="mob-plan__name">{meta.name}</span>
+            {meta.rec && <span className="chip chip--rec" style={{ fontSize: 9, padding: "2px 7px" }}>REC</span>}
+            {isCurrent && <span className="chip chip--current" style={{ fontSize: 9, padding: "2px 7px" }}>CURRENT</span>}
+          </div>
+          <span className="mob-plan__who">{meta.who}</span>
+        </div>
+        <span className="mob-plan__price">{priceLabel}</span>
+        <span className={"mob-plan__chev" + (open ? " mob-plan__chev--open" : "")}><ChevDown /></span>
+      </button>
+      {open && (
+        <div className="mob-plan__body">
+          <p className="mob-plan__period">{period}</p>
+          {MOBILE_MATRIX.map((g) => (
+            <div key={g.cat} className="mob-plan__group">
+              <div className="mob-plan__cat">
+                {g.cat}
+                {g.note && <span className="mob-plan__cat-note"> · {g.note}</span>}
+              </div>
+              {g.rows.map((r) => (
+                <div key={r.label} className="mob-plan__row">
+                  <span className="mob-plan__feat">{r.label}</span>
+                  <span className="mob-plan__val"><MobVal v={r.vals[plan]} /></span>
+                </div>
+              ))}
+            </div>
+          ))}
+          <div className="mob-plan__cta">{PlanCtaEl}</div>
+        </div>
+      )}
+    </div>
+  );
+}
 
 /**
  * Pricing comparison: four-tier table with a Monthly/Annual billing toggle.
@@ -237,6 +352,25 @@ export function PricingComparison({ currentPlan }: { currentPlan?: string | null
 
       <section className="pricing">
         <div className="container">
+          {/* mobile accordion — shown ≤860px, hidden otherwise */}
+          <div className="pr-mob">
+            {PLAN_ORDER.map((plan) => {
+              const p = PLAN_META[plan];
+              const price = plan === "FREE" ? "£0" : priceLabel(plan);
+              return (
+                <MobilePlanCard
+                  key={plan}
+                  plan={plan}
+                  currentPlan={currentPlan}
+                  annual={annual}
+                  priceLabel={price}
+                  openDefault={!!p.rec}
+                  PlanCtaEl={<PlanCta card={plan} />}
+                />
+              );
+            })}
+          </div>
+
           <div className="ptable-scroll">
             <table className="ptable">
               <colgroup>

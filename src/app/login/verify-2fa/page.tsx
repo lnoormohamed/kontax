@@ -150,7 +150,7 @@ export default function VerifyTwoFaPage() {
             <div className="mt-5">
               <input
                 autoFocus
-                className="w-full rounded-[1.2rem] border border-[#d8ddd6] bg-white px-4 py-3 font-mono text-[15px] uppercase tracking-[0.08em] text-[#1d2823] outline-none transition focus:border-[#4158f4] focus:ring-[3px] focus:ring-[#edf0fe]"
+                className="w-full rounded-[1.2rem] border border-[#d8ddd6] bg-white px-4 py-3 font-mono text-[16px] uppercase tracking-[0.08em] text-[#1d2823] outline-none transition focus:border-[#4158f4] focus:ring-[3px] focus:ring-[#edf0fe]"
                 onChange={(e) => setRecoveryCode(e.target.value)}
                 placeholder="XXXXXXXXXX"
                 type="text"

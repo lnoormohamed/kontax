@@ -9,16 +9,36 @@ interface BeforeInstallPromptEvent extends Event {
 }
 
 const INSTALL_PROMPT_DISMISSED_KEY = "kontax:pwa-install-dismissed-at";
+const IOS_INSTALL_PROMPT_DISMISSED_KEY = "kontax:pwa-ios-install-dismissed-at";
 const INSTALL_PROMPT_COOLDOWN_MS = 30 * 24 * 60 * 60 * 1000;
 
-const canShowInstallPrompt = () => {
-  const dismissedAt = Number(localStorage.getItem(INSTALL_PROMPT_DISMISSED_KEY) ?? "0");
+const canShowPrompt = (key: string) => {
+  const dismissedAt = Number(localStorage.getItem(key) ?? "0");
   return !Number.isFinite(dismissedAt) || Date.now() - dismissedAt > INSTALL_PROMPT_COOLDOWN_MS;
 };
+
+const isMobileInstallSurface = () =>
+  typeof window !== "undefined" &&
+  (window.matchMedia("(max-width: 767px)").matches ||
+    /android|iphone|ipad|ipod/i.test(navigator.userAgent));
+
+const isIosSafari = () =>
+  typeof navigator !== "undefined" &&
+  /iphone|ipad|ipod/i.test(navigator.userAgent) &&
+  /safari/i.test(navigator.userAgent) &&
+  !/crios|fxios|edgios/i.test(navigator.userAgent) &&
+  !(window as unknown as Record<string, unknown>).MSStream;
+
+const isInStandaloneMode = () =>
+  typeof window !== "undefined" &&
+  ("standalone" in window.navigator
+    ? (window.navigator as unknown as { standalone: boolean }).standalone
+    : window.matchMedia("(display-mode: standalone)").matches);
 
 export function PwaRegister() {
   const router = useRouter();
   const [installPrompt, setInstallPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [showIosGuide, setShowIosGuide] = useState(false);
   const [showUpdateBanner, setShowUpdateBanner] = useState(false);
 
   // Register service worker + wire up update notification + reconnect refresh.
@@ -45,7 +65,7 @@ export function PwaRegister() {
   useEffect(() => {
     const handler = (e: Event) => {
       e.preventDefault();
-      if (canShowInstallPrompt()) {
+      if (isMobileInstallSurface() && canShowPrompt(INSTALL_PROMPT_DISMISSED_KEY)) {
         setInstallPrompt(e as BeforeInstallPromptEvent);
       }
     };
@@ -68,6 +88,24 @@ export function PwaRegister() {
   const handleDismissInstall = () => {
     localStorage.setItem(INSTALL_PROMPT_DISMISSED_KEY, String(Date.now()));
     setInstallPrompt(null);
+  };
+
+  // iOS Safari has no beforeinstallprompt event, so show manual instructions on
+  // the same 30-day cadence while outside installed standalone mode.
+  useEffect(() => {
+    if (
+      isMobileInstallSurface() &&
+      isIosSafari() &&
+      !isInStandaloneMode() &&
+      canShowPrompt(IOS_INSTALL_PROMPT_DISMISSED_KEY)
+    ) {
+      setShowIosGuide(true);
+    }
+  }, []);
+
+  const handleDismissIosGuide = () => {
+    localStorage.setItem(IOS_INSTALL_PROMPT_DISMISSED_KEY, String(Date.now()));
+    setShowIosGuide(false);
   };
 
   return (
@@ -138,6 +176,68 @@ export function PwaRegister() {
           >
             x
           </button>
+        </div>
+      ) : null}
+
+      {/* iOS Safari install guide — manual instructions, capped to once every 30 days. */}
+      {showIosGuide ? (
+        <div
+          role="dialog"
+          aria-modal="true"
+          style={{
+            position: "fixed",
+            inset: 0,
+            zIndex: 100,
+            background: "rgba(0,0,0,0.45)",
+            display: "flex",
+            alignItems: "flex-end",
+            padding: "0 0 env(safe-area-inset-bottom)",
+          }}
+        >
+          <div
+            style={{
+              width: "100%",
+              background: "#fff",
+              borderRadius: "20px 20px 0 0",
+              padding: "24px 24px 32px",
+            }}
+          >
+            <div style={{ width: 40, height: 4, borderRadius: 2, background: "#d8ddd6", margin: "0 auto 20px" }} />
+            <p style={{ margin: "0 0 4px", fontSize: 17, fontWeight: 700, color: "#1d2823" }}>
+              Add Kontax to your Home Screen
+            </p>
+            <p style={{ margin: "0 0 20px", fontSize: 14, color: "#5c655e", lineHeight: 1.5 }}>
+              Open your contacts faster from the iPhone Home Screen.
+            </p>
+            <ol style={{ margin: "0 0 24px", padding: "0 0 0 20px", fontSize: 14, color: "#1d2823", lineHeight: 2 }}>
+              <li>
+                Tap the <strong>Share</strong> button in Safari.
+              </li>
+              <li>
+                Choose <strong>Add to Home Screen</strong>.
+              </li>
+              <li>
+                Tap <strong>Add</strong> to confirm.
+              </li>
+            </ol>
+            <button
+              onClick={handleDismissIosGuide}
+              style={{
+                width: "100%",
+                height: 50,
+                borderRadius: 14,
+                background: "#17352e",
+                color: "#fff",
+                border: "none",
+                fontSize: 15,
+                fontWeight: 700,
+                cursor: "pointer",
+              }}
+              type="button"
+            >
+              Got it
+            </button>
+          </div>
         </div>
       ) : null}
 

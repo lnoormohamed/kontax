@@ -156,7 +156,7 @@ function Field({
           aria-describedby={error ? `${id}-error` : undefined}
           aria-invalid={error ? "true" : undefined}
           autoComplete={autoComplete}
-          className={`h-11 w-full rounded-[12px] border bg-white px-4 text-[14px] text-[#1d2823] outline-none transition-[border-color,box-shadow] placeholder:text-[#aab1a9] ${
+          className={`h-11 w-full rounded-[12px] border bg-white px-4 text-[16px] text-[#1d2823] outline-none transition-[border-color,box-shadow] placeholder:text-[#aab1a9] ${
             error
               ? "border-[#b5472f] focus:border-[#b5472f] focus:shadow-[0_0_0_3px_rgba(181,71,47,0.22)]"
               : "border-[#d8ddd6] focus:border-[#4158f4] focus:shadow-[0_0_0_3px_rgba(65,88,244,0.28)]"
