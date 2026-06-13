@@ -17,6 +17,8 @@ export function formatSourceBadge(
       return detail ? `Imported from ${detail}` : "Imported";
     case "SYNC_CARDDAV":
       return detail ? `Synced from ${detail}` : "Synced";
+    case "SYNC_GOOGLE":
+      return detail ? `Synced from ${detail}` : "Synced from Google";
     case "SHARED_STATIC":
       return detail ? `Shared by ${detail}` : "Shared with you";
     case "SHARED_LIVE":
@@ -43,6 +45,8 @@ export function formatLastMutatedBy(
       return detail ? `import (${detail})` : "an import";
     case "SYNC_CARDDAV":
       return detail ? `${detail} sync` : "sync";
+    case "SYNC_GOOGLE":
+      return detail ? `${detail} sync` : "Google sync";
     case "SHARED_STATIC":
     case "SHARED_LIVE":
       return detail ? `${detail} (share)` : "a share";

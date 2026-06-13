@@ -8,6 +8,7 @@ import { formatRelativeTime } from "~/lib/activity/time";
 // Actor → icon glyph for the "Last edited" metadata row.
 const ACTOR_ICON: Partial<Record<SourceType, string>> = {
   SYNC_CARDDAV: "sync",
+  SYNC_GOOGLE: "sync",
   IMPORT_CSV: "upload",
   SHARED_STATIC: "download",
   SHARED_LIVE: "live",

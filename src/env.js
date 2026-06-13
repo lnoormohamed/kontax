@@ -44,6 +44,11 @@ export const env = createEnv({
     STRIPE_PRICE_ID_FAMILY_YEARLY: z.string().min(1).optional(),
     STRIPE_PRICE_ID_TEAMS_MONTHLY: z.string().min(1).optional(),
     STRIPE_PRICE_ID_TEAMS_YEARLY: z.string().min(1).optional(),
+    // Google Contacts OAuth connector (P27-01). All optional — the Google sync
+    // connector is only offered when all three are set (see isGoogleSyncConfigured).
+    GOOGLE_CLIENT_ID: z.string().min(1).optional(),
+    GOOGLE_CLIENT_SECRET: z.string().min(1).optional(),
+    GOOGLE_REDIRECT_URI: z.string().url().optional(),
   },
 
   /**
@@ -93,6 +98,9 @@ export const env = createEnv({
     STRIPE_PRICE_ID_FAMILY_YEARLY: process.env.STRIPE_PRICE_ID_FAMILY_YEARLY,
     STRIPE_PRICE_ID_TEAMS_MONTHLY: process.env.STRIPE_PRICE_ID_TEAMS_MONTHLY,
     STRIPE_PRICE_ID_TEAMS_YEARLY: process.env.STRIPE_PRICE_ID_TEAMS_YEARLY,
+    GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
+    GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+    GOOGLE_REDIRECT_URI: process.env.GOOGLE_REDIRECT_URI,
     NEXT_PUBLIC_PRICE_PRO_MONTHLY: process.env.NEXT_PUBLIC_PRICE_PRO_MONTHLY,
     NEXT_PUBLIC_PRICE_PRO_YEARLY: process.env.NEXT_PUBLIC_PRICE_PRO_YEARLY,
     NEXT_PUBLIC_PRICE_FAMILY_MONTHLY: process.env.NEXT_PUBLIC_PRICE_FAMILY_MONTHLY,

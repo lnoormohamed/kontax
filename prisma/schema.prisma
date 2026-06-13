@@ -118,6 +118,9 @@ enum MergeDecisionStatus {
 
 enum SyncProvider {
     CARDDAV
+    // P27-01: Google Contacts via OAuth 2.0 + People API. Credentials hold an
+    // OAuth token envelope (access/refresh/expiry) instead of username/password.
+    GOOGLE
 }
 
 enum SyncDirection {
@@ -188,6 +191,8 @@ enum SourceType {
     MANUAL
     IMPORT_CSV
     SYNC_CARDDAV
+    // P27-02: contacts imported via the Google Contacts OAuth connector.
+    SYNC_GOOGLE
     SHARED_STATIC
     SHARED_LIVE
     API

@@ -18,6 +18,25 @@ export type SyncCredentialPayload = {
   version: 1;
 };
 
+// P27-01: Google Contacts OAuth token envelope. Stored encrypted in the same
+// SyncAccount.credentialReference column as CardDAV credentials, just a
+// different JSON shape behind the same AES-256-GCM envelope.
+export type GoogleSyncCredentialPayload = {
+  provider: "GOOGLE";
+  version: 1;
+  accessToken: string;
+  refreshToken: string;
+  // Epoch milliseconds when the access token expires (google-auth-library
+  // expiry_date). May be null on rare token responses that omit it.
+  expiryDate: number | null;
+  // The connected Google account email (people/me), used for the account label
+  // and the connected-account row in the detail panel (P27-07).
+  googleEmail: string;
+  // Granted OAuth scopes, space-delimited as returned by Google. Used by P27-07
+  // to detect the "scope reduced" state.
+  scope: string;
+};
+
 type SyncCredentialEncryptionStatus = {
   available: boolean;
   keyRef: string | null;
@@ -93,7 +112,9 @@ export const getSyncCredentialEncryptionStatus = (): SyncCredentialEncryptionSta
   };
 };
 
-export const encryptSyncCredentialPayload = (payload: SyncCredentialPayload) => {
+// Core AES-256-GCM envelope over an arbitrary JSON-serialisable credential
+// payload. Provider-specific wrappers below give callers a typed surface.
+const encryptCredentialJson = (payload: unknown) => {
   const { key, keyRef } = getDerivedKey();
   const iv = randomBytes(12);
   const cipher = createCipheriv("aes-256-gcm", key, iv);
@@ -115,7 +136,7 @@ export const encryptSyncCredentialPayload = (payload: SyncCredentialPayload) => 
   };
 };
 
-export const decryptSyncCredentialPayload = (credentialReference: string): SyncCredentialPayload => {
+const decryptCredentialJson = <T>(credentialReference: string): T => {
   const { key } = getDerivedKey();
   const envelope = decodeEnvelope(credentialReference);
 
@@ -136,5 +157,20 @@ export const decryptSyncCredentialPayload = (credentialReference: string): SyncC
     decipher.final(),
   ]).toString("utf8");
 
-  return JSON.parse(decrypted) as SyncCredentialPayload;
+  return JSON.parse(decrypted) as T;
 };
+
+export const encryptSyncCredentialPayload = (payload: SyncCredentialPayload) =>
+  encryptCredentialJson(payload);
+
+export const decryptSyncCredentialPayload = (credentialReference: string): SyncCredentialPayload =>
+  decryptCredentialJson<SyncCredentialPayload>(credentialReference);
+
+// P27-01: Google OAuth token envelope wrappers.
+export const encryptGoogleSyncCredential = (payload: GoogleSyncCredentialPayload) =>
+  encryptCredentialJson(payload);
+
+export const decryptGoogleSyncCredential = (
+  credentialReference: string,
+): GoogleSyncCredentialPayload =>
+  decryptCredentialJson<GoogleSyncCredentialPayload>(credentialReference);

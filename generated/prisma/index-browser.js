@@ -780,6 +780,7 @@ exports.SourceType = exports.$Enums.SourceType = {
   MANUAL: 'MANUAL',
   IMPORT_CSV: 'IMPORT_CSV',
   SYNC_CARDDAV: 'SYNC_CARDDAV',
+  SYNC_GOOGLE: 'SYNC_GOOGLE',
   SHARED_STATIC: 'SHARED_STATIC',
   SHARED_LIVE: 'SHARED_LIVE',
   API: 'API'
@@ -854,7 +855,8 @@ exports.MergeDecisionStatus = exports.$Enums.MergeDecisionStatus = {
 };
 
 exports.SyncProvider = exports.$Enums.SyncProvider = {
-  CARDDAV: 'CARDDAV'
+  CARDDAV: 'CARDDAV',
+  GOOGLE: 'GOOGLE'
 };
 
 exports.SyncAccountStatus = exports.$Enums.SyncAccountStatus = {

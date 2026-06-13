@@ -16,6 +16,7 @@ import {
   getSyncErrorSupportBucket,
 } from "~/server/sync-health";
 import { decryptSyncCredentialPayload } from "~/server/sync-credentials";
+import { GoogleSyncError, runGoogleSync } from "~/server/google-sync";
 import { getEffectiveSyncAccountSettings } from "~/server/sync-settings";
 
 const createRetrySchedule = (attemptNumber: number) => {
@@ -123,6 +124,7 @@ const getFailureStatus = (
 ) => {
   if (
     errorCode === "CARDDAV_AUTH_FAILED" ||
+    errorCode === "GOOGLE_AUTH_FAILED" ||
     errorCode === "CREDENTIALS_MISSING" ||
     errorCode === "CREDENTIALS_UNREADABLE"
   ) {
@@ -253,12 +255,14 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
           userId: true,
           label: true,
           status: true,
+          provider: true,
           syncDirection: true,
           baseUrl: true,
           principalUrl: true,
           addressBookUrl: true,
           remoteAccountId: true,
           remoteCTag: true,
+          lastSyncCursor: true,
           credentialReference: true,
           credentialRevokedAt: true,
           // P14-06: when linked to a team book, sync operates on that book's
@@ -317,6 +321,82 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
         errorSummary: "The queued sync job was skipped because the sync account is paused.",
       });
       summary.failed += 1;
+      continue;
+    }
+
+    // P27-01: Google connector. OAuth accounts have no addressBookUrl/CardDAV
+    // credentials, so they branch out before the CardDAV-specific guards below.
+    // The connector handles full vs incremental (syncToken) internally.
+    if (job.syncAccount.provider === "GOOGLE") {
+      if (!job.syncAccount.credentialReference || job.syncAccount.credentialRevokedAt) {
+        await markJobFailed({
+          jobId: job.id,
+          syncAccountId: job.syncAccountId,
+          _syncDirection: job.syncDirection,
+          attemptCount: job.attemptCount,
+          maxAttempts: job.maxAttempts,
+          accountStatus: job.syncAccount.status,
+          errorCode: "CREDENTIALS_MISSING",
+          errorSummary:
+            "The Google sync account is missing active credentials. Reconnect to restore syncing.",
+        });
+        summary.failed += 1;
+        continue;
+      }
+
+      try {
+        const result = await runGoogleSync({
+          id: job.syncAccount.id,
+          userId: job.syncAccount.userId,
+          label: job.syncAccount.label,
+          credentialReference: job.syncAccount.credentialReference,
+          lastSyncCursor: job.syncAccount.lastSyncCursor,
+        });
+        const now = new Date();
+        await db.$transaction([
+          db.syncJob.update({
+            where: { id: job.id },
+            data: {
+              status: "SUCCEEDED",
+              completedAt: now,
+              leaseExpiresAt: null,
+              nextRetryAt: null,
+              errorCode: null,
+              errorSummary: null,
+              createdCount: result.created,
+              updatedCount: result.updated,
+              deletedCount: result.deleted,
+            },
+          }),
+          db.syncAccount.update({
+            where: { id: job.syncAccountId },
+            data: {
+              status: "ACTIVE",
+              lastSucceededAt: now,
+              lastErrorAt: null,
+              lastErrorCode: null,
+              lastErrorMessage: null,
+            },
+          }),
+        ]);
+        summary.succeeded += 1;
+      } catch (error) {
+        const errorCode =
+          error instanceof GoogleSyncError ? error.code : "GOOGLE_SYNC_FAILED";
+        const errorSummary =
+          error instanceof Error ? error.message : "Google sync failed.";
+        await markJobFailed({
+          jobId: job.id,
+          syncAccountId: job.syncAccountId,
+          _syncDirection: job.syncDirection,
+          attemptCount: job.attemptCount,
+          maxAttempts: job.maxAttempts,
+          accountStatus: job.syncAccount.status,
+          errorCode,
+          errorSummary,
+        });
+        summary.failed += 1;
+      }
       continue;
     }
 
