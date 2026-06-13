@@ -1,6 +1,8 @@
 import { type Metadata } from "next";
 
 import { HelpFaq } from "~/app/_components/help-faq";
+import { HELP_FAQ } from "~/app/_components/help-faq-data";
+import { breadcrumbSchema, faqPageSchema, JsonLd } from "~/app/_components/json-ld";
 import { PublicFooter } from "~/app/_components/public-footer";
 import { PublicNav } from "~/app/_components/public-nav";
 import { auth } from "~/server/auth";
@@ -19,6 +21,15 @@ export default async function HelpPage() {
 
   return (
     <div className="kx">
+      <JsonLd
+        data={[
+          breadcrumbSchema([
+            { name: "Home", path: "/" },
+            { name: "Help & FAQ", path: "/help" },
+          ]),
+          faqPageSchema(HELP_FAQ.flatMap((s) => s.items)),
+        ]}
+      />
       <PublicNav isAuthenticated={!!session?.user?.id} />
       <main>
         <div className="help-wrap">

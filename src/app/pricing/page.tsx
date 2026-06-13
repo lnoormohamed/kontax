@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 
+import { breadcrumbSchema, JsonLd } from "~/app/_components/json-ld";
 import { PricingComparison } from "~/app/_components/pricing-comparison";
 import { PublicFooter } from "~/app/_components/public-footer";
 import { PublicNav } from "~/app/_components/public-nav";
@@ -23,6 +24,12 @@ export default async function PricingPage() {
 
   return (
     <div className="kx">
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Pricing", path: "/pricing" },
+        ])}
+      />
       <PublicNav active="pricing" />
       <main>
         <PricingComparison currentPlan={currentPlan} />
