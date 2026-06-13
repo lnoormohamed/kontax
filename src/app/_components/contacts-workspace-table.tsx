@@ -644,6 +644,7 @@ export function ContactsWorkspaceTable({
   }, [flatRows, scrollEl?.scrollTop, virtualItems]);
 
   const restoredScrollRef = useRef(false);
+  const restoreTimersRef = useRef<Array<ReturnType<typeof setTimeout>>>([]);
   useLayoutEffect(() => {
     if (!mounted || restoredScrollRef.current || typeof window === "undefined") return;
 
@@ -690,8 +691,7 @@ export function ContactsWorkspaceTable({
 
       restoredScrollRef.current = true;
       sessionStorage.removeItem(CONTACT_LIST_SCROLL_KEY);
-      clearRestoreContactParam();
-      requestAnimationFrame(() => {
+      const restorePosition = () => {
         if (scrollEl && typeof saved.scrollTop === "number") {
           scrollEl.scrollTop = saved.scrollTop;
         }
@@ -704,11 +704,27 @@ export function ContactsWorkspaceTable({
             virtualizer.scrollToIndex(index, { align: "center" });
           }
         }
-      });
+      };
+      const restoreDelays = [0, 80, 180, 360, 700, 1200, 2200, 3600];
+      restoreTimersRef.current = restoreDelays.map((delay) =>
+        setTimeout(() => requestAnimationFrame(restorePosition), delay),
+      );
+      restoreTimersRef.current.push(
+        setTimeout(() => {
+          clearRestoreContactParam();
+          restoreTimersRef.current = [];
+        }, 4200),
+      );
     } catch {
       sessionStorage.removeItem(CONTACT_LIST_SCROLL_KEY);
       clearRestoreContactParam();
     }
+    return () => {
+      for (const timer of restoreTimersRef.current) {
+        clearTimeout(timer);
+      }
+      restoreTimersRef.current = [];
+    };
   }, [flatRows, mounted, scrollEl, scrollMemoryKey, virtualizer]);
 
   if (contacts.length === 0) {
