@@ -84,14 +84,14 @@ export async function GET(req: NextRequest) {
 
   // Reuse an existing connection for the same Google account if present, so a
   // reconnect refreshes credentials instead of hitting the unique constraint.
-  const existing = await db.syncAccount.findFirst({
-    where: {
-      userId: state.userId,
-      provider: "GOOGLE",
-      remoteAccountId: googleEmail || undefined,
-    },
-    select: { id: true, credentialReference: true },
-  });
+  // Only match when we resolved an email — matching on an undefined remoteAccountId
+  // would let Prisma drop the filter and return an arbitrary Google account.
+  const existing = googleEmail
+    ? await db.syncAccount.findFirst({
+        where: { userId: state.userId, provider: "GOOGLE", remoteAccountId: googleEmail },
+        select: { id: true, credentialReference: true },
+      })
+    : null;
 
   // Google only returns a refresh token on a fresh consent. Never overwrite a
   // good stored refresh token with undefined on reconnect.
@@ -115,43 +115,50 @@ export async function GET(req: NextRequest) {
   });
 
   const now = new Date();
-  const accountId = existing
-    ? (await db.syncAccount.update({
-        where: { id: existing.id },
-        data: {
-          label,
-          status: "ACTIVE",
-          credentialReference: enc.credentialReference,
-          encryptionKeyRef: enc.encryptionKeyRef,
-          credentialUpdatedAt: now,
-          credentialLastValidatedAt: now,
-          credentialRevokedAt: null,
-          // Re-consent: clear the cursor so the next run does a full re-import.
-          lastSyncCursor: null,
-          lastErrorAt: null,
-          lastErrorCode: null,
-          lastErrorMessage: null,
-        },
-        select: { id: true },
-      })).id
-    : (await db.syncAccount.create({
-        data: {
-          userId: state.userId,
-          provider: "GOOGLE",
-          status: "ACTIVE",
-          syncDirection: "TWO_WAY",
-          label,
-          baseUrl: GOOGLE_BASE_URL,
-          remoteAccountId: googleEmail || null,
-          credentialReference: enc.credentialReference,
-          encryptionKeyRef: enc.encryptionKeyRef,
-          credentialVersion: 1,
-          credentialUpdatedAt: now,
-          credentialLastValidatedAt: now,
-          connectionValidatedAt: now,
-        },
-        select: { id: true },
-      })).id;
+  let accountId: string;
+  try {
+    accountId = existing
+      ? (await db.syncAccount.update({
+          where: { id: existing.id },
+          data: {
+            label,
+            status: "ACTIVE",
+            credentialReference: enc.credentialReference,
+            encryptionKeyRef: enc.encryptionKeyRef,
+            credentialUpdatedAt: now,
+            credentialLastValidatedAt: now,
+            credentialRevokedAt: null,
+            // Re-consent: clear the cursor so the next run does a full re-import.
+            lastSyncCursor: null,
+            lastErrorAt: null,
+            lastErrorCode: null,
+            lastErrorMessage: null,
+          },
+          select: { id: true },
+        })).id
+      : (await db.syncAccount.create({
+          data: {
+            userId: state.userId,
+            provider: "GOOGLE",
+            status: "ACTIVE",
+            syncDirection: "TWO_WAY",
+            label,
+            baseUrl: GOOGLE_BASE_URL,
+            remoteAccountId: googleEmail || null,
+            credentialReference: enc.credentialReference,
+            encryptionKeyRef: enc.encryptionKeyRef,
+            credentialVersion: 1,
+            credentialUpdatedAt: now,
+            credentialLastValidatedAt: now,
+            connectionValidatedAt: now,
+          },
+          select: { id: true },
+        })).id;
+  } catch {
+    // Most likely the @@unique([userId, baseUrl, label]) constraint when a second
+    // Google account connects without a resolvable email (both get the same label).
+    return redirectTo(req, "/sync?error=google_duplicate");
+  }
 
   // Queue the initial import so the runner imports contacts on its next tick.
   await db.syncJob.create({

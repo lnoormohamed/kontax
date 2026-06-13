@@ -26,6 +26,22 @@ import {
 } from "./_components/sync-page-client";
 import { MobileSyncScreen } from "./_components/mobile-sync-screen";
 
+// P27-07: friendly messages for OAuth callback `?error=` codes (Google/Microsoft).
+const OAUTH_ERROR_MESSAGES: Record<string, string> = {
+  google_denied: "Google connection cancelled — access wasn't granted.",
+  google_invalid: "Google connection failed — the response was invalid. Please try again.",
+  google_state: "Google connection expired — please try connecting again.",
+  google_token: "Couldn't complete the Google connection. Please try again.",
+  google_duplicate: "That Google account looks already connected.",
+  google_unconfigured: "Google sync isn't configured on this server.",
+  microsoft_denied: "Outlook connection cancelled — access wasn't granted.",
+  microsoft_invalid: "Outlook connection failed — the response was invalid. Please try again.",
+  microsoft_state: "Outlook connection expired — please try connecting again.",
+  microsoft_token: "Couldn't complete the Outlook connection. Please try again.",
+  microsoft_duplicate: "That Outlook account looks already connected.",
+  microsoft_unconfigured: "Outlook sync isn't configured on this server.",
+};
+
 // ── helpers ───────────────────────────────────────────────────────────────────
 const getInitials = (value: string) =>
   value
@@ -144,6 +160,11 @@ export default async function SyncPage({ searchParams }: PageProps) {
   const flashMsg = (() => {
     if (getParam("connected") === "1")
       return "CardDAV account connected successfully — first sync queued.";
+    // P27-07: OAuth connect outcomes (callbacks redirect here).
+    if (getParam("connected") === "google")
+      return "Google Contacts connected — importing your contacts now.";
+    if (getParam("connected") === "microsoft")
+      return "Outlook connected — importing your contacts now.";
     if (getParam("queued") === "1") return "Sync queued.";
     if (getParam("paused") === "1") return "Sync paused.";
     if (getParam("credentialsSaved") === "1") return "Credentials updated.";
@@ -153,6 +174,8 @@ export default async function SyncPage({ searchParams }: PageProps) {
       return getParam("connectError") ?? "Connection failed — check your URL and credentials.";
     if (getParam("preflightFailed") === "1")
       return "Preflight failed — check the account error state and try again.";
+    const err = getParam("error");
+    if (err) return OAUTH_ERROR_MESSAGES[err] ?? "Connection failed. Please try again.";
     return null;
   })();
 
@@ -279,9 +302,14 @@ export default async function SyncPage({ searchParams }: PageProps) {
       // P23-05: surface the conflict-queue-full auto-pause to the detail panel.
       conflictQueueFull:
         acct.status === "PAUSED" && acct.lastErrorCode === "SYNC_CONFLICT_QUEUE_FULL",
-      // P27-08: duplicates found by the most recent completed import (0 hides the banner).
+      // P27-08: duplicates found by the most recently *completed* import (0 hides
+      // the banner). Pick by latest completedAt, not list order (a job can finish
+      // out of creation order).
       duplicatesDetected:
-        acct.syncJobs.find((j) => j.completedAt)?.duplicatesDetectedCount ?? 0,
+        acct.syncJobs
+          .filter((j) => j.completedAt)
+          .sort((a, b) => (b.completedAt!.getTime() ?? 0) - (a.completedAt!.getTime() ?? 0))[0]
+          ?.duplicatesDetectedCount ?? 0,
       jobs,
       conflicts,
     };

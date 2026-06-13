@@ -123,6 +123,11 @@ const normaliseMicrosoftError = (error: unknown): MicrosoftSyncError => {
   if (status === 429) {
     return new MicrosoftSyncError("MICROSOFT_QUOTA_EXCEEDED", message);
   }
+  // 410 Gone = the stored delta link is stale; the caller must do a full re-sync.
+  // Carry it as a stable code since the HTTP status is otherwise lost here.
+  if (status === 410) {
+    return new MicrosoftSyncError("MICROSOFT_DELTA_EXPIRED", message);
+  }
   return new MicrosoftSyncError("MICROSOFT_SYNC_FAILED", message);
 };
 
@@ -264,12 +269,15 @@ const traverseDelta = async (
   account: MicrosoftImportAccount,
   startUrl: string,
 ): Promise<{ summary: ImportBatchSummary; deltaLink: string | null }> => {
-  const accessToken = await getMicrosoftAccessToken(account);
   let summary = emptyImportBatch();
   let url: string | undefined = startUrl;
   let deltaLink: string | null = null;
 
   while (url) {
+    // Re-acquire per page so a long multi-page import can't fail on an expired
+    // token mid-traversal. acquireTokenSilent serves the cached token until it
+    // nears expiry, so this is cheap.
+    const accessToken = await getMicrosoftAccessToken(account);
     const page = await graphGet(accessToken, url);
     summary = addImportBatch(summary, await processMicrosoftContacts(page.value ?? [], account));
     if (page["@odata.nextLink"]) {
@@ -324,7 +332,7 @@ export const microsoftIncrementalSync = async (
   try {
     result = await traverseDelta(account, account.lastSyncCursor);
   } catch (error) {
-    if (error instanceof MicrosoftSyncError && /\b410\b/.test(error.message)) {
+    if (error instanceof MicrosoftSyncError && error.code === "MICROSOFT_DELTA_EXPIRED") {
       return microsoftFullImport(account);
     }
     throw error;

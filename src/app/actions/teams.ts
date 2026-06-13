@@ -513,7 +513,10 @@ export const linkTeamSyncAccount = async (formData: FormData) => {
     throw new Error("Only the team owner or an admin can manage sync accounts.");
   }
   const [account, book] = await Promise.all([
-    db.syncAccount.findFirst({ where: { id: syncAccountId, userId }, select: { id: true } }),
+    db.syncAccount.findFirst({
+      where: { id: syncAccountId, userId },
+      select: { id: true, provider: true },
+    }),
     db.groupAddressBook.findFirst({
       where: { id: bookId, groupId: manageable.team.id },
       select: { id: true },
@@ -521,6 +524,12 @@ export const linkTeamSyncAccount = async (formData: FormData) => {
   ]);
   if (!account) {
     throw new Error("That sync account isn't yours to link.");
+  }
+  // P27-07: OAuth (Google/Microsoft) connectors import into personal scope only;
+  // team-book scoping isn't wired for them, so block the link to avoid contacts
+  // silently landing in the wrong place.
+  if (account.provider !== "CARDDAV") {
+    throw new Error("Only CardDAV accounts can be linked to a team book.");
   }
   if (!book) {
     throw new Error("Address book not found.");

@@ -8,12 +8,25 @@
 import { refreshMergeSuggestionsForUser } from "~/server/contact-merge";
 import { db } from "~/server/db";
 
+// The merge engine is O(n²) over the user's whole library and runs inline in the
+// sync worker; above this size we skip the auto-dedup to protect the worker (the
+// user can still trigger a manual merge refresh from the merge review page).
+const DEDUP_MAX_CONTACTS = 3000;
+
 export const runPostImportDeduplication = async (params: {
   userId: string;
   syncAccountId: string;
   syncJobId: string;
   source: string;
 }): Promise<number> => {
+  const contactCount = await db.contact.count({
+    where: { userId: params.userId, archivedAt: null },
+  });
+  if (contactCount > DEDUP_MAX_CONTACTS) {
+    // Too large to scan inline — leave the count at 0 (no banner) and skip.
+    return 0;
+  }
+
   // Reuse the canonical engine (full refresh + OPEN/STALE reconciliation) so
   // the merge-review queue stays consistent with manual refreshes.
   await refreshMergeSuggestionsForUser(params.userId, params.source);

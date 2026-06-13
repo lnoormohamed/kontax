@@ -82,52 +82,57 @@ export async function GET(req: NextRequest) {
   });
 
   // Reuse an existing connection for the same Microsoft account on reconnect.
-  const existing = await db.syncAccount.findFirst({
-    where: {
-      userId: state.userId,
-      provider: "MICROSOFT",
-      remoteAccountId: microsoftEmail || undefined,
-    },
-    select: { id: true },
-  });
+  // Only match when we resolved an email — an undefined remoteAccountId filter is
+  // dropped by Prisma and would return an arbitrary Microsoft account.
+  const existing = microsoftEmail
+    ? await db.syncAccount.findFirst({
+        where: { userId: state.userId, provider: "MICROSOFT", remoteAccountId: microsoftEmail },
+        select: { id: true },
+      })
+    : null;
 
   const now = new Date();
-  const accountId = existing
-    ? (await db.syncAccount.update({
-        where: { id: existing.id },
-        data: {
-          label,
-          status: "ACTIVE",
-          credentialReference: enc.credentialReference,
-          encryptionKeyRef: enc.encryptionKeyRef,
-          credentialUpdatedAt: now,
-          credentialLastValidatedAt: now,
-          credentialRevokedAt: null,
-          lastSyncCursor: null,
-          lastErrorAt: null,
-          lastErrorCode: null,
-          lastErrorMessage: null,
-        },
-        select: { id: true },
-      })).id
-    : (await db.syncAccount.create({
-        data: {
-          userId: state.userId,
-          provider: "MICROSOFT",
-          status: "ACTIVE",
-          syncDirection: "TWO_WAY",
-          label,
-          baseUrl: GRAPH_BASE_URL,
-          remoteAccountId: microsoftEmail || null,
-          credentialReference: enc.credentialReference,
-          encryptionKeyRef: enc.encryptionKeyRef,
-          credentialVersion: 1,
-          credentialUpdatedAt: now,
-          credentialLastValidatedAt: now,
-          connectionValidatedAt: now,
-        },
-        select: { id: true },
-      })).id;
+  let accountId: string;
+  try {
+    accountId = existing
+      ? (await db.syncAccount.update({
+          where: { id: existing.id },
+          data: {
+            label,
+            status: "ACTIVE",
+            credentialReference: enc.credentialReference,
+            encryptionKeyRef: enc.encryptionKeyRef,
+            credentialUpdatedAt: now,
+            credentialLastValidatedAt: now,
+            credentialRevokedAt: null,
+            lastSyncCursor: null,
+            lastErrorAt: null,
+            lastErrorCode: null,
+            lastErrorMessage: null,
+          },
+          select: { id: true },
+        })).id
+      : (await db.syncAccount.create({
+          data: {
+            userId: state.userId,
+            provider: "MICROSOFT",
+            status: "ACTIVE",
+            syncDirection: "TWO_WAY",
+            label,
+            baseUrl: GRAPH_BASE_URL,
+            remoteAccountId: microsoftEmail || null,
+            credentialReference: enc.credentialReference,
+            encryptionKeyRef: enc.encryptionKeyRef,
+            credentialVersion: 1,
+            credentialUpdatedAt: now,
+            credentialLastValidatedAt: now,
+            connectionValidatedAt: now,
+          },
+          select: { id: true },
+        })).id;
+  } catch {
+    return redirectTo(req, "/sync?error=microsoft_duplicate");
+  }
 
   await db.syncJob.create({
     data: {
