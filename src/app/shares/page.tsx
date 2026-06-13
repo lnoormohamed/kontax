@@ -109,7 +109,10 @@ export default async function SharesPage() {
               title="Nothing shared with you yet"
               body="When someone shares a contact with you on Kontax, it will appear here."
             >
-              <Link className="text-[13px] font-medium text-[#4158f4] hover:underline" href="/contacts">
+              <Link className="text-[13px] font-medium text-[#4158f4] hover:underline" href="/help#sharing">
+                Learn about sharing →
+              </Link>
+              <Link className="text-[13px] font-medium text-[#8b938c] hover:underline" href="/contacts">
                 ← Back to contacts
               </Link>
             </EmptyState>

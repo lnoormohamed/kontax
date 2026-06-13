@@ -131,6 +131,10 @@ export function MobileSyncScreen({
                 Connect iCloud, Google, or any CardDAV account to keep your contacts in sync.
               </div>
             </div>
+            {/* P26-13: link to the CardDAV explainer on /help */}
+            <Link href="/help#carddav" style={{ fontSize: 13, fontWeight: 500, color: "#4158f4", textDecoration: "none" }}>
+              Learn about CardDAV →
+            </Link>
           </div>
         ) : (
           <div style={{ margin: "0 16px 16px", border: "1px solid #d8ddd6", borderRadius: 14, background: "#fff", overflow: "hidden" }}>

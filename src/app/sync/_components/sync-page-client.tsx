@@ -1471,6 +1471,15 @@ function EmptyState({ onAdd }: { onAdd: () => void }) {
       >
         Connect an account →
       </button>
+      {/* P26-13: link to the CardDAV explainer on /help */}
+      <div style={{ marginTop: 14 }}>
+        <a
+          href="/help#carddav"
+          style={{ fontSize: 13, fontWeight: 500, color: T.blue, textDecoration: "none" }}
+        >
+          Learn about CardDAV →
+        </a>
+      </div>
     </div>
   );
 }
