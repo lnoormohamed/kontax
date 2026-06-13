@@ -72,6 +72,13 @@ export type SyncAccountData = {
   id: string;
   label: string;
   baseUrl: string;
+  // P27-07: provider + OAuth metadata (Google/Microsoft show email, not a URL).
+  provider: "CARDDAV" | "GOOGLE" | "MICROSOFT";
+  connectedEmail: string | null;
+  scope: string | null;
+  tokenStatus: "valid" | "expired" | null;
+  lastRefreshedRelative: string | null;
+  lastErrorCode: string | null;
   direction: "TWO_WAY" | "IMPORT_ONLY" | "EXPORT_ONLY";
   conflictPolicy: "SERVER_WINS" | "DEVICE_WINS" | "MANUAL";
   // P23-01 convention: null = platform default (60 min), 0 = manual only.
@@ -183,16 +190,49 @@ const HEALTH_DETAIL: Record<VisualHealth, (a: SyncAccountData) => string> = {
 };
 
 // ── Platform icon (SVG only) ─────────────────────────────────────────────────
-const getPlatformKind = (label: string, url: string) => {
+type PlatKind = "icloud" | "nextcloud" | "fastmail" | "generic" | "gcontacts" | "outlook";
+
+const getPlatformKind = (label: string, url: string): PlatKind => {
   const s = `${label} ${url}`.toLowerCase();
-  if (s.includes("icloud")) return "icloud" as const;
-  if (s.includes("nextcloud")) return "nextcloud" as const;
-  if (s.includes("fastmail")) return "fastmail" as const;
-  return "generic" as const;
+  if (s.includes("icloud")) return "icloud";
+  if (s.includes("nextcloud")) return "nextcloud";
+  if (s.includes("fastmail")) return "fastmail";
+  return "generic";
 };
 
-function PlatIcon({ kind, size = 24 }: { kind: ReturnType<typeof getPlatformKind>; size?: number }) {
+// P27-07: provider-aware icon — OAuth providers get their brand mark.
+const getAccountIconKind = (account: {
+  provider: SyncAccountData["provider"];
+  label: string;
+  baseUrl: string;
+}): PlatKind => {
+  if (account.provider === "GOOGLE") return "gcontacts";
+  if (account.provider === "MICROSOFT") return "outlook";
+  return getPlatformKind(account.label, account.baseUrl);
+};
+
+function PlatIcon({ kind, size = 24 }: { kind: PlatKind; size?: number }) {
   const s = size;
+  if (kind === "gcontacts")
+    // Official multi-colour Google "G".
+    return (
+      <svg width={s} height={s} viewBox="0 0 48 48" aria-hidden>
+        <path fill="#4285F4" d="M45.12 24.5c0-1.56-.14-3.06-.4-4.5H24v8.51h11.84c-.51 2.75-2.06 5.08-4.39 6.64v5.52h7.11c4.16-3.83 6.56-9.47 6.56-16.17z" />
+        <path fill="#34A853" d="M24 46c5.94 0 10.92-1.97 14.56-5.33l-7.11-5.52c-1.97 1.32-4.49 2.1-7.45 2.1-5.73 0-10.58-3.87-12.31-9.07H4.34v5.7C7.96 41.07 15.4 46 24 46z" />
+        <path fill="#FBBC05" d="M11.69 28.18C11.25 26.86 11 25.45 11 24s.25-2.86.69-4.18v-5.7H4.34C2.85 17.09 2 20.45 2 24s.85 6.91 2.34 9.88l7.35-5.7z" />
+        <path fill="#EA4335" d="M24 10.75c3.23 0 6.13 1.11 8.41 3.29l6.31-6.31C34.91 4.18 29.93 2 24 2 15.4 2 7.96 6.93 4.34 14.12l7.35 5.7c1.73-5.2 6.58-9.07 12.31-9.07z" />
+      </svg>
+    );
+  if (kind === "outlook")
+    // Official Microsoft four-square mark.
+    return (
+      <svg width={s} height={s} viewBox="0 0 24 24" aria-hidden>
+        <rect x="2.4" y="2.4" width="8.7" height="8.7" fill="#F25022" />
+        <rect x="12.9" y="2.4" width="8.7" height="8.7" fill="#7FBA00" />
+        <rect x="2.4" y="12.9" width="8.7" height="8.7" fill="#00A4EF" />
+        <rect x="12.9" y="12.9" width="8.7" height="8.7" fill="#FFB900" />
+      </svg>
+    );
   if (kind === "icloud")
     return (
       <svg width={s} height={s} viewBox="0 0 24 24" fill="none" aria-hidden>
@@ -909,6 +949,148 @@ function ReauthBanner({ onFix }: { onFix: () => void }) {
   );
 }
 
+// ── P27-07: OAuth detail-panel metadata row ──────────────────────────────────
+function OAuthMetaRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div
+      style={{
+        display: "grid",
+        gridTemplateColumns: "168px 1fr",
+        alignItems: "baseline",
+        gap: 12,
+        padding: "9px 0",
+        borderTop: `1px solid ${T.line2}`,
+      }}
+    >
+      <span
+        style={{
+          fontSize: 12,
+          fontWeight: 600,
+          letterSpacing: "0.04em",
+          textTransform: "uppercase",
+          color: T.mute,
+        }}
+      >
+        {label}
+      </span>
+      <span style={{ fontSize: 13, color: T.ink2, minWidth: 0 }}>{children}</span>
+    </div>
+  );
+}
+
+// ── P27-07: OAuth-specific error banners (re-auth / quota / scope-reduced) ─────
+function OAuthErrorBanner({
+  account,
+}: {
+  account: SyncAccountData;
+}) {
+  const providerName = account.provider === "GOOGLE" ? "Google" : "Outlook";
+  const connectPath =
+    account.provider === "GOOGLE" ? "/api/sync/google/connect" : "/api/sync/microsoft/connect";
+  const code = account.lastErrorCode ?? "";
+  const isQuota = code === "GOOGLE_QUOTA_EXCEEDED" || code === "MICROSOFT_QUOTA_EXCEEDED";
+  const isReauth = account.status === "NEEDS_REAUTH";
+
+  // Nothing actionable to surface.
+  if (!isReauth && !isQuota) return null;
+
+  const amber = { bg: "#f6edd9", border: "#e9c87b", title: "#7a5a1a", body: "#8a6a2a" };
+
+  if (isQuota) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          gap: 12,
+          alignItems: "flex-start",
+          background: amber.bg,
+          border: `1px solid ${amber.border}`,
+          borderRadius: 10,
+          padding: "14px 16px",
+          marginBottom: 22,
+        }}
+      >
+        <WarnTri />
+        <div>
+          <div style={{ fontSize: 13.5, fontWeight: 700, color: amber.title }}>
+            {providerName} API quota exceeded
+          </div>
+          <div style={{ fontSize: 13, color: amber.body, marginTop: 3, lineHeight: 1.5 }}>
+            Sync is paused. Kontax will automatically retry later. “Sync now” is disabled during the
+            pause.
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Re-authorisation required (AUTH_FAILED / NEEDS_REAUTH).
+  return (
+    <div
+      style={{
+        background: amber.bg,
+        border: `1px solid ${amber.border}`,
+        borderRadius: 12,
+        padding: "16px 18px",
+        marginBottom: 22,
+      }}
+    >
+      <div style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+        <WarnTri />
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div style={{ fontSize: 14, fontWeight: 700, color: amber.title }}>
+            Re-authorisation required
+          </div>
+          <div style={{ fontSize: 13, color: amber.body, marginTop: 3, lineHeight: 1.5, maxWidth: 480 }}>
+            Your {account.provider === "GOOGLE" ? "Google" : "Microsoft"} authorisation has expired
+            or been revoked. Re-authorise to restore the connection.
+          </div>
+          <a href={connectPath} style={{ textDecoration: "none" }}>
+            <span
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 7,
+                marginTop: 13,
+                height: 38,
+                padding: "0 16px",
+                borderRadius: 9,
+                background: T.green,
+                color: "#dff0e7",
+                fontSize: 13.5,
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              Re-authorise {providerName} →
+            </span>
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function WarnTri() {
+  return (
+    <svg
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="#9a6a12"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      style={{ flexShrink: 0, marginTop: 1 }}
+    >
+      <path d="M12 4l9 16H3z" />
+      <path d="M12 10v4" />
+      <path d="M12 17h.01" />
+    </svg>
+  );
+}
+
 // ── Account header ─────────────────────────────────────────────────────────
 function AccountHeader({
   account,
@@ -926,6 +1108,12 @@ function AccountHeader({
   const [copiedUrl, setCopiedUrl] = useState(false);
   const isPaused = account.status === "PAUSED";
   const dir = DIR_BADGE[account.direction];
+  const isOAuth = account.provider !== "CARDDAV";
+  const providerName = account.provider === "GOOGLE" ? "Google" : "Outlook";
+  const authParty = account.provider === "GOOGLE" ? "Google" : "Microsoft";
+  const connectPath =
+    account.provider === "GOOGLE" ? "/api/sync/google/connect" : "/api/sync/microsoft/connect";
+  const needsReauth = isOAuth && account.status === "NEEDS_REAUTH";
 
   const handleCopyUrl = async () => {
     try {
@@ -941,7 +1129,7 @@ function AccountHeader({
     <div>
       <div style={{ display: "flex", alignItems: "flex-start", gap: 14 }}>
         <span style={{ marginTop: 2 }}>
-          <PlatIcon kind={getPlatformKind(account.label, account.baseUrl)} size={30} />
+          <PlatIcon kind={getAccountIconKind(account)} size={30} />
         </span>
         <div style={{ minWidth: 0, flex: 1 }}>
           <h1
@@ -955,63 +1143,79 @@ function AccountHeader({
           >
             {account.label}
           </h1>
-          <div style={{ display: "flex", alignItems: "center", gap: 7, marginTop: 3 }}>
-            <span
+          {isOAuth ? (
+            <div
               style={{
                 fontSize: 13,
                 color: T.mute,
+                marginTop: 3,
                 overflow: "hidden",
                 textOverflow: "ellipsis",
                 whiteSpace: "nowrap",
                 maxWidth: 360,
               }}
             >
-              {account.baseUrl}
-            </span>
-            <button
-              type="button"
-              onClick={handleCopyUrl}
-              title="Copy URL"
-              style={{
-                border: "none",
-                background: "transparent",
-                cursor: "pointer",
-                padding: 2,
-                color: copiedUrl ? T.sgreen : T.mute,
-                display: "inline-flex",
-                flexShrink: 0,
-              }}
-            >
-              {copiedUrl ? (
-                <svg
-                  width="15"
-                  height="15"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke={T.sgreen}
-                  strokeWidth="2.2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="M5 12.5l4 4 10-10" />
-                </svg>
-              ) : (
-                <svg
-                  width="15"
-                  height="15"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.7"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <rect x="9" y="9" width="11" height="11" rx="2" />
-                  <path d="M5 15V5a2 2 0 012-2h10" />
-                </svg>
-              )}
-            </button>
-          </div>
+              {account.connectedEmail ?? providerName}
+            </div>
+          ) : (
+            <div style={{ display: "flex", alignItems: "center", gap: 7, marginTop: 3 }}>
+              <span
+                style={{
+                  fontSize: 13,
+                  color: T.mute,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
+                  maxWidth: 360,
+                }}
+              >
+                {account.baseUrl}
+              </span>
+              <button
+                type="button"
+                onClick={handleCopyUrl}
+                title="Copy URL"
+                style={{
+                  border: "none",
+                  background: "transparent",
+                  cursor: "pointer",
+                  padding: 2,
+                  color: copiedUrl ? T.sgreen : T.mute,
+                  display: "inline-flex",
+                  flexShrink: 0,
+                }}
+              >
+                {copiedUrl ? (
+                  <svg
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke={T.sgreen}
+                    strokeWidth="2.2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M5 12.5l4 4 10-10" />
+                  </svg>
+                ) : (
+                  <svg
+                    width="15"
+                    height="15"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <rect x="9" y="9" width="11" height="11" rx="2" />
+                    <path d="M5 15V5a2 2 0 012-2h10" />
+                  </svg>
+                )}
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
@@ -1066,6 +1270,36 @@ function AccountHeader({
         </div>
       )}
 
+      {/* P27-07: OAuth metadata */}
+      {isOAuth && (
+        <div style={{ marginTop: 18, maxWidth: 520 }}>
+          <OAuthMetaRow label="Connected account">
+            <span style={{ color: T.ink, fontWeight: 500 }}>
+              {account.connectedEmail ?? "—"}
+            </span>
+          </OAuthMetaRow>
+          <OAuthMetaRow label="Authorised scope">{account.scope ?? "Contacts"}</OAuthMetaRow>
+          <OAuthMetaRow label="Token status">
+            {account.tokenStatus === "valid" ? (
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, color: T.sgreen, fontWeight: 600 }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={T.sgreen} strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M5 12.5l4 4 10-10" />
+                </svg>
+                Valid
+              </span>
+            ) : (
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6, color: T.red, fontWeight: 600 }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={T.red} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M12 4l9 16H3z" /><path d="M12 10v4" /><path d="M12 17h.01" />
+                </svg>
+                Expired
+              </span>
+            )}
+          </OAuthMetaRow>
+          <OAuthMetaRow label="Last refreshed">{account.lastRefreshedRelative ?? "—"}</OAuthMetaRow>
+        </div>
+      )}
+
       {/* action buttons */}
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginTop: 18 }}>
         {/* sync now */}
@@ -1090,14 +1324,25 @@ function AccountHeader({
           <ActionBtn type="submit">{isPaused ? "Resume" : "Pause"}</ActionBtn>
         </form>
 
-        {/* edit credentials */}
-        <ActionBtn onClick={onEdit}>Edit credentials</ActionBtn>
+        {/* edit credentials (CardDAV) / re-authorise (OAuth, only when needed) */}
+        {isOAuth ? (
+          needsReauth && (
+            <a href={connectPath} style={{ textDecoration: "none" }}>
+              <ActionBtn>Re-authorise</ActionBtn>
+            </a>
+          )
+        ) : (
+          <ActionBtn onClick={onEdit}>Edit credentials</ActionBtn>
+        )}
 
         {/* disconnect */}
         <form
           action={disconnectSyncAccount}
           onSubmit={(e) => {
-            if (!window.confirm(`Disconnect ${account.label}? Contacts will remain in Kontax but will no longer sync.`)) {
+            const msg = isOAuth
+              ? `Disconnect ${account.label}? Contacts synced from ${providerName} will remain in Kontax but will no longer sync automatically. Your ${authParty} authorisation will be revoked.`
+              : `Disconnect ${account.label}? Contacts will remain in Kontax but will no longer sync.`;
+            if (!window.confirm(msg)) {
               e.preventDefault();
             }
           }}
@@ -1283,6 +1528,24 @@ const QUICK_PRESETS: QuickPreset[] = [
   { kind: "generic", label: "Manual", url: "" },
 ];
 
+// P27-07: OAuth quick-connect tiles — navigate to the connector's redirect route.
+const OAUTH_TILES: Array<{ provider: string; kind: PlatKind; label: string; sub: string; href: string }> = [
+  {
+    provider: "GOOGLE",
+    kind: "gcontacts",
+    label: "Google Contacts",
+    sub: "via Google People API",
+    href: "/api/sync/google/connect",
+  },
+  {
+    provider: "MICROSOFT",
+    kind: "outlook",
+    label: "Outlook / Exchange",
+    sub: "via Microsoft Graph",
+    href: "/api/sync/microsoft/connect",
+  },
+];
+
 function AddAccountForm({ onCancel }: { onCancel: () => void }) {
   const [sel, setSel] = useState<QuickPreset>(QUICK_PRESETS[0]!);
   const [reveal, setReveal] = useState(false);
@@ -1293,26 +1556,55 @@ function AddAccountForm({ onCancel }: { onCancel: () => void }) {
         Add sync account
       </h2>
       <p style={{ margin: "0 0 22px", fontSize: 13.5, color: T.ink2, maxWidth: 480 }}>
-        Connect Kontax to a CardDAV service to pull and push contacts.
+        Connect a Google or Microsoft account in one tap, or link any CardDAV service manually.
       </p>
 
-      {/* quick-connect tiles */}
+      {/* P27-07: OAuth quick-connect (Google / Outlook) */}
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
-        <span style={{ fontSize: 12.5, fontWeight: 600, color: T.ink2 }}>Quick-connect</span>
-        <span
-          style={{
-            padding: "2px 7px",
-            borderRadius: 6,
-            background: "#edf0fe",
-            color: T.blue,
-            fontSize: 10,
-            fontWeight: 700,
-            textTransform: "uppercase",
-            letterSpacing: "0.06em",
-          }}
-        >
-          Proposed
-        </span>
+        <span style={{ fontSize: 12.5, fontWeight: 600, color: T.ink2 }}>Connect with OAuth</span>
+      </div>
+      <div
+        style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(auto-fit, minmax(190px, 1fr))",
+          gap: 12,
+          marginBottom: 24,
+          maxWidth: 460,
+        }}
+      >
+        {OAUTH_TILES.map((p) => (
+          <a
+            key={p.provider}
+            href={p.href}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              padding: "13px 15px",
+              minHeight: 64,
+              borderRadius: 12,
+              border: `1px solid ${T.line}`,
+              background: "#fff",
+              textDecoration: "none",
+              boxSizing: "border-box",
+            }}
+          >
+            <span style={{ flexShrink: 0, width: 26, display: "grid", placeItems: "center" }}>
+              <PlatIcon kind={p.kind} size={26} />
+            </span>
+            <span style={{ minWidth: 0 }}>
+              <span style={{ display: "block", fontSize: 14, fontWeight: 600, color: T.ink, lineHeight: 1.2 }}>
+                {p.label}
+              </span>
+              <span style={{ display: "block", fontSize: 11.5, color: T.mute, marginTop: 2 }}>{p.sub}</span>
+            </span>
+          </a>
+        ))}
+      </div>
+
+      {/* quick-connect tiles (CardDAV) */}
+      <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
+        <span style={{ fontSize: 12.5, fontWeight: 600, color: T.ink2 }}>CardDAV</span>
       </div>
       <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 24 }}>
         {QUICK_PRESETS.map((q) => {
@@ -2523,7 +2815,9 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
       );
     return (
       <div>
-        {vHealth === "auth" && <ReauthBanner onFix={() => setEditing(true)} />}
+        {selectedAccount.provider === "CARDDAV"
+          ? vHealth === "auth" && <ReauthBanner onFix={() => setEditing(true)} />
+          : <OAuthErrorBanner account={selectedAccount} />}
         {selectedAccount.conflictQueueFull && <AutoPauseBanner />}
         {selectedAccount.duplicatesDetected > 0 && (
           <DuplicatesBanner count={selectedAccount.duplicatesDetected} />
@@ -2697,7 +2991,7 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
                   }}
                 >
                   <span style={{ flexShrink: 0 }}>
-                    <PlatIcon kind={getPlatformKind(a.label, a.baseUrl)} size={24} />
+                    <PlatIcon kind={getAccountIconKind(a)} size={24} />
                   </span>
                   <span style={{ minWidth: 0, flex: 1 }}>
                     <span
@@ -2723,7 +3017,9 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
                         whiteSpace: "nowrap",
                       }}
                     >
-                      {HEALTH_LIST_TEXT[vH](a)}
+                      {a.provider !== "CARDDAV" && a.connectedEmail && (vH === "healthy" || vH === "syncing")
+                        ? a.connectedEmail
+                        : HEALTH_LIST_TEXT[vH](a)}
                     </span>
                   </span>
                   <Dot color={HEALTH_DOT[vH]} pulse={vH === "syncing"} />

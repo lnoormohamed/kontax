@@ -245,10 +245,26 @@ export default async function SyncPage({ searchParams }: PageProps) {
       comparisonRows: buildConflictRows(cf.localSnapshot, cf.remoteSnapshot),
     }));
 
+    // P27-07: OAuth providers (Google/Microsoft) show a connected email + token
+    // status instead of a server URL + credentials form.
+    const isOAuth = acct.provider === "GOOGLE" || acct.provider === "MICROSOFT";
     return {
       id: acct.id,
       label: acct.label,
       baseUrl: acct.baseUrl,
+      provider: acct.provider,
+      // OAuth: the connected provider account email (stored at connect time).
+      connectedEmail: isOAuth ? acct.remoteAccountId : null,
+      scope: isOAuth ? "Contacts (read & write)" : null,
+      tokenStatus: isOAuth
+        ? acct.status === "NEEDS_REAUTH"
+          ? "expired"
+          : "valid"
+        : null,
+      lastRefreshedRelative: isOAuth
+        ? formatRelative(acct.credentialLastValidatedAt ?? acct.credentialUpdatedAt)
+        : null,
+      lastErrorCode: acct.lastErrorCode ?? null,
       // P23-02: settings.syncDirection is the canonical home; fall back to the
       // SyncAccount column when no settings row exists yet.
       direction: acct.settings?.syncDirection ?? acct.syncDirection,

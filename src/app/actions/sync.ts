@@ -1635,6 +1635,23 @@ export const disconnectSyncAccount = async (formData: FormData) => {
   const syncAccountId = parseSyncAccountId(formData);
   const redirectTo = getRedirectTarget(formData) ?? "/sync";
 
+  // P27-07: revoke OAuth authorisation before deleting the account (best-effort —
+  // a revoke failure must not block disconnect).
+  const account = await db.syncAccount.findFirst({
+    where: { id: syncAccountId, userId },
+    select: { id: true, provider: true, credentialReference: true },
+  });
+  // Dynamic import keeps the googleapis/MSAL dependency graph server-only — a
+  // static import would drag it into this "use server" file's client reference
+  // graph (it's imported by the sync page client) and break the action module.
+  if (account?.provider === "GOOGLE") {
+    const { revokeGoogleToken } = await import("~/server/google-sync");
+    await revokeGoogleToken(account);
+  } else if (account?.provider === "MICROSOFT") {
+    const { revokeMicrosoftToken } = await import("~/server/microsoft-sync");
+    await revokeMicrosoftToken(account);
+  }
+
   await db.syncAccount.deleteMany({
     where: { id: syncAccountId, userId },
   });
