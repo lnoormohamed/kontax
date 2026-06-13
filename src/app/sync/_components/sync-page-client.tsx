@@ -2840,7 +2840,9 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
         @media (max-width: 767px) {
           .sy-hidden-mobile { display: none !important; }
           .sy-mobile-top { display: flex !important; }
-          .sy-detail-inner { padding: 18px 18px 70px !important; }
+          /* Clear the fixed bottom nav (56px + home-indicator safe area) plus a
+             comfortable gap so Connect/Cancel etc. don't crowd it. */
+          .sy-detail-inner { padding: 18px 18px calc(56px + env(safe-area-inset-bottom) + 32px) !important; }
         }
       `}</style>
     </>
