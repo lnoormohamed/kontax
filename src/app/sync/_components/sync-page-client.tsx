@@ -15,6 +15,7 @@ import {
   updateBookAllowlist,
   updateSyncAccountSettings,
 } from "~/app/actions/sync";
+import { HelpTooltip } from "~/app/_components/help-tooltip";
 
 // P23-06: server sentinel returned by settings actions when a re-auth elevation
 // is required. Mirrored here so the client can detect it and open the modal.
@@ -1183,17 +1184,20 @@ function FormField({
   placeholder,
   required,
   mono,
+  hint,
 }: {
   label: string;
   name: string;
   placeholder?: string;
   required?: boolean;
   mono?: boolean;
+  hint?: React.ReactNode;
 }) {
   return (
     <label style={{ display: "block" }}>
-      <span style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: T.ink2, marginBottom: 6 }}>
+      <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, fontWeight: 600, color: T.ink2, marginBottom: 6 }}>
         {label}
+        {hint}
       </span>
       <input
         name={name}
@@ -1295,11 +1299,35 @@ function AddAccountForm({ onCancel }: { onCancel: () => void }) {
       <form action={createSyncAccount}>
         <div style={{ display: "grid", gap: 14, maxWidth: 460 }}>
           <FormField label="Label" name="label" placeholder={sel.label} required />
-          <FormField label="Server URL" name="baseUrl" placeholder={sel.url || "https://…"} required mono />
-          <FormField label="Username" name="username" placeholder="you@example.com" required />
+          <FormField
+            label="Server URL"
+            name="baseUrl"
+            placeholder={sel.url || "https://…"}
+            required
+            mono
+            hint={
+              <HelpTooltip learnHref="/help#carddav" place="bottom">
+                Your CardDAV server URL looks like <b className="text-white">https://contacts.icloud.com/</b>. Find it in your contacts app’s account settings.
+              </HelpTooltip>
+            }
+          />
+          <FormField
+            label="Username"
+            name="username"
+            placeholder="you@example.com"
+            required
+            hint={
+              <HelpTooltip place="bottom">
+                Usually the email address you sign in to the service with.
+              </HelpTooltip>
+            }
+          />
           <div>
-            <label style={{ display: "block", fontSize: 12.5, fontWeight: 600, color: T.ink2, marginBottom: 6 }}>
+            <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, fontWeight: 600, color: T.ink2, marginBottom: 6 }}>
               Password
+              <HelpTooltip learnHref="/help#carddav" place="bottom">
+                Generate an app-specific password in your account’s security settings — your normal password won’t work for CardDAV.
+              </HelpTooltip>
             </label>
             <div style={{ position: "relative" }}>
               <input

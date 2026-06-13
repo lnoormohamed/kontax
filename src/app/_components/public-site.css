@@ -303,6 +303,35 @@
 .kx .faq__a a.inline { color: var(--accent); font-weight: 500; }
 .kx .faq__a a.inline:hover { text-decoration: underline; }
 
+/* P26-12 — /help FAQ page */
+.kx .help-wrap { max-width: 760px; margin: 0 auto; padding: 56px 32px 100px; }
+.kx .help-head { margin-bottom: 28px; }
+.kx .help-h1 { margin: 6px 0 0; font-size: clamp(28px, 4vw, 38px); font-weight: 700; letter-spacing: -0.02em; color: var(--ink); }
+.kx .help-lede { margin: 12px 0 0; font-size: 16px; line-height: 1.55; color: var(--ink2); }
+.kx .help-search { display: flex; align-items: center; gap: 10px; margin: 0 0 36px; padding: 0 14px; height: 48px; border: 1px solid var(--line); border-radius: 12px; background: #fff; transition: border-color 0.15s ease, box-shadow 0.15s ease; }
+.kx .help-search:focus-within { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(65, 88, 244, 0.18); }
+.kx .help-search input { flex: 1; min-width: 0; border: none; outline: none; background: transparent; font: inherit; font-size: 15px; color: var(--ink); }
+.kx .help-search input::placeholder { color: var(--mute); }
+.kx .help-search input::-webkit-search-cancel-button { display: none; }
+.kx .help-search__clear { flex: 0 0 auto; display: grid; place-items: center; width: 28px; height: 28px; border: none; border-radius: 8px; background: transparent; color: var(--mute); cursor: pointer; transition: background 0.14s ease; }
+.kx .help-search__clear:hover { background: var(--wash); }
+.kx .help-sections { display: grid; gap: 36px; }
+.kx .help-sectitle { margin: 0 0 8px; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em; color: var(--mute); }
+.kx .help-list { display: grid; }
+.kx .help-faq-item { border-top: 1px solid var(--line2); }
+.kx .help-faq-item:last-child { border-bottom: 1px solid var(--line2); }
+.kx .help-faq-q { list-style: none; cursor: pointer; display: flex; align-items: center; gap: 11px; padding: 15px 2px; font-size: 15px; font-weight: 500; color: var(--accent); }
+.kx .help-faq-q::-webkit-details-marker { display: none; }
+.kx .help-faq-q:hover { text-decoration: underline; }
+.kx .help-faq-chev { flex: 0 0 auto; font-size: 12px; color: var(--mute); transition: transform 0.16s ease; }
+.kx .help-faq-item[open] .help-faq-chev { transform: rotate(90deg); }
+.kx .help-faq-a { padding: 0 2px 16px 24px; font-size: 14px; line-height: 1.6; color: var(--ink2); text-wrap: pretty; }
+.kx .help-noresult { padding: 40px 0; text-align: center; }
+.kx .help-noresult__title { margin: 0; font-size: 15px; font-weight: 600; color: var(--ink); }
+.kx .help-noresult__sub { margin: 6px 0 0; font-size: 13.5px; color: var(--ink2); }
+.kx .help-foot { display: flex; align-items: center; gap: 12px; margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--line2); font-size: 13px; color: var(--mute); }
+.kx .help-foot__k { flex: 0 0 auto; display: grid; place-items: center; width: 30px; height: 30px; border-radius: 9px; background: var(--green); color: var(--green-tile-text); font-size: 15px; font-weight: 700; }
+
 /* closing CTA */
 .kx .cta-band { background: var(--green); }
 .kx .cta-band__inner { max-width: var(--maxw); margin: 0 auto; padding: 88px 48px; text-align: center; }
