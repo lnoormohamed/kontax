@@ -7,7 +7,15 @@ const { auth } = NextAuth(authConfigEdge);
 
 // Static assets + auth endpoints — always allowed, bypass all session gating
 // (these must load even for restricted sessions, e.g. CSS/JS for the 2FA page).
-const ALWAYS_ALLOW = ["/_next", "/favicon.ico", "/api/auth"];
+const ALWAYS_ALLOW = [
+  "/_next",
+  "/favicon.ico",
+  "/manifest.webmanifest",
+  "/sw.js",
+  "/offline.html",
+  "/api/auth",
+  "/api/pwa-icon",
+];
 
 // Public content pages — viewable while logged out. The page component itself
 // decides what to render based on session (e.g. "/" shows the marketing landing

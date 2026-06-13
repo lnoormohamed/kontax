@@ -1,7 +1,7 @@
 // @ts-nocheck
-const SHELL_CACHE = "kontax-shell-v3";
-const PAGE_CACHE = "kontax-pages-v3";
-const ASSET_CACHE = "kontax-assets-v3";
+const SHELL_CACHE = "kontax-shell-v4";
+const PAGE_CACHE = "kontax-pages-v4";
+const ASSET_CACHE = "kontax-assets-v4";
 const OFFLINE_URL = "/offline.html";
 
 const ALL_CACHES = [SHELL_CACHE, PAGE_CACHE, ASSET_CACHE];
