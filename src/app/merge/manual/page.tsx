@@ -98,8 +98,8 @@ export default async function ManualMergePage({ searchParams }: ManualMergePageP
   const rightContact = contacts.find((c) => c.id === rightId) ?? null;
   const validPair = leftContact != null && rightContact != null && leftContact.id !== rightContact.id;
 
-  const previewAB = validPair ? buildMergedContactPreview(leftContact!, rightContact!) : null;
-  const previewBA = validPair ? buildMergedContactPreview(rightContact!, leftContact!) : null;
+  const previewAB = validPair ? buildMergedContactPreview(leftContact, rightContact) : null;
+  const previewBA = validPair ? buildMergedContactPreview(rightContact, leftContact) : null;
 
   const people = contactCounts.find((r) => r.archivedAt === null)?._count.id ?? 0;
   const archived = contactCounts.find((r) => r.archivedAt !== null)?._count.id ?? 0;
@@ -333,8 +333,8 @@ export default async function ManualMergePage({ searchParams }: ManualMergePageP
         {/* Step 2 — field review */}
         {validPair && previewAB && previewBA && (
           <MergeReview
-            contactA={toReviewContact(leftContact!)}
-            contactB={toReviewContact(rightContact!)}
+            contactA={toReviewContact(leftContact)}
+            contactB={toReviewContact(rightContact)}
             mergeSource="manual-pair"
             unionsA={toUnions(previewAB)}
             unionsB={toUnions(previewBA)}
