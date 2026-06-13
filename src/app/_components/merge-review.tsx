@@ -520,17 +520,76 @@ function SurvivorSelector({
 // ── 4. Conflict field cards ───────────────────────────────────────────────────
 type ChoiceValue = "A" | "B" | "combine";
 
-function FieldOption({
-  caption,
+// Compact segmented A | B (| Both) chip — the canonical keep control
+function SegChip({
+  choice,
+  allowCombine,
+  onChoose,
+}: {
+  choice: ChoiceValue | undefined;
+  allowCombine?: boolean;
+  onChoose: (v: ChoiceValue) => void;
+}) {
+  const opts: ChoiceValue[] = allowCombine ? ["A", "B", "combine"] : ["A", "B"];
+  const label = (o: ChoiceValue) => (o === "combine" ? "Both" : o);
+  return (
+    <div
+      style={{
+        display: "inline-flex",
+        padding: 2,
+        background: C.wash,
+        border: `1px solid ${C.line2}`,
+        borderRadius: 9,
+        gap: 2,
+        flexShrink: 0,
+      }}
+      role="group"
+      aria-label="Keep which value"
+    >
+      {opts.map((o) => (
+        <button
+          key={o}
+          onClick={() => onChoose(o)}
+          style={{
+            border: "none",
+            background: choice === o ? "#fff" : "transparent",
+            borderRadius: 7,
+            padding: "0 10px",
+            height: 26,
+            minWidth: 28,
+            fontSize: 11.5,
+            fontWeight: 700,
+            letterSpacing: "0.02em",
+            color: choice === o ? C.green : C.ink2,
+            boxShadow: choice === o ? "0 1px 2px rgba(20,30,25,.12)" : "none",
+            cursor: "pointer",
+            transition: "background .12s, color .12s, box-shadow .12s",
+          }}
+          type="button"
+        >
+          {label(o)}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// Slim tappable value row — tap-the-value-that-wins
+function ValueRow({
+  badge,
   value,
   selected,
-  full,
+  dimmed,
+  isCombine,
+  fullWidth,
   onClick,
 }: {
-  caption: string;
+  badge: "A" | "B" | "";
   value: string;
   selected: boolean;
-  full?: boolean;
+  dimmed: boolean;
+  isCombine?: boolean;
+  fullWidth?: boolean;
   onClick: () => void;
 }) {
   return (
@@ -538,50 +597,43 @@ function FieldOption({
       onClick={onClick}
       style={{
         display: "flex",
-        flexDirection: "column",
-        gap: 7,
+        alignItems: "center",
+        gap: 9,
         textAlign: "left",
-        padding: "11px 13px",
-        borderRadius: 11,
+        width: "100%",
+        padding: "8px 10px",
+        borderRadius: 10,
         border: `1.5px solid ${selected ? C.green : C.line}`,
         background: selected ? "#eef5ef" : "#fff",
+        boxShadow: selected ? "0 0 0 3px rgba(23,53,46,.06)" : "none",
+        opacity: dimmed ? 0.48 : 1,
         cursor: "pointer",
-        boxShadow: selected ? "0 0 0 3px rgba(23,53,46,.07)" : "none",
-        transition: "border-color .12s, background .12s, box-shadow .12s",
-        gridColumn: full ? "1 / -1" : undefined,
-        marginTop: full ? 10 : undefined,
+        transition: "border-color .12s, background .12s, box-shadow .12s, opacity .12s",
+        gridColumn: fullWidth ? "1 / -1" : undefined,
       }}
       type="button"
     >
-      <span
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          gap: 8,
-        }}
-      >
+      {isCombine ? (
+        <svg fill="none" height="13" stroke={selected ? C.green : C.mute} strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" viewBox="0 0 24 24" width="13" style={{ flexShrink: 0 }}>
+          <path d="M7 4v6a5 5 0 005 5h5" /><path d="M17 4v6" /><path d="M14 12l3 3-3 3" /><path d="M7 4l-2 2" /><path d="M7 4l2 2" />
+        </svg>
+      ) : (
         <span
           style={{
-            fontSize: 10,
-            fontWeight: 700,
-            letterSpacing: "0.07em",
-            textTransform: "uppercase",
-            color: selected ? C.green : C.mute,
-            whiteSpace: "nowrap",
-            overflow: "hidden",
-            textOverflow: "ellipsis",
+            width: 20, height: 20, borderRadius: 6, flexShrink: 0,
+            display: "grid", placeItems: "center",
+            fontSize: 11, fontWeight: 800,
+            background: badge === "A" ? "#e7ebf1" : "#efe6dd",
+            color: badge === "A" ? "#46566e" : "#8a5a34",
           }}
         >
-          {caption}
+          {badge}
         </span>
-        <CheckRing on={selected} size={18} />
-      </span>
-      <span
-        style={{ fontSize: 13.5, lineHeight: 1.5, color: C.ink }}
-      >
+      )}
+      <span style={{ flex: 1, minWidth: 0, fontSize: 13, lineHeight: 1.45, color: selected ? C.ink : C.ink2 }}>
         {value || "—"}
       </span>
+      <CheckRing on={selected} size={18} />
     </button>
   );
 }
@@ -590,8 +642,6 @@ function ConflictCard({
   label,
   valueA,
   valueB,
-  labelA,
-  labelB,
   choice,
   allowCombine,
   onChoose,
@@ -605,86 +655,60 @@ function ConflictCard({
   allowCombine?: boolean;
   onChoose: (v: ChoiceValue) => void;
 }) {
-  const resolved = !!choice;
   return (
     <section
       style={{
         borderRadius: "1.4rem",
         border: "1px solid #ecdcb6",
-        background: "#fbf7ee",
-        padding: "16px 18px",
+        background: "#fdfaf3",
+        padding: "13px 15px 13px",
         boxShadow: "0 1px 2px rgba(20,30,25,0.03)",
       }}
     >
+      {/* Header: field label + segmented chip */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           gap: 12,
-          marginBottom: 12,
+          marginBottom: 10,
         }}
       >
-        <span style={{ fontSize: 14, fontWeight: 600, color: C.ink }}>{label}</span>
-        <span
-          style={{
-            display: "inline-flex",
-            alignItems: "center",
-            gap: 5,
-            height: 23,
-            padding: "0 9px",
-            borderRadius: 7,
-            background: "#f3e1da",
-            color: "#7a2f1d",
-            fontSize: 11,
-            fontWeight: 700,
-            whiteSpace: "nowrap",
-          }}
-        >
-          {resolved ? (
-            <>
-              <svg
-                fill="none"
-                height="12"
-                stroke="#7a2f1d"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2.2"
-                viewBox="0 0 12 12"
-                width="12"
-              >
-                <path d="M2.5 6.3l2.4 2.4L9.5 3.4" />
-              </svg>
-              Resolved
-            </>
-          ) : (
-            "Choose one"
-          )}
-        </span>
+        <span style={{ fontSize: 13.5, fontWeight: 600, color: C.ink }}>{label}</span>
+        <SegChip choice={choice} allowCombine={allowCombine} onChoose={onChoose} />
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-        <FieldOption
-          caption={labelA}
-          onClick={() => onChoose("A")}
-          selected={choice === "A"}
+      {/* Slim value rows — stacked on mobile, side-by-side on desktop */}
+      <div
+        className="mg-two-col"
+        style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 7 }}
+      >
+        <ValueRow
+          badge="A"
           value={valueA}
+          selected={choice === "A"}
+          dimmed={!!choice && choice !== "A"}
+          onClick={() => onChoose("A")}
         />
-        <FieldOption
-          caption={labelB}
-          onClick={() => onChoose("B")}
-          selected={choice === "B"}
+        <ValueRow
+          badge="B"
           value={valueB}
+          selected={choice === "B"}
+          dimmed={!!choice && choice !== "B"}
+          onClick={() => onChoose("B")}
         />
+        {allowCombine && (
+          <ValueRow
+            badge=""
+            value="Keep both — combine"
+            selected={choice === "combine"}
+            dimmed={!!choice && choice !== "combine"}
+            isCombine
+            fullWidth
+            onClick={() => onChoose("combine")}
+          />
+        )}
       </div>
-      {allowCombine && (
-        <FieldOption
-          caption="Keep both"
-          full
-          onClick={() => onChoose("combine")}
-          selected={choice === "combine"}
-          value="Combine the notes from both contacts into one."
-        />
-      )}
     </section>
   );
 }
