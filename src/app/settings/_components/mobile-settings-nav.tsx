@@ -72,7 +72,7 @@ function GroupCard({ children }: { children: React.ReactNode }) {
   return (
     <div
       style={{
-        margin: "0 16px 16px",
+        margin: "0 0 16px",
         border: "1px solid #d8ddd6",
         borderRadius: 14,
         background: "#fff",
@@ -103,7 +103,7 @@ export function MobileSettingsNav({
     s.split(/\s+/).map((p) => p[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
 
   return (
-    <div className="md:hidden" style={{ paddingTop: 16, paddingBottom: 8 }}>
+    <div className="md:hidden" style={{ paddingBottom: 8 }}>
       {/* Account card */}
       <GroupCard>
         <div style={{ display: "flex", alignItems: "center", gap: 13, padding: "14px 16px" }}>

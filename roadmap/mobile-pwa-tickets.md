@@ -80,7 +80,7 @@ Requirements** section; the paired build ticket builds to it.
 ## Workstream D — Settings sub-pages
 | Ticket | Title | Spec § | Priority | Status | Depends |
 | --- | --- | --- | --- | --- | --- |
-| P24B-12 | Sub-page content pass: single-column; notifications/preferences toggle rows; verify account/devices/security | E6 | P1 | ☐ | P24B-02 |
+| P24B-12 | Sub-page content pass: single-column; notifications/preferences toggle rows; verify account/devices/security | E6 | P1 | ✅ | P24B-02 |
 | P24B-13 | Family/Teams management: owner/admin vs member variance, roster cards, per-book permission **matrix → cards**, pending chips | E6, E0.3 | P1 | ☐ | P24B-02, P24B-04 |
 | P24B-14 | Teams/audit log — stacked rows / h-scroll | E6 | P2 | ☐ | P24B-04 |
 
@@ -203,6 +203,9 @@ Requirements** section; the paired build ticket builds to it.
 - 2026-06-13 — **P24B-23 done** — mobile notifications overlay to DB18: 52px full-screen mobile
   chrome above bottom nav, category rows with unread state, New/Earlier grouping, SECURITY drawer
   behavior, actionUrl navigation, mark-all-read, empty/loading states, and settings footer.
+- 2026-06-13 — **P24B-12 done** — settings sub-pages content pass: shared cards tighten on
+  mobile, duplicate in-page titles hidden behind the P24B-02 back header, account inputs use 16px,
+  notifications/preferences toggles render as row switches, and 2FA enrolment becomes a mobile bottom sheet.
 - 2026-06-13 — **P24B-07 edit redo done (DB19)** — `MobileContactSheet` rebuilt as ONE sheet for both
   create and edit, full field coverage vs the desktop editor: Basic (always-on) · Phones · Emails ·
   Websites · Address (multi sub-cards) · Dates (birthday + significant, native date inputs) · Related

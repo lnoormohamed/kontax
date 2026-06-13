@@ -113,7 +113,7 @@ export function ProfileSection({
   const [bg, fg] = tint(name || "K");
 
   return (
-    <section className="rounded-[2rem] border border-[#d8ddd6] bg-white p-6 shadow-[0_1px_2px_rgba(20,30,25,0.04)]">
+    <section className="rounded-[2rem] border border-[#d8ddd6] bg-white p-4 shadow-[0_1px_2px_rgba(20,30,25,0.04)] md:p-6">
       <div className="flex flex-wrap items-center gap-5">
         {/* avatar */}
         <div className="relative h-[88px] w-[88px] shrink-0">
@@ -173,7 +173,7 @@ export function ProfileSection({
           )}
         </div>
         <input
-          className={`mt-[6px] w-full rounded-[1.2rem] border px-4 py-3 text-[14px] text-[#1d2823] outline-none transition focus:border-[#4158f4] focus:ring-[3px] focus:ring-[#edf0fe] ${touched && empty ? "border-[#c98a76]" : "border-[#d8ddd6]"}`}
+          className={`mt-[6px] w-full rounded-[1.2rem] border px-4 py-3 text-[16px] text-[#1d2823] outline-none transition focus:border-[#4158f4] md:text-[14px] focus:ring-[3px] focus:ring-[#edf0fe] ${touched && empty ? "border-[#c98a76]" : "border-[#d8ddd6]"}`}
           maxLength={MAX_NAME}
           onChange={(e) => { setName(e.target.value); setTouched(true); }}
           onKeyDown={(e) => { if (e.key === "Enter") save(); }}

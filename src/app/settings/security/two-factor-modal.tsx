@@ -25,7 +25,7 @@ function OtpInput({ value, onChange, onComplete, error, disabled, autoFocus }: {
     <div className={`flex gap-[9px] ${error ? "st-shake" : ""}`}>
       {digits.map((d, i) => (
         <input
-          className="st-otp-box"
+          className="st-otp-box text-[16px]"
           disabled={disabled}
           inputMode="numeric"
           key={i}
@@ -115,8 +115,8 @@ export function TwoFactorModal({
   const secretSpaced = secret.replace(/(.{4})/g, "$1 ").trim();
 
   return (
-    <div className="fixed inset-0 z-[90] grid place-items-center bg-[rgba(20,30,25,0.42)] p-4" onClick={step === "codes" ? undefined : onCancel}>
-      <div className="st-modal-in w-full max-w-[460px] rounded-[1.6rem] bg-white p-6 shadow-[0_24px_60px_rgba(20,30,25,0.25)]" onClick={(e) => e.stopPropagation()} role="dialog">
+    <div className="fixed inset-0 z-[90] grid items-end bg-[rgba(20,30,25,0.42)] p-0 md:place-items-center md:p-4" onClick={step === "codes" ? undefined : onCancel}>
+      <div className="st-modal-in max-h-[calc(100dvh-18px)] w-full overflow-y-auto rounded-t-[1.6rem] bg-white p-4 shadow-[0_24px_60px_rgba(20,30,25,0.25)] md:max-w-[460px] md:rounded-[1.6rem] md:p-6" onClick={(e) => e.stopPropagation()} role="dialog">
 
         {step === "loading" && (
           <div className="flex flex-col items-center gap-4 py-8">

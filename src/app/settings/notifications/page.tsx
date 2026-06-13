@@ -33,11 +33,11 @@ function Toggle({
 }) {
   return (
     <label
-      className={`flex items-center gap-2.5 ${locked ? "cursor-not-allowed opacity-45" : "cursor-pointer"}`}
+      className={`flex min-h-[44px] items-center justify-between gap-3 rounded-xl bg-[#f8faf8] px-3 py-2 md:min-h-0 md:justify-start md:bg-transparent md:px-0 md:py-0 ${locked ? "cursor-not-allowed opacity-45" : "cursor-pointer"}`}
       title={locked ? "Security and billing alerts cannot be disabled." : undefined}
     >
-      <span className="text-[13px] text-[#5c655e]">{label}</span>
-      <span className="relative inline-flex h-5 w-9 items-center">
+      <span className="text-[13px] font-medium text-[#5c655e]">{label}</span>
+      <span className="relative inline-flex h-6 w-11 items-center md:h-5 md:w-9">
         <input
           className="peer sr-only"
           defaultChecked={on}
@@ -45,8 +45,8 @@ function Toggle({
           name={locked ? undefined : name}
           type="checkbox"
         />
-        <span className="h-5 w-9 rounded-full bg-[#d8ddd6] transition-colors peer-checked:bg-[#17352e]" />
-        <span className="absolute left-0.5 h-4 w-4 rounded-full bg-white shadow-[0_1px_2px_rgba(0,0,0,0.22)] transition-transform peer-checked:translate-x-4" />
+        <span className="h-6 w-11 rounded-full bg-[#d8ddd6] transition-colors peer-checked:bg-[#17352e] md:h-5 md:w-9" />
+        <span className="absolute left-0.5 h-5 w-5 rounded-full bg-white shadow-[0_1px_2px_rgba(0,0,0,0.22)] transition-transform peer-checked:translate-x-5 md:h-4 md:w-4 md:peer-checked:translate-x-4" />
       </span>
     </label>
   );
@@ -70,12 +70,12 @@ function CategoryRow({
   locked?: boolean;
 }) {
   return (
-    <div className="flex flex-wrap items-center justify-between gap-5 py-4">
+    <div className="flex flex-col gap-3 py-4 md:flex-row md:flex-wrap md:items-center md:justify-between md:gap-5">
       <div className="min-w-0 flex-1">
         <div className="text-[14px] font-semibold text-[#1d2823]">{name}</div>
         {note ? <div className="mt-0.5 text-[12px] text-[#8b938c]">{note}</div> : null}
       </div>
-      <div className="flex flex-none gap-7">
+      <div className="grid gap-2 md:flex md:flex-none md:gap-7">
         <Toggle label="In-app" locked={locked} name={inAppName} on={inApp} />
         <Toggle label="Email" locked={locked} name={emailName} on={email} />
       </div>
@@ -155,7 +155,7 @@ export default async function NotificationSettingsPage() {
               <div className="-mt-1 flex items-center gap-3 pb-4 pl-0.5">
                 <span className="text-[13px] text-[#5c655e]">Remind me</span>
                 <select
-                  className="h-9 rounded-lg border border-[#d8ddd6] bg-white px-2.5 text-[13px] text-[#1d2823] outline-none focus:border-[#4158f4] disabled:opacity-45"
+                  className="h-9 rounded-lg border border-[#d8ddd6] bg-white px-2.5 text-[16px] text-[#1d2823] outline-none focus:border-[#4158f4] disabled:opacity-45 md:text-[13px]"
                   defaultValue={String(leadDays)}
                   disabled={!prefs.remindersInApp}
                   name="reminderLeadDays"

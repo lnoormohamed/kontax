@@ -136,7 +136,7 @@ export function EmailSection({
   // ── PENDING / EXPIRED state ────────────────────────────────────────────────
   if (pendingEmail) {
     return (
-      <section className="rounded-[2rem] border border-[#d8ddd6] bg-white p-6 shadow-[0_1px_2px_rgba(20,30,25,0.04)]">
+      <section className="rounded-[2rem] border border-[#d8ddd6] bg-white p-4 shadow-[0_1px_2px_rgba(20,30,25,0.04)] md:p-6">
         <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">Email address</span>
         <div className="mt-2 break-all text-[18px] font-semibold text-[#8b938c]">{email}</div>
 
@@ -200,7 +200,7 @@ export function EmailSection({
 
   // ── NO PENDING CHANGE state ────────────────────────────────────────────────
   return (
-    <section className="rounded-[2rem] border border-[#d8ddd6] bg-white p-6 shadow-[0_1px_2px_rgba(20,30,25,0.04)]">
+    <section className="rounded-[2rem] border border-[#d8ddd6] bg-white p-4 shadow-[0_1px_2px_rgba(20,30,25,0.04)] md:p-6">
       <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">Email address</span>
 
       {!open ? (
@@ -222,7 +222,7 @@ export function EmailSection({
               <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">New email address</span>
               <input
                 autoComplete="email"
-                className={`mt-[6px] w-full rounded-[1.2rem] border px-4 py-3 text-[14px] text-[#1d2823] outline-none transition focus:border-[#4158f4] focus:ring-[3px] focus:ring-[#edf0fe] ${sendErr ? "border-[#c98a76]" : "border-[#d8ddd6]"}`}
+                className={`mt-[6px] w-full rounded-[1.2rem] border px-4 py-3 text-[16px] text-[#1d2823] outline-none transition focus:border-[#4158f4] md:text-[14px] focus:ring-[3px] focus:ring-[#edf0fe] ${sendErr ? "border-[#c98a76]" : "border-[#d8ddd6]"}`}
                 onChange={(e) => { setVal(e.target.value); if (sendErr) setSendErr(""); }}
                 onKeyDown={(e) => { if (e.key === "Enter") send(); }}
                 placeholder="you@newdomain.com"

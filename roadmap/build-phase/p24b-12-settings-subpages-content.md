@@ -1,5 +1,9 @@
 # P24B-12 — Settings sub-pages content pass (mobile)
 
+## Status
+
+Done — implemented 2026-06-13.
+
 ## Purpose
 
 Confirm and polish each settings sub-page's content to the mobile spec: single-column, card-based,
@@ -31,6 +35,14 @@ with the security page.
 - Notifications/preferences toggles render as clean rows.
 - No double-title between the back header and any in-page heading.
 - 2FA enrolment opens a sheet (QR + code entry).
+
+## Implementation Notes
+
+- Shared settings cards now use tighter mobile padding and retain desktop spacing at `md`.
+- `SettingsPageHead` hides duplicate mobile page titles so the P24B-02 back header remains the only title.
+- Account/profile/password/email fields use 16px mobile inputs to avoid browser zoom.
+- Preferences and notifications controls use row-style mobile switches with 44px touch targets.
+- Two-factor enrolment opens as a mobile bottom sheet and keeps the centered modal on desktop.
 
 ## Risks and Open Questions
 

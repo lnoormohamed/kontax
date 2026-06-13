@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { SessionProvider } from "next-auth/react";
 
 import { SettingsPageHead, StSecLabel } from "~/app/_components/settings-ui";
 import { auth } from "~/server/auth";
@@ -22,7 +23,9 @@ export default async function SettingsAccountPage() {
   });
 
   return (
-    <>
+    // ProfileSection / PasswordChangeForm call useSession(); they need a provider
+    // in the tree (none exists app-wide). Seed it with the server session.
+    <SessionProvider session={session}>
       <SettingsPageHead
         title="Profile & account"
         sub="Your identity, sign-in email, and password. These stay off the main contacts page."
@@ -58,6 +61,6 @@ export default async function SettingsAccountPage() {
         pendingRequestedAt={user?.emailPendingChangeRequestedAt ?? null}
       />
       <PasswordChangeForm />
-    </>
+    </SessionProvider>
   );
 }

@@ -44,7 +44,7 @@ function PwField({
       <div className="relative mt-[6px]">
         <input
           autoComplete={autoComplete}
-          className={`w-full rounded-[1.2rem] border px-4 py-3 pr-11 text-[14px] text-[#1d2823] outline-none transition focus:border-[#4158f4] focus:ring-[3px] focus:ring-[#edf0fe] ${error ? "border-[#c98a76]" : "border-[#d8ddd6]"}`}
+          className={`w-full rounded-[1.2rem] border px-4 py-3 pr-11 text-[16px] text-[#1d2823] outline-none transition focus:border-[#4158f4] md:text-[14px] focus:ring-[3px] focus:ring-[#edf0fe] ${error ? "border-[#c98a76]" : "border-[#d8ddd6]"}`}
           onChange={(e) => onChange(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter" && onEnter) onEnter(); }}
           placeholder={placeholder}
@@ -113,7 +113,7 @@ export function PasswordChangeForm({ oauthOnly = false }: { oauthOnly?: boolean 
   };
 
   return (
-    <section className="rounded-[2rem] border border-[#d8ddd6] bg-white p-6 shadow-[0_1px_2px_rgba(20,30,25,0.04)]">
+    <section className="rounded-[2rem] border border-[#d8ddd6] bg-white p-4 shadow-[0_1px_2px_rgba(20,30,25,0.04)] md:p-6">
       <span className="text-[12px] font-semibold uppercase tracking-[0.18em] text-[#8b938c]">Password</span>
 
       {!open ? (

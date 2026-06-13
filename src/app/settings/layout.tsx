@@ -94,7 +94,7 @@ export default async function SettingsLayout({ children }: { children: React.Rea
           />
         </div>
         <div className="flex min-w-0 flex-1 flex-col overflow-y-auto bg-[#f6f7f4]">
-          <div className="mx-auto w-full max-w-[1060px] px-0 py-0 pb-[calc(56px+env(safe-area-inset-bottom))] md:px-6 md:py-7 md:pb-7 lg:px-9 lg:py-8">
+          <div className="mx-auto w-full max-w-[1060px] px-4 pt-4 pb-[calc(56px+env(safe-area-inset-bottom))] md:px-6 md:py-7 md:pb-7 lg:px-9 lg:py-8">
             {children}
           </div>
         </div>
