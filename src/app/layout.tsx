@@ -4,6 +4,7 @@ import { type Metadata, type Viewport } from "next";
 
 import { ImpersonationBanner } from "~/app/_components/impersonation-banner";
 import { PwaRegister } from "~/app/_components/pwa-register";
+import { WebVitalsReporter } from "~/app/_components/web-vitals-reporter";
 import { SITE_URL } from "~/lib/site-url";
 
 const DESCRIPTION =
@@ -50,6 +51,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
+        <WebVitalsReporter />
         <ImpersonationBanner />
         {children}
         <PwaRegister />
