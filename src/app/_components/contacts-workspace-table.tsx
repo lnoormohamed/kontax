@@ -745,7 +745,8 @@ export function ContactsWorkspaceTable({
         {(() => {
           const items = virtualizer.getVirtualItems();
           if (items.length === 0) return null;
-          const offset = scrollEl?.scrollTop ?? 0;
+          const listOffsetTop = listRef.current?.offsetTop ?? 0;
+          const offset = Math.max(0, (scrollEl?.scrollTop ?? 0) - listOffsetTop + 2);
           let topIndex = items[0]!.index;
           for (const it of items) {
             if (it.start <= offset) topIndex = it.index;
