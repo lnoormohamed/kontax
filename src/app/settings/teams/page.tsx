@@ -228,6 +228,32 @@ export default async function TeamSettingsPage() {
       />
 
       <div className="grid gap-[18px]">
+        {/* seat meter — visible on mobile and desktop */}
+        {(() => {
+          const pct = Math.min(100, Math.round((activeCount / ownedTeam.maxMembers) * 100));
+          const atLimit = full;
+          return (
+            <div className="rounded-[14px] border border-[#d8ddd6] bg-white px-5 py-4">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[13px] font-semibold tabular-nums text-[#1d2823]">
+                  {activeCount} of {ownedTeam.maxMembers} seats used
+                </span>
+                {atLimit && (
+                  <span className="rounded-md bg-[#f6edd9] px-2 py-0.5 text-[11px] font-bold text-[#7c5511]">
+                    Limit reached
+                  </span>
+                )}
+              </div>
+              <div className="mt-2 h-[5px] overflow-hidden rounded-full bg-[#e9ece7]">
+                <div
+                  className="h-full rounded-full transition-all"
+                  style={{ width: `${pct}%`, background: atLimit ? "#bf8526" : "#17352e" }}
+                />
+              </div>
+            </div>
+          );
+        })()}
+
         {/* team identity */}
         <SettingsCard className="flex flex-wrap items-center gap-4">
           <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[#e7efe9] text-[#17352e]">
@@ -347,11 +373,19 @@ export default async function TeamSettingsPage() {
                               Resend
                             </button>
                           </form>
-                        ) : null}
+                        ) : (
+                          <form action={inviteTeamMember}>
+                            <input name="email" type="hidden" value={m.invitedEmail ?? m.user?.email ?? ""} />
+                            <input name="role" type="hidden" value={m.role} />
+                            <button className="text-[13px] font-semibold text-[#4158f4]" disabled={full} type="submit">
+                              Invite again
+                            </button>
+                          </form>
+                        )}
                         <form action={removeTeamMember}>
                           <input name="memberId" type="hidden" value={m.id} />
                           <button className="text-[13px] font-semibold text-[#b5472f]" type="submit">
-                            {declined ? "Remove" : "Cancel"}
+                            {declined ? "Dismiss" : "Cancel"}
                           </button>
                         </form>
                       </span>

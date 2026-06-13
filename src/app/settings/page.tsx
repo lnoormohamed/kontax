@@ -83,13 +83,36 @@ export default async function SettingsPlanPage({
 
   const userLabel = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
 
+  // Derive the group entry state for the mobile nav row (P24B-DB15 §00).
+  const isNeedsAttention =
+    planSummary.lifecyclePolicy.label === "Grace" ||
+    planSummary.lifecyclePolicy.label === "Locked";
+  const groupEntry = (() => {
+    if (teamMembership && groupMembership) {
+      if (isNeedsAttention) return { kind: "needsAttention" as const };
+      return {
+        kind: "teams" as const,
+        teamName: groupMembership.group.name,
+        memberCount: groupMembership.group._count.members,
+      };
+    }
+    if (familyMembership && groupMembership) {
+      if (isNeedsAttention) return { kind: "needsAttention" as const };
+      return {
+        kind: "family" as const,
+        memberCount: groupMembership.group._count.members,
+        limit: groupMembership.group.memberSlotsLimit ?? 6,
+      };
+    }
+    return { kind: "nogroup" as const };
+  })();
+
   return (
     <>
       {/* Mobile settings nav — full-screen nav list, hidden on desktop */}
       <MobileSettingsNav
         email={session.user.email ?? ""}
-        hasFamily={!!(familyMembership ?? planSummary.plan === "FAMILY")}
-        hasTeam={!!(teamMembership ?? planSummary.plan === "TEAMS")}
+        groupEntry={groupEntry}
         name={userLabel}
         plan={planSummary.planLabel}
         syncActive={syncConnections}

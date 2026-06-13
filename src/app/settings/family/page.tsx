@@ -250,6 +250,31 @@ export default async function FamilySettingsPage() {
       />
 
       <div className="grid gap-[18px]">
+        {/* seat meter */}
+        {(() => {
+          const pct = Math.min(100, Math.round((activeCount / ownedGroup.maxMembers) * 100));
+          const atLimit = full;
+          return (
+            <div className="rounded-[14px] border border-[#d8ddd6] bg-white px-5 py-4">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[13px] font-semibold tabular-nums text-[#1d2823]">
+                  {activeCount} of {ownedGroup.maxMembers} members
+                </span>
+                {atLimit && (
+                  <span className="rounded-md bg-[#f6edd9] px-2 py-0.5 text-[11px] font-bold text-[#7c5511]">
+                    Limit reached
+                  </span>
+                )}
+              </div>
+              <div className="mt-2 h-[5px] overflow-hidden rounded-full bg-[#e9ece7]">
+                <div
+                  className="h-full rounded-full transition-all"
+                  style={{ width: `${pct}%`, background: atLimit ? "#bf8526" : "#17352e" }}
+                />
+              </div>
+            </div>
+          );
+        })()}
         <SettingsCard className="flex flex-wrap items-center gap-4">
           <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl bg-[#e7efe9] text-[#17352e]">
             <WorkspaceIcon name="users" size={24} />
@@ -378,14 +403,21 @@ export default async function FamilySettingsPage() {
                         <Tag kind={declined ? "Declined" : "Pending"}>
                           {declined ? "Declined" : "Pending"}
                         </Tag>
-                        {!declined ? (
+                        {declined ? (
+                          <form action={inviteFamilyMember}>
+                            <input name="email" type="hidden" value={m.invitedEmail ?? m.user?.email ?? ""} />
+                            <button className="text-[13px] font-semibold text-[#4158f4] hover:underline" disabled={full} type="submit">
+                              Invite again
+                            </button>
+                          </form>
+                        ) : (
                           <form action={resendFamilyInvite}>
                             <input name="memberId" type="hidden" value={m.id} />
                             <button className="text-[13px] font-semibold text-[#4158f4] hover:underline" type="submit">
                               Resend
                             </button>
                           </form>
-                        ) : null}
+                        )}
                         <form action={removeFamilyMember}>
                           <input name="memberId" type="hidden" value={m.id} />
                           <button className="text-[13px] font-semibold text-[#b5472f] hover:underline" type="submit">

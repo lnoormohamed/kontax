@@ -4,15 +4,7 @@ import { redirect } from "next/navigation";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
 import { AUDIT_EVENT_TYPES, loadTeamAudit } from "~/server/team-audit";
-
-const fmt = (d: Date) =>
-  new Intl.DateTimeFormat("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(d);
+import { AuditTable } from "./audit-table";
 
 const eventLabel = (t: string) =>
   ({
@@ -163,40 +155,8 @@ export default async function TeamAuditPage({
         </Link>
       </form>
 
-      <div className="mt-4 overflow-hidden rounded-[12px] border border-[#d8ddd6] bg-white">
-        {data.rows.length === 0 ? (
-          <p className="px-5 py-10 text-center text-sm text-[#8b938c]">
-            No audit events match these filters.
-          </p>
-        ) : (
-          <table className="w-full text-[13px]">
-            <thead>
-              <tr className="border-b border-[#e9ece7] text-left text-[11px] font-semibold uppercase tracking-[0.06em] text-[#8b938c]">
-                <th className="px-4 py-2.5">When</th>
-                <th className="px-4 py-2.5">Member</th>
-                <th className="px-4 py-2.5">Event</th>
-                <th className="px-4 py-2.5">Contact</th>
-                <th className="px-4 py-2.5">Book</th>
-              </tr>
-            </thead>
-            <tbody>
-              {data.rows.map((r) => (
-                <tr className="border-b border-[#f0f2ee] last:border-b-0" key={r.id}>
-                  <td className="whitespace-nowrap px-4 py-2.5 text-[#5c655e]">{fmt(r.createdAt)}</td>
-                  <td className="px-4 py-2.5 text-[#1d2823]">{r.memberName}</td>
-                  <td className="px-4 py-2.5 text-[#1d2823]">
-                    {eventLabel(r.eventType)}
-                    {r.diffCount > 0 ? (
-                      <span className="text-[#8b938c]"> · {r.diffCount} field{r.diffCount === 1 ? "" : "s"}</span>
-                    ) : null}
-                  </td>
-                  <td className="px-4 py-2.5 text-[#5c655e]">{r.contactName}</td>
-                  <td className="px-4 py-2.5 text-[#5c655e]">{r.bookName}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
+      <div className="mt-4">
+        <AuditTable rows={data.rows} />
       </div>
 
       {data.nextCursor ? (

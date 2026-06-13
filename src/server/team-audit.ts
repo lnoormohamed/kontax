@@ -26,6 +26,8 @@ export const AUDIT_EVENT_TYPES = [
   "SYNC_PULLED",
 ] as const;
 
+export type AuditDiff = { field: string; before: unknown; after: unknown };
+
 export type TeamAuditRow = {
   id: string;
   createdAt: Date;
@@ -35,6 +37,7 @@ export type TeamAuditRow = {
   contactName: string;
   bookName: string;
   diffCount: number;
+  diffs: AuditDiff[];
 };
 
 export const loadTeamAudit = async (userId: string, filters: AuditFilters) => {
@@ -104,7 +107,15 @@ export const loadTeamAudit = async (userId: string, filters: AuditFilters) => {
   const hasMore = rowsRaw.length > AUDIT_LIMIT;
   const page = rowsRaw.slice(0, AUDIT_LIMIT);
   const rows: TeamAuditRow[] = page.map((e) => {
-    const diffs = (e.payload as { diffs?: unknown[] } | null)?.diffs;
+    const rawDiffs = (e.payload as { diffs?: unknown[] } | null)?.diffs;
+    const diffs: AuditDiff[] = Array.isArray(rawDiffs)
+      ? rawDiffs.flatMap((d) => {
+          if (d && typeof d === "object" && "field" in d) {
+            return [{ field: String((d as Record<string, unknown>).field), before: (d as Record<string, unknown>).before, after: (d as Record<string, unknown>).after }];
+          }
+          return [];
+        })
+      : [];
     return {
       id: e.id,
       createdAt: e.createdAt,
@@ -113,7 +124,8 @@ export const loadTeamAudit = async (userId: string, filters: AuditFilters) => {
       memberName: memberName.get(e.userId) ?? "Member",
       contactName: e.contact?.fullName ?? "(deleted contact)",
       bookName: bookName.get(contactBook.get(e.contactId ?? "") ?? "") ?? "—",
-      diffCount: Array.isArray(diffs) ? diffs.length : 0,
+      diffCount: diffs.length,
+      diffs,
     };
   });
 
