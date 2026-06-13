@@ -718,11 +718,11 @@ export const parseCsvContacts = (
     const notes = getFirstValue(row, notesIndexes);
     const customFields: Record<string, string> | null =
       customFieldColumns.size > 0
-        ? Object.fromEntries(
+        ? (Object.fromEntries(
             [...customFieldColumns.entries()]
-              .map(([colIdx, key]) => [key, getValue(row, colIdx) ?? ""])
+              .map(([colIdx, key]): [string, string] => [key, getValue(row, colIdx) ?? ""])
               .filter(([, v]) => v !== ""),
-          )
+          ) as Record<string, string>)
         : null;
     const fallbackName = [firstName, lastName].filter(Boolean).join(" ").trim();
     const usedFallbackIdentifier =
