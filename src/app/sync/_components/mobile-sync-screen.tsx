@@ -1,5 +1,9 @@
-import Link from "next/link";
+"use client";
 
+import Link from "next/link";
+import { useEffect, useState } from "react";
+
+import { OfflineBanner } from "~/app/_components/offline-banner";
 import { ReadOnlyBanner, UpsellCard } from "~/app/_components/mobile-variance";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import type { SyncAccountData } from "./sync-page-client";
@@ -51,6 +55,21 @@ export function MobileSyncScreen({
   canWrite: boolean;
   upgradePlan?: string;
 }) {
+  // Offline state (DB21): when offline we show the offline banner and disable
+  // Add. Read-only takes priority over offline (it has its own banner + reason).
+  const [offline, setOffline] = useState(false);
+  useEffect(() => {
+    setOffline(!navigator.onLine);
+    const goOnline = () => setOffline(false);
+    const goOffline = () => setOffline(true);
+    window.addEventListener("online", goOnline);
+    window.addEventListener("offline", goOffline);
+    return () => {
+      window.removeEventListener("online", goOnline);
+      window.removeEventListener("offline", goOffline);
+    };
+  }, []);
+
   if (hidden) return null;
 
   // Free: CardDAV sync is a paid feature — the whole screen is an upsell.
@@ -70,16 +89,19 @@ export function MobileSyncScreen({
   }
 
   const atCap = accounts.length >= syncAccountsLimit;
-  const addDisabled = !canWrite || atCap;
+  const addDisabled = !canWrite || offline || atCap;
+  // Reason priority mirrors the design: read-only → offline → at-cap.
   const addReason = !canWrite
     ? "Your account is read-only."
-    : atCap
-      ? `You're using all ${syncAccountsLimit} sync ${syncAccountsLimit === 1 ? "account" : "accounts"}.`
-      : null;
+    : offline
+      ? "Connect to add a new account."
+      : atCap
+        ? `You're using all ${syncAccountsLimit} sync ${syncAccountsLimit === 1 ? "account" : "accounts"}.`
+        : null;
 
   return (
     <div className="flex w-full flex-col md:hidden" style={{ background: "#f6f7f4" }}>
-      {!canWrite ? <ReadOnlyBanner variant="grace" /> : null}
+      {!canWrite ? <ReadOnlyBanner variant="grace" /> : <OfflineBanner />}
       <div className="mob-scroll" style={{ flex: 1, padding: "16px 0 28px" }}>
         {accounts.length === 0 ? (
           <div style={{ margin: "0 16px", display: "flex", flexDirection: "column", alignItems: "center", gap: 14, padding: "40px 24px", textAlign: "center" }}>

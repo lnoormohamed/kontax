@@ -424,9 +424,8 @@ function ConflictRow({
                 }}
               >
                 <div
+                  className="sy-cmp-grid sy-cmp-head"
                   style={{
-                    display: "grid",
-                    gridTemplateColumns: "130px 1fr 1fr",
                     background: T.wash,
                     borderBottom: `1px solid ${T.line2}`,
                   }}
@@ -450,11 +449,8 @@ function ConflictRow({
                 {cf.comparisonRows.map((r, i) => (
                   <div
                     key={i}
-                    style={{
-                      display: "grid",
-                      gridTemplateColumns: "130px 1fr 1fr",
-                      borderTop: i ? `1px solid ${T.line2}` : "none",
-                    }}
+                    className="sy-cmp-grid"
+                    style={{ borderTop: i ? `1px solid ${T.line2}` : "none" }}
                   >
                     <span style={{ padding: "11px 14px", fontSize: 13, color: T.ink2, fontWeight: 500 }}>
                       {r.label}
@@ -470,6 +466,7 @@ function ConflictRow({
                       {r.local}
                     </span>
                     <span
+                      className="sy-cmp-remote"
                       style={{
                         padding: "11px 14px",
                         fontSize: 13,
@@ -613,15 +610,7 @@ function HistoryTable({ jobs, isSyncing }: { jobs: SyncJobRow[]; isSyncing: bool
       ) : (
         <div>
           {/* table head */}
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "minmax(120px, 1.1fr) 120px 1fr 60px",
-              gap: 12,
-              padding: "8px 4px 10px",
-              color: T.mute,
-            }}
-          >
+          <div className="sy-trow sy-thead" style={{ color: T.mute }}>
             {["Date", "Direction", "Changes", "Status"].map((h, i) => (
               <span
                 key={h}
@@ -641,20 +630,14 @@ function HistoryTable({ jobs, isSyncing }: { jobs: SyncJobRow[]; isSyncing: bool
           {/* in-progress row */}
           {isSyncing && (
             <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: "minmax(120px, 1.1fr) 120px 1fr 60px",
-                gap: 12,
-                padding: "12px 4px",
-                fontSize: 13,
-                borderTop: `1px solid ${T.line2}`,
-                animation: "sy-fade .15s ease",
-              }}
+              className="sy-trow"
+              style={{ borderTop: `1px solid ${T.line2}`, animation: "sy-fade .15s ease" }}
             >
-              <span style={{ color: T.ink2 }}>In progress</span>
-              <span style={{ color: T.mute }}>↕ Two-way</span>
-              <span style={{ color: T.mute }}>—</span>
+              <span data-th="Date" style={{ color: T.ink2 }}>In progress</span>
+              <span data-th="Direction" style={{ color: T.mute }}>↕ Two-way</span>
+              <span data-th="Changes" style={{ color: T.mute }}>—</span>
               <span
+                data-th="Status"
                 style={{
                   display: "flex",
                   justifyContent: "flex-end",
@@ -672,21 +655,15 @@ function HistoryTable({ jobs, isSyncing }: { jobs: SyncJobRow[]; isSyncing: bool
           {visible.map((j) => (
             <div
               key={j.id}
-              style={{
-                display: "grid",
-                gridTemplateColumns: "minmax(120px, 1.1fr) 120px 1fr 60px",
-                gap: 12,
-                padding: "12px 4px",
-                fontSize: 13,
-                borderTop: `1px solid ${T.line2}`,
-                position: "relative",
-              }}
+              className="sy-trow"
+              style={{ borderTop: `1px solid ${T.line2}`, position: "relative" }}
             >
-              <span style={{ color: T.ink2 }}>{j.when}</span>
-              <span style={{ color: T.mute }}>
+              <span data-th="Date" style={{ color: T.ink2 }}>{j.when}</span>
+              <span data-th="Direction" style={{ color: T.mute }}>
                 {dirGlyph[j.direction]} {dirLabel[j.direction]}
               </span>
               <span
+                data-th="Changes"
                 style={{
                   fontFamily: '"Geist Mono", ui-monospace, monospace',
                   color: T.ink2,
@@ -697,7 +674,7 @@ function HistoryTable({ jobs, isSyncing }: { jobs: SyncJobRow[]; isSyncing: bool
                   ? `+${j.added} ~${j.modified} −${j.deleted}`
                   : "—"}
               </span>
-              <span style={{ display: "flex", justifyContent: "flex-end" }}>
+              <span data-th="Status" style={{ display: "flex", justifyContent: "flex-end" }}>
                 {j.status === "ok" ? (
                   <svg
                     width="17"
@@ -1948,22 +1925,8 @@ function ReauthModal({ onConfirmed, onCancel }: { onConfirmed: () => void; onCan
   };
 
   return (
-    <div
-      onClick={onCancel}
-      style={{
-        position: "fixed",
-        inset: 0,
-        zIndex: 90,
-        background: "rgba(20,30,25,0.42)",
-        display: "grid",
-        placeItems: "center",
-        padding: 16,
-      }}
-    >
-      <div
-        onClick={(e) => e.stopPropagation()}
-        style={{ background: "#fff", borderRadius: 16, padding: "28px 32px", width: "100%", maxWidth: 400, boxShadow: "0 24px 60px rgba(20,30,25,0.25)" }}
-      >
+    <div className="sy-overlay" onClick={onCancel}>
+      <div className="sy-modal" onClick={(e) => e.stopPropagation()}>
         <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: T.ink }}>Confirm your password</h3>
         <p style={{ margin: "10px 0 20px", fontSize: 14, lineHeight: 1.55, color: T.ink2 }}>
           Sync connection settings are sensitive. Enter your Kontax password to continue.
@@ -2388,9 +2351,6 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
   const [editing, setEditing] = useState(false);
   // On mobile we deep-link straight into a connection or the add form, so the
   // detail pane should be active from the start in those cases.
-  const [mobilePane, setMobilePane] = useState<"list" | "detail">(
-    initialAccountId || initialAdd ? "detail" : "list",
-  );
   // syncingId reserved for future optimistic in-progress indicator
   const syncingId: string | null = null;
   const [toast, setToast] = useState<string | null>(initialFlash);
@@ -2402,6 +2362,13 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
   const [reauthRetry, setReauthRetry] = useState<(() => void) | null>(null);
   const detailRef = useRef<HTMLElement>(null);
   const router = useRouter();
+
+  // Keep selection in sync with the deep-link param. On mobile the summary
+  // (MobileSyncScreen) navigates here by changing ?account; this component
+  // persists in the tree, so without this its selectedId could stay stale.
+  useEffect(() => {
+    if (initialAccountId) setSelectedId(initialAccountId);
+  }, [initialAccountId]);
 
   // After a gear click selects + expands settings, scroll the zone into view.
   useEffect(() => {
@@ -2427,7 +2394,6 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
     setView("detail");
     setEditing(false);
     setSettingsOpen(false);
-    setMobilePane("detail");
     if (detailRef.current) detailRef.current.scrollTop = 0;
   };
 
@@ -2437,14 +2403,12 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
     setView("detail");
     setEditing(false);
     setSettingsOpen(true);
-    setMobilePane("detail");
     setScrollToSettings(true);
   };
 
   const openAdd = () => {
     setView("add");
     setEditing(false);
-    setMobilePane("detail");
     if (detailRef.current) detailRef.current.scrollTop = 0;
   };
 
@@ -2544,9 +2508,10 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
     );
   };
 
-  const showLeft = mobilePane === "list";
-  const showRight = mobilePane === "detail";
-
+  // Mobile owns its list via MobileSyncScreen (the summary), so this full-screen
+  // client is only ever shown for a detail/add: the account rail is desktop-only
+  // (always hidden on mobile) and the detail pane always shows. On desktop both
+  // rails render side by side (the sy-hidden-mobile rule is mobile-only).
   return (
     <>
       {/* keyframe styles */}
@@ -2555,15 +2520,35 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
         @keyframes sy-spin { to { transform:rotate(360deg) } }
         @keyframes sy-shimmer { 0% { background-position:200% 0 } 100% { background-position:-200% 0 } }
         @keyframes sy-fade { from { opacity:0 } to { opacity:1 } }
+        @keyframes sy-up { from { transform: translateY(100%) } to { transform: translateY(0) } }
         .sy-row-wrap .sy-gear-btn { opacity: 0; }
         .sy-row-wrap:hover .sy-gear-btn,
         .sy-row-wrap[data-sel="1"] .sy-gear-btn { opacity: 1; }
-        @media (max-width: 767px) { .sy-row-wrap .sy-gear-btn { opacity: 1; } }
+        /* history table — desktop grid (restyled to stacked cards under 768) */
+        .sy-trow { display: grid; grid-template-columns: minmax(120px, 1.1fr) 130px 1fr 72px; align-items: center; gap: 12px; padding: 12px 4px; font-size: 13px; }
+        .sy-thead { padding: 8px 4px 10px; }
+        /* conflict comparison grid — 3 cols on desktop, stacked on mobile */
+        .sy-cmp-grid { display: grid; grid-template-columns: 130px 1fr 1fr; }
+        /* modal — centered card on desktop, bottom sheet on mobile */
+        .sy-overlay { position: fixed; inset: 0; z-index: 90; background: rgba(20,30,25,0.42); display: grid; place-items: center; padding: 16px; }
+        .sy-modal { background: #fff; border-radius: 16px; padding: 28px 32px; width: 100%; max-width: 400px; box-shadow: 0 24px 60px rgba(20,30,25,0.25); }
+        @media (max-width: 767px) {
+          .sy-row-wrap .sy-gear-btn { opacity: 1; }
+          .sy-trow { grid-template-columns: 1fr auto; row-gap: 4px; column-gap: 10px; }
+          .sy-thead { display: none; }
+          .sy-trow > span[data-th]::before { content: attr(data-th) ": "; color: ${T.mute}; font-size: 11px; font-weight: 600; margin-right: 4px; }
+          .sy-trow > span[data-th="Date"] { font-weight: 600; }
+          .sy-cmp-grid { grid-template-columns: 1fr; }
+          .sy-cmp-head { display: none; }
+          .sy-cmp-remote { border-left: none !important; border-top: 1px solid ${T.line2}; }
+          .sy-overlay { place-items: end stretch; padding: 0; }
+          .sy-modal { max-width: none; border-radius: 20px 20px 0 0; animation: sy-up .22s ease-out; }
+        }
       `}</style>
 
       {/* ── Rail 2: account list ── */}
       <aside
-        className={`sy-account-rail ${showLeft ? "" : "sy-hidden-mobile"}`}
+        className="sy-account-rail sy-hidden-mobile"
         style={{
           width: 240,
           flexShrink: 0,
@@ -2732,10 +2717,9 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
         </button>
       </aside>
 
-      {/* ── Rail 3: detail panel ── */}
+      {/* ── Rail 3: detail panel (always visible; the only pane on mobile) ── */}
       <main
         ref={detailRef}
-        className={`${showRight ? "" : "sy-hidden-mobile"}`}
         style={{
           flex: 1,
           minWidth: 0,
@@ -2756,13 +2740,9 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
           <button
             type="button"
             onClick={() => {
-              // Desktop has the rail alongside; mobile returns to the summary
-              // (MobileSyncScreen) by clearing the deep-link params.
-              if (typeof window !== "undefined" && window.innerWidth < 768) {
-                router.push("/sync");
-              } else {
-                setMobilePane("list");
-              }
+              // This bar only shows on mobile (sy-mobile-top is mobile-only), so
+              // back always returns to the summary (MobileSyncScreen) at /sync.
+              router.push("/sync");
             }}
             style={{
               display: "inline-flex",

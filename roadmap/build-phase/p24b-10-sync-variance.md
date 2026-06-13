@@ -1,5 +1,19 @@
 # P24B-10 — Sync: plan variance (Free CardDAV upsell / account cap)
 
+Status: Done — built against P24B-DB21. Free → pure `UpsellCard` (mirrors the
+server gate `cardDavSyncEnabled=false`); Pro+ caps at `syncAccountsLimit` with a
+reason; read-only and offline both disable Add with their own reason + banner.
+
+Mobile flow extension (beyond the original DB21 summary scope — the brief had
+deferred the detail/add/edit internals to the desktop client; that left an
+undesigned destination). `SyncPageClient` made responsive at ≤767px against the
+`Sync Connections.html` design:
+- Account rail is now desktop-only (always hidden on mobile — `MobileSyncScreen`
+  is the mobile list); the detail pane always shows. Removed the fragile
+  `mobilePane` state whose stale `list` value showed the rail after a client nav.
+- Sync-history table and conflict comparison grid stack into labelled rows
+  (`data-th`) instead of overflowing; the re-auth modal becomes a bottom sheet.
+
 ## Purpose
 
 Apply plan variance to the mobile Sync screen: Free has no CardDAV sync and a 1-account ceiling, so the
