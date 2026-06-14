@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useState } from "react";
 
 import { CopyField } from "~/app/_components/copy-field";
+import { QrCodeModal } from "~/app/contacts/_components/qr-code-modal";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import {
   createLiveShare,
@@ -38,6 +39,7 @@ export type SharedBook = {
 
 type Props = {
   contactId: string;
+  contactName: string;
   shareOrigin: string;
   isFree: boolean;
   staticShareEnabled: boolean;
@@ -390,6 +392,7 @@ function LiveFromPanel({ owner, contactId }: { owner: string; contactId: string 
 
 export function ContactSharing({
   contactId,
+  contactName,
   shareOrigin,
   isFree,
   staticShareEnabled,
@@ -403,6 +406,7 @@ export function ContactSharing({
 }: Props) {
   const hasStatic = staticShares.some((s) => s.status === "ACTIVE");
   const hasLive = liveShares.some((s) => s.status === "ACTIVE");
+  const [qrOpen, setQrOpen] = useState(false);
 
   return (
     <section className="rounded-[14px] border border-[#d8ddd6] bg-white" id="contact-sharing">
@@ -467,6 +471,20 @@ export function ContactSharing({
             </div>
           )}
         </ActionRow>
+
+        {/* P28-06: QR code — encodes the vCard share link for instant phone scanning */}
+        <button
+          className="flex w-full items-center gap-3 rounded-[11px] px-3 py-2.5 text-left transition hover:bg-[#f6f7f4]"
+          onClick={() => setQrOpen(true)}
+          type="button"
+        >
+          <IconTile icon="qr" />
+          <span className="min-w-0 flex-1">
+            <span className="block text-[14px] font-semibold text-[#1d2823]">Show QR code</span>
+            <span className="block text-[12.5px] text-[#8b938c]">Scan to add this contact to any phone</span>
+          </span>
+          <WorkspaceIcon name="chevronRight" size={16} />
+        </button>
 
         {/* ── Share with a Kontax user (Pro+) ── */}
         <GroupLabel note="Pro & above">Share with a Kontax user</GroupLabel>
@@ -535,6 +553,10 @@ export function ContactSharing({
           </div>
         )}
       </div>
+
+      {qrOpen ? (
+        <QrCodeModal contactId={contactId} contactName={contactName} onClose={() => setQrOpen(false)} />
+      ) : null}
     </section>
   );
 }

@@ -622,6 +622,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                   memberCount: b._count.members,
                 }))}
                 contactId={contact.id}
+                contactName={contact.fullName}
                 isFree={shellPlan.plan === "FREE"}
                 isLiveReceived={isLiveReceived}
                 liveOwnerLabel={contact.sourceDetail}
@@ -1039,6 +1040,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               memberCount: b._count.members,
             }))}
             contactId={contact.id}
+            contactName={contact.fullName}
             isFree={shellPlan.plan === "FREE"}
             isLiveReceived={isLiveReceived}
             liveOwnerLabel={contact.sourceDetail}

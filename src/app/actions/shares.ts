@@ -136,6 +136,61 @@ export const createVcardShareLink = async (formData: FormData) => {
   revalidatePath(`/contacts/${contactId}`);
 };
 
+// P28-06: return a usable vCard share URL for the QR modal — reusing the
+// contact's existing non-expired link if there is one, otherwise creating a new
+// one (plan-based expiry, same as createVcardShareLink). Returns the absolute
+// /share/{token} URL plus the link's expiry so the modal can surface it.
+export const getOrCreateVcardShareLink = async (
+  contactId: string,
+): Promise<{ url: string; expiresAt: string | null }> => {
+  const userId = await requireUserId();
+
+  const contact = await db.contact.findFirst({
+    where: { id: contactId, userId },
+    select: { id: true },
+  });
+  if (!contact) {
+    throw new Error("Contact not found.");
+  }
+
+  const existing = await db.contactShare.findFirst({
+    where: {
+      contactId,
+      ownerUserId: userId,
+      shareType: "VCARD_LINK",
+      status: "ACTIVE",
+      OR: [{ expiresAt: null }, { expiresAt: { gt: new Date() } }],
+    },
+    orderBy: { createdAt: "desc" },
+    select: { token: true, expiresAt: true },
+  });
+
+  if (existing?.token) {
+    return {
+      url: `${appUrl()}/share/${existing.token}`,
+      expiresAt: existing.expiresAt?.toISOString() ?? null,
+    };
+  }
+
+  const billing = await getUserBillingContext(userId);
+  const expiresAt = billing.plan === "FREE" ? new Date(Date.now() + FREE_LINK_TTL_MS) : null;
+  const token = randomBytes(24).toString("base64url");
+
+  await db.contactShare.create({
+    data: {
+      ownerUserId: userId,
+      contactId,
+      shareType: "VCARD_LINK",
+      token,
+      status: "ACTIVE",
+      expiresAt,
+    },
+  });
+  revalidatePath(`/contacts/${contactId}`);
+
+  return { url: `${appUrl()}/share/${token}`, expiresAt: expiresAt?.toISOString() ?? null };
+};
+
 export const revokeShare = async (formData: FormData) => {
   const userId = await requireUserId();
   const shareId = str(formData, "shareId");
