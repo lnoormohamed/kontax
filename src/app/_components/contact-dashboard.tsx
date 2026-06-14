@@ -504,7 +504,7 @@ export function ContactDashboard({
                 contacts={activeContacts}
                 emptyState={
                   query
-                    ? `No contacts match “${query}”.`
+                    ? `No contacts match "${query}".`
                     : isFavoritesView
                       ? "No favorites yet. Star a contact to pin it here."
                       : isEmergencyView
@@ -520,6 +520,7 @@ export function ContactDashboard({
                 books={personalBooks}
                 labelSuggestions={labelSuggestions}
                 smartLists={savedFilters}
+                labelRegistry={sidebarLabels}
               />
             )
           ) : null}
@@ -527,7 +528,7 @@ export function ContactDashboard({
           {currentTab === "archived" ? (
             <ContactsWorkspaceTable
               contacts={archivedContacts}
-              emptyState={query ? `No archived contacts match “${query}”.` : "No archived contacts."}
+              emptyState={query ? `No archived contacts match "${query}".` : "No archived contacts."}
               groupByLetter={groupByLetter}
               mode="archived"
               query={query}
@@ -535,6 +536,7 @@ export function ContactDashboard({
               books={personalBooks}
               labelSuggestions={labelSuggestions}
               smartLists={savedFilters}
+              labelRegistry={sidebarLabels}
             />
           ) : null}
 

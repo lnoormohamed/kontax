@@ -54,6 +54,8 @@ type ContactsWorkspaceTableProps = {
   labelSuggestions: string[];
   // P28-05: smart lists for the 1–9 keyboard shortcuts.
   smartLists: { id: string; name: string; filterState: unknown }[];
+  // P31B-06: label name → color lookup for row chips.
+  labelRegistry: { name: string; color: string }[];
 };
 
 const AVATAR_TINTS: Array<[string, string]> = [
@@ -228,23 +230,26 @@ const parseLabels = (raw: unknown): string[] => {
 // Desktop: up to 2 chips + +N overflow. Mobile: up to 3 dots + +N count.
 const RowLabelChips = memo(function RowLabelChips({
   labels,
+  labelColors,
   isMobile,
 }: {
   labels: string[];
+  labelColors: Record<string, string>;
   isMobile?: boolean;
 }) {
   const [overflowOpen, setOverflowOpen] = useState(false);
   if (labels.length === 0) return null;
+
+  const col = (name: string) => labelColors[name.toLowerCase()] ?? "#8b938c";
 
   if (isMobile) {
     const shown = labels.slice(0, 3);
     const extra = labels.length - shown.length;
     return (
       <span style={{ display: "inline-flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
-        {shown.map((name, i) => {
-          const col = "#8b938c"; // will be colored from registry; fallback for now
-          return <LabelDot key={i} col={col} size={8} />;
-        })}
+        {shown.map((name, i) => (
+          <LabelDot key={i} col={col(name)} size={8} />
+        ))}
         {extra > 0 && (
           <span style={{ fontSize: 11, fontWeight: 700, color: "#8b938c", marginLeft: 1 }}>+{extra}</span>
         )}
@@ -258,7 +263,7 @@ const RowLabelChips = memo(function RowLabelChips({
   return (
     <span style={{ display: "inline-flex", alignItems: "center", gap: 5, flexShrink: 0 }}>
       {shown.map((name) => (
-        <LabelChip key={name} name={name} col="#8b938c" sz="sm" />
+        <LabelChip key={name} name={name} col={col(name)} sz="sm" />
       ))}
       {hidden.length > 0 && (
         <span
@@ -301,7 +306,7 @@ const RowLabelChips = memo(function RowLabelChips({
               }}
             >
               {hidden.map((name) => (
-                <LabelChip key={name} name={name} col="#8b938c" sz="sm" />
+                <LabelChip key={name} name={name} col={col(name)} sz="sm" />
               ))}
             </span>
           )}
@@ -327,6 +332,7 @@ const ContactRow = memo(function ContactRow({
   query,
   selected,
   focused,
+  labelColors,
   onToggleSelect,
   onArchived,
   onOpenContact,
@@ -337,6 +343,7 @@ const ContactRow = memo(function ContactRow({
   query: string;
   selected: boolean;
   focused: boolean;
+  labelColors: Record<string, string>;
   onToggleSelect: (id: string) => void;
   onArchived: (contactId: string) => void;
   onOpenContact: (contactId: string) => void;
@@ -415,7 +422,7 @@ const ContactRow = memo(function ContactRow({
             </span>
           </Link>
           <RowBadges contact={contact} mode={mode} />
-          {contactLabels.length > 0 && <RowLabelChips labels={contactLabels} isMobile />}
+          {contactLabels.length > 0 && <RowLabelChips labels={contactLabels} labelColors={labelColors} isMobile />}
         </div>
         <p className="truncate text-[12.5px] text-[#8b938c]">
           {meta.length > 0
@@ -476,7 +483,7 @@ const ContactRow = memo(function ContactRow({
             </span>
           </Link>
           <RowBadges contact={contact} mode={mode} />
-          {contactLabels.length > 0 && <RowLabelChips labels={contactLabels} />}
+          {contactLabels.length > 0 && <RowLabelChips labels={contactLabels} labelColors={labelColors} />}
         </div>
         <div className="truncate text-[13px] text-[#5c655e]">
           <Cell query={query} value={contact.company} />
@@ -581,6 +588,7 @@ export function ContactsWorkspaceTable({
   books,
   labelSuggestions,
   smartLists,
+  labelRegistry,
 }: ContactsWorkspaceTableProps) {
   const router = useRouter();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
@@ -603,6 +611,11 @@ export function ContactsWorkspaceTable({
   useEffect(() => {
     setScrollEl(getScrollParent(listRef.current));
   }, []);
+
+  const labelColors = useMemo(
+    () => Object.fromEntries(labelRegistry.map((l) => [l.name.toLowerCase(), l.color])),
+    [labelRegistry],
+  );
 
   const visibleContacts = useMemo(
     () => contacts.filter((c) => !hiddenIds.has(c.id)),
@@ -1026,6 +1039,7 @@ export function ContactsWorkspaceTable({
                   selected={selectedSet.has(row.contact.id)}
                   focused={focusedId === row.contact.id}
                   viewMode={viewMode}
+                  labelColors={labelColors}
                 />
               )}
             </div>
