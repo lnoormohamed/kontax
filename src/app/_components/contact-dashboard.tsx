@@ -439,22 +439,31 @@ export function ContactDashboard({
         {/* P31B-05/08: label filter context bar — shown when filtering by a label */}
         {currentLabel ? (
           <>
-            <div className="hidden md:block">
-              <LabelFilterBar
-                name={currentLabel}
-                color={sidebarLabels.find((l) => l.name.toLowerCase() === currentLabel.toLowerCase())?.color ?? "#8b938c"}
-                count={counts.people}
-                clearHref={buildHref("people", { filter: "all" })}
-              />
-            </div>
-            <div className="md:hidden">
-              <MobileLabelFilterBar
-                name={currentLabel}
-                color={sidebarLabels.find((l) => l.name.toLowerCase() === currentLabel.toLowerCase())?.color ?? "#8b938c"}
-                count={counts.people}
-                clearHref={buildHref("people", { filter: "all" })}
-              />
-            </div>
+            {(() => {
+              const labelMeta = sidebarLabels.find((l) => l.name.toLowerCase() === currentLabel.toLowerCase());
+              const labelColor = labelMeta?.color ?? "#8b938c";
+              const labelCount = labelMeta?.count ?? 0;
+              return (
+                <>
+                  <div className="hidden md:block">
+                    <LabelFilterBar
+                      name={currentLabel}
+                      color={labelColor}
+                      count={labelCount}
+                      clearHref={buildHref("people", { filter: "all" })}
+                    />
+                  </div>
+                  <div className="md:hidden">
+                    <MobileLabelFilterBar
+                      name={currentLabel}
+                      color={labelColor}
+                      count={labelCount}
+                      clearHref={buildHref("people", { filter: "all" })}
+                    />
+                  </div>
+                </>
+              );
+            })()}
           </>
         ) : null}
 
