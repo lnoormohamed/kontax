@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
+
+import { redirectToLogin } from "~/server/auth/require-page-auth";
 
 import { SettingsPageHead } from "~/app/_components/settings-ui";
 import { auth } from "~/server/auth";
@@ -9,7 +10,7 @@ import { ApiTokenManager } from "./_components/api-token-manager";
 
 export default async function DeveloperSettingsPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) return redirectToLogin("/settings/developer");
   const userId = session.user.id;
 
   const [context, tokens] = await Promise.all([

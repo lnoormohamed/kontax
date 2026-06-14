@@ -1,5 +1,6 @@
-import { redirect } from "next/navigation";
 import { SessionProvider } from "next-auth/react";
+
+import { redirectToLogin } from "~/server/auth/require-page-auth";
 
 import { SettingsPageHead, StSecLabel } from "~/app/_components/settings-ui";
 import { auth } from "~/server/auth";
@@ -12,7 +13,7 @@ import { UsernameSection } from "./username-section";
 
 export default async function SettingsAccountPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) return redirectToLogin("/settings/account");
 
   // Fetch pending email change state — not stored in JWT to avoid stale data
   const user = await db.user.findUnique({

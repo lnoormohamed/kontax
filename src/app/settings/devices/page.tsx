@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { redirectToLogin } from "~/server/auth/require-page-auth";
 
 import { AppPasswordManager } from "~/app/_components/app-password-manager";
 import { ConnectionGuides } from "~/app/_components/connection-guides";
@@ -10,9 +10,7 @@ import { getPublicOrigin } from "~/lib/public-origin";
 
 export default async function SettingsDevicesPage() {
   const session = await auth();
-  if (!session?.user?.id) {
-    redirect("/login");
-  }
+  if (!session?.user?.id) return redirectToLogin("/settings/devices");
   const userId = session.user.id;
   const [appPasswords, appPasswordAllowance, carddavServerUrl] = await Promise.all([
     listUserAppPasswords(userId),

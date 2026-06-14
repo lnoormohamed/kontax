@@ -1,6 +1,5 @@
-import { redirect } from "next/navigation";
-
 import { SettingsPageHead } from "~/app/_components/settings-ui";
+import { redirectToLogin } from "~/server/auth/require-page-auth";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { getCardAnalytics } from "~/server/public-card/analytics";
@@ -23,7 +22,7 @@ function StatTile({ value, label }: { value: number; label: string }) {
 
 export default async function CardSettingsPage() {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) return redirectToLogin("/settings/profile/card");
 
   const [user, analytics] = await Promise.all([
     db.user.findUniqueOrThrow({

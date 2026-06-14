@@ -1,6 +1,5 @@
-import { redirect } from "next/navigation";
-
 import { SettingsCard, SettingsPageHead } from "~/app/_components/settings-ui";
+import { redirectToLogin } from "~/server/auth/require-page-auth";
 import { updatePhoneticSettings } from "~/app/actions/settings";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
@@ -23,9 +22,7 @@ function Switch({ defaultChecked, name }: { defaultChecked: boolean; name: strin
 
 export default async function SettingsPreferencesPage() {
   const session = await auth();
-  if (!session?.user?.id) {
-    redirect("/login");
-  }
+  if (!session?.user?.id) return redirectToLogin("/settings/preferences");
   const userSettings = await db.user.findUnique({
     where: { id: session.user.id },
     select: { autoFillPhoneticNames: true },

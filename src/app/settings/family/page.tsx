@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
+
+import { redirectToLogin } from "~/server/auth/require-page-auth";
 
 import { ConfirmAction } from "~/app/_components/confirm-action";
 import { SectionLabel, SettingsCard, SettingsPageHead } from "~/app/_components/settings-ui";
@@ -61,9 +62,7 @@ function Tag({ children, kind }: { children: React.ReactNode; kind?: TagKind; gr
 
 export default async function FamilySettingsPage() {
   const session = await auth();
-  if (!session?.user?.id) {
-    redirect("/login");
-  }
+  if (!session?.user?.id) return redirectToLogin("/settings/family");
   const userId = session.user.id;
 
   const billing = await getUserBillingContext(userId);

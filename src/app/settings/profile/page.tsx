@@ -1,13 +1,10 @@
-import { redirect } from "next/navigation";
-
 import { SettingsCard, SettingsPageHead } from "~/app/_components/settings-ui";
+import { redirectToLogin } from "~/server/auth/require-page-auth";
 import { auth } from "~/server/auth";
 
 export default async function SettingsProfilePage() {
   const session = await auth();
-  if (!session?.user?.id) {
-    redirect("/login");
-  }
+  if (!session?.user?.id) return redirectToLogin("/settings/profile");
   const userLabel = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
 
   return (

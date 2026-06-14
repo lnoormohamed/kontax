@@ -1,6 +1,5 @@
-import { redirect } from "next/navigation";
-
 import { updateNotificationPreferences } from "~/app/actions/notifications";
+import { redirectToLogin } from "~/server/auth/require-page-auth";
 import { CalendarFeedSection } from "~/app/_components/calendar-feed-section";
 import { SettingsCard, SettingsPageHead } from "~/app/_components/settings-ui";
 import { auth } from "~/server/auth";
@@ -91,9 +90,7 @@ const DIGEST_OPTIONS = [
 
 export default async function NotificationSettingsPage() {
   const session = await auth();
-  if (!session?.user?.id) {
-    redirect("/login");
-  }
+  if (!session?.user?.id) return redirectToLogin("/settings/notifications");
   const prefs = await getNotificationSettings(session.user.id);
   const user = await db.user.findUnique({
     where: { id: session.user.id },

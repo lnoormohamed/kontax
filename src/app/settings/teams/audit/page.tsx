@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
+
+import { redirectToLogin } from "~/server/auth/require-page-auth";
 
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
@@ -29,9 +30,7 @@ export default async function TeamAuditPage({
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const session = await auth();
-  if (!session?.user?.id) {
-    redirect("/login");
-  }
+  if (!session?.user?.id) return redirectToLogin("/settings/teams/audit");
   const sp = searchParams ? await searchParams : undefined;
   const filters = {
     memberId: single(sp?.member),

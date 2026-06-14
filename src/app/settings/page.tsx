@@ -1,5 +1,6 @@
 import Link from "next/link";
-import { redirect } from "next/navigation";
+
+import { redirectToLogin } from "~/server/auth/require-page-auth";
 
 import {
   LifecycleBadge,
@@ -32,9 +33,7 @@ export default async function SettingsPlanPage({
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const session = await auth();
-  if (!session?.user?.id) {
-    redirect("/login");
-  }
+  if (!session?.user?.id) return redirectToLogin("/settings");
   const userId = session.user.id;
   const sp = searchParams ? await searchParams : undefined;
   const showBillingSuccess = sp?.billing === "success";

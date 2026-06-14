@@ -1,5 +1,7 @@
 import Link from "next/link";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
+
+import { redirectToLogin } from "~/server/auth/require-page-auth";
 
 import { AppShell } from "~/app/_components/app-shell";
 import {
@@ -60,7 +62,7 @@ const toReviewContact = (c: {
 
 export default async function MergeSuggestionReviewPage({ params }: PageProps) {
   const session = await auth();
-  if (!session?.user?.id) redirect("/login");
+  if (!session?.user?.id) return redirectToLogin("/merge-suggestions");
   const userId = session.user.id;
 
   const { id } = await params;
