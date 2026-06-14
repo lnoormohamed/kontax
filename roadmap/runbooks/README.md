@@ -20,18 +20,18 @@ Each runbook covers one subsystem: when to use it, normal state, failure modes, 
 
 ---
 
-### Planned (P32-05)
+### P32-05 (written)
 
-| Runbook | Subsystem | Priority |
-|---------|-----------|----------|
-| [deploy.md](deploy.md) *(not yet written)* | Deploy & schema — Coolify / Proxmox LXC 114, `prisma db push` on startup, schema drift crash-loop recovery, rollback | P0 |
-| [stripe-billing.md](stripe-billing.md) *(not yet written)* | Stripe & billing — webhook secret rotation, failed payments, subscription state machine, `lifecycleState` values, manual plan override via admin panel | P0 |
-| [admin-ops.md](admin-ops.md) *(not yet written)* | Admin operations — how to impersonate a user, override a plan, use feature flags, read the admin audit log, suspend/unsuspend an account | P0 |
-| [gdpr-erasure.md](gdpr-erasure.md) *(not yet written)* | GDPR erasure — what "Delete my data" triggers, cascade order, how to verify completion, handling a contested erasure request | P0 |
-| [env-secrets.md](env-secrets.md) *(not yet written)* | Env / secrets — all required env vars, where they live, how to rotate each, `.env.example` reference | P1 |
-| [sync-ops.md](sync-ops.md) *(not yet written)* | Sync engine operations — stuck CardDAV sync, OAuth token expiry, forced re-auth, manual sync trigger, `syncVersion` drift, reading sync job logs | P1 |
-| [import-export-jobs.md](import-export-jobs.md) *(not yet written)* | Import/export jobs — stuck jobs, re-triggering a failed export, GDPR ZIP contents, blob storage expiry | P1 |
-| [incident.md](incident.md) *(not yet written)* | Incident basics — severity definitions, first-response checklist, escalation path, postmortem template | P2 |
+| Runbook | Subsystem |
+|---------|-----------|
+| [deploy.md](deploy.md) | Deploy & schema — Coolify / Proxmox LXC 114, `prisma db push` on startup, schema drift crash-loop recovery |
+| [stripe-billing.md](stripe-billing.md) | Stripe & billing — webhook handlers, `lifecycleState` state machine, grace period (3 days), plan override, secret rotation |
+| [admin-ops.md](admin-ops.md) | Admin operations — impersonation (30-min TTL cookie), feature flags (OFF/ALL/SPECIFIC_USERS/ROLLOUT), plan override, audit log |
+| [gdpr-erasure.md](gdpr-erasure.md) | GDPR erasure — deletion phases (grace → cron hard-delete), data export ZIP contents, contested erasure handling |
+| [env-secrets.md](env-secrets.md) | Env / secrets — full variable inventory with rotation guidance for each |
+| [sync-ops.md](sync-ops.md) | Sync engine operations — CardDAV auth failures, OAuth token expiry, stuck jobs, forced re-sync, `syncVersion` drift |
+| [import-export-jobs.md](import-export-jobs.md) | Import/export jobs — import pipeline phases, stuck exports, MinIO blob expiry, large file handling |
+| [incident.md](incident.md) | Incident basics — severity definitions, first-response checklist, common patterns, postmortem template |
 
 ---
 

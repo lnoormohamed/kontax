@@ -57,13 +57,13 @@ CRUD, books/lists/labels, import/export, merge/duplicates, sync/CardDAV,
 sharing, family/teams, billing, notifications, security/2FA, account lifecycle.
 
 ### P32-04 — External developer docs completeness
-Status: Not Started · Priority: P1 · Depends: P32-01
+Status: Done · Priority: P1 · Depends: P32-01
 
 Verify `/developers` covers every public endpoint, auth, field, error, and rate
 limit shipped in Phase 29; fill gaps; add examples.
 
 ### P32-05 — Internal admin/ops runbooks backfill
-Status: Not Started · Priority: P0 · Depends: P32-01
+Status: Done · Priority: P0 · Depends: P32-01
 
 Runbooks for operating Kontax: deploy & the `db push`-on-startup model (and its
 schema-drift footgun), env/secrets, SES/email, sync engine operations, Stripe/
@@ -71,7 +71,7 @@ billing & webhooks, admin impersonation, feature flags, import/export & data
 jobs, GDPR export/erasure handling, incident basics.
 
 ### P32-06 — Internal engineering concept docs backfill
-Status: Not Started · Priority: P1 · Depends: P32-01
+Status: Done · Priority: P1 · Depends: P32-01
 
 `docs/` concept docs for cross-cutting subsystems: the sync/CardDAV model,
 sharing (vCard/static/live) model, billing entitlements & lifecycle, import/

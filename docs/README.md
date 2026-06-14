@@ -22,17 +22,17 @@ These docs capture the *concepts* and *decisions* that span tickets and phases.
 
 ---
 
-### Planned (P32-06)
+### P32-06 (written)
 
-| Doc | What it should cover | Priority |
-|-----|----------------------|----------|
-| [sync-carddav-model.md](sync-carddav-model.md) *(not yet written)* | The CardDAV server architecture, URL structure, app-password model, `syncVersion` / `lastMutatedBy` sentinels, conflict handling (SERVER_WINS / DEVICE_WINS / MANUAL), sync job lifecycle, and how Google/Outlook OAuth sync differs from CardDAV. | P0 |
-| [billing-lifecycle.md](billing-lifecycle.md) *(not yet written)* | The entitlement model, `lifecycleState` enum (ACTIVE / GRACE / LOCKED / CANCELED), the `canWrite` / `canUseBasicExport` flag derivation, grace period mechanics, and how Stripe webhook events drive state transitions. | P0 |
-| [sharing-model.md](sharing-model.md) *(not yet written)* | The three contact-share types (vCard link / static Kontax-to-Kontax / live Kontax-to-Kontax), the `ContactShare` schema, live-share propagation flow, and what happens on revoke/downgrade. | P1 |
-| [family-teams-model.md](family-teams-model.md) *(not yet written)* | The `GroupAddressBook` model, membership roles (owner / editor / viewer), how change propagation works across family members, how Teams extends Family with multiple books and per-book permissions, and the audit log. | P1 |
-| [import-export-pipeline.md](import-export-pipeline.md) *(not yet written)* | The CSV/vCard import pipeline (parse → column classification → field mapping → dedup check → preview → commit), the export job model (background job, blob storage, 48h expiry), and the GDPR data-export ZIP structure. | P1 |
-| [notifications-model.md](notifications-model.md) *(not yet written)* | The `UserNotification` model, notification categories and which can be suppressed, the digest scheduler, birthday/anniversary reminder logic (RRULE, lead-time override), and the iCal birthday feed. | P1 |
-| [auth-security-model.md](auth-security-model.md) *(not yet written)* | The session table and `sessionVersion` invalidation pattern, TOTP 2FA enrolment and challenge flow, step-up auth for sensitive actions, rate limiting infrastructure, and the suspicious-activity detection rules. | P2 |
+| Doc | What it covers |
+|-----|----------------|
+| [sync-carddav-model.md](sync-carddav-model.md) | CardDAV server architecture, URL structure, app-password model, `syncVersion` / `lastMutatedBy` sentinels, OAuth vs CardDAV sync, conflict handling, `SyncAccount` status machine |
+| [billing-lifecycle.md](billing-lifecycle.md) | `lifecycleState` state machine (ACTIVE / GRACE / LOCKED), plan entitlement matrix, `canWrite` / `canUseBasicExport` policy, Stripe webhook → state transitions, downgrade side-effects |
+| [sharing-model.md](sharing-model.md) | Three share types (VCARD_LINK / STATIC_COPY / LIVE_SYNC), `ContactShare` schema, live-share propagation, revoke/downgrade conversion |
+| [family-teams-model.md](family-teams-model.md) | `Group` / `GroupMember` / `GroupAddressBook` / `GroupContact` models, Family vs Teams roles, per-book permissions, invite flow, dissolution |
+| [import-export-pipeline.md](import-export-pipeline.md) | CSV/vCard import pipeline (5 phases), export (synchronous + background job), GDPR ZIP contents, blob expiry |
+| [notifications-model.md](notifications-model.md) | `Notification` model, 6 categories, always-on vs suppressible, digest cron, birthday reminder dedup, iCal feed, security alert resolution |
+| [auth-security-model.md](auth-security-model.md) | Session table, `sessionVersion` invalidation, impersonation cookie, TOTP enrolment + challenge, step-up auth, rate limiters, suspicious-activity detection |
 
 ---
 

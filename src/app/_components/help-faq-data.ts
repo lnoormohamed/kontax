@@ -369,7 +369,7 @@ export const HELP_FAQ: HelpFaqSection[] = [
       },
       {
         q: "What happens if my subscription lapses?",
-        a: "Your account enters a grace period (7 days) during which you retain full access while Kontax retries the payment. After the grace period, write access is restricted — you can still read and export your contacts but cannot add or edit until billing is resolved. Your data is never deleted.",
+        a: "Your account enters a grace period (3 days) during which you retain full access while Kontax retries the payment. After the grace period, write access is restricted — you can still read and export your contacts but cannot add or edit until billing is resolved. Your data is never deleted.",
       },
       {
         q: "How does Family billing work?",
