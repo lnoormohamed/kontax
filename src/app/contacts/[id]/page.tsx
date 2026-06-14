@@ -16,6 +16,7 @@ import { ContactSharing } from "~/app/_components/contact-sharing";
 import { CopyMonoRow } from "~/app/_components/copy-field";
 import { LastUpdatedBy } from "~/app/_components/last-updated-by";
 import { MoreMenu } from "~/app/_components/more-menu";
+import { LabelChip } from "~/app/_components/label-chip";
 import { SourceBadge } from "~/app/_components/source-badge";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import {
@@ -325,7 +326,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     notFound();
   }
 
-  const [shellPlan, shellPeople, shellFavorites, shellArchived, shellDuplicates, viewerForReminders] =
+  const [shellPlan, shellPeople, shellFavorites, shellArchived, shellDuplicates, viewerForReminders, labelRegistry] =
     await Promise.all([
       getUserPlanSummary(session.user.id),
       db.contact.count({ where: { userId: session.user.id, archivedAt: null } }),
@@ -333,7 +334,10 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
       db.contact.count({ where: { userId: session.user.id, NOT: { archivedAt: null } } }),
       db.mergeSuggestion.count({ where: { userId: session.user.id, status: "OPEN" } }),
       db.user.findUnique({ where: { id: session.user.id }, select: { reminderLeadDays: true } }),
+      db.label.findMany({ where: { userId: session.user.id }, select: { name: true, color: true } }),
     ]);
+  const labelColors = Object.fromEntries(labelRegistry.map((l) => [l.name.toLowerCase(), l.color]));
+  const contactLabels = Array.isArray(contact.labels) ? (contact.labels as string[]).filter((v) => typeof v === "string") : [];
   // P22-10: show the per-contact reminder lead-time control when the contact has
   // a date that can fire a reminder.
   const reminderUserDefault = viewerForReminders?.reminderLeadDays ?? 7;
@@ -789,6 +793,9 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                   Archived
                 </span>
               ) : null}
+              {contactLabels.map((name) => (
+                <LabelChip key={name} name={name} col={labelColors[name.toLowerCase()] ?? "#8b938c"} sz="sm" />
+              ))}
             </div>
 
             <div className="my-5 h-px bg-[#edf0ea]" />
