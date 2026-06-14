@@ -13,7 +13,7 @@ import {
 } from "~/app/actions/contacts";
 import { BulkEditToolbar, type ToolbarBook } from "~/app/_components/bulk-edit-toolbar";
 import { ContactBadgeCluster } from "~/app/_components/contact-badge-cluster";
-import { LabelChip, LabelDot, paletteSwatch } from "~/app/_components/label-chip";
+import { LabelChip, LabelDot } from "~/app/_components/label-chip";
 import { SwipeableRow } from "~/app/_components/contact-list/swipeable-row";
 import { KeyboardShortcutsOverlay } from "~/app/contacts/_components/keyboard-shortcuts-overlay";
 import { fromJson, toQueryString } from "~/lib/contact-filter-state";

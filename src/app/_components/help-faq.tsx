@@ -56,7 +56,7 @@ export function HelpFaq() {
 
       {sections.length === 0 ? (
         <div className="help-noresult">
-          <p className="help-noresult__title">No results for "{q}"</p>
+          <p className="help-noresult__title">No results for &ldquo;{q}&rdquo;</p>
           <p className="help-noresult__sub">Try a different term, or browse the sections by clearing the search.</p>
         </div>
       ) : (
