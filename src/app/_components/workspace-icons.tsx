@@ -132,6 +132,7 @@ const PATHS: Record<string, string[]> = {
     "M3 12.5A8.5 8.5 0 0 0 17.4 18L21 14.8",
     "M21 19.6V14.8h-4.8",
   ],
+  code: ["M8 6L4 12l4 6", "M16 6l4 6-4 6"],
 };
 
 export function WorkspaceIcon({

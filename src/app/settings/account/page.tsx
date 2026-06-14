@@ -4,6 +4,7 @@ import { SessionProvider } from "next-auth/react";
 import { SettingsPageHead, StSecLabel } from "~/app/_components/settings-ui";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
+import { DataExportSection } from "./_components/data-export-section";
 import { EmailSection } from "./email-section";
 import { PasswordChangeForm } from "./password-change-form";
 import { ProfileSection } from "./profile-section";
@@ -54,6 +55,7 @@ export default async function SettingsAccountPage() {
       />
 
       <StSecLabel>Account</StSecLabel>
+      <DataExportSection />
       <EmailSection
         email={session.user.email ?? ""}
         emailVerified={session.user.emailVerified ?? null}

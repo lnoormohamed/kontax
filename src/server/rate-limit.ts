@@ -46,6 +46,10 @@ export const rateLimiters = {
 
   // P23-06: sync settings re-auth (sudo) — 5 password attempts per 15 minutes
   syncSettingsElevation: makeLimiter(5, 15 * 60, "rl:sync-elevation"),
+
+  // P29-08: REST API per-token sliding window (key = token SHA-256 hash)
+  apiRead: makeLimiter(1_000, 60 * 60, "rl:api-read:"),
+  apiWrite: makeLimiter(200, 60 * 60, "rl:api-write:"),
 } as const;
 
 export interface RateLimitResult {

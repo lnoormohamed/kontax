@@ -741,6 +741,33 @@ exports.Prisma.ExportPresetScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.DataExportJobScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  status: 'status',
+  includeArchived: 'includeArchived',
+  downloadUrl: 'downloadUrl',
+  fileSizeBytes: 'fileSizeBytes',
+  requestedAt: 'requestedAt',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  expiresAt: 'expiresAt',
+  errorMessage: 'errorMessage'
+};
+
+exports.Prisma.ApiTokenScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  tokenHash: 'tokenHash',
+  tokenPrefix: 'tokenPrefix',
+  scope: 'scope',
+  lastUsedAt: 'lastUsedAt',
+  requestCountThisMonth: 'requestCountThisMonth',
+  createdAt: 'createdAt',
+  revokedAt: 'revokedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -966,7 +993,8 @@ exports.Actor = exports.$Enums.Actor = {
   SHARE: 'SHARE',
   FAMILY_MEMBER: 'FAMILY_MEMBER',
   TEAM_MEMBER: 'TEAM_MEMBER',
-  SYSTEM: 'SYSTEM'
+  SYSTEM: 'SYSTEM',
+  API: 'API'
 };
 
 exports.FeatureFlagMode = exports.$Enums.FeatureFlagMode = {
@@ -1022,6 +1050,19 @@ exports.DigestCadence = exports.$Enums.DigestCadence = {
   WEEKLY: 'WEEKLY'
 };
 
+exports.DataExportStatus = exports.$Enums.DataExportStatus = {
+  PENDING: 'PENDING',
+  PROCESSING: 'PROCESSING',
+  READY: 'READY',
+  EXPIRED: 'EXPIRED',
+  FAILED: 'FAILED'
+};
+
+exports.ApiTokenScope = exports.$Enums.ApiTokenScope = {
+  READ_ONLY: 'READ_ONLY',
+  READ_WRITE: 'READ_WRITE'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   UserOnboardingState: 'UserOnboardingState',
@@ -1062,7 +1103,9 @@ exports.Prisma.ModelName = {
   BirthdayReminderState: 'BirthdayReminderState',
   ImportMappingSuggestionFeedback: 'ImportMappingSuggestionFeedback',
   ImportMappingPreset: 'ImportMappingPreset',
-  ExportPreset: 'ExportPreset'
+  ExportPreset: 'ExportPreset',
+  DataExportJob: 'DataExportJob',
+  ApiToken: 'ApiToken'
 };
 
 /**

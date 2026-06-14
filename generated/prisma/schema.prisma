@@ -81,6 +81,20 @@ enum ImportExportJobStatus {
   FAILED
 }
 
+// P29-02: async GDPR data-export job lifecycle
+enum DataExportStatus {
+  PENDING
+  PROCESSING
+  READY
+  EXPIRED
+  FAILED
+}
+
+enum ApiTokenScope {
+  READ_ONLY
+  READ_WRITE
+}
+
 enum ContactImportFormat {
   CSV_GENERIC
 }
@@ -264,6 +278,10 @@ model User {
   importMappingSuggestionFeedbacks ImportMappingSuggestionFeedback[]
   importMappingPresets             ImportMappingPreset[]
   exportPresets                    ExportPreset[]
+  // P29-02: async GDPR data-export jobs
+  dataExportJobs                   DataExportJob[]
+  // P29-05: developer API access tokens
+  apiTokens                        ApiToken[]
   // P22-11: subscribable iCal calendar token (revocable credential).
   // NOT a DB @unique constraint: the startup `prisma db push --skip-generate`
   // (Dockerfile) has no --accept-data-loss, so adding a unique index to a new
@@ -814,6 +832,7 @@ enum Actor {
   FAMILY_MEMBER
   TEAM_MEMBER
   SYSTEM
+  API
 }
 
 model ActivityEvent {
@@ -1260,4 +1279,44 @@ model ExportPreset {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt(sort: Desc)])
+}
+
+// P29-02: tracks async GDPR data-export job lifecycle. One active (PENDING /
+// PROCESSING / READY) job per user at a time. A CRON runner advances the status;
+// a second CRON expires READY jobs after 48 hours.
+model DataExportJob {
+  id              String           @id @default(cuid())
+  userId          String
+  status          DataExportStatus @default(PENDING)
+  includeArchived Boolean          @default(false)
+  downloadUrl     String? // null until READY; pre-signed MinIO URL
+  fileSizeBytes   Int?
+  requestedAt     DateTime         @default(now())
+  startedAt       DateTime?
+  completedAt     DateTime?
+  expiresAt       DateTime? // requestedAt + 48 h, set on READY
+  errorMessage    String?
+  user            User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([status, expiresAt])
+}
+
+model ApiToken {
+  id                    String        @id @default(cuid())
+  userId                String
+  name                  String
+  tokenHash             String        @unique
+  tokenPrefix           String // first 12 chars of plaintext, e.g. "ktx_live_7f3"
+  scope                 ApiTokenScope @default(READ_ONLY)
+  lastUsedAt            DateTime?
+  requestCountThisMonth Int           @default(0)
+  createdAt             DateTime      @default(now())
+  revokedAt             DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, name])
+  @@index([userId, revokedAt])
+  @@index([tokenHash])
 }

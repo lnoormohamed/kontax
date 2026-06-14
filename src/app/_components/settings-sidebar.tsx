@@ -30,6 +30,7 @@ const SECTIONS = [
   { href: "/settings/preferences", icon: "gear", label: "Preferences" },
   { href: "/settings/notifications", icon: "bell", label: "Notifications" },
   { href: "/settings/devices", icon: "phone", label: "Devices & app passwords" },
+  { href: "/settings/developer", icon: "code", label: "Developer" },
   { href: "/sync", icon: "sync", label: "Sync connections" },
   { href: "/settings/security", icon: "emergency", label: "Security & session" },
 ] as const;

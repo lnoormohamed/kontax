@@ -17,6 +17,7 @@ const SUBPAGE_TITLES: Record<string, string> = {
   notifications: "Notifications",
   preferences: "Preferences",
   devices: "Devices & app passwords",
+  developer: "Developer",
   security: "Security",
   family: "Family",
   teams: "Team management",

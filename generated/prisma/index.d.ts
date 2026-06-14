@@ -213,6 +213,16 @@ export type ImportMappingPreset = $Result.DefaultSelection<Prisma.$ImportMapping
  * 
  */
 export type ExportPreset = $Result.DefaultSelection<Prisma.$ExportPresetPayload>
+/**
+ * Model DataExportJob
+ * 
+ */
+export type DataExportJob = $Result.DefaultSelection<Prisma.$DataExportJobPayload>
+/**
+ * Model ApiToken
+ * 
+ */
+export type ApiToken = $Result.DefaultSelection<Prisma.$ApiTokenPayload>
 
 /**
  * Enums
@@ -319,6 +329,25 @@ export const ImportExportJobStatus: {
 };
 
 export type ImportExportJobStatus = (typeof ImportExportJobStatus)[keyof typeof ImportExportJobStatus]
+
+
+export const DataExportStatus: {
+  PENDING: 'PENDING',
+  PROCESSING: 'PROCESSING',
+  READY: 'READY',
+  EXPIRED: 'EXPIRED',
+  FAILED: 'FAILED'
+};
+
+export type DataExportStatus = (typeof DataExportStatus)[keyof typeof DataExportStatus]
+
+
+export const ApiTokenScope: {
+  READ_ONLY: 'READ_ONLY',
+  READ_WRITE: 'READ_WRITE'
+};
+
+export type ApiTokenScope = (typeof ApiTokenScope)[keyof typeof ApiTokenScope]
 
 
 export const ContactImportFormat: {
@@ -522,7 +551,8 @@ export const Actor: {
   SHARE: 'SHARE',
   FAMILY_MEMBER: 'FAMILY_MEMBER',
   TEAM_MEMBER: 'TEAM_MEMBER',
-  SYSTEM: 'SYSTEM'
+  SYSTEM: 'SYSTEM',
+  API: 'API'
 };
 
 export type Actor = (typeof Actor)[keyof typeof Actor]
@@ -622,6 +652,14 @@ export const SubscriptionInterval: typeof $Enums.SubscriptionInterval
 export type ImportExportJobStatus = $Enums.ImportExportJobStatus
 
 export const ImportExportJobStatus: typeof $Enums.ImportExportJobStatus
+
+export type DataExportStatus = $Enums.DataExportStatus
+
+export const DataExportStatus: typeof $Enums.DataExportStatus
+
+export type ApiTokenScope = $Enums.ApiTokenScope
+
+export const ApiTokenScope: typeof $Enums.ApiTokenScope
 
 export type ContactImportFormat = $Enums.ContactImportFormat
 
@@ -1240,6 +1278,26 @@ export class PrismaClient<
     * ```
     */
   get exportPreset(): Prisma.ExportPresetDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.dataExportJob`: Exposes CRUD operations for the **DataExportJob** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more DataExportJobs
+    * const dataExportJobs = await prisma.dataExportJob.findMany()
+    * ```
+    */
+  get dataExportJob(): Prisma.DataExportJobDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.apiToken`: Exposes CRUD operations for the **ApiToken** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more ApiTokens
+    * const apiTokens = await prisma.apiToken.findMany()
+    * ```
+    */
+  get apiToken(): Prisma.ApiTokenDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1720,7 +1778,9 @@ export namespace Prisma {
     BirthdayReminderState: 'BirthdayReminderState',
     ImportMappingSuggestionFeedback: 'ImportMappingSuggestionFeedback',
     ImportMappingPreset: 'ImportMappingPreset',
-    ExportPreset: 'ExportPreset'
+    ExportPreset: 'ExportPreset',
+    DataExportJob: 'DataExportJob',
+    ApiToken: 'ApiToken'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1739,7 +1799,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "userOnboardingState" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "savedFilter" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset" | "exportPreset"
+      modelProps: "user" | "userOnboardingState" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "savedFilter" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset" | "exportPreset" | "dataExportJob" | "apiToken"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -4703,6 +4763,154 @@ export namespace Prisma {
           }
         }
       }
+      DataExportJob: {
+        payload: Prisma.$DataExportJobPayload<ExtArgs>
+        fields: Prisma.DataExportJobFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.DataExportJobFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataExportJobPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.DataExportJobFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataExportJobPayload>
+          }
+          findFirst: {
+            args: Prisma.DataExportJobFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataExportJobPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.DataExportJobFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataExportJobPayload>
+          }
+          findMany: {
+            args: Prisma.DataExportJobFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataExportJobPayload>[]
+          }
+          create: {
+            args: Prisma.DataExportJobCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataExportJobPayload>
+          }
+          createMany: {
+            args: Prisma.DataExportJobCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.DataExportJobCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataExportJobPayload>[]
+          }
+          delete: {
+            args: Prisma.DataExportJobDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataExportJobPayload>
+          }
+          update: {
+            args: Prisma.DataExportJobUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataExportJobPayload>
+          }
+          deleteMany: {
+            args: Prisma.DataExportJobDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.DataExportJobUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.DataExportJobUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataExportJobPayload>[]
+          }
+          upsert: {
+            args: Prisma.DataExportJobUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$DataExportJobPayload>
+          }
+          aggregate: {
+            args: Prisma.DataExportJobAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateDataExportJob>
+          }
+          groupBy: {
+            args: Prisma.DataExportJobGroupByArgs<ExtArgs>
+            result: $Utils.Optional<DataExportJobGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.DataExportJobCountArgs<ExtArgs>
+            result: $Utils.Optional<DataExportJobCountAggregateOutputType> | number
+          }
+        }
+      }
+      ApiToken: {
+        payload: Prisma.$ApiTokenPayload<ExtArgs>
+        fields: Prisma.ApiTokenFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.ApiTokenFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ApiTokenPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.ApiTokenFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ApiTokenPayload>
+          }
+          findFirst: {
+            args: Prisma.ApiTokenFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ApiTokenPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.ApiTokenFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ApiTokenPayload>
+          }
+          findMany: {
+            args: Prisma.ApiTokenFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ApiTokenPayload>[]
+          }
+          create: {
+            args: Prisma.ApiTokenCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ApiTokenPayload>
+          }
+          createMany: {
+            args: Prisma.ApiTokenCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.ApiTokenCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ApiTokenPayload>[]
+          }
+          delete: {
+            args: Prisma.ApiTokenDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ApiTokenPayload>
+          }
+          update: {
+            args: Prisma.ApiTokenUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ApiTokenPayload>
+          }
+          deleteMany: {
+            args: Prisma.ApiTokenDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.ApiTokenUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.ApiTokenUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ApiTokenPayload>[]
+          }
+          upsert: {
+            args: Prisma.ApiTokenUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$ApiTokenPayload>
+          }
+          aggregate: {
+            args: Prisma.ApiTokenAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateApiToken>
+          }
+          groupBy: {
+            args: Prisma.ApiTokenGroupByArgs<ExtArgs>
+            result: $Utils.Optional<ApiTokenGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.ApiTokenCountArgs<ExtArgs>
+            result: $Utils.Optional<ApiTokenCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -4839,6 +5047,8 @@ export namespace Prisma {
     importMappingSuggestionFeedback?: ImportMappingSuggestionFeedbackOmit
     importMappingPreset?: ImportMappingPresetOmit
     exportPreset?: ExportPresetOmit
+    dataExportJob?: DataExportJobOmit
+    apiToken?: ApiTokenOmit
   }
 
   /* Types for Logging */
@@ -4945,6 +5155,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks: number
     importMappingPresets: number
     exportPresets: number
+    dataExportJobs: number
+    apiTokens: number
     failedLoginAttempts: number
   }
 
@@ -4975,6 +5187,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: boolean | UserCountOutputTypeCountImportMappingSuggestionFeedbacksArgs
     importMappingPresets?: boolean | UserCountOutputTypeCountImportMappingPresetsArgs
     exportPresets?: boolean | UserCountOutputTypeCountExportPresetsArgs
+    dataExportJobs?: boolean | UserCountOutputTypeCountDataExportJobsArgs
+    apiTokens?: boolean | UserCountOutputTypeCountApiTokensArgs
     failedLoginAttempts?: boolean | UserCountOutputTypeCountFailedLoginAttemptsArgs
   }
 
@@ -5169,6 +5383,20 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountExportPresetsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ExportPresetWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountDataExportJobsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DataExportJobWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountApiTokensArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ApiTokenWhereInput
   }
 
   /**
@@ -6055,6 +6283,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: boolean | User$importMappingSuggestionFeedbacksArgs<ExtArgs>
     importMappingPresets?: boolean | User$importMappingPresetsArgs<ExtArgs>
     exportPresets?: boolean | User$exportPresetsArgs<ExtArgs>
+    dataExportJobs?: boolean | User$dataExportJobsArgs<ExtArgs>
+    apiTokens?: boolean | User$apiTokensArgs<ExtArgs>
     failedLoginAttempts?: boolean | User$failedLoginAttemptsArgs<ExtArgs>
     onboardingState?: boolean | User$onboardingStateArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -6168,6 +6398,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: boolean | User$importMappingSuggestionFeedbacksArgs<ExtArgs>
     importMappingPresets?: boolean | User$importMappingPresetsArgs<ExtArgs>
     exportPresets?: boolean | User$exportPresetsArgs<ExtArgs>
+    dataExportJobs?: boolean | User$dataExportJobsArgs<ExtArgs>
+    apiTokens?: boolean | User$apiTokensArgs<ExtArgs>
     failedLoginAttempts?: boolean | User$failedLoginAttemptsArgs<ExtArgs>
     onboardingState?: boolean | User$onboardingStateArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
@@ -6206,6 +6438,8 @@ export namespace Prisma {
       importMappingSuggestionFeedbacks: Prisma.$ImportMappingSuggestionFeedbackPayload<ExtArgs>[]
       importMappingPresets: Prisma.$ImportMappingPresetPayload<ExtArgs>[]
       exportPresets: Prisma.$ExportPresetPayload<ExtArgs>[]
+      dataExportJobs: Prisma.$DataExportJobPayload<ExtArgs>[]
+      apiTokens: Prisma.$ApiTokenPayload<ExtArgs>[]
       failedLoginAttempts: Prisma.$FailedLoginAttemptPayload<ExtArgs>[]
       onboardingState: Prisma.$UserOnboardingStatePayload<ExtArgs> | null
     }
@@ -6655,6 +6889,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks<T extends User$importMappingSuggestionFeedbacksArgs<ExtArgs> = {}>(args?: Subset<T, User$importMappingSuggestionFeedbacksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ImportMappingSuggestionFeedbackPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     importMappingPresets<T extends User$importMappingPresetsArgs<ExtArgs> = {}>(args?: Subset<T, User$importMappingPresetsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ImportMappingPresetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     exportPresets<T extends User$exportPresetsArgs<ExtArgs> = {}>(args?: Subset<T, User$exportPresetsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExportPresetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    dataExportJobs<T extends User$dataExportJobsArgs<ExtArgs> = {}>(args?: Subset<T, User$dataExportJobsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataExportJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    apiTokens<T extends User$apiTokensArgs<ExtArgs> = {}>(args?: Subset<T, User$apiTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ApiTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     failedLoginAttempts<T extends User$failedLoginAttemptsArgs<ExtArgs> = {}>(args?: Subset<T, User$failedLoginAttemptsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FailedLoginAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     onboardingState<T extends User$onboardingStateArgs<ExtArgs> = {}>(args?: Subset<T, User$onboardingStateArgs<ExtArgs>>): Prisma__UserOnboardingStateClient<$Result.GetResult<Prisma.$UserOnboardingStatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
@@ -7756,6 +7992,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ExportPresetScalarFieldEnum | ExportPresetScalarFieldEnum[]
+  }
+
+  /**
+   * User.dataExportJobs
+   */
+  export type User$dataExportJobsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataExportJob
+     */
+    select?: DataExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataExportJob
+     */
+    omit?: DataExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataExportJobInclude<ExtArgs> | null
+    where?: DataExportJobWhereInput
+    orderBy?: DataExportJobOrderByWithRelationInput | DataExportJobOrderByWithRelationInput[]
+    cursor?: DataExportJobWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: DataExportJobScalarFieldEnum | DataExportJobScalarFieldEnum[]
+  }
+
+  /**
+   * User.apiTokens
+   */
+  export type User$apiTokensArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ApiToken
+     */
+    select?: ApiTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ApiToken
+     */
+    omit?: ApiTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApiTokenInclude<ExtArgs> | null
+    where?: ApiTokenWhereInput
+    orderBy?: ApiTokenOrderByWithRelationInput | ApiTokenOrderByWithRelationInput[]
+    cursor?: ApiTokenWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: ApiTokenScalarFieldEnum | ApiTokenScalarFieldEnum[]
   }
 
   /**
@@ -54290,6 +54574,2333 @@ export namespace Prisma {
 
 
   /**
+   * Model DataExportJob
+   */
+
+  export type AggregateDataExportJob = {
+    _count: DataExportJobCountAggregateOutputType | null
+    _avg: DataExportJobAvgAggregateOutputType | null
+    _sum: DataExportJobSumAggregateOutputType | null
+    _min: DataExportJobMinAggregateOutputType | null
+    _max: DataExportJobMaxAggregateOutputType | null
+  }
+
+  export type DataExportJobAvgAggregateOutputType = {
+    fileSizeBytes: number | null
+  }
+
+  export type DataExportJobSumAggregateOutputType = {
+    fileSizeBytes: number | null
+  }
+
+  export type DataExportJobMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    status: $Enums.DataExportStatus | null
+    includeArchived: boolean | null
+    downloadUrl: string | null
+    fileSizeBytes: number | null
+    requestedAt: Date | null
+    startedAt: Date | null
+    completedAt: Date | null
+    expiresAt: Date | null
+    errorMessage: string | null
+  }
+
+  export type DataExportJobMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    status: $Enums.DataExportStatus | null
+    includeArchived: boolean | null
+    downloadUrl: string | null
+    fileSizeBytes: number | null
+    requestedAt: Date | null
+    startedAt: Date | null
+    completedAt: Date | null
+    expiresAt: Date | null
+    errorMessage: string | null
+  }
+
+  export type DataExportJobCountAggregateOutputType = {
+    id: number
+    userId: number
+    status: number
+    includeArchived: number
+    downloadUrl: number
+    fileSizeBytes: number
+    requestedAt: number
+    startedAt: number
+    completedAt: number
+    expiresAt: number
+    errorMessage: number
+    _all: number
+  }
+
+
+  export type DataExportJobAvgAggregateInputType = {
+    fileSizeBytes?: true
+  }
+
+  export type DataExportJobSumAggregateInputType = {
+    fileSizeBytes?: true
+  }
+
+  export type DataExportJobMinAggregateInputType = {
+    id?: true
+    userId?: true
+    status?: true
+    includeArchived?: true
+    downloadUrl?: true
+    fileSizeBytes?: true
+    requestedAt?: true
+    startedAt?: true
+    completedAt?: true
+    expiresAt?: true
+    errorMessage?: true
+  }
+
+  export type DataExportJobMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    status?: true
+    includeArchived?: true
+    downloadUrl?: true
+    fileSizeBytes?: true
+    requestedAt?: true
+    startedAt?: true
+    completedAt?: true
+    expiresAt?: true
+    errorMessage?: true
+  }
+
+  export type DataExportJobCountAggregateInputType = {
+    id?: true
+    userId?: true
+    status?: true
+    includeArchived?: true
+    downloadUrl?: true
+    fileSizeBytes?: true
+    requestedAt?: true
+    startedAt?: true
+    completedAt?: true
+    expiresAt?: true
+    errorMessage?: true
+    _all?: true
+  }
+
+  export type DataExportJobAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DataExportJob to aggregate.
+     */
+    where?: DataExportJobWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DataExportJobs to fetch.
+     */
+    orderBy?: DataExportJobOrderByWithRelationInput | DataExportJobOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: DataExportJobWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DataExportJobs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DataExportJobs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned DataExportJobs
+    **/
+    _count?: true | DataExportJobCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: DataExportJobAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: DataExportJobSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: DataExportJobMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: DataExportJobMaxAggregateInputType
+  }
+
+  export type GetDataExportJobAggregateType<T extends DataExportJobAggregateArgs> = {
+        [P in keyof T & keyof AggregateDataExportJob]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateDataExportJob[P]>
+      : GetScalarType<T[P], AggregateDataExportJob[P]>
+  }
+
+
+
+
+  export type DataExportJobGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: DataExportJobWhereInput
+    orderBy?: DataExportJobOrderByWithAggregationInput | DataExportJobOrderByWithAggregationInput[]
+    by: DataExportJobScalarFieldEnum[] | DataExportJobScalarFieldEnum
+    having?: DataExportJobScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: DataExportJobCountAggregateInputType | true
+    _avg?: DataExportJobAvgAggregateInputType
+    _sum?: DataExportJobSumAggregateInputType
+    _min?: DataExportJobMinAggregateInputType
+    _max?: DataExportJobMaxAggregateInputType
+  }
+
+  export type DataExportJobGroupByOutputType = {
+    id: string
+    userId: string
+    status: $Enums.DataExportStatus
+    includeArchived: boolean
+    downloadUrl: string | null
+    fileSizeBytes: number | null
+    requestedAt: Date
+    startedAt: Date | null
+    completedAt: Date | null
+    expiresAt: Date | null
+    errorMessage: string | null
+    _count: DataExportJobCountAggregateOutputType | null
+    _avg: DataExportJobAvgAggregateOutputType | null
+    _sum: DataExportJobSumAggregateOutputType | null
+    _min: DataExportJobMinAggregateOutputType | null
+    _max: DataExportJobMaxAggregateOutputType | null
+  }
+
+  type GetDataExportJobGroupByPayload<T extends DataExportJobGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<DataExportJobGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof DataExportJobGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], DataExportJobGroupByOutputType[P]>
+            : GetScalarType<T[P], DataExportJobGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type DataExportJobSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    status?: boolean
+    includeArchived?: boolean
+    downloadUrl?: boolean
+    fileSizeBytes?: boolean
+    requestedAt?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    expiresAt?: boolean
+    errorMessage?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["dataExportJob"]>
+
+  export type DataExportJobSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    status?: boolean
+    includeArchived?: boolean
+    downloadUrl?: boolean
+    fileSizeBytes?: boolean
+    requestedAt?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    expiresAt?: boolean
+    errorMessage?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["dataExportJob"]>
+
+  export type DataExportJobSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    status?: boolean
+    includeArchived?: boolean
+    downloadUrl?: boolean
+    fileSizeBytes?: boolean
+    requestedAt?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    expiresAt?: boolean
+    errorMessage?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["dataExportJob"]>
+
+  export type DataExportJobSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    status?: boolean
+    includeArchived?: boolean
+    downloadUrl?: boolean
+    fileSizeBytes?: boolean
+    requestedAt?: boolean
+    startedAt?: boolean
+    completedAt?: boolean
+    expiresAt?: boolean
+    errorMessage?: boolean
+  }
+
+  export type DataExportJobOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "status" | "includeArchived" | "downloadUrl" | "fileSizeBytes" | "requestedAt" | "startedAt" | "completedAt" | "expiresAt" | "errorMessage", ExtArgs["result"]["dataExportJob"]>
+  export type DataExportJobInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type DataExportJobIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type DataExportJobIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $DataExportJobPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "DataExportJob"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      status: $Enums.DataExportStatus
+      includeArchived: boolean
+      downloadUrl: string | null
+      fileSizeBytes: number | null
+      requestedAt: Date
+      startedAt: Date | null
+      completedAt: Date | null
+      expiresAt: Date | null
+      errorMessage: string | null
+    }, ExtArgs["result"]["dataExportJob"]>
+    composites: {}
+  }
+
+  type DataExportJobGetPayload<S extends boolean | null | undefined | DataExportJobDefaultArgs> = $Result.GetResult<Prisma.$DataExportJobPayload, S>
+
+  type DataExportJobCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<DataExportJobFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: DataExportJobCountAggregateInputType | true
+    }
+
+  export interface DataExportJobDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['DataExportJob'], meta: { name: 'DataExportJob' } }
+    /**
+     * Find zero or one DataExportJob that matches the filter.
+     * @param {DataExportJobFindUniqueArgs} args - Arguments to find a DataExportJob
+     * @example
+     * // Get one DataExportJob
+     * const dataExportJob = await prisma.dataExportJob.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends DataExportJobFindUniqueArgs>(args: SelectSubset<T, DataExportJobFindUniqueArgs<ExtArgs>>): Prisma__DataExportJobClient<$Result.GetResult<Prisma.$DataExportJobPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one DataExportJob that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {DataExportJobFindUniqueOrThrowArgs} args - Arguments to find a DataExportJob
+     * @example
+     * // Get one DataExportJob
+     * const dataExportJob = await prisma.dataExportJob.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends DataExportJobFindUniqueOrThrowArgs>(args: SelectSubset<T, DataExportJobFindUniqueOrThrowArgs<ExtArgs>>): Prisma__DataExportJobClient<$Result.GetResult<Prisma.$DataExportJobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DataExportJob that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataExportJobFindFirstArgs} args - Arguments to find a DataExportJob
+     * @example
+     * // Get one DataExportJob
+     * const dataExportJob = await prisma.dataExportJob.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends DataExportJobFindFirstArgs>(args?: SelectSubset<T, DataExportJobFindFirstArgs<ExtArgs>>): Prisma__DataExportJobClient<$Result.GetResult<Prisma.$DataExportJobPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first DataExportJob that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataExportJobFindFirstOrThrowArgs} args - Arguments to find a DataExportJob
+     * @example
+     * // Get one DataExportJob
+     * const dataExportJob = await prisma.dataExportJob.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends DataExportJobFindFirstOrThrowArgs>(args?: SelectSubset<T, DataExportJobFindFirstOrThrowArgs<ExtArgs>>): Prisma__DataExportJobClient<$Result.GetResult<Prisma.$DataExportJobPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more DataExportJobs that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataExportJobFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all DataExportJobs
+     * const dataExportJobs = await prisma.dataExportJob.findMany()
+     * 
+     * // Get first 10 DataExportJobs
+     * const dataExportJobs = await prisma.dataExportJob.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const dataExportJobWithIdOnly = await prisma.dataExportJob.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends DataExportJobFindManyArgs>(args?: SelectSubset<T, DataExportJobFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataExportJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a DataExportJob.
+     * @param {DataExportJobCreateArgs} args - Arguments to create a DataExportJob.
+     * @example
+     * // Create one DataExportJob
+     * const DataExportJob = await prisma.dataExportJob.create({
+     *   data: {
+     *     // ... data to create a DataExportJob
+     *   }
+     * })
+     * 
+     */
+    create<T extends DataExportJobCreateArgs>(args: SelectSubset<T, DataExportJobCreateArgs<ExtArgs>>): Prisma__DataExportJobClient<$Result.GetResult<Prisma.$DataExportJobPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many DataExportJobs.
+     * @param {DataExportJobCreateManyArgs} args - Arguments to create many DataExportJobs.
+     * @example
+     * // Create many DataExportJobs
+     * const dataExportJob = await prisma.dataExportJob.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends DataExportJobCreateManyArgs>(args?: SelectSubset<T, DataExportJobCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many DataExportJobs and returns the data saved in the database.
+     * @param {DataExportJobCreateManyAndReturnArgs} args - Arguments to create many DataExportJobs.
+     * @example
+     * // Create many DataExportJobs
+     * const dataExportJob = await prisma.dataExportJob.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many DataExportJobs and only return the `id`
+     * const dataExportJobWithIdOnly = await prisma.dataExportJob.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends DataExportJobCreateManyAndReturnArgs>(args?: SelectSubset<T, DataExportJobCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataExportJobPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a DataExportJob.
+     * @param {DataExportJobDeleteArgs} args - Arguments to delete one DataExportJob.
+     * @example
+     * // Delete one DataExportJob
+     * const DataExportJob = await prisma.dataExportJob.delete({
+     *   where: {
+     *     // ... filter to delete one DataExportJob
+     *   }
+     * })
+     * 
+     */
+    delete<T extends DataExportJobDeleteArgs>(args: SelectSubset<T, DataExportJobDeleteArgs<ExtArgs>>): Prisma__DataExportJobClient<$Result.GetResult<Prisma.$DataExportJobPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one DataExportJob.
+     * @param {DataExportJobUpdateArgs} args - Arguments to update one DataExportJob.
+     * @example
+     * // Update one DataExportJob
+     * const dataExportJob = await prisma.dataExportJob.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends DataExportJobUpdateArgs>(args: SelectSubset<T, DataExportJobUpdateArgs<ExtArgs>>): Prisma__DataExportJobClient<$Result.GetResult<Prisma.$DataExportJobPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more DataExportJobs.
+     * @param {DataExportJobDeleteManyArgs} args - Arguments to filter DataExportJobs to delete.
+     * @example
+     * // Delete a few DataExportJobs
+     * const { count } = await prisma.dataExportJob.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends DataExportJobDeleteManyArgs>(args?: SelectSubset<T, DataExportJobDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DataExportJobs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataExportJobUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many DataExportJobs
+     * const dataExportJob = await prisma.dataExportJob.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends DataExportJobUpdateManyArgs>(args: SelectSubset<T, DataExportJobUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more DataExportJobs and returns the data updated in the database.
+     * @param {DataExportJobUpdateManyAndReturnArgs} args - Arguments to update many DataExportJobs.
+     * @example
+     * // Update many DataExportJobs
+     * const dataExportJob = await prisma.dataExportJob.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more DataExportJobs and only return the `id`
+     * const dataExportJobWithIdOnly = await prisma.dataExportJob.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends DataExportJobUpdateManyAndReturnArgs>(args: SelectSubset<T, DataExportJobUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataExportJobPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one DataExportJob.
+     * @param {DataExportJobUpsertArgs} args - Arguments to update or create a DataExportJob.
+     * @example
+     * // Update or create a DataExportJob
+     * const dataExportJob = await prisma.dataExportJob.upsert({
+     *   create: {
+     *     // ... data to create a DataExportJob
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the DataExportJob we want to update
+     *   }
+     * })
+     */
+    upsert<T extends DataExportJobUpsertArgs>(args: SelectSubset<T, DataExportJobUpsertArgs<ExtArgs>>): Prisma__DataExportJobClient<$Result.GetResult<Prisma.$DataExportJobPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of DataExportJobs.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataExportJobCountArgs} args - Arguments to filter DataExportJobs to count.
+     * @example
+     * // Count the number of DataExportJobs
+     * const count = await prisma.dataExportJob.count({
+     *   where: {
+     *     // ... the filter for the DataExportJobs we want to count
+     *   }
+     * })
+    **/
+    count<T extends DataExportJobCountArgs>(
+      args?: Subset<T, DataExportJobCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], DataExportJobCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a DataExportJob.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataExportJobAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends DataExportJobAggregateArgs>(args: Subset<T, DataExportJobAggregateArgs>): Prisma.PrismaPromise<GetDataExportJobAggregateType<T>>
+
+    /**
+     * Group by DataExportJob.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {DataExportJobGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends DataExportJobGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: DataExportJobGroupByArgs['orderBy'] }
+        : { orderBy?: DataExportJobGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, DataExportJobGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetDataExportJobGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the DataExportJob model
+   */
+  readonly fields: DataExportJobFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for DataExportJob.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__DataExportJobClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the DataExportJob model
+   */
+  interface DataExportJobFieldRefs {
+    readonly id: FieldRef<"DataExportJob", 'String'>
+    readonly userId: FieldRef<"DataExportJob", 'String'>
+    readonly status: FieldRef<"DataExportJob", 'DataExportStatus'>
+    readonly includeArchived: FieldRef<"DataExportJob", 'Boolean'>
+    readonly downloadUrl: FieldRef<"DataExportJob", 'String'>
+    readonly fileSizeBytes: FieldRef<"DataExportJob", 'Int'>
+    readonly requestedAt: FieldRef<"DataExportJob", 'DateTime'>
+    readonly startedAt: FieldRef<"DataExportJob", 'DateTime'>
+    readonly completedAt: FieldRef<"DataExportJob", 'DateTime'>
+    readonly expiresAt: FieldRef<"DataExportJob", 'DateTime'>
+    readonly errorMessage: FieldRef<"DataExportJob", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * DataExportJob findUnique
+   */
+  export type DataExportJobFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataExportJob
+     */
+    select?: DataExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataExportJob
+     */
+    omit?: DataExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataExportJobInclude<ExtArgs> | null
+    /**
+     * Filter, which DataExportJob to fetch.
+     */
+    where: DataExportJobWhereUniqueInput
+  }
+
+  /**
+   * DataExportJob findUniqueOrThrow
+   */
+  export type DataExportJobFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataExportJob
+     */
+    select?: DataExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataExportJob
+     */
+    omit?: DataExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataExportJobInclude<ExtArgs> | null
+    /**
+     * Filter, which DataExportJob to fetch.
+     */
+    where: DataExportJobWhereUniqueInput
+  }
+
+  /**
+   * DataExportJob findFirst
+   */
+  export type DataExportJobFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataExportJob
+     */
+    select?: DataExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataExportJob
+     */
+    omit?: DataExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataExportJobInclude<ExtArgs> | null
+    /**
+     * Filter, which DataExportJob to fetch.
+     */
+    where?: DataExportJobWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DataExportJobs to fetch.
+     */
+    orderBy?: DataExportJobOrderByWithRelationInput | DataExportJobOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DataExportJobs.
+     */
+    cursor?: DataExportJobWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DataExportJobs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DataExportJobs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DataExportJobs.
+     */
+    distinct?: DataExportJobScalarFieldEnum | DataExportJobScalarFieldEnum[]
+  }
+
+  /**
+   * DataExportJob findFirstOrThrow
+   */
+  export type DataExportJobFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataExportJob
+     */
+    select?: DataExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataExportJob
+     */
+    omit?: DataExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataExportJobInclude<ExtArgs> | null
+    /**
+     * Filter, which DataExportJob to fetch.
+     */
+    where?: DataExportJobWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DataExportJobs to fetch.
+     */
+    orderBy?: DataExportJobOrderByWithRelationInput | DataExportJobOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for DataExportJobs.
+     */
+    cursor?: DataExportJobWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DataExportJobs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DataExportJobs.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of DataExportJobs.
+     */
+    distinct?: DataExportJobScalarFieldEnum | DataExportJobScalarFieldEnum[]
+  }
+
+  /**
+   * DataExportJob findMany
+   */
+  export type DataExportJobFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataExportJob
+     */
+    select?: DataExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataExportJob
+     */
+    omit?: DataExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataExportJobInclude<ExtArgs> | null
+    /**
+     * Filter, which DataExportJobs to fetch.
+     */
+    where?: DataExportJobWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of DataExportJobs to fetch.
+     */
+    orderBy?: DataExportJobOrderByWithRelationInput | DataExportJobOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing DataExportJobs.
+     */
+    cursor?: DataExportJobWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` DataExportJobs from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` DataExportJobs.
+     */
+    skip?: number
+    distinct?: DataExportJobScalarFieldEnum | DataExportJobScalarFieldEnum[]
+  }
+
+  /**
+   * DataExportJob create
+   */
+  export type DataExportJobCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataExportJob
+     */
+    select?: DataExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataExportJob
+     */
+    omit?: DataExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataExportJobInclude<ExtArgs> | null
+    /**
+     * The data needed to create a DataExportJob.
+     */
+    data: XOR<DataExportJobCreateInput, DataExportJobUncheckedCreateInput>
+  }
+
+  /**
+   * DataExportJob createMany
+   */
+  export type DataExportJobCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many DataExportJobs.
+     */
+    data: DataExportJobCreateManyInput | DataExportJobCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * DataExportJob createManyAndReturn
+   */
+  export type DataExportJobCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataExportJob
+     */
+    select?: DataExportJobSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataExportJob
+     */
+    omit?: DataExportJobOmit<ExtArgs> | null
+    /**
+     * The data used to create many DataExportJobs.
+     */
+    data: DataExportJobCreateManyInput | DataExportJobCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataExportJobIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DataExportJob update
+   */
+  export type DataExportJobUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataExportJob
+     */
+    select?: DataExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataExportJob
+     */
+    omit?: DataExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataExportJobInclude<ExtArgs> | null
+    /**
+     * The data needed to update a DataExportJob.
+     */
+    data: XOR<DataExportJobUpdateInput, DataExportJobUncheckedUpdateInput>
+    /**
+     * Choose, which DataExportJob to update.
+     */
+    where: DataExportJobWhereUniqueInput
+  }
+
+  /**
+   * DataExportJob updateMany
+   */
+  export type DataExportJobUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update DataExportJobs.
+     */
+    data: XOR<DataExportJobUpdateManyMutationInput, DataExportJobUncheckedUpdateManyInput>
+    /**
+     * Filter which DataExportJobs to update
+     */
+    where?: DataExportJobWhereInput
+    /**
+     * Limit how many DataExportJobs to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * DataExportJob updateManyAndReturn
+   */
+  export type DataExportJobUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataExportJob
+     */
+    select?: DataExportJobSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataExportJob
+     */
+    omit?: DataExportJobOmit<ExtArgs> | null
+    /**
+     * The data used to update DataExportJobs.
+     */
+    data: XOR<DataExportJobUpdateManyMutationInput, DataExportJobUncheckedUpdateManyInput>
+    /**
+     * Filter which DataExportJobs to update
+     */
+    where?: DataExportJobWhereInput
+    /**
+     * Limit how many DataExportJobs to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataExportJobIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * DataExportJob upsert
+   */
+  export type DataExportJobUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataExportJob
+     */
+    select?: DataExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataExportJob
+     */
+    omit?: DataExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataExportJobInclude<ExtArgs> | null
+    /**
+     * The filter to search for the DataExportJob to update in case it exists.
+     */
+    where: DataExportJobWhereUniqueInput
+    /**
+     * In case the DataExportJob found by the `where` argument doesn't exist, create a new DataExportJob with this data.
+     */
+    create: XOR<DataExportJobCreateInput, DataExportJobUncheckedCreateInput>
+    /**
+     * In case the DataExportJob was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<DataExportJobUpdateInput, DataExportJobUncheckedUpdateInput>
+  }
+
+  /**
+   * DataExportJob delete
+   */
+  export type DataExportJobDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataExportJob
+     */
+    select?: DataExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataExportJob
+     */
+    omit?: DataExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataExportJobInclude<ExtArgs> | null
+    /**
+     * Filter which DataExportJob to delete.
+     */
+    where: DataExportJobWhereUniqueInput
+  }
+
+  /**
+   * DataExportJob deleteMany
+   */
+  export type DataExportJobDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which DataExportJobs to delete
+     */
+    where?: DataExportJobWhereInput
+    /**
+     * Limit how many DataExportJobs to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * DataExportJob without action
+   */
+  export type DataExportJobDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the DataExportJob
+     */
+    select?: DataExportJobSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the DataExportJob
+     */
+    omit?: DataExportJobOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: DataExportJobInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model ApiToken
+   */
+
+  export type AggregateApiToken = {
+    _count: ApiTokenCountAggregateOutputType | null
+    _avg: ApiTokenAvgAggregateOutputType | null
+    _sum: ApiTokenSumAggregateOutputType | null
+    _min: ApiTokenMinAggregateOutputType | null
+    _max: ApiTokenMaxAggregateOutputType | null
+  }
+
+  export type ApiTokenAvgAggregateOutputType = {
+    requestCountThisMonth: number | null
+  }
+
+  export type ApiTokenSumAggregateOutputType = {
+    requestCountThisMonth: number | null
+  }
+
+  export type ApiTokenMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    name: string | null
+    tokenHash: string | null
+    tokenPrefix: string | null
+    scope: $Enums.ApiTokenScope | null
+    lastUsedAt: Date | null
+    requestCountThisMonth: number | null
+    createdAt: Date | null
+    revokedAt: Date | null
+  }
+
+  export type ApiTokenMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    name: string | null
+    tokenHash: string | null
+    tokenPrefix: string | null
+    scope: $Enums.ApiTokenScope | null
+    lastUsedAt: Date | null
+    requestCountThisMonth: number | null
+    createdAt: Date | null
+    revokedAt: Date | null
+  }
+
+  export type ApiTokenCountAggregateOutputType = {
+    id: number
+    userId: number
+    name: number
+    tokenHash: number
+    tokenPrefix: number
+    scope: number
+    lastUsedAt: number
+    requestCountThisMonth: number
+    createdAt: number
+    revokedAt: number
+    _all: number
+  }
+
+
+  export type ApiTokenAvgAggregateInputType = {
+    requestCountThisMonth?: true
+  }
+
+  export type ApiTokenSumAggregateInputType = {
+    requestCountThisMonth?: true
+  }
+
+  export type ApiTokenMinAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    tokenHash?: true
+    tokenPrefix?: true
+    scope?: true
+    lastUsedAt?: true
+    requestCountThisMonth?: true
+    createdAt?: true
+    revokedAt?: true
+  }
+
+  export type ApiTokenMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    tokenHash?: true
+    tokenPrefix?: true
+    scope?: true
+    lastUsedAt?: true
+    requestCountThisMonth?: true
+    createdAt?: true
+    revokedAt?: true
+  }
+
+  export type ApiTokenCountAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    tokenHash?: true
+    tokenPrefix?: true
+    scope?: true
+    lastUsedAt?: true
+    requestCountThisMonth?: true
+    createdAt?: true
+    revokedAt?: true
+    _all?: true
+  }
+
+  export type ApiTokenAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ApiToken to aggregate.
+     */
+    where?: ApiTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ApiTokens to fetch.
+     */
+    orderBy?: ApiTokenOrderByWithRelationInput | ApiTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: ApiTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ApiTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ApiTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned ApiTokens
+    **/
+    _count?: true | ApiTokenCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: ApiTokenAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ApiTokenSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: ApiTokenMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: ApiTokenMaxAggregateInputType
+  }
+
+  export type GetApiTokenAggregateType<T extends ApiTokenAggregateArgs> = {
+        [P in keyof T & keyof AggregateApiToken]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateApiToken[P]>
+      : GetScalarType<T[P], AggregateApiToken[P]>
+  }
+
+
+
+
+  export type ApiTokenGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: ApiTokenWhereInput
+    orderBy?: ApiTokenOrderByWithAggregationInput | ApiTokenOrderByWithAggregationInput[]
+    by: ApiTokenScalarFieldEnum[] | ApiTokenScalarFieldEnum
+    having?: ApiTokenScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: ApiTokenCountAggregateInputType | true
+    _avg?: ApiTokenAvgAggregateInputType
+    _sum?: ApiTokenSumAggregateInputType
+    _min?: ApiTokenMinAggregateInputType
+    _max?: ApiTokenMaxAggregateInputType
+  }
+
+  export type ApiTokenGroupByOutputType = {
+    id: string
+    userId: string
+    name: string
+    tokenHash: string
+    tokenPrefix: string
+    scope: $Enums.ApiTokenScope
+    lastUsedAt: Date | null
+    requestCountThisMonth: number
+    createdAt: Date
+    revokedAt: Date | null
+    _count: ApiTokenCountAggregateOutputType | null
+    _avg: ApiTokenAvgAggregateOutputType | null
+    _sum: ApiTokenSumAggregateOutputType | null
+    _min: ApiTokenMinAggregateOutputType | null
+    _max: ApiTokenMaxAggregateOutputType | null
+  }
+
+  type GetApiTokenGroupByPayload<T extends ApiTokenGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<ApiTokenGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof ApiTokenGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], ApiTokenGroupByOutputType[P]>
+            : GetScalarType<T[P], ApiTokenGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type ApiTokenSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    tokenHash?: boolean
+    tokenPrefix?: boolean
+    scope?: boolean
+    lastUsedAt?: boolean
+    requestCountThisMonth?: boolean
+    createdAt?: boolean
+    revokedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["apiToken"]>
+
+  export type ApiTokenSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    tokenHash?: boolean
+    tokenPrefix?: boolean
+    scope?: boolean
+    lastUsedAt?: boolean
+    requestCountThisMonth?: boolean
+    createdAt?: boolean
+    revokedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["apiToken"]>
+
+  export type ApiTokenSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    tokenHash?: boolean
+    tokenPrefix?: boolean
+    scope?: boolean
+    lastUsedAt?: boolean
+    requestCountThisMonth?: boolean
+    createdAt?: boolean
+    revokedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["apiToken"]>
+
+  export type ApiTokenSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    tokenHash?: boolean
+    tokenPrefix?: boolean
+    scope?: boolean
+    lastUsedAt?: boolean
+    requestCountThisMonth?: boolean
+    createdAt?: boolean
+    revokedAt?: boolean
+  }
+
+  export type ApiTokenOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "name" | "tokenHash" | "tokenPrefix" | "scope" | "lastUsedAt" | "requestCountThisMonth" | "createdAt" | "revokedAt", ExtArgs["result"]["apiToken"]>
+  export type ApiTokenInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type ApiTokenIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type ApiTokenIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $ApiTokenPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "ApiToken"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      name: string
+      tokenHash: string
+      tokenPrefix: string
+      scope: $Enums.ApiTokenScope
+      lastUsedAt: Date | null
+      requestCountThisMonth: number
+      createdAt: Date
+      revokedAt: Date | null
+    }, ExtArgs["result"]["apiToken"]>
+    composites: {}
+  }
+
+  type ApiTokenGetPayload<S extends boolean | null | undefined | ApiTokenDefaultArgs> = $Result.GetResult<Prisma.$ApiTokenPayload, S>
+
+  type ApiTokenCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<ApiTokenFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: ApiTokenCountAggregateInputType | true
+    }
+
+  export interface ApiTokenDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['ApiToken'], meta: { name: 'ApiToken' } }
+    /**
+     * Find zero or one ApiToken that matches the filter.
+     * @param {ApiTokenFindUniqueArgs} args - Arguments to find a ApiToken
+     * @example
+     * // Get one ApiToken
+     * const apiToken = await prisma.apiToken.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends ApiTokenFindUniqueArgs>(args: SelectSubset<T, ApiTokenFindUniqueArgs<ExtArgs>>): Prisma__ApiTokenClient<$Result.GetResult<Prisma.$ApiTokenPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one ApiToken that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {ApiTokenFindUniqueOrThrowArgs} args - Arguments to find a ApiToken
+     * @example
+     * // Get one ApiToken
+     * const apiToken = await prisma.apiToken.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends ApiTokenFindUniqueOrThrowArgs>(args: SelectSubset<T, ApiTokenFindUniqueOrThrowArgs<ExtArgs>>): Prisma__ApiTokenClient<$Result.GetResult<Prisma.$ApiTokenPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ApiToken that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ApiTokenFindFirstArgs} args - Arguments to find a ApiToken
+     * @example
+     * // Get one ApiToken
+     * const apiToken = await prisma.apiToken.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends ApiTokenFindFirstArgs>(args?: SelectSubset<T, ApiTokenFindFirstArgs<ExtArgs>>): Prisma__ApiTokenClient<$Result.GetResult<Prisma.$ApiTokenPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first ApiToken that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ApiTokenFindFirstOrThrowArgs} args - Arguments to find a ApiToken
+     * @example
+     * // Get one ApiToken
+     * const apiToken = await prisma.apiToken.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends ApiTokenFindFirstOrThrowArgs>(args?: SelectSubset<T, ApiTokenFindFirstOrThrowArgs<ExtArgs>>): Prisma__ApiTokenClient<$Result.GetResult<Prisma.$ApiTokenPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more ApiTokens that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ApiTokenFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all ApiTokens
+     * const apiTokens = await prisma.apiToken.findMany()
+     * 
+     * // Get first 10 ApiTokens
+     * const apiTokens = await prisma.apiToken.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const apiTokenWithIdOnly = await prisma.apiToken.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends ApiTokenFindManyArgs>(args?: SelectSubset<T, ApiTokenFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ApiTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a ApiToken.
+     * @param {ApiTokenCreateArgs} args - Arguments to create a ApiToken.
+     * @example
+     * // Create one ApiToken
+     * const ApiToken = await prisma.apiToken.create({
+     *   data: {
+     *     // ... data to create a ApiToken
+     *   }
+     * })
+     * 
+     */
+    create<T extends ApiTokenCreateArgs>(args: SelectSubset<T, ApiTokenCreateArgs<ExtArgs>>): Prisma__ApiTokenClient<$Result.GetResult<Prisma.$ApiTokenPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many ApiTokens.
+     * @param {ApiTokenCreateManyArgs} args - Arguments to create many ApiTokens.
+     * @example
+     * // Create many ApiTokens
+     * const apiToken = await prisma.apiToken.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends ApiTokenCreateManyArgs>(args?: SelectSubset<T, ApiTokenCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many ApiTokens and returns the data saved in the database.
+     * @param {ApiTokenCreateManyAndReturnArgs} args - Arguments to create many ApiTokens.
+     * @example
+     * // Create many ApiTokens
+     * const apiToken = await prisma.apiToken.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many ApiTokens and only return the `id`
+     * const apiTokenWithIdOnly = await prisma.apiToken.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends ApiTokenCreateManyAndReturnArgs>(args?: SelectSubset<T, ApiTokenCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ApiTokenPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a ApiToken.
+     * @param {ApiTokenDeleteArgs} args - Arguments to delete one ApiToken.
+     * @example
+     * // Delete one ApiToken
+     * const ApiToken = await prisma.apiToken.delete({
+     *   where: {
+     *     // ... filter to delete one ApiToken
+     *   }
+     * })
+     * 
+     */
+    delete<T extends ApiTokenDeleteArgs>(args: SelectSubset<T, ApiTokenDeleteArgs<ExtArgs>>): Prisma__ApiTokenClient<$Result.GetResult<Prisma.$ApiTokenPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one ApiToken.
+     * @param {ApiTokenUpdateArgs} args - Arguments to update one ApiToken.
+     * @example
+     * // Update one ApiToken
+     * const apiToken = await prisma.apiToken.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends ApiTokenUpdateArgs>(args: SelectSubset<T, ApiTokenUpdateArgs<ExtArgs>>): Prisma__ApiTokenClient<$Result.GetResult<Prisma.$ApiTokenPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more ApiTokens.
+     * @param {ApiTokenDeleteManyArgs} args - Arguments to filter ApiTokens to delete.
+     * @example
+     * // Delete a few ApiTokens
+     * const { count } = await prisma.apiToken.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends ApiTokenDeleteManyArgs>(args?: SelectSubset<T, ApiTokenDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ApiTokens.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ApiTokenUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many ApiTokens
+     * const apiToken = await prisma.apiToken.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends ApiTokenUpdateManyArgs>(args: SelectSubset<T, ApiTokenUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more ApiTokens and returns the data updated in the database.
+     * @param {ApiTokenUpdateManyAndReturnArgs} args - Arguments to update many ApiTokens.
+     * @example
+     * // Update many ApiTokens
+     * const apiToken = await prisma.apiToken.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more ApiTokens and only return the `id`
+     * const apiTokenWithIdOnly = await prisma.apiToken.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends ApiTokenUpdateManyAndReturnArgs>(args: SelectSubset<T, ApiTokenUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ApiTokenPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one ApiToken.
+     * @param {ApiTokenUpsertArgs} args - Arguments to update or create a ApiToken.
+     * @example
+     * // Update or create a ApiToken
+     * const apiToken = await prisma.apiToken.upsert({
+     *   create: {
+     *     // ... data to create a ApiToken
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the ApiToken we want to update
+     *   }
+     * })
+     */
+    upsert<T extends ApiTokenUpsertArgs>(args: SelectSubset<T, ApiTokenUpsertArgs<ExtArgs>>): Prisma__ApiTokenClient<$Result.GetResult<Prisma.$ApiTokenPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of ApiTokens.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ApiTokenCountArgs} args - Arguments to filter ApiTokens to count.
+     * @example
+     * // Count the number of ApiTokens
+     * const count = await prisma.apiToken.count({
+     *   where: {
+     *     // ... the filter for the ApiTokens we want to count
+     *   }
+     * })
+    **/
+    count<T extends ApiTokenCountArgs>(
+      args?: Subset<T, ApiTokenCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], ApiTokenCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a ApiToken.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ApiTokenAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends ApiTokenAggregateArgs>(args: Subset<T, ApiTokenAggregateArgs>): Prisma.PrismaPromise<GetApiTokenAggregateType<T>>
+
+    /**
+     * Group by ApiToken.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {ApiTokenGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends ApiTokenGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: ApiTokenGroupByArgs['orderBy'] }
+        : { orderBy?: ApiTokenGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, ApiTokenGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetApiTokenGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the ApiToken model
+   */
+  readonly fields: ApiTokenFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for ApiToken.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__ApiTokenClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the ApiToken model
+   */
+  interface ApiTokenFieldRefs {
+    readonly id: FieldRef<"ApiToken", 'String'>
+    readonly userId: FieldRef<"ApiToken", 'String'>
+    readonly name: FieldRef<"ApiToken", 'String'>
+    readonly tokenHash: FieldRef<"ApiToken", 'String'>
+    readonly tokenPrefix: FieldRef<"ApiToken", 'String'>
+    readonly scope: FieldRef<"ApiToken", 'ApiTokenScope'>
+    readonly lastUsedAt: FieldRef<"ApiToken", 'DateTime'>
+    readonly requestCountThisMonth: FieldRef<"ApiToken", 'Int'>
+    readonly createdAt: FieldRef<"ApiToken", 'DateTime'>
+    readonly revokedAt: FieldRef<"ApiToken", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * ApiToken findUnique
+   */
+  export type ApiTokenFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ApiToken
+     */
+    select?: ApiTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ApiToken
+     */
+    omit?: ApiTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApiTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which ApiToken to fetch.
+     */
+    where: ApiTokenWhereUniqueInput
+  }
+
+  /**
+   * ApiToken findUniqueOrThrow
+   */
+  export type ApiTokenFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ApiToken
+     */
+    select?: ApiTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ApiToken
+     */
+    omit?: ApiTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApiTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which ApiToken to fetch.
+     */
+    where: ApiTokenWhereUniqueInput
+  }
+
+  /**
+   * ApiToken findFirst
+   */
+  export type ApiTokenFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ApiToken
+     */
+    select?: ApiTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ApiToken
+     */
+    omit?: ApiTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApiTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which ApiToken to fetch.
+     */
+    where?: ApiTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ApiTokens to fetch.
+     */
+    orderBy?: ApiTokenOrderByWithRelationInput | ApiTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ApiTokens.
+     */
+    cursor?: ApiTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ApiTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ApiTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ApiTokens.
+     */
+    distinct?: ApiTokenScalarFieldEnum | ApiTokenScalarFieldEnum[]
+  }
+
+  /**
+   * ApiToken findFirstOrThrow
+   */
+  export type ApiTokenFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ApiToken
+     */
+    select?: ApiTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ApiToken
+     */
+    omit?: ApiTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApiTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which ApiToken to fetch.
+     */
+    where?: ApiTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ApiTokens to fetch.
+     */
+    orderBy?: ApiTokenOrderByWithRelationInput | ApiTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for ApiTokens.
+     */
+    cursor?: ApiTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ApiTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ApiTokens.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of ApiTokens.
+     */
+    distinct?: ApiTokenScalarFieldEnum | ApiTokenScalarFieldEnum[]
+  }
+
+  /**
+   * ApiToken findMany
+   */
+  export type ApiTokenFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ApiToken
+     */
+    select?: ApiTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ApiToken
+     */
+    omit?: ApiTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApiTokenInclude<ExtArgs> | null
+    /**
+     * Filter, which ApiTokens to fetch.
+     */
+    where?: ApiTokenWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of ApiTokens to fetch.
+     */
+    orderBy?: ApiTokenOrderByWithRelationInput | ApiTokenOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing ApiTokens.
+     */
+    cursor?: ApiTokenWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` ApiTokens from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` ApiTokens.
+     */
+    skip?: number
+    distinct?: ApiTokenScalarFieldEnum | ApiTokenScalarFieldEnum[]
+  }
+
+  /**
+   * ApiToken create
+   */
+  export type ApiTokenCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ApiToken
+     */
+    select?: ApiTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ApiToken
+     */
+    omit?: ApiTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApiTokenInclude<ExtArgs> | null
+    /**
+     * The data needed to create a ApiToken.
+     */
+    data: XOR<ApiTokenCreateInput, ApiTokenUncheckedCreateInput>
+  }
+
+  /**
+   * ApiToken createMany
+   */
+  export type ApiTokenCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many ApiTokens.
+     */
+    data: ApiTokenCreateManyInput | ApiTokenCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * ApiToken createManyAndReturn
+   */
+  export type ApiTokenCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ApiToken
+     */
+    select?: ApiTokenSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ApiToken
+     */
+    omit?: ApiTokenOmit<ExtArgs> | null
+    /**
+     * The data used to create many ApiTokens.
+     */
+    data: ApiTokenCreateManyInput | ApiTokenCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApiTokenIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ApiToken update
+   */
+  export type ApiTokenUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ApiToken
+     */
+    select?: ApiTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ApiToken
+     */
+    omit?: ApiTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApiTokenInclude<ExtArgs> | null
+    /**
+     * The data needed to update a ApiToken.
+     */
+    data: XOR<ApiTokenUpdateInput, ApiTokenUncheckedUpdateInput>
+    /**
+     * Choose, which ApiToken to update.
+     */
+    where: ApiTokenWhereUniqueInput
+  }
+
+  /**
+   * ApiToken updateMany
+   */
+  export type ApiTokenUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update ApiTokens.
+     */
+    data: XOR<ApiTokenUpdateManyMutationInput, ApiTokenUncheckedUpdateManyInput>
+    /**
+     * Filter which ApiTokens to update
+     */
+    where?: ApiTokenWhereInput
+    /**
+     * Limit how many ApiTokens to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * ApiToken updateManyAndReturn
+   */
+  export type ApiTokenUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ApiToken
+     */
+    select?: ApiTokenSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the ApiToken
+     */
+    omit?: ApiTokenOmit<ExtArgs> | null
+    /**
+     * The data used to update ApiTokens.
+     */
+    data: XOR<ApiTokenUpdateManyMutationInput, ApiTokenUncheckedUpdateManyInput>
+    /**
+     * Filter which ApiTokens to update
+     */
+    where?: ApiTokenWhereInput
+    /**
+     * Limit how many ApiTokens to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApiTokenIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * ApiToken upsert
+   */
+  export type ApiTokenUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ApiToken
+     */
+    select?: ApiTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ApiToken
+     */
+    omit?: ApiTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApiTokenInclude<ExtArgs> | null
+    /**
+     * The filter to search for the ApiToken to update in case it exists.
+     */
+    where: ApiTokenWhereUniqueInput
+    /**
+     * In case the ApiToken found by the `where` argument doesn't exist, create a new ApiToken with this data.
+     */
+    create: XOR<ApiTokenCreateInput, ApiTokenUncheckedCreateInput>
+    /**
+     * In case the ApiToken was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<ApiTokenUpdateInput, ApiTokenUncheckedUpdateInput>
+  }
+
+  /**
+   * ApiToken delete
+   */
+  export type ApiTokenDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ApiToken
+     */
+    select?: ApiTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ApiToken
+     */
+    omit?: ApiTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApiTokenInclude<ExtArgs> | null
+    /**
+     * Filter which ApiToken to delete.
+     */
+    where: ApiTokenWhereUniqueInput
+  }
+
+  /**
+   * ApiToken deleteMany
+   */
+  export type ApiTokenDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which ApiTokens to delete
+     */
+    where?: ApiTokenWhereInput
+    /**
+     * Limit how many ApiTokens to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * ApiToken without action
+   */
+  export type ApiTokenDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the ApiToken
+     */
+    select?: ApiTokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the ApiToken
+     */
+    omit?: ApiTokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: ApiTokenInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -55043,6 +57654,39 @@ export namespace Prisma {
   export type ExportPresetScalarFieldEnum = (typeof ExportPresetScalarFieldEnum)[keyof typeof ExportPresetScalarFieldEnum]
 
 
+  export const DataExportJobScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    status: 'status',
+    includeArchived: 'includeArchived',
+    downloadUrl: 'downloadUrl',
+    fileSizeBytes: 'fileSizeBytes',
+    requestedAt: 'requestedAt',
+    startedAt: 'startedAt',
+    completedAt: 'completedAt',
+    expiresAt: 'expiresAt',
+    errorMessage: 'errorMessage'
+  };
+
+  export type DataExportJobScalarFieldEnum = (typeof DataExportJobScalarFieldEnum)[keyof typeof DataExportJobScalarFieldEnum]
+
+
+  export const ApiTokenScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    name: 'name',
+    tokenHash: 'tokenHash',
+    tokenPrefix: 'tokenPrefix',
+    scope: 'scope',
+    lastUsedAt: 'lastUsedAt',
+    requestCountThisMonth: 'requestCountThisMonth',
+    createdAt: 'createdAt',
+    revokedAt: 'revokedAt'
+  };
+
+  export type ApiTokenScalarFieldEnum = (typeof ApiTokenScalarFieldEnum)[keyof typeof ApiTokenScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
@@ -55664,6 +58308,34 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'DataExportStatus'
+   */
+  export type EnumDataExportStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DataExportStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'DataExportStatus[]'
+   */
+  export type ListEnumDataExportStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DataExportStatus[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'ApiTokenScope'
+   */
+  export type EnumApiTokenScopeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ApiTokenScope'>
+    
+
+
+  /**
+   * Reference to a field of type 'ApiTokenScope[]'
+   */
+  export type ListEnumApiTokenScopeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'ApiTokenScope[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -55735,6 +58407,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackListRelationFilter
     importMappingPresets?: ImportMappingPresetListRelationFilter
     exportPresets?: ExportPresetListRelationFilter
+    dataExportJobs?: DataExportJobListRelationFilter
+    apiTokens?: ApiTokenListRelationFilter
     failedLoginAttempts?: FailedLoginAttemptListRelationFilter
     onboardingState?: XOR<UserOnboardingStateNullableScalarRelationFilter, UserOnboardingStateWhereInput> | null
   }
@@ -55791,6 +58465,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackOrderByRelationAggregateInput
     importMappingPresets?: ImportMappingPresetOrderByRelationAggregateInput
     exportPresets?: ExportPresetOrderByRelationAggregateInput
+    dataExportJobs?: DataExportJobOrderByRelationAggregateInput
+    apiTokens?: ApiTokenOrderByRelationAggregateInput
     failedLoginAttempts?: FailedLoginAttemptOrderByRelationAggregateInput
     onboardingState?: UserOnboardingStateOrderByWithRelationInput
   }
@@ -55850,6 +58526,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackListRelationFilter
     importMappingPresets?: ImportMappingPresetListRelationFilter
     exportPresets?: ExportPresetListRelationFilter
+    dataExportJobs?: DataExportJobListRelationFilter
+    apiTokens?: ApiTokenListRelationFilter
     failedLoginAttempts?: FailedLoginAttemptListRelationFilter
     onboardingState?: XOR<UserOnboardingStateNullableScalarRelationFilter, UserOnboardingStateWhereInput> | null
   }, "id" | "email">
@@ -59655,6 +62333,176 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"ExportPreset"> | Date | string
   }
 
+  export type DataExportJobWhereInput = {
+    AND?: DataExportJobWhereInput | DataExportJobWhereInput[]
+    OR?: DataExportJobWhereInput[]
+    NOT?: DataExportJobWhereInput | DataExportJobWhereInput[]
+    id?: StringFilter<"DataExportJob"> | string
+    userId?: StringFilter<"DataExportJob"> | string
+    status?: EnumDataExportStatusFilter<"DataExportJob"> | $Enums.DataExportStatus
+    includeArchived?: BoolFilter<"DataExportJob"> | boolean
+    downloadUrl?: StringNullableFilter<"DataExportJob"> | string | null
+    fileSizeBytes?: IntNullableFilter<"DataExportJob"> | number | null
+    requestedAt?: DateTimeFilter<"DataExportJob"> | Date | string
+    startedAt?: DateTimeNullableFilter<"DataExportJob"> | Date | string | null
+    completedAt?: DateTimeNullableFilter<"DataExportJob"> | Date | string | null
+    expiresAt?: DateTimeNullableFilter<"DataExportJob"> | Date | string | null
+    errorMessage?: StringNullableFilter<"DataExportJob"> | string | null
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type DataExportJobOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    status?: SortOrder
+    includeArchived?: SortOrder
+    downloadUrl?: SortOrderInput | SortOrder
+    fileSizeBytes?: SortOrderInput | SortOrder
+    requestedAt?: SortOrder
+    startedAt?: SortOrderInput | SortOrder
+    completedAt?: SortOrderInput | SortOrder
+    expiresAt?: SortOrderInput | SortOrder
+    errorMessage?: SortOrderInput | SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type DataExportJobWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: DataExportJobWhereInput | DataExportJobWhereInput[]
+    OR?: DataExportJobWhereInput[]
+    NOT?: DataExportJobWhereInput | DataExportJobWhereInput[]
+    userId?: StringFilter<"DataExportJob"> | string
+    status?: EnumDataExportStatusFilter<"DataExportJob"> | $Enums.DataExportStatus
+    includeArchived?: BoolFilter<"DataExportJob"> | boolean
+    downloadUrl?: StringNullableFilter<"DataExportJob"> | string | null
+    fileSizeBytes?: IntNullableFilter<"DataExportJob"> | number | null
+    requestedAt?: DateTimeFilter<"DataExportJob"> | Date | string
+    startedAt?: DateTimeNullableFilter<"DataExportJob"> | Date | string | null
+    completedAt?: DateTimeNullableFilter<"DataExportJob"> | Date | string | null
+    expiresAt?: DateTimeNullableFilter<"DataExportJob"> | Date | string | null
+    errorMessage?: StringNullableFilter<"DataExportJob"> | string | null
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type DataExportJobOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    status?: SortOrder
+    includeArchived?: SortOrder
+    downloadUrl?: SortOrderInput | SortOrder
+    fileSizeBytes?: SortOrderInput | SortOrder
+    requestedAt?: SortOrder
+    startedAt?: SortOrderInput | SortOrder
+    completedAt?: SortOrderInput | SortOrder
+    expiresAt?: SortOrderInput | SortOrder
+    errorMessage?: SortOrderInput | SortOrder
+    _count?: DataExportJobCountOrderByAggregateInput
+    _avg?: DataExportJobAvgOrderByAggregateInput
+    _max?: DataExportJobMaxOrderByAggregateInput
+    _min?: DataExportJobMinOrderByAggregateInput
+    _sum?: DataExportJobSumOrderByAggregateInput
+  }
+
+  export type DataExportJobScalarWhereWithAggregatesInput = {
+    AND?: DataExportJobScalarWhereWithAggregatesInput | DataExportJobScalarWhereWithAggregatesInput[]
+    OR?: DataExportJobScalarWhereWithAggregatesInput[]
+    NOT?: DataExportJobScalarWhereWithAggregatesInput | DataExportJobScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"DataExportJob"> | string
+    userId?: StringWithAggregatesFilter<"DataExportJob"> | string
+    status?: EnumDataExportStatusWithAggregatesFilter<"DataExportJob"> | $Enums.DataExportStatus
+    includeArchived?: BoolWithAggregatesFilter<"DataExportJob"> | boolean
+    downloadUrl?: StringNullableWithAggregatesFilter<"DataExportJob"> | string | null
+    fileSizeBytes?: IntNullableWithAggregatesFilter<"DataExportJob"> | number | null
+    requestedAt?: DateTimeWithAggregatesFilter<"DataExportJob"> | Date | string
+    startedAt?: DateTimeNullableWithAggregatesFilter<"DataExportJob"> | Date | string | null
+    completedAt?: DateTimeNullableWithAggregatesFilter<"DataExportJob"> | Date | string | null
+    expiresAt?: DateTimeNullableWithAggregatesFilter<"DataExportJob"> | Date | string | null
+    errorMessage?: StringNullableWithAggregatesFilter<"DataExportJob"> | string | null
+  }
+
+  export type ApiTokenWhereInput = {
+    AND?: ApiTokenWhereInput | ApiTokenWhereInput[]
+    OR?: ApiTokenWhereInput[]
+    NOT?: ApiTokenWhereInput | ApiTokenWhereInput[]
+    id?: StringFilter<"ApiToken"> | string
+    userId?: StringFilter<"ApiToken"> | string
+    name?: StringFilter<"ApiToken"> | string
+    tokenHash?: StringFilter<"ApiToken"> | string
+    tokenPrefix?: StringFilter<"ApiToken"> | string
+    scope?: EnumApiTokenScopeFilter<"ApiToken"> | $Enums.ApiTokenScope
+    lastUsedAt?: DateTimeNullableFilter<"ApiToken"> | Date | string | null
+    requestCountThisMonth?: IntFilter<"ApiToken"> | number
+    createdAt?: DateTimeFilter<"ApiToken"> | Date | string
+    revokedAt?: DateTimeNullableFilter<"ApiToken"> | Date | string | null
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type ApiTokenOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    tokenHash?: SortOrder
+    tokenPrefix?: SortOrder
+    scope?: SortOrder
+    lastUsedAt?: SortOrderInput | SortOrder
+    requestCountThisMonth?: SortOrder
+    createdAt?: SortOrder
+    revokedAt?: SortOrderInput | SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type ApiTokenWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    tokenHash?: string
+    userId_name?: ApiTokenUserIdNameCompoundUniqueInput
+    AND?: ApiTokenWhereInput | ApiTokenWhereInput[]
+    OR?: ApiTokenWhereInput[]
+    NOT?: ApiTokenWhereInput | ApiTokenWhereInput[]
+    userId?: StringFilter<"ApiToken"> | string
+    name?: StringFilter<"ApiToken"> | string
+    tokenPrefix?: StringFilter<"ApiToken"> | string
+    scope?: EnumApiTokenScopeFilter<"ApiToken"> | $Enums.ApiTokenScope
+    lastUsedAt?: DateTimeNullableFilter<"ApiToken"> | Date | string | null
+    requestCountThisMonth?: IntFilter<"ApiToken"> | number
+    createdAt?: DateTimeFilter<"ApiToken"> | Date | string
+    revokedAt?: DateTimeNullableFilter<"ApiToken"> | Date | string | null
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "tokenHash" | "userId_name">
+
+  export type ApiTokenOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    tokenHash?: SortOrder
+    tokenPrefix?: SortOrder
+    scope?: SortOrder
+    lastUsedAt?: SortOrderInput | SortOrder
+    requestCountThisMonth?: SortOrder
+    createdAt?: SortOrder
+    revokedAt?: SortOrderInput | SortOrder
+    _count?: ApiTokenCountOrderByAggregateInput
+    _avg?: ApiTokenAvgOrderByAggregateInput
+    _max?: ApiTokenMaxOrderByAggregateInput
+    _min?: ApiTokenMinOrderByAggregateInput
+    _sum?: ApiTokenSumOrderByAggregateInput
+  }
+
+  export type ApiTokenScalarWhereWithAggregatesInput = {
+    AND?: ApiTokenScalarWhereWithAggregatesInput | ApiTokenScalarWhereWithAggregatesInput[]
+    OR?: ApiTokenScalarWhereWithAggregatesInput[]
+    NOT?: ApiTokenScalarWhereWithAggregatesInput | ApiTokenScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"ApiToken"> | string
+    userId?: StringWithAggregatesFilter<"ApiToken"> | string
+    name?: StringWithAggregatesFilter<"ApiToken"> | string
+    tokenHash?: StringWithAggregatesFilter<"ApiToken"> | string
+    tokenPrefix?: StringWithAggregatesFilter<"ApiToken"> | string
+    scope?: EnumApiTokenScopeWithAggregatesFilter<"ApiToken"> | $Enums.ApiTokenScope
+    lastUsedAt?: DateTimeNullableWithAggregatesFilter<"ApiToken"> | Date | string | null
+    requestCountThisMonth?: IntWithAggregatesFilter<"ApiToken"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"ApiToken"> | Date | string
+    revokedAt?: DateTimeNullableWithAggregatesFilter<"ApiToken"> | Date | string | null
+  }
+
   export type UserCreateInput = {
     id?: string
     name?: string | null
@@ -59707,6 +62555,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -59763,6 +62613,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -59819,6 +62671,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -59875,6 +62729,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -64169,6 +67025,193 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type DataExportJobCreateInput = {
+    id?: string
+    status?: $Enums.DataExportStatus
+    includeArchived?: boolean
+    downloadUrl?: string | null
+    fileSizeBytes?: number | null
+    requestedAt?: Date | string
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    expiresAt?: Date | string | null
+    errorMessage?: string | null
+    user: UserCreateNestedOneWithoutDataExportJobsInput
+  }
+
+  export type DataExportJobUncheckedCreateInput = {
+    id?: string
+    userId: string
+    status?: $Enums.DataExportStatus
+    includeArchived?: boolean
+    downloadUrl?: string | null
+    fileSizeBytes?: number | null
+    requestedAt?: Date | string
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    expiresAt?: Date | string | null
+    errorMessage?: string | null
+  }
+
+  export type DataExportJobUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumDataExportStatusFieldUpdateOperationsInput | $Enums.DataExportStatus
+    includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    downloadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneRequiredWithoutDataExportJobsNestedInput
+  }
+
+  export type DataExportJobUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    status?: EnumDataExportStatusFieldUpdateOperationsInput | $Enums.DataExportStatus
+    includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    downloadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type DataExportJobCreateManyInput = {
+    id?: string
+    userId: string
+    status?: $Enums.DataExportStatus
+    includeArchived?: boolean
+    downloadUrl?: string | null
+    fileSizeBytes?: number | null
+    requestedAt?: Date | string
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    expiresAt?: Date | string | null
+    errorMessage?: string | null
+  }
+
+  export type DataExportJobUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumDataExportStatusFieldUpdateOperationsInput | $Enums.DataExportStatus
+    includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    downloadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type DataExportJobUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    status?: EnumDataExportStatusFieldUpdateOperationsInput | $Enums.DataExportStatus
+    includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    downloadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type ApiTokenCreateInput = {
+    id?: string
+    name: string
+    tokenHash: string
+    tokenPrefix: string
+    scope?: $Enums.ApiTokenScope
+    lastUsedAt?: Date | string | null
+    requestCountThisMonth?: number
+    createdAt?: Date | string
+    revokedAt?: Date | string | null
+    user: UserCreateNestedOneWithoutApiTokensInput
+  }
+
+  export type ApiTokenUncheckedCreateInput = {
+    id?: string
+    userId: string
+    name: string
+    tokenHash: string
+    tokenPrefix: string
+    scope?: $Enums.ApiTokenScope
+    lastUsedAt?: Date | string | null
+    requestCountThisMonth?: number
+    createdAt?: Date | string
+    revokedAt?: Date | string | null
+  }
+
+  export type ApiTokenUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    tokenPrefix?: StringFieldUpdateOperationsInput | string
+    scope?: EnumApiTokenScopeFieldUpdateOperationsInput | $Enums.ApiTokenScope
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    requestCountThisMonth?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    user?: UserUpdateOneRequiredWithoutApiTokensNestedInput
+  }
+
+  export type ApiTokenUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    tokenPrefix?: StringFieldUpdateOperationsInput | string
+    scope?: EnumApiTokenScopeFieldUpdateOperationsInput | $Enums.ApiTokenScope
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    requestCountThisMonth?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ApiTokenCreateManyInput = {
+    id?: string
+    userId: string
+    name: string
+    tokenHash: string
+    tokenPrefix: string
+    scope?: $Enums.ApiTokenScope
+    lastUsedAt?: Date | string | null
+    requestCountThisMonth?: number
+    createdAt?: Date | string
+    revokedAt?: Date | string | null
+  }
+
+  export type ApiTokenUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    tokenPrefix?: StringFieldUpdateOperationsInput | string
+    scope?: EnumApiTokenScopeFieldUpdateOperationsInput | $Enums.ApiTokenScope
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    requestCountThisMonth?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ApiTokenUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    tokenPrefix?: StringFieldUpdateOperationsInput | string
+    scope?: EnumApiTokenScopeFieldUpdateOperationsInput | $Enums.ApiTokenScope
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    requestCountThisMonth?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -64418,6 +67461,18 @@ export namespace Prisma {
     none?: ExportPresetWhereInput
   }
 
+  export type DataExportJobListRelationFilter = {
+    every?: DataExportJobWhereInput
+    some?: DataExportJobWhereInput
+    none?: DataExportJobWhereInput
+  }
+
+  export type ApiTokenListRelationFilter = {
+    every?: ApiTokenWhereInput
+    some?: ApiTokenWhereInput
+    none?: ApiTokenWhereInput
+  }
+
   export type FailedLoginAttemptListRelationFilter = {
     every?: FailedLoginAttemptWhereInput
     some?: FailedLoginAttemptWhereInput
@@ -64531,6 +67586,14 @@ export namespace Prisma {
   }
 
   export type ExportPresetOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type DataExportJobOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type ApiTokenOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -67557,6 +70620,142 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
+  export type EnumDataExportStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.DataExportStatus | EnumDataExportStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.DataExportStatus[] | ListEnumDataExportStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DataExportStatus[] | ListEnumDataExportStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumDataExportStatusFilter<$PrismaModel> | $Enums.DataExportStatus
+  }
+
+  export type DataExportJobCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    status?: SortOrder
+    includeArchived?: SortOrder
+    downloadUrl?: SortOrder
+    fileSizeBytes?: SortOrder
+    requestedAt?: SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrder
+    expiresAt?: SortOrder
+    errorMessage?: SortOrder
+  }
+
+  export type DataExportJobAvgOrderByAggregateInput = {
+    fileSizeBytes?: SortOrder
+  }
+
+  export type DataExportJobMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    status?: SortOrder
+    includeArchived?: SortOrder
+    downloadUrl?: SortOrder
+    fileSizeBytes?: SortOrder
+    requestedAt?: SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrder
+    expiresAt?: SortOrder
+    errorMessage?: SortOrder
+  }
+
+  export type DataExportJobMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    status?: SortOrder
+    includeArchived?: SortOrder
+    downloadUrl?: SortOrder
+    fileSizeBytes?: SortOrder
+    requestedAt?: SortOrder
+    startedAt?: SortOrder
+    completedAt?: SortOrder
+    expiresAt?: SortOrder
+    errorMessage?: SortOrder
+  }
+
+  export type DataExportJobSumOrderByAggregateInput = {
+    fileSizeBytes?: SortOrder
+  }
+
+  export type EnumDataExportStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DataExportStatus | EnumDataExportStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.DataExportStatus[] | ListEnumDataExportStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DataExportStatus[] | ListEnumDataExportStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumDataExportStatusWithAggregatesFilter<$PrismaModel> | $Enums.DataExportStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDataExportStatusFilter<$PrismaModel>
+    _max?: NestedEnumDataExportStatusFilter<$PrismaModel>
+  }
+
+  export type EnumApiTokenScopeFilter<$PrismaModel = never> = {
+    equals?: $Enums.ApiTokenScope | EnumApiTokenScopeFieldRefInput<$PrismaModel>
+    in?: $Enums.ApiTokenScope[] | ListEnumApiTokenScopeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ApiTokenScope[] | ListEnumApiTokenScopeFieldRefInput<$PrismaModel>
+    not?: NestedEnumApiTokenScopeFilter<$PrismaModel> | $Enums.ApiTokenScope
+  }
+
+  export type ApiTokenUserIdNameCompoundUniqueInput = {
+    userId: string
+    name: string
+  }
+
+  export type ApiTokenCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    tokenHash?: SortOrder
+    tokenPrefix?: SortOrder
+    scope?: SortOrder
+    lastUsedAt?: SortOrder
+    requestCountThisMonth?: SortOrder
+    createdAt?: SortOrder
+    revokedAt?: SortOrder
+  }
+
+  export type ApiTokenAvgOrderByAggregateInput = {
+    requestCountThisMonth?: SortOrder
+  }
+
+  export type ApiTokenMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    tokenHash?: SortOrder
+    tokenPrefix?: SortOrder
+    scope?: SortOrder
+    lastUsedAt?: SortOrder
+    requestCountThisMonth?: SortOrder
+    createdAt?: SortOrder
+    revokedAt?: SortOrder
+  }
+
+  export type ApiTokenMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    tokenHash?: SortOrder
+    tokenPrefix?: SortOrder
+    scope?: SortOrder
+    lastUsedAt?: SortOrder
+    requestCountThisMonth?: SortOrder
+    createdAt?: SortOrder
+    revokedAt?: SortOrder
+  }
+
+  export type ApiTokenSumOrderByAggregateInput = {
+    requestCountThisMonth?: SortOrder
+  }
+
+  export type EnumApiTokenScopeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ApiTokenScope | EnumApiTokenScopeFieldRefInput<$PrismaModel>
+    in?: $Enums.ApiTokenScope[] | ListEnumApiTokenScopeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ApiTokenScope[] | ListEnumApiTokenScopeFieldRefInput<$PrismaModel>
+    not?: NestedEnumApiTokenScopeWithAggregatesFilter<$PrismaModel> | $Enums.ApiTokenScope
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumApiTokenScopeFilter<$PrismaModel>
+    _max?: NestedEnumApiTokenScopeFilter<$PrismaModel>
+  }
+
   export type AppPasswordCreateNestedManyWithoutUserInput = {
     create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
@@ -67749,6 +70948,20 @@ export namespace Prisma {
     connectOrCreate?: ExportPresetCreateOrConnectWithoutUserInput | ExportPresetCreateOrConnectWithoutUserInput[]
     createMany?: ExportPresetCreateManyUserInputEnvelope
     connect?: ExportPresetWhereUniqueInput | ExportPresetWhereUniqueInput[]
+  }
+
+  export type DataExportJobCreateNestedManyWithoutUserInput = {
+    create?: XOR<DataExportJobCreateWithoutUserInput, DataExportJobUncheckedCreateWithoutUserInput> | DataExportJobCreateWithoutUserInput[] | DataExportJobUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: DataExportJobCreateOrConnectWithoutUserInput | DataExportJobCreateOrConnectWithoutUserInput[]
+    createMany?: DataExportJobCreateManyUserInputEnvelope
+    connect?: DataExportJobWhereUniqueInput | DataExportJobWhereUniqueInput[]
+  }
+
+  export type ApiTokenCreateNestedManyWithoutUserInput = {
+    create?: XOR<ApiTokenCreateWithoutUserInput, ApiTokenUncheckedCreateWithoutUserInput> | ApiTokenCreateWithoutUserInput[] | ApiTokenUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ApiTokenCreateOrConnectWithoutUserInput | ApiTokenCreateOrConnectWithoutUserInput[]
+    createMany?: ApiTokenCreateManyUserInputEnvelope
+    connect?: ApiTokenWhereUniqueInput | ApiTokenWhereUniqueInput[]
   }
 
   export type FailedLoginAttemptCreateNestedManyWithoutUserInput = {
@@ -67956,6 +71169,20 @@ export namespace Prisma {
     connectOrCreate?: ExportPresetCreateOrConnectWithoutUserInput | ExportPresetCreateOrConnectWithoutUserInput[]
     createMany?: ExportPresetCreateManyUserInputEnvelope
     connect?: ExportPresetWhereUniqueInput | ExportPresetWhereUniqueInput[]
+  }
+
+  export type DataExportJobUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<DataExportJobCreateWithoutUserInput, DataExportJobUncheckedCreateWithoutUserInput> | DataExportJobCreateWithoutUserInput[] | DataExportJobUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: DataExportJobCreateOrConnectWithoutUserInput | DataExportJobCreateOrConnectWithoutUserInput[]
+    createMany?: DataExportJobCreateManyUserInputEnvelope
+    connect?: DataExportJobWhereUniqueInput | DataExportJobWhereUniqueInput[]
+  }
+
+  export type ApiTokenUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<ApiTokenCreateWithoutUserInput, ApiTokenUncheckedCreateWithoutUserInput> | ApiTokenCreateWithoutUserInput[] | ApiTokenUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ApiTokenCreateOrConnectWithoutUserInput | ApiTokenCreateOrConnectWithoutUserInput[]
+    createMany?: ApiTokenCreateManyUserInputEnvelope
+    connect?: ApiTokenWhereUniqueInput | ApiTokenWhereUniqueInput[]
   }
 
   export type FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput = {
@@ -68395,6 +71622,34 @@ export namespace Prisma {
     deleteMany?: ExportPresetScalarWhereInput | ExportPresetScalarWhereInput[]
   }
 
+  export type DataExportJobUpdateManyWithoutUserNestedInput = {
+    create?: XOR<DataExportJobCreateWithoutUserInput, DataExportJobUncheckedCreateWithoutUserInput> | DataExportJobCreateWithoutUserInput[] | DataExportJobUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: DataExportJobCreateOrConnectWithoutUserInput | DataExportJobCreateOrConnectWithoutUserInput[]
+    upsert?: DataExportJobUpsertWithWhereUniqueWithoutUserInput | DataExportJobUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: DataExportJobCreateManyUserInputEnvelope
+    set?: DataExportJobWhereUniqueInput | DataExportJobWhereUniqueInput[]
+    disconnect?: DataExportJobWhereUniqueInput | DataExportJobWhereUniqueInput[]
+    delete?: DataExportJobWhereUniqueInput | DataExportJobWhereUniqueInput[]
+    connect?: DataExportJobWhereUniqueInput | DataExportJobWhereUniqueInput[]
+    update?: DataExportJobUpdateWithWhereUniqueWithoutUserInput | DataExportJobUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: DataExportJobUpdateManyWithWhereWithoutUserInput | DataExportJobUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: DataExportJobScalarWhereInput | DataExportJobScalarWhereInput[]
+  }
+
+  export type ApiTokenUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ApiTokenCreateWithoutUserInput, ApiTokenUncheckedCreateWithoutUserInput> | ApiTokenCreateWithoutUserInput[] | ApiTokenUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ApiTokenCreateOrConnectWithoutUserInput | ApiTokenCreateOrConnectWithoutUserInput[]
+    upsert?: ApiTokenUpsertWithWhereUniqueWithoutUserInput | ApiTokenUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ApiTokenCreateManyUserInputEnvelope
+    set?: ApiTokenWhereUniqueInput | ApiTokenWhereUniqueInput[]
+    disconnect?: ApiTokenWhereUniqueInput | ApiTokenWhereUniqueInput[]
+    delete?: ApiTokenWhereUniqueInput | ApiTokenWhereUniqueInput[]
+    connect?: ApiTokenWhereUniqueInput | ApiTokenWhereUniqueInput[]
+    update?: ApiTokenUpdateWithWhereUniqueWithoutUserInput | ApiTokenUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ApiTokenUpdateManyWithWhereWithoutUserInput | ApiTokenUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ApiTokenScalarWhereInput | ApiTokenScalarWhereInput[]
+  }
+
   export type FailedLoginAttemptUpdateManyWithoutUserNestedInput = {
     create?: XOR<FailedLoginAttemptCreateWithoutUserInput, FailedLoginAttemptUncheckedCreateWithoutUserInput> | FailedLoginAttemptCreateWithoutUserInput[] | FailedLoginAttemptUncheckedCreateWithoutUserInput[]
     connectOrCreate?: FailedLoginAttemptCreateOrConnectWithoutUserInput | FailedLoginAttemptCreateOrConnectWithoutUserInput[]
@@ -68801,6 +72056,34 @@ export namespace Prisma {
     update?: ExportPresetUpdateWithWhereUniqueWithoutUserInput | ExportPresetUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: ExportPresetUpdateManyWithWhereWithoutUserInput | ExportPresetUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: ExportPresetScalarWhereInput | ExportPresetScalarWhereInput[]
+  }
+
+  export type DataExportJobUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<DataExportJobCreateWithoutUserInput, DataExportJobUncheckedCreateWithoutUserInput> | DataExportJobCreateWithoutUserInput[] | DataExportJobUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: DataExportJobCreateOrConnectWithoutUserInput | DataExportJobCreateOrConnectWithoutUserInput[]
+    upsert?: DataExportJobUpsertWithWhereUniqueWithoutUserInput | DataExportJobUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: DataExportJobCreateManyUserInputEnvelope
+    set?: DataExportJobWhereUniqueInput | DataExportJobWhereUniqueInput[]
+    disconnect?: DataExportJobWhereUniqueInput | DataExportJobWhereUniqueInput[]
+    delete?: DataExportJobWhereUniqueInput | DataExportJobWhereUniqueInput[]
+    connect?: DataExportJobWhereUniqueInput | DataExportJobWhereUniqueInput[]
+    update?: DataExportJobUpdateWithWhereUniqueWithoutUserInput | DataExportJobUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: DataExportJobUpdateManyWithWhereWithoutUserInput | DataExportJobUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: DataExportJobScalarWhereInput | DataExportJobScalarWhereInput[]
+  }
+
+  export type ApiTokenUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<ApiTokenCreateWithoutUserInput, ApiTokenUncheckedCreateWithoutUserInput> | ApiTokenCreateWithoutUserInput[] | ApiTokenUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: ApiTokenCreateOrConnectWithoutUserInput | ApiTokenCreateOrConnectWithoutUserInput[]
+    upsert?: ApiTokenUpsertWithWhereUniqueWithoutUserInput | ApiTokenUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: ApiTokenCreateManyUserInputEnvelope
+    set?: ApiTokenWhereUniqueInput | ApiTokenWhereUniqueInput[]
+    disconnect?: ApiTokenWhereUniqueInput | ApiTokenWhereUniqueInput[]
+    delete?: ApiTokenWhereUniqueInput | ApiTokenWhereUniqueInput[]
+    connect?: ApiTokenWhereUniqueInput | ApiTokenWhereUniqueInput[]
+    update?: ApiTokenUpdateWithWhereUniqueWithoutUserInput | ApiTokenUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: ApiTokenUpdateManyWithWhereWithoutUserInput | ApiTokenUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: ApiTokenScalarWhereInput | ApiTokenScalarWhereInput[]
   }
 
   export type FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput = {
@@ -70990,6 +74273,42 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutExportPresetsInput, UserUpdateWithoutExportPresetsInput>, UserUncheckedUpdateWithoutExportPresetsInput>
   }
 
+  export type UserCreateNestedOneWithoutDataExportJobsInput = {
+    create?: XOR<UserCreateWithoutDataExportJobsInput, UserUncheckedCreateWithoutDataExportJobsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDataExportJobsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type EnumDataExportStatusFieldUpdateOperationsInput = {
+    set?: $Enums.DataExportStatus
+  }
+
+  export type UserUpdateOneRequiredWithoutDataExportJobsNestedInput = {
+    create?: XOR<UserCreateWithoutDataExportJobsInput, UserUncheckedCreateWithoutDataExportJobsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDataExportJobsInput
+    upsert?: UserUpsertWithoutDataExportJobsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutDataExportJobsInput, UserUpdateWithoutDataExportJobsInput>, UserUncheckedUpdateWithoutDataExportJobsInput>
+  }
+
+  export type UserCreateNestedOneWithoutApiTokensInput = {
+    create?: XOR<UserCreateWithoutApiTokensInput, UserUncheckedCreateWithoutApiTokensInput>
+    connectOrCreate?: UserCreateOrConnectWithoutApiTokensInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type EnumApiTokenScopeFieldUpdateOperationsInput = {
+    set?: $Enums.ApiTokenScope
+  }
+
+  export type UserUpdateOneRequiredWithoutApiTokensNestedInput = {
+    create?: XOR<UserCreateWithoutApiTokensInput, UserUncheckedCreateWithoutApiTokensInput>
+    connectOrCreate?: UserCreateOrConnectWithoutApiTokensInput
+    upsert?: UserUpsertWithoutApiTokensInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutApiTokensInput, UserUpdateWithoutApiTokensInput>, UserUncheckedUpdateWithoutApiTokensInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -71847,6 +75166,40 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumDigestCadenceFilter<$PrismaModel>
     _max?: NestedEnumDigestCadenceFilter<$PrismaModel>
+  }
+
+  export type NestedEnumDataExportStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.DataExportStatus | EnumDataExportStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.DataExportStatus[] | ListEnumDataExportStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DataExportStatus[] | ListEnumDataExportStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumDataExportStatusFilter<$PrismaModel> | $Enums.DataExportStatus
+  }
+
+  export type NestedEnumDataExportStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.DataExportStatus | EnumDataExportStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.DataExportStatus[] | ListEnumDataExportStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.DataExportStatus[] | ListEnumDataExportStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumDataExportStatusWithAggregatesFilter<$PrismaModel> | $Enums.DataExportStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumDataExportStatusFilter<$PrismaModel>
+    _max?: NestedEnumDataExportStatusFilter<$PrismaModel>
+  }
+
+  export type NestedEnumApiTokenScopeFilter<$PrismaModel = never> = {
+    equals?: $Enums.ApiTokenScope | EnumApiTokenScopeFieldRefInput<$PrismaModel>
+    in?: $Enums.ApiTokenScope[] | ListEnumApiTokenScopeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ApiTokenScope[] | ListEnumApiTokenScopeFieldRefInput<$PrismaModel>
+    not?: NestedEnumApiTokenScopeFilter<$PrismaModel> | $Enums.ApiTokenScope
+  }
+
+  export type NestedEnumApiTokenScopeWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.ApiTokenScope | EnumApiTokenScopeFieldRefInput<$PrismaModel>
+    in?: $Enums.ApiTokenScope[] | ListEnumApiTokenScopeFieldRefInput<$PrismaModel>
+    notIn?: $Enums.ApiTokenScope[] | ListEnumApiTokenScopeFieldRefInput<$PrismaModel>
+    not?: NestedEnumApiTokenScopeWithAggregatesFilter<$PrismaModel> | $Enums.ApiTokenScope
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumApiTokenScopeFilter<$PrismaModel>
+    _max?: NestedEnumApiTokenScopeFilter<$PrismaModel>
   }
 
   export type AppPasswordCreateWithoutUserInput = {
@@ -73027,6 +76380,76 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type DataExportJobCreateWithoutUserInput = {
+    id?: string
+    status?: $Enums.DataExportStatus
+    includeArchived?: boolean
+    downloadUrl?: string | null
+    fileSizeBytes?: number | null
+    requestedAt?: Date | string
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    expiresAt?: Date | string | null
+    errorMessage?: string | null
+  }
+
+  export type DataExportJobUncheckedCreateWithoutUserInput = {
+    id?: string
+    status?: $Enums.DataExportStatus
+    includeArchived?: boolean
+    downloadUrl?: string | null
+    fileSizeBytes?: number | null
+    requestedAt?: Date | string
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    expiresAt?: Date | string | null
+    errorMessage?: string | null
+  }
+
+  export type DataExportJobCreateOrConnectWithoutUserInput = {
+    where: DataExportJobWhereUniqueInput
+    create: XOR<DataExportJobCreateWithoutUserInput, DataExportJobUncheckedCreateWithoutUserInput>
+  }
+
+  export type DataExportJobCreateManyUserInputEnvelope = {
+    data: DataExportJobCreateManyUserInput | DataExportJobCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type ApiTokenCreateWithoutUserInput = {
+    id?: string
+    name: string
+    tokenHash: string
+    tokenPrefix: string
+    scope?: $Enums.ApiTokenScope
+    lastUsedAt?: Date | string | null
+    requestCountThisMonth?: number
+    createdAt?: Date | string
+    revokedAt?: Date | string | null
+  }
+
+  export type ApiTokenUncheckedCreateWithoutUserInput = {
+    id?: string
+    name: string
+    tokenHash: string
+    tokenPrefix: string
+    scope?: $Enums.ApiTokenScope
+    lastUsedAt?: Date | string | null
+    requestCountThisMonth?: number
+    createdAt?: Date | string
+    revokedAt?: Date | string | null
+  }
+
+  export type ApiTokenCreateOrConnectWithoutUserInput = {
+    where: ApiTokenWhereUniqueInput
+    create: XOR<ApiTokenCreateWithoutUserInput, ApiTokenUncheckedCreateWithoutUserInput>
+  }
+
+  export type ApiTokenCreateManyUserInputEnvelope = {
+    data: ApiTokenCreateManyUserInput | ApiTokenCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type FailedLoginAttemptCreateWithoutUserInput = {
     id?: string
     ipAddress?: string | null
@@ -74046,6 +77469,71 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"ExportPreset"> | Date | string
   }
 
+  export type DataExportJobUpsertWithWhereUniqueWithoutUserInput = {
+    where: DataExportJobWhereUniqueInput
+    update: XOR<DataExportJobUpdateWithoutUserInput, DataExportJobUncheckedUpdateWithoutUserInput>
+    create: XOR<DataExportJobCreateWithoutUserInput, DataExportJobUncheckedCreateWithoutUserInput>
+  }
+
+  export type DataExportJobUpdateWithWhereUniqueWithoutUserInput = {
+    where: DataExportJobWhereUniqueInput
+    data: XOR<DataExportJobUpdateWithoutUserInput, DataExportJobUncheckedUpdateWithoutUserInput>
+  }
+
+  export type DataExportJobUpdateManyWithWhereWithoutUserInput = {
+    where: DataExportJobScalarWhereInput
+    data: XOR<DataExportJobUpdateManyMutationInput, DataExportJobUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type DataExportJobScalarWhereInput = {
+    AND?: DataExportJobScalarWhereInput | DataExportJobScalarWhereInput[]
+    OR?: DataExportJobScalarWhereInput[]
+    NOT?: DataExportJobScalarWhereInput | DataExportJobScalarWhereInput[]
+    id?: StringFilter<"DataExportJob"> | string
+    userId?: StringFilter<"DataExportJob"> | string
+    status?: EnumDataExportStatusFilter<"DataExportJob"> | $Enums.DataExportStatus
+    includeArchived?: BoolFilter<"DataExportJob"> | boolean
+    downloadUrl?: StringNullableFilter<"DataExportJob"> | string | null
+    fileSizeBytes?: IntNullableFilter<"DataExportJob"> | number | null
+    requestedAt?: DateTimeFilter<"DataExportJob"> | Date | string
+    startedAt?: DateTimeNullableFilter<"DataExportJob"> | Date | string | null
+    completedAt?: DateTimeNullableFilter<"DataExportJob"> | Date | string | null
+    expiresAt?: DateTimeNullableFilter<"DataExportJob"> | Date | string | null
+    errorMessage?: StringNullableFilter<"DataExportJob"> | string | null
+  }
+
+  export type ApiTokenUpsertWithWhereUniqueWithoutUserInput = {
+    where: ApiTokenWhereUniqueInput
+    update: XOR<ApiTokenUpdateWithoutUserInput, ApiTokenUncheckedUpdateWithoutUserInput>
+    create: XOR<ApiTokenCreateWithoutUserInput, ApiTokenUncheckedCreateWithoutUserInput>
+  }
+
+  export type ApiTokenUpdateWithWhereUniqueWithoutUserInput = {
+    where: ApiTokenWhereUniqueInput
+    data: XOR<ApiTokenUpdateWithoutUserInput, ApiTokenUncheckedUpdateWithoutUserInput>
+  }
+
+  export type ApiTokenUpdateManyWithWhereWithoutUserInput = {
+    where: ApiTokenScalarWhereInput
+    data: XOR<ApiTokenUpdateManyMutationInput, ApiTokenUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type ApiTokenScalarWhereInput = {
+    AND?: ApiTokenScalarWhereInput | ApiTokenScalarWhereInput[]
+    OR?: ApiTokenScalarWhereInput[]
+    NOT?: ApiTokenScalarWhereInput | ApiTokenScalarWhereInput[]
+    id?: StringFilter<"ApiToken"> | string
+    userId?: StringFilter<"ApiToken"> | string
+    name?: StringFilter<"ApiToken"> | string
+    tokenHash?: StringFilter<"ApiToken"> | string
+    tokenPrefix?: StringFilter<"ApiToken"> | string
+    scope?: EnumApiTokenScopeFilter<"ApiToken"> | $Enums.ApiTokenScope
+    lastUsedAt?: DateTimeNullableFilter<"ApiToken"> | Date | string | null
+    requestCountThisMonth?: IntFilter<"ApiToken"> | number
+    createdAt?: DateTimeFilter<"ApiToken"> | Date | string
+    revokedAt?: DateTimeNullableFilter<"ApiToken"> | Date | string | null
+  }
+
   export type FailedLoginAttemptUpsertWithWhereUniqueWithoutUserInput = {
     where: FailedLoginAttemptWhereUniqueInput
     update: XOR<FailedLoginAttemptUpdateWithoutUserInput, FailedLoginAttemptUncheckedUpdateWithoutUserInput>
@@ -74157,6 +77645,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
   }
 
@@ -74212,6 +77702,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
   }
 
@@ -74283,6 +77775,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
   }
 
@@ -74338,6 +77832,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
   }
 
@@ -74392,6 +77888,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -74447,6 +77945,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -74572,6 +78072,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -74627,6 +78129,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -74724,6 +78228,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -74779,6 +78285,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -75573,6 +79081,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -75628,6 +79138,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -76109,6 +79621,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -76164,6 +79678,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -76315,6 +79831,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -76370,6 +79888,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -76441,6 +79961,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -76496,6 +80018,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -76632,6 +80156,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -76687,6 +80213,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -76789,6 +80317,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -76844,6 +80374,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -77047,6 +80579,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -77102,6 +80636,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -77173,6 +80709,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -77228,6 +80766,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -77299,6 +80839,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -77354,6 +80896,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -77409,6 +80953,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -77464,6 +81010,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -77827,6 +81375,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -77882,6 +81432,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -78262,6 +81814,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -78317,6 +81871,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -78437,6 +81993,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -78492,6 +82050,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -78547,6 +82107,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -78602,6 +82164,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -78881,6 +82445,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -78936,6 +82502,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -80500,6 +84068,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -80555,6 +84125,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -80626,6 +84198,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -80681,6 +84255,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -80736,6 +84312,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -80791,6 +84369,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -80862,6 +84442,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -80917,6 +84499,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -80972,6 +84556,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -81027,6 +84613,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -81098,6 +84686,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -81153,6 +84743,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -81208,6 +84800,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -81263,6 +84857,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -81334,6 +84930,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -81389,6 +84987,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -81444,6 +85044,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -81499,6 +85101,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -81697,6 +85301,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -81752,6 +85358,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -81940,6 +85548,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -81995,6 +85605,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -82066,6 +85678,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -82121,6 +85735,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -82176,6 +85792,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -82231,6 +85849,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -82481,6 +86101,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -82536,6 +86158,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -82782,6 +86406,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -82837,6 +86463,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -82949,6 +86577,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -83004,6 +86634,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -83219,6 +86851,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -83274,6 +86908,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -83477,6 +87113,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -83532,6 +87170,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -83603,6 +87243,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -83658,6 +87300,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -83729,6 +87373,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -83784,6 +87430,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -84471,6 +88119,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -84526,6 +88176,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -84713,6 +88365,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -84768,6 +88422,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -84966,6 +88622,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -85021,6 +88679,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -85220,6 +88880,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -85275,6 +88937,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -85463,6 +89127,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -85518,6 +89184,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -85618,6 +89286,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -85673,6 +89343,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -85763,6 +89435,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -85818,6 +89492,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -85925,6 +89601,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -85980,6 +89658,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -86051,6 +89731,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -86106,6 +89788,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -86177,6 +89861,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -86232,6 +89918,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -86288,6 +89976,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
@@ -86343,6 +90033,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
 
@@ -86414,6 +90106,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
 
@@ -86469,6 +90163,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
@@ -86523,6 +90219,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -86578,6 +90276,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -86776,6 +90476,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -86831,6 +90533,8 @@ export namespace Prisma {
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -87019,6 +90723,8 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -87074,6 +90780,8 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -87145,6 +90853,8 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -87200,6 +90910,8 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -87255,6 +90967,8 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -87310,6 +91024,8 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -87381,6 +91097,8 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -87436,6 +91154,8 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -87491,6 +91211,8 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -87546,6 +91268,8 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -87617,6 +91341,8 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -87672,6 +91398,496 @@ export namespace Prisma {
     birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
     importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutDataExportJobsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutDataExportJobsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutDataExportJobsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutDataExportJobsInput, UserUncheckedCreateWithoutDataExportJobsInput>
+  }
+
+  export type UserUpsertWithoutDataExportJobsInput = {
+    update: XOR<UserUpdateWithoutDataExportJobsInput, UserUncheckedUpdateWithoutDataExportJobsInput>
+    create: XOR<UserCreateWithoutDataExportJobsInput, UserUncheckedCreateWithoutDataExportJobsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutDataExportJobsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutDataExportJobsInput, UserUncheckedUpdateWithoutDataExportJobsInput>
+  }
+
+  export type UserUpdateWithoutDataExportJobsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutDataExportJobsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutApiTokensInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutApiTokensInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutApiTokensInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutApiTokensInput, UserUncheckedCreateWithoutApiTokensInput>
+  }
+
+  export type UserUpsertWithoutApiTokensInput = {
+    update: XOR<UserUpdateWithoutApiTokensInput, UserUncheckedUpdateWithoutApiTokensInput>
+    create: XOR<UserCreateWithoutApiTokensInput, UserUncheckedCreateWithoutApiTokensInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutApiTokensInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutApiTokensInput, UserUncheckedUpdateWithoutApiTokensInput>
+  }
+
+  export type UserUpdateWithoutApiTokensInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutApiTokensInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -88082,6 +92298,31 @@ export namespace Prisma {
     fieldSelection: JsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
+  }
+
+  export type DataExportJobCreateManyUserInput = {
+    id?: string
+    status?: $Enums.DataExportStatus
+    includeArchived?: boolean
+    downloadUrl?: string | null
+    fileSizeBytes?: number | null
+    requestedAt?: Date | string
+    startedAt?: Date | string | null
+    completedAt?: Date | string | null
+    expiresAt?: Date | string | null
+    errorMessage?: string | null
+  }
+
+  export type ApiTokenCreateManyUserInput = {
+    id?: string
+    name: string
+    tokenHash: string
+    tokenPrefix: string
+    scope?: $Enums.ApiTokenScope
+    lastUsedAt?: Date | string | null
+    requestCountThisMonth?: number
+    createdAt?: Date | string
+    revokedAt?: Date | string | null
   }
 
   export type FailedLoginAttemptCreateManyUserInput = {
@@ -89360,6 +93601,81 @@ export namespace Prisma {
     fieldSelection?: JsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type DataExportJobUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumDataExportStatusFieldUpdateOperationsInput | $Enums.DataExportStatus
+    includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    downloadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type DataExportJobUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumDataExportStatusFieldUpdateOperationsInput | $Enums.DataExportStatus
+    includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    downloadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type DataExportJobUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    status?: EnumDataExportStatusFieldUpdateOperationsInput | $Enums.DataExportStatus
+    includeArchived?: BoolFieldUpdateOperationsInput | boolean
+    downloadUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    fileSizeBytes?: NullableIntFieldUpdateOperationsInput | number | null
+    requestedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    startedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    completedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    expiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    errorMessage?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type ApiTokenUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    tokenPrefix?: StringFieldUpdateOperationsInput | string
+    scope?: EnumApiTokenScopeFieldUpdateOperationsInput | $Enums.ApiTokenScope
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    requestCountThisMonth?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ApiTokenUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    tokenPrefix?: StringFieldUpdateOperationsInput | string
+    scope?: EnumApiTokenScopeFieldUpdateOperationsInput | $Enums.ApiTokenScope
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    requestCountThisMonth?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type ApiTokenUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    tokenHash?: StringFieldUpdateOperationsInput | string
+    tokenPrefix?: StringFieldUpdateOperationsInput | string
+    scope?: EnumApiTokenScopeFieldUpdateOperationsInput | $Enums.ApiTokenScope
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    requestCountThisMonth?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   }
 
   export type FailedLoginAttemptUpdateWithoutUserInput = {

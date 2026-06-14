@@ -25,6 +25,7 @@ type PlanEntitlements = {
   historyDisplayCap: number | null;
   liveShareEnabled: boolean;
   staticShareEnabled: boolean;
+  apiAccessEnabled: boolean;
 };
 
 type BillingContext = {
@@ -133,6 +134,7 @@ const PRO_PERSONAL = {
   historyDisplayCap: null,
   liveShareEnabled: true,
   staticShareEnabled: true,
+  apiAccessEnabled: true,
 } as const;
 
 const PLAN_DEFAULTS: Record<SubscriptionPlan, PlanEntitlements> = {
@@ -157,6 +159,7 @@ const PLAN_DEFAULTS: Record<SubscriptionPlan, PlanEntitlements> = {
     historyDisplayCap: 3,
     liveShareEnabled: false,
     staticShareEnabled: false,
+    apiAccessEnabled: false,
   },
   PRO: {
     ...PRO_PERSONAL,

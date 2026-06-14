@@ -84,8 +84,10 @@ export default function SettingsSecurityPage() {
         </div>
       </section>
 
-      <StSecLabel>Danger zone</StSecLabel>
-      <DeleteAccountSection />
+      <div id="delete">
+        <StSecLabel>Danger zone</StSecLabel>
+        <DeleteAccountSection />
+      </div>
 
       {toast && <Toast message={toast} />}
     </>
