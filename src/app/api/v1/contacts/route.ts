@@ -12,10 +12,10 @@ export const dynamic = "force-dynamic";
 export async function GET(req: NextRequest) {
   return withApiAuth(req, async (userId) => {
     const { searchParams } = new URL(req.url);
-    const q = searchParams.get("q")?.trim() || undefined;
-    const bookId = searchParams.get("bookId") || undefined;
+    const q = searchParams.get("q")?.trim() ?? undefined;
+    const bookId = searchParams.get("bookId") ?? undefined;
     const limit = Math.min(Math.max(parseInt(searchParams.get("limit") ?? "50"), 1), 100);
-    const cursor = searchParams.get("cursor") || undefined;
+    const cursor = searchParams.get("cursor") ?? undefined;
     const archived = searchParams.get("archived") === "true";
 
     const contacts = await db.contact.findMany({
