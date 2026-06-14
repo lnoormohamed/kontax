@@ -9,7 +9,11 @@ import { db } from "~/server/db";
 import { getUserFamilyMembership } from "~/server/family-access";
 import { getAccessibleTeamBooks } from "~/server/team-access";
 
-export default async function NewContactPage() {
+export default async function NewContactPage({
+  searchParams,
+}: {
+  searchParams?: Promise<Record<string, string | string[] | undefined>>;
+}) {
   const session = await auth();
 
   if (!session?.user?.id) {
@@ -42,6 +46,10 @@ export default async function NewContactPage() {
 
   const name = session.user.name?.trim() ?? session.user.email?.split("@")[0] ?? "Kontax";
 
+  const params = searchParams ? await searchParams : undefined;
+  const rawPrefill = params?.prefill;
+  const prefillParam = Array.isArray(rawPrefill) ? rawPrefill[0] : rawPrefill;
+
   return (
     <AppShell
       account={{ name, email: session.user.email ?? "", plan: planSummary.planLabel }}
@@ -55,7 +63,12 @@ export default async function NewContactPage() {
       mobileBackHref="/contacts"
       mobileBackLabel="Contacts"
     >
-      <CreateContactForm familyBookName={familyTarget} familyCanEdit={familyCanEdit} teamBooks={editableTeamBooks} />
+      <CreateContactForm
+        familyBookName={familyTarget}
+        familyCanEdit={familyCanEdit}
+        teamBooks={editableTeamBooks}
+        prefillParam={prefillParam}
+      />
     </AppShell>
   );
 }

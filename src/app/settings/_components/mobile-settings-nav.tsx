@@ -179,6 +179,7 @@ export function MobileSettingsNav({
 
       <GroupCard>
         <NavRow icon="person" label="Profile" href="/settings/profile" />
+        <NavRow icon="qr" label="Public card" href="/settings/profile/card" />
         <NavRow icon="bell" label="Notifications" href="/settings/notifications" />
         <NavRow icon="phone" label="Devices & app passwords" href="/settings/devices" />
         <NavRow icon="emergency" label="Security" href="/settings/security" />

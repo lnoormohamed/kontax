@@ -26,6 +26,7 @@ const getInitials = (value: string) =>
 const SECTIONS = [
   { href: "/settings", icon: "briefcase", label: "Plan & billing" },
   { href: "/settings/profile", icon: "people", label: "Profile" },
+  { href: "/settings/profile/card", icon: "qr", label: "Public card" },
   { href: "/settings/account", icon: "person", label: "Account" },
   { href: "/settings/preferences", icon: "gear", label: "Preferences" },
   { href: "/settings/notifications", icon: "bell", label: "Notifications" },

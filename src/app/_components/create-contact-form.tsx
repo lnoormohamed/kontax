@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 
 import { createContact } from "~/app/actions/contacts";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
+import type { CardPrefillData } from "~/app/u/[username]/add-to-kontax";
 
 type ValueRow = { label: string; value: string };
 type RelatedRow = { relationship: string; name: string };
@@ -119,11 +120,25 @@ export function CreateContactForm({
   familyBookName,
   familyCanEdit = true,
   teamBooks = [],
+  prefillParam,
 }: {
   familyBookName?: string | null;
   familyCanEdit?: boolean;
   teamBooks?: { id: string; name: string }[];
+  prefillParam?: string;
 }) {
+  // Decode card prefill once on mount (safe: user sees the form before saving)
+  const prefill = useMemo<CardPrefillData | null>(() => {
+    if (!prefillParam) return null;
+    try {
+      return JSON.parse(atob(prefillParam)) as CardPrefillData;
+    } catch {
+      return null;
+    }
+  }, [prefillParam]);
+
+  const [prefillDismissed, setPrefillDismissed] = useState(false);
+
   const [mode, setMode] = useState<"person" | "org">("person");
   const [showMore, setShowMore] = useState(false);
   const [target, setTarget] = useState<string>("private");
@@ -131,8 +146,8 @@ export function CreateContactForm({
   const [showBirthday, setShowBirthday] = useState(false);
   const [showNotes, setShowNotes] = useState(false);
 
-  const [first, setFirst] = useState("");
-  const [last, setLast] = useState("");
+  const [first, setFirst] = useState(prefill?.firstName ?? "");
+  const [last, setLast] = useState(prefill?.lastName ?? "");
   const [middle, setMiddle] = useState("");
   const [prefix, setPrefix] = useState("");
   const [suffix, setSuffix] = useState("");
@@ -140,13 +155,19 @@ export function CreateContactForm({
   const [phoneticFirst, setPhoneticFirst] = useState("");
   const [phoneticLast, setPhoneticLast] = useState("");
 
-  const [company, setCompany] = useState("");
+  const [company, setCompany] = useState(prefill?.company ?? "");
   const [phoneticCompany, setPhoneticCompany] = useState("");
-  const [jobTitle, setJobTitle] = useState("");
+  const [jobTitle, setJobTitle] = useState(prefill?.jobTitle ?? "");
 
-  const [emails, setEmails] = useState<ValueRow[]>([{ label: "Home", value: "" }]);
-  const [phones, setPhones] = useState<ValueRow[]>([{ label: "Mobile", value: "" }]);
-  const [websites, setWebsites] = useState<ValueRow[]>([{ label: "Homepage", value: "" }]);
+  const [emails, setEmails] = useState<ValueRow[]>(
+    prefill?.emails?.length ? prefill.emails : [{ label: "Home", value: "" }],
+  );
+  const [phones, setPhones] = useState<ValueRow[]>(
+    prefill?.phones?.length ? prefill.phones : [{ label: "Mobile", value: "" }],
+  );
+  const [websites, setWebsites] = useState<ValueRow[]>(
+    prefill?.websites?.length ? prefill.websites : [{ label: "Homepage", value: "" }],
+  );
 
   const [addrLabel, setAddrLabel] = useState("Home");
   const [street, setStreet] = useState("");
@@ -215,11 +236,40 @@ export function CreateContactForm({
 
   return (
     <div className="text-[#1d2823]">
+      {/* Prefill banner */}
+      {prefill && !prefillDismissed && (
+        <div className="flex items-center gap-2 border-b border-amber-200 bg-amber-50 px-4 py-2.5 text-[13px] text-amber-800">
+          <span className="flex-1">
+            Pre-filled from{" "}
+            <a
+              href={`/u/${prefill.sourceCardUsername}`}
+              className="font-semibold underline"
+            >
+              {[prefill.firstName, prefill.lastName].filter(Boolean).join(" ")}
+            </a>
+            &apos;s Kontax card
+          </span>
+          <button
+            type="button"
+            onClick={() => setPrefillDismissed(true)}
+            className="text-amber-600 hover:text-amber-900"
+            aria-label="Dismiss"
+          >
+            ×
+          </button>
+        </div>
+      )}
       <form action={createContact}>
         {Object.entries(hidden).map(([name, value]) => (
           <input key={name} name={name} type="hidden" value={value} />
         ))}
         <input name="target" type="hidden" value={target} />
+        {prefill?.sourceCardUsername && (
+          <>
+            <input name="sourceType" type="hidden" value="CARD_IMPORT" />
+            <input name="sourceCardUsername" type="hidden" value={prefill.sourceCardUsername} />
+          </>
+        )}
 
         {/* sticky action bar */}
         <div className="sticky top-0 z-10 flex h-14 items-center gap-3 border-b border-[#d8ddd6] bg-white/95 px-4 backdrop-blur lg:px-6">

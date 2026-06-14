@@ -14,6 +14,7 @@ const ICON_BY_SOURCE: Record<SourceType, string> = {
   SHARED_STATIC: "download",
   SHARED_LIVE: "live",
   API: "gear",
+  CARD_IMPORT: "qr",
 };
 
 /**

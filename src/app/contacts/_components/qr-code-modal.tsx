@@ -15,18 +15,24 @@ const firstName = (full: string) => full.trim().split(/\s+/)[0] ?? full;
 const fmtDate = (iso: string) =>
   new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "short", year: "numeric" }).format(new Date(iso));
 
-export function QrCodeModal({
-  contactId,
-  contactName,
-  onClose,
-}: {
-  contactId: string;
-  contactName: string;
-  onClose: () => void;
-}) {
+// Two usage modes:
+// A) Contact-based (P28-06): pass contactId + contactName — creates a vCard share link.
+// B) Direct URL (P30-07): pass shareUrl + title + downloadFilename — skips link creation.
+type QrCodeModalProps =
+  | { contactId: string; contactName: string; shareUrl?: never; title?: never; downloadFilename?: never; onClose: () => void }
+  | { shareUrl: string; title: string; downloadFilename: string; contactId?: never; contactName?: never; onClose: () => void };
+
+export function QrCodeModal(props: QrCodeModalProps) {
+  const { onClose } = props;
+  const isDirectUrl = !!props.shareUrl;
+  const displayTitle = isDirectUrl ? props.title : `Share ${props.contactName}`;
+  const downloadName = isDirectUrl
+    ? props.downloadFilename
+    : (props.contactName ?? "contact").toLowerCase().replace(/\s+/g, "-");
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [mounted, setMounted] = useState(false);
-  const [shareUrl, setShareUrl] = useState<string | null>(null);
+  const [shareUrl, setShareUrl] = useState<string | null>(isDirectUrl ? props.shareUrl : null);
   const [expiresAt, setExpiresAt] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
@@ -45,10 +51,11 @@ export function QrCodeModal({
     };
   }, [onClose]);
 
-  // Get / create the share link.
+  // Get / create the share link (contact-based mode only).
   useEffect(() => {
+    if (isDirectUrl || !props.contactId) return;
     let active = true;
-    getOrCreateVcardShareLink(contactId)
+    getOrCreateVcardShareLink(props.contactId)
       .then((res) => {
         if (!active) return;
         setShareUrl(res.url);
@@ -58,7 +65,8 @@ export function QrCodeModal({
     return () => {
       active = false;
     };
-  }, [contactId]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.contactId, isDirectUrl]);
 
   // Render the QR once we have a URL and the canvas is mounted.
   useEffect(() => {
@@ -73,7 +81,7 @@ export function QrCodeModal({
   const handleDownload = () => {
     if (!canvasRef.current) return;
     const link = document.createElement("a");
-    link.download = `${contactName.toLowerCase().replace(/\s+/g, "-") || "contact"}-qr.png`;
+    link.download = `${downloadName}-qr.png`;
     link.href = canvasRef.current.toDataURL("image/png");
     link.click();
   };
@@ -97,12 +105,12 @@ export function QrCodeModal({
   const loading = !shareUrl && !error;
 
   return createPortal(
-    <div className="fixed inset-0 z-[110] flex items-end justify-center sm:items-center" role="dialog" aria-modal="true" aria-label={`Share ${contactName}`}>
+    <div className="fixed inset-0 z-[110] flex items-end justify-center sm:items-center" role="dialog" aria-modal="true" aria-label={displayTitle}>
       <div onClick={onClose} className="absolute inset-0" style={{ background: "rgba(29,40,35,0.5)" }} />
       <div className="relative w-full rounded-t-2xl bg-white sm:w-auto sm:max-w-[380px] sm:rounded-2xl" style={{ boxShadow: "0 24px 60px rgba(20,30,25,0.28)" }}>
         {/* header */}
         <div className="flex items-center gap-3 px-6 pt-5">
-          <span className="text-[16px] font-bold tracking-[-0.01em] text-[#1d2823]">Share {contactName}</span>
+          <span className="text-[16px] font-bold tracking-[-0.01em] text-[#1d2823]">{displayTitle}</span>
           <button type="button" aria-label="Close" onClick={onClose} className="ml-auto grid h-8 w-8 place-items-center rounded-lg text-[#5c655e] transition hover:bg-[#f2f4f0]">
             ✕
           </button>
@@ -125,7 +133,9 @@ export function QrCodeModal({
           </div>
 
           <p className="mt-4 max-w-[280px] text-center text-[13.5px] leading-snug text-[#5c655e]">
-            Scan to add {firstName(contactName)}’s contact to any phone.
+            {isDirectUrl
+              ? "Scan to share your Kontax card."
+              : `Scan to add ${firstName(props.contactName ?? "")}’s contact to any phone.`}
           </p>
 
           {/* link scope (resolved decision: never-expires for paid; honest expiry for free) */}

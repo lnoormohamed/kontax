@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 
 import { AuthCard } from "~/app/_components/auth-card";
 import { auth } from "~/server/auth";
+import { CardRegisterContext } from "./card-register-context";
 
 export const metadata: Metadata = {
   title: "Create your account",
@@ -23,7 +24,14 @@ export default async function RegisterPage({
   const rawPlan = params?.plan;
   const plan = Array.isArray(rawPlan) ? rawPlan[0] : rawPlan;
 
+  const rawPrefill = params?.prefill;
+  const prefillParam = Array.isArray(rawPrefill) ? rawPrefill[0] : rawPrefill;
+
   if (session?.user) {
+    // Logged-in users visiting /register?prefill go straight to create contact with the data
+    if (prefillParam) {
+      redirect(`/contacts/new?prefill=${encodeURIComponent(prefillParam)}`);
+    }
     redirect(next ?? "/contacts");
   }
 
@@ -50,6 +58,7 @@ export default async function RegisterPage({
           }}
         />
       </div>
+      {prefillParam && <CardRegisterContext prefillParam={prefillParam} />}
       <AuthCard mode="register" next={next} plan={plan} />
       <p className="text-[12px] text-[#8b938c]">© Kontax · Your contacts, organized and yours.</p>
     </main>

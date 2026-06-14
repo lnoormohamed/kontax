@@ -143,8 +143,20 @@ exports.Prisma.UserScalarFieldEnum = {
   planOverriddenAt: 'planOverriddenAt',
   reminderLeadDays: 'reminderLeadDays',
   calToken: 'calToken',
+  username: 'username',
+  usernameClaimedAt: 'usernameClaimedAt',
+  publicCardFields: 'publicCardFields',
+  publicCardViews: 'publicCardViews',
+  addToKontaxClicks: 'addToKontaxClicks',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PublicCardViewScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  viewedAt: 'viewedAt',
+  referrer: 'referrer'
 };
 
 exports.Prisma.UserOnboardingStateScalarFieldEnum = {
@@ -787,15 +799,15 @@ exports.Prisma.QueryMode = {
   insensitive: 'insensitive'
 };
 
-exports.Prisma.NullsOrder = {
-  first: 'first',
-  last: 'last'
-};
-
 exports.Prisma.JsonNullValueFilter = {
   DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull,
   AnyNull: Prisma.AnyNull
+};
+
+exports.Prisma.NullsOrder = {
+  first: 'first',
+  last: 'last'
 };
 exports.AccountLifecycleState = exports.$Enums.AccountLifecycleState = {
   ACTIVE: 'ACTIVE',
@@ -824,7 +836,8 @@ exports.SourceType = exports.$Enums.SourceType = {
   SYNC_MICROSOFT: 'SYNC_MICROSOFT',
   SHARED_STATIC: 'SHARED_STATIC',
   SHARED_LIVE: 'SHARED_LIVE',
-  API: 'API'
+  API: 'API',
+  CARD_IMPORT: 'CARD_IMPORT'
 };
 
 exports.BillingProvider = exports.$Enums.BillingProvider = {
@@ -1065,6 +1078,7 @@ exports.ApiTokenScope = exports.$Enums.ApiTokenScope = {
 
 exports.Prisma.ModelName = {
   User: 'User',
+  PublicCardView: 'PublicCardView',
   UserOnboardingState: 'UserOnboardingState',
   AppPassword: 'AppPassword',
   Contact: 'Contact',

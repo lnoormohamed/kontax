@@ -73,6 +73,9 @@ const contactSchema = z.object({
   relatedPeople: z.string().trim().max(4000).optional(),
   customFields: z.string().trim().max(4000).optional(),
   notes: z.string().trim().max(2000).optional(),
+  // P30-04: source attribution for contacts saved from public card pages
+  sourceType: z.string().trim().max(40).optional(),
+  sourceCardUsername: z.string().trim().max(30).optional(),
 });
 
 const contactIdSchema = z.object({
@@ -269,6 +272,8 @@ const parseContactInput = (formData: FormData) => {
     relatedPeople: getOptionalString(formData, "relatedPeople"),
     customFields: getOptionalString(formData, "customFields"),
     notes: getOptionalString(formData, "notes"),
+    sourceType: getOptionalString(formData, "sourceType"),
+    sourceCardUsername: getOptionalString(formData, "sourceCardUsername"),
   });
 
   if (!parsed.success) {
@@ -424,6 +429,8 @@ const parseContactInput = (formData: FormData) => {
     relatedPeople: relatedPeople.length > 0 ? relatedPeople : undefined,
     customFields: customFields.length > 0 ? customFields : undefined,
     notes: parsed.data.notes,
+    sourceType: parsed.data.sourceType,
+    sourceCardUsername: parsed.data.sourceCardUsername,
   };
 };
 
@@ -569,13 +576,20 @@ export const createContact = async (formData: FormData) => {
   const { getUserDefaultBook } = await import("~/server/address-books");
   const defaultBook = !bookTarget ? await getUserDefaultBook(userId) : null;
 
+  // Extract P30-04 card attribution fields — not Contact DB columns, handle separately
+  const { sourceType: cardSourceType, sourceCardUsername, ...contactFields } = input;
+  const isCardImport = cardSourceType === "CARD_IMPORT" && !!sourceCardUsername;
+
   const createdContact = await db.$transaction(async (tx) => {
     const contact = await tx.contact.create({
       data: {
         userId: bookTarget?.ownerId ?? userId,
-        ...input,
+        ...contactFields,
         ...phoneticFields,
         ...(bookTarget ? { sourceDetail: bookTarget.label } : {}),
+        ...(isCardImport
+          ? { sourceType: "CARD_IMPORT" as const, sourceDetail: `card:${sourceCardUsername}` }
+          : {}),
         // Assign to default book for private contacts (P18-11)
         ...(!bookTarget && defaultBook ? { bookId: defaultBook.id } : {}),
       },
@@ -610,7 +624,7 @@ export const createContact = async (formData: FormData) => {
 export const updateContact = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const contactId = parseContactId(formData);
-  const input = parseContactInput(formData);
+  const { sourceType: _st, sourceCardUsername: _scu, ...input } = parseContactInput(formData);
   const redirectTo = getRedirectTarget(formData);
   const userSettings = await db.user.findUnique({
     where: {

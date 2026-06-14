@@ -69,6 +69,15 @@ the code is shipped and working; these are deployment-environment steps. Clean u
   Header: x-cron-secret: $CRON_SECRET
   ```
 
+## Phase 30 — Public card analytics (P30-06)
+
+- [ ] **Schedule the card-view cleanup cron.** Once per day at **03:00 UTC** — deletes
+  `PublicCardView` rows older than 90 days to keep the table lean:
+  ```
+  POST https://<host>/api/cron/cleanup-card-views
+  Header: x-cron-secret: $CRON_SECRET
+  ```
+
 ## Phase 29 — REST API rate limiting (P29-08)
 
 - [ ] **Confirm `REDIS_URL` is set in prod.** The API rate limiter uses `rate-limiter-flexible`

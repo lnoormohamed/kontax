@@ -27,6 +27,8 @@ export function formatSourceBadge(
       return detail ? `Live from ${detail}` : "Live share";
     case "API":
       return detail ? `Added via API (${detail})` : "Added via API";
+    case "CARD_IMPORT":
+      return detail ? `Saved from Kontax card (${detail.replace("card:", "")})` : "Saved from Kontax card";
     default:
       return "Added manually";
   }
@@ -56,6 +58,8 @@ export function formatLastMutatedBy(
       return detail ? `${detail} (share)` : "a share";
     case "API":
       return "the API";
+    case "CARD_IMPORT":
+      return "a Kontax card";
     default:
       return "you";
   }

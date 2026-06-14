@@ -215,6 +215,8 @@ enum SourceType {
     SHARED_STATIC
     SHARED_LIVE
     API
+    // P30-04: contact saved from a public card page
+    CARD_IMPORT
 }
 
 model User {
@@ -292,6 +294,15 @@ model User {
     failedLoginAttempts     FailedLoginAttempt[]
     // P26-04: first-run onboarding checklist state
     onboardingState         UserOnboardingState?
+    // P30-01: public card username (powers /u/{username})
+    username                String?   @unique
+    usernameClaimedAt       DateTime?
+    // P30-03: per-field visibility config for the public card (null = defaults)
+    publicCardFields        Json?
+    // P30-06: card analytics counters
+    publicCardViews         Int       @default(0)
+    addToKontaxClicks       Int       @default(0)
+    cardViewLog             PublicCardView[]
     createdAt             DateTime                @default(now())
     updatedAt             DateTime                @updatedAt
 
@@ -301,6 +312,19 @@ model User {
 
 // P26-04: first-run onboarding checklist state. The "create account", "add a
 // contact", and "connect a sync account" steps are derived live from existing
+// P30-06: one row per public card page view (kept 90 days, pruned by cron).
+// Counter on User (publicCardViews) is the durable total; this table powers the
+// 30-day breakdown in settings without a full table scan.
+model PublicCardView {
+    id        String   @id @default(cuid())
+    userId    String
+    user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+    viewedAt  DateTime @default(now())
+    referrer  String?  @db.VarChar(500)
+
+    @@index([userId, viewedAt])
+}
+
 // data; only the route-visit ("explore") trigger and the dismiss/complete
 // lifecycle need persisting here. One row per user, created lazily on first
 // dismiss/explore/complete.

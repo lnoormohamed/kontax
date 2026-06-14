@@ -8,6 +8,7 @@ import { DataExportSection } from "./_components/data-export-section";
 import { EmailSection } from "./email-section";
 import { PasswordChangeForm } from "./password-change-form";
 import { ProfileSection } from "./profile-section";
+import { UsernameSection } from "./username-section";
 
 export default async function SettingsAccountPage() {
   const session = await auth();
@@ -20,6 +21,7 @@ export default async function SettingsAccountPage() {
       emailPendingChange: true,
       emailPendingChangeRequestedAt: true,
       emailStatus: true,
+      username: true,
     },
   });
 
@@ -53,6 +55,9 @@ export default async function SettingsAccountPage() {
         initialAvatarUrl={session.user.avatarUrl}
         initialName={session.user.name ?? ""}
       />
+
+      <StSecLabel>Public card</StSecLabel>
+      <UsernameSection initialUsername={user?.username ?? null} />
 
       <StSecLabel>Account</StSecLabel>
       <DataExportSection />

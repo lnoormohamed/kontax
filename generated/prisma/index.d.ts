@@ -19,6 +19,11 @@ export type PrismaPromise<T> = $Public.PrismaPromise<T>
  */
 export type User = $Result.DefaultSelection<Prisma.$UserPayload>
 /**
+ * Model PublicCardView
+ * 
+ */
+export type PublicCardView = $Result.DefaultSelection<Prisma.$PublicCardViewPayload>
+/**
  * Model UserOnboardingState
  * 
  */
@@ -508,7 +513,8 @@ export const SourceType: {
   SYNC_MICROSOFT: 'SYNC_MICROSOFT',
   SHARED_STATIC: 'SHARED_STATIC',
   SHARED_LIVE: 'SHARED_LIVE',
-  API: 'API'
+  API: 'API',
+  CARD_IMPORT: 'CARD_IMPORT'
 };
 
 export type SourceType = (typeof SourceType)[keyof typeof SourceType]
@@ -888,6 +894,16 @@ export class PrismaClient<
     * ```
     */
   get user(): Prisma.UserDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.publicCardView`: Exposes CRUD operations for the **PublicCardView** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PublicCardViews
+    * const publicCardViews = await prisma.publicCardView.findMany()
+    * ```
+    */
+  get publicCardView(): Prisma.PublicCardViewDelegate<ExtArgs, ClientOptions>;
 
   /**
    * `prisma.userOnboardingState`: Exposes CRUD operations for the **UserOnboardingState** model.
@@ -1740,6 +1756,7 @@ export namespace Prisma {
 
   export const ModelName: {
     User: 'User',
+    PublicCardView: 'PublicCardView',
     UserOnboardingState: 'UserOnboardingState',
     AppPassword: 'AppPassword',
     Contact: 'Contact',
@@ -1799,7 +1816,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "userOnboardingState" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "savedFilter" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset" | "exportPreset" | "dataExportJob" | "apiToken"
+      modelProps: "user" | "publicCardView" | "userOnboardingState" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "savedFilter" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset" | "exportPreset" | "dataExportJob" | "apiToken"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1874,6 +1891,80 @@ export namespace Prisma {
           count: {
             args: Prisma.UserCountArgs<ExtArgs>
             result: $Utils.Optional<UserCountAggregateOutputType> | number
+          }
+        }
+      }
+      PublicCardView: {
+        payload: Prisma.$PublicCardViewPayload<ExtArgs>
+        fields: Prisma.PublicCardViewFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PublicCardViewFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicCardViewPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PublicCardViewFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicCardViewPayload>
+          }
+          findFirst: {
+            args: Prisma.PublicCardViewFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicCardViewPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PublicCardViewFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicCardViewPayload>
+          }
+          findMany: {
+            args: Prisma.PublicCardViewFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicCardViewPayload>[]
+          }
+          create: {
+            args: Prisma.PublicCardViewCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicCardViewPayload>
+          }
+          createMany: {
+            args: Prisma.PublicCardViewCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.PublicCardViewCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicCardViewPayload>[]
+          }
+          delete: {
+            args: Prisma.PublicCardViewDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicCardViewPayload>
+          }
+          update: {
+            args: Prisma.PublicCardViewUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicCardViewPayload>
+          }
+          deleteMany: {
+            args: Prisma.PublicCardViewDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PublicCardViewUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.PublicCardViewUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicCardViewPayload>[]
+          }
+          upsert: {
+            args: Prisma.PublicCardViewUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PublicCardViewPayload>
+          }
+          aggregate: {
+            args: Prisma.PublicCardViewAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePublicCardView>
+          }
+          groupBy: {
+            args: Prisma.PublicCardViewGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PublicCardViewGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PublicCardViewCountArgs<ExtArgs>
+            result: $Utils.Optional<PublicCardViewCountAggregateOutputType> | number
           }
         }
       }
@@ -5008,6 +5099,7 @@ export namespace Prisma {
   }
   export type GlobalOmitConfig = {
     user?: UserOmit
+    publicCardView?: PublicCardViewOmit
     userOnboardingState?: UserOnboardingStateOmit
     appPassword?: AppPasswordOmit
     contact?: ContactOmit
@@ -5158,6 +5250,7 @@ export namespace Prisma {
     dataExportJobs: number
     apiTokens: number
     failedLoginAttempts: number
+    cardViewLog: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -5190,6 +5283,7 @@ export namespace Prisma {
     dataExportJobs?: boolean | UserCountOutputTypeCountDataExportJobsArgs
     apiTokens?: boolean | UserCountOutputTypeCountApiTokensArgs
     failedLoginAttempts?: boolean | UserCountOutputTypeCountFailedLoginAttemptsArgs
+    cardViewLog?: boolean | UserCountOutputTypeCountCardViewLogArgs
   }
 
   // Custom InputTypes
@@ -5404,6 +5498,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountFailedLoginAttemptsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: FailedLoginAttemptWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountCardViewLogArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PublicCardViewWhereInput
   }
 
 
@@ -5924,11 +6025,15 @@ export namespace Prisma {
   export type UserAvgAggregateOutputType = {
     sessionVersion: number | null
     reminderLeadDays: number | null
+    publicCardViews: number | null
+    addToKontaxClicks: number | null
   }
 
   export type UserSumAggregateOutputType = {
     sessionVersion: number | null
     reminderLeadDays: number | null
+    publicCardViews: number | null
+    addToKontaxClicks: number | null
   }
 
   export type UserMinAggregateOutputType = {
@@ -5953,6 +6058,10 @@ export namespace Prisma {
     planOverriddenAt: Date | null
     reminderLeadDays: number | null
     calToken: string | null
+    username: string | null
+    usernameClaimedAt: Date | null
+    publicCardViews: number | null
+    addToKontaxClicks: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -5979,6 +6088,10 @@ export namespace Prisma {
     planOverriddenAt: Date | null
     reminderLeadDays: number | null
     calToken: string | null
+    username: string | null
+    usernameClaimedAt: Date | null
+    publicCardViews: number | null
+    addToKontaxClicks: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -6005,6 +6118,11 @@ export namespace Prisma {
     planOverriddenAt: number
     reminderLeadDays: number
     calToken: number
+    username: number
+    usernameClaimedAt: number
+    publicCardFields: number
+    publicCardViews: number
+    addToKontaxClicks: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -6014,11 +6132,15 @@ export namespace Prisma {
   export type UserAvgAggregateInputType = {
     sessionVersion?: true
     reminderLeadDays?: true
+    publicCardViews?: true
+    addToKontaxClicks?: true
   }
 
   export type UserSumAggregateInputType = {
     sessionVersion?: true
     reminderLeadDays?: true
+    publicCardViews?: true
+    addToKontaxClicks?: true
   }
 
   export type UserMinAggregateInputType = {
@@ -6043,6 +6165,10 @@ export namespace Prisma {
     planOverriddenAt?: true
     reminderLeadDays?: true
     calToken?: true
+    username?: true
+    usernameClaimedAt?: true
+    publicCardViews?: true
+    addToKontaxClicks?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -6069,6 +6195,10 @@ export namespace Prisma {
     planOverriddenAt?: true
     reminderLeadDays?: true
     calToken?: true
+    username?: true
+    usernameClaimedAt?: true
+    publicCardViews?: true
+    addToKontaxClicks?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -6095,6 +6225,11 @@ export namespace Prisma {
     planOverriddenAt?: true
     reminderLeadDays?: true
     calToken?: true
+    username?: true
+    usernameClaimedAt?: true
+    publicCardFields?: true
+    publicCardViews?: true
+    addToKontaxClicks?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -6208,6 +6343,11 @@ export namespace Prisma {
     planOverriddenAt: Date | null
     reminderLeadDays: number
     calToken: string | null
+    username: string | null
+    usernameClaimedAt: Date | null
+    publicCardFields: JsonValue | null
+    publicCardViews: number
+    addToKontaxClicks: number
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
@@ -6253,6 +6393,11 @@ export namespace Prisma {
     planOverriddenAt?: boolean
     reminderLeadDays?: boolean
     calToken?: boolean
+    username?: boolean
+    usernameClaimedAt?: boolean
+    publicCardFields?: boolean
+    publicCardViews?: boolean
+    addToKontaxClicks?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     appPasswords?: boolean | User$appPasswordsArgs<ExtArgs>
@@ -6287,6 +6432,7 @@ export namespace Prisma {
     apiTokens?: boolean | User$apiTokensArgs<ExtArgs>
     failedLoginAttempts?: boolean | User$failedLoginAttemptsArgs<ExtArgs>
     onboardingState?: boolean | User$onboardingStateArgs<ExtArgs>
+    cardViewLog?: boolean | User$cardViewLogArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -6312,6 +6458,11 @@ export namespace Prisma {
     planOverriddenAt?: boolean
     reminderLeadDays?: boolean
     calToken?: boolean
+    username?: boolean
+    usernameClaimedAt?: boolean
+    publicCardFields?: boolean
+    publicCardViews?: boolean
+    addToKontaxClicks?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -6338,6 +6489,11 @@ export namespace Prisma {
     planOverriddenAt?: boolean
     reminderLeadDays?: boolean
     calToken?: boolean
+    username?: boolean
+    usernameClaimedAt?: boolean
+    publicCardFields?: boolean
+    publicCardViews?: boolean
+    addToKontaxClicks?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -6364,11 +6520,16 @@ export namespace Prisma {
     planOverriddenAt?: boolean
     reminderLeadDays?: boolean
     calToken?: boolean
+    username?: boolean
+    usernameClaimedAt?: boolean
+    publicCardFields?: boolean
+    publicCardViews?: boolean
+    addToKontaxClicks?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "password" | "lifecycleState" | "autoFillPhoneticNames" | "sessionVersion" | "avatarUrl" | "emailVerified" | "emailPendingChange" | "emailPendingChangeRequestedAt" | "emailStatus" | "totpEnabled" | "totpSecret" | "totpVerifiedAt" | "scheduledDeleteAt" | "role" | "planOverrideReason" | "planOverriddenAt" | "reminderLeadDays" | "calToken" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "password" | "lifecycleState" | "autoFillPhoneticNames" | "sessionVersion" | "avatarUrl" | "emailVerified" | "emailPendingChange" | "emailPendingChangeRequestedAt" | "emailStatus" | "totpEnabled" | "totpSecret" | "totpVerifiedAt" | "scheduledDeleteAt" | "role" | "planOverrideReason" | "planOverriddenAt" | "reminderLeadDays" | "calToken" | "username" | "usernameClaimedAt" | "publicCardFields" | "publicCardViews" | "addToKontaxClicks" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     appPasswords?: boolean | User$appPasswordsArgs<ExtArgs>
     contacts?: boolean | User$contactsArgs<ExtArgs>
@@ -6402,6 +6563,7 @@ export namespace Prisma {
     apiTokens?: boolean | User$apiTokensArgs<ExtArgs>
     failedLoginAttempts?: boolean | User$failedLoginAttemptsArgs<ExtArgs>
     onboardingState?: boolean | User$onboardingStateArgs<ExtArgs>
+    cardViewLog?: boolean | User$cardViewLogArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -6442,6 +6604,7 @@ export namespace Prisma {
       apiTokens: Prisma.$ApiTokenPayload<ExtArgs>[]
       failedLoginAttempts: Prisma.$FailedLoginAttemptPayload<ExtArgs>[]
       onboardingState: Prisma.$UserOnboardingStatePayload<ExtArgs> | null
+      cardViewLog: Prisma.$PublicCardViewPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -6465,6 +6628,11 @@ export namespace Prisma {
       planOverriddenAt: Date | null
       reminderLeadDays: number
       calToken: string | null
+      username: string | null
+      usernameClaimedAt: Date | null
+      publicCardFields: Prisma.JsonValue | null
+      publicCardViews: number
+      addToKontaxClicks: number
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -6893,6 +7061,7 @@ export namespace Prisma {
     apiTokens<T extends User$apiTokensArgs<ExtArgs> = {}>(args?: Subset<T, User$apiTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ApiTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     failedLoginAttempts<T extends User$failedLoginAttemptsArgs<ExtArgs> = {}>(args?: Subset<T, User$failedLoginAttemptsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FailedLoginAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     onboardingState<T extends User$onboardingStateArgs<ExtArgs> = {}>(args?: Subset<T, User$onboardingStateArgs<ExtArgs>>): Prisma__UserOnboardingStateClient<$Result.GetResult<Prisma.$UserOnboardingStatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    cardViewLog<T extends User$cardViewLogArgs<ExtArgs> = {}>(args?: Subset<T, User$cardViewLogArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PublicCardViewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6943,6 +7112,11 @@ export namespace Prisma {
     readonly planOverriddenAt: FieldRef<"User", 'DateTime'>
     readonly reminderLeadDays: FieldRef<"User", 'Int'>
     readonly calToken: FieldRef<"User", 'String'>
+    readonly username: FieldRef<"User", 'String'>
+    readonly usernameClaimedAt: FieldRef<"User", 'DateTime'>
+    readonly publicCardFields: FieldRef<"User", 'Json'>
+    readonly publicCardViews: FieldRef<"User", 'Int'>
+    readonly addToKontaxClicks: FieldRef<"User", 'Int'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
   }
@@ -8086,6 +8260,30 @@ export namespace Prisma {
   }
 
   /**
+   * User.cardViewLog
+   */
+  export type User$cardViewLogArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicCardView
+     */
+    select?: PublicCardViewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicCardView
+     */
+    omit?: PublicCardViewOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicCardViewInclude<ExtArgs> | null
+    where?: PublicCardViewWhereInput
+    orderBy?: PublicCardViewOrderByWithRelationInput | PublicCardViewOrderByWithRelationInput[]
+    cursor?: PublicCardViewWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: PublicCardViewScalarFieldEnum | PublicCardViewScalarFieldEnum[]
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -8101,6 +8299,1051 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: UserInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model PublicCardView
+   */
+
+  export type AggregatePublicCardView = {
+    _count: PublicCardViewCountAggregateOutputType | null
+    _min: PublicCardViewMinAggregateOutputType | null
+    _max: PublicCardViewMaxAggregateOutputType | null
+  }
+
+  export type PublicCardViewMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    viewedAt: Date | null
+    referrer: string | null
+  }
+
+  export type PublicCardViewMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    viewedAt: Date | null
+    referrer: string | null
+  }
+
+  export type PublicCardViewCountAggregateOutputType = {
+    id: number
+    userId: number
+    viewedAt: number
+    referrer: number
+    _all: number
+  }
+
+
+  export type PublicCardViewMinAggregateInputType = {
+    id?: true
+    userId?: true
+    viewedAt?: true
+    referrer?: true
+  }
+
+  export type PublicCardViewMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    viewedAt?: true
+    referrer?: true
+  }
+
+  export type PublicCardViewCountAggregateInputType = {
+    id?: true
+    userId?: true
+    viewedAt?: true
+    referrer?: true
+    _all?: true
+  }
+
+  export type PublicCardViewAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PublicCardView to aggregate.
+     */
+    where?: PublicCardViewWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PublicCardViews to fetch.
+     */
+    orderBy?: PublicCardViewOrderByWithRelationInput | PublicCardViewOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PublicCardViewWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PublicCardViews from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PublicCardViews.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned PublicCardViews
+    **/
+    _count?: true | PublicCardViewCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PublicCardViewMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PublicCardViewMaxAggregateInputType
+  }
+
+  export type GetPublicCardViewAggregateType<T extends PublicCardViewAggregateArgs> = {
+        [P in keyof T & keyof AggregatePublicCardView]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePublicCardView[P]>
+      : GetScalarType<T[P], AggregatePublicCardView[P]>
+  }
+
+
+
+
+  export type PublicCardViewGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PublicCardViewWhereInput
+    orderBy?: PublicCardViewOrderByWithAggregationInput | PublicCardViewOrderByWithAggregationInput[]
+    by: PublicCardViewScalarFieldEnum[] | PublicCardViewScalarFieldEnum
+    having?: PublicCardViewScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PublicCardViewCountAggregateInputType | true
+    _min?: PublicCardViewMinAggregateInputType
+    _max?: PublicCardViewMaxAggregateInputType
+  }
+
+  export type PublicCardViewGroupByOutputType = {
+    id: string
+    userId: string
+    viewedAt: Date
+    referrer: string | null
+    _count: PublicCardViewCountAggregateOutputType | null
+    _min: PublicCardViewMinAggregateOutputType | null
+    _max: PublicCardViewMaxAggregateOutputType | null
+  }
+
+  type GetPublicCardViewGroupByPayload<T extends PublicCardViewGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PublicCardViewGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PublicCardViewGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PublicCardViewGroupByOutputType[P]>
+            : GetScalarType<T[P], PublicCardViewGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PublicCardViewSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    viewedAt?: boolean
+    referrer?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["publicCardView"]>
+
+  export type PublicCardViewSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    viewedAt?: boolean
+    referrer?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["publicCardView"]>
+
+  export type PublicCardViewSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    viewedAt?: boolean
+    referrer?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["publicCardView"]>
+
+  export type PublicCardViewSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    viewedAt?: boolean
+    referrer?: boolean
+  }
+
+  export type PublicCardViewOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "viewedAt" | "referrer", ExtArgs["result"]["publicCardView"]>
+  export type PublicCardViewInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type PublicCardViewIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type PublicCardViewIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $PublicCardViewPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "PublicCardView"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      viewedAt: Date
+      referrer: string | null
+    }, ExtArgs["result"]["publicCardView"]>
+    composites: {}
+  }
+
+  type PublicCardViewGetPayload<S extends boolean | null | undefined | PublicCardViewDefaultArgs> = $Result.GetResult<Prisma.$PublicCardViewPayload, S>
+
+  type PublicCardViewCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PublicCardViewFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PublicCardViewCountAggregateInputType | true
+    }
+
+  export interface PublicCardViewDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PublicCardView'], meta: { name: 'PublicCardView' } }
+    /**
+     * Find zero or one PublicCardView that matches the filter.
+     * @param {PublicCardViewFindUniqueArgs} args - Arguments to find a PublicCardView
+     * @example
+     * // Get one PublicCardView
+     * const publicCardView = await prisma.publicCardView.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PublicCardViewFindUniqueArgs>(args: SelectSubset<T, PublicCardViewFindUniqueArgs<ExtArgs>>): Prisma__PublicCardViewClient<$Result.GetResult<Prisma.$PublicCardViewPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one PublicCardView that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PublicCardViewFindUniqueOrThrowArgs} args - Arguments to find a PublicCardView
+     * @example
+     * // Get one PublicCardView
+     * const publicCardView = await prisma.publicCardView.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PublicCardViewFindUniqueOrThrowArgs>(args: SelectSubset<T, PublicCardViewFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PublicCardViewClient<$Result.GetResult<Prisma.$PublicCardViewPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PublicCardView that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicCardViewFindFirstArgs} args - Arguments to find a PublicCardView
+     * @example
+     * // Get one PublicCardView
+     * const publicCardView = await prisma.publicCardView.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PublicCardViewFindFirstArgs>(args?: SelectSubset<T, PublicCardViewFindFirstArgs<ExtArgs>>): Prisma__PublicCardViewClient<$Result.GetResult<Prisma.$PublicCardViewPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PublicCardView that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicCardViewFindFirstOrThrowArgs} args - Arguments to find a PublicCardView
+     * @example
+     * // Get one PublicCardView
+     * const publicCardView = await prisma.publicCardView.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PublicCardViewFindFirstOrThrowArgs>(args?: SelectSubset<T, PublicCardViewFindFirstOrThrowArgs<ExtArgs>>): Prisma__PublicCardViewClient<$Result.GetResult<Prisma.$PublicCardViewPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more PublicCardViews that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicCardViewFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PublicCardViews
+     * const publicCardViews = await prisma.publicCardView.findMany()
+     * 
+     * // Get first 10 PublicCardViews
+     * const publicCardViews = await prisma.publicCardView.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const publicCardViewWithIdOnly = await prisma.publicCardView.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PublicCardViewFindManyArgs>(args?: SelectSubset<T, PublicCardViewFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PublicCardViewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a PublicCardView.
+     * @param {PublicCardViewCreateArgs} args - Arguments to create a PublicCardView.
+     * @example
+     * // Create one PublicCardView
+     * const PublicCardView = await prisma.publicCardView.create({
+     *   data: {
+     *     // ... data to create a PublicCardView
+     *   }
+     * })
+     * 
+     */
+    create<T extends PublicCardViewCreateArgs>(args: SelectSubset<T, PublicCardViewCreateArgs<ExtArgs>>): Prisma__PublicCardViewClient<$Result.GetResult<Prisma.$PublicCardViewPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many PublicCardViews.
+     * @param {PublicCardViewCreateManyArgs} args - Arguments to create many PublicCardViews.
+     * @example
+     * // Create many PublicCardViews
+     * const publicCardView = await prisma.publicCardView.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PublicCardViewCreateManyArgs>(args?: SelectSubset<T, PublicCardViewCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many PublicCardViews and returns the data saved in the database.
+     * @param {PublicCardViewCreateManyAndReturnArgs} args - Arguments to create many PublicCardViews.
+     * @example
+     * // Create many PublicCardViews
+     * const publicCardView = await prisma.publicCardView.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many PublicCardViews and only return the `id`
+     * const publicCardViewWithIdOnly = await prisma.publicCardView.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends PublicCardViewCreateManyAndReturnArgs>(args?: SelectSubset<T, PublicCardViewCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PublicCardViewPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a PublicCardView.
+     * @param {PublicCardViewDeleteArgs} args - Arguments to delete one PublicCardView.
+     * @example
+     * // Delete one PublicCardView
+     * const PublicCardView = await prisma.publicCardView.delete({
+     *   where: {
+     *     // ... filter to delete one PublicCardView
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PublicCardViewDeleteArgs>(args: SelectSubset<T, PublicCardViewDeleteArgs<ExtArgs>>): Prisma__PublicCardViewClient<$Result.GetResult<Prisma.$PublicCardViewPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one PublicCardView.
+     * @param {PublicCardViewUpdateArgs} args - Arguments to update one PublicCardView.
+     * @example
+     * // Update one PublicCardView
+     * const publicCardView = await prisma.publicCardView.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PublicCardViewUpdateArgs>(args: SelectSubset<T, PublicCardViewUpdateArgs<ExtArgs>>): Prisma__PublicCardViewClient<$Result.GetResult<Prisma.$PublicCardViewPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more PublicCardViews.
+     * @param {PublicCardViewDeleteManyArgs} args - Arguments to filter PublicCardViews to delete.
+     * @example
+     * // Delete a few PublicCardViews
+     * const { count } = await prisma.publicCardView.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PublicCardViewDeleteManyArgs>(args?: SelectSubset<T, PublicCardViewDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PublicCardViews.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicCardViewUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PublicCardViews
+     * const publicCardView = await prisma.publicCardView.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PublicCardViewUpdateManyArgs>(args: SelectSubset<T, PublicCardViewUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PublicCardViews and returns the data updated in the database.
+     * @param {PublicCardViewUpdateManyAndReturnArgs} args - Arguments to update many PublicCardViews.
+     * @example
+     * // Update many PublicCardViews
+     * const publicCardView = await prisma.publicCardView.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more PublicCardViews and only return the `id`
+     * const publicCardViewWithIdOnly = await prisma.publicCardView.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends PublicCardViewUpdateManyAndReturnArgs>(args: SelectSubset<T, PublicCardViewUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PublicCardViewPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one PublicCardView.
+     * @param {PublicCardViewUpsertArgs} args - Arguments to update or create a PublicCardView.
+     * @example
+     * // Update or create a PublicCardView
+     * const publicCardView = await prisma.publicCardView.upsert({
+     *   create: {
+     *     // ... data to create a PublicCardView
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PublicCardView we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PublicCardViewUpsertArgs>(args: SelectSubset<T, PublicCardViewUpsertArgs<ExtArgs>>): Prisma__PublicCardViewClient<$Result.GetResult<Prisma.$PublicCardViewPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of PublicCardViews.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicCardViewCountArgs} args - Arguments to filter PublicCardViews to count.
+     * @example
+     * // Count the number of PublicCardViews
+     * const count = await prisma.publicCardView.count({
+     *   where: {
+     *     // ... the filter for the PublicCardViews we want to count
+     *   }
+     * })
+    **/
+    count<T extends PublicCardViewCountArgs>(
+      args?: Subset<T, PublicCardViewCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PublicCardViewCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PublicCardView.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicCardViewAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PublicCardViewAggregateArgs>(args: Subset<T, PublicCardViewAggregateArgs>): Prisma.PrismaPromise<GetPublicCardViewAggregateType<T>>
+
+    /**
+     * Group by PublicCardView.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PublicCardViewGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PublicCardViewGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PublicCardViewGroupByArgs['orderBy'] }
+        : { orderBy?: PublicCardViewGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PublicCardViewGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPublicCardViewGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the PublicCardView model
+   */
+  readonly fields: PublicCardViewFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for PublicCardView.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PublicCardViewClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the PublicCardView model
+   */
+  interface PublicCardViewFieldRefs {
+    readonly id: FieldRef<"PublicCardView", 'String'>
+    readonly userId: FieldRef<"PublicCardView", 'String'>
+    readonly viewedAt: FieldRef<"PublicCardView", 'DateTime'>
+    readonly referrer: FieldRef<"PublicCardView", 'String'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * PublicCardView findUnique
+   */
+  export type PublicCardViewFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicCardView
+     */
+    select?: PublicCardViewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicCardView
+     */
+    omit?: PublicCardViewOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicCardViewInclude<ExtArgs> | null
+    /**
+     * Filter, which PublicCardView to fetch.
+     */
+    where: PublicCardViewWhereUniqueInput
+  }
+
+  /**
+   * PublicCardView findUniqueOrThrow
+   */
+  export type PublicCardViewFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicCardView
+     */
+    select?: PublicCardViewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicCardView
+     */
+    omit?: PublicCardViewOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicCardViewInclude<ExtArgs> | null
+    /**
+     * Filter, which PublicCardView to fetch.
+     */
+    where: PublicCardViewWhereUniqueInput
+  }
+
+  /**
+   * PublicCardView findFirst
+   */
+  export type PublicCardViewFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicCardView
+     */
+    select?: PublicCardViewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicCardView
+     */
+    omit?: PublicCardViewOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicCardViewInclude<ExtArgs> | null
+    /**
+     * Filter, which PublicCardView to fetch.
+     */
+    where?: PublicCardViewWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PublicCardViews to fetch.
+     */
+    orderBy?: PublicCardViewOrderByWithRelationInput | PublicCardViewOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PublicCardViews.
+     */
+    cursor?: PublicCardViewWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PublicCardViews from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PublicCardViews.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PublicCardViews.
+     */
+    distinct?: PublicCardViewScalarFieldEnum | PublicCardViewScalarFieldEnum[]
+  }
+
+  /**
+   * PublicCardView findFirstOrThrow
+   */
+  export type PublicCardViewFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicCardView
+     */
+    select?: PublicCardViewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicCardView
+     */
+    omit?: PublicCardViewOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicCardViewInclude<ExtArgs> | null
+    /**
+     * Filter, which PublicCardView to fetch.
+     */
+    where?: PublicCardViewWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PublicCardViews to fetch.
+     */
+    orderBy?: PublicCardViewOrderByWithRelationInput | PublicCardViewOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PublicCardViews.
+     */
+    cursor?: PublicCardViewWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PublicCardViews from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PublicCardViews.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PublicCardViews.
+     */
+    distinct?: PublicCardViewScalarFieldEnum | PublicCardViewScalarFieldEnum[]
+  }
+
+  /**
+   * PublicCardView findMany
+   */
+  export type PublicCardViewFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicCardView
+     */
+    select?: PublicCardViewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicCardView
+     */
+    omit?: PublicCardViewOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicCardViewInclude<ExtArgs> | null
+    /**
+     * Filter, which PublicCardViews to fetch.
+     */
+    where?: PublicCardViewWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PublicCardViews to fetch.
+     */
+    orderBy?: PublicCardViewOrderByWithRelationInput | PublicCardViewOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing PublicCardViews.
+     */
+    cursor?: PublicCardViewWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PublicCardViews from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PublicCardViews.
+     */
+    skip?: number
+    distinct?: PublicCardViewScalarFieldEnum | PublicCardViewScalarFieldEnum[]
+  }
+
+  /**
+   * PublicCardView create
+   */
+  export type PublicCardViewCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicCardView
+     */
+    select?: PublicCardViewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicCardView
+     */
+    omit?: PublicCardViewOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicCardViewInclude<ExtArgs> | null
+    /**
+     * The data needed to create a PublicCardView.
+     */
+    data: XOR<PublicCardViewCreateInput, PublicCardViewUncheckedCreateInput>
+  }
+
+  /**
+   * PublicCardView createMany
+   */
+  export type PublicCardViewCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many PublicCardViews.
+     */
+    data: PublicCardViewCreateManyInput | PublicCardViewCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PublicCardView createManyAndReturn
+   */
+  export type PublicCardViewCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicCardView
+     */
+    select?: PublicCardViewSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicCardView
+     */
+    omit?: PublicCardViewOmit<ExtArgs> | null
+    /**
+     * The data used to create many PublicCardViews.
+     */
+    data: PublicCardViewCreateManyInput | PublicCardViewCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicCardViewIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PublicCardView update
+   */
+  export type PublicCardViewUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicCardView
+     */
+    select?: PublicCardViewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicCardView
+     */
+    omit?: PublicCardViewOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicCardViewInclude<ExtArgs> | null
+    /**
+     * The data needed to update a PublicCardView.
+     */
+    data: XOR<PublicCardViewUpdateInput, PublicCardViewUncheckedUpdateInput>
+    /**
+     * Choose, which PublicCardView to update.
+     */
+    where: PublicCardViewWhereUniqueInput
+  }
+
+  /**
+   * PublicCardView updateMany
+   */
+  export type PublicCardViewUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update PublicCardViews.
+     */
+    data: XOR<PublicCardViewUpdateManyMutationInput, PublicCardViewUncheckedUpdateManyInput>
+    /**
+     * Filter which PublicCardViews to update
+     */
+    where?: PublicCardViewWhereInput
+    /**
+     * Limit how many PublicCardViews to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PublicCardView updateManyAndReturn
+   */
+  export type PublicCardViewUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicCardView
+     */
+    select?: PublicCardViewSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicCardView
+     */
+    omit?: PublicCardViewOmit<ExtArgs> | null
+    /**
+     * The data used to update PublicCardViews.
+     */
+    data: XOR<PublicCardViewUpdateManyMutationInput, PublicCardViewUncheckedUpdateManyInput>
+    /**
+     * Filter which PublicCardViews to update
+     */
+    where?: PublicCardViewWhereInput
+    /**
+     * Limit how many PublicCardViews to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicCardViewIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PublicCardView upsert
+   */
+  export type PublicCardViewUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicCardView
+     */
+    select?: PublicCardViewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicCardView
+     */
+    omit?: PublicCardViewOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicCardViewInclude<ExtArgs> | null
+    /**
+     * The filter to search for the PublicCardView to update in case it exists.
+     */
+    where: PublicCardViewWhereUniqueInput
+    /**
+     * In case the PublicCardView found by the `where` argument doesn't exist, create a new PublicCardView with this data.
+     */
+    create: XOR<PublicCardViewCreateInput, PublicCardViewUncheckedCreateInput>
+    /**
+     * In case the PublicCardView was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PublicCardViewUpdateInput, PublicCardViewUncheckedUpdateInput>
+  }
+
+  /**
+   * PublicCardView delete
+   */
+  export type PublicCardViewDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicCardView
+     */
+    select?: PublicCardViewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicCardView
+     */
+    omit?: PublicCardViewOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicCardViewInclude<ExtArgs> | null
+    /**
+     * Filter which PublicCardView to delete.
+     */
+    where: PublicCardViewWhereUniqueInput
+  }
+
+  /**
+   * PublicCardView deleteMany
+   */
+  export type PublicCardViewDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PublicCardViews to delete
+     */
+    where?: PublicCardViewWhereInput
+    /**
+     * Limit how many PublicCardViews to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * PublicCardView without action
+   */
+  export type PublicCardViewDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PublicCardView
+     */
+    select?: PublicCardViewSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PublicCardView
+     */
+    omit?: PublicCardViewOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PublicCardViewInclude<ExtArgs> | null
   }
 
 
@@ -56936,11 +58179,26 @@ export namespace Prisma {
     planOverriddenAt: 'planOverriddenAt',
     reminderLeadDays: 'reminderLeadDays',
     calToken: 'calToken',
+    username: 'username',
+    usernameClaimedAt: 'usernameClaimedAt',
+    publicCardFields: 'publicCardFields',
+    publicCardViews: 'publicCardViews',
+    addToKontaxClicks: 'addToKontaxClicks',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
 
   export type UserScalarFieldEnum = (typeof UserScalarFieldEnum)[keyof typeof UserScalarFieldEnum]
+
+
+  export const PublicCardViewScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    viewedAt: 'viewedAt',
+    referrer: 'referrer'
+  };
+
+  export type PublicCardViewScalarFieldEnum = (typeof PublicCardViewScalarFieldEnum)[keyof typeof PublicCardViewScalarFieldEnum]
 
 
   export const UserOnboardingStateScalarFieldEnum: {
@@ -57718,14 +58976,6 @@ export namespace Prisma {
   export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
-  export const NullsOrder: {
-    first: 'first',
-    last: 'last'
-  };
-
-  export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
-
-
   export const JsonNullValueFilter: {
     DbNull: typeof DbNull,
     JsonNull: typeof JsonNull,
@@ -57733,6 +58983,14 @@ export namespace Prisma {
   };
 
   export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+  export const NullsOrder: {
+    first: 'first',
+    last: 'last'
+  };
+
+  export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
   /**
@@ -58377,6 +59635,11 @@ export namespace Prisma {
     planOverriddenAt?: DateTimeNullableFilter<"User"> | Date | string | null
     reminderLeadDays?: IntFilter<"User"> | number
     calToken?: StringNullableFilter<"User"> | string | null
+    username?: StringNullableFilter<"User"> | string | null
+    usernameClaimedAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    publicCardFields?: JsonNullableFilter<"User">
+    publicCardViews?: IntFilter<"User"> | number
+    addToKontaxClicks?: IntFilter<"User"> | number
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     appPasswords?: AppPasswordListRelationFilter
@@ -58411,6 +59674,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenListRelationFilter
     failedLoginAttempts?: FailedLoginAttemptListRelationFilter
     onboardingState?: XOR<UserOnboardingStateNullableScalarRelationFilter, UserOnboardingStateWhereInput> | null
+    cardViewLog?: PublicCardViewListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -58435,6 +59699,11 @@ export namespace Prisma {
     planOverriddenAt?: SortOrderInput | SortOrder
     reminderLeadDays?: SortOrder
     calToken?: SortOrderInput | SortOrder
+    username?: SortOrderInput | SortOrder
+    usernameClaimedAt?: SortOrderInput | SortOrder
+    publicCardFields?: SortOrderInput | SortOrder
+    publicCardViews?: SortOrder
+    addToKontaxClicks?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     appPasswords?: AppPasswordOrderByRelationAggregateInput
@@ -58469,11 +59738,13 @@ export namespace Prisma {
     apiTokens?: ApiTokenOrderByRelationAggregateInput
     failedLoginAttempts?: FailedLoginAttemptOrderByRelationAggregateInput
     onboardingState?: UserOnboardingStateOrderByWithRelationInput
+    cardViewLog?: PublicCardViewOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
     id?: string
     email?: string
+    username?: string
     AND?: UserWhereInput | UserWhereInput[]
     OR?: UserWhereInput[]
     NOT?: UserWhereInput | UserWhereInput[]
@@ -58496,6 +59767,10 @@ export namespace Prisma {
     planOverriddenAt?: DateTimeNullableFilter<"User"> | Date | string | null
     reminderLeadDays?: IntFilter<"User"> | number
     calToken?: StringNullableFilter<"User"> | string | null
+    usernameClaimedAt?: DateTimeNullableFilter<"User"> | Date | string | null
+    publicCardFields?: JsonNullableFilter<"User">
+    publicCardViews?: IntFilter<"User"> | number
+    addToKontaxClicks?: IntFilter<"User"> | number
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     appPasswords?: AppPasswordListRelationFilter
@@ -58530,7 +59805,8 @@ export namespace Prisma {
     apiTokens?: ApiTokenListRelationFilter
     failedLoginAttempts?: FailedLoginAttemptListRelationFilter
     onboardingState?: XOR<UserOnboardingStateNullableScalarRelationFilter, UserOnboardingStateWhereInput> | null
-  }, "id" | "email">
+    cardViewLog?: PublicCardViewListRelationFilter
+  }, "id" | "email" | "username">
 
   export type UserOrderByWithAggregationInput = {
     id?: SortOrder
@@ -58554,6 +59830,11 @@ export namespace Prisma {
     planOverriddenAt?: SortOrderInput | SortOrder
     reminderLeadDays?: SortOrder
     calToken?: SortOrderInput | SortOrder
+    username?: SortOrderInput | SortOrder
+    usernameClaimedAt?: SortOrderInput | SortOrder
+    publicCardFields?: SortOrderInput | SortOrder
+    publicCardViews?: SortOrder
+    addToKontaxClicks?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -58588,8 +59869,63 @@ export namespace Prisma {
     planOverriddenAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
     reminderLeadDays?: IntWithAggregatesFilter<"User"> | number
     calToken?: StringNullableWithAggregatesFilter<"User"> | string | null
+    username?: StringNullableWithAggregatesFilter<"User"> | string | null
+    usernameClaimedAt?: DateTimeNullableWithAggregatesFilter<"User"> | Date | string | null
+    publicCardFields?: JsonNullableWithAggregatesFilter<"User">
+    publicCardViews?: IntWithAggregatesFilter<"User"> | number
+    addToKontaxClicks?: IntWithAggregatesFilter<"User"> | number
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
+  }
+
+  export type PublicCardViewWhereInput = {
+    AND?: PublicCardViewWhereInput | PublicCardViewWhereInput[]
+    OR?: PublicCardViewWhereInput[]
+    NOT?: PublicCardViewWhereInput | PublicCardViewWhereInput[]
+    id?: StringFilter<"PublicCardView"> | string
+    userId?: StringFilter<"PublicCardView"> | string
+    viewedAt?: DateTimeFilter<"PublicCardView"> | Date | string
+    referrer?: StringNullableFilter<"PublicCardView"> | string | null
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type PublicCardViewOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    viewedAt?: SortOrder
+    referrer?: SortOrderInput | SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type PublicCardViewWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: PublicCardViewWhereInput | PublicCardViewWhereInput[]
+    OR?: PublicCardViewWhereInput[]
+    NOT?: PublicCardViewWhereInput | PublicCardViewWhereInput[]
+    userId?: StringFilter<"PublicCardView"> | string
+    viewedAt?: DateTimeFilter<"PublicCardView"> | Date | string
+    referrer?: StringNullableFilter<"PublicCardView"> | string | null
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type PublicCardViewOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    viewedAt?: SortOrder
+    referrer?: SortOrderInput | SortOrder
+    _count?: PublicCardViewCountOrderByAggregateInput
+    _max?: PublicCardViewMaxOrderByAggregateInput
+    _min?: PublicCardViewMinOrderByAggregateInput
+  }
+
+  export type PublicCardViewScalarWhereWithAggregatesInput = {
+    AND?: PublicCardViewScalarWhereWithAggregatesInput | PublicCardViewScalarWhereWithAggregatesInput[]
+    OR?: PublicCardViewScalarWhereWithAggregatesInput[]
+    NOT?: PublicCardViewScalarWhereWithAggregatesInput | PublicCardViewScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"PublicCardView"> | string
+    userId?: StringWithAggregatesFilter<"PublicCardView"> | string
+    viewedAt?: DateTimeWithAggregatesFilter<"PublicCardView"> | Date | string
+    referrer?: StringNullableWithAggregatesFilter<"PublicCardView"> | string | null
   }
 
   export type UserOnboardingStateWhereInput = {
@@ -62525,6 +63861,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -62559,6 +63900,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -62583,6 +63925,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -62617,6 +63964,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserUpdateInput = {
@@ -62641,6 +63989,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -62675,6 +64028,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -62699,6 +64053,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -62733,6 +64092,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -62757,6 +64117,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -62783,6 +64148,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -62809,8 +64179,61 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PublicCardViewCreateInput = {
+    id?: string
+    viewedAt?: Date | string
+    referrer?: string | null
+    user: UserCreateNestedOneWithoutCardViewLogInput
+  }
+
+  export type PublicCardViewUncheckedCreateInput = {
+    id?: string
+    userId: string
+    viewedAt?: Date | string
+    referrer?: string | null
+  }
+
+  export type PublicCardViewUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    viewedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    referrer?: NullableStringFieldUpdateOperationsInput | string | null
+    user?: UserUpdateOneRequiredWithoutCardViewLogNestedInput
+  }
+
+  export type PublicCardViewUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    viewedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    referrer?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type PublicCardViewCreateManyInput = {
+    id?: string
+    userId: string
+    viewedAt?: Date | string
+    referrer?: string | null
+  }
+
+  export type PublicCardViewUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    viewedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    referrer?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type PublicCardViewUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    viewedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    referrer?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type UserOnboardingStateCreateInput = {
@@ -67289,6 +68712,29 @@ export namespace Prisma {
     notIn?: $Enums.UserRole[] | ListEnumUserRoleFieldRefInput<$PrismaModel>
     not?: NestedEnumUserRoleFilter<$PrismaModel> | $Enums.UserRole
   }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type DateTimeFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
@@ -67484,6 +68930,12 @@ export namespace Prisma {
     isNot?: UserOnboardingStateWhereInput | null
   }
 
+  export type PublicCardViewListRelationFilter = {
+    every?: PublicCardViewWhereInput
+    some?: PublicCardViewWhereInput
+    none?: PublicCardViewWhereInput
+  }
+
   export type SortOrderInput = {
     sort: SortOrder
     nulls?: NullsOrder
@@ -67601,6 +69053,10 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type PublicCardViewOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
@@ -67623,6 +69079,11 @@ export namespace Prisma {
     planOverriddenAt?: SortOrder
     reminderLeadDays?: SortOrder
     calToken?: SortOrder
+    username?: SortOrder
+    usernameClaimedAt?: SortOrder
+    publicCardFields?: SortOrder
+    publicCardViews?: SortOrder
+    addToKontaxClicks?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -67630,6 +69091,8 @@ export namespace Prisma {
   export type UserAvgOrderByAggregateInput = {
     sessionVersion?: SortOrder
     reminderLeadDays?: SortOrder
+    publicCardViews?: SortOrder
+    addToKontaxClicks?: SortOrder
   }
 
   export type UserMaxOrderByAggregateInput = {
@@ -67654,6 +69117,10 @@ export namespace Prisma {
     planOverriddenAt?: SortOrder
     reminderLeadDays?: SortOrder
     calToken?: SortOrder
+    username?: SortOrder
+    usernameClaimedAt?: SortOrder
+    publicCardViews?: SortOrder
+    addToKontaxClicks?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -67680,6 +69147,10 @@ export namespace Prisma {
     planOverriddenAt?: SortOrder
     reminderLeadDays?: SortOrder
     calToken?: SortOrder
+    username?: SortOrder
+    usernameClaimedAt?: SortOrder
+    publicCardViews?: SortOrder
+    addToKontaxClicks?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -67687,6 +69158,8 @@ export namespace Prisma {
   export type UserSumOrderByAggregateInput = {
     sessionVersion?: SortOrder
     reminderLeadDays?: SortOrder
+    publicCardViews?: SortOrder
+    addToKontaxClicks?: SortOrder
   }
 
   export type StringWithAggregatesFilter<$PrismaModel = never> = {
@@ -67792,6 +69265,32 @@ export namespace Prisma {
     _min?: NestedEnumUserRoleFilter<$PrismaModel>
     _max?: NestedEnumUserRoleFilter<$PrismaModel>
   }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
 
   export type DateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
@@ -67810,6 +69309,27 @@ export namespace Prisma {
   export type UserScalarRelationFilter = {
     is?: UserWhereInput
     isNot?: UserWhereInput
+  }
+
+  export type PublicCardViewCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    viewedAt?: SortOrder
+    referrer?: SortOrder
+  }
+
+  export type PublicCardViewMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    viewedAt?: SortOrder
+    referrer?: SortOrder
+  }
+
+  export type PublicCardViewMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    viewedAt?: SortOrder
+    referrer?: SortOrder
   }
 
   export type UserOnboardingStateCountOrderByAggregateInput = {
@@ -67900,29 +69420,6 @@ export namespace Prisma {
     gt?: number | IntFieldRefInput<$PrismaModel>
     gte?: number | IntFieldRefInput<$PrismaModel>
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
-  }
-  export type JsonNullableFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
   export type EnumSourceTypeFilter<$PrismaModel = never> = {
@@ -68125,32 +69622,6 @@ export namespace Prisma {
     _sum?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedIntNullableFilter<$PrismaModel>
     _max?: NestedIntNullableFilter<$PrismaModel>
-  }
-  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
-        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
-
-  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedJsonNullableFilter<$PrismaModel>
-    _max?: NestedJsonNullableFilter<$PrismaModel>
   }
 
   export type EnumSourceTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -70977,6 +72448,13 @@ export namespace Prisma {
     connect?: UserOnboardingStateWhereUniqueInput
   }
 
+  export type PublicCardViewCreateNestedManyWithoutUserInput = {
+    create?: XOR<PublicCardViewCreateWithoutUserInput, PublicCardViewUncheckedCreateWithoutUserInput> | PublicCardViewCreateWithoutUserInput[] | PublicCardViewUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PublicCardViewCreateOrConnectWithoutUserInput | PublicCardViewCreateOrConnectWithoutUserInput[]
+    createMany?: PublicCardViewCreateManyUserInputEnvelope
+    connect?: PublicCardViewWhereUniqueInput | PublicCardViewWhereUniqueInput[]
+  }
+
   export type AppPasswordUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
@@ -71196,6 +72674,13 @@ export namespace Prisma {
     create?: XOR<UserOnboardingStateCreateWithoutUserInput, UserOnboardingStateUncheckedCreateWithoutUserInput>
     connectOrCreate?: UserOnboardingStateCreateOrConnectWithoutUserInput
     connect?: UserOnboardingStateWhereUniqueInput
+  }
+
+  export type PublicCardViewUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<PublicCardViewCreateWithoutUserInput, PublicCardViewUncheckedCreateWithoutUserInput> | PublicCardViewCreateWithoutUserInput[] | PublicCardViewUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PublicCardViewCreateOrConnectWithoutUserInput | PublicCardViewCreateOrConnectWithoutUserInput[]
+    createMany?: PublicCardViewCreateManyUserInputEnvelope
+    connect?: PublicCardViewWhereUniqueInput | PublicCardViewWhereUniqueInput[]
   }
 
   export type StringFieldUpdateOperationsInput = {
@@ -71674,6 +73159,20 @@ export namespace Prisma {
     update?: XOR<XOR<UserOnboardingStateUpdateToOneWithWhereWithoutUserInput, UserOnboardingStateUpdateWithoutUserInput>, UserOnboardingStateUncheckedUpdateWithoutUserInput>
   }
 
+  export type PublicCardViewUpdateManyWithoutUserNestedInput = {
+    create?: XOR<PublicCardViewCreateWithoutUserInput, PublicCardViewUncheckedCreateWithoutUserInput> | PublicCardViewCreateWithoutUserInput[] | PublicCardViewUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PublicCardViewCreateOrConnectWithoutUserInput | PublicCardViewCreateOrConnectWithoutUserInput[]
+    upsert?: PublicCardViewUpsertWithWhereUniqueWithoutUserInput | PublicCardViewUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: PublicCardViewCreateManyUserInputEnvelope
+    set?: PublicCardViewWhereUniqueInput | PublicCardViewWhereUniqueInput[]
+    disconnect?: PublicCardViewWhereUniqueInput | PublicCardViewWhereUniqueInput[]
+    delete?: PublicCardViewWhereUniqueInput | PublicCardViewWhereUniqueInput[]
+    connect?: PublicCardViewWhereUniqueInput | PublicCardViewWhereUniqueInput[]
+    update?: PublicCardViewUpdateWithWhereUniqueWithoutUserInput | PublicCardViewUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: PublicCardViewUpdateManyWithWhereWithoutUserInput | PublicCardViewUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: PublicCardViewScalarWhereInput | PublicCardViewScalarWhereInput[]
+  }
+
   export type AppPasswordUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<AppPasswordCreateWithoutUserInput, AppPasswordUncheckedCreateWithoutUserInput> | AppPasswordCreateWithoutUserInput[] | AppPasswordUncheckedCreateWithoutUserInput[]
     connectOrCreate?: AppPasswordCreateOrConnectWithoutUserInput | AppPasswordCreateOrConnectWithoutUserInput[]
@@ -72108,6 +73607,34 @@ export namespace Prisma {
     delete?: UserOnboardingStateWhereInput | boolean
     connect?: UserOnboardingStateWhereUniqueInput
     update?: XOR<XOR<UserOnboardingStateUpdateToOneWithWhereWithoutUserInput, UserOnboardingStateUpdateWithoutUserInput>, UserOnboardingStateUncheckedUpdateWithoutUserInput>
+  }
+
+  export type PublicCardViewUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<PublicCardViewCreateWithoutUserInput, PublicCardViewUncheckedCreateWithoutUserInput> | PublicCardViewCreateWithoutUserInput[] | PublicCardViewUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: PublicCardViewCreateOrConnectWithoutUserInput | PublicCardViewCreateOrConnectWithoutUserInput[]
+    upsert?: PublicCardViewUpsertWithWhereUniqueWithoutUserInput | PublicCardViewUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: PublicCardViewCreateManyUserInputEnvelope
+    set?: PublicCardViewWhereUniqueInput | PublicCardViewWhereUniqueInput[]
+    disconnect?: PublicCardViewWhereUniqueInput | PublicCardViewWhereUniqueInput[]
+    delete?: PublicCardViewWhereUniqueInput | PublicCardViewWhereUniqueInput[]
+    connect?: PublicCardViewWhereUniqueInput | PublicCardViewWhereUniqueInput[]
+    update?: PublicCardViewUpdateWithWhereUniqueWithoutUserInput | PublicCardViewUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: PublicCardViewUpdateManyWithWhereWithoutUserInput | PublicCardViewUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: PublicCardViewScalarWhereInput | PublicCardViewScalarWhereInput[]
+  }
+
+  export type UserCreateNestedOneWithoutCardViewLogInput = {
+    create?: XOR<UserCreateWithoutCardViewLogInput, UserUncheckedCreateWithoutCardViewLogInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCardViewLogInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutCardViewLogNestedInput = {
+    create?: XOR<UserCreateWithoutCardViewLogInput, UserUncheckedCreateWithoutCardViewLogInput>
+    connectOrCreate?: UserCreateOrConnectWithoutCardViewLogInput
+    upsert?: UserUpsertWithoutCardViewLogInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutCardViewLogInput, UserUpdateWithoutCardViewLogInput>, UserUncheckedUpdateWithoutCardViewLogInput>
   }
 
   export type UserCreateNestedOneWithoutOnboardingStateInput = {
@@ -74519,6 +76046,29 @@ export namespace Prisma {
     _min?: NestedEnumUserRoleFilter<$PrismaModel>
     _max?: NestedEnumUserRoleFilter<$PrismaModel>
   }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
 
   export type NestedDateTimeWithAggregatesFilter<$PrismaModel = never> = {
     equals?: Date | string | DateTimeFieldRefInput<$PrismaModel>
@@ -74566,29 +76116,6 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
-  }
-  export type NestedJsonNullableFilter<$PrismaModel = never> =
-    | PatchUndefined<
-        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
-        Required<NestedJsonNullableFilterBase<$PrismaModel>>
-      >
-    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
-
-  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
-    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
-    path?: string[]
-    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
-    string_contains?: string | StringFieldRefInput<$PrismaModel>
-    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
-    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
-    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
-    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
-    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
   export type NestedEnumSourceTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -76499,6 +78026,28 @@ export namespace Prisma {
     create: XOR<UserOnboardingStateCreateWithoutUserInput, UserOnboardingStateUncheckedCreateWithoutUserInput>
   }
 
+  export type PublicCardViewCreateWithoutUserInput = {
+    id?: string
+    viewedAt?: Date | string
+    referrer?: string | null
+  }
+
+  export type PublicCardViewUncheckedCreateWithoutUserInput = {
+    id?: string
+    viewedAt?: Date | string
+    referrer?: string | null
+  }
+
+  export type PublicCardViewCreateOrConnectWithoutUserInput = {
+    where: PublicCardViewWhereUniqueInput
+    create: XOR<PublicCardViewCreateWithoutUserInput, PublicCardViewUncheckedCreateWithoutUserInput>
+  }
+
+  export type PublicCardViewCreateManyUserInputEnvelope = {
+    data: PublicCardViewCreateManyUserInput | PublicCardViewCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AppPasswordUpsertWithWhereUniqueWithoutUserInput = {
     where: AppPasswordWhereUniqueInput
     update: XOR<AppPasswordUpdateWithoutUserInput, AppPasswordUncheckedUpdateWithoutUserInput>
@@ -77593,7 +79142,33 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
-  export type UserCreateWithoutOnboardingStateInput = {
+  export type PublicCardViewUpsertWithWhereUniqueWithoutUserInput = {
+    where: PublicCardViewWhereUniqueInput
+    update: XOR<PublicCardViewUpdateWithoutUserInput, PublicCardViewUncheckedUpdateWithoutUserInput>
+    create: XOR<PublicCardViewCreateWithoutUserInput, PublicCardViewUncheckedCreateWithoutUserInput>
+  }
+
+  export type PublicCardViewUpdateWithWhereUniqueWithoutUserInput = {
+    where: PublicCardViewWhereUniqueInput
+    data: XOR<PublicCardViewUpdateWithoutUserInput, PublicCardViewUncheckedUpdateWithoutUserInput>
+  }
+
+  export type PublicCardViewUpdateManyWithWhereWithoutUserInput = {
+    where: PublicCardViewScalarWhereInput
+    data: XOR<PublicCardViewUpdateManyMutationInput, PublicCardViewUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type PublicCardViewScalarWhereInput = {
+    AND?: PublicCardViewScalarWhereInput | PublicCardViewScalarWhereInput[]
+    OR?: PublicCardViewScalarWhereInput[]
+    NOT?: PublicCardViewScalarWhereInput | PublicCardViewScalarWhereInput[]
+    id?: StringFilter<"PublicCardView"> | string
+    userId?: StringFilter<"PublicCardView"> | string
+    viewedAt?: DateTimeFilter<"PublicCardView"> | Date | string
+    referrer?: StringNullableFilter<"PublicCardView"> | string | null
+  }
+
+  export type UserCreateWithoutCardViewLogInput = {
     id?: string
     name?: string | null
     email: string
@@ -77615,6 +79190,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -77648,9 +79228,10 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
 
-  export type UserUncheckedCreateWithoutOnboardingStateInput = {
+  export type UserUncheckedCreateWithoutCardViewLogInput = {
     id?: string
     name?: string | null
     email: string
@@ -77672,6 +79253,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -77705,6 +79291,275 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutCardViewLogInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutCardViewLogInput, UserUncheckedCreateWithoutCardViewLogInput>
+  }
+
+  export type UserUpsertWithoutCardViewLogInput = {
+    update: XOR<UserUpdateWithoutCardViewLogInput, UserUncheckedUpdateWithoutCardViewLogInput>
+    create: XOR<UserCreateWithoutCardViewLogInput, UserUncheckedCreateWithoutCardViewLogInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutCardViewLogInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutCardViewLogInput, UserUncheckedUpdateWithoutCardViewLogInput>
+  }
+
+  export type UserUpdateWithoutCardViewLogInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutCardViewLogInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutOnboardingStateInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutOnboardingStateInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutOnboardingStateInput = {
@@ -77745,6 +79600,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -77778,6 +79638,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOnboardingStateInput = {
@@ -77802,6 +79663,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -77835,6 +79701,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutAppPasswordsInput = {
@@ -77859,6 +79726,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -77892,6 +79764,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAppPasswordsInput = {
@@ -77916,6 +79789,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -77949,6 +79827,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAppPasswordsInput = {
@@ -78043,6 +79922,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -78076,6 +79960,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAppPasswordsInput = {
@@ -78100,6 +79985,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -78133,6 +80023,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SyncConflictUpsertWithWhereUniqueWithoutAppPasswordInput = {
@@ -78199,6 +80090,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -78232,6 +80128,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutContactsInput = {
@@ -78256,6 +80153,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -78289,6 +80191,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutContactsInput = {
@@ -79052,6 +80955,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -79085,6 +80993,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutContactsInput = {
@@ -79109,6 +81018,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -79142,6 +81056,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ImportJobUpsertWithoutContactsInput = {
@@ -79592,6 +81507,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -79625,6 +81545,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSubscriptionCustomerInput = {
@@ -79649,6 +81570,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -79682,6 +81608,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSubscriptionCustomerInput = {
@@ -79802,6 +81729,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -79835,6 +81767,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSubscriptionCustomerInput = {
@@ -79859,6 +81792,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -79892,6 +81830,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SubscriptionUpsertWithWhereUniqueWithoutSubscriptionCustomerInput = {
@@ -79932,6 +81871,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -79965,6 +81909,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSubscriptionsInput = {
@@ -79989,6 +81934,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -80022,6 +81972,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSubscriptionsInput = {
@@ -80127,6 +82078,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -80160,6 +82116,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSubscriptionsInput = {
@@ -80184,6 +82141,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -80217,6 +82179,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SubscriptionCustomerUpsertWithoutSubscriptionsInput = {
@@ -80288,6 +82251,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -80321,6 +82289,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutImportJobsInput = {
@@ -80345,6 +82314,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -80378,6 +82352,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutImportJobsInput = {
@@ -80550,6 +82525,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -80583,6 +82563,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutImportJobsInput = {
@@ -80607,6 +82588,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -80640,6 +82626,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ContactUpsertWithWhereUniqueWithoutImportJobInput = {
@@ -80680,6 +82667,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -80713,6 +82705,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutExportJobsInput = {
@@ -80737,6 +82730,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -80770,6 +82768,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutExportJobsInput = {
@@ -80810,6 +82809,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -80843,6 +82847,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutExportJobsInput = {
@@ -80867,6 +82872,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -80900,6 +82910,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutMergeSuggestionsInput = {
@@ -80924,6 +82935,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -80957,6 +82973,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutMergeSuggestionsInput = {
@@ -80981,6 +82998,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -81014,6 +83036,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutMergeSuggestionsInput = {
@@ -81346,6 +83369,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -81379,6 +83407,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMergeSuggestionsInput = {
@@ -81403,6 +83432,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -81436,6 +83470,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ContactUpsertWithoutLeftMergeSuggestionsInput = {
@@ -81785,6 +83820,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -81818,6 +83858,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutMergeDecisionsInput = {
@@ -81842,6 +83883,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -81875,6 +83921,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutMergeDecisionsInput = {
@@ -81964,6 +84011,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -81997,6 +84049,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutMergeDecisionsInput = {
@@ -82021,6 +84074,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -82054,6 +84112,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutSyncAccountsInput = {
@@ -82078,6 +84137,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -82111,6 +84175,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSyncAccountsInput = {
@@ -82135,6 +84200,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -82168,6 +84238,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSyncAccountsInput = {
@@ -82416,6 +84487,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -82449,6 +84525,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSyncAccountsInput = {
@@ -82473,6 +84550,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -82506,6 +84588,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SyncContactLinkUpsertWithWhereUniqueWithoutSyncAccountInput = {
@@ -84039,6 +86122,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -84072,6 +86160,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutEmailVerificationTokensInput = {
@@ -84096,6 +86185,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -84129,6 +86223,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutEmailVerificationTokensInput = {
@@ -84169,6 +86264,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -84202,6 +86302,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutEmailVerificationTokensInput = {
@@ -84226,6 +86327,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -84259,6 +86365,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutPasswordResetTokensInput = {
@@ -84283,6 +86390,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -84316,6 +86428,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutPasswordResetTokensInput = {
@@ -84340,6 +86453,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -84373,6 +86491,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutPasswordResetTokensInput = {
@@ -84413,6 +86532,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -84446,6 +86570,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPasswordResetTokensInput = {
@@ -84470,6 +86595,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -84503,6 +86633,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutSessionsInput = {
@@ -84527,6 +86658,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -84560,6 +86696,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSessionsInput = {
@@ -84584,6 +86721,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -84617,6 +86759,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSessionsInput = {
@@ -84657,6 +86800,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -84690,6 +86838,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -84714,6 +86863,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -84747,6 +86901,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutTotpRecoveryCodesInput = {
@@ -84771,6 +86926,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -84804,6 +86964,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutTotpRecoveryCodesInput = {
@@ -84828,6 +86989,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -84861,6 +87027,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutTotpRecoveryCodesInput = {
@@ -84901,6 +87068,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -84934,6 +87106,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutTotpRecoveryCodesInput = {
@@ -84958,6 +87131,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -84991,6 +87169,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutActivityEventsInput = {
@@ -85015,6 +87194,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -85048,6 +87232,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutActivityEventsInput = {
@@ -85072,6 +87257,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -85105,6 +87295,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutActivityEventsInput = {
@@ -85272,6 +87463,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -85305,6 +87501,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutActivityEventsInput = {
@@ -85329,6 +87526,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -85362,6 +87564,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ContactUpsertWithoutActivityEventsInput = {
@@ -85519,6 +87722,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -85552,6 +87760,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAdminAuditEventsInput = {
@@ -85576,6 +87785,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -85609,6 +87823,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAdminAuditEventsInput = {
@@ -85649,6 +87864,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -85682,6 +87902,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAdminAuditEventsInput = {
@@ -85706,6 +87927,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -85739,6 +87965,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutOwnedGroupsInput = {
@@ -85763,6 +87990,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -85796,6 +88028,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutOwnedGroupsInput = {
@@ -85820,6 +88053,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -85853,6 +88091,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutOwnedGroupsInput = {
@@ -86072,6 +88311,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -86105,6 +88349,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutOwnedGroupsInput = {
@@ -86129,6 +88374,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -86162,6 +88412,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SubscriptionUpsertWithoutGroupsInput = {
@@ -86377,6 +88628,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -86410,6 +88666,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutGroupMembershipsInput = {
@@ -86434,6 +88691,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -86467,6 +88729,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutGroupMembershipsInput = {
@@ -86548,6 +88811,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -86581,6 +88849,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutGroupMembershipsInput = {
@@ -86605,6 +88874,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -86638,6 +88912,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type GroupCreateWithoutAddressBooksInput = {
@@ -86822,6 +89097,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -86855,6 +89135,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutAddressBooksInput = {
@@ -86879,6 +89160,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -86912,6 +89198,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutAddressBooksInput = {
@@ -87084,6 +89371,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -87117,6 +89409,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutAddressBooksInput = {
@@ -87141,6 +89434,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -87174,6 +89472,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ContactUpsertWithWhereUniqueWithoutBookInput = {
@@ -87214,6 +89513,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -87247,6 +89551,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSavedFiltersInput = {
@@ -87271,6 +89576,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -87304,6 +89614,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSavedFiltersInput = {
@@ -87344,6 +89655,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -87377,6 +89693,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSavedFiltersInput = {
@@ -87401,6 +89718,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -87434,6 +89756,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type GroupCreateWithoutTeamSyncAccountsInput = {
@@ -88090,6 +90413,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -88123,6 +90451,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutContactSharesOwnedInput = {
@@ -88147,6 +90476,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -88180,6 +90514,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutContactSharesOwnedInput = {
@@ -88336,6 +90671,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -88369,6 +90709,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutContactSharesReceivedInput = {
@@ -88393,6 +90734,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -88426,6 +90772,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutContactSharesReceivedInput = {
@@ -88593,6 +90940,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -88626,6 +90978,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutContactSharesOwnedInput = {
@@ -88650,6 +91003,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -88683,6 +91041,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ContactUpsertWithoutSharesFromContactInput = {
@@ -88851,6 +91210,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -88884,6 +91248,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutContactSharesReceivedInput = {
@@ -88908,6 +91273,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -88941,6 +91311,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ContactUpsertWithoutSharesAsRecipientCopyInput = {
@@ -89098,6 +91469,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -89131,6 +91507,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutNotificationsInput = {
@@ -89155,6 +91532,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -89188,6 +91570,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutNotificationsInput = {
@@ -89257,6 +91640,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -89290,6 +91678,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutNotificationsInput = {
@@ -89314,6 +91703,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -89347,6 +91741,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type SecurityAlertUpsertWithoutNotificationsInput = {
@@ -89406,6 +91801,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -89439,6 +91839,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutSecurityAlertsInput = {
@@ -89463,6 +91864,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -89496,6 +91902,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutSecurityAlertsInput = {
@@ -89572,6 +91979,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -89605,6 +92017,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutSecurityAlertsInput = {
@@ -89629,6 +92042,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -89662,6 +92080,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type NotificationUpsertWithWhereUniqueWithoutSecurityAlertInput = {
@@ -89702,6 +92121,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -89735,6 +92159,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutNotificationSettingsInput = {
@@ -89759,6 +92184,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -89792,6 +92222,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutNotificationSettingsInput = {
@@ -89832,6 +92263,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -89865,6 +92301,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutNotificationSettingsInput = {
@@ -89889,6 +92326,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -89922,6 +92364,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutFailedLoginAttemptsInput = {
@@ -89946,6 +92389,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -89979,6 +92427,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutFailedLoginAttemptsInput = {
@@ -90003,6 +92452,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -90036,6 +92490,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutFailedLoginAttemptsInput = {
@@ -90076,6 +92531,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -90109,6 +92569,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutFailedLoginAttemptsInput = {
@@ -90133,6 +92594,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -90166,6 +92632,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutBirthdayReminderStatesInput = {
@@ -90190,6 +92657,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -90223,6 +92695,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutBirthdayReminderStatesInput = {
@@ -90247,6 +92720,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -90280,6 +92758,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutBirthdayReminderStatesInput = {
@@ -90447,6 +92926,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -90480,6 +92964,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutBirthdayReminderStatesInput = {
@@ -90504,6 +92989,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -90537,6 +93027,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type ContactUpsertWithoutBirthdayReminderStatesInput = {
@@ -90694,6 +93185,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -90727,6 +93223,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutImportMappingSuggestionFeedbacksInput = {
@@ -90751,6 +93248,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -90784,6 +93286,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutImportMappingSuggestionFeedbacksInput = {
@@ -90824,6 +93327,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -90857,6 +93365,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutImportMappingSuggestionFeedbacksInput = {
@@ -90881,6 +93390,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -90914,6 +93428,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutImportMappingPresetsInput = {
@@ -90938,6 +93453,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -90971,6 +93491,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutImportMappingPresetsInput = {
@@ -90995,6 +93516,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -91028,6 +93554,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutImportMappingPresetsInput = {
@@ -91068,6 +93595,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -91101,6 +93633,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutImportMappingPresetsInput = {
@@ -91125,6 +93658,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -91158,6 +93696,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutExportPresetsInput = {
@@ -91182,6 +93721,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -91215,6 +93759,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutExportPresetsInput = {
@@ -91239,6 +93784,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -91272,6 +93822,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutExportPresetsInput = {
@@ -91312,6 +93863,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -91345,6 +93901,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutExportPresetsInput = {
@@ -91369,6 +93926,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -91402,6 +93964,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutDataExportJobsInput = {
@@ -91426,6 +93989,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -91459,6 +94027,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutDataExportJobsInput = {
@@ -91483,6 +94052,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -91516,6 +94090,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutDataExportJobsInput = {
@@ -91556,6 +94131,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -91589,6 +94169,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutDataExportJobsInput = {
@@ -91613,6 +94194,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -91646,6 +94232,7 @@ export namespace Prisma {
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type UserCreateWithoutApiTokensInput = {
@@ -91670,6 +94257,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -91703,6 +94295,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
 
   export type UserUncheckedCreateWithoutApiTokensInput = {
@@ -91727,6 +94320,11 @@ export namespace Prisma {
     planOverriddenAt?: Date | string | null
     reminderLeadDays?: number
     calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -91760,6 +94358,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
 
   export type UserCreateOrConnectWithoutApiTokensInput = {
@@ -91800,6 +94399,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -91833,6 +94437,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
 
   export type UserUncheckedUpdateWithoutApiTokensInput = {
@@ -91857,6 +94462,11 @@ export namespace Prisma {
     planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     reminderLeadDays?: IntFieldUpdateOperationsInput | number
     calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -91890,6 +94500,7 @@ export namespace Prisma {
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
   export type AppPasswordCreateManyUserInput = {
@@ -92329,6 +94940,12 @@ export namespace Prisma {
     id?: string
     ipAddress?: string | null
     createdAt?: Date | string
+  }
+
+  export type PublicCardViewCreateManyUserInput = {
+    id?: string
+    viewedAt?: Date | string
+    referrer?: string | null
   }
 
   export type AppPasswordUpdateWithoutUserInput = {
@@ -93694,6 +96311,24 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     ipAddress?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PublicCardViewUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    viewedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    referrer?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type PublicCardViewUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    viewedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    referrer?: NullableStringFieldUpdateOperationsInput | string | null
+  }
+
+  export type PublicCardViewUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    viewedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    referrer?: NullableStringFieldUpdateOperationsInput | string | null
   }
 
   export type SyncConflictCreateManyAppPasswordInput = {
