@@ -1,7 +1,7 @@
 # Phase 32 — Documentation (backfill & standardization)
 
 ## Phase status
-Pre-plan
+In progress — P32-01 complete
 
 ## Phase objective
 Bring documentation up to standard across everything Kontax already does. Phases
@@ -35,7 +35,7 @@ per-ticket convention, so this phase's scope is the **historical backlog plus an
 ## Proposed tickets
 
 ### P32-01 — Documentation audit & gap matrix
-Status: Not Started · Priority: P0
+Status: Done · Priority: P0 · Output: [p32-01-doc-audit-gap-matrix.md](p32-01-doc-audit-gap-matrix.md)
 
 Inventory Phases 1–31 against the four surfaces. Produce a matrix (feature/phase
 × user-help / dev-docs / runbook / concept-doc) marking present / missing /
