@@ -445,7 +445,6 @@ export function ContactDashboard({
                 color={sidebarLabels.find((l) => l.name.toLowerCase() === currentLabel.toLowerCase())?.color ?? "#8b938c"}
                 count={counts.people}
                 clearHref={buildHref("people", { filter: "all" })}
-                onSaveAsList={() => {/* handled by SmartListsBooks save flow */}}
               />
             </div>
             <div className="md:hidden">
@@ -454,7 +453,6 @@ export function ContactDashboard({
                 color={sidebarLabels.find((l) => l.name.toLowerCase() === currentLabel.toLowerCase())?.color ?? "#8b938c"}
                 count={counts.people}
                 clearHref={buildHref("people", { filter: "all" })}
-                onSaveAsList={() => {/* handled by SmartListsBooks save flow */}}
               />
             </div>
           </>
