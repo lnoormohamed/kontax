@@ -189,3 +189,10 @@ Copy button copies the HTML. Instructions: "Paste this into your email client's 
 - Visibility toggle states (always-on, checked, unchecked) are fully specified.
 - Username availability states (available, taken, reserved) are specified with colour indicators.
 - Mobile: card is full-width, no rounded container; field rows stack; CTA is full-width.
+
+## Documentation (per roadmap/documentation-policy.md)
+On completion, update the relevant surface(s):
+- [ ] External · users — in-app Help (P26-12)
+- [ ] External · developers — /developers (P29-07)
+- [ ] Internal · admins/ops — roadmap/runbooks/
+- [ ] Internal · engineering — docs/

@@ -203,3 +203,10 @@ When `shareUrl` is provided, skip the `getOrCreateVCardShareLink` call and use t
 
 - **Email signature HTML in Outlook:** Outlook's email renderer does not support `<p>` tags inside table cells reliably in some versions. The snippet uses `<table>` + `<td>` layout for maximum compatibility. Test the snippet in Outlook before marking this ticket done.
 - **QrCodeModal coupling:** the P28-06 `QrCodeModal` was built specifically for contact-level sharing (it calls `getOrCreateVCardShareLink`). The refactor to support a direct `shareUrl` prop must not break the P28-06 contact usage. Add a test for both paths in the component.
+
+## Documentation (per roadmap/documentation-policy.md)
+On completion, update the relevant surface(s):
+- [ ] External · users — in-app Help (P26-12)
+- [ ] External · developers — /developers (P29-07)
+- [ ] Internal · admins/ops — roadmap/runbooks/
+- [ ] Internal · engineering — docs/

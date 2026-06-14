@@ -202,3 +202,10 @@ The settings page (P29-03) polls this every 5 seconds while status is `PENDING` 
 
 - **CRON frequency vs Vercel limits:** Vercel's free plan limits cron jobs to once per day; Pro allows up to once per minute. Confirm the project's Vercel plan before setting `"* * * * *"` frequency. An alternative: trigger the export generation synchronously via a background `fetch` call inside `requestDataExport` using a Next.js Route Handler with `waitUntil` (Vercel Edge Runtime) to avoid CRON dependency entirely.
 - **Concurrent CRON runs:** if two CRON invocations pick up the same job simultaneously, both will try to generate the export. Mitigate with a database-level advisory lock or by atomically transitioning from `PENDING` to `PROCESSING` using a conditional update: `UPDATE ... WHERE status = 'PENDING' AND id = ? RETURNING id` — only one runner proceeds.
+
+## Documentation (per roadmap/documentation-policy.md)
+On completion, update the relevant surface(s):
+- [ ] External · users — in-app Help (P26-12)
+- [ ] External · developers — /developers (P29-07)
+- [ ] Internal · admins/ops — roadmap/runbooks/
+- [ ] Internal · engineering — docs/

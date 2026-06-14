@@ -191,3 +191,10 @@ Or use `react-syntax-highlighter` for inline code blocks. Apply the `github-ligh
 ## Risks and Open Questions
 
 - **Keeping docs in sync with the API:** as the API evolves, the documentation page must be updated manually. Consider a `/* API_VERSION: 1 */` comment at the top of the docs page as a reminder of the current version. A future improvement is auto-generating docs from the Zod schemas (P29-06).
+
+## Documentation (per roadmap/documentation-policy.md)
+On completion, update the relevant surface(s):
+- [ ] External · users — in-app Help (P26-12)
+- [ ] External · developers — /developers (P29-07)
+- [ ] Internal · admins/ops — roadmap/runbooks/
+- [ ] Internal · engineering — docs/

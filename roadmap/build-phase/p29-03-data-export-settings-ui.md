@@ -198,3 +198,10 @@ export async function requestDataExport(params: {
 ## Risks and Open Questions
 
 - **Download URL security:** the download URL points directly to the ZIP file on Vercel Blob or S3. The URL is unguessable (contains the user ID and a timestamp hash) but is not authenticated — anyone with the URL can download it for 48 hours. For higher security, generate a server-side redirect route (`/api/data-export/download?jobId={id}`) that validates the session before redirecting to the blob URL. This is a P2 hardening step.
+
+## Documentation (per roadmap/documentation-policy.md)
+On completion, update the relevant surface(s):
+- [ ] External · users — in-app Help (P26-12)
+- [ ] External · developers — /developers (P29-07)
+- [ ] Internal · admins/ops — roadmap/runbooks/
+- [ ] Internal · engineering — docs/

@@ -175,3 +175,10 @@ My scripts          read-only    Last used: 2h ago
 
 - **Valkey availability:** if the self-hosted Valkey instance is unavailable, `checkApiRateLimit` will throw. Handle this gracefully by catching the error and allowing the request through (fail open) with a logged warning. Rate limiting is a best-effort protection, not a hard security gate — the token validation (P29-05) is the security layer.
 - **Sliding window vs fixed window:** `Ratelimit.slidingWindow` is fairer than `fixedWindow` (avoids the "burst at the top of the hour" exploit) but slightly more expensive in Redis. For the request volumes expected at v1 launch (hundreds of tokens, not millions), this is not a concern.
+
+## Documentation (per roadmap/documentation-policy.md)
+On completion, update the relevant surface(s):
+- [ ] External · users — in-app Help (P26-12)
+- [ ] External · developers — /developers (P29-07)
+- [ ] Internal · admins/ops — roadmap/runbooks/
+- [ ] Internal · engineering — docs/

@@ -240,3 +240,10 @@ function buildPersonSchema(card: PublicCardData): object {
 
 - **"Own profile" contact vs User fields:** deciding whether the public card reads from a special contact record or from User-level fields is an architectural choice. The contact record approach is more flexible (uses all the rich field infrastructure from Phase 6) but adds complexity (an `isOwnProfile` flag, a migration to create the profile contact for existing users). The User-field approach is simpler but limits the card to fields explicitly stored on User. For v1, start with User fields and add a migration path to contact-backed profiles later.
 - **Card caching:** public cards are server-rendered on every request. For popular cards, add a 60-second `Cache-Control: public, max-age=60` header so CDN edge nodes cache the page. The view count increment is fire-and-forget so it is not blocked by caching.
+
+## Documentation (per roadmap/documentation-policy.md)
+On completion, update the relevant surface(s):
+- [ ] External · users — in-app Help (P26-12)
+- [ ] External · developers — /developers (P29-07)
+- [ ] Internal · admins/ops — roadmap/runbooks/
+- [ ] Internal · engineering — docs/

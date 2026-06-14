@@ -180,3 +180,10 @@ you can do so from the account deletion settings.
 - All 4 data export status states (idle, preparing, ready, expired) are specified.
 - Rate limit display per token is specified.
 - Mobile: token list rows stack; create modal is a full-screen bottom sheet.
+
+## Documentation (per roadmap/documentation-policy.md)
+On completion, update the relevant surface(s):
+- [ ] External · users — in-app Help (P26-12)
+- [ ] External · developers — /developers (P29-07)
+- [ ] Internal · admins/ops — roadmap/runbooks/
+- [ ] Internal · engineering — docs/

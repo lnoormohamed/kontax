@@ -214,3 +214,10 @@ function UsernameClaimInput() {
 
 - **Username squatting on launch:** early users may claim common names. Consider requiring email verification before a username can be claimed (already a prerequisite for Pro features in this roadmap, so this is implicitly handled).
 - **Username change and SEO:** if a user changes their username, the old URL (`/u/oldname`) returns a 404. This breaks any links the user has shared. For v1, usernames are immutable after claiming (the 30-day cooldown plus a support step is the change path). Document this prominently in the UI: "Choose carefully — your URL cannot be changed easily."
+
+## Documentation (per roadmap/documentation-policy.md)
+On completion, update the relevant surface(s):
+- [ ] External · users — in-app Help (P26-12)
+- [ ] External · developers — /developers (P29-07)
+- [ ] Internal · admins/ops — roadmap/runbooks/
+- [ ] Internal · engineering — docs/

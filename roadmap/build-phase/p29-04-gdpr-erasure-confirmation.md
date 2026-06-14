@@ -148,3 +148,10 @@ The email send is fire-and-forget (`void sendAccountDeletionConfirmationEmail(..
 
 - **Suppression check:** `sendEmail` calls `isEmailSuppressed`, which looks up the User row. Since the user is deleted before the email is sent, the lookup will return `null` — and `null?.emailStatus` is `undefined`, not `BOUNCED`. Confirm that `isEmailSuppressed` handles a not-found user gracefully (returns `false`, allowing the send). Add a null-safe guard if needed.
 - **GDPR audit log:** consider storing a record of the deletion confirmation in a separate `DeletionRecord` table (not on `User`, which is deleted) for compliance auditing. This is a P2 hardening step.
+
+## Documentation (per roadmap/documentation-policy.md)
+On completion, update the relevant surface(s):
+- [ ] External · users — in-app Help (P26-12)
+- [ ] External · developers — /developers (P29-07)
+- [ ] Internal · admins/ops — roadmap/runbooks/
+- [ ] Internal · engineering — docs/

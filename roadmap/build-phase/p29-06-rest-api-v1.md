@@ -260,3 +260,10 @@ Validation errors include a `details` field:
 
 - **`PUT` vs `PATCH` semantics:** using `PUT` for updates means unspecified fields are cleared. Using `PATCH` means only specified fields are updated. The API uses `PATCH` semantics (partial update) even though the route is named `PUT` — document this explicitly in P29-07. A future v2 can add a true `PATCH` route.
 - **Multi-value fields (emails, phones):** the PUT endpoint replaces the entire `emails` or `phones` array. Callers must send the complete current array plus any new entries — they cannot add a single phone without sending all existing phones. This is a known limitation of REST array fields; document it clearly.
+
+## Documentation (per roadmap/documentation-policy.md)
+On completion, update the relevant surface(s):
+- [ ] External · users — in-app Help (P26-12)
+- [ ] External · developers — /developers (P29-07)
+- [ ] Internal · admins/ops — roadmap/runbooks/
+- [ ] Internal · engineering — docs/

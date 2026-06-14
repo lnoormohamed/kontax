@@ -225,3 +225,10 @@ await sendEmail({
 - **Large contact libraries:** for users with 10,000+ contacts, ZIP generation may take 30–60 seconds. Run export generation as a background job (P29-02 handles this). Never run it in-process on an HTTP request.
 - **Activity log cap at 10,000 events:** the export caps activity events to prevent multi-GB exports. For Teams users (unlimited retention), this may exclude old events. Consider a paginated export for large logs in a future iteration, or increase the cap to 100,000 for Teams.
 - **MinIO bucket policy:** the exports bucket should have private access (no public read). Access is via pre-signed URLs only. Ensure the MinIO LXC is reachable from the app server. If MinIO is unavailable, export jobs will fail at the upload step — surface this as a `FAILED` status on the job so the user can retry.
+
+## Documentation (per roadmap/documentation-policy.md)
+On completion, update the relevant surface(s):
+- [ ] External · users — in-app Help (P26-12)
+- [ ] External · developers — /developers (P29-07)
+- [ ] Internal · admins/ops — roadmap/runbooks/
+- [ ] Internal · engineering — docs/

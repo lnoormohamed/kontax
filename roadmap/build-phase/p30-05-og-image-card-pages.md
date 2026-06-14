@@ -214,3 +214,10 @@ twitter: {
 
 - **Edge DB access:** same as P26-10 — the edge runtime may not support the full Prisma client. Use an edge-compatible query or call an internal API endpoint from the OG route. Benchmark the cold start time; if > 500ms, switch to a short-TTL edge cache with a background regeneration strategy.
 - **Name-only OG image:** for v1, the OG image contains only the public name (no job title or company) because the profile field architecture (P30-02 risk note) is not yet resolved. Ship the basic name-and-initial image first; add subtitle when the profile fields decision is made.
+
+## Documentation (per roadmap/documentation-policy.md)
+On completion, update the relevant surface(s):
+- [ ] External · users — in-app Help (P26-12)
+- [ ] External · developers — /developers (P29-07)
+- [ ] Internal · admins/ops — roadmap/runbooks/
+- [ ] Internal · engineering — docs/

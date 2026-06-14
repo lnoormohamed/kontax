@@ -181,3 +181,10 @@ export default async function CardSettingsPage() {
 
 - **Missing field data:** if a user enables "Show phone" but has no phone number on their profile, the card renders with no phone row (not an error). The settings UI should show a hint: "Add a phone number in your profile to show it here." This requires a check of whether the underlying profile data exists.
 - **"Show email" and spam:** showing an email address publicly exposes it to scrapers. The card should use a `mailto:` link with `rel="nofollow"` but render the address as plaintext (not obfuscated) — email obfuscation via CSS is unreliable and breaks accessibility. Document this trade-off in the settings UI tooltip.
+
+## Documentation (per roadmap/documentation-policy.md)
+On completion, update the relevant surface(s):
+- [ ] External · users — in-app Help (P26-12)
+- [ ] External · developers — /developers (P29-07)
+- [ ] Internal · admins/ops — roadmap/runbooks/
+- [ ] Internal · engineering — docs/

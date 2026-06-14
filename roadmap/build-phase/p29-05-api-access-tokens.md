@@ -173,3 +173,10 @@ export async function validateApiToken(
 
 - **Token prefix collision:** the 12-char prefix (`ktx_live_7f3`) is display-only and not unique. If two tokens happen to share the same prefix, both appear identically in the UI. The user identifies tokens by name (which must be unique per user) — the prefix is just a visual hint. Add a uniqueness constraint on `(userId, name)` to ensure names are distinct.
 - **`requestCountThisMonth` reset:** the counter must reset at the start of each calendar month. Add a CRON job that runs on the 1st of each month: `db.apiToken.updateMany({ data: { requestCountThisMonth: 0 } })`. Alternatively, use a `countResetAt DateTime` field and compute the count in a time-windowed query, but the CRON approach is simpler for v1.
+
+## Documentation (per roadmap/documentation-policy.md)
+On completion, update the relevant surface(s):
+- [ ] External · users — in-app Help (P26-12)
+- [ ] External · developers — /developers (P29-07)
+- [ ] Internal · admins/ops — roadmap/runbooks/
+- [ ] Internal · engineering — docs/

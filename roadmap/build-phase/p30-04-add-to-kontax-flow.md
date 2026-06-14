@@ -217,3 +217,10 @@ await createContact({
 
 - **Mobile vCard download on iOS Safari:** iOS Safari opens `.vcf` files inline in the browser rather than downloading them — triggering the system "Add contact" sheet. This is actually better UX than a download. Test on real iOS to confirm the behaviour. On Android Chrome, the `.vcf` triggers a download followed by the system contacts import prompt.
 - **`atob` security:** the `prefill` param is base64-encoded JSON. It is not signed or authenticated — a malicious URL could pre-fill arbitrary data into the create form. Mitigate by sanitising all pre-fill values (trim, max length) before setting them in form state. The user sees the pre-filled form before saving — they are the last line of defence.
+
+## Documentation (per roadmap/documentation-policy.md)
+On completion, update the relevant surface(s):
+- [ ] External · users — in-app Help (P26-12)
+- [ ] External · developers — /developers (P29-07)
+- [ ] Internal · admins/ops — roadmap/runbooks/
+- [ ] Internal · engineering — docs/

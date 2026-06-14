@@ -173,3 +173,10 @@ Register: `{ "path": "/api/cron/cleanup-card-views", "schedule": "0 3 * * *" }` 
 
 - **Bot traffic inflating view counts:** search engine crawlers and link-preview bots will trigger the page's server component and inflate view counts. Mitigate by checking the `User-Agent` header in `recordCardView` and skipping recording for known bot patterns. Add `if (isBot(userAgent)) return;` before the DB write. A simple bot detection list (Googlebot, bingbot, twitterbot, facebookexternalhit, etc.) is sufficient for v1.
 - **Self-view inflation:** a user viewing their own card in settings or while testing will inflate their view count. Suppress self-views by checking if the logged-in session user ID matches the card owner: if `session?.user?.id === card.userId`, skip `recordCardView`.
+
+## Documentation (per roadmap/documentation-policy.md)
+On completion, update the relevant surface(s):
+- [ ] External · users — in-app Help (P26-12)
+- [ ] External · developers — /developers (P29-07)
+- [ ] Internal · admins/ops — roadmap/runbooks/
+- [ ] Internal · engineering — docs/
