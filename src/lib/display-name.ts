@@ -25,5 +25,5 @@ export function getDisplayName(
       ? `${last}, ${first}`
       : `${first} ${last}`;
   }
-  return contact.fullName?.trim() || contact.company?.trim() || "";
+  return contact.fullName?.trim() ?? contact.company?.trim() ?? "";
 }
