@@ -110,7 +110,7 @@ export async function AppShell({
             <span className="text-[19px] font-bold tracking-[-0.01em] text-[#1d2823]">Kontax</span>
           </Link>
 
-          <SearchDropdown labelRegistry={labelRegistry as { name: string; color: string }[]} />
+          <SearchDropdown labelRegistry={labelRegistry} />
 
           <div className="flex shrink-0 items-center gap-2.5">
             <Link

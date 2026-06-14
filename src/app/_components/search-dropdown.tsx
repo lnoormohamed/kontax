@@ -113,7 +113,7 @@ export function SearchDropdown({ labelRegistry = [] }: { labelRegistry?: LabelEn
 
   const sections = groupResults(results);
   const visRows = seVisibleRows(sections, expanded);
-  const activeId = activeIdx >= 0 && visRows[activeIdx] ? visRows[activeIdx]!.id : null;
+  const activeId = activeIdx >= 0 ? (visRows[activeIdx]?.id ?? null) : null;
   const total = results.length;
 
   // ── search ──────────────────────────────────────────────────────────────────

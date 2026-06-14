@@ -17,7 +17,6 @@ import {
   SearchRecentBlock,
   SearchResultsList,
   SearchSkeleton,
-  seVisibleRows,
 } from "~/app/_components/search-results";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 
@@ -42,7 +41,6 @@ export function MobileSearchButton({ labelRegistry = [] }: { labelRegistry?: Lab
   const router = useRouter();
 
   const sections = groupResults(results);
-  const visRows = seVisibleRows(sections, expanded);
 
   useEffect(() => setMounted(true), []);
 
@@ -60,7 +58,6 @@ export function MobileSearchButton({ labelRegistry = [] }: { labelRegistry?: Lab
       document.removeEventListener("keydown", onKey);
       document.body.style.overflow = prev;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open]);
 
   // Cancel in-flight requests when overlay closes.

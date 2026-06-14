@@ -92,7 +92,7 @@ function attributeMatch(
   }
 
   if (digits.length >= 2) {
-    if (c.phone && c.phone.replace(/\D/g, "").includes(digits)) {
+    if (c.phone?.replace(/\D/g, "").includes(digits)) {
       return { matchField: "phone", snippet: c.phone, matchAlt: false };
     }
     const entries = safePhoneEntries(c.phoneEntries);
