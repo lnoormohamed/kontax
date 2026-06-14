@@ -6,17 +6,20 @@ import { CopyField } from "~/app/_components/copy-field";
 import { SettingsCard, SettingsPageHead } from "~/app/_components/settings-ui";
 import { canCreateAppPassword, listUserAppPasswords } from "~/server/app-passwords";
 import { auth } from "~/server/auth";
+import { db } from "~/server/db";
 import { getPublicOrigin } from "~/lib/public-origin";
 
 export default async function SettingsDevicesPage() {
   const session = await auth();
   if (!session?.user?.id) return redirectToLogin("/settings/devices");
   const userId = session.user.id;
-  const [appPasswords, appPasswordAllowance, carddavServerUrl] = await Promise.all([
+  const [appPasswords, appPasswordAllowance, carddavServerUrl, userRecord] = await Promise.all([
     listUserAppPasswords(userId),
     canCreateAppPassword(userId),
     getPublicOrigin(),
+    db.user.findUnique({ where: { id: userId }, select: { password: true } }),
   ]);
+  const hasPassword = !!userRecord?.password;
   const email = session.user.email ?? "";
 
   return (
@@ -49,7 +52,7 @@ export default async function SettingsDevicesPage() {
             device without affecting the others.
           </p>
           <div className="mt-4">
-            <AppPasswordManager allowance={appPasswordAllowance} appPasswords={appPasswords} />
+            <AppPasswordManager allowance={appPasswordAllowance} appPasswords={appPasswords} hasPassword={hasPassword} />
           </div>
         </SettingsCard>
 

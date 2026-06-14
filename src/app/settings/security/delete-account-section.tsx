@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 import { getDeleteAccountInfo, scheduleAccountDeletion } from "~/app/actions/account";
 import { signOutAction } from "~/app/actions/auth";
+import { ConfirmPasswordModal } from "~/app/_components/confirm-password-modal";
 
 function Spinner({ size = 15, light = true }: { size?: number; light?: boolean }) {
   return <span className="st-spin inline-block rounded-full" style={{ width: size, height: size, border: `2px solid ${light ? "rgba(255,255,255,.35)" : "rgba(23,53,46,.2)"}`, borderTopColor: light ? "#fff" : "#17352e" }} />;
@@ -14,20 +15,22 @@ export function DeleteAccountSection() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [contactCount, setContactCount] = useState(0);
+  const [hasPassword, setHasPassword] = useState(false);
   const [open, setOpen] = useState(false);
+  const [showStepUp, setShowStepUp] = useState(false);
   const [confirmEmail, setConfirmEmail] = useState("");
   const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
-    getDeleteAccountInfo().then(({ email: e, contactCount: c }) => {
-      setEmail(e); setContactCount(c);
+    getDeleteAccountInfo().then(({ email: e, contactCount: c, hasPassword: hp }) => {
+      setEmail(e); setContactCount(c); setHasPassword(hp);
     }).catch(console.error);
   }, []);
 
   const matches = !!email && confirmEmail.trim().toLowerCase() === email.toLowerCase();
 
-  const handleDelete = () => {
+  const executeDelete = () => {
     setError("");
     startTransition(async () => {
       const result = await scheduleAccountDeletion({ confirmEmail });
@@ -42,6 +45,11 @@ export function DeleteAccountSection() {
         );
       }
     });
+  };
+
+  const handleDelete = () => {
+    if (hasPassword) { setShowStepUp(true); return; }
+    executeDelete();
   };
 
   return (
@@ -63,6 +71,16 @@ export function DeleteAccountSection() {
           Delete my account
         </button>
       </div>
+
+      {showStepUp && (
+        <ConfirmPasswordModal
+          title="Confirm your identity"
+          description="Enter your password to continue deleting your account."
+          confirmLabel="Continue"
+          onConfirmed={async () => { setShowStepUp(false); executeDelete(); }}
+          onClose={() => setShowStepUp(false)}
+        />
+      )}
 
       {open && (
         <div className="fixed inset-0 z-[90] grid place-items-center bg-[rgba(20,30,25,0.42)] p-4" onClick={() => { setOpen(false); setConfirmEmail(""); setError(""); }}>

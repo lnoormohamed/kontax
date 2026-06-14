@@ -3,6 +3,7 @@
 import { useState, useTransition } from "react";
 
 import { createBillingPortalSession } from "~/app/actions/billing";
+import { ConfirmPasswordModal } from "~/app/_components/confirm-password-modal";
 
 type Variant = "blue" | "green" | "red" | "ghost";
 
@@ -36,16 +37,19 @@ export function BillingPortalButton({
   variant = "ghost",
   icon = "arrow",
   className,
+  hasPassword = false,
 }: {
   label: string;
   variant?: Variant;
   icon?: "arrow" | "card" | "none";
   className?: string;
+  hasPassword?: boolean;
 }) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState(false);
+  const [showStepUp, setShowStepUp] = useState(false);
 
-  const handleClick = () => {
+  const executeClick = () => {
     setError(false);
     startTransition(async () => {
       const result = await createBillingPortalSession();
@@ -57,8 +61,22 @@ export function BillingPortalButton({
     });
   };
 
+  const handleClick = () => {
+    if (hasPassword) { setShowStepUp(true); return; }
+    executeClick();
+  };
+
   return (
     <div className={className}>
+      {showStepUp && (
+        <ConfirmPasswordModal
+          title="Confirm your identity"
+          description="Enter your password to open the billing portal."
+          confirmLabel="Open billing portal"
+          onConfirmed={async () => { setShowStepUp(false); executeClick(); }}
+          onClose={() => setShowStepUp(false)}
+        />
+      )}
       <button
         className={`inline-flex h-11 w-full items-center justify-center gap-2 rounded-2xl px-[18px] text-sm font-semibold transition disabled:opacity-75 md:w-auto ${VARIANT_CLASS[variant]}`}
         disabled={isPending}

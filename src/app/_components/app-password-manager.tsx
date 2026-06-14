@@ -1,8 +1,9 @@
 "use client";
 
-import { useActionState, useEffect, useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 
 import { createAppPassword, revokeAppPassword } from "~/app/actions/app-passwords";
+import { ConfirmPasswordModal } from "~/app/_components/confirm-password-modal";
 import type { AppPasswordSummary } from "~/server/app-passwords";
 
 type AppPasswordAllowance = {
@@ -125,22 +126,46 @@ function TokenReveal({ formattedToken }: { formattedToken: string }) {
 export function AppPasswordManager({
   allowance,
   appPasswords,
+  hasPassword,
 }: {
   allowance: AppPasswordAllowance;
   appPasswords: AppPasswordSummary[];
+  hasPassword: boolean;
 }) {
-  const [createState, createAction, isCreating] = useActionState(createAppPassword, initialState);
+  const [createState, setCreateState] = useState<CreateActionState>(null);
+  const [isCreating, startCreate] = useTransition();
+  const [showCreateStepUp, setShowCreateStepUp] = useState(false);
+  const [pendingLabel, setPendingLabel] = useState("");
+  const formRef = useRef<HTMLFormElement>(null);
   const [confirmRevoke, setConfirmRevoke] = useState<AppPasswordSummary | null>(null);
   const [revokePending, startRevoke] = useTransition();
   const [revokeError, setRevokeError] = useState<string | null>(null);
-
-  // Reset the success banner key so a fresh token reveal mounts per creation.
   const [revealKey, setRevealKey] = useState(0);
-  useEffect(() => {
-    if (createState?.ok) {
-      setRevealKey((key) => key + 1);
+
+  const executeCreate = (label: string) => {
+    startCreate(async () => {
+      const formData = new FormData();
+      formData.set("label", label);
+      const result = await createAppPassword(null, formData);
+      setCreateState(result);
+      if (result?.ok) {
+        setRevealKey((k) => k + 1);
+        formRef.current?.reset();
+      }
+    });
+  };
+
+  const handleCreateSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const label = (new FormData(e.currentTarget).get("label") as string | null)?.trim() ?? "";
+    if (!label) return;
+    if (hasPassword) {
+      setPendingLabel(label);
+      setShowCreateStepUp(true);
+    } else {
+      executeCreate(label);
     }
-  }, [createState]);
+  };
 
   const handleRevoke = (appPassword: AppPasswordSummary) => {
     setRevokeError(null);
@@ -163,8 +188,18 @@ export function AppPasswordManager({
 
   return (
     <div className="grid gap-5">
+      {showCreateStepUp && (
+        <ConfirmPasswordModal
+          title="Confirm your identity"
+          description="Enter your password to create an app password."
+          confirmLabel="Create password"
+          onConfirmed={async () => { setShowCreateStepUp(false); executeCreate(pendingLabel); }}
+          onClose={() => setShowCreateStepUp(false)}
+        />
+      )}
       <form
-        action={createAction}
+        ref={formRef}
+        onSubmit={handleCreateSubmit}
         className="grid gap-4 rounded-[1.5rem] border border-[#d8ddd6] bg-[#f8faf8] p-4"
       >
         <div>

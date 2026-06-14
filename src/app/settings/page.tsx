@@ -60,7 +60,7 @@ export default async function SettingsPlanPage({
         },
       },
     }),
-    db.user.findUnique({ where: { id: userId }, select: { planOverriddenAt: true } }),
+    db.user.findUnique({ where: { id: userId }, select: { planOverriddenAt: true, password: true } }),
     getUserFamilyMembership(userId),
     getUserTeamMembership(userId),
   ]);
@@ -141,7 +141,7 @@ export default async function SettingsPlanPage({
             </span>
           </div>
         ) : null}
-        <BillingSection cancelDetails={cancelDetails} surface={billingSurface} />
+        <BillingSection cancelDetails={cancelDetails} surface={billingSurface} hasPassword={!!overrideInfo?.password} />
 
         {/* group membership shortcut */}
         {isGroupPlan ? (

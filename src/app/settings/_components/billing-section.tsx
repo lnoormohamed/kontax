@@ -105,9 +105,11 @@ function UsageCard({ row }: { row: BillingUsageRow }) {
 export function BillingSection({
   surface,
   cancelDetails,
+  hasPassword,
 }: {
   surface: BillingSurface;
   cancelDetails: CancelPlanDetails;
+  hasPassword: boolean;
 }) {
   const { state } = surface;
 
@@ -263,14 +265,14 @@ export function BillingSection({
             </svg>
           </Link>
         ) : state === "trial" ? (
-          <BillingPortalButton icon="card" label="Add payment method" variant="blue" />
+          <BillingPortalButton hasPassword={hasPassword} icon="card" label="Add payment method" variant="blue" />
         ) : state === "grace" ? (
-          <BillingPortalButton icon="card" label="Update payment method" variant="red" />
+          <BillingPortalButton hasPassword={hasPassword} icon="card" label="Update payment method" variant="red" />
         ) : state === "cancel" ? (
-          <BillingPortalButton icon="none" label="Keep my plan" variant="green" />
+          <BillingPortalButton hasPassword={hasPassword} icon="none" label="Keep my plan" variant="green" />
         ) : (
           <>
-            <BillingPortalButton label="Manage billing" variant="ghost" />
+            <BillingPortalButton hasPassword={hasPassword} label="Manage billing" variant="ghost" />
             <CancelPlanModal details={cancelDetails} family={isFamily} />
           </>
         )}

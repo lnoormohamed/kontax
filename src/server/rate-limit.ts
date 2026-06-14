@@ -41,6 +41,9 @@ export const rateLimiters = {
   // P18-07: TOTP recovery code per user — 5 attempts per 15 minutes
   totpRecovery: makeLimiter(5, 15 * 60, "rl:totp-recovery"),
 
+  // P31-02: step-up password verify — 5 attempts per user per hour
+  stepUpVerify: makeLimiter(5, 60 * 60, "rl:step-up-verify"),
+
   // Registration: new accounts per IP — 10 per hour
   registration: makeLimiter(10, 60 * 60, "rl:registration"),
 

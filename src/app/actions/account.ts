@@ -354,19 +354,49 @@ export async function cancelAccountDeletion(): Promise<{ success: true }> {
   return { success: true };
 }
 
+// ─── Step-up password verification (P31-02) ──────────────────────────────────
+
+// Called by the ConfirmPasswordModal before executing any sensitive action.
+// OAuth-only users (no password hash) are automatically verified — their active
+// session is the step-up signal.
+export async function verifyPasswordForStepUp(
+  password: string,
+): Promise<{ ok: true } | { ok: false; error: "INCORRECT_PASSWORD" | "RATE_LIMITED" | "NOT_AUTHENTICATED" }> {
+  const session = await auth();
+  if (!session?.user?.id) return { ok: false, error: "NOT_AUTHENTICATED" };
+
+  const rl = await checkRateLimit(rateLimiters.stepUpVerify, `user:${session.user.id}`);
+  if (!rl.allowed) return { ok: false, error: "RATE_LIMITED" };
+
+  const user = await db.user.findUnique({
+    where: { id: session.user.id },
+    select: { password: true },
+  });
+
+  // OAuth-only account: no password set — treat active session as verified.
+  if (!user?.password) return { ok: true };
+
+  const matches = await bcrypt.compare(password, user.password);
+  return matches ? { ok: true } : { ok: false, error: "INCORRECT_PASSWORD" };
+}
+
 // ─── Account info for delete confirmation dialog ─────────────────────────────
 
 export async function getDeleteAccountInfo(): Promise<{
   email: string;
   contactCount: number;
+  hasPassword: boolean;
 }> {
   const session = await auth();
-  if (!session?.user?.id) return { email: "", contactCount: 0 };
+  if (!session?.user?.id) return { email: "", contactCount: 0, hasPassword: false };
 
-  const contactCount = await db.contact.count({
-    where: { userId: session.user.id, archivedAt: null, syncTombstoneAt: null },
-  });
-  return { email: session.user.email ?? "", contactCount };
+  const [contactCount, user] = await Promise.all([
+    db.contact.count({
+      where: { userId: session.user.id, archivedAt: null, syncTombstoneAt: null },
+    }),
+    db.user.findUnique({ where: { id: session.user.id }, select: { password: true } }),
+  ]);
+  return { email: session.user.email ?? "", contactCount, hasPassword: !!user?.password };
 }
 
 // ─── Email Verification Resend (P18-04) ──────────────────────────────────────

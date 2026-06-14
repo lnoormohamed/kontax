@@ -23,6 +23,7 @@ export default async function SettingsAccountPage() {
       emailPendingChangeRequestedAt: true,
       emailStatus: true,
       username: true,
+      password: true,
     },
   });
 
@@ -61,7 +62,7 @@ export default async function SettingsAccountPage() {
       <UsernameSection initialUsername={user?.username ?? null} />
 
       <StSecLabel>Account</StSecLabel>
-      <DataExportSection />
+      <DataExportSection hasPassword={!!user?.password} />
       <EmailSection
         email={session.user.email ?? ""}
         emailVerified={session.user.emailVerified ?? null}

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 
 import { getDataExportStatus, requestDataExport } from "~/app/actions/data-export";
+import { ConfirmPasswordModal } from "~/app/_components/confirm-password-modal";
 
 type ExportJob = Awaited<ReturnType<typeof getDataExportStatus>>;
 
@@ -60,10 +61,11 @@ function formatRelative(date: Date): string {
   }
 }
 
-export function DataExportSection() {
+export function DataExportSection({ hasPassword }: { hasPassword: boolean }) {
   const [job, setJob] = useState<ExportJob>(null);
   const [includeArchived, setIncludeArchived] = useState(false);
   const [requesting, setRequesting] = useState(false);
+  const [showStepUp, setShowStepUp] = useState(false);
 
   useEffect(() => {
     getDataExportStatus().then(setJob).catch(console.error);
@@ -79,7 +81,7 @@ export function DataExportSection() {
     return () => clearInterval(interval);
   }, [job?.status]);
 
-  const handleRequest = async () => {
+  const executeRequest = async () => {
     setRequesting(true);
     try {
       await requestDataExport({ includeArchived });
@@ -90,6 +92,11 @@ export function DataExportSection() {
     }
   };
 
+  const handleRequest = () => {
+    if (hasPassword) { setShowStepUp(true); return; }
+    void executeRequest();
+  };
+
   const isIdle = !job || job.status === "EXPIRED" || job.status === "FAILED";
   const isPreparing = job?.status === "PENDING" || job?.status === "PROCESSING";
   const isReady = job?.status === "READY";
@@ -98,6 +105,15 @@ export function DataExportSection() {
 
   return (
     <section className="rounded-[2rem] border border-[#d8ddd6] bg-white p-4 shadow-[0_1px_2px_rgba(20,30,25,0.04)] md:p-6">
+      {showStepUp && (
+        <ConfirmPasswordModal
+          title="Confirm your identity"
+          description="Enter your password to request a data export."
+          confirmLabel="Request export"
+          onConfirmed={async () => { setShowStepUp(false); await executeRequest(); }}
+          onClose={() => setShowStepUp(false)}
+        />
+      )}
       <p className="mb-1 text-[14.5px] font-semibold text-[#1d2823]">Data export</p>
       <p className="mb-4 max-w-[520px] text-[13px] leading-[1.55] text-[#5c655e]">
         Download all your Kontax data as a ZIP file: contacts (vCard + CSV), activity log,
