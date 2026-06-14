@@ -153,9 +153,8 @@ export function UsernameSection({ initialUsername }: { initialUsername: string |
     if (!value || isSameAsCurrent) { setStatus("idle"); return; }
 
     setStatus("checking");
-    debounceRef.current = setTimeout(async () => {
-      const result = await checkUsernameAvailability(value);
-      setStatus(result);
+    debounceRef.current = setTimeout(() => {
+      void checkUsernameAvailability(value).then(setStatus);
     }, 400);
 
     return () => { if (debounceRef.current) clearTimeout(debounceRef.current); };

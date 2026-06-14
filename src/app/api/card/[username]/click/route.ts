@@ -12,6 +12,6 @@ export async function POST(
       where: { username: username.toLowerCase() },
       data: { addToKontaxClicks: { increment: 1 } },
     })
-    .catch(() => {});
+    .catch(() => undefined);
   return NextResponse.json({ ok: true });
 }

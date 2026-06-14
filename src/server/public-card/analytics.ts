@@ -20,7 +20,7 @@ export async function recordCardView(
     db.publicCardView.create({
       data: { userId, referrer: referrer?.slice(0, 500) ?? null },
     }),
-  ]).catch(() => {});
+  ]).catch(() => undefined);
 }
 
 export async function getCardAnalytics(userId: string) {
