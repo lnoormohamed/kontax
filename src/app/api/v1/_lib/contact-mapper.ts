@@ -63,6 +63,7 @@ function buildPhoneEntries(phones: { value: string; label?: string }[] | undefin
 export function deriveFullName(input: ContactCreateInput | ContactUpdateInput): string | null {
   const parts = [input.firstName, input.lastName].filter((v): v is string => !!v?.trim());
   const fromParts = parts.join(" ").trim();
+  // eslint-disable-next-line @typescript-eslint/prefer-nullish-coalescing -- empty-string fallback, not just null/undefined
   return input.fullName?.trim() || fromParts || input.company?.trim() || null;
 }
 
