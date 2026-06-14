@@ -514,6 +514,7 @@ export function ContactDashboard({
                 viewMode={viewMode}
                 books={personalBooks}
                 labelSuggestions={labelSuggestions}
+                smartLists={savedFilters}
               />
             )
           ) : null}
@@ -528,6 +529,7 @@ export function ContactDashboard({
               viewMode={viewMode}
               books={personalBooks}
               labelSuggestions={labelSuggestions}
+              smartLists={savedFilters}
             />
           ) : null}
 

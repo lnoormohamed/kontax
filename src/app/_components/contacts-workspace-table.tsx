@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useTransition } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
@@ -13,6 +14,8 @@ import {
 import { BulkEditToolbar, type ToolbarBook } from "~/app/_components/bulk-edit-toolbar";
 import { ContactBadgeCluster } from "~/app/_components/contact-badge-cluster";
 import { SwipeableRow } from "~/app/_components/contact-list/swipeable-row";
+import { KeyboardShortcutsOverlay } from "~/app/contacts/_components/keyboard-shortcuts-overlay";
+import { fromJson, toQueryString } from "~/lib/contact-filter-state";
 
 type WorkspaceContact = {
   id: string;
@@ -46,6 +49,8 @@ type ContactsWorkspaceTableProps = {
   // P28-04: bulk-edit toolbar data.
   books: ToolbarBook[];
   labelSuggestions: string[];
+  // P28-05: smart lists for the 1–9 keyboard shortcuts.
+  smartLists: { id: string; name: string; filterState: unknown }[];
 };
 
 const AVATAR_TINTS: Array<[string, string]> = [
@@ -226,6 +231,7 @@ const ContactRow = memo(function ContactRow({
   viewMode,
   query,
   selected,
+  focused,
   onToggleSelect,
   onArchived,
   onOpenContact,
@@ -235,6 +241,7 @@ const ContactRow = memo(function ContactRow({
   viewMode: "compact" | "cozy";
   query: string;
   selected: boolean;
+  focused: boolean;
   onToggleSelect: (id: string) => void;
   onArchived: (contactId: string) => void;
   onOpenContact: (contactId: string) => void;
@@ -351,9 +358,11 @@ const ContactRow = memo(function ContactRow({
   return (
     <div
       className={`group border-b border-[#edf0ea] transition ${
-        selected ? "bg-[#edf0fe]" : "hover:bg-[#f2f4f0]"
+        selected ? "bg-[#edf0fe]" : focused ? "bg-[#f1f5ee]" : "hover:bg-[#f2f4f0]"
       }`}
       data-selected={selected ? "1" : "0"}
+      data-contact-row={contact.id}
+      style={focused && !selected ? { boxShadow: "inset 2px 0 0 #17352e" } : undefined}
     >
       <div className={`hidden ${GRID} items-center gap-4 px-3 py-2 lg:grid`}>
         {avatarSlot}
@@ -473,8 +482,12 @@ export function ContactsWorkspaceTable({
   query,
   books,
   labelSuggestions,
+  smartLists,
 }: ContactsWorkspaceTableProps) {
+  const router = useRouter();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [focusedId, setFocusedId] = useState<string | null>(null);
+  const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
   const [undoContactId, setUndoContactId] = useState<string | null>(null);
   const undoTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -628,6 +641,118 @@ export function ContactsWorkspaceTable({
         : undefined,
   });
   const virtualItems = virtualizer.getVirtualItems();
+
+  // P28-05: keyboard shortcuts. Focused-row navigation + global actions, scoped
+  // to the contacts workspace and suppressed while an input/textarea is focused.
+  const contactRows = useMemo(
+    () =>
+      flatRows.flatMap((row, flatIndex) =>
+        row.type === "contact" ? [{ id: row.contact.id, flatIndex }] : [],
+      ),
+    [flatRows],
+  );
+
+  useEffect(() => {
+    const isInputFocused = () => {
+      const el = document.activeElement as HTMLElement | null;
+      if (!el) return false;
+      const tag = el.tagName.toLowerCase();
+      return tag === "input" || tag === "textarea" || tag === "select" || el.isContentEditable;
+    };
+
+    const focusAt = (pos: number) => {
+      const target = contactRows[pos];
+      if (!target) return;
+      setFocusedId(target.id);
+      virtualizer.scrollToIndex(target.flatIndex, { align: "auto" });
+    };
+
+    const handler = (e: KeyboardEvent) => {
+      // `?` always toggles the overlay (even when it's open, to close it).
+      if (e.key === "?" && !isInputFocused()) {
+        e.preventDefault();
+        setShortcutsOpen((v) => !v);
+        return;
+      }
+      if (shortcutsOpen) return; // overlay owns Escape; ignore the rest underneath.
+      if (isInputFocused()) return;
+      if (e.metaKey || e.ctrlKey || e.altKey) {
+        // leave 1–9 list switching for the unmodified keys only.
+        if (!/^[1-9]$/.test(e.key)) return;
+      }
+
+      const pos = focusedId ? contactRows.findIndex((c) => c.id === focusedId) : -1;
+      const focusedContactId = pos >= 0 ? contactRows[pos]!.id : null;
+      const runForm = (action: (fd: FormData) => Promise<unknown>, id: string) => {
+        const fd = new FormData();
+        fd.set("contactId", id);
+        startUndoTransition(async () => {
+          await action(fd);
+        });
+      };
+
+      switch (e.key) {
+        case "j":
+          e.preventDefault();
+          focusAt(pos < 0 ? 0 : Math.min(pos + 1, contactRows.length - 1));
+          break;
+        case "k":
+          e.preventDefault();
+          focusAt(pos < 0 ? 0 : Math.max(pos - 1, 0));
+          break;
+        case "/":
+          e.preventDefault();
+          document.querySelector<HTMLInputElement>("[data-search-input]")?.focus();
+          break;
+        case "c":
+          e.preventDefault();
+          router.push("/contacts/new");
+          break;
+        case "Enter":
+        case "e":
+          if (focusedContactId) {
+            e.preventDefault();
+            router.push(`/contacts/${focusedContactId}`);
+          }
+          break;
+        case "f":
+          if (focusedContactId) {
+            e.preventDefault();
+            runForm(toggleFavoriteContact, focusedContactId);
+          }
+          break;
+        case "Backspace":
+          if (focusedContactId && mode === "active") {
+            e.preventDefault();
+            handleArchived(focusedContactId);
+            runForm(archiveContact, focusedContactId);
+            // advance focus to the row that takes its place
+            focusAt(Math.min(pos, contactRows.length - 2));
+          }
+          break;
+        case "Escape":
+          if (focusedId) {
+            e.preventDefault();
+            setFocusedId(null);
+          }
+          break;
+        default: {
+          if (/^[1-9]$/.test(e.key)) {
+            const idx = Number(e.key) - 1;
+            const list = smartLists[idx];
+            if (list) {
+              e.preventDefault();
+              router.push(`/contacts?${toQueryString(fromJson(list.filterState))}`);
+            }
+          }
+        }
+      }
+    };
+
+    document.addEventListener("keydown", handler);
+    return () => document.removeEventListener("keydown", handler);
+  }, [contactRows, focusedId, mode, router, shortcutsOpen, smartLists, virtualizer, handleArchived, startUndoTransition]);
+
   const stickySection = useMemo(() => {
     if (virtualItems.length === 0) return null;
     const listOffsetTop = listRef.current?.offsetTop ?? 0;
@@ -801,6 +926,7 @@ export function ContactsWorkspaceTable({
                   onToggleSelect={toggleSelect}
                   query={query}
                   selected={selectedSet.has(row.contact.id)}
+                  focused={focusedId === row.contact.id}
                   viewMode={viewMode}
                 />
               )}
@@ -824,6 +950,8 @@ export function ContactsWorkspaceTable({
           </div>
         </div>
       ) : null}
+
+      <KeyboardShortcutsOverlay open={shortcutsOpen} onClose={() => setShortcutsOpen(false)} />
     </div>
   );
 }

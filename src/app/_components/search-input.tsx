@@ -71,6 +71,7 @@ export function SearchInput({
       >
         <WorkspaceIcon className={value ? "text-[#5c655e]" : "text-[#8b938c]"} name="search" size={18} />
         <input
+          data-search-input
           className="h-10 w-full bg-transparent text-sm text-[#1d2823] outline-none placeholder:text-[#8b938c]"
           onChange={(event) => onChange(event.target.value)}
           onKeyDown={(event) => {
