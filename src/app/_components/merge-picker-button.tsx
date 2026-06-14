@@ -219,6 +219,7 @@ function MergePickerOverlay({
       <div
         className="fixed inset-x-0 bottom-0 z-50 md:inset-0 md:flex md:items-center md:justify-center md:p-6"
         onMouseDown={(e) => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
       >
         <div className="w-full rounded-t-[20px] bg-white shadow-[0_24px_70px_rgba(20,30,25,0.28)] md:max-w-[540px] md:rounded-[16px]">
           {step === "search" ? (
