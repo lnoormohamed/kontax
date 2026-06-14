@@ -3,6 +3,8 @@ import Link from "next/link";
 import { ActivityFeed, ActivityLocked } from "~/app/_components/activity-feed";
 import { ContactsWorkspaceTable } from "~/app/_components/contacts-workspace-table";
 import { EmptyState } from "~/app/_components/empty-state";
+import { LabelFilterBar, MobileLabelFilterBar } from "~/app/_components/label-filter-bar";
+import { LabelsSidebar, type SidebarLabel } from "~/app/_components/labels-sidebar";
 import { BulkMergeButton, UndoMergeButton } from "~/app/_components/merge-actions";
 import { MobileActivityFeed } from "~/app/_components/mobile-activity-feed";
 import { MergeSuggestionDismissButton } from "~/app/_components/merge-suggestion-dismiss-button";
@@ -35,6 +37,7 @@ type DashboardContact = {
   notes: string | null;
   archivedAt: Date | null;
   updatedAt: Date;
+  labels?: unknown; // P31B-06: JSON string[] from Prisma
 };
 
 type PlanSummary = {
@@ -76,6 +79,8 @@ type ContactDashboardProps = {
   savedFilters: SmartList[];
   personalBooks: PersonalBook[];
   labelSuggestions: string[];
+  sidebarLabels: SidebarLabel[];
+  currentLabel: string | null;
   counts: {
     people: number;
     favorites: number;
@@ -118,6 +123,8 @@ export function ContactDashboard({
   savedFilters,
   personalBooks,
   labelSuggestions,
+  sidebarLabels,
+  currentLabel,
   counts,
   account,
   syncState,
@@ -356,32 +363,8 @@ export function ContactDashboard({
           </div>
         ) : null}
 
-        {/* Labels (placeholder until the labels feature ships) */}
-        <div className="mt-3">
-          <div className="flex items-center gap-2 px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8b938c]">
-            <span className="text-[#aeb4ac]">▾</span>
-            <span>Labels</span>
-          </div>
-          {(
-            [
-              ["Family", "#7aa37f"],
-              ["Work", "#8a93c8"],
-              ["VIP", "#c9a86a"],
-            ] as const
-          ).map(([label, color]) => (
-            <div
-              className="ml-[9px] flex h-8 items-center gap-2.5 rounded-md px-2.5 text-[12.5px] text-[#5c655e]"
-              key={label}
-            >
-              <span className="h-2 w-2 rounded-sm" style={{ background: color }} />
-              {label}
-            </div>
-          ))}
-          <div className="ml-[9px] flex h-8 items-center gap-2 rounded-md px-2.5 text-[12px] text-[#8b938c]">
-            <WorkspaceIcon name="plus" size={13} />
-            Create label
-          </div>
-        </div>
+        {/* P31B-04: real Labels sidebar section */}
+        <LabelsSidebar labels={sidebarLabels} activeLabel={currentLabel} />
 
         <div className="mt-auto border-t border-[#e9ece7] pt-2">
           {sideLink("/import-export", "upload", "Import")}
@@ -452,6 +435,30 @@ export function ContactDashboard({
           <span className="ml-auto text-[12.5px] text-[#8b938c]">{countLabel}</span>
         </div>
         )}
+
+        {/* P31B-05/08: label filter context bar — shown when filtering by a label */}
+        {currentLabel ? (
+          <>
+            <div className="hidden md:block">
+              <LabelFilterBar
+                name={currentLabel}
+                color={sidebarLabels.find((l) => l.name.toLowerCase() === currentLabel.toLowerCase())?.color ?? "#8b938c"}
+                count={counts.people}
+                clearHref={buildHref("people", { filter: "all" })}
+                onSaveAsList={() => {/* handled by SmartListsBooks save flow */}}
+              />
+            </div>
+            <div className="md:hidden">
+              <MobileLabelFilterBar
+                name={currentLabel}
+                color={sidebarLabels.find((l) => l.name.toLowerCase() === currentLabel.toLowerCase())?.color ?? "#8b938c"}
+                count={counts.people}
+                clearHref={buildHref("people", { filter: "all" })}
+                onSaveAsList={() => {/* handled by SmartListsBooks save flow */}}
+              />
+            </div>
+          </>
+        ) : null}
 
         <div className="flex-1 overflow-y-auto pb-24 lg:pb-0">
           {showOnboarding ? (

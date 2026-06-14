@@ -19,6 +19,8 @@ export type ContactFilterState = {
   q?: string;
   book?: string;
   scope?: string;
+  // P31B-02: label filter — single label name for v1 (multi-label is a future smart-list concern)
+  label?: string;
 };
 
 // Values that mean "no filter" — the default People / All view. A state equal to
@@ -29,9 +31,10 @@ const DEFAULTS: Record<keyof ContactFilterState, string> = {
   q: "",
   book: "",
   scope: "all",
+  label: "",
 };
 
-const KEYS: (keyof ContactFilterState)[] = ["tab", "filter", "q", "book", "scope"];
+const KEYS: (keyof ContactFilterState)[] = ["tab", "filter", "q", "book", "scope", "label"];
 
 type ParamGetter = Pick<URLSearchParams, "get"> | Record<string, string | undefined>;
 
@@ -101,6 +104,7 @@ export function toQueryString(state: ContactFilterState): string {
   if (n.q) params.set("q", n.q);
   if (n.book) params.set("book", n.book);
   if (n.scope) params.set("scope", n.scope);
+  if (n.label) params.set("label", n.label);
   return params.toString();
 }
 
@@ -131,6 +135,7 @@ export function summarise(
   if (n.scope === "private") chips.push({ k: "Scope", v: "Private" });
   if (n.scope === "shared") chips.push({ k: "Scope", v: "Family" });
   if (n.book) chips.push({ k: "Book", v: bookName?.(n.book) ?? "Book" });
+  if (n.label) chips.push({ k: "Label", v: n.label });
   if (n.q) chips.push({ k: "Search", v: n.q });
   return chips;
 }

@@ -12,9 +12,10 @@ import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 interface MobileHomeHeaderProps {
   userId: string;
   tab?: string;
+  filterSlot?: React.ReactNode;
 }
 
-export function MobileHomeHeader({ userId, tab }: MobileHomeHeaderProps) {
+export function MobileHomeHeader({ userId, tab, filterSlot }: MobileHomeHeaderProps) {
   // Activity tab → the shared plain-title header (P24B-01).
   if (tab === "activity") {
     return (
@@ -77,6 +78,7 @@ export function MobileHomeHeader({ userId, tab }: MobileHomeHeaderProps) {
 
       <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 0 }}>
         <NotificationBellSlot userId={userId} />
+        {filterSlot}
         <Suspense fallback={null}>
           <MobileSearchButton />
         </Suspense>

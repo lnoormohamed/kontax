@@ -13,6 +13,7 @@ import {
 } from "~/app/actions/contacts";
 import { BulkEditToolbar, type ToolbarBook } from "~/app/_components/bulk-edit-toolbar";
 import { ContactBadgeCluster } from "~/app/_components/contact-badge-cluster";
+import { LabelChip, LabelDot, paletteSwatch } from "~/app/_components/label-chip";
 import { SwipeableRow } from "~/app/_components/contact-list/swipeable-row";
 import { KeyboardShortcutsOverlay } from "~/app/contacts/_components/keyboard-shortcuts-overlay";
 import { fromJson, toQueryString } from "~/lib/contact-filter-state";
@@ -37,6 +38,8 @@ type WorkspaceContact = {
   notes: string | null;
   archivedAt: Date | null;
   updatedAt: Date;
+  // P31B-06: JSON string[] from Prisma (optional — may be absent on older data)
+  labels?: unknown;
 };
 
 type ContactsWorkspaceTableProps = {
@@ -216,6 +219,98 @@ function RowActions({ contact, mode }: { contact: WorkspaceContact; mode: "activ
   );
 }
 
+// P31B-06: parse the Prisma JSON[] into a clean string array.
+const parseLabels = (raw: unknown): string[] => {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter((v): v is string => typeof v === "string");
+};
+
+// Desktop: up to 2 chips + +N overflow. Mobile: up to 3 dots + +N count.
+const RowLabelChips = memo(function RowLabelChips({
+  labels,
+  isMobile,
+}: {
+  labels: string[];
+  isMobile?: boolean;
+}) {
+  const [overflowOpen, setOverflowOpen] = useState(false);
+  if (labels.length === 0) return null;
+
+  if (isMobile) {
+    const shown = labels.slice(0, 3);
+    const extra = labels.length - shown.length;
+    return (
+      <span style={{ display: "inline-flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
+        {shown.map((name, i) => {
+          const col = "#8b938c"; // will be colored from registry; fallback for now
+          return <LabelDot key={i} col={col} size={8} />;
+        })}
+        {extra > 0 && (
+          <span style={{ fontSize: 11, fontWeight: 700, color: "#8b938c", marginLeft: 1 }}>+{extra}</span>
+        )}
+      </span>
+    );
+  }
+
+  const shown = labels.slice(0, 2);
+  const hidden = labels.slice(2);
+
+  return (
+    <span style={{ display: "inline-flex", alignItems: "center", gap: 5, flexShrink: 0 }}>
+      {shown.map((name) => (
+        <LabelChip key={name} name={name} col="#8b938c" sz="sm" />
+      ))}
+      {hidden.length > 0 && (
+        <span
+          style={{ position: "relative", display: "inline-flex", flexShrink: 0 }}
+          onMouseEnter={() => setOverflowOpen(true)}
+          onMouseLeave={() => setOverflowOpen(false)}
+        >
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              height: 22,
+              padding: "0 9px",
+              borderRadius: 999,
+              background: "#f2f4f0",
+              color: "#5c655e",
+              fontSize: 12,
+              fontWeight: 700,
+              lineHeight: 1,
+              cursor: "default",
+            }}
+          >
+            +{hidden.length}
+          </span>
+          {overflowOpen && (
+            <span
+              style={{
+                position: "absolute",
+                top: "calc(100% + 7px)",
+                left: 0,
+                zIndex: 50,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "flex-start",
+                gap: 7,
+                padding: 9,
+                background: "#fff",
+                borderRadius: 11,
+                boxShadow: "0 12px 34px rgba(20,30,25,0.2), 0 0 0 1px rgba(20,30,25,0.06)",
+              }}
+            >
+              {hidden.map((name) => (
+                <LabelChip key={name} name={name} col="#8b938c" sz="sm" />
+              ))}
+            </span>
+          )}
+        </span>
+      )}
+    </span>
+  );
+});
+
 const GRID = "grid-cols-[44px_minmax(150px,2.3fr)_minmax(110px,1.35fr)_minmax(170px,1.95fr)_158px_92px]";
 
 function Cell({ value, query }: { value: string | null; query: string }) {
@@ -301,6 +396,7 @@ const ContactRow = memo(function ContactRow({
   );
 
   const meta = [contact.company, contact.email, contact.phone].filter((value) => value?.trim());
+  const contactLabels = parseLabels(contact.labels);
 
   const stacked = (
     <div className="flex min-w-0 flex-1 items-center gap-3">
@@ -319,6 +415,7 @@ const ContactRow = memo(function ContactRow({
             </span>
           </Link>
           <RowBadges contact={contact} mode={mode} />
+          {contactLabels.length > 0 && <RowLabelChips labels={contactLabels} isMobile />}
         </div>
         <p className="truncate text-[12.5px] text-[#8b938c]">
           {meta.length > 0
@@ -379,6 +476,7 @@ const ContactRow = memo(function ContactRow({
             </span>
           </Link>
           <RowBadges contact={contact} mode={mode} />
+          {contactLabels.length > 0 && <RowLabelChips labels={contactLabels} />}
         </div>
         <div className="truncate text-[13px] text-[#5c655e]">
           <Cell query={query} value={contact.company} />

@@ -110,24 +110,29 @@ not "this specific set of people".
 "Investor", "Newsletter". A contact can carry any number of labels, and labels
 cut across books (a "VIP" can live in any book).
 
-**Data model.** `Contact.labels` — a JSON array of strings on the contact itself.
-No separate Label table; labels exist by being used.
+**Data model.** Two layers:
+
+- `Contact.labels` — a JSON string array on each contact row (the source of truth for membership).
+- `Label` registry table — per-user rows with `id / userId / name / color / position`. Stores the canonical name, 8-swatch color, and display order. Lazily back-filled from `Contact.labels` on first access. Needed because rename, recolor, merge, and delete require a single canonical record to update atomically.
+
+**Palette.** Eight fixed swatches (sage / teal / peri / plum / rose / clay / gold / olive). No free hex picker — colors are assigned in round-robin order and can be changed via Manage Labels.
 
 **Behavior.**
-- Attached at create time (contact form) and in bulk (the bulk-edit toolbar's
-  "Add label", which de-dupes case-insensitively). [[P28-04]]
-- Cross-cutting: applying/removing a label only edits that contact's tag array;
-  it doesn't move or copy anything.
+- Attach at create time (contact form) and in bulk (bulk-edit toolbar "Add label"). [[P28-04]]
+- Remove from contact detail page (tap ✕ on chip) or via Manage Labels → delete.
+- **Rename** — updates registry row + rewrites the string in every `Contact.labels` array in one transaction. Safe to rename; nothing is keyed on the raw string at query time.
+- **Recolor** — updates registry row only (no contact rows touched).
+- **Merge** — folds label A into label B: rewrites every contact, deduplicates, deletes A's registry row.
+- **Delete** — removes the string from every contact + deletes the registry row.
+- **Filter** — `?label=<name>` on the contacts URL; uses Prisma `array_contains` (case-sensitive against registry names). Sidebar section shows live counts; active label gets a highlighted row. A compact filter bar appears above the contact list when a label filter is active.
 
-**Use it when** the user wants flexible, overlapping classification that a single
-exclusive book can't express — the same contact being both "Investor" and "VIP".
+**Mobile.** Tap the filter glyph in the header to open the "Filter & organize" sheet (Quick filters / My Lists / Books / Labels). Tapping a label row navigates to `?label=<name>`. "Manage" link opens the full-screen manage panel where tapping a label opens an edit bottom sheet (rename / recolor / merge / delete).
 
-**Status:** **partially built.** The data layer (attach at create, bulk add) is
-live, but there is **no browse/filter-by-label UI yet** — the sidebar "Labels"
-section is a hardcoded placeholder, and no `label=` filter exists on the contacts
-list. Filtering by label is the missing piece. (A future smart list *could* one
-day filter on a label, which is exactly why labels and lists are different
-layers: labels are the *data*, lists are *saved queries over* that data.)
+**Chips on rows.** Desktop: up to 2 colored chips + `+N` overflow pill (hover to see all). Mobile rows: up to 3 dots + `+N` count (no popover). Tapping a chip navigates to `?label=<name>` (replaces active label, not additive).
+
+**Status:** **fully shipped** (P31B). The data layer, registry model, sidebar, filter bar, manage modal, and mobile sheet are all live.
+
+> A smart list *can* filter on a label — save the current `?label=<name>` view via "Save as list" in the filter bar. This is exactly why labels and lists are different layers: labels are the *data*, lists are *saved queries over* that data.
 
 ---
 

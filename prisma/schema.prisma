@@ -284,6 +284,8 @@ model User {
     dataExportJobs                      DataExportJob[]
     // P29-05: developer API access tokens
     apiTokens                           ApiToken[]
+    // P31B-01: label registry
+    labels                              Label[]
     // P22-11: subscribable iCal calendar token (revocable credential).
     // NOT a DB @unique constraint: the startup `prisma db push --skip-generate`
     // (Dockerfile) has no --accept-data-loss, so adding a unique index to a new
@@ -1047,6 +1049,25 @@ model SavedFilter {
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
     @@index([userId, sortOrder])
+}
+
+// P31B-01: per-user label registry. Contact.labels[] remains the source of
+// truth for membership; this table holds canonical name + color + position so
+// rename / recolor / merge have a single home. Backfilled from existing
+// Contact.labels values on first use (see actions/labels.ts ensureRegistry).
+model Label {
+    id        String   @id @default(cuid())
+    userId    String
+    name      String
+    color     String   // one of the 8-swatch palette hex values
+    position  Int      @default(0)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, name])
+    @@index([userId, position])
 }
 
 // P14-01 (Teams): links an existing personal SyncAccount to a team address book

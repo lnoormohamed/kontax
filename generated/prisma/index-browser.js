@@ -620,6 +620,16 @@ exports.Prisma.SavedFilterScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.LabelScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  color: 'color',
+  position: 'position',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.TeamSyncAccountScalarFieldEnum = {
   id: 'id',
   groupId: 'groupId',
@@ -1106,6 +1116,7 @@ exports.Prisma.ModelName = {
   GroupAddressBook: 'GroupAddressBook',
   AddressBook: 'AddressBook',
   SavedFilter: 'SavedFilter',
+  Label: 'Label',
   TeamSyncAccount: 'TeamSyncAccount',
   GroupContact: 'GroupContact',
   ContactShare: 'ContactShare',

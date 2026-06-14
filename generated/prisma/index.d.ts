@@ -159,6 +159,11 @@ export type AddressBook = $Result.DefaultSelection<Prisma.$AddressBookPayload>
  */
 export type SavedFilter = $Result.DefaultSelection<Prisma.$SavedFilterPayload>
 /**
+ * Model Label
+ * 
+ */
+export type Label = $Result.DefaultSelection<Prisma.$LabelPayload>
+/**
  * Model TeamSyncAccount
  * 
  */
@@ -1176,6 +1181,16 @@ export class PrismaClient<
   get savedFilter(): Prisma.SavedFilterDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.label`: Exposes CRUD operations for the **Label** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more Labels
+    * const labels = await prisma.label.findMany()
+    * ```
+    */
+  get label(): Prisma.LabelDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.teamSyncAccount`: Exposes CRUD operations for the **TeamSyncAccount** model.
     * Example usage:
     * ```ts
@@ -1784,6 +1799,7 @@ export namespace Prisma {
     GroupAddressBook: 'GroupAddressBook',
     AddressBook: 'AddressBook',
     SavedFilter: 'SavedFilter',
+    Label: 'Label',
     TeamSyncAccount: 'TeamSyncAccount',
     GroupContact: 'GroupContact',
     ContactShare: 'ContactShare',
@@ -1816,7 +1832,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "publicCardView" | "userOnboardingState" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "savedFilter" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset" | "exportPreset" | "dataExportJob" | "apiToken"
+      modelProps: "user" | "publicCardView" | "userOnboardingState" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "savedFilter" | "label" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset" | "exportPreset" | "dataExportJob" | "apiToken"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -3966,6 +3982,80 @@ export namespace Prisma {
           }
         }
       }
+      Label: {
+        payload: Prisma.$LabelPayload<ExtArgs>
+        fields: Prisma.LabelFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.LabelFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LabelPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.LabelFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LabelPayload>
+          }
+          findFirst: {
+            args: Prisma.LabelFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LabelPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.LabelFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LabelPayload>
+          }
+          findMany: {
+            args: Prisma.LabelFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LabelPayload>[]
+          }
+          create: {
+            args: Prisma.LabelCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LabelPayload>
+          }
+          createMany: {
+            args: Prisma.LabelCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.LabelCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LabelPayload>[]
+          }
+          delete: {
+            args: Prisma.LabelDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LabelPayload>
+          }
+          update: {
+            args: Prisma.LabelUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LabelPayload>
+          }
+          deleteMany: {
+            args: Prisma.LabelDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.LabelUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.LabelUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LabelPayload>[]
+          }
+          upsert: {
+            args: Prisma.LabelUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$LabelPayload>
+          }
+          aggregate: {
+            args: Prisma.LabelAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateLabel>
+          }
+          groupBy: {
+            args: Prisma.LabelGroupByArgs<ExtArgs>
+            result: $Utils.Optional<LabelGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.LabelCountArgs<ExtArgs>
+            result: $Utils.Optional<LabelCountAggregateOutputType> | number
+          }
+        }
+      }
       TeamSyncAccount: {
         payload: Prisma.$TeamSyncAccountPayload<ExtArgs>
         fields: Prisma.TeamSyncAccountFieldRefs
@@ -5127,6 +5217,7 @@ export namespace Prisma {
     groupAddressBook?: GroupAddressBookOmit
     addressBook?: AddressBookOmit
     savedFilter?: SavedFilterOmit
+    label?: LabelOmit
     teamSyncAccount?: TeamSyncAccountOmit
     groupContact?: GroupContactOmit
     contactShare?: ContactShareOmit
@@ -5249,6 +5340,7 @@ export namespace Prisma {
     exportPresets: number
     dataExportJobs: number
     apiTokens: number
+    labels: number
     failedLoginAttempts: number
     cardViewLog: number
   }
@@ -5282,6 +5374,7 @@ export namespace Prisma {
     exportPresets?: boolean | UserCountOutputTypeCountExportPresetsArgs
     dataExportJobs?: boolean | UserCountOutputTypeCountDataExportJobsArgs
     apiTokens?: boolean | UserCountOutputTypeCountApiTokensArgs
+    labels?: boolean | UserCountOutputTypeCountLabelsArgs
     failedLoginAttempts?: boolean | UserCountOutputTypeCountFailedLoginAttemptsArgs
     cardViewLog?: boolean | UserCountOutputTypeCountCardViewLogArgs
   }
@@ -5491,6 +5584,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountApiTokensArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: ApiTokenWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountLabelsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: LabelWhereInput
   }
 
   /**
@@ -6430,6 +6530,7 @@ export namespace Prisma {
     exportPresets?: boolean | User$exportPresetsArgs<ExtArgs>
     dataExportJobs?: boolean | User$dataExportJobsArgs<ExtArgs>
     apiTokens?: boolean | User$apiTokensArgs<ExtArgs>
+    labels?: boolean | User$labelsArgs<ExtArgs>
     failedLoginAttempts?: boolean | User$failedLoginAttemptsArgs<ExtArgs>
     onboardingState?: boolean | User$onboardingStateArgs<ExtArgs>
     cardViewLog?: boolean | User$cardViewLogArgs<ExtArgs>
@@ -6561,6 +6662,7 @@ export namespace Prisma {
     exportPresets?: boolean | User$exportPresetsArgs<ExtArgs>
     dataExportJobs?: boolean | User$dataExportJobsArgs<ExtArgs>
     apiTokens?: boolean | User$apiTokensArgs<ExtArgs>
+    labels?: boolean | User$labelsArgs<ExtArgs>
     failedLoginAttempts?: boolean | User$failedLoginAttemptsArgs<ExtArgs>
     onboardingState?: boolean | User$onboardingStateArgs<ExtArgs>
     cardViewLog?: boolean | User$cardViewLogArgs<ExtArgs>
@@ -6602,6 +6704,7 @@ export namespace Prisma {
       exportPresets: Prisma.$ExportPresetPayload<ExtArgs>[]
       dataExportJobs: Prisma.$DataExportJobPayload<ExtArgs>[]
       apiTokens: Prisma.$ApiTokenPayload<ExtArgs>[]
+      labels: Prisma.$LabelPayload<ExtArgs>[]
       failedLoginAttempts: Prisma.$FailedLoginAttemptPayload<ExtArgs>[]
       onboardingState: Prisma.$UserOnboardingStatePayload<ExtArgs> | null
       cardViewLog: Prisma.$PublicCardViewPayload<ExtArgs>[]
@@ -7059,6 +7162,7 @@ export namespace Prisma {
     exportPresets<T extends User$exportPresetsArgs<ExtArgs> = {}>(args?: Subset<T, User$exportPresetsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExportPresetPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     dataExportJobs<T extends User$dataExportJobsArgs<ExtArgs> = {}>(args?: Subset<T, User$dataExportJobsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$DataExportJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     apiTokens<T extends User$apiTokensArgs<ExtArgs> = {}>(args?: Subset<T, User$apiTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ApiTokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    labels<T extends User$labelsArgs<ExtArgs> = {}>(args?: Subset<T, User$labelsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LabelPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     failedLoginAttempts<T extends User$failedLoginAttemptsArgs<ExtArgs> = {}>(args?: Subset<T, User$failedLoginAttemptsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$FailedLoginAttemptPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     onboardingState<T extends User$onboardingStateArgs<ExtArgs> = {}>(args?: Subset<T, User$onboardingStateArgs<ExtArgs>>): Prisma__UserOnboardingStateClient<$Result.GetResult<Prisma.$UserOnboardingStatePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     cardViewLog<T extends User$cardViewLogArgs<ExtArgs> = {}>(args?: Subset<T, User$cardViewLogArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PublicCardViewPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -8214,6 +8318,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: ApiTokenScalarFieldEnum | ApiTokenScalarFieldEnum[]
+  }
+
+  /**
+   * User.labels
+   */
+  export type User$labelsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Label
+     */
+    select?: LabelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Label
+     */
+    omit?: LabelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabelInclude<ExtArgs> | null
+    where?: LabelWhereInput
+    orderBy?: LabelOrderByWithRelationInput | LabelOrderByWithRelationInput[]
+    cursor?: LabelWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: LabelScalarFieldEnum | LabelScalarFieldEnum[]
   }
 
   /**
@@ -42447,6 +42575,1124 @@ export namespace Prisma {
 
 
   /**
+   * Model Label
+   */
+
+  export type AggregateLabel = {
+    _count: LabelCountAggregateOutputType | null
+    _avg: LabelAvgAggregateOutputType | null
+    _sum: LabelSumAggregateOutputType | null
+    _min: LabelMinAggregateOutputType | null
+    _max: LabelMaxAggregateOutputType | null
+  }
+
+  export type LabelAvgAggregateOutputType = {
+    position: number | null
+  }
+
+  export type LabelSumAggregateOutputType = {
+    position: number | null
+  }
+
+  export type LabelMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    name: string | null
+    color: string | null
+    position: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type LabelMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    name: string | null
+    color: string | null
+    position: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type LabelCountAggregateOutputType = {
+    id: number
+    userId: number
+    name: number
+    color: number
+    position: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type LabelAvgAggregateInputType = {
+    position?: true
+  }
+
+  export type LabelSumAggregateInputType = {
+    position?: true
+  }
+
+  export type LabelMinAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    color?: true
+    position?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type LabelMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    color?: true
+    position?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type LabelCountAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    color?: true
+    position?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type LabelAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Label to aggregate.
+     */
+    where?: LabelWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Labels to fetch.
+     */
+    orderBy?: LabelOrderByWithRelationInput | LabelOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: LabelWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Labels from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Labels.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned Labels
+    **/
+    _count?: true | LabelCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: LabelAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: LabelSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: LabelMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: LabelMaxAggregateInputType
+  }
+
+  export type GetLabelAggregateType<T extends LabelAggregateArgs> = {
+        [P in keyof T & keyof AggregateLabel]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateLabel[P]>
+      : GetScalarType<T[P], AggregateLabel[P]>
+  }
+
+
+
+
+  export type LabelGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: LabelWhereInput
+    orderBy?: LabelOrderByWithAggregationInput | LabelOrderByWithAggregationInput[]
+    by: LabelScalarFieldEnum[] | LabelScalarFieldEnum
+    having?: LabelScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: LabelCountAggregateInputType | true
+    _avg?: LabelAvgAggregateInputType
+    _sum?: LabelSumAggregateInputType
+    _min?: LabelMinAggregateInputType
+    _max?: LabelMaxAggregateInputType
+  }
+
+  export type LabelGroupByOutputType = {
+    id: string
+    userId: string
+    name: string
+    color: string
+    position: number
+    createdAt: Date
+    updatedAt: Date
+    _count: LabelCountAggregateOutputType | null
+    _avg: LabelAvgAggregateOutputType | null
+    _sum: LabelSumAggregateOutputType | null
+    _min: LabelMinAggregateOutputType | null
+    _max: LabelMaxAggregateOutputType | null
+  }
+
+  type GetLabelGroupByPayload<T extends LabelGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<LabelGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof LabelGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], LabelGroupByOutputType[P]>
+            : GetScalarType<T[P], LabelGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type LabelSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    color?: boolean
+    position?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["label"]>
+
+  export type LabelSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    color?: boolean
+    position?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["label"]>
+
+  export type LabelSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    color?: boolean
+    position?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["label"]>
+
+  export type LabelSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    color?: boolean
+    position?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type LabelOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "name" | "color" | "position" | "createdAt" | "updatedAt", ExtArgs["result"]["label"]>
+  export type LabelInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type LabelIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type LabelIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $LabelPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "Label"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      name: string
+      color: string
+      position: number
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["label"]>
+    composites: {}
+  }
+
+  type LabelGetPayload<S extends boolean | null | undefined | LabelDefaultArgs> = $Result.GetResult<Prisma.$LabelPayload, S>
+
+  type LabelCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<LabelFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: LabelCountAggregateInputType | true
+    }
+
+  export interface LabelDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['Label'], meta: { name: 'Label' } }
+    /**
+     * Find zero or one Label that matches the filter.
+     * @param {LabelFindUniqueArgs} args - Arguments to find a Label
+     * @example
+     * // Get one Label
+     * const label = await prisma.label.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends LabelFindUniqueArgs>(args: SelectSubset<T, LabelFindUniqueArgs<ExtArgs>>): Prisma__LabelClient<$Result.GetResult<Prisma.$LabelPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one Label that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {LabelFindUniqueOrThrowArgs} args - Arguments to find a Label
+     * @example
+     * // Get one Label
+     * const label = await prisma.label.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends LabelFindUniqueOrThrowArgs>(args: SelectSubset<T, LabelFindUniqueOrThrowArgs<ExtArgs>>): Prisma__LabelClient<$Result.GetResult<Prisma.$LabelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Label that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LabelFindFirstArgs} args - Arguments to find a Label
+     * @example
+     * // Get one Label
+     * const label = await prisma.label.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends LabelFindFirstArgs>(args?: SelectSubset<T, LabelFindFirstArgs<ExtArgs>>): Prisma__LabelClient<$Result.GetResult<Prisma.$LabelPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first Label that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LabelFindFirstOrThrowArgs} args - Arguments to find a Label
+     * @example
+     * // Get one Label
+     * const label = await prisma.label.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends LabelFindFirstOrThrowArgs>(args?: SelectSubset<T, LabelFindFirstOrThrowArgs<ExtArgs>>): Prisma__LabelClient<$Result.GetResult<Prisma.$LabelPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more Labels that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LabelFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all Labels
+     * const labels = await prisma.label.findMany()
+     * 
+     * // Get first 10 Labels
+     * const labels = await prisma.label.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const labelWithIdOnly = await prisma.label.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends LabelFindManyArgs>(args?: SelectSubset<T, LabelFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LabelPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a Label.
+     * @param {LabelCreateArgs} args - Arguments to create a Label.
+     * @example
+     * // Create one Label
+     * const Label = await prisma.label.create({
+     *   data: {
+     *     // ... data to create a Label
+     *   }
+     * })
+     * 
+     */
+    create<T extends LabelCreateArgs>(args: SelectSubset<T, LabelCreateArgs<ExtArgs>>): Prisma__LabelClient<$Result.GetResult<Prisma.$LabelPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many Labels.
+     * @param {LabelCreateManyArgs} args - Arguments to create many Labels.
+     * @example
+     * // Create many Labels
+     * const label = await prisma.label.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends LabelCreateManyArgs>(args?: SelectSubset<T, LabelCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many Labels and returns the data saved in the database.
+     * @param {LabelCreateManyAndReturnArgs} args - Arguments to create many Labels.
+     * @example
+     * // Create many Labels
+     * const label = await prisma.label.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many Labels and only return the `id`
+     * const labelWithIdOnly = await prisma.label.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends LabelCreateManyAndReturnArgs>(args?: SelectSubset<T, LabelCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LabelPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a Label.
+     * @param {LabelDeleteArgs} args - Arguments to delete one Label.
+     * @example
+     * // Delete one Label
+     * const Label = await prisma.label.delete({
+     *   where: {
+     *     // ... filter to delete one Label
+     *   }
+     * })
+     * 
+     */
+    delete<T extends LabelDeleteArgs>(args: SelectSubset<T, LabelDeleteArgs<ExtArgs>>): Prisma__LabelClient<$Result.GetResult<Prisma.$LabelPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one Label.
+     * @param {LabelUpdateArgs} args - Arguments to update one Label.
+     * @example
+     * // Update one Label
+     * const label = await prisma.label.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends LabelUpdateArgs>(args: SelectSubset<T, LabelUpdateArgs<ExtArgs>>): Prisma__LabelClient<$Result.GetResult<Prisma.$LabelPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more Labels.
+     * @param {LabelDeleteManyArgs} args - Arguments to filter Labels to delete.
+     * @example
+     * // Delete a few Labels
+     * const { count } = await prisma.label.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends LabelDeleteManyArgs>(args?: SelectSubset<T, LabelDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Labels.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LabelUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many Labels
+     * const label = await prisma.label.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends LabelUpdateManyArgs>(args: SelectSubset<T, LabelUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more Labels and returns the data updated in the database.
+     * @param {LabelUpdateManyAndReturnArgs} args - Arguments to update many Labels.
+     * @example
+     * // Update many Labels
+     * const label = await prisma.label.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more Labels and only return the `id`
+     * const labelWithIdOnly = await prisma.label.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends LabelUpdateManyAndReturnArgs>(args: SelectSubset<T, LabelUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$LabelPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one Label.
+     * @param {LabelUpsertArgs} args - Arguments to update or create a Label.
+     * @example
+     * // Update or create a Label
+     * const label = await prisma.label.upsert({
+     *   create: {
+     *     // ... data to create a Label
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the Label we want to update
+     *   }
+     * })
+     */
+    upsert<T extends LabelUpsertArgs>(args: SelectSubset<T, LabelUpsertArgs<ExtArgs>>): Prisma__LabelClient<$Result.GetResult<Prisma.$LabelPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of Labels.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LabelCountArgs} args - Arguments to filter Labels to count.
+     * @example
+     * // Count the number of Labels
+     * const count = await prisma.label.count({
+     *   where: {
+     *     // ... the filter for the Labels we want to count
+     *   }
+     * })
+    **/
+    count<T extends LabelCountArgs>(
+      args?: Subset<T, LabelCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], LabelCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a Label.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LabelAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends LabelAggregateArgs>(args: Subset<T, LabelAggregateArgs>): Prisma.PrismaPromise<GetLabelAggregateType<T>>
+
+    /**
+     * Group by Label.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {LabelGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends LabelGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: LabelGroupByArgs['orderBy'] }
+        : { orderBy?: LabelGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, LabelGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetLabelGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the Label model
+   */
+  readonly fields: LabelFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for Label.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__LabelClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the Label model
+   */
+  interface LabelFieldRefs {
+    readonly id: FieldRef<"Label", 'String'>
+    readonly userId: FieldRef<"Label", 'String'>
+    readonly name: FieldRef<"Label", 'String'>
+    readonly color: FieldRef<"Label", 'String'>
+    readonly position: FieldRef<"Label", 'Int'>
+    readonly createdAt: FieldRef<"Label", 'DateTime'>
+    readonly updatedAt: FieldRef<"Label", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * Label findUnique
+   */
+  export type LabelFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Label
+     */
+    select?: LabelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Label
+     */
+    omit?: LabelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabelInclude<ExtArgs> | null
+    /**
+     * Filter, which Label to fetch.
+     */
+    where: LabelWhereUniqueInput
+  }
+
+  /**
+   * Label findUniqueOrThrow
+   */
+  export type LabelFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Label
+     */
+    select?: LabelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Label
+     */
+    omit?: LabelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabelInclude<ExtArgs> | null
+    /**
+     * Filter, which Label to fetch.
+     */
+    where: LabelWhereUniqueInput
+  }
+
+  /**
+   * Label findFirst
+   */
+  export type LabelFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Label
+     */
+    select?: LabelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Label
+     */
+    omit?: LabelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabelInclude<ExtArgs> | null
+    /**
+     * Filter, which Label to fetch.
+     */
+    where?: LabelWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Labels to fetch.
+     */
+    orderBy?: LabelOrderByWithRelationInput | LabelOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Labels.
+     */
+    cursor?: LabelWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Labels from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Labels.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Labels.
+     */
+    distinct?: LabelScalarFieldEnum | LabelScalarFieldEnum[]
+  }
+
+  /**
+   * Label findFirstOrThrow
+   */
+  export type LabelFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Label
+     */
+    select?: LabelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Label
+     */
+    omit?: LabelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabelInclude<ExtArgs> | null
+    /**
+     * Filter, which Label to fetch.
+     */
+    where?: LabelWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Labels to fetch.
+     */
+    orderBy?: LabelOrderByWithRelationInput | LabelOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for Labels.
+     */
+    cursor?: LabelWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Labels from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Labels.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of Labels.
+     */
+    distinct?: LabelScalarFieldEnum | LabelScalarFieldEnum[]
+  }
+
+  /**
+   * Label findMany
+   */
+  export type LabelFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Label
+     */
+    select?: LabelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Label
+     */
+    omit?: LabelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabelInclude<ExtArgs> | null
+    /**
+     * Filter, which Labels to fetch.
+     */
+    where?: LabelWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of Labels to fetch.
+     */
+    orderBy?: LabelOrderByWithRelationInput | LabelOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing Labels.
+     */
+    cursor?: LabelWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` Labels from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` Labels.
+     */
+    skip?: number
+    distinct?: LabelScalarFieldEnum | LabelScalarFieldEnum[]
+  }
+
+  /**
+   * Label create
+   */
+  export type LabelCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Label
+     */
+    select?: LabelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Label
+     */
+    omit?: LabelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabelInclude<ExtArgs> | null
+    /**
+     * The data needed to create a Label.
+     */
+    data: XOR<LabelCreateInput, LabelUncheckedCreateInput>
+  }
+
+  /**
+   * Label createMany
+   */
+  export type LabelCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many Labels.
+     */
+    data: LabelCreateManyInput | LabelCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * Label createManyAndReturn
+   */
+  export type LabelCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Label
+     */
+    select?: LabelSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Label
+     */
+    omit?: LabelOmit<ExtArgs> | null
+    /**
+     * The data used to create many Labels.
+     */
+    data: LabelCreateManyInput | LabelCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabelIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Label update
+   */
+  export type LabelUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Label
+     */
+    select?: LabelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Label
+     */
+    omit?: LabelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabelInclude<ExtArgs> | null
+    /**
+     * The data needed to update a Label.
+     */
+    data: XOR<LabelUpdateInput, LabelUncheckedUpdateInput>
+    /**
+     * Choose, which Label to update.
+     */
+    where: LabelWhereUniqueInput
+  }
+
+  /**
+   * Label updateMany
+   */
+  export type LabelUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update Labels.
+     */
+    data: XOR<LabelUpdateManyMutationInput, LabelUncheckedUpdateManyInput>
+    /**
+     * Filter which Labels to update
+     */
+    where?: LabelWhereInput
+    /**
+     * Limit how many Labels to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * Label updateManyAndReturn
+   */
+  export type LabelUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Label
+     */
+    select?: LabelSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the Label
+     */
+    omit?: LabelOmit<ExtArgs> | null
+    /**
+     * The data used to update Labels.
+     */
+    data: XOR<LabelUpdateManyMutationInput, LabelUncheckedUpdateManyInput>
+    /**
+     * Filter which Labels to update
+     */
+    where?: LabelWhereInput
+    /**
+     * Limit how many Labels to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabelIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * Label upsert
+   */
+  export type LabelUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Label
+     */
+    select?: LabelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Label
+     */
+    omit?: LabelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabelInclude<ExtArgs> | null
+    /**
+     * The filter to search for the Label to update in case it exists.
+     */
+    where: LabelWhereUniqueInput
+    /**
+     * In case the Label found by the `where` argument doesn't exist, create a new Label with this data.
+     */
+    create: XOR<LabelCreateInput, LabelUncheckedCreateInput>
+    /**
+     * In case the Label was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<LabelUpdateInput, LabelUncheckedUpdateInput>
+  }
+
+  /**
+   * Label delete
+   */
+  export type LabelDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Label
+     */
+    select?: LabelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Label
+     */
+    omit?: LabelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabelInclude<ExtArgs> | null
+    /**
+     * Filter which Label to delete.
+     */
+    where: LabelWhereUniqueInput
+  }
+
+  /**
+   * Label deleteMany
+   */
+  export type LabelDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which Labels to delete
+     */
+    where?: LabelWhereInput
+    /**
+     * Limit how many Labels to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * Label without action
+   */
+  export type LabelDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Label
+     */
+    select?: LabelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Label
+     */
+    omit?: LabelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabelInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model TeamSyncAccount
    */
 
@@ -58743,6 +59989,19 @@ export namespace Prisma {
   export type SavedFilterScalarFieldEnum = (typeof SavedFilterScalarFieldEnum)[keyof typeof SavedFilterScalarFieldEnum]
 
 
+  export const LabelScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    name: 'name',
+    color: 'color',
+    position: 'position',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type LabelScalarFieldEnum = (typeof LabelScalarFieldEnum)[keyof typeof LabelScalarFieldEnum]
+
+
   export const TeamSyncAccountScalarFieldEnum: {
     id: 'id',
     groupId: 'groupId',
@@ -59672,6 +60931,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetListRelationFilter
     dataExportJobs?: DataExportJobListRelationFilter
     apiTokens?: ApiTokenListRelationFilter
+    labels?: LabelListRelationFilter
     failedLoginAttempts?: FailedLoginAttemptListRelationFilter
     onboardingState?: XOR<UserOnboardingStateNullableScalarRelationFilter, UserOnboardingStateWhereInput> | null
     cardViewLog?: PublicCardViewListRelationFilter
@@ -59736,6 +60996,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetOrderByRelationAggregateInput
     dataExportJobs?: DataExportJobOrderByRelationAggregateInput
     apiTokens?: ApiTokenOrderByRelationAggregateInput
+    labels?: LabelOrderByRelationAggregateInput
     failedLoginAttempts?: FailedLoginAttemptOrderByRelationAggregateInput
     onboardingState?: UserOnboardingStateOrderByWithRelationInput
     cardViewLog?: PublicCardViewOrderByRelationAggregateInput
@@ -59803,6 +61064,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetListRelationFilter
     dataExportJobs?: DataExportJobListRelationFilter
     apiTokens?: ApiTokenListRelationFilter
+    labels?: LabelListRelationFilter
     failedLoginAttempts?: FailedLoginAttemptListRelationFilter
     onboardingState?: XOR<UserOnboardingStateNullableScalarRelationFilter, UserOnboardingStateWhereInput> | null
     cardViewLog?: PublicCardViewListRelationFilter
@@ -62791,6 +64053,74 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"SavedFilter"> | Date | string
   }
 
+  export type LabelWhereInput = {
+    AND?: LabelWhereInput | LabelWhereInput[]
+    OR?: LabelWhereInput[]
+    NOT?: LabelWhereInput | LabelWhereInput[]
+    id?: StringFilter<"Label"> | string
+    userId?: StringFilter<"Label"> | string
+    name?: StringFilter<"Label"> | string
+    color?: StringFilter<"Label"> | string
+    position?: IntFilter<"Label"> | number
+    createdAt?: DateTimeFilter<"Label"> | Date | string
+    updatedAt?: DateTimeFilter<"Label"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type LabelOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    color?: SortOrder
+    position?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type LabelWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId_name?: LabelUserIdNameCompoundUniqueInput
+    AND?: LabelWhereInput | LabelWhereInput[]
+    OR?: LabelWhereInput[]
+    NOT?: LabelWhereInput | LabelWhereInput[]
+    userId?: StringFilter<"Label"> | string
+    name?: StringFilter<"Label"> | string
+    color?: StringFilter<"Label"> | string
+    position?: IntFilter<"Label"> | number
+    createdAt?: DateTimeFilter<"Label"> | Date | string
+    updatedAt?: DateTimeFilter<"Label"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id" | "userId_name">
+
+  export type LabelOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    color?: SortOrder
+    position?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: LabelCountOrderByAggregateInput
+    _avg?: LabelAvgOrderByAggregateInput
+    _max?: LabelMaxOrderByAggregateInput
+    _min?: LabelMinOrderByAggregateInput
+    _sum?: LabelSumOrderByAggregateInput
+  }
+
+  export type LabelScalarWhereWithAggregatesInput = {
+    AND?: LabelScalarWhereWithAggregatesInput | LabelScalarWhereWithAggregatesInput[]
+    OR?: LabelScalarWhereWithAggregatesInput[]
+    NOT?: LabelScalarWhereWithAggregatesInput | LabelScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"Label"> | string
+    userId?: StringWithAggregatesFilter<"Label"> | string
+    name?: StringWithAggregatesFilter<"Label"> | string
+    color?: StringWithAggregatesFilter<"Label"> | string
+    position?: IntWithAggregatesFilter<"Label"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"Label"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"Label"> | Date | string
+  }
+
   export type TeamSyncAccountWhereInput = {
     AND?: TeamSyncAccountWhereInput | TeamSyncAccountWhereInput[]
     OR?: TeamSyncAccountWhereInput[]
@@ -63898,6 +65228,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -63962,6 +65293,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -64026,6 +65358,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -64090,6 +65423,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -67532,6 +68866,75 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type LabelCreateInput = {
+    id?: string
+    name: string
+    color: string
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutLabelsInput
+  }
+
+  export type LabelUncheckedCreateInput = {
+    id?: string
+    userId: string
+    name: string
+    color: string
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type LabelUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    color?: StringFieldUpdateOperationsInput | string
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutLabelsNestedInput
+  }
+
+  export type LabelUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    color?: StringFieldUpdateOperationsInput | string
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type LabelCreateManyInput = {
+    id?: string
+    userId: string
+    name: string
+    color: string
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type LabelUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    color?: StringFieldUpdateOperationsInput | string
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type LabelUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    color?: StringFieldUpdateOperationsInput | string
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type TeamSyncAccountCreateInput = {
     id?: string
     addedByUserId: string
@@ -68919,6 +70322,12 @@ export namespace Prisma {
     none?: ApiTokenWhereInput
   }
 
+  export type LabelListRelationFilter = {
+    every?: LabelWhereInput
+    some?: LabelWhereInput
+    none?: LabelWhereInput
+  }
+
   export type FailedLoginAttemptListRelationFilter = {
     every?: FailedLoginAttemptWhereInput
     some?: FailedLoginAttemptWhereInput
@@ -69046,6 +70455,10 @@ export namespace Prisma {
   }
 
   export type ApiTokenOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type LabelOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -71582,6 +72995,49 @@ export namespace Prisma {
     usageCount?: SortOrder
   }
 
+  export type LabelUserIdNameCompoundUniqueInput = {
+    userId: string
+    name: string
+  }
+
+  export type LabelCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    color?: SortOrder
+    position?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type LabelAvgOrderByAggregateInput = {
+    position?: SortOrder
+  }
+
+  export type LabelMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    color?: SortOrder
+    position?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type LabelMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    color?: SortOrder
+    position?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type LabelSumOrderByAggregateInput = {
+    position?: SortOrder
+  }
+
   export type GroupAddressBookScalarRelationFilter = {
     is?: GroupAddressBookWhereInput
     isNot?: GroupAddressBookWhereInput
@@ -72435,6 +73891,13 @@ export namespace Prisma {
     connect?: ApiTokenWhereUniqueInput | ApiTokenWhereUniqueInput[]
   }
 
+  export type LabelCreateNestedManyWithoutUserInput = {
+    create?: XOR<LabelCreateWithoutUserInput, LabelUncheckedCreateWithoutUserInput> | LabelCreateWithoutUserInput[] | LabelUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: LabelCreateOrConnectWithoutUserInput | LabelCreateOrConnectWithoutUserInput[]
+    createMany?: LabelCreateManyUserInputEnvelope
+    connect?: LabelWhereUniqueInput | LabelWhereUniqueInput[]
+  }
+
   export type FailedLoginAttemptCreateNestedManyWithoutUserInput = {
     create?: XOR<FailedLoginAttemptCreateWithoutUserInput, FailedLoginAttemptUncheckedCreateWithoutUserInput> | FailedLoginAttemptCreateWithoutUserInput[] | FailedLoginAttemptUncheckedCreateWithoutUserInput[]
     connectOrCreate?: FailedLoginAttemptCreateOrConnectWithoutUserInput | FailedLoginAttemptCreateOrConnectWithoutUserInput[]
@@ -72661,6 +74124,13 @@ export namespace Prisma {
     connectOrCreate?: ApiTokenCreateOrConnectWithoutUserInput | ApiTokenCreateOrConnectWithoutUserInput[]
     createMany?: ApiTokenCreateManyUserInputEnvelope
     connect?: ApiTokenWhereUniqueInput | ApiTokenWhereUniqueInput[]
+  }
+
+  export type LabelUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<LabelCreateWithoutUserInput, LabelUncheckedCreateWithoutUserInput> | LabelCreateWithoutUserInput[] | LabelUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: LabelCreateOrConnectWithoutUserInput | LabelCreateOrConnectWithoutUserInput[]
+    createMany?: LabelCreateManyUserInputEnvelope
+    connect?: LabelWhereUniqueInput | LabelWhereUniqueInput[]
   }
 
   export type FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput = {
@@ -73135,6 +74605,20 @@ export namespace Prisma {
     deleteMany?: ApiTokenScalarWhereInput | ApiTokenScalarWhereInput[]
   }
 
+  export type LabelUpdateManyWithoutUserNestedInput = {
+    create?: XOR<LabelCreateWithoutUserInput, LabelUncheckedCreateWithoutUserInput> | LabelCreateWithoutUserInput[] | LabelUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: LabelCreateOrConnectWithoutUserInput | LabelCreateOrConnectWithoutUserInput[]
+    upsert?: LabelUpsertWithWhereUniqueWithoutUserInput | LabelUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: LabelCreateManyUserInputEnvelope
+    set?: LabelWhereUniqueInput | LabelWhereUniqueInput[]
+    disconnect?: LabelWhereUniqueInput | LabelWhereUniqueInput[]
+    delete?: LabelWhereUniqueInput | LabelWhereUniqueInput[]
+    connect?: LabelWhereUniqueInput | LabelWhereUniqueInput[]
+    update?: LabelUpdateWithWhereUniqueWithoutUserInput | LabelUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: LabelUpdateManyWithWhereWithoutUserInput | LabelUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: LabelScalarWhereInput | LabelScalarWhereInput[]
+  }
+
   export type FailedLoginAttemptUpdateManyWithoutUserNestedInput = {
     create?: XOR<FailedLoginAttemptCreateWithoutUserInput, FailedLoginAttemptUncheckedCreateWithoutUserInput> | FailedLoginAttemptCreateWithoutUserInput[] | FailedLoginAttemptUncheckedCreateWithoutUserInput[]
     connectOrCreate?: FailedLoginAttemptCreateOrConnectWithoutUserInput | FailedLoginAttemptCreateOrConnectWithoutUserInput[]
@@ -73583,6 +75067,20 @@ export namespace Prisma {
     update?: ApiTokenUpdateWithWhereUniqueWithoutUserInput | ApiTokenUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: ApiTokenUpdateManyWithWhereWithoutUserInput | ApiTokenUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: ApiTokenScalarWhereInput | ApiTokenScalarWhereInput[]
+  }
+
+  export type LabelUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<LabelCreateWithoutUserInput, LabelUncheckedCreateWithoutUserInput> | LabelCreateWithoutUserInput[] | LabelUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: LabelCreateOrConnectWithoutUserInput | LabelCreateOrConnectWithoutUserInput[]
+    upsert?: LabelUpsertWithWhereUniqueWithoutUserInput | LabelUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: LabelCreateManyUserInputEnvelope
+    set?: LabelWhereUniqueInput | LabelWhereUniqueInput[]
+    disconnect?: LabelWhereUniqueInput | LabelWhereUniqueInput[]
+    delete?: LabelWhereUniqueInput | LabelWhereUniqueInput[]
+    connect?: LabelWhereUniqueInput | LabelWhereUniqueInput[]
+    update?: LabelUpdateWithWhereUniqueWithoutUserInput | LabelUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: LabelUpdateManyWithWhereWithoutUserInput | LabelUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: LabelScalarWhereInput | LabelScalarWhereInput[]
   }
 
   export type FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput = {
@@ -75466,6 +76964,20 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutSavedFiltersInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSavedFiltersInput, UserUpdateWithoutSavedFiltersInput>, UserUncheckedUpdateWithoutSavedFiltersInput>
+  }
+
+  export type UserCreateNestedOneWithoutLabelsInput = {
+    create?: XOR<UserCreateWithoutLabelsInput, UserUncheckedCreateWithoutLabelsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutLabelsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutLabelsNestedInput = {
+    create?: XOR<UserCreateWithoutLabelsInput, UserUncheckedCreateWithoutLabelsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutLabelsInput
+    upsert?: UserUpsertWithoutLabelsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutLabelsInput, UserUpdateWithoutLabelsInput>, UserUncheckedUpdateWithoutLabelsInput>
   }
 
   export type GroupCreateNestedOneWithoutTeamSyncAccountsInput = {
@@ -77977,6 +79489,34 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type LabelCreateWithoutUserInput = {
+    id?: string
+    name: string
+    color: string
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type LabelUncheckedCreateWithoutUserInput = {
+    id?: string
+    name: string
+    color: string
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type LabelCreateOrConnectWithoutUserInput = {
+    where: LabelWhereUniqueInput
+    create: XOR<LabelCreateWithoutUserInput, LabelUncheckedCreateWithoutUserInput>
+  }
+
+  export type LabelCreateManyUserInputEnvelope = {
+    data: LabelCreateManyUserInput | LabelCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type FailedLoginAttemptCreateWithoutUserInput = {
     id?: string
     ipAddress?: string | null
@@ -79083,6 +80623,35 @@ export namespace Prisma {
     revokedAt?: DateTimeNullableFilter<"ApiToken"> | Date | string | null
   }
 
+  export type LabelUpsertWithWhereUniqueWithoutUserInput = {
+    where: LabelWhereUniqueInput
+    update: XOR<LabelUpdateWithoutUserInput, LabelUncheckedUpdateWithoutUserInput>
+    create: XOR<LabelCreateWithoutUserInput, LabelUncheckedCreateWithoutUserInput>
+  }
+
+  export type LabelUpdateWithWhereUniqueWithoutUserInput = {
+    where: LabelWhereUniqueInput
+    data: XOR<LabelUpdateWithoutUserInput, LabelUncheckedUpdateWithoutUserInput>
+  }
+
+  export type LabelUpdateManyWithWhereWithoutUserInput = {
+    where: LabelScalarWhereInput
+    data: XOR<LabelUpdateManyMutationInput, LabelUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type LabelScalarWhereInput = {
+    AND?: LabelScalarWhereInput | LabelScalarWhereInput[]
+    OR?: LabelScalarWhereInput[]
+    NOT?: LabelScalarWhereInput | LabelScalarWhereInput[]
+    id?: StringFilter<"Label"> | string
+    userId?: StringFilter<"Label"> | string
+    name?: StringFilter<"Label"> | string
+    color?: StringFilter<"Label"> | string
+    position?: IntFilter<"Label"> | number
+    createdAt?: DateTimeFilter<"Label"> | Date | string
+    updatedAt?: DateTimeFilter<"Label"> | Date | string
+  }
+
   export type FailedLoginAttemptUpsertWithWhereUniqueWithoutUserInput = {
     where: FailedLoginAttemptWhereUniqueInput
     update: XOR<FailedLoginAttemptUpdateWithoutUserInput, FailedLoginAttemptUncheckedUpdateWithoutUserInput>
@@ -79227,6 +80796,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
   }
@@ -79290,6 +80860,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
   }
@@ -79369,6 +80940,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
   }
@@ -79432,6 +81004,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
@@ -79495,6 +81068,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
@@ -79558,6 +81132,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
@@ -79637,6 +81212,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
@@ -79700,6 +81276,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
@@ -79762,6 +81339,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -79825,6 +81403,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -79958,6 +81537,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -80021,6 +81601,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -80126,6 +81707,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -80189,6 +81771,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -80991,6 +82574,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -81054,6 +82638,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -81543,6 +83128,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -81606,6 +83192,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -81765,6 +83352,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -81828,6 +83416,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -81907,6 +83496,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -81970,6 +83560,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -82114,6 +83705,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -82177,6 +83769,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -82287,6 +83880,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -82350,6 +83944,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -82561,6 +84156,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -82624,6 +84220,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -82703,6 +84300,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -82766,6 +84364,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -82845,6 +84444,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -82908,6 +84508,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -82971,6 +84572,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -83034,6 +84636,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -83405,6 +85008,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -83468,6 +85072,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -83856,6 +85461,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -83919,6 +85525,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -84047,6 +85654,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -84110,6 +85718,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -84173,6 +85782,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -84236,6 +85846,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -84523,6 +86134,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -84586,6 +86198,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -86158,6 +87771,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -86221,6 +87835,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -86300,6 +87915,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -86363,6 +87979,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -86426,6 +88043,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -86489,6 +88107,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -86568,6 +88187,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -86631,6 +88251,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -86694,6 +88315,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -86757,6 +88379,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -86836,6 +88459,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -86899,6 +88523,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -86962,6 +88587,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -87025,6 +88651,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -87104,6 +88731,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -87167,6 +88795,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -87230,6 +88859,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -87293,6 +88923,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -87499,6 +89130,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -87562,6 +89194,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -87758,6 +89391,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -87821,6 +89455,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -87900,6 +89535,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -87963,6 +89599,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -88026,6 +89663,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -88089,6 +89727,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -88347,6 +89986,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -88410,6 +90050,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -88664,6 +90305,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -88727,6 +90369,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -88847,6 +90490,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -88910,6 +90554,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -89133,6 +90778,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -89196,6 +90842,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -89407,6 +91054,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -89470,6 +91118,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -89549,6 +91198,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -89612,6 +91262,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -89691,6 +91342,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -89744,6 +91396,279 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutLabelsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutLabelsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutLabelsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutLabelsInput, UserUncheckedCreateWithoutLabelsInput>
+  }
+
+  export type UserUpsertWithoutLabelsInput = {
+    update: XOR<UserUpdateWithoutLabelsInput, UserUncheckedUpdateWithoutLabelsInput>
+    create: XOR<UserCreateWithoutLabelsInput, UserUncheckedCreateWithoutLabelsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutLabelsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutLabelsInput, UserUncheckedUpdateWithoutLabelsInput>
+  }
+
+  export type UserUpdateWithoutLabelsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutLabelsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -90449,6 +92374,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -90512,6 +92438,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -90707,6 +92634,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -90770,6 +92698,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -90976,6 +92905,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -91039,6 +92969,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -91246,6 +93177,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -91309,6 +93241,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -91505,6 +93438,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -91568,6 +93502,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -91676,6 +93611,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -91739,6 +93675,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -91837,6 +93774,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -91900,6 +93838,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -92015,6 +93954,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -92078,6 +94018,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -92157,6 +94098,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -92220,6 +94162,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -92299,6 +94242,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -92362,6 +94306,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -92426,6 +94371,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
   }
@@ -92489,6 +94435,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
   }
@@ -92568,6 +94515,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
   }
@@ -92631,6 +94579,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
@@ -92693,6 +94642,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -92756,6 +94706,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -92962,6 +94913,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -93025,6 +94977,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -93221,6 +95174,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -93284,6 +95238,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -93363,6 +95318,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -93426,6 +95382,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -93489,6 +95446,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -93552,6 +95510,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -93631,6 +95590,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -93694,6 +95654,7 @@ export namespace Prisma {
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -93757,6 +95718,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -93820,6 +95782,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -93899,6 +95862,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -93962,6 +95926,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -94025,6 +95990,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -94088,6 +96054,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -94167,6 +96134,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -94230,6 +96198,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -94293,6 +96262,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
@@ -94356,6 +96326,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
     exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
     dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
     onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
     cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
@@ -94435,6 +96406,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
@@ -94498,6 +96470,7 @@ export namespace Prisma {
     importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
     exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
     dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
@@ -94934,6 +96907,15 @@ export namespace Prisma {
     requestCountThisMonth?: number
     createdAt?: Date | string
     revokedAt?: Date | string | null
+  }
+
+  export type LabelCreateManyUserInput = {
+    id?: string
+    name: string
+    color: string
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
   }
 
   export type FailedLoginAttemptCreateManyUserInput = {
@@ -96293,6 +98275,33 @@ export namespace Prisma {
     requestCountThisMonth?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     revokedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  }
+
+  export type LabelUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    color?: StringFieldUpdateOperationsInput | string
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type LabelUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    color?: StringFieldUpdateOperationsInput | string
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type LabelUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    color?: StringFieldUpdateOperationsInput | string
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type FailedLoginAttemptUpdateWithoutUserInput = {

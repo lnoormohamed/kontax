@@ -7,6 +7,7 @@ import { ContactDashboard } from "~/app/_components/contact-dashboard";
 import { EmailVerificationBanner } from "~/app/_components/email-verification-banner";
 import { MobileHomeHeader } from "~/app/_components/mobile-header";
 import { MobileCreateFab } from "~/app/_components/mobile-create-fab";
+import { MobileFilterButton } from "~/app/_components/mobile-filter-sheet";
 import { NotificationBellSlot } from "~/app/_components/notification-bell-slot";
 import { SecurityAlertBannerSlot } from "~/app/_components/security-alert-banner-slot";
 import { SearchInput } from "~/app/_components/search-input";
@@ -20,6 +21,7 @@ import { getAccessibleTeamBooks } from "~/server/team-access";
 import { getOnboardingChecklist } from "~/server/onboarding";
 import { isFullTextEligible, searchContactIds } from "~/server/contact-search";
 import { db } from "~/server/db";
+import { getLabels } from "~/app/actions/labels";
 
 type ContactsPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -269,9 +271,19 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
     notes: true,
     archivedAt: true,
     updatedAt: true,
+    // P31B-06: labels for chip rendering on rows
+    labels: true,
   } as const;
 
-  const [familyMembership, accessibleTeamBooks, savedFilters, personalBooksRaw, personalBookCounts, labelRows] =
+  // P31B-05: label filter — ?label=<name> shows only contacts carrying that label.
+  const labelParam = (await getSingleParam(searchParams, "label"))?.trim() ?? "";
+  // Prisma JSON filter: Contact.labels is a Json string[]; array_contains checks membership.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const labelFilterCondition: Record<string, any> = labelParam
+    ? { labels: { array_contains: labelParam } }
+    : {};
+
+  const [familyMembership, accessibleTeamBooks, savedFilters, personalBooksRaw, personalBookCounts, labelRows, sidebarLabels] =
     await Promise.all([
       getUserFamilyMembership(session.user.id),
       getAccessibleTeamBooks(session.user.id),
@@ -299,6 +311,8 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         select: { labels: true },
         take: 2000,
       }),
+      // P31B-04: label registry for the sidebar Labels section.
+      getLabels(),
     ]);
 
   // Flatten + dedupe label strings (case-insensitive), capped for the popover.
@@ -403,7 +417,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
               userId: session.user.id,
               archivedAt: null,
               groupContacts: { none: {} },
-              AND: [personalBookWhere, privateSearchConditions, filterConditions],
+              AND: [personalBookWhere, privateSearchConditions, filterConditions, labelFilterCondition],
             },
             orderBy: sortOrder,
             select: contactListSelect,
@@ -411,14 +425,14 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         : Promise.resolve([]),
       includeShared && familyTargetId
         ? db.contact.findMany({
-            where: { archivedAt: null, groupContacts: { some: { groupAddressBookId: familyTargetId } }, ...sharedSearchConditions, ...filterConditions },
+            where: { archivedAt: null, groupContacts: { some: { groupAddressBookId: familyTargetId } }, ...sharedSearchConditions, ...filterConditions, ...labelFilterCondition },
             orderBy: { updatedAt: "desc" as const },
             select: contactListSelect,
           })
         : Promise.resolve([]),
       includeShared && teamTargetIds.length > 0
         ? db.contact.findMany({
-            where: { archivedAt: null, groupContacts: { some: { groupAddressBookId: { in: teamTargetIds } } }, ...sharedSearchConditions, ...filterConditions },
+            where: { archivedAt: null, groupContacts: { some: { groupAddressBookId: { in: teamTargetIds } } }, ...sharedSearchConditions, ...filterConditions, ...labelFilterCondition },
             orderBy: { updatedAt: "desc" as const },
             select: contactListSelect,
           })
@@ -521,7 +535,20 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
   return (
     <main className="flex h-dvh flex-col overflow-hidden bg-white text-[#1d2823]">
       {/* mobile home header — wordmark + bell (activity tab shows plain title) */}
-      <MobileHomeHeader userId={session.user.id} tab={selectedTab} />
+      <MobileHomeHeader
+        userId={session.user.id}
+        tab={selectedTab}
+        filterSlot={
+          <MobileFilterButton
+            labels={sidebarLabels}
+            savedFilters={savedFilters}
+            personalBooks={personalBooks}
+            activeLabel={labelParam || null}
+            activeBook={activeBook ?? activePersonalBookId}
+            currentFilter={selectedFilter}
+          />
+        }
+      />
 
       {/* desktop header */}
       <header className="hidden shrink-0 border-b border-[#d8ddd6] bg-white md:block">
@@ -601,6 +628,8 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         savedFilters={savedFilters}
         personalBooks={personalBooks}
         labelSuggestions={labelSuggestions}
+        sidebarLabels={sidebarLabels}
+        currentLabel={labelParam || null}
         counts={{
           people: peopleCount,
           favorites: favoritesCount,
