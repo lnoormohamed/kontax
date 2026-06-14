@@ -149,6 +149,11 @@ export type GroupAddressBook = $Result.DefaultSelection<Prisma.$GroupAddressBook
  */
 export type AddressBook = $Result.DefaultSelection<Prisma.$AddressBookPayload>
 /**
+ * Model SavedFilter
+ * 
+ */
+export type SavedFilter = $Result.DefaultSelection<Prisma.$SavedFilterPayload>
+/**
  * Model TeamSyncAccount
  * 
  */
@@ -1107,6 +1112,16 @@ export class PrismaClient<
   get addressBook(): Prisma.AddressBookDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.savedFilter`: Exposes CRUD operations for the **SavedFilter** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more SavedFilters
+    * const savedFilters = await prisma.savedFilter.findMany()
+    * ```
+    */
+  get savedFilter(): Prisma.SavedFilterDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.teamSyncAccount`: Exposes CRUD operations for the **TeamSyncAccount** model.
     * Example usage:
     * ```ts
@@ -1693,6 +1708,7 @@ export namespace Prisma {
     GroupMember: 'GroupMember',
     GroupAddressBook: 'GroupAddressBook',
     AddressBook: 'AddressBook',
+    SavedFilter: 'SavedFilter',
     TeamSyncAccount: 'TeamSyncAccount',
     GroupContact: 'GroupContact',
     ContactShare: 'ContactShare',
@@ -1723,7 +1739,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "userOnboardingState" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset" | "exportPreset"
+      modelProps: "user" | "userOnboardingState" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "savedFilter" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset" | "exportPreset"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -3725,6 +3741,80 @@ export namespace Prisma {
           }
         }
       }
+      SavedFilter: {
+        payload: Prisma.$SavedFilterPayload<ExtArgs>
+        fields: Prisma.SavedFilterFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.SavedFilterFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedFilterPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.SavedFilterFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedFilterPayload>
+          }
+          findFirst: {
+            args: Prisma.SavedFilterFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedFilterPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.SavedFilterFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedFilterPayload>
+          }
+          findMany: {
+            args: Prisma.SavedFilterFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedFilterPayload>[]
+          }
+          create: {
+            args: Prisma.SavedFilterCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedFilterPayload>
+          }
+          createMany: {
+            args: Prisma.SavedFilterCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.SavedFilterCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedFilterPayload>[]
+          }
+          delete: {
+            args: Prisma.SavedFilterDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedFilterPayload>
+          }
+          update: {
+            args: Prisma.SavedFilterUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedFilterPayload>
+          }
+          deleteMany: {
+            args: Prisma.SavedFilterDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.SavedFilterUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.SavedFilterUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedFilterPayload>[]
+          }
+          upsert: {
+            args: Prisma.SavedFilterUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$SavedFilterPayload>
+          }
+          aggregate: {
+            args: Prisma.SavedFilterAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateSavedFilter>
+          }
+          groupBy: {
+            args: Prisma.SavedFilterGroupByArgs<ExtArgs>
+            result: $Utils.Optional<SavedFilterGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.SavedFilterCountArgs<ExtArgs>
+            result: $Utils.Optional<SavedFilterCountAggregateOutputType> | number
+          }
+        }
+      }
       TeamSyncAccount: {
         payload: Prisma.$TeamSyncAccountPayload<ExtArgs>
         fields: Prisma.TeamSyncAccountFieldRefs
@@ -4736,6 +4826,7 @@ export namespace Prisma {
     groupMember?: GroupMemberOmit
     groupAddressBook?: GroupAddressBookOmit
     addressBook?: AddressBookOmit
+    savedFilter?: SavedFilterOmit
     teamSyncAccount?: TeamSyncAccountOmit
     groupContact?: GroupContactOmit
     contactShare?: ContactShareOmit
@@ -4846,6 +4937,7 @@ export namespace Prisma {
     sessions: number
     totpRecoveryCodes: number
     addressBooks: number
+    savedFilters: number
     adminAuditEvents: number
     notifications: number
     securityAlerts: number
@@ -4875,6 +4967,7 @@ export namespace Prisma {
     sessions?: boolean | UserCountOutputTypeCountSessionsArgs
     totpRecoveryCodes?: boolean | UserCountOutputTypeCountTotpRecoveryCodesArgs
     addressBooks?: boolean | UserCountOutputTypeCountAddressBooksArgs
+    savedFilters?: boolean | UserCountOutputTypeCountSavedFiltersArgs
     adminAuditEvents?: boolean | UserCountOutputTypeCountAdminAuditEventsArgs
     notifications?: boolean | UserCountOutputTypeCountNotificationsArgs
     securityAlerts?: boolean | UserCountOutputTypeCountSecurityAlertsArgs
@@ -5020,6 +5113,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountAddressBooksArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: AddressBookWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountSavedFiltersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SavedFilterWhereInput
   }
 
   /**
@@ -5946,6 +6046,7 @@ export namespace Prisma {
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     totpRecoveryCodes?: boolean | User$totpRecoveryCodesArgs<ExtArgs>
     addressBooks?: boolean | User$addressBooksArgs<ExtArgs>
+    savedFilters?: boolean | User$savedFiltersArgs<ExtArgs>
     adminAuditEvents?: boolean | User$adminAuditEventsArgs<ExtArgs>
     notifications?: boolean | User$notificationsArgs<ExtArgs>
     securityAlerts?: boolean | User$securityAlertsArgs<ExtArgs>
@@ -6058,6 +6159,7 @@ export namespace Prisma {
     sessions?: boolean | User$sessionsArgs<ExtArgs>
     totpRecoveryCodes?: boolean | User$totpRecoveryCodesArgs<ExtArgs>
     addressBooks?: boolean | User$addressBooksArgs<ExtArgs>
+    savedFilters?: boolean | User$savedFiltersArgs<ExtArgs>
     adminAuditEvents?: boolean | User$adminAuditEventsArgs<ExtArgs>
     notifications?: boolean | User$notificationsArgs<ExtArgs>
     securityAlerts?: boolean | User$securityAlertsArgs<ExtArgs>
@@ -6095,6 +6197,7 @@ export namespace Prisma {
       sessions: Prisma.$UserSessionPayload<ExtArgs>[]
       totpRecoveryCodes: Prisma.$TotpRecoveryCodePayload<ExtArgs>[]
       addressBooks: Prisma.$AddressBookPayload<ExtArgs>[]
+      savedFilters: Prisma.$SavedFilterPayload<ExtArgs>[]
       adminAuditEvents: Prisma.$AdminAuditEventPayload<ExtArgs>[]
       notifications: Prisma.$NotificationPayload<ExtArgs>[]
       securityAlerts: Prisma.$SecurityAlertPayload<ExtArgs>[]
@@ -6543,6 +6646,7 @@ export namespace Prisma {
     sessions<T extends User$sessionsArgs<ExtArgs> = {}>(args?: Subset<T, User$sessionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     totpRecoveryCodes<T extends User$totpRecoveryCodesArgs<ExtArgs> = {}>(args?: Subset<T, User$totpRecoveryCodesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TotpRecoveryCodePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     addressBooks<T extends User$addressBooksArgs<ExtArgs> = {}>(args?: Subset<T, User$addressBooksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AddressBookPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    savedFilters<T extends User$savedFiltersArgs<ExtArgs> = {}>(args?: Subset<T, User$savedFiltersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SavedFilterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     adminAuditEvents<T extends User$adminAuditEventsArgs<ExtArgs> = {}>(args?: Subset<T, User$adminAuditEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$AdminAuditEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     notifications<T extends User$notificationsArgs<ExtArgs> = {}>(args?: Subset<T, User$notificationsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$NotificationPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     securityAlerts<T extends User$securityAlertsArgs<ExtArgs> = {}>(args?: Subset<T, User$securityAlertsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SecurityAlertPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -7441,6 +7545,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: AddressBookScalarFieldEnum | AddressBookScalarFieldEnum[]
+  }
+
+  /**
+   * User.savedFilters
+   */
+  export type User$savedFiltersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFilter
+     */
+    select?: SavedFilterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFilter
+     */
+    omit?: SavedFilterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFilterInclude<ExtArgs> | null
+    where?: SavedFilterWhereInput
+    orderBy?: SavedFilterOrderByWithRelationInput | SavedFilterOrderByWithRelationInput[]
+    cursor?: SavedFilterWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SavedFilterScalarFieldEnum | SavedFilterScalarFieldEnum[]
   }
 
   /**
@@ -39648,6 +39776,1150 @@ export namespace Prisma {
 
 
   /**
+   * Model SavedFilter
+   */
+
+  export type AggregateSavedFilter = {
+    _count: SavedFilterCountAggregateOutputType | null
+    _avg: SavedFilterAvgAggregateOutputType | null
+    _sum: SavedFilterSumAggregateOutputType | null
+    _min: SavedFilterMinAggregateOutputType | null
+    _max: SavedFilterMaxAggregateOutputType | null
+  }
+
+  export type SavedFilterAvgAggregateOutputType = {
+    sortOrder: number | null
+    usageCount: number | null
+  }
+
+  export type SavedFilterSumAggregateOutputType = {
+    sortOrder: number | null
+    usageCount: number | null
+  }
+
+  export type SavedFilterMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    name: string | null
+    sortOrder: number | null
+    lastUsedAt: Date | null
+    usageCount: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SavedFilterMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    name: string | null
+    sortOrder: number | null
+    lastUsedAt: Date | null
+    usageCount: number | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type SavedFilterCountAggregateOutputType = {
+    id: number
+    userId: number
+    name: number
+    filterState: number
+    sortOrder: number
+    lastUsedAt: number
+    usageCount: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type SavedFilterAvgAggregateInputType = {
+    sortOrder?: true
+    usageCount?: true
+  }
+
+  export type SavedFilterSumAggregateInputType = {
+    sortOrder?: true
+    usageCount?: true
+  }
+
+  export type SavedFilterMinAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    sortOrder?: true
+    lastUsedAt?: true
+    usageCount?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SavedFilterMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    sortOrder?: true
+    lastUsedAt?: true
+    usageCount?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type SavedFilterCountAggregateInputType = {
+    id?: true
+    userId?: true
+    name?: true
+    filterState?: true
+    sortOrder?: true
+    lastUsedAt?: true
+    usageCount?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type SavedFilterAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SavedFilter to aggregate.
+     */
+    where?: SavedFilterWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SavedFilters to fetch.
+     */
+    orderBy?: SavedFilterOrderByWithRelationInput | SavedFilterOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: SavedFilterWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SavedFilters from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SavedFilters.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned SavedFilters
+    **/
+    _count?: true | SavedFilterCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: SavedFilterAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: SavedFilterSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: SavedFilterMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: SavedFilterMaxAggregateInputType
+  }
+
+  export type GetSavedFilterAggregateType<T extends SavedFilterAggregateArgs> = {
+        [P in keyof T & keyof AggregateSavedFilter]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateSavedFilter[P]>
+      : GetScalarType<T[P], AggregateSavedFilter[P]>
+  }
+
+
+
+
+  export type SavedFilterGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SavedFilterWhereInput
+    orderBy?: SavedFilterOrderByWithAggregationInput | SavedFilterOrderByWithAggregationInput[]
+    by: SavedFilterScalarFieldEnum[] | SavedFilterScalarFieldEnum
+    having?: SavedFilterScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: SavedFilterCountAggregateInputType | true
+    _avg?: SavedFilterAvgAggregateInputType
+    _sum?: SavedFilterSumAggregateInputType
+    _min?: SavedFilterMinAggregateInputType
+    _max?: SavedFilterMaxAggregateInputType
+  }
+
+  export type SavedFilterGroupByOutputType = {
+    id: string
+    userId: string
+    name: string
+    filterState: JsonValue
+    sortOrder: number
+    lastUsedAt: Date | null
+    usageCount: number
+    createdAt: Date
+    updatedAt: Date
+    _count: SavedFilterCountAggregateOutputType | null
+    _avg: SavedFilterAvgAggregateOutputType | null
+    _sum: SavedFilterSumAggregateOutputType | null
+    _min: SavedFilterMinAggregateOutputType | null
+    _max: SavedFilterMaxAggregateOutputType | null
+  }
+
+  type GetSavedFilterGroupByPayload<T extends SavedFilterGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<SavedFilterGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof SavedFilterGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], SavedFilterGroupByOutputType[P]>
+            : GetScalarType<T[P], SavedFilterGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type SavedFilterSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    filterState?: boolean
+    sortOrder?: boolean
+    lastUsedAt?: boolean
+    usageCount?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["savedFilter"]>
+
+  export type SavedFilterSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    filterState?: boolean
+    sortOrder?: boolean
+    lastUsedAt?: boolean
+    usageCount?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["savedFilter"]>
+
+  export type SavedFilterSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    filterState?: boolean
+    sortOrder?: boolean
+    lastUsedAt?: boolean
+    usageCount?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["savedFilter"]>
+
+  export type SavedFilterSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    name?: boolean
+    filterState?: boolean
+    sortOrder?: boolean
+    lastUsedAt?: boolean
+    usageCount?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type SavedFilterOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "name" | "filterState" | "sortOrder" | "lastUsedAt" | "usageCount" | "createdAt" | "updatedAt", ExtArgs["result"]["savedFilter"]>
+  export type SavedFilterInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SavedFilterIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+  export type SavedFilterIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+  }
+
+  export type $SavedFilterPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "SavedFilter"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      name: string
+      filterState: Prisma.JsonValue
+      sortOrder: number
+      lastUsedAt: Date | null
+      usageCount: number
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["savedFilter"]>
+    composites: {}
+  }
+
+  type SavedFilterGetPayload<S extends boolean | null | undefined | SavedFilterDefaultArgs> = $Result.GetResult<Prisma.$SavedFilterPayload, S>
+
+  type SavedFilterCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<SavedFilterFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: SavedFilterCountAggregateInputType | true
+    }
+
+  export interface SavedFilterDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['SavedFilter'], meta: { name: 'SavedFilter' } }
+    /**
+     * Find zero or one SavedFilter that matches the filter.
+     * @param {SavedFilterFindUniqueArgs} args - Arguments to find a SavedFilter
+     * @example
+     * // Get one SavedFilter
+     * const savedFilter = await prisma.savedFilter.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends SavedFilterFindUniqueArgs>(args: SelectSubset<T, SavedFilterFindUniqueArgs<ExtArgs>>): Prisma__SavedFilterClient<$Result.GetResult<Prisma.$SavedFilterPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one SavedFilter that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {SavedFilterFindUniqueOrThrowArgs} args - Arguments to find a SavedFilter
+     * @example
+     * // Get one SavedFilter
+     * const savedFilter = await prisma.savedFilter.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends SavedFilterFindUniqueOrThrowArgs>(args: SelectSubset<T, SavedFilterFindUniqueOrThrowArgs<ExtArgs>>): Prisma__SavedFilterClient<$Result.GetResult<Prisma.$SavedFilterPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SavedFilter that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SavedFilterFindFirstArgs} args - Arguments to find a SavedFilter
+     * @example
+     * // Get one SavedFilter
+     * const savedFilter = await prisma.savedFilter.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends SavedFilterFindFirstArgs>(args?: SelectSubset<T, SavedFilterFindFirstArgs<ExtArgs>>): Prisma__SavedFilterClient<$Result.GetResult<Prisma.$SavedFilterPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first SavedFilter that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SavedFilterFindFirstOrThrowArgs} args - Arguments to find a SavedFilter
+     * @example
+     * // Get one SavedFilter
+     * const savedFilter = await prisma.savedFilter.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends SavedFilterFindFirstOrThrowArgs>(args?: SelectSubset<T, SavedFilterFindFirstOrThrowArgs<ExtArgs>>): Prisma__SavedFilterClient<$Result.GetResult<Prisma.$SavedFilterPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more SavedFilters that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SavedFilterFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all SavedFilters
+     * const savedFilters = await prisma.savedFilter.findMany()
+     * 
+     * // Get first 10 SavedFilters
+     * const savedFilters = await prisma.savedFilter.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const savedFilterWithIdOnly = await prisma.savedFilter.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends SavedFilterFindManyArgs>(args?: SelectSubset<T, SavedFilterFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SavedFilterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a SavedFilter.
+     * @param {SavedFilterCreateArgs} args - Arguments to create a SavedFilter.
+     * @example
+     * // Create one SavedFilter
+     * const SavedFilter = await prisma.savedFilter.create({
+     *   data: {
+     *     // ... data to create a SavedFilter
+     *   }
+     * })
+     * 
+     */
+    create<T extends SavedFilterCreateArgs>(args: SelectSubset<T, SavedFilterCreateArgs<ExtArgs>>): Prisma__SavedFilterClient<$Result.GetResult<Prisma.$SavedFilterPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many SavedFilters.
+     * @param {SavedFilterCreateManyArgs} args - Arguments to create many SavedFilters.
+     * @example
+     * // Create many SavedFilters
+     * const savedFilter = await prisma.savedFilter.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends SavedFilterCreateManyArgs>(args?: SelectSubset<T, SavedFilterCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many SavedFilters and returns the data saved in the database.
+     * @param {SavedFilterCreateManyAndReturnArgs} args - Arguments to create many SavedFilters.
+     * @example
+     * // Create many SavedFilters
+     * const savedFilter = await prisma.savedFilter.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many SavedFilters and only return the `id`
+     * const savedFilterWithIdOnly = await prisma.savedFilter.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends SavedFilterCreateManyAndReturnArgs>(args?: SelectSubset<T, SavedFilterCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SavedFilterPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a SavedFilter.
+     * @param {SavedFilterDeleteArgs} args - Arguments to delete one SavedFilter.
+     * @example
+     * // Delete one SavedFilter
+     * const SavedFilter = await prisma.savedFilter.delete({
+     *   where: {
+     *     // ... filter to delete one SavedFilter
+     *   }
+     * })
+     * 
+     */
+    delete<T extends SavedFilterDeleteArgs>(args: SelectSubset<T, SavedFilterDeleteArgs<ExtArgs>>): Prisma__SavedFilterClient<$Result.GetResult<Prisma.$SavedFilterPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one SavedFilter.
+     * @param {SavedFilterUpdateArgs} args - Arguments to update one SavedFilter.
+     * @example
+     * // Update one SavedFilter
+     * const savedFilter = await prisma.savedFilter.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends SavedFilterUpdateArgs>(args: SelectSubset<T, SavedFilterUpdateArgs<ExtArgs>>): Prisma__SavedFilterClient<$Result.GetResult<Prisma.$SavedFilterPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more SavedFilters.
+     * @param {SavedFilterDeleteManyArgs} args - Arguments to filter SavedFilters to delete.
+     * @example
+     * // Delete a few SavedFilters
+     * const { count } = await prisma.savedFilter.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends SavedFilterDeleteManyArgs>(args?: SelectSubset<T, SavedFilterDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SavedFilters.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SavedFilterUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many SavedFilters
+     * const savedFilter = await prisma.savedFilter.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends SavedFilterUpdateManyArgs>(args: SelectSubset<T, SavedFilterUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more SavedFilters and returns the data updated in the database.
+     * @param {SavedFilterUpdateManyAndReturnArgs} args - Arguments to update many SavedFilters.
+     * @example
+     * // Update many SavedFilters
+     * const savedFilter = await prisma.savedFilter.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more SavedFilters and only return the `id`
+     * const savedFilterWithIdOnly = await prisma.savedFilter.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends SavedFilterUpdateManyAndReturnArgs>(args: SelectSubset<T, SavedFilterUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SavedFilterPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one SavedFilter.
+     * @param {SavedFilterUpsertArgs} args - Arguments to update or create a SavedFilter.
+     * @example
+     * // Update or create a SavedFilter
+     * const savedFilter = await prisma.savedFilter.upsert({
+     *   create: {
+     *     // ... data to create a SavedFilter
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the SavedFilter we want to update
+     *   }
+     * })
+     */
+    upsert<T extends SavedFilterUpsertArgs>(args: SelectSubset<T, SavedFilterUpsertArgs<ExtArgs>>): Prisma__SavedFilterClient<$Result.GetResult<Prisma.$SavedFilterPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of SavedFilters.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SavedFilterCountArgs} args - Arguments to filter SavedFilters to count.
+     * @example
+     * // Count the number of SavedFilters
+     * const count = await prisma.savedFilter.count({
+     *   where: {
+     *     // ... the filter for the SavedFilters we want to count
+     *   }
+     * })
+    **/
+    count<T extends SavedFilterCountArgs>(
+      args?: Subset<T, SavedFilterCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], SavedFilterCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a SavedFilter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SavedFilterAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends SavedFilterAggregateArgs>(args: Subset<T, SavedFilterAggregateArgs>): Prisma.PrismaPromise<GetSavedFilterAggregateType<T>>
+
+    /**
+     * Group by SavedFilter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {SavedFilterGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends SavedFilterGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: SavedFilterGroupByArgs['orderBy'] }
+        : { orderBy?: SavedFilterGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, SavedFilterGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetSavedFilterGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the SavedFilter model
+   */
+  readonly fields: SavedFilterFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for SavedFilter.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__SavedFilterClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the SavedFilter model
+   */
+  interface SavedFilterFieldRefs {
+    readonly id: FieldRef<"SavedFilter", 'String'>
+    readonly userId: FieldRef<"SavedFilter", 'String'>
+    readonly name: FieldRef<"SavedFilter", 'String'>
+    readonly filterState: FieldRef<"SavedFilter", 'Json'>
+    readonly sortOrder: FieldRef<"SavedFilter", 'Int'>
+    readonly lastUsedAt: FieldRef<"SavedFilter", 'DateTime'>
+    readonly usageCount: FieldRef<"SavedFilter", 'Int'>
+    readonly createdAt: FieldRef<"SavedFilter", 'DateTime'>
+    readonly updatedAt: FieldRef<"SavedFilter", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * SavedFilter findUnique
+   */
+  export type SavedFilterFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFilter
+     */
+    select?: SavedFilterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFilter
+     */
+    omit?: SavedFilterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFilterInclude<ExtArgs> | null
+    /**
+     * Filter, which SavedFilter to fetch.
+     */
+    where: SavedFilterWhereUniqueInput
+  }
+
+  /**
+   * SavedFilter findUniqueOrThrow
+   */
+  export type SavedFilterFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFilter
+     */
+    select?: SavedFilterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFilter
+     */
+    omit?: SavedFilterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFilterInclude<ExtArgs> | null
+    /**
+     * Filter, which SavedFilter to fetch.
+     */
+    where: SavedFilterWhereUniqueInput
+  }
+
+  /**
+   * SavedFilter findFirst
+   */
+  export type SavedFilterFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFilter
+     */
+    select?: SavedFilterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFilter
+     */
+    omit?: SavedFilterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFilterInclude<ExtArgs> | null
+    /**
+     * Filter, which SavedFilter to fetch.
+     */
+    where?: SavedFilterWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SavedFilters to fetch.
+     */
+    orderBy?: SavedFilterOrderByWithRelationInput | SavedFilterOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SavedFilters.
+     */
+    cursor?: SavedFilterWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SavedFilters from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SavedFilters.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SavedFilters.
+     */
+    distinct?: SavedFilterScalarFieldEnum | SavedFilterScalarFieldEnum[]
+  }
+
+  /**
+   * SavedFilter findFirstOrThrow
+   */
+  export type SavedFilterFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFilter
+     */
+    select?: SavedFilterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFilter
+     */
+    omit?: SavedFilterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFilterInclude<ExtArgs> | null
+    /**
+     * Filter, which SavedFilter to fetch.
+     */
+    where?: SavedFilterWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SavedFilters to fetch.
+     */
+    orderBy?: SavedFilterOrderByWithRelationInput | SavedFilterOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for SavedFilters.
+     */
+    cursor?: SavedFilterWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SavedFilters from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SavedFilters.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of SavedFilters.
+     */
+    distinct?: SavedFilterScalarFieldEnum | SavedFilterScalarFieldEnum[]
+  }
+
+  /**
+   * SavedFilter findMany
+   */
+  export type SavedFilterFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFilter
+     */
+    select?: SavedFilterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFilter
+     */
+    omit?: SavedFilterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFilterInclude<ExtArgs> | null
+    /**
+     * Filter, which SavedFilters to fetch.
+     */
+    where?: SavedFilterWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of SavedFilters to fetch.
+     */
+    orderBy?: SavedFilterOrderByWithRelationInput | SavedFilterOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing SavedFilters.
+     */
+    cursor?: SavedFilterWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` SavedFilters from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` SavedFilters.
+     */
+    skip?: number
+    distinct?: SavedFilterScalarFieldEnum | SavedFilterScalarFieldEnum[]
+  }
+
+  /**
+   * SavedFilter create
+   */
+  export type SavedFilterCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFilter
+     */
+    select?: SavedFilterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFilter
+     */
+    omit?: SavedFilterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFilterInclude<ExtArgs> | null
+    /**
+     * The data needed to create a SavedFilter.
+     */
+    data: XOR<SavedFilterCreateInput, SavedFilterUncheckedCreateInput>
+  }
+
+  /**
+   * SavedFilter createMany
+   */
+  export type SavedFilterCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many SavedFilters.
+     */
+    data: SavedFilterCreateManyInput | SavedFilterCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * SavedFilter createManyAndReturn
+   */
+  export type SavedFilterCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFilter
+     */
+    select?: SavedFilterSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFilter
+     */
+    omit?: SavedFilterOmit<ExtArgs> | null
+    /**
+     * The data used to create many SavedFilters.
+     */
+    data: SavedFilterCreateManyInput | SavedFilterCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFilterIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SavedFilter update
+   */
+  export type SavedFilterUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFilter
+     */
+    select?: SavedFilterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFilter
+     */
+    omit?: SavedFilterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFilterInclude<ExtArgs> | null
+    /**
+     * The data needed to update a SavedFilter.
+     */
+    data: XOR<SavedFilterUpdateInput, SavedFilterUncheckedUpdateInput>
+    /**
+     * Choose, which SavedFilter to update.
+     */
+    where: SavedFilterWhereUniqueInput
+  }
+
+  /**
+   * SavedFilter updateMany
+   */
+  export type SavedFilterUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update SavedFilters.
+     */
+    data: XOR<SavedFilterUpdateManyMutationInput, SavedFilterUncheckedUpdateManyInput>
+    /**
+     * Filter which SavedFilters to update
+     */
+    where?: SavedFilterWhereInput
+    /**
+     * Limit how many SavedFilters to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * SavedFilter updateManyAndReturn
+   */
+  export type SavedFilterUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFilter
+     */
+    select?: SavedFilterSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFilter
+     */
+    omit?: SavedFilterOmit<ExtArgs> | null
+    /**
+     * The data used to update SavedFilters.
+     */
+    data: XOR<SavedFilterUpdateManyMutationInput, SavedFilterUncheckedUpdateManyInput>
+    /**
+     * Filter which SavedFilters to update
+     */
+    where?: SavedFilterWhereInput
+    /**
+     * Limit how many SavedFilters to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFilterIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * SavedFilter upsert
+   */
+  export type SavedFilterUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFilter
+     */
+    select?: SavedFilterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFilter
+     */
+    omit?: SavedFilterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFilterInclude<ExtArgs> | null
+    /**
+     * The filter to search for the SavedFilter to update in case it exists.
+     */
+    where: SavedFilterWhereUniqueInput
+    /**
+     * In case the SavedFilter found by the `where` argument doesn't exist, create a new SavedFilter with this data.
+     */
+    create: XOR<SavedFilterCreateInput, SavedFilterUncheckedCreateInput>
+    /**
+     * In case the SavedFilter was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<SavedFilterUpdateInput, SavedFilterUncheckedUpdateInput>
+  }
+
+  /**
+   * SavedFilter delete
+   */
+  export type SavedFilterDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFilter
+     */
+    select?: SavedFilterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFilter
+     */
+    omit?: SavedFilterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFilterInclude<ExtArgs> | null
+    /**
+     * Filter which SavedFilter to delete.
+     */
+    where: SavedFilterWhereUniqueInput
+  }
+
+  /**
+   * SavedFilter deleteMany
+   */
+  export type SavedFilterDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which SavedFilters to delete
+     */
+    where?: SavedFilterWhereInput
+    /**
+     * Limit how many SavedFilters to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * SavedFilter without action
+   */
+  export type SavedFilterDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SavedFilter
+     */
+    select?: SavedFilterSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SavedFilter
+     */
+    omit?: SavedFilterOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SavedFilterInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Model TeamSyncAccount
    */
 
@@ -53587,6 +54859,21 @@ export namespace Prisma {
   export type AddressBookScalarFieldEnum = (typeof AddressBookScalarFieldEnum)[keyof typeof AddressBookScalarFieldEnum]
 
 
+  export const SavedFilterScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    name: 'name',
+    filterState: 'filterState',
+    sortOrder: 'sortOrder',
+    lastUsedAt: 'lastUsedAt',
+    usageCount: 'usageCount',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type SavedFilterScalarFieldEnum = (typeof SavedFilterScalarFieldEnum)[keyof typeof SavedFilterScalarFieldEnum]
+
+
   export const TeamSyncAccountScalarFieldEnum: {
     id: 'id',
     groupId: 'groupId',
@@ -54439,6 +55726,7 @@ export namespace Prisma {
     sessions?: UserSessionListRelationFilter
     totpRecoveryCodes?: TotpRecoveryCodeListRelationFilter
     addressBooks?: AddressBookListRelationFilter
+    savedFilters?: SavedFilterListRelationFilter
     adminAuditEvents?: AdminAuditEventListRelationFilter
     notifications?: NotificationListRelationFilter
     securityAlerts?: SecurityAlertListRelationFilter
@@ -54494,6 +55782,7 @@ export namespace Prisma {
     sessions?: UserSessionOrderByRelationAggregateInput
     totpRecoveryCodes?: TotpRecoveryCodeOrderByRelationAggregateInput
     addressBooks?: AddressBookOrderByRelationAggregateInput
+    savedFilters?: SavedFilterOrderByRelationAggregateInput
     adminAuditEvents?: AdminAuditEventOrderByRelationAggregateInput
     notifications?: NotificationOrderByRelationAggregateInput
     securityAlerts?: SecurityAlertOrderByRelationAggregateInput
@@ -54552,6 +55841,7 @@ export namespace Prisma {
     sessions?: UserSessionListRelationFilter
     totpRecoveryCodes?: TotpRecoveryCodeListRelationFilter
     addressBooks?: AddressBookListRelationFilter
+    savedFilters?: SavedFilterListRelationFilter
     adminAuditEvents?: AdminAuditEventListRelationFilter
     notifications?: NotificationListRelationFilter
     securityAlerts?: SecurityAlertListRelationFilter
@@ -57410,6 +58700,83 @@ export namespace Prisma {
     updatedAt?: DateTimeWithAggregatesFilter<"AddressBook"> | Date | string
   }
 
+  export type SavedFilterWhereInput = {
+    AND?: SavedFilterWhereInput | SavedFilterWhereInput[]
+    OR?: SavedFilterWhereInput[]
+    NOT?: SavedFilterWhereInput | SavedFilterWhereInput[]
+    id?: StringFilter<"SavedFilter"> | string
+    userId?: StringFilter<"SavedFilter"> | string
+    name?: StringFilter<"SavedFilter"> | string
+    filterState?: JsonFilter<"SavedFilter">
+    sortOrder?: IntFilter<"SavedFilter"> | number
+    lastUsedAt?: DateTimeNullableFilter<"SavedFilter"> | Date | string | null
+    usageCount?: IntFilter<"SavedFilter"> | number
+    createdAt?: DateTimeFilter<"SavedFilter"> | Date | string
+    updatedAt?: DateTimeFilter<"SavedFilter"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }
+
+  export type SavedFilterOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    filterState?: SortOrder
+    sortOrder?: SortOrder
+    lastUsedAt?: SortOrderInput | SortOrder
+    usageCount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+  }
+
+  export type SavedFilterWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: SavedFilterWhereInput | SavedFilterWhereInput[]
+    OR?: SavedFilterWhereInput[]
+    NOT?: SavedFilterWhereInput | SavedFilterWhereInput[]
+    userId?: StringFilter<"SavedFilter"> | string
+    name?: StringFilter<"SavedFilter"> | string
+    filterState?: JsonFilter<"SavedFilter">
+    sortOrder?: IntFilter<"SavedFilter"> | number
+    lastUsedAt?: DateTimeNullableFilter<"SavedFilter"> | Date | string | null
+    usageCount?: IntFilter<"SavedFilter"> | number
+    createdAt?: DateTimeFilter<"SavedFilter"> | Date | string
+    updatedAt?: DateTimeFilter<"SavedFilter"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+  }, "id">
+
+  export type SavedFilterOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    filterState?: SortOrder
+    sortOrder?: SortOrder
+    lastUsedAt?: SortOrderInput | SortOrder
+    usageCount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: SavedFilterCountOrderByAggregateInput
+    _avg?: SavedFilterAvgOrderByAggregateInput
+    _max?: SavedFilterMaxOrderByAggregateInput
+    _min?: SavedFilterMinOrderByAggregateInput
+    _sum?: SavedFilterSumOrderByAggregateInput
+  }
+
+  export type SavedFilterScalarWhereWithAggregatesInput = {
+    AND?: SavedFilterScalarWhereWithAggregatesInput | SavedFilterScalarWhereWithAggregatesInput[]
+    OR?: SavedFilterScalarWhereWithAggregatesInput[]
+    NOT?: SavedFilterScalarWhereWithAggregatesInput | SavedFilterScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"SavedFilter"> | string
+    userId?: StringWithAggregatesFilter<"SavedFilter"> | string
+    name?: StringWithAggregatesFilter<"SavedFilter"> | string
+    filterState?: JsonWithAggregatesFilter<"SavedFilter">
+    sortOrder?: IntWithAggregatesFilter<"SavedFilter"> | number
+    lastUsedAt?: DateTimeNullableWithAggregatesFilter<"SavedFilter"> | Date | string | null
+    usageCount?: IntWithAggregatesFilter<"SavedFilter"> | number
+    createdAt?: DateTimeWithAggregatesFilter<"SavedFilter"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"SavedFilter"> | Date | string
+  }
+
   export type TeamSyncAccountWhereInput = {
     AND?: TeamSyncAccountWhereInput | TeamSyncAccountWhereInput[]
     OR?: TeamSyncAccountWhereInput[]
@@ -58331,6 +59698,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -58386,6 +59754,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -58441,6 +59810,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -58496,6 +59866,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -61799,6 +63170,89 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type SavedFilterCreateInput = {
+    id?: string
+    name: string
+    filterState: JsonNullValueInput | InputJsonValue
+    sortOrder?: number
+    lastUsedAt?: Date | string | null
+    usageCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutSavedFiltersInput
+  }
+
+  export type SavedFilterUncheckedCreateInput = {
+    id?: string
+    userId: string
+    name: string
+    filterState: JsonNullValueInput | InputJsonValue
+    sortOrder?: number
+    lastUsedAt?: Date | string | null
+    usageCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SavedFilterUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    filterState?: JsonNullValueInput | InputJsonValue
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    usageCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutSavedFiltersNestedInput
+  }
+
+  export type SavedFilterUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    filterState?: JsonNullValueInput | InputJsonValue
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    usageCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SavedFilterCreateManyInput = {
+    id?: string
+    userId: string
+    name: string
+    filterState: JsonNullValueInput | InputJsonValue
+    sortOrder?: number
+    lastUsedAt?: Date | string | null
+    usageCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SavedFilterUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    filterState?: JsonNullValueInput | InputJsonValue
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    usageCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SavedFilterUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    filterState?: JsonNullValueInput | InputJsonValue
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    usageCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type TeamSyncAccountCreateInput = {
     id?: string
     addedByUserId: string
@@ -62911,6 +64365,12 @@ export namespace Prisma {
     none?: AddressBookWhereInput
   }
 
+  export type SavedFilterListRelationFilter = {
+    every?: SavedFilterWhereInput
+    some?: SavedFilterWhereInput
+    none?: SavedFilterWhereInput
+  }
+
   export type AdminAuditEventListRelationFilter = {
     every?: AdminAuditEventWhereInput
     some?: AdminAuditEventWhereInput
@@ -63039,6 +64499,10 @@ export namespace Prisma {
   }
 
   export type AddressBookOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type SavedFilterOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -65540,6 +67004,50 @@ export namespace Prisma {
     updatedAt?: SortOrder
   }
 
+  export type SavedFilterCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    filterState?: SortOrder
+    sortOrder?: SortOrder
+    lastUsedAt?: SortOrder
+    usageCount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SavedFilterAvgOrderByAggregateInput = {
+    sortOrder?: SortOrder
+    usageCount?: SortOrder
+  }
+
+  export type SavedFilterMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    sortOrder?: SortOrder
+    lastUsedAt?: SortOrder
+    usageCount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SavedFilterMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    name?: SortOrder
+    sortOrder?: SortOrder
+    lastUsedAt?: SortOrder
+    usageCount?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type SavedFilterSumOrderByAggregateInput = {
+    sortOrder?: SortOrder
+    usageCount?: SortOrder
+  }
+
   export type GroupAddressBookScalarRelationFilter = {
     is?: GroupAddressBookWhereInput
     isNot?: GroupAddressBookWhereInput
@@ -66181,6 +67689,13 @@ export namespace Prisma {
     connect?: AddressBookWhereUniqueInput | AddressBookWhereUniqueInput[]
   }
 
+  export type SavedFilterCreateNestedManyWithoutUserInput = {
+    create?: XOR<SavedFilterCreateWithoutUserInput, SavedFilterUncheckedCreateWithoutUserInput> | SavedFilterCreateWithoutUserInput[] | SavedFilterUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SavedFilterCreateOrConnectWithoutUserInput | SavedFilterCreateOrConnectWithoutUserInput[]
+    createMany?: SavedFilterCreateManyUserInputEnvelope
+    connect?: SavedFilterWhereUniqueInput | SavedFilterWhereUniqueInput[]
+  }
+
   export type AdminAuditEventCreateNestedManyWithoutAdminInput = {
     create?: XOR<AdminAuditEventCreateWithoutAdminInput, AdminAuditEventUncheckedCreateWithoutAdminInput> | AdminAuditEventCreateWithoutAdminInput[] | AdminAuditEventUncheckedCreateWithoutAdminInput[]
     connectOrCreate?: AdminAuditEventCreateOrConnectWithoutAdminInput | AdminAuditEventCreateOrConnectWithoutAdminInput[]
@@ -66379,6 +67894,13 @@ export namespace Prisma {
     connectOrCreate?: AddressBookCreateOrConnectWithoutUserInput | AddressBookCreateOrConnectWithoutUserInput[]
     createMany?: AddressBookCreateManyUserInputEnvelope
     connect?: AddressBookWhereUniqueInput | AddressBookWhereUniqueInput[]
+  }
+
+  export type SavedFilterUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<SavedFilterCreateWithoutUserInput, SavedFilterUncheckedCreateWithoutUserInput> | SavedFilterCreateWithoutUserInput[] | SavedFilterUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SavedFilterCreateOrConnectWithoutUserInput | SavedFilterCreateOrConnectWithoutUserInput[]
+    createMany?: SavedFilterCreateManyUserInputEnvelope
+    connect?: SavedFilterWhereUniqueInput | SavedFilterWhereUniqueInput[]
   }
 
   export type AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput = {
@@ -66749,6 +68271,20 @@ export namespace Prisma {
     update?: AddressBookUpdateWithWhereUniqueWithoutUserInput | AddressBookUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: AddressBookUpdateManyWithWhereWithoutUserInput | AddressBookUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: AddressBookScalarWhereInput | AddressBookScalarWhereInput[]
+  }
+
+  export type SavedFilterUpdateManyWithoutUserNestedInput = {
+    create?: XOR<SavedFilterCreateWithoutUserInput, SavedFilterUncheckedCreateWithoutUserInput> | SavedFilterCreateWithoutUserInput[] | SavedFilterUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SavedFilterCreateOrConnectWithoutUserInput | SavedFilterCreateOrConnectWithoutUserInput[]
+    upsert?: SavedFilterUpsertWithWhereUniqueWithoutUserInput | SavedFilterUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: SavedFilterCreateManyUserInputEnvelope
+    set?: SavedFilterWhereUniqueInput | SavedFilterWhereUniqueInput[]
+    disconnect?: SavedFilterWhereUniqueInput | SavedFilterWhereUniqueInput[]
+    delete?: SavedFilterWhereUniqueInput | SavedFilterWhereUniqueInput[]
+    connect?: SavedFilterWhereUniqueInput | SavedFilterWhereUniqueInput[]
+    update?: SavedFilterUpdateWithWhereUniqueWithoutUserInput | SavedFilterUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: SavedFilterUpdateManyWithWhereWithoutUserInput | SavedFilterUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: SavedFilterScalarWhereInput | SavedFilterScalarWhereInput[]
   }
 
   export type AdminAuditEventUpdateManyWithoutAdminNestedInput = {
@@ -67143,6 +68679,20 @@ export namespace Prisma {
     update?: AddressBookUpdateWithWhereUniqueWithoutUserInput | AddressBookUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: AddressBookUpdateManyWithWhereWithoutUserInput | AddressBookUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: AddressBookScalarWhereInput | AddressBookScalarWhereInput[]
+  }
+
+  export type SavedFilterUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<SavedFilterCreateWithoutUserInput, SavedFilterUncheckedCreateWithoutUserInput> | SavedFilterCreateWithoutUserInput[] | SavedFilterUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: SavedFilterCreateOrConnectWithoutUserInput | SavedFilterCreateOrConnectWithoutUserInput[]
+    upsert?: SavedFilterUpsertWithWhereUniqueWithoutUserInput | SavedFilterUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: SavedFilterCreateManyUserInputEnvelope
+    set?: SavedFilterWhereUniqueInput | SavedFilterWhereUniqueInput[]
+    disconnect?: SavedFilterWhereUniqueInput | SavedFilterWhereUniqueInput[]
+    delete?: SavedFilterWhereUniqueInput | SavedFilterWhereUniqueInput[]
+    connect?: SavedFilterWhereUniqueInput | SavedFilterWhereUniqueInput[]
+    update?: SavedFilterUpdateWithWhereUniqueWithoutUserInput | SavedFilterUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: SavedFilterUpdateManyWithWhereWithoutUserInput | SavedFilterUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: SavedFilterScalarWhereInput | SavedFilterScalarWhereInput[]
   }
 
   export type AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput = {
@@ -69092,6 +70642,20 @@ export namespace Prisma {
     update?: ContactUpdateWithWhereUniqueWithoutBookInput | ContactUpdateWithWhereUniqueWithoutBookInput[]
     updateMany?: ContactUpdateManyWithWhereWithoutBookInput | ContactUpdateManyWithWhereWithoutBookInput[]
     deleteMany?: ContactScalarWhereInput | ContactScalarWhereInput[]
+  }
+
+  export type UserCreateNestedOneWithoutSavedFiltersInput = {
+    create?: XOR<UserCreateWithoutSavedFiltersInput, UserUncheckedCreateWithoutSavedFiltersInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSavedFiltersInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutSavedFiltersNestedInput = {
+    create?: XOR<UserCreateWithoutSavedFiltersInput, UserUncheckedCreateWithoutSavedFiltersInput>
+    connectOrCreate?: UserCreateOrConnectWithoutSavedFiltersInput
+    upsert?: UserUpsertWithoutSavedFiltersInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSavedFiltersInput, UserUpdateWithoutSavedFiltersInput>, UserUncheckedUpdateWithoutSavedFiltersInput>
   }
 
   export type GroupCreateNestedOneWithoutTeamSyncAccountsInput = {
@@ -71190,6 +72754,38 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type SavedFilterCreateWithoutUserInput = {
+    id?: string
+    name: string
+    filterState: JsonNullValueInput | InputJsonValue
+    sortOrder?: number
+    lastUsedAt?: Date | string | null
+    usageCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SavedFilterUncheckedCreateWithoutUserInput = {
+    id?: string
+    name: string
+    filterState: JsonNullValueInput | InputJsonValue
+    sortOrder?: number
+    lastUsedAt?: Date | string | null
+    usageCount?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SavedFilterCreateOrConnectWithoutUserInput = {
+    where: SavedFilterWhereUniqueInput
+    create: XOR<SavedFilterCreateWithoutUserInput, SavedFilterUncheckedCreateWithoutUserInput>
+  }
+
+  export type SavedFilterCreateManyUserInputEnvelope = {
+    data: SavedFilterCreateManyUserInput | SavedFilterCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
   export type AdminAuditEventCreateWithoutAdminInput = {
     id?: string
     action: string
@@ -72174,6 +73770,37 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"AddressBook"> | Date | string
   }
 
+  export type SavedFilterUpsertWithWhereUniqueWithoutUserInput = {
+    where: SavedFilterWhereUniqueInput
+    update: XOR<SavedFilterUpdateWithoutUserInput, SavedFilterUncheckedUpdateWithoutUserInput>
+    create: XOR<SavedFilterCreateWithoutUserInput, SavedFilterUncheckedCreateWithoutUserInput>
+  }
+
+  export type SavedFilterUpdateWithWhereUniqueWithoutUserInput = {
+    where: SavedFilterWhereUniqueInput
+    data: XOR<SavedFilterUpdateWithoutUserInput, SavedFilterUncheckedUpdateWithoutUserInput>
+  }
+
+  export type SavedFilterUpdateManyWithWhereWithoutUserInput = {
+    where: SavedFilterScalarWhereInput
+    data: XOR<SavedFilterUpdateManyMutationInput, SavedFilterUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type SavedFilterScalarWhereInput = {
+    AND?: SavedFilterScalarWhereInput | SavedFilterScalarWhereInput[]
+    OR?: SavedFilterScalarWhereInput[]
+    NOT?: SavedFilterScalarWhereInput | SavedFilterScalarWhereInput[]
+    id?: StringFilter<"SavedFilter"> | string
+    userId?: StringFilter<"SavedFilter"> | string
+    name?: StringFilter<"SavedFilter"> | string
+    filterState?: JsonFilter<"SavedFilter">
+    sortOrder?: IntFilter<"SavedFilter"> | number
+    lastUsedAt?: DateTimeNullableFilter<"SavedFilter"> | Date | string | null
+    usageCount?: IntFilter<"SavedFilter"> | number
+    createdAt?: DateTimeFilter<"SavedFilter"> | Date | string
+    updatedAt?: DateTimeFilter<"SavedFilter"> | Date | string
+  }
+
   export type AdminAuditEventUpsertWithWhereUniqueWithoutAdminInput = {
     where: AdminAuditEventWhereUniqueInput
     update: XOR<AdminAuditEventUpdateWithoutAdminInput, AdminAuditEventUncheckedUpdateWithoutAdminInput>
@@ -72521,6 +74148,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -72575,6 +74203,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -72645,6 +74274,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -72699,6 +74329,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -72752,6 +74383,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -72806,6 +74438,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -72930,6 +74563,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -72984,6 +74618,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -73080,6 +74715,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -73134,6 +74770,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -73927,6 +75564,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -73981,6 +75619,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -74461,6 +76100,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -74515,6 +76155,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -74665,6 +76306,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -74719,6 +76361,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -74789,6 +76432,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -74843,6 +76487,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -74978,6 +76623,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -75032,6 +76678,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -75133,6 +76780,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -75187,6 +76835,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -75389,6 +77038,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -75443,6 +77093,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -75513,6 +77164,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -75567,6 +77219,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -75637,6 +77290,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -75691,6 +77345,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -75745,6 +77400,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -75799,6 +77455,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -76161,6 +77818,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -76215,6 +77873,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -76594,6 +78253,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -76648,6 +78308,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -76767,6 +78428,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -76821,6 +78483,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -76875,6 +78538,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -76929,6 +78593,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -77207,6 +78872,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -77261,6 +78927,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -78824,6 +80491,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -78878,6 +80546,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -78948,6 +80617,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -79002,6 +80672,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -79056,6 +80727,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -79110,6 +80782,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -79180,6 +80853,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -79234,6 +80908,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -79288,6 +80963,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -79342,6 +81018,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -79412,6 +81089,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -79466,6 +81144,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -79520,6 +81199,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -79574,6 +81254,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -79644,6 +81325,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -79698,6 +81380,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -79752,6 +81435,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -79806,6 +81490,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -80003,6 +81688,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -80057,6 +81743,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -80245,6 +81932,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
@@ -80299,6 +81987,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
@@ -80369,6 +82058,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
@@ -80423,6 +82113,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
@@ -80476,6 +82167,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -80530,6 +82222,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -80779,6 +82472,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -80833,6 +82527,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -81078,6 +82773,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -81132,6 +82828,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -81243,6 +82940,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -81297,6 +82995,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -81511,6 +83210,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -81565,6 +83265,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -81767,6 +83468,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -81821,6 +83523,7 @@ export namespace Prisma {
     passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -81847,6 +83550,242 @@ export namespace Prisma {
   export type ContactUpdateManyWithWhereWithoutBookInput = {
     where: ContactScalarWhereInput
     data: XOR<ContactUpdateManyMutationInput, ContactUncheckedUpdateManyWithoutBookInput>
+  }
+
+  export type UserCreateWithoutSavedFiltersInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutSavedFiltersInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutSavedFiltersInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutSavedFiltersInput, UserUncheckedCreateWithoutSavedFiltersInput>
+  }
+
+  export type UserUpsertWithoutSavedFiltersInput = {
+    update: XOR<UserUpdateWithoutSavedFiltersInput, UserUncheckedUpdateWithoutSavedFiltersInput>
+    create: XOR<UserCreateWithoutSavedFiltersInput, UserUncheckedCreateWithoutSavedFiltersInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutSavedFiltersInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutSavedFiltersInput, UserUncheckedUpdateWithoutSavedFiltersInput>
+  }
+
+  export type UserUpdateWithoutSavedFiltersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutSavedFiltersInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
   }
 
   export type GroupCreateWithoutTeamSyncAccountsInput = {
@@ -82523,6 +84462,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -82577,6 +84517,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -82763,6 +84704,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -82817,6 +84759,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -83014,6 +84957,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -83068,6 +85012,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -83266,6 +85211,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -83320,6 +85266,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -83508,6 +85455,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
@@ -83562,6 +85510,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
@@ -83661,6 +85610,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
@@ -83715,6 +85665,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
@@ -83804,6 +85755,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
@@ -83858,6 +85810,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
@@ -83964,6 +85917,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
@@ -84018,6 +85972,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
@@ -84088,6 +86043,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -84142,6 +86098,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -84212,6 +86169,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -84266,6 +86224,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -84320,6 +86279,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -84374,6 +86334,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -84444,6 +86405,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -84498,6 +86460,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -84552,6 +86515,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -84606,6 +86570,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -84803,6 +86768,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -84857,6 +86823,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -85044,6 +87011,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -85098,6 +87066,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -85168,6 +87137,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -85222,6 +87192,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -85276,6 +87247,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -85330,6 +87302,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -85400,6 +87373,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -85454,6 +87428,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -85508,6 +87483,7 @@ export namespace Prisma {
     sessions?: UserSessionCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
     notifications?: NotificationCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
@@ -85562,6 +87538,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
     addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
     adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
     notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
     securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
@@ -85632,6 +87609,7 @@ export namespace Prisma {
     sessions?: UserSessionUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
@@ -85686,6 +87664,7 @@ export namespace Prisma {
     sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
     totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
     addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
     adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
     notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
     securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
@@ -86020,6 +87999,17 @@ export namespace Prisma {
     sourceBookIds?: AddressBookCreatesourceBookIdsInput | string[]
     sourceGroupBookId?: string | null
     archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type SavedFilterCreateManyUserInput = {
+    id?: string
+    name: string
+    filterState: JsonNullValueInput | InputJsonValue
+    sortOrder?: number
+    lastUsedAt?: Date | string | null
+    usageCount?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -87123,6 +89113,39 @@ export namespace Prisma {
     sourceBookIds?: AddressBookUpdatesourceBookIdsInput | string[]
     sourceGroupBookId?: NullableStringFieldUpdateOperationsInput | string | null
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SavedFilterUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    filterState?: JsonNullValueInput | InputJsonValue
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    usageCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SavedFilterUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    filterState?: JsonNullValueInput | InputJsonValue
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    usageCount?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SavedFilterUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    filterState?: JsonNullValueInput | InputJsonValue
+    sortOrder?: IntFieldUpdateOperationsInput | number
+    lastUsedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    usageCount?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

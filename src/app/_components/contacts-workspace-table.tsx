@@ -6,14 +6,11 @@ import { useVirtualizer } from "@tanstack/react-virtual";
 
 import {
   archiveContact,
-  archiveContactsBulk,
-  deleteContactsBulk,
-  favoriteContactsBulk,
   permanentlyDeleteContact,
   restoreContact,
-  restoreContactsBulk,
   toggleFavoriteContact,
 } from "~/app/actions/contacts";
+import { BulkEditToolbar, type ToolbarBook } from "~/app/_components/bulk-edit-toolbar";
 import { ContactBadgeCluster } from "~/app/_components/contact-badge-cluster";
 import { SwipeableRow } from "~/app/_components/contact-list/swipeable-row";
 
@@ -46,6 +43,9 @@ type ContactsWorkspaceTableProps = {
   viewMode: "compact" | "cozy";
   groupByLetter: boolean;
   query: string;
+  // P28-04: bulk-edit toolbar data.
+  books: ToolbarBook[];
+  labelSuggestions: string[];
 };
 
 const AVATAR_TINTS: Array<[string, string]> = [
@@ -471,9 +471,10 @@ export function ContactsWorkspaceTable({
   viewMode,
   groupByLetter,
   query,
+  books,
+  labelSuggestions,
 }: ContactsWorkspaceTableProps) {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [confirmDelete, setConfirmDelete] = useState(false);
   const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
   const [undoContactId, setUndoContactId] = useState<string | null>(null);
   const undoTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
@@ -739,90 +740,14 @@ export function ContactsWorkspaceTable({
   return (
     <div className="bg-white">
       {hasSelection ? (
-        <div className="fixed left-3 right-3 top-[calc(env(safe-area-inset-top)+72px)] z-40 flex flex-wrap items-center gap-3 rounded-2xl border border-[#d8ddfb] bg-[#edf0fe] px-4 py-2.5 shadow-[0_12px_30px_rgba(36,54,130,0.18)] md:static md:rounded-none md:border-x-0 md:border-t-0 md:border-[#e9ece7] md:shadow-none">
-          <button
-            aria-label="Clear selection"
-            className="grid h-7 w-7 place-items-center rounded-md text-slate-600 transition hover:bg-[rgba(0,0,0,0.06)]"
-            onClick={() => setSelectedIds([])}
-            type="button"
-          >
-            ✕
-          </button>
-          <span className="text-sm font-semibold text-slate-700">{selectedIds.length} selected</span>
-          <div className="mx-1 h-5 w-px bg-[#d8ddd6]" />
-          <div className="flex flex-wrap items-center gap-2">
-            {mode === "active" ? (
-              <form action={favoriteContactsBulk}>
-                {selectedIds.map((id) => (
-                  <input key={id} name="contactIds" type="hidden" value={id} />
-                ))}
-                <input name="redirectTo" type="hidden" value="/contacts?tab=people" />
-                <button
-                  className="inline-flex items-center gap-1.5 rounded-lg border border-[#d8ddd6] bg-white px-3 py-1.5 text-xs font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
-                  type="submit"
-                >
-                  <span aria-hidden>☆</span> Favorite
-                </button>
-              </form>
-            ) : null}
-            <form action={mode === "active" ? archiveContactsBulk : restoreContactsBulk}>
-              {selectedIds.map((id) => (
-                <input key={id} name="contactIds" type="hidden" value={id} />
-              ))}
-              <input name="redirectTo" type="hidden" value={mode === "active" ? "/contacts?tab=people" : "/contacts?tab=archived"} />
-              <button
-                className="inline-flex items-center gap-1.5 rounded-lg border border-[#d8ddd6] bg-white px-3 py-1.5 text-xs font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
-                type="submit"
-              >
-                {mode === "active" ? "Archive" : "Restore"}
-              </button>
-            </form>
-            <a
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#d8ddd6] bg-white px-3 py-1.5 text-xs font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
-              href={`/api/exports/contacts/csv?ids=${encodeURIComponent(selectedIds.join(","))}`}
-            >
-              <span aria-hidden>↓</span> Export
-            </a>
-            <button
-              className="inline-flex items-center gap-1.5 rounded-lg border border-[#b5472f] bg-white px-3 py-1.5 text-xs font-semibold text-[#b5472f] transition hover:bg-[#fbeae6]"
-              onClick={() => setConfirmDelete(true)}
-              type="button"
-            >
-              <span aria-hidden>🗑</span> Delete
-            </button>
-          </div>
-        </div>
-      ) : null}
-
-      {confirmDelete ? (
-        <div aria-modal="true" className="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 px-4" role="dialog">
-          <div className="w-full max-w-md rounded-[1.4rem] border border-[#d8ddd6] bg-white p-6 shadow-xl">
-            <p className="text-lg font-semibold text-[#1d2823]">
-              Delete {selectedIds.length} contact{selectedIds.length === 1 ? "" : "s"} permanently?
-            </p>
-            <p className="mt-2 text-sm leading-6 text-slate-500">
-              This can&apos;t be undone. The contact{selectedIds.length === 1 ? "" : "s"} and their sync links will be removed from Kontax.
-            </p>
-            <div className="mt-5 flex flex-wrap justify-end gap-2">
-              <button
-                className="rounded-[0.9rem] border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:bg-slate-50"
-                onClick={() => setConfirmDelete(false)}
-                type="button"
-              >
-                Cancel
-              </button>
-              <form action={deleteContactsBulk}>
-                {selectedIds.map((id) => (
-                  <input key={id} name="contactIds" type="hidden" value={id} />
-                ))}
-                <input name="redirectTo" type="hidden" value={mode === "active" ? "/contacts?tab=people" : "/contacts?tab=archived"} />
-                <button className="rounded-[0.9rem] bg-[#b5472f] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#9c3c28]" type="submit">
-                  Delete {selectedIds.length}
-                </button>
-              </form>
-            </div>
-          </div>
-        </div>
+        <BulkEditToolbar
+          selectedIds={selectedIds}
+          mode={mode}
+          books={books}
+          labelSuggestions={labelSuggestions}
+          redirectTo={mode === "active" ? "/contacts?tab=people" : "/contacts?tab=archived"}
+          onClear={() => setSelectedIds([])}
+        />
       ) : null}
 
       {/* Sticky column header — compact desktop only, sits above the virtual list */}

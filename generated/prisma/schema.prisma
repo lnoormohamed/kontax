@@ -251,6 +251,8 @@ model User {
   sessions                         UserSession[]
   totpRecoveryCodes                TotpRecoveryCode[]
   addressBooks                     AddressBook[]
+  // P28-02: smart lists (saved contact filters)
+  savedFilters                     SavedFilter[]
   adminAuditEvents                 AdminAuditEvent[]                 @relation("AdminActor")
   // P22-DB05: in-app notification layer
   notifications                    Notification[]
@@ -982,6 +984,26 @@ model AddressBook {
   @@unique([userId, slug])
   @@index([userId, isDefault])
   @@index([userId, archivedAt])
+}
+
+// P28-02: a "smart list" — a named, persisted snapshot of the contacts-list
+// filter state (the URL query params). filterState is the serialised
+// ContactFilterState (see ~/lib/contact-filter-state); stored as JSON so new
+// filter keys are captured without a schema change. Personal only (no sharing).
+model SavedFilter {
+  id          String    @id @default(cuid())
+  userId      String
+  name        String
+  filterState Json
+  sortOrder   Int       @default(0)
+  lastUsedAt  DateTime?
+  usageCount  Int       @default(0)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, sortOrder])
 }
 
 // P14-01 (Teams): links an existing personal SyncAccount to a team address book

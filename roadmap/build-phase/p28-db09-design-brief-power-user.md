@@ -28,6 +28,28 @@ The locked design language applies throughout.
 
 ---
 
+## Resolved Decisions (design review, 2026-06-14)
+
+Two open questions were raised in the design review and resolved by product:
+
+### QR link expiry → default never-expires; rely on revocation, not expiry
+
+The QR encodes the **full vCard inline**, so scanning adds the contact **offline with no server call** — the code can never be recalled once shared. Expiry therefore only has real effect on the **"Copy link"** (`/share/{token}`) path, not the QR itself.
+
+- **Default:** "Anyone with the link · never expires" (matches the business-card mental model; an offline QR can't be revoked anyway).
+- The privacy safeguard is **revocability + visibility, not expiry**: every QR / Copy-link share MUST surface in the Phase 12 share-management UI so the owner can see active links and revoke them (`ContactShare.status = REVOKED`).
+- The **Change** control offers expiry options (7d / 30d / never) for the copied-*link* path, where expiry is meaningful.
+
+### Shared books → separate sidebar section, not inline
+
+Personal books (`AddressBook`) and shared books (`GroupAddressBook`) are distinct entities with different ownership and permission models (group books are gated by `GroupMember`, not `Contact.userId`). They must **not** be mixed into one list:
+
+- Keep **"Books"** for personal `AddressBook`s.
+- Add a separate **"Shared"** section listing `GroupAddressBook`s, grouped by their family/team.
+- Rationale: (1) prevents mis-drops that silently expose a contact to a group; (2) scales to Teams, where a user can be in multiple groups each with several books (per the `GroupAddressBook` model). A flat lock-glyph list degrades once shared books multiply.
+
+---
+
 ## Design / Implementation Spec
 
 ### 1. Smart Lists
@@ -71,7 +93,7 @@ Right-click context menu (or `…` button on hover): Rename / Duplicate / Delete
 
 ### 2. Personal Address Books Panel
 
-In the sidebar, below "My Lists", a "Books" section:
+In the sidebar, below "My Lists", a "Books" section holds the user's **personal** books. Shared (group-owned) books live in a separate **"Shared"** section below it, grouped by family/team — see Resolved Decisions:
 
 ```
 Books
@@ -79,10 +101,12 @@ Books
   📘 Default
   📘 Work
   📘 Friends
-  📘 Family (shared) ← from Phase 13 — read-only icon
+
+Shared
+  📘 Family (shared) ← from Phase 13 — read-only icon, no ⋯ menu
 ```
 
-Section header with same style as "My Lists". Book icon: `BookOpen`, 14px.
+Section header with same style as "My Lists". Book icon: `BookOpen`, 14px. Shared books carry a read-only lock glyph and no `…` menu (they're managed from the family/team surface, not here).
 
 **Book management modal** (opened by clicking a book's `…` menu → "Manage"):
 
@@ -191,7 +215,7 @@ Accessible from the contact detail page via a "Share" → "QR code" button, or f
 
 - QR code: 200×200px, white background, black modules. Generated client-side (no server call).
 - "Download QR": downloads `jane-smith-qr.png`.
-- "Copy link": copies the `/share/{token}` URL (creates a vCard share link if one doesn't exist, or uses the existing non-expired one).
+- "Copy link": copies the `/share/{token}` URL (creates a vCard share link if one doesn't exist, or uses the existing non-expired one). The link defaults to **never-expires** with a **Change** control (7d / 30d / never); shares surface in the Phase 12 share-management UI for revocation. See Resolved Decisions.
 
 ---
 

@@ -257,10 +257,49 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
     updatedAt: true,
   } as const;
 
-  const [familyMembership, accessibleTeamBooks] = await Promise.all([
-    getUserFamilyMembership(session.user.id),
-    getAccessibleTeamBooks(session.user.id),
-  ]);
+  const [familyMembership, accessibleTeamBooks, savedFilters, personalBooksRaw, personalBookCounts, labelRows] =
+    await Promise.all([
+      getUserFamilyMembership(session.user.id),
+      getAccessibleTeamBooks(session.user.id),
+      // P28-01: smart lists (saved filters), in user order.
+      db.savedFilter.findMany({
+        where: { userId: session.user.id },
+        orderBy: { sortOrder: "asc" },
+        select: { id: true, name: true, filterState: true },
+      }),
+      // P28-03: personal address books — default first, then alphabetical.
+      db.addressBook.findMany({
+        where: { userId: session.user.id, archivedAt: null },
+        orderBy: [{ isDefault: "desc" }, { name: "asc" }],
+        select: { id: true, name: true, slug: true, isDefault: true },
+      }),
+      // Non-archived contact counts per book (null bookId rolls into the default book).
+      db.contact.groupBy({
+        by: ["bookId"],
+        where: { userId: session.user.id, archivedAt: null, groupContacts: { none: {} } },
+        _count: { _all: true },
+      }),
+      // P28-04: existing labels to suggest in the bulk "Add label" popover.
+      db.contact.findMany({
+        where: { userId: session.user.id, archivedAt: null },
+        select: { labels: true },
+        take: 2000,
+      }),
+    ]);
+
+  // Flatten + dedupe label strings (case-insensitive), capped for the popover.
+  const labelSuggestions = (() => {
+    const seen = new Map<string, string>();
+    for (const row of labelRows) {
+      if (!Array.isArray(row.labels)) continue;
+      for (const value of row.labels) {
+        if (typeof value !== "string") continue;
+        const key = value.trim().toLowerCase();
+        if (key && !seen.has(key)) seen.set(key, value.trim());
+      }
+    }
+    return [...seen.values()].sort((a, b) => a.localeCompare(b)).slice(0, 24);
+  })();
   const familyBookId = familyMembership?.bookId ?? null;
   const teamBookIds = accessibleTeamBooks.map((b) => b.id);
   const sharedBooks = [
@@ -271,15 +310,44 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
   ];
   const hasShared = sharedBooks.length > 0;
 
+  // P28-03: personal books with non-archived counts (null bookId → default book).
+  const nullBookCount = personalBookCounts.find((c) => c.bookId === null)?._count._all ?? 0;
+  const personalBooks = personalBooksRaw.map((b) => ({
+    id: b.id,
+    name: b.name,
+    slug: b.slug,
+    isDefault: b.isDefault,
+    count:
+      (personalBookCounts.find((c) => c.bookId === b.id)?._count._all ?? 0) +
+      (b.isDefault ? nullBookCount : 0),
+  }));
+
   const bookParam = await getSingleParam(searchParams, "book");
   const activeBook = bookParam && sharedBooks.some((b) => b.id === bookParam) ? bookParam : null;
+  // A personal book filter (mutually exclusive with shared-book selection).
+  const activePersonalBookId =
+    bookParam && personalBooksRaw.some((b) => b.id === bookParam) ? bookParam : null;
+  // Default book also owns un-booked contacts (bookId = null), so don't filter
+  // those out when the default book is selected.
+  const activePersonalBookIsDefault =
+    activePersonalBookId != null &&
+    (personalBooksRaw.find((b) => b.id === activePersonalBookId)?.isDefault ?? false);
   const scopeParam = await getSingleParam(searchParams, "scope");
   const scope = scopeParam === "private" || scopeParam === "shared" ? scopeParam : "all";
 
   const includePrivate = !activeBook && scope !== "shared";
-  const includeShared = scope !== "private";
+  // A selected personal book restricts to that book only (no shared contacts).
+  const includeShared = scope !== "private" && !activePersonalBookId;
   const familyTargetId = activeBook ? (activeBook === familyBookId ? familyBookId : null) : familyBookId;
   const teamTargetIds = activeBook ? (teamBookIds.includes(activeBook) ? [activeBook] : []) : teamBookIds;
+
+  // P28-03: scope the private query to the selected personal book. The default
+  // book additionally claims un-booked contacts (bookId = null).
+  const personalBookWhere = activePersonalBookId
+    ? activePersonalBookIsDefault
+      ? { OR: [{ bookId: activePersonalBookId }, { bookId: null }] }
+      : { bookId: activePersonalBookId }
+    : {};
 
   const sortOrder =
     selectedSort === "name" ? { isFavorite: "desc" as const } : { updatedAt: "desc" as const };
@@ -299,7 +367,15 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
   ] = await Promise.all([
       includePrivate
         ? db.contact.findMany({
-            where: { userId: session.user.id, archivedAt: null, groupContacts: { none: {} }, ...searchConditions, ...filterConditions },
+            // AND the fragments rather than spreading: personalBookWhere,
+            // searchConditions, and the "incomplete" filter each carry a
+            // top-level `OR`, which would clobber each other if spread.
+            where: {
+              userId: session.user.id,
+              archivedAt: null,
+              groupContacts: { none: {} },
+              AND: [personalBookWhere, searchConditions, filterConditions],
+            },
             orderBy: sortOrder,
             select: contactListSelect,
           })
@@ -483,9 +559,12 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         query={query}
         viewMode={selectedView}
         currentScope={scope}
-        currentBook={activeBook}
+        currentBook={activeBook ?? activePersonalBookId}
         hasShared={hasShared}
         sharedBooks={sharedBooks}
+        savedFilters={savedFilters}
+        personalBooks={personalBooks}
+        labelSuggestions={labelSuggestions}
         counts={{
           people: peopleCount,
           favorites: favoritesCount,

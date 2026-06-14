@@ -596,6 +596,18 @@ exports.Prisma.AddressBookScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.SavedFilterScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  name: 'name',
+  filterState: 'filterState',
+  sortOrder: 'sortOrder',
+  lastUsedAt: 'lastUsedAt',
+  usageCount: 'usageCount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.TeamSyncAccountScalarFieldEnum = {
   id: 'id',
   groupId: 'groupId',
@@ -1038,6 +1050,7 @@ exports.Prisma.ModelName = {
   GroupMember: 'GroupMember',
   GroupAddressBook: 'GroupAddressBook',
   AddressBook: 'AddressBook',
+  SavedFilter: 'SavedFilter',
   TeamSyncAccount: 'TeamSyncAccount',
   GroupContact: 'GroupContact',
   ContactShare: 'ContactShare',

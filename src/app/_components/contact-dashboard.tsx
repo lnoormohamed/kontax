@@ -8,6 +8,7 @@ import { MobileActivityFeed } from "~/app/_components/mobile-activity-feed";
 import { MergeSuggestionDismissButton } from "~/app/_components/merge-suggestion-dismiss-button";
 import { MergeSuggestionRefreshButton } from "~/app/_components/merge-suggestion-refresh-button";
 import { OnboardingChecklist } from "~/app/_components/onboarding-checklist";
+import { SmartListsBooks, type PersonalBook, type SmartList } from "~/app/_components/smart-lists-books";
 import { SortMenu } from "~/app/_components/sort-menu";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import type { BillingLifecycleState } from "~/server/billing";
@@ -72,6 +73,9 @@ type ContactDashboardProps = {
   currentBook: string | null;
   hasShared: boolean;
   sharedBooks: { id: string; name: string; kind: "family" | "team" }[];
+  savedFilters: SmartList[];
+  personalBooks: PersonalBook[];
+  labelSuggestions: string[];
   counts: {
     people: number;
     favorites: number;
@@ -111,6 +115,9 @@ export function ContactDashboard({
   currentBook,
   hasShared,
   sharedBooks,
+  savedFilters,
+  personalBooks,
+  labelSuggestions,
   counts,
   account,
   syncState,
@@ -313,22 +320,39 @@ export function ContactDashboard({
         {navItem(currentTab === "activity", buildHref("activity"), "clock", "Activity", null)}
         {navItem(false, "/shares", "download", "Shared with me", incomingShares ?? null, true)}
 
+        {/* P28-01/03: smart lists ("My Lists") + personal address books ("Books") */}
+        <SmartListsBooks lists={savedFilters} books={personalBooks} />
+
         {/* Shared books (P15-04 family + P14-07 teams) — membership views live
             here, not mixed into the personal Favorites/Emergency filters */}
         {hasShared ? (
           <div className="mt-3">
             <div className="px-2.5 py-1 text-[11px] font-semibold uppercase tracking-[0.08em] text-[#8b938c]">
-              Shared books
+              Shared
             </div>
-            {sharedBooks.map((b) =>
-              navItem(
-                currentTab === "people" && currentBook === b.id,
-                buildHref("people", { filter: "all", book: b.id }),
-                b.kind === "team" ? "team" : "users",
-                b.name,
-                null,
-              ),
-            )}
+            {(["family", "team"] as const).map((kind) => {
+              const group = sharedBooks.filter((b) => b.kind === kind);
+              if (group.length === 0) return null;
+              return (
+                <div key={kind}>
+                  <div className="flex items-center gap-2 px-2.5 pb-0.5 pt-1.5 text-[11.5px] font-semibold text-[#5c655e]">
+                    <WorkspaceIcon name={kind === "team" ? "team" : "users"} size={13} />
+                    <span>{kind === "team" ? "Teams" : "Family"}</span>
+                  </div>
+                  <div className="pl-2">
+                    {group.map((b) =>
+                      navItem(
+                        currentTab === "people" && currentBook === b.id,
+                        buildHref("people", { filter: "all", book: b.id }),
+                        b.kind === "team" ? "team" : "users",
+                        b.name,
+                        null,
+                      ),
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         ) : null}
 
@@ -488,6 +512,8 @@ export function ContactDashboard({
                 mode="active"
                 query={query}
                 viewMode={viewMode}
+                books={personalBooks}
+                labelSuggestions={labelSuggestions}
               />
             )
           ) : null}
@@ -500,6 +526,8 @@ export function ContactDashboard({
               mode="archived"
               query={query}
               viewMode={viewMode}
+              books={personalBooks}
+              labelSuggestions={labelSuggestions}
             />
           ) : null}
 
