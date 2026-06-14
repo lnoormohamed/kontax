@@ -22,6 +22,7 @@ export default async function LoginPage({
   const next = nextParam?.startsWith("/") ? nextParam : undefined;
   const rawMessage = params?.message;
   const message = Array.isArray(rawMessage) ? rawMessage[0] : rawMessage;
+  const expired = params?.expired === "1";
 
   if (session?.user) {
     redirect(next ?? "/contacts");
@@ -50,7 +51,7 @@ export default async function LoginPage({
           }}
         />
       </div>
-      <AuthCard message={message} mode="login" next={next} />
+      <AuthCard expired={expired} message={message} mode="login" next={next} />
       <p className="text-[12px] text-[#8b938c]">© Kontax · Your contacts, organized and yours.</p>
     </main>
   );

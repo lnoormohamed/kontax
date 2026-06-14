@@ -185,12 +185,15 @@ export function AuthCard({
   next,
   message,
   plan,
+  expired = false,
 }: {
   mode: "login" | "register";
   next?: string;
   message?: string;
   /** Pre-selected plan from ?plan= — "pro" shows a 14-day trial callout. */
   plan?: string;
+  /** True when redirected from an authenticated route with ?expired=1 — session ended. */
+  expired?: boolean;
 }) {
   const isLogin = mode === "login";
 
@@ -342,10 +345,17 @@ export function AuthCard({
           Your email has been updated. Please sign in with your new address.
         </div>
       )}
-      {/* Show a context-aware nudge when redirected from an authenticated route */}
-      {!message && next && isLogin && (
+      {/* Session-expired: had a valid session, token is now expired/invalidated */}
+      {!message && expired && isLogin && (
+        <div className="mt-4 rounded-[1.2rem] border border-[#e6d3a3] bg-[#f6edd9] px-4 py-3 text-[13.5px] text-[#7c5511]">
+          <p className="font-semibold">Your session ended</p>
+          <p className="mt-0.5 leading-[1.45]">Sign back in and you&rsquo;ll return right where you left off.</p>
+        </div>
+      )}
+      {/* Auth-required: accessing a protected route without a session */}
+      {!message && !expired && next && isLogin && (
         <div className="mt-4 rounded-[1.2rem] border border-[#e6d3a3] bg-[#f6edd9] px-4 py-3 text-center text-[13.5px] text-[#7c5511]">
-          Your session ended — sign in to continue.
+          Sign in to access this page.
         </div>
       )}
 

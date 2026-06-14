@@ -534,8 +534,17 @@ export function ContactEditProvider({
       }
       exitToRead();
       router.refresh();
-    } catch {
-      setSaveError("Couldn't save changes — check your connection and try again.");
+    } catch (err) {
+      // Server actions that hit an expired session call redirect("/login?..."), which
+      // throws a NEXT_REDIRECT error the action runner can't suppress. Detect it here
+      // and show a recoverable inline prompt instead of a generic "connection" error.
+      const digest = (err as { digest?: string })?.digest ?? "";
+      const isSessionExpired = digest.includes("NEXT_REDIRECT") && digest.includes("/login");
+      setSaveError(
+        isSessionExpired
+          ? "SESSION_EXPIRED"
+          : "Couldn't save changes — check your connection and try again.",
+      );
       setSaving(false);
     }
   };
@@ -707,7 +716,21 @@ export function ContactInlineEditor() {
         </p>
       ) : null}
 
-      {saveError ? (
+      {saveError === "SESSION_EXPIRED" ? (
+        <div className="rounded-[0.9rem] border border-[#e6d3a3] bg-[#f6edd9] px-4 py-3 text-[13px] text-[#7c5511]">
+          <p className="font-semibold">Your session ended</p>
+          <p className="mt-0.5 leading-[1.45]">
+            Your edits are still here.{" "}
+            <a
+              href={`/login?next=${encodeURIComponent(typeof window !== "undefined" ? window.location.pathname : "")}&expired=1`}
+              className="font-semibold underline"
+            >
+              Sign back in
+            </a>{" "}
+            to save them.
+          </p>
+        </div>
+      ) : saveError ? (
         <p className="rounded-[0.9rem] border border-[#ecd0c7] bg-[#f7e9e4] px-4 py-2.5 text-[13px] text-[#8f3320]">
           {saveError}
         </p>
