@@ -13,9 +13,10 @@ interface MobileHomeHeaderProps {
   userId: string;
   tab?: string;
   filterSlot?: React.ReactNode;
+  labelRegistry?: { name: string; color: string }[];
 }
 
-export function MobileHomeHeader({ userId, tab, filterSlot }: MobileHomeHeaderProps) {
+export function MobileHomeHeader({ userId, tab, filterSlot, labelRegistry }: MobileHomeHeaderProps) {
   // Activity tab → the shared plain-title header (P24B-01).
   if (tab === "activity") {
     return (
@@ -80,7 +81,7 @@ export function MobileHomeHeader({ userId, tab, filterSlot }: MobileHomeHeaderPr
         <NotificationBellSlot userId={userId} />
         {filterSlot}
         <Suspense fallback={null}>
-          <MobileSearchButton />
+          <MobileSearchButton labelRegistry={labelRegistry} />
         </Suspense>
       </div>
     </header>

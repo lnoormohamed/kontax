@@ -17,6 +17,7 @@ import { CopyMonoRow } from "~/app/_components/copy-field";
 import { LastUpdatedBy } from "~/app/_components/last-updated-by";
 import { MoreMenu } from "~/app/_components/more-menu";
 import { LabelChip } from "~/app/_components/label-chip";
+import { RecentlyViewedTracker } from "~/app/_components/search-results";
 import { SourceBadge } from "~/app/_components/source-badge";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import {
@@ -551,6 +552,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
       account={shellAccount}
       counts={shellCounts}
     >
+      <RecentlyViewedTracker id={contact.id} name={contact.fullName} company={contact.company} />
       <ContactEditProvider
         contact={editorContact}
         editableShared={!isLiveReceived}

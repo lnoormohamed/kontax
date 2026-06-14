@@ -47,6 +47,8 @@ const PATHS: Record<string, string[]> = {
   check: ["M5 12.5l4.5 4.5L19 7"],
   close: ["M6 6l12 12", "M18 6l-12 12"],
   briefcase: ["M3 8h18v12H3z", "M8 8V5.5h8V8", "M3 13h18"],
+  tag: ["M3 11l8-8 9 .5.5 9-8 8z", "M7.5 7.5h.01"],
+  note: ["M5 4h14v11l-5 5H5z", "M14 20v-5h5"],
   gift: [
     "M4 11h16v9H4z",
     "M3 8h18v3H3z",

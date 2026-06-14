@@ -7,7 +7,7 @@ import { MobileSecondaryHeader } from "~/app/_components/mobile-header";
 import { NotificationBellSlot } from "~/app/_components/notification-bell-slot";
 import { OfflineBanner } from "~/app/_components/offline-banner";
 import { SecurityAlertBannerSlot } from "~/app/_components/security-alert-banner-slot";
-import { SearchInput } from "~/app/_components/search-input";
+import { SearchDropdown } from "~/app/_components/search-dropdown";
 import { UserMenu } from "~/app/_components/user-menu";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { auth } from "~/server/auth";
@@ -50,7 +50,7 @@ export async function AppShell({
   const session = await auth();
   const userId = session?.user?.id;
 
-  const [incomingShares, syncConnected, unreadCount, syncErrorCount] = userId
+  const [incomingShares, syncConnected, unreadCount, syncErrorCount, labelRegistry] = userId
     ? await Promise.all([
         db.contactShare.count({
           where: {
@@ -65,8 +65,13 @@ export async function AppShell({
           .then((n) => n > 0),
         db.notification.count({ where: { userId, readAt: null, dismissedAt: null } }),
         db.syncAccount.count({ where: { userId, status: { in: ["ERROR", "NEEDS_REAUTH"] } } }),
+        db.label.findMany({
+          where: { userId },
+          select: { name: true, color: true },
+          orderBy: { position: "asc" },
+        }),
       ])
-    : [0, false, 0, 0];
+    : [0, false, 0, 0, []];
   const navItem = (href: string, icon: string, label: string, count?: number, badge?: boolean) => (
     <Link
       className="flex h-9 items-center gap-3 rounded-lg px-2.5 text-[13.5px] font-medium text-[#5c655e] transition hover:bg-[#f2f4f0]"
@@ -105,7 +110,7 @@ export async function AppShell({
             <span className="text-[19px] font-bold tracking-[-0.01em] text-[#1d2823]">Kontax</span>
           </Link>
 
-          <SearchInput filter="all" initialQuery="" sort="name" tab="people" view="compact" />
+          <SearchDropdown labelRegistry={labelRegistry as { name: string; color: string }[]} />
 
           <div className="flex shrink-0 items-center gap-2.5">
             <Link

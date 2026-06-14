@@ -104,6 +104,46 @@ const getGroupLetter = (contact: WorkspaceContact) => {
   return /[A-Z]/.test(first) ? first : "#";
 };
 
+// P33-05: when query is active, show why a contact matched if it's not
+// immediately obvious from the visible name/company/email/phone cells.
+// Returns { field, snippet } only for label and notes matches.
+function inferMatchSnippet(
+  contact: WorkspaceContact,
+  q: string,
+): { field: "label" | "notes"; snippet: string } | null {
+  if (!q) return null;
+  const ql = q.toLowerCase();
+  const digits = q.replace(/\D/g, "");
+  const isPhoneQuery = !/[a-z]/i.test(q) && digits.length >= 2;
+  if (isPhoneQuery) return null;
+  // name / company / email / phone already highlighted inline — skip them
+  if (
+    contact.fullName.toLowerCase().includes(ql) ||
+    (contact.nickname ?? "").toLowerCase().includes(ql) ||
+    (contact.company ?? "").toLowerCase().includes(ql) ||
+    (contact.email ?? "").toLowerCase().includes(ql) ||
+    (contact.phone ?? "").toLowerCase().includes(ql)
+  ) return null;
+  // label match
+  const labels = Array.isArray(contact.labels)
+    ? (contact.labels as unknown[]).filter((v): v is string => typeof v === "string")
+    : [];
+  const matchedLabel = labels.find((l) => l.toLowerCase().includes(ql));
+  if (matchedLabel) return { field: "label", snippet: matchedLabel };
+  // notes match
+  if (contact.notes?.toLowerCase().includes(ql)) {
+    const notes = contact.notes;
+    const i = notes.toLowerCase().indexOf(ql);
+    let start = Math.max(0, i - 28);
+    if (start > 0) { const sp = notes.indexOf(" ", start); if (sp > -1 && sp < i) start = sp + 1; }
+    let end = Math.min(notes.length, start + 90);
+    if (end < notes.length) { const sp = notes.lastIndexOf(" ", end); if (sp > start + 20) end = sp; }
+    const excerpt = (start > 0 ? "…" : "") + notes.slice(start, end).trim() + (end < notes.length ? "…" : "");
+    return { field: "notes", snippet: excerpt };
+  }
+  return null;
+}
+
 const Highlight = memo(function Highlight({ text, query }: { text: string; query: string }) {
   if (!query) {
     return <>{text}</>;
@@ -404,6 +444,7 @@ const ContactRow = memo(function ContactRow({
 
   const meta = [contact.company, contact.email, contact.phone].filter((value) => value?.trim());
   const contactLabels = parseLabels(contact.labels);
+  const matchSnippet = inferMatchSnippet(contact, query);
 
   const stacked = (
     <div className="flex min-w-0 flex-1 items-center gap-3">
@@ -434,6 +475,23 @@ const ContactRow = memo(function ContactRow({
               ))
             : "No details yet"}
         </p>
+        {matchSnippet && (
+          <p className="mt-0.5 truncate text-[11.5px] text-[#8b938c]" style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            {matchSnippet.field === "label" ? (
+              <>
+                <LabelDot col={labelColors[matchSnippet.snippet] ?? "#aeb4ac"} />
+                <span style={{ color: "#5c655e", fontWeight: 500 }}>{matchSnippet.snippet}</span>
+              </>
+            ) : (
+              <>
+                <span style={{ color: "#aeb4ac" }}>Note:</span>
+                <span className="truncate">
+                  <Highlight query={query} text={matchSnippet.snippet} />
+                </span>
+              </>
+            )}
+          </p>
+        )}
       </div>
       <RowActions contact={contact} mode={mode} />
     </div>

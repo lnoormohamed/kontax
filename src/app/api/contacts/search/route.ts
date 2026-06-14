@@ -6,13 +6,121 @@ import { isFullTextEligible, searchContactIds } from "~/server/contact-search";
 import { getUserFamilyMembership } from "~/server/family-access";
 import { getAccessibleTeamBooks } from "~/server/team-access";
 
-const RESULT_SELECT = { id: true, fullName: true, company: true, email: true, phone: true } as const;
+// P33-01: extended to include fields needed for matchField + snippet attribution.
+const RESULT_SELECT = {
+  id: true,
+  fullName: true,
+  nickname: true,
+  company: true,
+  email: true,
+  phone: true,
+  phoneEntries: true,
+  labels: true,
+  notes: true,
+} as const;
 
-// P24B-22 / P28-07: contacts search for the mobile search overlay. Uses the same
-// full-text + phone-number search as the desktop list (so phone fragments, notes,
-// and multi-value fields all match), across the user's own contacts + the shared
-// family/team books they can see. Falls back to multi-field ILIKE for short /
-// symbol-only queries that aren't full-text eligible.
+export type MatchField = "name" | "company" | "email" | "phone" | "label" | "notes";
+
+export type SearchResult = {
+  id: string;
+  name: string;
+  company: string | null;
+  email: string | null;
+  phone: string | null;
+  labels: string[];
+  matchField: MatchField;
+  snippet: string | null;
+  matchAlt: boolean; // true when the phone match was on a secondary number
+};
+
+type PhoneEntry = { label: string; value: string; isPrimary: boolean };
+
+function safeLabels(raw: unknown): string[] {
+  return Array.isArray(raw) ? (raw as unknown[]).filter((v): v is string => typeof v === "string") : [];
+}
+
+function safePhoneEntries(raw: unknown): PhoneEntry[] {
+  if (!Array.isArray(raw)) return [];
+  return (raw as unknown[]).filter(
+    (e): e is PhoneEntry =>
+      typeof e === "object" && e !== null && "value" in e && typeof (e as PhoneEntry).value === "string",
+  );
+}
+
+// Returns a windowed excerpt of `notes` centered on the first occurrence of `ql`.
+function notesExcerpt(notes: string, ql: string, win = 100): string {
+  const i = notes.toLowerCase().indexOf(ql);
+  if (i < 0) return notes.slice(0, win);
+  let start = Math.max(0, i - 30);
+  if (start > 0) {
+    const sp = notes.indexOf(" ", start);
+    if (sp > -1 && sp < i) start = sp + 1;
+  }
+  let end = Math.min(notes.length, start + win);
+  if (end < notes.length) {
+    const sp = notes.lastIndexOf(" ", end);
+    if (sp > start + 20) end = sp;
+  }
+  return (start > 0 ? "…" : "") + notes.slice(start, end).trim() + (end < notes.length ? "…" : "");
+}
+
+type ContactRow = Awaited<ReturnType<typeof db.contact.findMany<{ select: typeof RESULT_SELECT }>>>[number];
+
+// Priority order mirrors the spec's FIELDS: name → company → email → phone → label → notes.
+// A contact is attributed to the first (highest-priority) field whose value contains the query.
+function attributeMatch(
+  c: ContactRow,
+  q: string,
+): { matchField: MatchField; snippet: string | null; matchAlt: boolean } {
+  const ql = q.toLowerCase();
+  const digits = q.replace(/\D/g, "");
+  const isPhoneQuery = !/[a-z]/i.test(q) && digits.length >= 2;
+
+  if (!isPhoneQuery) {
+    if (
+      c.fullName.toLowerCase().includes(ql) ||
+      (c.nickname ?? "").toLowerCase().includes(ql)
+    ) {
+      return { matchField: "name", snippet: null, matchAlt: false };
+    }
+    if (c.company?.toLowerCase().includes(ql)) {
+      return { matchField: "company", snippet: c.company, matchAlt: false };
+    }
+    if (c.email?.toLowerCase().includes(ql)) {
+      return { matchField: "email", snippet: c.email, matchAlt: false };
+    }
+  }
+
+  if (digits.length >= 2) {
+    if (c.phone && c.phone.replace(/\D/g, "").includes(digits)) {
+      return { matchField: "phone", snippet: c.phone, matchAlt: false };
+    }
+    const entries = safePhoneEntries(c.phoneEntries);
+    const altEntry = entries.find((e) => e.value.replace(/\D/g, "").includes(digits));
+    if (altEntry) {
+      return { matchField: "phone", snippet: altEntry.value, matchAlt: true };
+    }
+  }
+
+  if (!isPhoneQuery) {
+    const labels = safeLabels(c.labels);
+    const matchedLabel = labels.find((l) => l.toLowerCase().includes(ql));
+    if (matchedLabel) {
+      return { matchField: "label", snippet: matchedLabel, matchAlt: false };
+    }
+    if (c.notes?.toLowerCase().includes(ql)) {
+      return { matchField: "notes", snippet: notesExcerpt(c.notes, ql), matchAlt: false };
+    }
+  }
+
+  // Fallback: FTS matched but our per-field scan didn't find a hit (rare edge case
+  // e.g. multi-value JSON field match). Attribute to name so the row renders cleanly.
+  return { matchField: "name", snippet: null, matchAlt: false };
+}
+
+// P24B-22 / P28-07 / P33-01: contacts search. Full-text + phone-number matching
+// across the user's own contacts + accessible shared books, with matchField + snippet
+// attribution so the client can group results and show why a contact matched.
 export async function GET(request: Request) {
   const session = await auth();
   if (!session?.user?.id) {
@@ -34,7 +142,7 @@ export async function GET(request: Request) {
     ...accessibleTeamBooks.map((b) => b.id),
   ].filter((bookId): bookId is string => Boolean(bookId));
 
-  let contacts: { id: string; fullName: string; company: string | null; email: string | null; phone: string | null }[];
+  let contacts: ContactRow[];
 
   if (isFullTextEligible(q)) {
     // Full-text + phone match over both scopes, ranked.
@@ -94,13 +202,20 @@ export async function GET(request: Request) {
     });
   }
 
-  return NextResponse.json({
-    results: contacts.map((c) => ({
+  const results: SearchResult[] = contacts.map((c) => {
+    const { matchField, snippet, matchAlt } = attributeMatch(c, q);
+    return {
       id: c.id,
       name: c.fullName,
       company: c.company,
       email: c.email,
       phone: c.phone,
-    })),
+      labels: safeLabels(c.labels),
+      matchField,
+      snippet,
+      matchAlt,
+    };
   });
+
+  return NextResponse.json({ results });
 }

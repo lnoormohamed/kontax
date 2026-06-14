@@ -39,3 +39,7 @@
 .live-pulse {
   animation: livePulse 1.8s ease-out infinite;
 }
+
+/* P33-02: search result row hover/active states */
+.se-row { transition: background 0.08s; cursor: pointer; }
+.se-row:hover { background: #f2f4f0; }

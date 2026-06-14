@@ -538,6 +538,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
       <MobileHomeHeader
         userId={session.user.id}
         tab={selectedTab}
+        labelRegistry={sidebarLabels.map((l) => ({ name: l.name, color: l.color }))}
         filterSlot={
           <MobileFilterButton
             labels={sidebarLabels}
