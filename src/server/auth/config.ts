@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { db } from "~/server/db";
 import { detectNewDeviceSignIn, recordFailedLogin } from "~/server/notifications";
+import { getPreferences, type UserPreferences, DEFAULT_PREFERENCES } from "~/lib/preferences";
 
 /**
  * Module augmentation for `next-auth` types.
@@ -18,6 +19,8 @@ declare module "next-auth" {
       avatarUrl: string | null;
       // P21-01: platform admin role, surfaced so middleware can gate /admin.
       role: "USER" | "ADMIN";
+      // P34B-01: per-user UI preferences, always fully populated via DEFAULT_PREFERENCES merge.
+      preferences: Required<UserPreferences>;
     } & DefaultSession["user"];
     jti?: string;
     // Set by P18-07 (TOTP) — user authenticated with password but TOTP code not yet submitted
@@ -131,11 +134,12 @@ export const authConfig = {
         // not be blocked.
         await detectNewDeviceSignIn({ userId: user.id!, ipAddress: ip, deviceHint });
 
-        const [dbUser] = await Promise.all([
+        const [dbUser, preferences] = await Promise.all([
           db.user.findUnique({
             where: { id: user.id },
             select: { sessionVersion: true, emailVerified: true, name: true, avatarUrl: true, role: true },
           }),
+          getPreferences(user.id!),
           // Create UserSession row (P18-06)
           db.userSession.create({
             data: {
@@ -158,6 +162,7 @@ export const authConfig = {
         token.name = dbUser?.name ?? null;
         token.avatarUrl = dbUser?.avatarUrl ?? null;
         token.role = dbUser?.role ?? "USER";
+        token.preferences = preferences;
         // P18-07: embed pendingTotp if credentials verified but TOTP not yet confirmed
         if ((user as { _pendingTotp?: boolean })._pendingTotp) {
           token.pendingTotp = true;
@@ -214,14 +219,18 @@ export const authConfig = {
       }
 
       if (trigger === "update" && session) {
-        const fresh = await db.user.findUnique({
-          where: { id: token.sub ?? "" },
-          select: { sessionVersion: true, emailVerified: true, name: true, avatarUrl: true },
-        });
+        const [fresh, preferences] = await Promise.all([
+          db.user.findUnique({
+            where: { id: token.sub ?? "" },
+            select: { sessionVersion: true, emailVerified: true, name: true, avatarUrl: true },
+          }),
+          getPreferences(token.sub ?? ""),
+        ]);
         token.sv = fresh?.sessionVersion ?? token.sv;
         token.emailVerified = fresh?.emailVerified?.toISOString() ?? null;
         token.name = fresh?.name ?? token.name;
         token.avatarUrl = fresh?.avatarUrl ?? null;
+        token.preferences = preferences;
         // P18-07: clear pendingTotp after successful TOTP challenge
         if ((session as { clearPendingTotp?: boolean }).clearPendingTotp) {
           token.pendingTotp = undefined;
@@ -240,6 +249,7 @@ export const authConfig = {
         emailVerified: token.emailVerified
           ? new Date(token.emailVerified as string)
           : null,
+        preferences: (token.preferences as Required<UserPreferences> | undefined) ?? DEFAULT_PREFERENCES,
       },
       // Expose the UserSession id as `jti` to the app layer (sessions.ts, totp.ts
       // compare session.jti against UserSession.jti). Sourced from token.sid.

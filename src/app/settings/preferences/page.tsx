@@ -3,6 +3,8 @@ import { redirectToLogin } from "~/server/auth/require-page-auth";
 import { updatePhoneticSettings } from "~/app/actions/settings";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
+import { DEFAULT_PREFERENCES } from "~/lib/preferences";
+import { DisplayPreferencesSection } from "./_components/display-preferences-section";
 
 function Switch({ defaultChecked, name }: { defaultChecked: boolean; name: string }) {
   return (
@@ -27,6 +29,7 @@ export default async function SettingsPreferencesPage() {
     where: { id: session.user.id },
     select: { autoFillPhoneticNames: true },
   });
+  const preferences = session.user.preferences ?? DEFAULT_PREFERENCES;
 
   return (
     <>
@@ -66,6 +69,7 @@ export default async function SettingsPreferencesPage() {
           </button>
         </form>
       </SettingsCard>
+      <DisplayPreferencesSection initialPreferences={preferences} />
     </>
   );
 }

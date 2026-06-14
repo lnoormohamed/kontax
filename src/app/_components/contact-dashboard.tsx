@@ -20,6 +20,8 @@ import type { OnboardingChecklist as OnboardingChecklistData } from "~/server/on
 type DashboardContact = {
   id: string;
   fullName: string;
+  firstName: string | null;
+  lastName: string | null;
   phoneticFirstName: string | null;
   phoneticLastName: string | null;
   nickname: string | null;
@@ -94,6 +96,7 @@ type ContactDashboardProps = {
   highConfidenceCount: number;
   recentMerges: RecentMerge[];
   onboarding: OnboardingChecklistData;
+  nameDisplayOrder?: "first-last" | "last-first";
 };
 
 const getInitials = (value: string) =>
@@ -132,6 +135,7 @@ export function ContactDashboard({
   recentMerges,
   incomingShares,
   onboarding,
+  nameDisplayOrder,
 }: ContactDashboardProps) {
   // P26-04: show the first-run checklist only on the default people list —
   // not inside favorites/emergency views, a shared book, or a search.
@@ -524,6 +528,7 @@ export function ContactDashboard({
                 }
                 groupByLetter={groupByLetter}
                 mode="active"
+                nameDisplayOrder={nameDisplayOrder}
                 query={query}
                 viewMode={viewMode}
                 books={personalBooks}
@@ -540,6 +545,7 @@ export function ContactDashboard({
               emptyState={query ? `No archived contacts match "${query}".` : "No archived contacts."}
               groupByLetter={groupByLetter}
               mode="archived"
+              nameDisplayOrder={nameDisplayOrder}
               query={query}
               viewMode={viewMode}
               books={personalBooks}

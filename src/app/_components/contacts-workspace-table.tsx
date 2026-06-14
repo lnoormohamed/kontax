@@ -17,11 +17,14 @@ import { LabelChip, LabelDot } from "~/app/_components/label-chip";
 import { SwipeableRow } from "~/app/_components/contact-list/swipeable-row";
 import { KeyboardShortcutsOverlay } from "~/app/contacts/_components/keyboard-shortcuts-overlay";
 import { fromJson, toQueryString } from "~/lib/contact-filter-state";
+import { getDisplayName } from "~/lib/display-name";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 
 type WorkspaceContact = {
   id: string;
   fullName: string;
+  firstName: string | null;
+  lastName: string | null;
   phoneticFirstName: string | null;
   phoneticLastName: string | null;
   nickname: string | null;
@@ -50,6 +53,7 @@ type ContactsWorkspaceTableProps = {
   viewMode: "compact" | "cozy";
   groupByLetter: boolean;
   query: string;
+  nameDisplayOrder?: "first-last" | "last-first";
   // P28-04: bulk-edit toolbar data.
   books: ToolbarBook[];
   labelSuggestions: string[];
@@ -88,15 +92,6 @@ const getInitials = (primary: string | null | undefined, fallback?: string | nul
     .slice(0, 2)
     .join("")
     .toUpperCase();
-};
-
-const getDisplayName = (contact: WorkspaceContact) => {
-  const fullName = contact.fullName?.trim() ?? "";
-  if (fullName.length > 0) {
-    return fullName;
-  }
-  const company = contact.company?.trim() ?? "";
-  return company.length > 0 ? company : "Unnamed contact";
 };
 
 const getGroupLetter = (contact: WorkspaceContact) => {
@@ -390,6 +385,7 @@ const ContactRow = memo(function ContactRow({
   selected,
   focused,
   labelColors,
+  nameDisplayOrder,
   onToggleSelect,
   onArchived,
   onOpenContact,
@@ -401,13 +397,14 @@ const ContactRow = memo(function ContactRow({
   selected: boolean;
   focused: boolean;
   labelColors: Record<string, string>;
+  nameDisplayOrder?: "first-last" | "last-first";
   onToggleSelect: (id: string) => void;
   onArchived: (contactId: string) => void;
   onOpenContact: (contactId: string) => void;
 }) {
   const [, startTransition] = useTransition();
   const [optimisticFavorite, setOptimisticFavorite] = useState(contact.isFavorite);
-  const displayName = getDisplayName(contact);
+  const displayName = getDisplayName(contact, { nameDisplayOrder }) || "Unnamed contact";
   const avatarSize = viewMode === "compact" ? 32 : 40;
 
   useEffect(() => {
@@ -660,6 +657,7 @@ export function ContactsWorkspaceTable({
   viewMode,
   groupByLetter,
   query,
+  nameDisplayOrder,
   books,
   labelSuggestions,
   smartLists,
@@ -1107,6 +1105,7 @@ export function ContactsWorkspaceTable({
                 <ContactRow
                   contact={row.contact}
                   mode={mode}
+                  nameDisplayOrder={nameDisplayOrder}
                   onArchived={handleArchived}
                   onOpenContact={saveListScrollPosition}
                   onToggleSelect={toggleSelect}

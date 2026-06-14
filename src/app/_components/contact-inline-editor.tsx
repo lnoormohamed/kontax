@@ -12,6 +12,8 @@ import {
   type SimpleEntry,
 } from "~/app/_components/contact-multi-value";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
+import { formatStoredDate } from "~/lib/dates";
+import type { UserPreferences } from "~/lib/preferences";
 
 export type InlineEditorContact = {
   id: string;
@@ -45,28 +47,6 @@ type FieldDef = {
   display?: "date";
 };
 
-// Friendly read-mode rendering for stored date values (vCard basic YYYYMMDD,
-// extended YYYY-MM-DD, or year-less --MMDD). Falls back to the raw string.
-const formatDateDisplay = (value: string): string => {
-  const noYear = /^--(\d{2})-?(\d{2})$/.exec(value);
-  if (noYear) {
-    const [, month, day] = noYear;
-    return new Intl.DateTimeFormat("en-GB", {
-      day: "2-digit",
-      month: "long",
-      timeZone: "UTC",
-    }).format(new Date(Date.UTC(2000, Number(month) - 1, Number(day))));
-  }
-  const full = /^(\d{4})-?(\d{2})-?(\d{2})$/.exec(value);
-  if (!full) return value;
-  const [, year, month, day] = full;
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(new Date(Date.UTC(Number(year), Number(month) - 1, Number(day))));
-};
 
 const IDENTITY_FIELDS: FieldDef[] = [
   { key: "fullName", label: "Full name" },
@@ -93,6 +73,7 @@ function InlineField({
   initialValue,
   editable,
   onBuffer,
+  dateFormat = "DD MMM YYYY",
 }: {
   contactId: string;
   field: FieldDef;
@@ -100,6 +81,7 @@ function InlineField({
   editable: boolean;
   /** Buffered mode: report the committed value up instead of saving immediately. */
   onBuffer?: (value: string) => void;
+  dateFormat?: NonNullable<UserPreferences["dateFormat"]>;
 }) {
   const [value, setValue] = useState(initialValue);
   const [draft, setDraft] = useState(initialValue);
@@ -201,7 +183,7 @@ function InlineField({
           >
             {has
               ? field.display === "date"
-                ? formatDateDisplay(value)
+                ? formatStoredDate(value, dateFormat)
                 : value
               : editable
                 ? "Not added"
@@ -263,9 +245,11 @@ function ReadRow({ label, children }: { label: string; children: React.ReactNode
 function ContactReadView({
   contact,
   entries,
+  dateFormat,
 }: {
   contact: InlineEditorContact;
   entries: ContactEntries;
+  dateFormat: NonNullable<UserPreferences["dateFormat"]>;
 }) {
   const identityRows = IDENTITY_FIELDS.filter((f) => nonEmpty(contact[f.key]));
   const workRows = WORK_FIELDS.filter((f) => nonEmpty(contact[f.key]));
@@ -290,7 +274,7 @@ function ContactReadView({
       <SectionCard title="Identity">
         {identityRows.map((f) => (
           <ReadRow key={f.key} label={f.label}>
-            {f.display === "date" ? formatDateDisplay(contact[f.key] ?? "") : contact[f.key]}
+            {f.display === "date" ? formatStoredDate(contact[f.key] ?? "", dateFormat) : contact[f.key]}
           </ReadRow>
         ))}
       </SectionCard>
@@ -318,7 +302,7 @@ function ContactReadView({
       {hasPersonal ? (
         <SectionCard title="Personal">
           {nonEmpty(contact.birthday) ? (
-            <ReadRow label="Birthday">{formatDateDisplay(contact.birthday ?? "")}</ReadRow>
+            <ReadRow label="Birthday">{formatStoredDate(contact.birthday ?? "", dateFormat)}</ReadRow>
           ) : null}
           {addresses.length > 0 ? (
             <>
@@ -341,7 +325,7 @@ function ContactReadView({
               <GroupLabel>Significant dates</GroupLabel>
               {dates.map((e, i) => (
                 <ReadRow key={`date-${i}`} label={e.label}>
-                  {formatDateDisplay(e.value)}
+                  {formatStoredDate(e.value, dateFormat)}
                 </ReadRow>
               ))}
             </>
@@ -408,6 +392,7 @@ type ContactEditCtx = {
   contact: InlineEditorContact;
   entries: ContactEntries;
   editableShared: boolean;
+  dateFormat: NonNullable<UserPreferences["dateFormat"]>;
   mode: "read" | "edit";
   draft: EditorDraft | null;
   saving: boolean;
@@ -435,12 +420,14 @@ export function ContactEditProvider({
   contact,
   entries,
   editableShared,
+  dateFormat = "DD MMM YYYY",
   children,
 }: {
   contact: InlineEditorContact;
   entries: ContactEntries;
   /** false for a live-received contact: shared fields read-only, notes still editable */
   editableShared: boolean;
+  dateFormat?: NonNullable<UserPreferences["dateFormat"]>;
   children: React.ReactNode;
 }) {
   const router = useRouter();
@@ -555,6 +542,7 @@ export function ContactEditProvider({
         contact,
         entries,
         editableShared,
+        dateFormat,
         mode,
         draft,
         saving,
@@ -703,7 +691,7 @@ export function ContactDetailHeaderBar({
 
 /** The Details-tab body — read view by default, buffered edit fields in edit mode. */
 export function ContactInlineEditor() {
-  const { contact, entries, editableShared, mode, draft, saveError, setScalar, setGroup } =
+  const { contact, entries, editableShared, dateFormat, mode, draft, saveError, setScalar, setGroup } =
     useContactEdit();
   const editable = editableShared;
 
@@ -737,7 +725,7 @@ export function ContactInlineEditor() {
       ) : null}
 
       {mode === "read" || !draft ? (
-        <ContactReadView contact={contact} entries={entries} />
+        <ContactReadView contact={contact} entries={entries} dateFormat={dateFormat} />
       ) : (
         <div className="grid gap-4">
           <SectionCard title="Identity">
@@ -804,6 +792,7 @@ export function ContactInlineEditor() {
           <SectionCard title="Personal">
             <InlineField
               contactId={contact.id}
+              dateFormat={dateFormat}
               editable={editable}
               field={{ key: "birthday", label: "Birthday", display: "date" }}
               initialValue={draft.scalars.birthday ?? ""}

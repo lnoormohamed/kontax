@@ -22,6 +22,7 @@ import { getOnboardingChecklist } from "~/server/onboarding";
 import { isFullTextEligible, searchContactIds } from "~/server/contact-search";
 import { db } from "~/server/db";
 import { getLabels } from "~/app/actions/labels";
+import { DEFAULT_PREFERENCES } from "~/lib/preferences";
 
 type ContactsPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -73,22 +74,24 @@ const getSelectedFilter = async (
 
 const getSelectedSort = async (
   searchParams?: ContactsPageProps["searchParams"],
+  // URL param → user preference → hardcoded default (P34B-08)
+  prefDefault: ContactsWorkspaceSort = "name",
 ): Promise<ContactsWorkspaceSort> => {
   const sort = await getSingleParam(searchParams, "sort");
-  if (sort === "updated") {
-    return "updated";
-  }
-  return "name";
+  if (sort === "updated") return "updated";
+  if (sort === "name") return "name";
+  return prefDefault;
 };
 
 const getSelectedView = async (
   searchParams?: ContactsPageProps["searchParams"],
+  // URL param → user preference → hardcoded default (P34B-08)
+  prefDefault: ContactsWorkspaceView = "compact",
 ): Promise<ContactsWorkspaceView> => {
   const view = await getSingleParam(searchParams, "view");
-  if (view === "cozy") {
-    return "cozy";
-  }
-  return "compact";
+  if (view === "cozy") return "cozy";
+  if (view === "compact") return "compact";
+  return prefDefault;
 };
 
 const getSearchConditions = (query: string) =>
@@ -208,12 +211,14 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
   const session = await auth();
   if (!session?.user?.id) redirect("/login?next=/contacts");
 
+  const prefs = session.user.preferences ?? DEFAULT_PREFERENCES;
+
   const [query, selectedTab, selectedFilter, selectedSort, selectedView] = await Promise.all([
     getQueryValue(searchParams),
     getSelectedTab(searchParams),
     getSelectedFilter(searchParams),
-    getSelectedSort(searchParams),
-    getSelectedView(searchParams),
+    getSelectedSort(searchParams, prefs.defaultSort),
+    getSelectedView(searchParams, prefs.defaultViewMode),
   ]);
 
   const params = searchParams ? await searchParams : undefined;
@@ -603,6 +608,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         currentFilter={selectedFilter}
         currentSort={selectedSort}
         currentTab={selectedTab}
+        nameDisplayOrder={prefs.nameDisplayOrder}
         mergeSuggestions={mergeSuggestions}
         mergeSuggestionsRefreshed={mergeSuggestionsRefreshed}
         planSummary={{

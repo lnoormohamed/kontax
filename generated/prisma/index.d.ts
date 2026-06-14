@@ -6341,6 +6341,7 @@ export namespace Prisma {
     publicCardFields: number
     publicCardViews: number
     addToKontaxClicks: number
+    preferences: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -6448,6 +6449,7 @@ export namespace Prisma {
     publicCardFields?: true
     publicCardViews?: true
     addToKontaxClicks?: true
+    preferences?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -6566,6 +6568,7 @@ export namespace Prisma {
     publicCardFields: JsonValue | null
     publicCardViews: number
     addToKontaxClicks: number
+    preferences: JsonValue | null
     createdAt: Date
     updatedAt: Date
     _count: UserCountAggregateOutputType | null
@@ -6616,6 +6619,7 @@ export namespace Prisma {
     publicCardFields?: boolean
     publicCardViews?: boolean
     addToKontaxClicks?: boolean
+    preferences?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     appPasswords?: boolean | User$appPasswordsArgs<ExtArgs>
@@ -6683,6 +6687,7 @@ export namespace Prisma {
     publicCardFields?: boolean
     publicCardViews?: boolean
     addToKontaxClicks?: boolean
+    preferences?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -6714,6 +6719,7 @@ export namespace Prisma {
     publicCardFields?: boolean
     publicCardViews?: boolean
     addToKontaxClicks?: boolean
+    preferences?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["user"]>
@@ -6745,11 +6751,12 @@ export namespace Prisma {
     publicCardFields?: boolean
     publicCardViews?: boolean
     addToKontaxClicks?: boolean
+    preferences?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "password" | "lifecycleState" | "autoFillPhoneticNames" | "sessionVersion" | "avatarUrl" | "emailVerified" | "emailPendingChange" | "emailPendingChangeRequestedAt" | "emailStatus" | "totpEnabled" | "totpSecret" | "totpVerifiedAt" | "scheduledDeleteAt" | "role" | "planOverrideReason" | "planOverriddenAt" | "reminderLeadDays" | "calToken" | "username" | "usernameClaimedAt" | "publicCardFields" | "publicCardViews" | "addToKontaxClicks" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "email" | "password" | "lifecycleState" | "autoFillPhoneticNames" | "sessionVersion" | "avatarUrl" | "emailVerified" | "emailPendingChange" | "emailPendingChangeRequestedAt" | "emailStatus" | "totpEnabled" | "totpSecret" | "totpVerifiedAt" | "scheduledDeleteAt" | "role" | "planOverrideReason" | "planOverriddenAt" | "reminderLeadDays" | "calToken" | "username" | "usernameClaimedAt" | "publicCardFields" | "publicCardViews" | "addToKontaxClicks" | "preferences" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     appPasswords?: boolean | User$appPasswordsArgs<ExtArgs>
     contacts?: boolean | User$contactsArgs<ExtArgs>
@@ -6857,6 +6864,7 @@ export namespace Prisma {
       publicCardFields: Prisma.JsonValue | null
       publicCardViews: number
       addToKontaxClicks: number
+      preferences: Prisma.JsonValue | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["user"]>
@@ -7343,6 +7351,7 @@ export namespace Prisma {
     readonly publicCardFields: FieldRef<"User", 'Json'>
     readonly publicCardViews: FieldRef<"User", 'Int'>
     readonly addToKontaxClicks: FieldRef<"User", 'Int'>
+    readonly preferences: FieldRef<"User", 'Json'>
     readonly createdAt: FieldRef<"User", 'DateTime'>
     readonly updatedAt: FieldRef<"User", 'DateTime'>
   }
@@ -60706,6 +60715,7 @@ export namespace Prisma {
     publicCardFields: 'publicCardFields',
     publicCardViews: 'publicCardViews',
     addToKontaxClicks: 'addToKontaxClicks',
+    preferences: 'preferences',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -62186,6 +62196,7 @@ export namespace Prisma {
     publicCardFields?: JsonNullableFilter<"User">
     publicCardViews?: IntFilter<"User"> | number
     addToKontaxClicks?: IntFilter<"User"> | number
+    preferences?: JsonNullableFilter<"User">
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     appPasswords?: AppPasswordListRelationFilter
@@ -62252,6 +62263,7 @@ export namespace Prisma {
     publicCardFields?: SortOrderInput | SortOrder
     publicCardViews?: SortOrder
     addToKontaxClicks?: SortOrder
+    preferences?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     appPasswords?: AppPasswordOrderByRelationAggregateInput
@@ -62321,6 +62333,7 @@ export namespace Prisma {
     publicCardFields?: JsonNullableFilter<"User">
     publicCardViews?: IntFilter<"User"> | number
     addToKontaxClicks?: IntFilter<"User"> | number
+    preferences?: JsonNullableFilter<"User">
     createdAt?: DateTimeFilter<"User"> | Date | string
     updatedAt?: DateTimeFilter<"User"> | Date | string
     appPasswords?: AppPasswordListRelationFilter
@@ -62387,6 +62400,7 @@ export namespace Prisma {
     publicCardFields?: SortOrderInput | SortOrder
     publicCardViews?: SortOrder
     addToKontaxClicks?: SortOrder
+    preferences?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: UserCountOrderByAggregateInput
@@ -62426,6 +62440,7 @@ export namespace Prisma {
     publicCardFields?: JsonNullableWithAggregatesFilter<"User">
     publicCardViews?: IntWithAggregatesFilter<"User"> | number
     addToKontaxClicks?: IntWithAggregatesFilter<"User"> | number
+    preferences?: JsonNullableWithAggregatesFilter<"User">
     createdAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"User"> | Date | string
   }
@@ -66554,6 +66569,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -66620,6 +66636,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -66686,6 +66703,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -66752,6 +66770,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -66818,6 +66837,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -66849,6 +66869,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -66880,6 +66901,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -71930,6 +71952,7 @@ export namespace Prisma {
     publicCardFields?: SortOrder
     publicCardViews?: SortOrder
     addToKontaxClicks?: SortOrder
+    preferences?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -82450,6 +82473,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -82515,6 +82539,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -82596,6 +82621,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -82661,6 +82687,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -82726,6 +82753,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -82791,6 +82819,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -82872,6 +82901,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -82937,6 +82967,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -83002,6 +83033,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactCreateNestedManyWithoutUserInput
@@ -83067,6 +83099,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
@@ -83202,6 +83235,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUpdateManyWithoutUserNestedInput
@@ -83267,6 +83301,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
@@ -83374,6 +83409,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -83439,6 +83475,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -84299,6 +84336,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -84364,6 +84402,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -84891,6 +84930,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -84956,6 +84996,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -85117,6 +85158,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -85182,6 +85224,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -85263,6 +85306,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -85328,6 +85372,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -85474,6 +85519,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -85539,6 +85585,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -85651,6 +85698,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -85716,6 +85764,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -85933,6 +85982,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -85998,6 +86048,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -86079,6 +86130,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -86144,6 +86196,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -86225,6 +86278,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -86290,6 +86344,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -86355,6 +86410,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -86420,6 +86476,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -86801,6 +86858,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -86866,6 +86924,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -87264,6 +87323,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -87329,6 +87389,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -87459,6 +87520,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -87524,6 +87586,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -87589,6 +87652,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -87654,6 +87718,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -87997,6 +88062,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -88062,6 +88128,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -88401,6 +88468,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -88466,6 +88534,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -88755,6 +88824,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -88820,6 +88890,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -90410,6 +90481,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -90475,6 +90547,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -90556,6 +90629,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -90621,6 +90695,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -90686,6 +90761,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -90751,6 +90827,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -90832,6 +90909,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -90897,6 +90975,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -90962,6 +91041,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -91027,6 +91107,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -91108,6 +91189,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -91173,6 +91255,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -91238,6 +91321,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -91303,6 +91387,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -91384,6 +91469,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -91449,6 +91535,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -91514,6 +91601,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -91579,6 +91667,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -91791,6 +91880,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -91856,6 +91946,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -92058,6 +92149,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -92123,6 +92215,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -92204,6 +92297,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -92269,6 +92363,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -92334,6 +92429,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -92399,6 +92495,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -92659,6 +92756,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -92724,6 +92822,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -92980,6 +93079,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -93045,6 +93145,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -93167,6 +93268,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -93232,6 +93334,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -93457,6 +93560,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -93522,6 +93626,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -93739,6 +93844,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -93804,6 +93910,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -93885,6 +93992,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -93950,6 +94058,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -94031,6 +94140,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -94096,6 +94206,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -94161,6 +94272,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -94226,6 +94338,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -94307,6 +94420,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -94372,6 +94486,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -95077,6 +95192,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -95142,6 +95258,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -95343,6 +95460,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -95408,6 +95526,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -95620,6 +95739,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -95685,6 +95805,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -95898,6 +96019,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -95963,6 +96085,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -96165,6 +96288,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -96230,6 +96354,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -96340,6 +96465,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -96405,6 +96531,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -96505,6 +96632,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -96570,6 +96698,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -96687,6 +96816,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -96752,6 +96882,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -96833,6 +96964,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -96898,6 +97030,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -96979,6 +97112,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -97044,6 +97178,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -97109,6 +97244,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -97174,6 +97310,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -97255,6 +97392,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -97320,6 +97458,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -97385,6 +97524,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -97450,6 +97590,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -97662,6 +97803,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -97727,6 +97869,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -97929,6 +98072,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -97994,6 +98138,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -98075,6 +98220,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -98140,6 +98286,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -98205,6 +98352,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -98270,6 +98418,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -98351,6 +98500,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -98416,6 +98566,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -98481,6 +98632,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -98546,6 +98698,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -98627,6 +98780,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -98692,6 +98846,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -98757,6 +98912,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -98822,6 +98978,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -98903,6 +99060,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -98968,6 +99126,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
@@ -99033,6 +99192,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
@@ -99098,6 +99258,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: number
     addToKontaxClicks?: number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: Date | string
     updatedAt?: Date | string
     appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
@@ -99179,6 +99340,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
@@ -99244,6 +99406,7 @@ export namespace Prisma {
     publicCardFields?: NullableJsonNullValueInput | InputJsonValue
     publicCardViews?: IntFieldUpdateOperationsInput | number
     addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    preferences?: NullableJsonNullValueInput | InputJsonValue
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput

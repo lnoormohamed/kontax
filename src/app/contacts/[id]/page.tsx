@@ -36,6 +36,9 @@ import { getContactFamilyContext, getUserFamilyMembership } from "~/server/famil
 import { resolveContactEditAccess } from "~/server/shared-access";
 import { getAccessibleTeamBooks, getContactTeamContext } from "~/server/team-access";
 import { getPublicOrigin } from "~/lib/public-origin";
+import { DEFAULT_PREFERENCES } from "~/lib/preferences";
+import { formatDate, formatStoredDate } from "~/lib/dates";
+import { getDisplayName } from "~/lib/display-name";
 
 type ContactDetailPageProps = {
   params: Promise<{
@@ -50,45 +53,6 @@ const formatTimestamp = (value: Date) =>
     month: "short",
     year: "numeric",
   }).format(value);
-
-// Left-rail metadata dates match the design: non-padded day (e.g. "8 Jun 2026").
-const formatMetaDate = (value: Date) =>
-  new Intl.DateTimeFormat("en-GB", {
-    day: "numeric",
-    month: "short",
-    year: "numeric",
-  }).format(value);
-
-
-const formatStoredDateValue = (value: string | null | undefined) => {
-  if (!value) {
-    return "Not added yet";
-  }
-  // Year-less vCard form: --MMDD or --MM-DD
-  const noYearMatch = /^--(\d{2})-?(\d{2})$/.exec(value);
-  if (noYearMatch) {
-    const [, month, day] = noYearMatch;
-    const parsed = new Date(Date.UTC(2000, Number(month) - 1, Number(day)));
-    return new Intl.DateTimeFormat("en-GB", {
-      day: "2-digit",
-      month: "long",
-      timeZone: "UTC",
-    }).format(parsed);
-  }
-  // Full date: YYYY-MM-DD (extended) or YYYYMMDD (vCard basic)
-  const exactDateMatch = /^(\d{4})-?(\d{2})-?(\d{2})$/.exec(value);
-  if (!exactDateMatch) {
-    return value;
-  }
-  const [, year, month, day] = exactDateMatch;
-  const parsed = new Date(Date.UTC(Number(year), Number(month) - 1, Number(day)));
-  return new Intl.DateTimeFormat("en-GB", {
-    day: "2-digit",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(parsed);
-};
 
 const getSyncLinkStatusLabel = (link: {
   lastSyncedAt: Date | null;
@@ -238,6 +202,8 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     const next = h.get("x-pathname") ?? "/contacts";
     redirect(`/login?next=${encodeURIComponent(next)}`);
   }
+
+  const dateFormat = (session.user.preferences ?? DEFAULT_PREFERENCES).dateFormat;
 
   const { id } = await params;
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
@@ -434,7 +400,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
     ? (lastFamilyEvent.actorDetail?.replace(/ \(CardDAV\)$/, "") ??
        (lastFamilyEvent.actor === "FAMILY_MEMBER" ? "a family member" : "you"))
     : null;
-  const lastEditedAt = lastFamilyEvent ? formatMetaDate(lastFamilyEvent.createdAt) : null;
+  const lastEditedAt = lastFamilyEvent ? formatDate(lastFamilyEvent.createdAt, dateFormat) : null;
 
   // Shared books — only needed on the sharing tab.
   const sharedBooks = await (detailTab === "sharing"
@@ -576,6 +542,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
         contact={editorContact}
         editableShared={!isLiveReceived}
         entries={editorEntries}
+        dateFormat={dateFormat}
       >
 
       {/* ── MOBILE layout (< md) ─────────────────────────────────────── */}
@@ -800,7 +767,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               );
             })()}
             <h1 className="mt-4 text-[21px] font-bold leading-tight tracking-[-0.01em] text-[#1d2823]">
-              {contact.fullName}
+              {getDisplayName(contact, { nameDisplayOrder: (session.user.preferences ?? DEFAULT_PREFERENCES).nameDisplayOrder }) || contact.fullName}
             </h1>
             {contact.company || contact.jobTitle ? (
               <p className="mt-1 text-[13.5px] text-[#5c655e]">
@@ -810,7 +777,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
             {contact.birthday ? (
               <p className="mt-1 flex items-center gap-1.5 text-[13px] text-[#8b938c]">
                 <WorkspaceIcon name="gift" size={14} />
-                {formatStoredDateValue(contact.birthday)}
+                {formatStoredDate(contact.birthday, dateFormat) || "Not added yet"}
               </p>
             ) : null}
 
@@ -924,11 +891,11 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
             <dl className="grid gap-2 text-[12px]">
               <div className="flex justify-between gap-3">
                 <dt className="text-[#8b938c]">Added</dt>
-                <dd className="text-right text-[#5c655e]">{formatMetaDate(contact.createdAt)}</dd>
+                <dd className="text-right text-[#5c655e]">{formatDate(contact.createdAt, dateFormat)}</dd>
               </div>
               <div className="flex justify-between gap-3">
                 <dt className="text-[#8b938c]">Modified</dt>
-                <dd className="text-right text-[#5c655e]">{formatMetaDate(contact.updatedAt)}</dd>
+                <dd className="text-right text-[#5c655e]">{formatDate(contact.updatedAt, dateFormat)}</dd>
               </div>
               <div className="flex justify-between gap-3">
                 <dt className="text-[#8b938c]">UID</dt>

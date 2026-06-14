@@ -148,6 +148,7 @@ exports.Prisma.UserScalarFieldEnum = {
   publicCardFields: 'publicCardFields',
   publicCardViews: 'publicCardViews',
   addToKontaxClicks: 'addToKontaxClicks',
+  preferences: 'preferences',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

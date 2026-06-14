@@ -306,6 +306,8 @@ model User {
   publicCardViews                  Int                               @default(0)
   addToKontaxClicks                Int                               @default(0)
   cardViewLog                      PublicCardView[]
+  // P34B-01: per-user UI preferences (sort, view mode, date format, name order, week start)
+  preferences                      Json?                             @default("{}")
   createdAt                        DateTime                          @default(now())
   updatedAt                        DateTime                          @updatedAt
 
