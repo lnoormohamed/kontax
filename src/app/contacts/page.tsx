@@ -227,10 +227,13 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
   // methods, custom fields, ranked). Short/symbol-only queries fall back to the
   // multi-field ILIKE path. Shared/family/team contacts keep ILIKE (they aren't
   // owned by this user, so they're outside the per-user full-text scan).
-  const ftsRows =
-    query && isFullTextEligible(query) ? await searchContactIds(session.user.id, query) : null;
-  const ftsRankById = ftsRows ? new Map(ftsRows.map((r) => [r.id, r.rank])) : null;
-  const privateSearchConditions = ftsRows ? { id: { in: ftsRows.map((r) => r.id) } } : searchConditions;
+  const ftsActive = !!(query && isFullTextEligible(query));
+  const ftsPrivateRows = ftsActive
+    ? await searchContactIds({ userId: session.user.id }, query)
+    : null;
+  const privateSearchConditions = ftsPrivateRows
+    ? { id: { in: ftsPrivateRows.map((r) => r.id) } }
+    : searchConditions;
 
   const recentCutoff = new Date();
   recentCutoff.setDate(recentCutoff.getDate() - 30);
@@ -352,6 +355,21 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
   const familyTargetId = activeBook ? (activeBook === familyBookId ? familyBookId : null) : familyBookId;
   const teamTargetIds = activeBook ? (teamBookIds.includes(activeBook) ? [activeBook] : []) : teamBookIds;
 
+  // P28-07: full-text + phone search over the shared (group) books in view, so
+  // family/team contacts match the same way private ones do.
+  const sharedBookIds = [familyTargetId, ...teamTargetIds].filter((id): id is string => !!id);
+  const ftsSharedRows =
+    ftsActive && includeShared && sharedBookIds.length > 0
+      ? await searchContactIds({ groupBookIds: sharedBookIds }, query)
+      : null;
+  const sharedSearchConditions = ftsSharedRows
+    ? { id: { in: ftsSharedRows.map((r) => r.id) } }
+    : searchConditions;
+  // Relevance ranking spans both scopes (used to order the merged result set).
+  const ftsRankById = ftsActive
+    ? new Map([...(ftsPrivateRows ?? []), ...(ftsSharedRows ?? [])].map((r) => [r.id, r.rank]))
+    : null;
+
   // P28-03: scope the private query to the selected personal book. The default
   // book additionally claims un-booked contacts (bookId = null).
   const personalBookWhere = activePersonalBookId
@@ -393,14 +411,14 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         : Promise.resolve([]),
       includeShared && familyTargetId
         ? db.contact.findMany({
-            where: { archivedAt: null, groupContacts: { some: { groupAddressBookId: familyTargetId } }, ...searchConditions, ...filterConditions },
+            where: { archivedAt: null, groupContacts: { some: { groupAddressBookId: familyTargetId } }, ...sharedSearchConditions, ...filterConditions },
             orderBy: { updatedAt: "desc" as const },
             select: contactListSelect,
           })
         : Promise.resolve([]),
       includeShared && teamTargetIds.length > 0
         ? db.contact.findMany({
-            where: { archivedAt: null, groupContacts: { some: { groupAddressBookId: { in: teamTargetIds } } }, ...searchConditions, ...filterConditions },
+            where: { archivedAt: null, groupContacts: { some: { groupAddressBookId: { in: teamTargetIds } } }, ...sharedSearchConditions, ...filterConditions },
             orderBy: { updatedAt: "desc" as const },
             select: contactListSelect,
           })

@@ -1,3 +1,4 @@
+import { Prisma } from "../../generated/prisma";
 import { db } from "~/server/db";
 
 /**
@@ -38,19 +39,49 @@ export function buildTsQuery(q: string): string | null {
 
 export const isFullTextEligible = (q: string): boolean => buildTsQuery(q) !== null;
 
+// Phone search is a separate concern from text FTS: phone numbers are stored with
+// spaces/punctuation (e.g. "+44 7882 539146"), which to_tsvector splits into
+// multiple tokens, and tsquery only prefix-matches — so a mid-number fragment
+// ("78825") or the un-spaced full number ("+447882539146") never matches. We
+// instead strip both sides to digits and do a substring match.
+const looksLikePhone = (q: string): boolean => /^[+(]?\d[\d\s()+.\-]*$/.test(q.trim());
+
+/** Digits of `q` when it looks like a phone number, else "" (disables phone match). */
+const phoneDigits = (q: string): string => (looksLikePhone(q) ? q.replace(/\D/g, "") : "");
+
 /**
- * Returns the ids of the user's contacts matching `q`, with a relevance rank
- * (higher = better). Empty when the query isn't full-text eligible.
+ * Search scope: either a user's own contacts, or the contacts of a set of
+ * shared (group) address books. Same FTS + phone matching applies to both.
+ */
+export type SearchScope = { userId: string } | { groupBookIds: string[] };
+
+/**
+ * Returns the ids of the in-scope contacts matching `q`, with a relevance rank
+ * (higher = better). Empty when the query isn't full-text eligible and isn't a
+ * phone number.
  */
 export async function searchContactIds(
-  userId: string,
+  scope: SearchScope,
   q: string,
   limit = 1000,
 ): Promise<{ id: string; rank: number }[]> {
-  const tsq = buildTsQuery(q);
-  if (!tsq) return [];
+  // Group scope with no books can't match anything.
+  if ("groupBookIds" in scope && scope.groupBookIds.length === 0) return [];
 
-  const rows = await db.$queryRaw<{ id: string; rank: number }[]>`
+  const tsq = buildTsQuery(q);
+  const digits = phoneDigits(q); // "" unless the query looks like a phone number
+  // Nothing to search on (too short / symbol-only and not a phone number).
+  if (!tsq && digits.length < 3) return [];
+  // A phone-only query may not be text-eligible; a tsquery that matches nothing
+  // keeps the SQL shape uniform so the phone branch can still run.
+  const tsqParam = tsq ?? "x0x0x0nomatch0x0x0:*";
+
+  const scopeWhere =
+    "userId" in scope
+      ? Prisma.sql`"userId" = ${scope.userId}`
+      : Prisma.sql`id IN (SELECT "contactId" FROM "GroupContact" WHERE "groupAddressBookId" IN (${Prisma.join(scope.groupBookIds)}))`;
+
+  const rows = await db.$queryRaw<{ id: string; rank: number }[]>(Prisma.sql`
     WITH scored AS (
       SELECT
         id,
@@ -63,16 +94,27 @@ export async function searchContactIds(
           coalesce("addressEntries"::text, '') || ' ' || coalesce("postalAddresses"::text, '') || ' ' ||
           coalesce("emailAddresses"::text, '') || ' ' || coalesce("phoneNumbers"::text, '') || ' ' ||
           coalesce("customFields"::text, '')
-        ), 'C') AS vec
+        ), 'C') AS vec,
+        -- all phone sources stripped to digits, for substring matching
+        regexp_replace(
+          coalesce("phone", '') || ' ' || coalesce("phoneNumbers"::text, '') || ' ' || coalesce("phoneEntries"::text, ''),
+          '[^0-9]', '', 'g'
+        ) AS phone_digits
       FROM "Contact"
-      WHERE "userId" = ${userId}
+      WHERE ${scopeWhere}
     )
-    SELECT id, ts_rank(vec, to_tsquery('english', ${tsq})) AS rank
+    SELECT
+      id,
+      GREATEST(
+        ts_rank(vec, to_tsquery('english', ${tsqParam})),
+        CASE WHEN length(${digits}) >= 3 AND phone_digits LIKE '%' || ${digits} || '%' THEN 1.0 ELSE 0 END
+      ) AS rank
     FROM scored
-    WHERE vec @@ to_tsquery('english', ${tsq})
+    WHERE vec @@ to_tsquery('english', ${tsqParam})
+       OR (length(${digits}) >= 3 AND phone_digits LIKE '%' || ${digits} || '%')
     ORDER BY rank DESC
     LIMIT ${limit}
-  `;
+  `);
 
   return rows.map((r) => ({ id: r.id, rank: Number(r.rank) }));
 }
