@@ -354,6 +354,14 @@ exports.Prisma.MergeDecisionScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.MergeDismissalScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  contactAId: 'contactAId',
+  contactBId: 'contactBId',
+  dismissedAt: 'dismissedAt'
+};
+
 exports.Prisma.SyncAccountScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
@@ -1098,6 +1106,7 @@ exports.Prisma.ModelName = {
   ExportJob: 'ExportJob',
   MergeSuggestion: 'MergeSuggestion',
   MergeDecision: 'MergeDecision',
+  MergeDismissal: 'MergeDismissal',
   SyncAccount: 'SyncAccount',
   SyncAccountSettings: 'SyncAccountSettings',
   SyncSettingsElevation: 'SyncSettingsElevation',

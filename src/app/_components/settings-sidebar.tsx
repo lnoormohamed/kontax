@@ -25,9 +25,8 @@ const getInitials = (value: string) =>
 
 const SECTIONS = [
   { href: "/settings", icon: "briefcase", label: "Plan & billing" },
-  { href: "/settings/profile", icon: "people", label: "Profile" },
-  { href: "/settings/profile/card", icon: "qr", label: "Public card" },
   { href: "/settings/account", icon: "person", label: "Account" },
+  { href: "/settings/profile/card", icon: "qr", label: "Public card" },
   { href: "/settings/preferences", icon: "gear", label: "Preferences" },
   { href: "/settings/notifications", icon: "bell", label: "Notifications" },
   { href: "/settings/devices", icon: "phone", label: "Devices & app passwords" },
@@ -86,7 +85,7 @@ export function SettingsSidebar({ account, shared }: SettingsSidebarProps) {
     <>
       <Link
         className="mb-1 flex items-center gap-3 rounded-xl border border-[#e9ece7] bg-[#f6f7f4] p-2.5 transition hover:bg-[#f2f4f0]"
-        href="/settings/profile"
+        href="/settings/account"
         onClick={() => setDrawerOpen(false)}
       >
         <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#17352e] text-xs font-semibold text-[#dff0e7]">

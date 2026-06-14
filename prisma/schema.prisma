@@ -254,6 +254,7 @@ model User {
     exportJobs            ExportJob[]
     mergeSuggestions      MergeSuggestion[]
     mergeDecisions        MergeDecision[]
+    dismissals            MergeDismissal[]
     syncAccounts          SyncAccount[]
     subscriptionCustomer  SubscriptionCustomer?
     subscriptions         Subscription[]
@@ -372,6 +373,8 @@ model Contact {
     importJob   ImportJob? @relation(fields: [importJobId], references: [id], onDelete: SetNull)
     leftMergeSuggestions  MergeSuggestion[] @relation("MergeSuggestionLeftContact")
     rightMergeSuggestions MergeSuggestion[] @relation("MergeSuggestionRightContact")
+    dismissalsAsA         MergeDismissal[]  @relation("DismissalA")
+    dismissalsAsB         MergeDismissal[]  @relation("DismissalB")
     syncLinks   SyncContactLink[]
     syncConflicts SyncConflict[]
     activityEvents ActivityEvent[]
@@ -590,6 +593,21 @@ model MergeDecision {
 
     @@index([userId, status, decidedAt])
     @@index([suggestionId, decidedAt])
+}
+
+model MergeDismissal {
+    id          String   @id @default(cuid())
+    userId      String
+    contactAId  String
+    contactBId  String
+    dismissedAt DateTime @default(now())
+
+    user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+    contact_a Contact @relation("DismissalA", fields: [contactAId], references: [id], onDelete: Cascade)
+    contact_b Contact @relation("DismissalB", fields: [contactBId], references: [id], onDelete: Cascade)
+
+    @@unique([userId, contactAId, contactBId])
+    @@index([userId])
 }
 
 model SyncAccount {

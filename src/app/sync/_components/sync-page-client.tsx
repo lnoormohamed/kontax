@@ -3207,19 +3207,20 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
 
       {/* responsive styles */}
       <style>{`
-        @media (max-width: 1120px) {
+        @media (max-width: 1120px) and (min-width: 1024px) {
           .sy-account-rail { width: 220px !important; }
           .sy-detail-inner { padding: 28px 28px 90px !important; }
         }
-        @media (max-width: 959px) {
+        @media (max-width: 1023px) {
           .sy-account-rail {
             width: 100% !important;
             border-right: none !important;
             border-bottom: 1.5px solid #d8ddd6 !important;
-            flex-direction: row !important;
-            flex-wrap: wrap !important;
-            align-items: center !important;
+            flex-direction: column !important;
+            max-height: 260px !important;
+            overflow-y: auto !important;
           }
+          .sy-detail-inner { padding: 22px 20px 90px !important; }
         }
         @media (max-width: 767px) {
           .sy-hidden-mobile { display: none !important; }

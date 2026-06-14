@@ -5,6 +5,7 @@ import {
   emailDomain,
   getFamilyName as getFamilyNameKey,
   givenInitialMatch,
+  levenshtein,
   normalizePhoneKey,
   phoneticNameKey,
 } from "~/lib/duplicate-signals";
@@ -51,6 +52,9 @@ export type MergeSuggestionSignal =
   | "exact-email"
   | "exact-phone"
   | "normalized-phone"
+  | "exact-name"
+  | "fuzzy-name-company"
+  | "fuzzy-name"
   | "name-and-company"
   | "name-and-company-proximity"
   | "name-and-missing-company"
@@ -95,6 +99,50 @@ export type MergeSuggestionPreview = {
   hardMatch: boolean;
 };
 
+export type SuggestionContact = {
+  id: string;
+  fullName: string | null;
+  email: string | null;
+  phone: string | null;
+  company: string | null;
+  jobTitle: string | null;
+  notes: string | null;
+  address: string | null;
+  birthday: string | null;
+  updatedAt: Date;
+};
+
+const SIGNAL_LABELS: Record<string, string> = {
+  "exact-email": "Same email",
+  "exact-phone": "Same phone",
+  "normalized-phone": "Same phone",
+  "exact-name": "Same name",
+  "fuzzy-name-company": "Similar name",
+  "fuzzy-name": "Similar name",
+  "name-and-company": "Same company",
+  "name-and-missing-company": "Same name",
+  "name-and-company-proximity": "Similar name",
+  "phonetic-name": "Similar name",
+  "email-domain-and-name": "Similar name",
+};
+
+const SIGNAL_PRIORITY = [
+  "Same email",
+  "Same phone",
+  "Same name",
+  "Similar name",
+  "Same company",
+];
+
+export function deriveDisplaySignals(contributions: SignalContribution[]): string[] {
+  const seen = new Set<string>();
+  for (const c of contributions) {
+    const label = SIGNAL_LABELS[c.signal];
+    if (label) seen.add(label);
+  }
+  return SIGNAL_PRIORITY.filter((l) => seen.has(l)).slice(0, 3);
+}
+
 export type PersistedMergeSuggestion = {
   id: string;
   status: "OPEN" | "DISMISSED" | "MERGED" | "STALE";
@@ -107,8 +155,9 @@ export type PersistedMergeSuggestion = {
   reasons: string[];
   signals: MergeSuggestionSignal[];
   contributions: SignalContribution[];
-  leftContact: MergeCandidateContact;
-  rightContact: MergeCandidateContact;
+  displaySignals: string[];
+  leftContact: SuggestionContact;
+  rightContact: SuggestionContact;
 };
 
 export type MergePreview = {
@@ -725,7 +774,7 @@ const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateCont
 
   // --- Hard identifier matches -------------------------------------------------
   if (leftEmail && rightEmail && leftEmail === rightEmail) {
-    add("exact-email", `Same email: ${left.email}`, 100);
+    add("exact-email", `Same email: ${left.email}`, 95);
     hardMatch = true;
   }
 
@@ -733,18 +782,27 @@ const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateCont
     add("exact-phone", `Same phone: ${left.phone}`, 95);
     hardMatch = true;
   } else if (leftPhoneKey && rightPhoneKey && leftPhoneKey === rightPhoneKey) {
-    // Same number written in different formats (country code / spacing / trunk 0).
     add("normalized-phone", `Same phone in a different format: ${left.phone} ≈ ${right.phone}`, 90);
     hardMatch = true;
   }
 
-  // --- Name + company ----------------------------------------------------------
+  // --- Name signals ------------------------------------------------------------
   const exactName = Boolean(leftName && rightName && leftName === rightName);
+  const nameDist = leftName && rightName ? levenshtein(leftName, rightName, 2) : 3;
+  const fuzzyName = !exactName && nameDist <= 2;
+
   if (exactName) {
+    add("exact-name", `Same full name: ${left.fullName}`, 80);
     if (sameCompany) {
-      add("name-and-company", `Same name and company: ${left.fullName} at ${left.company}`, 70);
+      add("name-and-company", `Same name and company: ${left.fullName} at ${left.company}`, 60);
     } else if (!leftCompany || !rightCompany) {
-      add("name-and-missing-company", `Same name with missing company context: ${left.fullName}`, 45);
+      add("name-and-missing-company", `Same name with missing company context: ${left.fullName}`, 40);
+    }
+  } else if (fuzzyName) {
+    if (sameCompany) {
+      add("fuzzy-name-company", `Similar name at same company: ${left.fullName} ≈ ${right.fullName}`, 65);
+    } else {
+      add("fuzzy-name", `Similar name: ${left.fullName} ≈ ${right.fullName}`, 40);
     }
   } else if (
     sameCompany &&
@@ -752,23 +810,22 @@ const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateCont
     getFamilyNameKey(left.fullName) === getFamilyNameKey(right.fullName) &&
     givenInitialMatch(left.fullName, right.fullName)
   ) {
-    // "J. Smith at Acme" ~ "John Smith, Acme Corp": same surname + initial + company.
     add(
       "name-and-company-proximity",
       `Likely same person at ${left.company}: ${left.fullName} ≈ ${right.fullName}`,
-      55,
+      60,
     );
   }
 
   // --- Phonetic name (supporting signal only — never a hard match) -------------
-  if (!exactName) {
+  if (!exactName && !fuzzyName) {
     const leftPhonetic = phoneticNameKey(left.fullName);
     const rightPhonetic = phoneticNameKey(right.fullName);
     if (leftPhonetic && leftPhonetic === rightPhonetic) {
       add(
         "phonetic-name",
         `Names sound alike: ${left.fullName} ≈ ${right.fullName}`,
-        sameCompany ? 40 : 30,
+        sameCompany ? 40 : 25,
       );
     }
   }
@@ -810,10 +867,10 @@ const deriveConfidence = (
   hardMatch: boolean,
   hasEdgeWarnings: boolean,
 ): MergeSuggestionConfidence => {
-  if (!hasEdgeWarnings && (hardMatch || score >= 90)) {
+  if (!hasEdgeWarnings && (hardMatch || score >= 80)) {
     return "high";
   }
-  if (score >= 45) {
+  if (score >= 50) {
     return "medium";
   }
   return "low";
@@ -1533,10 +1590,30 @@ export const regenerateStaleSuggestionsForUser = async (userId: string) => {
   }
 };
 
+const suggestionContactSelect = {
+  id: true,
+  fullName: true,
+  email: true,
+  phone: true,
+  company: true,
+  jobTitle: true,
+  notes: true,
+  address: true,
+  birthday: true,
+  updatedAt: true,
+} as const;
+
 export const getOpenMergeSuggestionsForUser = async (userId: string) => {
   // Keep the open queue fresh: any suggestion whose contacts changed since it
   // was generated is recomputed (or retired) before we read (P10-08).
   await regenerateStaleSuggestionsForUser(userId);
+
+  // Load dismissed pairs so we can exclude them after fetch.
+  const dismissed = await db.mergeDismissal.findMany({
+    where: { userId },
+    select: { contactAId: true, contactBId: true },
+  });
+  const dismissedSet = new Set(dismissed.map((d) => `${d.contactAId}:${d.contactBId}`));
 
   const suggestions = await db.mergeSuggestion.findMany({
     where: {
@@ -1544,7 +1621,7 @@ export const getOpenMergeSuggestionsForUser = async (userId: string) => {
       status: "OPEN",
     },
     orderBy: [{ score: "desc" }, { updatedAt: "desc" }],
-    take: 8,
+    take: 20,
     select: {
       id: true,
       status: true,
@@ -1556,47 +1633,36 @@ export const getOpenMergeSuggestionsForUser = async (userId: string) => {
       reviewedAt: true,
       reasons: true,
       signals: true,
-      leftContact: {
-        select: {
-          id: true,
-          fullName: true,
-          email: true,
-          phone: true,
-          company: true,
-          updatedAt: true,
-        },
-      },
-      rightContact: {
-        select: {
-          id: true,
-          fullName: true,
-          email: true,
-          phone: true,
-          company: true,
-          updatedAt: true,
-        },
-      },
+      leftContact: { select: suggestionContactSelect },
+      rightContact: { select: suggestionContactSelect },
     },
   });
 
-  return suggestions.map((suggestion) => {
-    const contributions = parseContributions(suggestion.signals);
-    return {
-      id: suggestion.id,
-      status: suggestion.status,
-      confidence: suggestion.confidence.toLowerCase() as MergeSuggestionConfidence,
-      score: suggestion.score,
-      hardMatch: suggestion.hardMatch,
-      source: suggestion.source,
-      generatedAt: suggestion.generatedAt,
-      reviewedAt: suggestion.reviewedAt,
-      reasons: Array.isArray(suggestion.reasons) ? (suggestion.reasons as string[]) : [],
-      signals: contributions.map((contribution) => contribution.signal),
-      contributions,
-      leftContact: suggestion.leftContact,
-      rightContact: suggestion.rightContact,
-    };
-  }) satisfies PersistedMergeSuggestion[];
+  return suggestions
+    .filter((s) => {
+      const [aId, bId] = [s.leftContact.id, s.rightContact.id].sort() as [string, string];
+      return !dismissedSet.has(`${aId}:${bId}`);
+    })
+    .slice(0, 8)
+    .map((suggestion) => {
+      const contributions = parseContributions(suggestion.signals);
+      return {
+        id: suggestion.id,
+        status: suggestion.status,
+        confidence: suggestion.confidence.toLowerCase() as MergeSuggestionConfidence,
+        score: suggestion.score,
+        hardMatch: suggestion.hardMatch,
+        source: suggestion.source,
+        generatedAt: suggestion.generatedAt,
+        reviewedAt: suggestion.reviewedAt,
+        reasons: Array.isArray(suggestion.reasons) ? (suggestion.reasons as string[]) : [],
+        signals: contributions.map((c) => c.signal),
+        contributions,
+        displaySignals: deriveDisplaySignals(contributions),
+        leftContact: suggestion.leftContact,
+        rightContact: suggestion.rightContact,
+      };
+    }) satisfies PersistedMergeSuggestion[];
 };
 
 // Full field selection for the field-level merge review (P10-05): include the

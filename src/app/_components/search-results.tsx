@@ -158,31 +158,39 @@ const AVATAR_TINTS: Array<[string, string]> = [
   ["#e3eef0", "#3f7d7a"],
 ];
 
-function tintForName(name: string): [string, string] {
+function tintForName(primary: string | null | undefined, fallback?: string | null): [string, string] {
+  const src = (primary?.trim() ?? fallback?.trim()) ?? "?";
   let hash = 0;
-  for (let i = 0; i < name.length; i++) hash = ((hash * 31) + name.charCodeAt(i)) >>> 0;
+  for (let i = 0; i < src.length; i++) hash = ((hash * 31) + src.charCodeAt(i)) >>> 0;
   return AVATAR_TINTS[hash % AVATAR_TINTS.length]!;
 }
 
-function getInitials(name: string): string {
-  const parts = name.trim().split(/\s+/);
+function getInitials(primary: string | null | undefined, fallback?: string | null): string {
+  const src = (primary?.trim() ?? fallback?.trim()) ?? "";
+  if (!src) return "";
+  const parts = src.split(/\s+/);
   return ((parts[0]?.[0] ?? "") + (parts.length > 1 ? (parts[parts.length - 1]?.[0] ?? "") : ""))
     .toUpperCase();
 }
 
-function ContactAvatar({ name, size }: { name: string; size: number }) {
-  const [bg, fg] = tintForName(name);
+function ContactAvatar({ fullName, company, size }: { fullName: string | null | undefined; company?: string | null; size: number }) {
+  const [bg, fg] = tintForName(fullName, company);
+  const initials = getInitials(fullName, company);
   return (
     <span
       style={{
         width: size, height: size, borderRadius: "50%",
-        background: bg, color: fg,
+        background: bg,
         display: "grid", placeItems: "center",
         fontSize: size * 0.36, fontWeight: 600,
         flexShrink: 0, userSelect: "none",
       }}
     >
-      {getInitials(name)}
+      {initials ? (
+        <span style={{ color: fg }}>{initials}</span>
+      ) : (
+        <WorkspaceIcon name="person" size={Math.round(size * 0.4)} strokeWidth={1.6} className="text-[#aeb4ac]" />
+      )}
     </span>
   );
 }
@@ -343,7 +351,7 @@ export function SearchResultRow({ result, q, active, onOpen, onHover, mob, label
       onMouseLeave={undefined}
       className={`se-row${active ? " se-row--active" : ""}`}
     >
-      <ContactAvatar name={result.name} size={mob ? 44 : 40} />
+      <ContactAvatar fullName={result.name} company={result.company} size={mob ? 44 : 40} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <span style={{
@@ -603,7 +611,7 @@ export function SearchRecentBlock({ mob, onPickSearch }: SearchRecentBlockProps)
               className="se-row"
               onClick={() => { window.location.href = `/contacts/${entry.id}`; }}
             >
-              <ContactAvatar name={entry.name} size={mob ? 38 : 32} />
+              <ContactAvatar fullName={entry.name} company={entry.company} size={mob ? 38 : 32} />
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ fontSize: mob ? 14.5 : 13.5, fontWeight: 600, color: T.ink }}>{entry.name}</div>
                 {entry.company && (

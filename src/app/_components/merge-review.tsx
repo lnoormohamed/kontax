@@ -3,6 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 
 import { mergeContacts } from "~/app/actions/contacts";
+import { dismissMergeSuggestion } from "~/app/actions/merge";
 
 // ── Public types (consumed by page.tsx) ──────────────────────────────────────
 export type MergeReviewContact = {
@@ -1135,25 +1136,37 @@ function MergeBar({
 }
 
 // ── 8. Dismiss card ───────────────────────────────────────────────────────────
-function DismissCard({ suggestionId }: { suggestionId: string }) {
+function DismissCard({
+  suggestionId,
+  contactAId,
+  contactBId,
+}: {
+  suggestionId: string;
+  contactAId: string;
+  contactBId: string;
+}) {
   const [isDismissing, setIsDismissing] = useState(false);
   const [error, setError] = useState("");
 
   const handleDismiss = async () => {
     setIsDismissing(true);
     setError("");
-    const res = await fetch("/api/merge-suggestions/dismiss", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ suggestionId }),
-    });
-    if (!res.ok) {
-      const data = (await res.json().catch(() => null)) as { message?: string } | null;
-      setError(data?.message ?? "Dismiss failed.");
+    try {
+      await Promise.all([
+        fetch("/api/merge-suggestions/dismiss", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ suggestionId }),
+        }).then((r) => {
+          if (!r.ok) throw new Error("Dismiss failed.");
+        }),
+        dismissMergeSuggestion(contactAId, contactBId),
+      ]);
+      window.location.href = "/contacts?tab=duplicates";
+    } catch {
+      setError("Dismiss failed.");
       setIsDismissing(false);
-      return;
     }
-    window.location.href = "/contacts?tab=duplicates";
   };
 
   return (
@@ -1429,7 +1442,13 @@ export function MergeReview({
         />
       </form>
 
-      {suggestionId && <DismissCard suggestionId={suggestionId} />}
+      {suggestionId && (
+        <DismissCard
+          suggestionId={suggestionId}
+          contactAId={contactA.id}
+          contactBId={contactB.id}
+        />
+      )}
     </>
   );
 }

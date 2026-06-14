@@ -69,6 +69,11 @@ export type MergeSuggestion = $Result.DefaultSelection<Prisma.$MergeSuggestionPa
  */
 export type MergeDecision = $Result.DefaultSelection<Prisma.$MergeDecisionPayload>
 /**
+ * Model MergeDismissal
+ * 
+ */
+export type MergeDismissal = $Result.DefaultSelection<Prisma.$MergeDismissalPayload>
+/**
  * Model SyncAccount
  * 
  */
@@ -1001,6 +1006,16 @@ export class PrismaClient<
   get mergeDecision(): Prisma.MergeDecisionDelegate<ExtArgs, ClientOptions>;
 
   /**
+   * `prisma.mergeDismissal`: Exposes CRUD operations for the **MergeDismissal** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more MergeDismissals
+    * const mergeDismissals = await prisma.mergeDismissal.findMany()
+    * ```
+    */
+  get mergeDismissal(): Prisma.MergeDismissalDelegate<ExtArgs, ClientOptions>;
+
+  /**
    * `prisma.syncAccount`: Exposes CRUD operations for the **SyncAccount** model.
     * Example usage:
     * ```ts
@@ -1781,6 +1796,7 @@ export namespace Prisma {
     ExportJob: 'ExportJob',
     MergeSuggestion: 'MergeSuggestion',
     MergeDecision: 'MergeDecision',
+    MergeDismissal: 'MergeDismissal',
     SyncAccount: 'SyncAccount',
     SyncAccountSettings: 'SyncAccountSettings',
     SyncSettingsElevation: 'SyncSettingsElevation',
@@ -1832,7 +1848,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "publicCardView" | "userOnboardingState" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "savedFilter" | "label" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset" | "exportPreset" | "dataExportJob" | "apiToken"
+      modelProps: "user" | "publicCardView" | "userOnboardingState" | "appPassword" | "contact" | "subscriptionCustomer" | "subscription" | "importJob" | "exportJob" | "mergeSuggestion" | "mergeDecision" | "mergeDismissal" | "syncAccount" | "syncAccountSettings" | "syncSettingsElevation" | "syncContactLink" | "syncJob" | "syncConflict" | "emailVerificationToken" | "passwordResetToken" | "userSession" | "totpRecoveryCode" | "activityEvent" | "adminAuditEvent" | "featureFlag" | "group" | "groupMember" | "groupAddressBook" | "addressBook" | "savedFilter" | "label" | "teamSyncAccount" | "groupContact" | "contactShare" | "stripeWebhookEvent" | "notification" | "securityAlert" | "notificationSettings" | "failedLoginAttempt" | "birthdayReminderState" | "importMappingSuggestionFeedback" | "importMappingPreset" | "exportPreset" | "dataExportJob" | "apiToken"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2647,6 +2663,80 @@ export namespace Prisma {
           count: {
             args: Prisma.MergeDecisionCountArgs<ExtArgs>
             result: $Utils.Optional<MergeDecisionCountAggregateOutputType> | number
+          }
+        }
+      }
+      MergeDismissal: {
+        payload: Prisma.$MergeDismissalPayload<ExtArgs>
+        fields: Prisma.MergeDismissalFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.MergeDismissalFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeDismissalPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.MergeDismissalFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeDismissalPayload>
+          }
+          findFirst: {
+            args: Prisma.MergeDismissalFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeDismissalPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.MergeDismissalFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeDismissalPayload>
+          }
+          findMany: {
+            args: Prisma.MergeDismissalFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeDismissalPayload>[]
+          }
+          create: {
+            args: Prisma.MergeDismissalCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeDismissalPayload>
+          }
+          createMany: {
+            args: Prisma.MergeDismissalCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.MergeDismissalCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeDismissalPayload>[]
+          }
+          delete: {
+            args: Prisma.MergeDismissalDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeDismissalPayload>
+          }
+          update: {
+            args: Prisma.MergeDismissalUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeDismissalPayload>
+          }
+          deleteMany: {
+            args: Prisma.MergeDismissalDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.MergeDismissalUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.MergeDismissalUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeDismissalPayload>[]
+          }
+          upsert: {
+            args: Prisma.MergeDismissalUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$MergeDismissalPayload>
+          }
+          aggregate: {
+            args: Prisma.MergeDismissalAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateMergeDismissal>
+          }
+          groupBy: {
+            args: Prisma.MergeDismissalGroupByArgs<ExtArgs>
+            result: $Utils.Optional<MergeDismissalGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.MergeDismissalCountArgs<ExtArgs>
+            result: $Utils.Optional<MergeDismissalCountAggregateOutputType> | number
           }
         }
       }
@@ -5199,6 +5289,7 @@ export namespace Prisma {
     exportJob?: ExportJobOmit
     mergeSuggestion?: MergeSuggestionOmit
     mergeDecision?: MergeDecisionOmit
+    mergeDismissal?: MergeDismissalOmit
     syncAccount?: SyncAccountOmit
     syncAccountSettings?: SyncAccountSettingsOmit
     syncSettingsElevation?: SyncSettingsElevationOmit
@@ -5318,6 +5409,7 @@ export namespace Prisma {
     exportJobs: number
     mergeSuggestions: number
     mergeDecisions: number
+    dismissals: number
     syncAccounts: number
     subscriptions: number
     activityEvents: number
@@ -5352,6 +5444,7 @@ export namespace Prisma {
     exportJobs?: boolean | UserCountOutputTypeCountExportJobsArgs
     mergeSuggestions?: boolean | UserCountOutputTypeCountMergeSuggestionsArgs
     mergeDecisions?: boolean | UserCountOutputTypeCountMergeDecisionsArgs
+    dismissals?: boolean | UserCountOutputTypeCountDismissalsArgs
     syncAccounts?: boolean | UserCountOutputTypeCountSyncAccountsArgs
     subscriptions?: boolean | UserCountOutputTypeCountSubscriptionsArgs
     activityEvents?: boolean | UserCountOutputTypeCountActivityEventsArgs
@@ -5430,6 +5523,13 @@ export namespace Prisma {
    */
   export type UserCountOutputTypeCountMergeDecisionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: MergeDecisionWhereInput
+  }
+
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountDismissalsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MergeDismissalWhereInput
   }
 
   /**
@@ -5646,6 +5746,8 @@ export namespace Prisma {
   export type ContactCountOutputType = {
     leftMergeSuggestions: number
     rightMergeSuggestions: number
+    dismissalsAsA: number
+    dismissalsAsB: number
     syncLinks: number
     syncConflicts: number
     activityEvents: number
@@ -5659,6 +5761,8 @@ export namespace Prisma {
   export type ContactCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     leftMergeSuggestions?: boolean | ContactCountOutputTypeCountLeftMergeSuggestionsArgs
     rightMergeSuggestions?: boolean | ContactCountOutputTypeCountRightMergeSuggestionsArgs
+    dismissalsAsA?: boolean | ContactCountOutputTypeCountDismissalsAsAArgs
+    dismissalsAsB?: boolean | ContactCountOutputTypeCountDismissalsAsBArgs
     syncLinks?: boolean | ContactCountOutputTypeCountSyncLinksArgs
     syncConflicts?: boolean | ContactCountOutputTypeCountSyncConflictsArgs
     activityEvents?: boolean | ContactCountOutputTypeCountActivityEventsArgs
@@ -5692,6 +5796,20 @@ export namespace Prisma {
    */
   export type ContactCountOutputTypeCountRightMergeSuggestionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: MergeSuggestionWhereInput
+  }
+
+  /**
+   * ContactCountOutputType without action
+   */
+  export type ContactCountOutputTypeCountDismissalsAsAArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MergeDismissalWhereInput
+  }
+
+  /**
+   * ContactCountOutputType without action
+   */
+  export type ContactCountOutputTypeCountDismissalsAsBArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MergeDismissalWhereInput
   }
 
   /**
@@ -6506,6 +6624,7 @@ export namespace Prisma {
     exportJobs?: boolean | User$exportJobsArgs<ExtArgs>
     mergeSuggestions?: boolean | User$mergeSuggestionsArgs<ExtArgs>
     mergeDecisions?: boolean | User$mergeDecisionsArgs<ExtArgs>
+    dismissals?: boolean | User$dismissalsArgs<ExtArgs>
     syncAccounts?: boolean | User$syncAccountsArgs<ExtArgs>
     subscriptionCustomer?: boolean | User$subscriptionCustomerArgs<ExtArgs>
     subscriptions?: boolean | User$subscriptionsArgs<ExtArgs>
@@ -6638,6 +6757,7 @@ export namespace Prisma {
     exportJobs?: boolean | User$exportJobsArgs<ExtArgs>
     mergeSuggestions?: boolean | User$mergeSuggestionsArgs<ExtArgs>
     mergeDecisions?: boolean | User$mergeDecisionsArgs<ExtArgs>
+    dismissals?: boolean | User$dismissalsArgs<ExtArgs>
     syncAccounts?: boolean | User$syncAccountsArgs<ExtArgs>
     subscriptionCustomer?: boolean | User$subscriptionCustomerArgs<ExtArgs>
     subscriptions?: boolean | User$subscriptionsArgs<ExtArgs>
@@ -6680,6 +6800,7 @@ export namespace Prisma {
       exportJobs: Prisma.$ExportJobPayload<ExtArgs>[]
       mergeSuggestions: Prisma.$MergeSuggestionPayload<ExtArgs>[]
       mergeDecisions: Prisma.$MergeDecisionPayload<ExtArgs>[]
+      dismissals: Prisma.$MergeDismissalPayload<ExtArgs>[]
       syncAccounts: Prisma.$SyncAccountPayload<ExtArgs>[]
       subscriptionCustomer: Prisma.$SubscriptionCustomerPayload<ExtArgs> | null
       subscriptions: Prisma.$SubscriptionPayload<ExtArgs>[]
@@ -7138,6 +7259,7 @@ export namespace Prisma {
     exportJobs<T extends User$exportJobsArgs<ExtArgs> = {}>(args?: Subset<T, User$exportJobsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ExportJobPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     mergeSuggestions<T extends User$mergeSuggestionsArgs<ExtArgs> = {}>(args?: Subset<T, User$mergeSuggestionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeSuggestionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     mergeDecisions<T extends User$mergeDecisionsArgs<ExtArgs> = {}>(args?: Subset<T, User$mergeDecisionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeDecisionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    dismissals<T extends User$dismissalsArgs<ExtArgs> = {}>(args?: Subset<T, User$dismissalsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeDismissalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     syncAccounts<T extends User$syncAccountsArgs<ExtArgs> = {}>(args?: Subset<T, User$syncAccountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     subscriptionCustomer<T extends User$subscriptionCustomerArgs<ExtArgs> = {}>(args?: Subset<T, User$subscriptionCustomerArgs<ExtArgs>>): Prisma__SubscriptionCustomerClient<$Result.GetResult<Prisma.$SubscriptionCustomerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     subscriptions<T extends User$subscriptionsArgs<ExtArgs> = {}>(args?: Subset<T, User$subscriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -7752,6 +7874,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: MergeDecisionScalarFieldEnum | MergeDecisionScalarFieldEnum[]
+  }
+
+  /**
+   * User.dismissals
+   */
+  export type User$dismissalsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDismissal
+     */
+    select?: MergeDismissalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDismissal
+     */
+    omit?: MergeDismissalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDismissalInclude<ExtArgs> | null
+    where?: MergeDismissalWhereInput
+    orderBy?: MergeDismissalOrderByWithRelationInput | MergeDismissalOrderByWithRelationInput[]
+    cursor?: MergeDismissalWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MergeDismissalScalarFieldEnum | MergeDismissalScalarFieldEnum[]
   }
 
   /**
@@ -12226,6 +12372,8 @@ export namespace Prisma {
     importJob?: boolean | Contact$importJobArgs<ExtArgs>
     leftMergeSuggestions?: boolean | Contact$leftMergeSuggestionsArgs<ExtArgs>
     rightMergeSuggestions?: boolean | Contact$rightMergeSuggestionsArgs<ExtArgs>
+    dismissalsAsA?: boolean | Contact$dismissalsAsAArgs<ExtArgs>
+    dismissalsAsB?: boolean | Contact$dismissalsAsBArgs<ExtArgs>
     syncLinks?: boolean | Contact$syncLinksArgs<ExtArgs>
     syncConflicts?: boolean | Contact$syncConflictsArgs<ExtArgs>
     activityEvents?: boolean | Contact$activityEventsArgs<ExtArgs>
@@ -12409,6 +12557,8 @@ export namespace Prisma {
     importJob?: boolean | Contact$importJobArgs<ExtArgs>
     leftMergeSuggestions?: boolean | Contact$leftMergeSuggestionsArgs<ExtArgs>
     rightMergeSuggestions?: boolean | Contact$rightMergeSuggestionsArgs<ExtArgs>
+    dismissalsAsA?: boolean | Contact$dismissalsAsAArgs<ExtArgs>
+    dismissalsAsB?: boolean | Contact$dismissalsAsBArgs<ExtArgs>
     syncLinks?: boolean | Contact$syncLinksArgs<ExtArgs>
     syncConflicts?: boolean | Contact$syncConflictsArgs<ExtArgs>
     activityEvents?: boolean | Contact$activityEventsArgs<ExtArgs>
@@ -12441,6 +12591,8 @@ export namespace Prisma {
       importJob: Prisma.$ImportJobPayload<ExtArgs> | null
       leftMergeSuggestions: Prisma.$MergeSuggestionPayload<ExtArgs>[]
       rightMergeSuggestions: Prisma.$MergeSuggestionPayload<ExtArgs>[]
+      dismissalsAsA: Prisma.$MergeDismissalPayload<ExtArgs>[]
+      dismissalsAsB: Prisma.$MergeDismissalPayload<ExtArgs>[]
       syncLinks: Prisma.$SyncContactLinkPayload<ExtArgs>[]
       syncConflicts: Prisma.$SyncConflictPayload<ExtArgs>[]
       activityEvents: Prisma.$ActivityEventPayload<ExtArgs>[]
@@ -12900,6 +13052,8 @@ export namespace Prisma {
     importJob<T extends Contact$importJobArgs<ExtArgs> = {}>(args?: Subset<T, Contact$importJobArgs<ExtArgs>>): Prisma__ImportJobClient<$Result.GetResult<Prisma.$ImportJobPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     leftMergeSuggestions<T extends Contact$leftMergeSuggestionsArgs<ExtArgs> = {}>(args?: Subset<T, Contact$leftMergeSuggestionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeSuggestionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     rightMergeSuggestions<T extends Contact$rightMergeSuggestionsArgs<ExtArgs> = {}>(args?: Subset<T, Contact$rightMergeSuggestionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeSuggestionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    dismissalsAsA<T extends Contact$dismissalsAsAArgs<ExtArgs> = {}>(args?: Subset<T, Contact$dismissalsAsAArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeDismissalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    dismissalsAsB<T extends Contact$dismissalsAsBArgs<ExtArgs> = {}>(args?: Subset<T, Contact$dismissalsAsBArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeDismissalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     syncLinks<T extends Contact$syncLinksArgs<ExtArgs> = {}>(args?: Subset<T, Contact$syncLinksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncContactLinkPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     syncConflicts<T extends Contact$syncConflictsArgs<ExtArgs> = {}>(args?: Subset<T, Contact$syncConflictsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncConflictPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     activityEvents<T extends Contact$activityEventsArgs<ExtArgs> = {}>(args?: Subset<T, Contact$activityEventsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$ActivityEventPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -13448,6 +13602,54 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: MergeSuggestionScalarFieldEnum | MergeSuggestionScalarFieldEnum[]
+  }
+
+  /**
+   * Contact.dismissalsAsA
+   */
+  export type Contact$dismissalsAsAArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDismissal
+     */
+    select?: MergeDismissalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDismissal
+     */
+    omit?: MergeDismissalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDismissalInclude<ExtArgs> | null
+    where?: MergeDismissalWhereInput
+    orderBy?: MergeDismissalOrderByWithRelationInput | MergeDismissalOrderByWithRelationInput[]
+    cursor?: MergeDismissalWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MergeDismissalScalarFieldEnum | MergeDismissalScalarFieldEnum[]
+  }
+
+  /**
+   * Contact.dismissalsAsB
+   */
+  export type Contact$dismissalsAsBArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDismissal
+     */
+    select?: MergeDismissalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDismissal
+     */
+    omit?: MergeDismissalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDismissalInclude<ExtArgs> | null
+    where?: MergeDismissalWhereInput
+    orderBy?: MergeDismissalOrderByWithRelationInput | MergeDismissalOrderByWithRelationInput[]
+    cursor?: MergeDismissalWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: MergeDismissalScalarFieldEnum | MergeDismissalScalarFieldEnum[]
   }
 
   /**
@@ -21308,6 +21510,1080 @@ export namespace Prisma {
      * Choose, which related nodes to fetch as well
      */
     include?: MergeDecisionInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model MergeDismissal
+   */
+
+  export type AggregateMergeDismissal = {
+    _count: MergeDismissalCountAggregateOutputType | null
+    _min: MergeDismissalMinAggregateOutputType | null
+    _max: MergeDismissalMaxAggregateOutputType | null
+  }
+
+  export type MergeDismissalMinAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    contactAId: string | null
+    contactBId: string | null
+    dismissedAt: Date | null
+  }
+
+  export type MergeDismissalMaxAggregateOutputType = {
+    id: string | null
+    userId: string | null
+    contactAId: string | null
+    contactBId: string | null
+    dismissedAt: Date | null
+  }
+
+  export type MergeDismissalCountAggregateOutputType = {
+    id: number
+    userId: number
+    contactAId: number
+    contactBId: number
+    dismissedAt: number
+    _all: number
+  }
+
+
+  export type MergeDismissalMinAggregateInputType = {
+    id?: true
+    userId?: true
+    contactAId?: true
+    contactBId?: true
+    dismissedAt?: true
+  }
+
+  export type MergeDismissalMaxAggregateInputType = {
+    id?: true
+    userId?: true
+    contactAId?: true
+    contactBId?: true
+    dismissedAt?: true
+  }
+
+  export type MergeDismissalCountAggregateInputType = {
+    id?: true
+    userId?: true
+    contactAId?: true
+    contactBId?: true
+    dismissedAt?: true
+    _all?: true
+  }
+
+  export type MergeDismissalAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MergeDismissal to aggregate.
+     */
+    where?: MergeDismissalWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MergeDismissals to fetch.
+     */
+    orderBy?: MergeDismissalOrderByWithRelationInput | MergeDismissalOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: MergeDismissalWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MergeDismissals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MergeDismissals.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned MergeDismissals
+    **/
+    _count?: true | MergeDismissalCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: MergeDismissalMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: MergeDismissalMaxAggregateInputType
+  }
+
+  export type GetMergeDismissalAggregateType<T extends MergeDismissalAggregateArgs> = {
+        [P in keyof T & keyof AggregateMergeDismissal]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateMergeDismissal[P]>
+      : GetScalarType<T[P], AggregateMergeDismissal[P]>
+  }
+
+
+
+
+  export type MergeDismissalGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: MergeDismissalWhereInput
+    orderBy?: MergeDismissalOrderByWithAggregationInput | MergeDismissalOrderByWithAggregationInput[]
+    by: MergeDismissalScalarFieldEnum[] | MergeDismissalScalarFieldEnum
+    having?: MergeDismissalScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: MergeDismissalCountAggregateInputType | true
+    _min?: MergeDismissalMinAggregateInputType
+    _max?: MergeDismissalMaxAggregateInputType
+  }
+
+  export type MergeDismissalGroupByOutputType = {
+    id: string
+    userId: string
+    contactAId: string
+    contactBId: string
+    dismissedAt: Date
+    _count: MergeDismissalCountAggregateOutputType | null
+    _min: MergeDismissalMinAggregateOutputType | null
+    _max: MergeDismissalMaxAggregateOutputType | null
+  }
+
+  type GetMergeDismissalGroupByPayload<T extends MergeDismissalGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<MergeDismissalGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof MergeDismissalGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], MergeDismissalGroupByOutputType[P]>
+            : GetScalarType<T[P], MergeDismissalGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type MergeDismissalSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    contactAId?: boolean
+    contactBId?: boolean
+    dismissedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    contact_a?: boolean | ContactDefaultArgs<ExtArgs>
+    contact_b?: boolean | ContactDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["mergeDismissal"]>
+
+  export type MergeDismissalSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    contactAId?: boolean
+    contactBId?: boolean
+    dismissedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    contact_a?: boolean | ContactDefaultArgs<ExtArgs>
+    contact_b?: boolean | ContactDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["mergeDismissal"]>
+
+  export type MergeDismissalSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    userId?: boolean
+    contactAId?: boolean
+    contactBId?: boolean
+    dismissedAt?: boolean
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    contact_a?: boolean | ContactDefaultArgs<ExtArgs>
+    contact_b?: boolean | ContactDefaultArgs<ExtArgs>
+  }, ExtArgs["result"]["mergeDismissal"]>
+
+  export type MergeDismissalSelectScalar = {
+    id?: boolean
+    userId?: boolean
+    contactAId?: boolean
+    contactBId?: boolean
+    dismissedAt?: boolean
+  }
+
+  export type MergeDismissalOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "contactAId" | "contactBId" | "dismissedAt", ExtArgs["result"]["mergeDismissal"]>
+  export type MergeDismissalInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    contact_a?: boolean | ContactDefaultArgs<ExtArgs>
+    contact_b?: boolean | ContactDefaultArgs<ExtArgs>
+  }
+  export type MergeDismissalIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    contact_a?: boolean | ContactDefaultArgs<ExtArgs>
+    contact_b?: boolean | ContactDefaultArgs<ExtArgs>
+  }
+  export type MergeDismissalIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    user?: boolean | UserDefaultArgs<ExtArgs>
+    contact_a?: boolean | ContactDefaultArgs<ExtArgs>
+    contact_b?: boolean | ContactDefaultArgs<ExtArgs>
+  }
+
+  export type $MergeDismissalPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "MergeDismissal"
+    objects: {
+      user: Prisma.$UserPayload<ExtArgs>
+      contact_a: Prisma.$ContactPayload<ExtArgs>
+      contact_b: Prisma.$ContactPayload<ExtArgs>
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      userId: string
+      contactAId: string
+      contactBId: string
+      dismissedAt: Date
+    }, ExtArgs["result"]["mergeDismissal"]>
+    composites: {}
+  }
+
+  type MergeDismissalGetPayload<S extends boolean | null | undefined | MergeDismissalDefaultArgs> = $Result.GetResult<Prisma.$MergeDismissalPayload, S>
+
+  type MergeDismissalCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<MergeDismissalFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: MergeDismissalCountAggregateInputType | true
+    }
+
+  export interface MergeDismissalDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['MergeDismissal'], meta: { name: 'MergeDismissal' } }
+    /**
+     * Find zero or one MergeDismissal that matches the filter.
+     * @param {MergeDismissalFindUniqueArgs} args - Arguments to find a MergeDismissal
+     * @example
+     * // Get one MergeDismissal
+     * const mergeDismissal = await prisma.mergeDismissal.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends MergeDismissalFindUniqueArgs>(args: SelectSubset<T, MergeDismissalFindUniqueArgs<ExtArgs>>): Prisma__MergeDismissalClient<$Result.GetResult<Prisma.$MergeDismissalPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one MergeDismissal that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {MergeDismissalFindUniqueOrThrowArgs} args - Arguments to find a MergeDismissal
+     * @example
+     * // Get one MergeDismissal
+     * const mergeDismissal = await prisma.mergeDismissal.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends MergeDismissalFindUniqueOrThrowArgs>(args: SelectSubset<T, MergeDismissalFindUniqueOrThrowArgs<ExtArgs>>): Prisma__MergeDismissalClient<$Result.GetResult<Prisma.$MergeDismissalPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MergeDismissal that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergeDismissalFindFirstArgs} args - Arguments to find a MergeDismissal
+     * @example
+     * // Get one MergeDismissal
+     * const mergeDismissal = await prisma.mergeDismissal.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends MergeDismissalFindFirstArgs>(args?: SelectSubset<T, MergeDismissalFindFirstArgs<ExtArgs>>): Prisma__MergeDismissalClient<$Result.GetResult<Prisma.$MergeDismissalPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first MergeDismissal that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergeDismissalFindFirstOrThrowArgs} args - Arguments to find a MergeDismissal
+     * @example
+     * // Get one MergeDismissal
+     * const mergeDismissal = await prisma.mergeDismissal.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends MergeDismissalFindFirstOrThrowArgs>(args?: SelectSubset<T, MergeDismissalFindFirstOrThrowArgs<ExtArgs>>): Prisma__MergeDismissalClient<$Result.GetResult<Prisma.$MergeDismissalPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more MergeDismissals that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergeDismissalFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all MergeDismissals
+     * const mergeDismissals = await prisma.mergeDismissal.findMany()
+     * 
+     * // Get first 10 MergeDismissals
+     * const mergeDismissals = await prisma.mergeDismissal.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const mergeDismissalWithIdOnly = await prisma.mergeDismissal.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends MergeDismissalFindManyArgs>(args?: SelectSubset<T, MergeDismissalFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeDismissalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a MergeDismissal.
+     * @param {MergeDismissalCreateArgs} args - Arguments to create a MergeDismissal.
+     * @example
+     * // Create one MergeDismissal
+     * const MergeDismissal = await prisma.mergeDismissal.create({
+     *   data: {
+     *     // ... data to create a MergeDismissal
+     *   }
+     * })
+     * 
+     */
+    create<T extends MergeDismissalCreateArgs>(args: SelectSubset<T, MergeDismissalCreateArgs<ExtArgs>>): Prisma__MergeDismissalClient<$Result.GetResult<Prisma.$MergeDismissalPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many MergeDismissals.
+     * @param {MergeDismissalCreateManyArgs} args - Arguments to create many MergeDismissals.
+     * @example
+     * // Create many MergeDismissals
+     * const mergeDismissal = await prisma.mergeDismissal.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends MergeDismissalCreateManyArgs>(args?: SelectSubset<T, MergeDismissalCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many MergeDismissals and returns the data saved in the database.
+     * @param {MergeDismissalCreateManyAndReturnArgs} args - Arguments to create many MergeDismissals.
+     * @example
+     * // Create many MergeDismissals
+     * const mergeDismissal = await prisma.mergeDismissal.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many MergeDismissals and only return the `id`
+     * const mergeDismissalWithIdOnly = await prisma.mergeDismissal.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends MergeDismissalCreateManyAndReturnArgs>(args?: SelectSubset<T, MergeDismissalCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeDismissalPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a MergeDismissal.
+     * @param {MergeDismissalDeleteArgs} args - Arguments to delete one MergeDismissal.
+     * @example
+     * // Delete one MergeDismissal
+     * const MergeDismissal = await prisma.mergeDismissal.delete({
+     *   where: {
+     *     // ... filter to delete one MergeDismissal
+     *   }
+     * })
+     * 
+     */
+    delete<T extends MergeDismissalDeleteArgs>(args: SelectSubset<T, MergeDismissalDeleteArgs<ExtArgs>>): Prisma__MergeDismissalClient<$Result.GetResult<Prisma.$MergeDismissalPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one MergeDismissal.
+     * @param {MergeDismissalUpdateArgs} args - Arguments to update one MergeDismissal.
+     * @example
+     * // Update one MergeDismissal
+     * const mergeDismissal = await prisma.mergeDismissal.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends MergeDismissalUpdateArgs>(args: SelectSubset<T, MergeDismissalUpdateArgs<ExtArgs>>): Prisma__MergeDismissalClient<$Result.GetResult<Prisma.$MergeDismissalPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more MergeDismissals.
+     * @param {MergeDismissalDeleteManyArgs} args - Arguments to filter MergeDismissals to delete.
+     * @example
+     * // Delete a few MergeDismissals
+     * const { count } = await prisma.mergeDismissal.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends MergeDismissalDeleteManyArgs>(args?: SelectSubset<T, MergeDismissalDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MergeDismissals.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergeDismissalUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many MergeDismissals
+     * const mergeDismissal = await prisma.mergeDismissal.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends MergeDismissalUpdateManyArgs>(args: SelectSubset<T, MergeDismissalUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more MergeDismissals and returns the data updated in the database.
+     * @param {MergeDismissalUpdateManyAndReturnArgs} args - Arguments to update many MergeDismissals.
+     * @example
+     * // Update many MergeDismissals
+     * const mergeDismissal = await prisma.mergeDismissal.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more MergeDismissals and only return the `id`
+     * const mergeDismissalWithIdOnly = await prisma.mergeDismissal.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends MergeDismissalUpdateManyAndReturnArgs>(args: SelectSubset<T, MergeDismissalUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$MergeDismissalPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one MergeDismissal.
+     * @param {MergeDismissalUpsertArgs} args - Arguments to update or create a MergeDismissal.
+     * @example
+     * // Update or create a MergeDismissal
+     * const mergeDismissal = await prisma.mergeDismissal.upsert({
+     *   create: {
+     *     // ... data to create a MergeDismissal
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the MergeDismissal we want to update
+     *   }
+     * })
+     */
+    upsert<T extends MergeDismissalUpsertArgs>(args: SelectSubset<T, MergeDismissalUpsertArgs<ExtArgs>>): Prisma__MergeDismissalClient<$Result.GetResult<Prisma.$MergeDismissalPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of MergeDismissals.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergeDismissalCountArgs} args - Arguments to filter MergeDismissals to count.
+     * @example
+     * // Count the number of MergeDismissals
+     * const count = await prisma.mergeDismissal.count({
+     *   where: {
+     *     // ... the filter for the MergeDismissals we want to count
+     *   }
+     * })
+    **/
+    count<T extends MergeDismissalCountArgs>(
+      args?: Subset<T, MergeDismissalCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], MergeDismissalCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a MergeDismissal.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergeDismissalAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends MergeDismissalAggregateArgs>(args: Subset<T, MergeDismissalAggregateArgs>): Prisma.PrismaPromise<GetMergeDismissalAggregateType<T>>
+
+    /**
+     * Group by MergeDismissal.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {MergeDismissalGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends MergeDismissalGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: MergeDismissalGroupByArgs['orderBy'] }
+        : { orderBy?: MergeDismissalGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, MergeDismissalGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetMergeDismissalGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the MergeDismissal model
+   */
+  readonly fields: MergeDismissalFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for MergeDismissal.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__MergeDismissalClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    contact_a<T extends ContactDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ContactDefaultArgs<ExtArgs>>): Prisma__ContactClient<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    contact_b<T extends ContactDefaultArgs<ExtArgs> = {}>(args?: Subset<T, ContactDefaultArgs<ExtArgs>>): Prisma__ContactClient<$Result.GetResult<Prisma.$ContactPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the MergeDismissal model
+   */
+  interface MergeDismissalFieldRefs {
+    readonly id: FieldRef<"MergeDismissal", 'String'>
+    readonly userId: FieldRef<"MergeDismissal", 'String'>
+    readonly contactAId: FieldRef<"MergeDismissal", 'String'>
+    readonly contactBId: FieldRef<"MergeDismissal", 'String'>
+    readonly dismissedAt: FieldRef<"MergeDismissal", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * MergeDismissal findUnique
+   */
+  export type MergeDismissalFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDismissal
+     */
+    select?: MergeDismissalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDismissal
+     */
+    omit?: MergeDismissalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDismissalInclude<ExtArgs> | null
+    /**
+     * Filter, which MergeDismissal to fetch.
+     */
+    where: MergeDismissalWhereUniqueInput
+  }
+
+  /**
+   * MergeDismissal findUniqueOrThrow
+   */
+  export type MergeDismissalFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDismissal
+     */
+    select?: MergeDismissalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDismissal
+     */
+    omit?: MergeDismissalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDismissalInclude<ExtArgs> | null
+    /**
+     * Filter, which MergeDismissal to fetch.
+     */
+    where: MergeDismissalWhereUniqueInput
+  }
+
+  /**
+   * MergeDismissal findFirst
+   */
+  export type MergeDismissalFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDismissal
+     */
+    select?: MergeDismissalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDismissal
+     */
+    omit?: MergeDismissalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDismissalInclude<ExtArgs> | null
+    /**
+     * Filter, which MergeDismissal to fetch.
+     */
+    where?: MergeDismissalWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MergeDismissals to fetch.
+     */
+    orderBy?: MergeDismissalOrderByWithRelationInput | MergeDismissalOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MergeDismissals.
+     */
+    cursor?: MergeDismissalWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MergeDismissals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MergeDismissals.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MergeDismissals.
+     */
+    distinct?: MergeDismissalScalarFieldEnum | MergeDismissalScalarFieldEnum[]
+  }
+
+  /**
+   * MergeDismissal findFirstOrThrow
+   */
+  export type MergeDismissalFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDismissal
+     */
+    select?: MergeDismissalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDismissal
+     */
+    omit?: MergeDismissalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDismissalInclude<ExtArgs> | null
+    /**
+     * Filter, which MergeDismissal to fetch.
+     */
+    where?: MergeDismissalWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MergeDismissals to fetch.
+     */
+    orderBy?: MergeDismissalOrderByWithRelationInput | MergeDismissalOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for MergeDismissals.
+     */
+    cursor?: MergeDismissalWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MergeDismissals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MergeDismissals.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of MergeDismissals.
+     */
+    distinct?: MergeDismissalScalarFieldEnum | MergeDismissalScalarFieldEnum[]
+  }
+
+  /**
+   * MergeDismissal findMany
+   */
+  export type MergeDismissalFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDismissal
+     */
+    select?: MergeDismissalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDismissal
+     */
+    omit?: MergeDismissalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDismissalInclude<ExtArgs> | null
+    /**
+     * Filter, which MergeDismissals to fetch.
+     */
+    where?: MergeDismissalWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of MergeDismissals to fetch.
+     */
+    orderBy?: MergeDismissalOrderByWithRelationInput | MergeDismissalOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing MergeDismissals.
+     */
+    cursor?: MergeDismissalWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` MergeDismissals from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` MergeDismissals.
+     */
+    skip?: number
+    distinct?: MergeDismissalScalarFieldEnum | MergeDismissalScalarFieldEnum[]
+  }
+
+  /**
+   * MergeDismissal create
+   */
+  export type MergeDismissalCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDismissal
+     */
+    select?: MergeDismissalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDismissal
+     */
+    omit?: MergeDismissalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDismissalInclude<ExtArgs> | null
+    /**
+     * The data needed to create a MergeDismissal.
+     */
+    data: XOR<MergeDismissalCreateInput, MergeDismissalUncheckedCreateInput>
+  }
+
+  /**
+   * MergeDismissal createMany
+   */
+  export type MergeDismissalCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many MergeDismissals.
+     */
+    data: MergeDismissalCreateManyInput | MergeDismissalCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * MergeDismissal createManyAndReturn
+   */
+  export type MergeDismissalCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDismissal
+     */
+    select?: MergeDismissalSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDismissal
+     */
+    omit?: MergeDismissalOmit<ExtArgs> | null
+    /**
+     * The data used to create many MergeDismissals.
+     */
+    data: MergeDismissalCreateManyInput | MergeDismissalCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDismissalIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MergeDismissal update
+   */
+  export type MergeDismissalUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDismissal
+     */
+    select?: MergeDismissalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDismissal
+     */
+    omit?: MergeDismissalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDismissalInclude<ExtArgs> | null
+    /**
+     * The data needed to update a MergeDismissal.
+     */
+    data: XOR<MergeDismissalUpdateInput, MergeDismissalUncheckedUpdateInput>
+    /**
+     * Choose, which MergeDismissal to update.
+     */
+    where: MergeDismissalWhereUniqueInput
+  }
+
+  /**
+   * MergeDismissal updateMany
+   */
+  export type MergeDismissalUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update MergeDismissals.
+     */
+    data: XOR<MergeDismissalUpdateManyMutationInput, MergeDismissalUncheckedUpdateManyInput>
+    /**
+     * Filter which MergeDismissals to update
+     */
+    where?: MergeDismissalWhereInput
+    /**
+     * Limit how many MergeDismissals to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * MergeDismissal updateManyAndReturn
+   */
+  export type MergeDismissalUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDismissal
+     */
+    select?: MergeDismissalSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDismissal
+     */
+    omit?: MergeDismissalOmit<ExtArgs> | null
+    /**
+     * The data used to update MergeDismissals.
+     */
+    data: XOR<MergeDismissalUpdateManyMutationInput, MergeDismissalUncheckedUpdateManyInput>
+    /**
+     * Filter which MergeDismissals to update
+     */
+    where?: MergeDismissalWhereInput
+    /**
+     * Limit how many MergeDismissals to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDismissalIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * MergeDismissal upsert
+   */
+  export type MergeDismissalUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDismissal
+     */
+    select?: MergeDismissalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDismissal
+     */
+    omit?: MergeDismissalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDismissalInclude<ExtArgs> | null
+    /**
+     * The filter to search for the MergeDismissal to update in case it exists.
+     */
+    where: MergeDismissalWhereUniqueInput
+    /**
+     * In case the MergeDismissal found by the `where` argument doesn't exist, create a new MergeDismissal with this data.
+     */
+    create: XOR<MergeDismissalCreateInput, MergeDismissalUncheckedCreateInput>
+    /**
+     * In case the MergeDismissal was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<MergeDismissalUpdateInput, MergeDismissalUncheckedUpdateInput>
+  }
+
+  /**
+   * MergeDismissal delete
+   */
+  export type MergeDismissalDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDismissal
+     */
+    select?: MergeDismissalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDismissal
+     */
+    omit?: MergeDismissalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDismissalInclude<ExtArgs> | null
+    /**
+     * Filter which MergeDismissal to delete.
+     */
+    where: MergeDismissalWhereUniqueInput
+  }
+
+  /**
+   * MergeDismissal deleteMany
+   */
+  export type MergeDismissalDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which MergeDismissals to delete
+     */
+    where?: MergeDismissalWhereInput
+    /**
+     * Limit how many MergeDismissals to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * MergeDismissal without action
+   */
+  export type MergeDismissalDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the MergeDismissal
+     */
+    select?: MergeDismissalSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the MergeDismissal
+     */
+    omit?: MergeDismissalOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: MergeDismissalInclude<ExtArgs> | null
   }
 
 
@@ -59669,6 +60945,17 @@ export namespace Prisma {
   export type MergeDecisionScalarFieldEnum = (typeof MergeDecisionScalarFieldEnum)[keyof typeof MergeDecisionScalarFieldEnum]
 
 
+  export const MergeDismissalScalarFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    contactAId: 'contactAId',
+    contactBId: 'contactBId',
+    dismissedAt: 'dismissedAt'
+  };
+
+  export type MergeDismissalScalarFieldEnum = (typeof MergeDismissalScalarFieldEnum)[keyof typeof MergeDismissalScalarFieldEnum]
+
+
   export const SyncAccountScalarFieldEnum: {
     id: 'id',
     userId: 'userId',
@@ -60907,6 +62194,7 @@ export namespace Prisma {
     exportJobs?: ExportJobListRelationFilter
     mergeSuggestions?: MergeSuggestionListRelationFilter
     mergeDecisions?: MergeDecisionListRelationFilter
+    dismissals?: MergeDismissalListRelationFilter
     syncAccounts?: SyncAccountListRelationFilter
     subscriptionCustomer?: XOR<SubscriptionCustomerNullableScalarRelationFilter, SubscriptionCustomerWhereInput> | null
     subscriptions?: SubscriptionListRelationFilter
@@ -60972,6 +62260,7 @@ export namespace Prisma {
     exportJobs?: ExportJobOrderByRelationAggregateInput
     mergeSuggestions?: MergeSuggestionOrderByRelationAggregateInput
     mergeDecisions?: MergeDecisionOrderByRelationAggregateInput
+    dismissals?: MergeDismissalOrderByRelationAggregateInput
     syncAccounts?: SyncAccountOrderByRelationAggregateInput
     subscriptionCustomer?: SubscriptionCustomerOrderByWithRelationInput
     subscriptions?: SubscriptionOrderByRelationAggregateInput
@@ -61040,6 +62329,7 @@ export namespace Prisma {
     exportJobs?: ExportJobListRelationFilter
     mergeSuggestions?: MergeSuggestionListRelationFilter
     mergeDecisions?: MergeDecisionListRelationFilter
+    dismissals?: MergeDismissalListRelationFilter
     syncAccounts?: SyncAccountListRelationFilter
     subscriptionCustomer?: XOR<SubscriptionCustomerNullableScalarRelationFilter, SubscriptionCustomerWhereInput> | null
     subscriptions?: SubscriptionListRelationFilter
@@ -61395,6 +62685,8 @@ export namespace Prisma {
     importJob?: XOR<ImportJobNullableScalarRelationFilter, ImportJobWhereInput> | null
     leftMergeSuggestions?: MergeSuggestionListRelationFilter
     rightMergeSuggestions?: MergeSuggestionListRelationFilter
+    dismissalsAsA?: MergeDismissalListRelationFilter
+    dismissalsAsB?: MergeDismissalListRelationFilter
     syncLinks?: SyncContactLinkListRelationFilter
     syncConflicts?: SyncConflictListRelationFilter
     activityEvents?: ActivityEventListRelationFilter
@@ -61461,6 +62753,8 @@ export namespace Prisma {
     importJob?: ImportJobOrderByWithRelationInput
     leftMergeSuggestions?: MergeSuggestionOrderByRelationAggregateInput
     rightMergeSuggestions?: MergeSuggestionOrderByRelationAggregateInput
+    dismissalsAsA?: MergeDismissalOrderByRelationAggregateInput
+    dismissalsAsB?: MergeDismissalOrderByRelationAggregateInput
     syncLinks?: SyncContactLinkOrderByRelationAggregateInput
     syncConflicts?: SyncConflictOrderByRelationAggregateInput
     activityEvents?: ActivityEventOrderByRelationAggregateInput
@@ -61530,6 +62824,8 @@ export namespace Prisma {
     importJob?: XOR<ImportJobNullableScalarRelationFilter, ImportJobWhereInput> | null
     leftMergeSuggestions?: MergeSuggestionListRelationFilter
     rightMergeSuggestions?: MergeSuggestionListRelationFilter
+    dismissalsAsA?: MergeDismissalListRelationFilter
+    dismissalsAsB?: MergeDismissalListRelationFilter
     syncLinks?: SyncContactLinkListRelationFilter
     syncConflicts?: SyncConflictListRelationFilter
     activityEvents?: ActivityEventListRelationFilter
@@ -62377,6 +63673,68 @@ export namespace Prisma {
     reversalSource?: StringNullableWithAggregatesFilter<"MergeDecision"> | string | null
     createdAt?: DateTimeWithAggregatesFilter<"MergeDecision"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"MergeDecision"> | Date | string
+  }
+
+  export type MergeDismissalWhereInput = {
+    AND?: MergeDismissalWhereInput | MergeDismissalWhereInput[]
+    OR?: MergeDismissalWhereInput[]
+    NOT?: MergeDismissalWhereInput | MergeDismissalWhereInput[]
+    id?: StringFilter<"MergeDismissal"> | string
+    userId?: StringFilter<"MergeDismissal"> | string
+    contactAId?: StringFilter<"MergeDismissal"> | string
+    contactBId?: StringFilter<"MergeDismissal"> | string
+    dismissedAt?: DateTimeFilter<"MergeDismissal"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    contact_a?: XOR<ContactScalarRelationFilter, ContactWhereInput>
+    contact_b?: XOR<ContactScalarRelationFilter, ContactWhereInput>
+  }
+
+  export type MergeDismissalOrderByWithRelationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    contactAId?: SortOrder
+    contactBId?: SortOrder
+    dismissedAt?: SortOrder
+    user?: UserOrderByWithRelationInput
+    contact_a?: ContactOrderByWithRelationInput
+    contact_b?: ContactOrderByWithRelationInput
+  }
+
+  export type MergeDismissalWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    userId_contactAId_contactBId?: MergeDismissalUserIdContactAIdContactBIdCompoundUniqueInput
+    AND?: MergeDismissalWhereInput | MergeDismissalWhereInput[]
+    OR?: MergeDismissalWhereInput[]
+    NOT?: MergeDismissalWhereInput | MergeDismissalWhereInput[]
+    userId?: StringFilter<"MergeDismissal"> | string
+    contactAId?: StringFilter<"MergeDismissal"> | string
+    contactBId?: StringFilter<"MergeDismissal"> | string
+    dismissedAt?: DateTimeFilter<"MergeDismissal"> | Date | string
+    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    contact_a?: XOR<ContactScalarRelationFilter, ContactWhereInput>
+    contact_b?: XOR<ContactScalarRelationFilter, ContactWhereInput>
+  }, "id" | "userId_contactAId_contactBId">
+
+  export type MergeDismissalOrderByWithAggregationInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    contactAId?: SortOrder
+    contactBId?: SortOrder
+    dismissedAt?: SortOrder
+    _count?: MergeDismissalCountOrderByAggregateInput
+    _max?: MergeDismissalMaxOrderByAggregateInput
+    _min?: MergeDismissalMinOrderByAggregateInput
+  }
+
+  export type MergeDismissalScalarWhereWithAggregatesInput = {
+    AND?: MergeDismissalScalarWhereWithAggregatesInput | MergeDismissalScalarWhereWithAggregatesInput[]
+    OR?: MergeDismissalScalarWhereWithAggregatesInput[]
+    NOT?: MergeDismissalScalarWhereWithAggregatesInput | MergeDismissalScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"MergeDismissal"> | string
+    userId?: StringWithAggregatesFilter<"MergeDismissal"> | string
+    contactAId?: StringWithAggregatesFilter<"MergeDismissal"> | string
+    contactBId?: StringWithAggregatesFilter<"MergeDismissal"> | string
+    dismissedAt?: DateTimeWithAggregatesFilter<"MergeDismissal"> | Date | string
   }
 
   export type SyncAccountWhereInput = {
@@ -65204,6 +66562,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -65269,6 +66628,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -65334,6 +66694,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -65399,6 +66760,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -65783,6 +67145,8 @@ export namespace Prisma {
     importJob?: ImportJobCreateNestedOneWithoutContactsInput
     leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
@@ -65847,6 +67211,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalUncheckedCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalUncheckedCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
@@ -65907,6 +67273,8 @@ export namespace Prisma {
     importJob?: ImportJobUpdateOneWithoutContactsNestedInput
     leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
@@ -65971,6 +67339,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUncheckedUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUncheckedUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
@@ -66977,6 +68347,59 @@ export namespace Prisma {
     reversalSource?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergeDismissalCreateInput = {
+    id?: string
+    dismissedAt?: Date | string
+    user: UserCreateNestedOneWithoutDismissalsInput
+    contact_a: ContactCreateNestedOneWithoutDismissalsAsAInput
+    contact_b: ContactCreateNestedOneWithoutDismissalsAsBInput
+  }
+
+  export type MergeDismissalUncheckedCreateInput = {
+    id?: string
+    userId: string
+    contactAId: string
+    contactBId: string
+    dismissedAt?: Date | string
+  }
+
+  export type MergeDismissalUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dismissedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutDismissalsNestedInput
+    contact_a?: ContactUpdateOneRequiredWithoutDismissalsAsANestedInput
+    contact_b?: ContactUpdateOneRequiredWithoutDismissalsAsBNestedInput
+  }
+
+  export type MergeDismissalUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    contactAId?: StringFieldUpdateOperationsInput | string
+    contactBId?: StringFieldUpdateOperationsInput | string
+    dismissedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergeDismissalCreateManyInput = {
+    id?: string
+    userId: string
+    contactAId: string
+    contactBId: string
+    dismissedAt?: Date | string
+  }
+
+  export type MergeDismissalUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dismissedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergeDismissalUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    contactAId?: StringFieldUpdateOperationsInput | string
+    contactBId?: StringFieldUpdateOperationsInput | string
+    dismissedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SyncAccountCreateInput = {
@@ -70186,6 +71609,12 @@ export namespace Prisma {
     none?: MergeDecisionWhereInput
   }
 
+  export type MergeDismissalListRelationFilter = {
+    every?: MergeDismissalWhereInput
+    some?: MergeDismissalWhereInput
+    none?: MergeDismissalWhereInput
+  }
+
   export type SyncAccountListRelationFilter = {
     every?: SyncAccountWhereInput
     some?: SyncAccountWhereInput
@@ -70371,6 +71800,10 @@ export namespace Prisma {
   }
 
   export type MergeDecisionOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
+  export type MergeDismissalOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
 
@@ -71723,6 +73156,36 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumMergeDecisionStatusFilter<$PrismaModel>
     _max?: NestedEnumMergeDecisionStatusFilter<$PrismaModel>
+  }
+
+  export type MergeDismissalUserIdContactAIdContactBIdCompoundUniqueInput = {
+    userId: string
+    contactAId: string
+    contactBId: string
+  }
+
+  export type MergeDismissalCountOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    contactAId?: SortOrder
+    contactBId?: SortOrder
+    dismissedAt?: SortOrder
+  }
+
+  export type MergeDismissalMaxOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    contactAId?: SortOrder
+    contactBId?: SortOrder
+    dismissedAt?: SortOrder
+  }
+
+  export type MergeDismissalMinOrderByAggregateInput = {
+    id?: SortOrder
+    userId?: SortOrder
+    contactAId?: SortOrder
+    contactBId?: SortOrder
+    dismissedAt?: SortOrder
   }
 
   export type EnumSyncProviderFilter<$PrismaModel = never> = {
@@ -73725,6 +75188,13 @@ export namespace Prisma {
     connect?: MergeDecisionWhereUniqueInput | MergeDecisionWhereUniqueInput[]
   }
 
+  export type MergeDismissalCreateNestedManyWithoutUserInput = {
+    create?: XOR<MergeDismissalCreateWithoutUserInput, MergeDismissalUncheckedCreateWithoutUserInput> | MergeDismissalCreateWithoutUserInput[] | MergeDismissalUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: MergeDismissalCreateOrConnectWithoutUserInput | MergeDismissalCreateOrConnectWithoutUserInput[]
+    createMany?: MergeDismissalCreateManyUserInputEnvelope
+    connect?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+  }
+
   export type SyncAccountCreateNestedManyWithoutUserInput = {
     create?: XOR<SyncAccountCreateWithoutUserInput, SyncAccountUncheckedCreateWithoutUserInput> | SyncAccountCreateWithoutUserInput[] | SyncAccountUncheckedCreateWithoutUserInput[]
     connectOrCreate?: SyncAccountCreateOrConnectWithoutUserInput | SyncAccountCreateOrConnectWithoutUserInput[]
@@ -73958,6 +75428,13 @@ export namespace Prisma {
     connectOrCreate?: MergeDecisionCreateOrConnectWithoutUserInput | MergeDecisionCreateOrConnectWithoutUserInput[]
     createMany?: MergeDecisionCreateManyUserInputEnvelope
     connect?: MergeDecisionWhereUniqueInput | MergeDecisionWhereUniqueInput[]
+  }
+
+  export type MergeDismissalUncheckedCreateNestedManyWithoutUserInput = {
+    create?: XOR<MergeDismissalCreateWithoutUserInput, MergeDismissalUncheckedCreateWithoutUserInput> | MergeDismissalCreateWithoutUserInput[] | MergeDismissalUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: MergeDismissalCreateOrConnectWithoutUserInput | MergeDismissalCreateOrConnectWithoutUserInput[]
+    createMany?: MergeDismissalCreateManyUserInputEnvelope
+    connect?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
   }
 
   export type SyncAccountUncheckedCreateNestedManyWithoutUserInput = {
@@ -74275,6 +75752,20 @@ export namespace Prisma {
     update?: MergeDecisionUpdateWithWhereUniqueWithoutUserInput | MergeDecisionUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: MergeDecisionUpdateManyWithWhereWithoutUserInput | MergeDecisionUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: MergeDecisionScalarWhereInput | MergeDecisionScalarWhereInput[]
+  }
+
+  export type MergeDismissalUpdateManyWithoutUserNestedInput = {
+    create?: XOR<MergeDismissalCreateWithoutUserInput, MergeDismissalUncheckedCreateWithoutUserInput> | MergeDismissalCreateWithoutUserInput[] | MergeDismissalUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: MergeDismissalCreateOrConnectWithoutUserInput | MergeDismissalCreateOrConnectWithoutUserInput[]
+    upsert?: MergeDismissalUpsertWithWhereUniqueWithoutUserInput | MergeDismissalUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: MergeDismissalCreateManyUserInputEnvelope
+    set?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+    disconnect?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+    delete?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+    connect?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+    update?: MergeDismissalUpdateWithWhereUniqueWithoutUserInput | MergeDismissalUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: MergeDismissalUpdateManyWithWhereWithoutUserInput | MergeDismissalUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: MergeDismissalScalarWhereInput | MergeDismissalScalarWhereInput[]
   }
 
   export type SyncAccountUpdateManyWithoutUserNestedInput = {
@@ -74739,6 +76230,20 @@ export namespace Prisma {
     update?: MergeDecisionUpdateWithWhereUniqueWithoutUserInput | MergeDecisionUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: MergeDecisionUpdateManyWithWhereWithoutUserInput | MergeDecisionUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: MergeDecisionScalarWhereInput | MergeDecisionScalarWhereInput[]
+  }
+
+  export type MergeDismissalUncheckedUpdateManyWithoutUserNestedInput = {
+    create?: XOR<MergeDismissalCreateWithoutUserInput, MergeDismissalUncheckedCreateWithoutUserInput> | MergeDismissalCreateWithoutUserInput[] | MergeDismissalUncheckedCreateWithoutUserInput[]
+    connectOrCreate?: MergeDismissalCreateOrConnectWithoutUserInput | MergeDismissalCreateOrConnectWithoutUserInput[]
+    upsert?: MergeDismissalUpsertWithWhereUniqueWithoutUserInput | MergeDismissalUpsertWithWhereUniqueWithoutUserInput[]
+    createMany?: MergeDismissalCreateManyUserInputEnvelope
+    set?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+    disconnect?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+    delete?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+    connect?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+    update?: MergeDismissalUpdateWithWhereUniqueWithoutUserInput | MergeDismissalUpdateWithWhereUniqueWithoutUserInput[]
+    updateMany?: MergeDismissalUpdateManyWithWhereWithoutUserInput | MergeDismissalUpdateManyWithWhereWithoutUserInput[]
+    deleteMany?: MergeDismissalScalarWhereInput | MergeDismissalScalarWhereInput[]
   }
 
   export type SyncAccountUncheckedUpdateManyWithoutUserNestedInput = {
@@ -75231,6 +76736,20 @@ export namespace Prisma {
     connect?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
   }
 
+  export type MergeDismissalCreateNestedManyWithoutContact_aInput = {
+    create?: XOR<MergeDismissalCreateWithoutContact_aInput, MergeDismissalUncheckedCreateWithoutContact_aInput> | MergeDismissalCreateWithoutContact_aInput[] | MergeDismissalUncheckedCreateWithoutContact_aInput[]
+    connectOrCreate?: MergeDismissalCreateOrConnectWithoutContact_aInput | MergeDismissalCreateOrConnectWithoutContact_aInput[]
+    createMany?: MergeDismissalCreateManyContact_aInputEnvelope
+    connect?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+  }
+
+  export type MergeDismissalCreateNestedManyWithoutContact_bInput = {
+    create?: XOR<MergeDismissalCreateWithoutContact_bInput, MergeDismissalUncheckedCreateWithoutContact_bInput> | MergeDismissalCreateWithoutContact_bInput[] | MergeDismissalUncheckedCreateWithoutContact_bInput[]
+    connectOrCreate?: MergeDismissalCreateOrConnectWithoutContact_bInput | MergeDismissalCreateOrConnectWithoutContact_bInput[]
+    createMany?: MergeDismissalCreateManyContact_bInputEnvelope
+    connect?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+  }
+
   export type SyncContactLinkCreateNestedManyWithoutContactInput = {
     create?: XOR<SyncContactLinkCreateWithoutContactInput, SyncContactLinkUncheckedCreateWithoutContactInput> | SyncContactLinkCreateWithoutContactInput[] | SyncContactLinkUncheckedCreateWithoutContactInput[]
     connectOrCreate?: SyncContactLinkCreateOrConnectWithoutContactInput | SyncContactLinkCreateOrConnectWithoutContactInput[]
@@ -75311,6 +76830,20 @@ export namespace Prisma {
     connectOrCreate?: MergeSuggestionCreateOrConnectWithoutRightContactInput | MergeSuggestionCreateOrConnectWithoutRightContactInput[]
     createMany?: MergeSuggestionCreateManyRightContactInputEnvelope
     connect?: MergeSuggestionWhereUniqueInput | MergeSuggestionWhereUniqueInput[]
+  }
+
+  export type MergeDismissalUncheckedCreateNestedManyWithoutContact_aInput = {
+    create?: XOR<MergeDismissalCreateWithoutContact_aInput, MergeDismissalUncheckedCreateWithoutContact_aInput> | MergeDismissalCreateWithoutContact_aInput[] | MergeDismissalUncheckedCreateWithoutContact_aInput[]
+    connectOrCreate?: MergeDismissalCreateOrConnectWithoutContact_aInput | MergeDismissalCreateOrConnectWithoutContact_aInput[]
+    createMany?: MergeDismissalCreateManyContact_aInputEnvelope
+    connect?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+  }
+
+  export type MergeDismissalUncheckedCreateNestedManyWithoutContact_bInput = {
+    create?: XOR<MergeDismissalCreateWithoutContact_bInput, MergeDismissalUncheckedCreateWithoutContact_bInput> | MergeDismissalCreateWithoutContact_bInput[] | MergeDismissalUncheckedCreateWithoutContact_bInput[]
+    connectOrCreate?: MergeDismissalCreateOrConnectWithoutContact_bInput | MergeDismissalCreateOrConnectWithoutContact_bInput[]
+    createMany?: MergeDismissalCreateManyContact_bInputEnvelope
+    connect?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
   }
 
   export type SyncContactLinkUncheckedCreateNestedManyWithoutContactInput = {
@@ -75425,6 +76958,34 @@ export namespace Prisma {
     update?: MergeSuggestionUpdateWithWhereUniqueWithoutRightContactInput | MergeSuggestionUpdateWithWhereUniqueWithoutRightContactInput[]
     updateMany?: MergeSuggestionUpdateManyWithWhereWithoutRightContactInput | MergeSuggestionUpdateManyWithWhereWithoutRightContactInput[]
     deleteMany?: MergeSuggestionScalarWhereInput | MergeSuggestionScalarWhereInput[]
+  }
+
+  export type MergeDismissalUpdateManyWithoutContact_aNestedInput = {
+    create?: XOR<MergeDismissalCreateWithoutContact_aInput, MergeDismissalUncheckedCreateWithoutContact_aInput> | MergeDismissalCreateWithoutContact_aInput[] | MergeDismissalUncheckedCreateWithoutContact_aInput[]
+    connectOrCreate?: MergeDismissalCreateOrConnectWithoutContact_aInput | MergeDismissalCreateOrConnectWithoutContact_aInput[]
+    upsert?: MergeDismissalUpsertWithWhereUniqueWithoutContact_aInput | MergeDismissalUpsertWithWhereUniqueWithoutContact_aInput[]
+    createMany?: MergeDismissalCreateManyContact_aInputEnvelope
+    set?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+    disconnect?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+    delete?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+    connect?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+    update?: MergeDismissalUpdateWithWhereUniqueWithoutContact_aInput | MergeDismissalUpdateWithWhereUniqueWithoutContact_aInput[]
+    updateMany?: MergeDismissalUpdateManyWithWhereWithoutContact_aInput | MergeDismissalUpdateManyWithWhereWithoutContact_aInput[]
+    deleteMany?: MergeDismissalScalarWhereInput | MergeDismissalScalarWhereInput[]
+  }
+
+  export type MergeDismissalUpdateManyWithoutContact_bNestedInput = {
+    create?: XOR<MergeDismissalCreateWithoutContact_bInput, MergeDismissalUncheckedCreateWithoutContact_bInput> | MergeDismissalCreateWithoutContact_bInput[] | MergeDismissalUncheckedCreateWithoutContact_bInput[]
+    connectOrCreate?: MergeDismissalCreateOrConnectWithoutContact_bInput | MergeDismissalCreateOrConnectWithoutContact_bInput[]
+    upsert?: MergeDismissalUpsertWithWhereUniqueWithoutContact_bInput | MergeDismissalUpsertWithWhereUniqueWithoutContact_bInput[]
+    createMany?: MergeDismissalCreateManyContact_bInputEnvelope
+    set?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+    disconnect?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+    delete?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+    connect?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+    update?: MergeDismissalUpdateWithWhereUniqueWithoutContact_bInput | MergeDismissalUpdateWithWhereUniqueWithoutContact_bInput[]
+    updateMany?: MergeDismissalUpdateManyWithWhereWithoutContact_bInput | MergeDismissalUpdateManyWithWhereWithoutContact_bInput[]
+    deleteMany?: MergeDismissalScalarWhereInput | MergeDismissalScalarWhereInput[]
   }
 
   export type SyncContactLinkUpdateManyWithoutContactNestedInput = {
@@ -75585,6 +77146,34 @@ export namespace Prisma {
     update?: MergeSuggestionUpdateWithWhereUniqueWithoutRightContactInput | MergeSuggestionUpdateWithWhereUniqueWithoutRightContactInput[]
     updateMany?: MergeSuggestionUpdateManyWithWhereWithoutRightContactInput | MergeSuggestionUpdateManyWithWhereWithoutRightContactInput[]
     deleteMany?: MergeSuggestionScalarWhereInput | MergeSuggestionScalarWhereInput[]
+  }
+
+  export type MergeDismissalUncheckedUpdateManyWithoutContact_aNestedInput = {
+    create?: XOR<MergeDismissalCreateWithoutContact_aInput, MergeDismissalUncheckedCreateWithoutContact_aInput> | MergeDismissalCreateWithoutContact_aInput[] | MergeDismissalUncheckedCreateWithoutContact_aInput[]
+    connectOrCreate?: MergeDismissalCreateOrConnectWithoutContact_aInput | MergeDismissalCreateOrConnectWithoutContact_aInput[]
+    upsert?: MergeDismissalUpsertWithWhereUniqueWithoutContact_aInput | MergeDismissalUpsertWithWhereUniqueWithoutContact_aInput[]
+    createMany?: MergeDismissalCreateManyContact_aInputEnvelope
+    set?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+    disconnect?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+    delete?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+    connect?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+    update?: MergeDismissalUpdateWithWhereUniqueWithoutContact_aInput | MergeDismissalUpdateWithWhereUniqueWithoutContact_aInput[]
+    updateMany?: MergeDismissalUpdateManyWithWhereWithoutContact_aInput | MergeDismissalUpdateManyWithWhereWithoutContact_aInput[]
+    deleteMany?: MergeDismissalScalarWhereInput | MergeDismissalScalarWhereInput[]
+  }
+
+  export type MergeDismissalUncheckedUpdateManyWithoutContact_bNestedInput = {
+    create?: XOR<MergeDismissalCreateWithoutContact_bInput, MergeDismissalUncheckedCreateWithoutContact_bInput> | MergeDismissalCreateWithoutContact_bInput[] | MergeDismissalUncheckedCreateWithoutContact_bInput[]
+    connectOrCreate?: MergeDismissalCreateOrConnectWithoutContact_bInput | MergeDismissalCreateOrConnectWithoutContact_bInput[]
+    upsert?: MergeDismissalUpsertWithWhereUniqueWithoutContact_bInput | MergeDismissalUpsertWithWhereUniqueWithoutContact_bInput[]
+    createMany?: MergeDismissalCreateManyContact_bInputEnvelope
+    set?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+    disconnect?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+    delete?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+    connect?: MergeDismissalWhereUniqueInput | MergeDismissalWhereUniqueInput[]
+    update?: MergeDismissalUpdateWithWhereUniqueWithoutContact_bInput | MergeDismissalUpdateWithWhereUniqueWithoutContact_bInput[]
+    updateMany?: MergeDismissalUpdateManyWithWhereWithoutContact_bInput | MergeDismissalUpdateManyWithWhereWithoutContact_bInput[]
+    deleteMany?: MergeDismissalScalarWhereInput | MergeDismissalScalarWhereInput[]
   }
 
   export type SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput = {
@@ -76049,6 +77638,48 @@ export namespace Prisma {
     upsert?: UserUpsertWithoutMergeDecisionsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutMergeDecisionsInput, UserUpdateWithoutMergeDecisionsInput>, UserUncheckedUpdateWithoutMergeDecisionsInput>
+  }
+
+  export type UserCreateNestedOneWithoutDismissalsInput = {
+    create?: XOR<UserCreateWithoutDismissalsInput, UserUncheckedCreateWithoutDismissalsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDismissalsInput
+    connect?: UserWhereUniqueInput
+  }
+
+  export type ContactCreateNestedOneWithoutDismissalsAsAInput = {
+    create?: XOR<ContactCreateWithoutDismissalsAsAInput, ContactUncheckedCreateWithoutDismissalsAsAInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutDismissalsAsAInput
+    connect?: ContactWhereUniqueInput
+  }
+
+  export type ContactCreateNestedOneWithoutDismissalsAsBInput = {
+    create?: XOR<ContactCreateWithoutDismissalsAsBInput, ContactUncheckedCreateWithoutDismissalsAsBInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutDismissalsAsBInput
+    connect?: ContactWhereUniqueInput
+  }
+
+  export type UserUpdateOneRequiredWithoutDismissalsNestedInput = {
+    create?: XOR<UserCreateWithoutDismissalsInput, UserUncheckedCreateWithoutDismissalsInput>
+    connectOrCreate?: UserCreateOrConnectWithoutDismissalsInput
+    upsert?: UserUpsertWithoutDismissalsInput
+    connect?: UserWhereUniqueInput
+    update?: XOR<XOR<UserUpdateToOneWithWhereWithoutDismissalsInput, UserUpdateWithoutDismissalsInput>, UserUncheckedUpdateWithoutDismissalsInput>
+  }
+
+  export type ContactUpdateOneRequiredWithoutDismissalsAsANestedInput = {
+    create?: XOR<ContactCreateWithoutDismissalsAsAInput, ContactUncheckedCreateWithoutDismissalsAsAInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutDismissalsAsAInput
+    upsert?: ContactUpsertWithoutDismissalsAsAInput
+    connect?: ContactWhereUniqueInput
+    update?: XOR<XOR<ContactUpdateToOneWithWhereWithoutDismissalsAsAInput, ContactUpdateWithoutDismissalsAsAInput>, ContactUncheckedUpdateWithoutDismissalsAsAInput>
+  }
+
+  export type ContactUpdateOneRequiredWithoutDismissalsAsBNestedInput = {
+    create?: XOR<ContactCreateWithoutDismissalsAsBInput, ContactUncheckedCreateWithoutDismissalsAsBInput>
+    connectOrCreate?: ContactCreateOrConnectWithoutDismissalsAsBInput
+    upsert?: ContactUpsertWithoutDismissalsAsBInput
+    connect?: ContactWhereUniqueInput
+    update?: XOR<XOR<ContactUpdateToOneWithWhereWithoutDismissalsAsBInput, ContactUpdateWithoutDismissalsAsBInput>, ContactUncheckedUpdateWithoutDismissalsAsBInput>
   }
 
   export type UserCreateNestedOneWithoutSyncAccountsInput = {
@@ -78322,6 +79953,8 @@ export namespace Prisma {
     importJob?: ImportJobCreateNestedOneWithoutContactsInput
     leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
@@ -78385,6 +80018,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalUncheckedCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalUncheckedCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
@@ -78588,6 +80223,30 @@ export namespace Prisma {
 
   export type MergeDecisionCreateManyUserInputEnvelope = {
     data: MergeDecisionCreateManyUserInput | MergeDecisionCreateManyUserInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type MergeDismissalCreateWithoutUserInput = {
+    id?: string
+    dismissedAt?: Date | string
+    contact_a: ContactCreateNestedOneWithoutDismissalsAsAInput
+    contact_b: ContactCreateNestedOneWithoutDismissalsAsBInput
+  }
+
+  export type MergeDismissalUncheckedCreateWithoutUserInput = {
+    id?: string
+    contactAId: string
+    contactBId: string
+    dismissedAt?: Date | string
+  }
+
+  export type MergeDismissalCreateOrConnectWithoutUserInput = {
+    where: MergeDismissalWhereUniqueInput
+    create: XOR<MergeDismissalCreateWithoutUserInput, MergeDismissalUncheckedCreateWithoutUserInput>
+  }
+
+  export type MergeDismissalCreateManyUserInputEnvelope = {
+    data: MergeDismissalCreateManyUserInput | MergeDismissalCreateManyUserInput[]
     skipDuplicates?: boolean
   }
 
@@ -79840,6 +81499,33 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"MergeDecision"> | Date | string
   }
 
+  export type MergeDismissalUpsertWithWhereUniqueWithoutUserInput = {
+    where: MergeDismissalWhereUniqueInput
+    update: XOR<MergeDismissalUpdateWithoutUserInput, MergeDismissalUncheckedUpdateWithoutUserInput>
+    create: XOR<MergeDismissalCreateWithoutUserInput, MergeDismissalUncheckedCreateWithoutUserInput>
+  }
+
+  export type MergeDismissalUpdateWithWhereUniqueWithoutUserInput = {
+    where: MergeDismissalWhereUniqueInput
+    data: XOR<MergeDismissalUpdateWithoutUserInput, MergeDismissalUncheckedUpdateWithoutUserInput>
+  }
+
+  export type MergeDismissalUpdateManyWithWhereWithoutUserInput = {
+    where: MergeDismissalScalarWhereInput
+    data: XOR<MergeDismissalUpdateManyMutationInput, MergeDismissalUncheckedUpdateManyWithoutUserInput>
+  }
+
+  export type MergeDismissalScalarWhereInput = {
+    AND?: MergeDismissalScalarWhereInput | MergeDismissalScalarWhereInput[]
+    OR?: MergeDismissalScalarWhereInput[]
+    NOT?: MergeDismissalScalarWhereInput | MergeDismissalScalarWhereInput[]
+    id?: StringFilter<"MergeDismissal"> | string
+    userId?: StringFilter<"MergeDismissal"> | string
+    contactAId?: StringFilter<"MergeDismissal"> | string
+    contactBId?: StringFilter<"MergeDismissal"> | string
+    dismissedAt?: DateTimeFilter<"MergeDismissal"> | Date | string
+  }
+
   export type SyncAccountUpsertWithWhereUniqueWithoutUserInput = {
     where: SyncAccountWhereUniqueInput
     update: XOR<SyncAccountUpdateWithoutUserInput, SyncAccountUncheckedUpdateWithoutUserInput>
@@ -80772,6 +82458,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -80836,6 +82523,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -80916,6 +82604,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -80980,6 +82669,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -81044,6 +82734,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -81108,6 +82799,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -81188,6 +82880,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -81252,6 +82945,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -81315,6 +83009,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -81379,6 +83074,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -81513,6 +83209,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -81577,6 +83274,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -81683,6 +83381,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -81747,6 +83446,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -81930,6 +83630,54 @@ export namespace Prisma {
 
   export type MergeSuggestionCreateManyRightContactInputEnvelope = {
     data: MergeSuggestionCreateManyRightContactInput | MergeSuggestionCreateManyRightContactInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type MergeDismissalCreateWithoutContact_aInput = {
+    id?: string
+    dismissedAt?: Date | string
+    user: UserCreateNestedOneWithoutDismissalsInput
+    contact_b: ContactCreateNestedOneWithoutDismissalsAsBInput
+  }
+
+  export type MergeDismissalUncheckedCreateWithoutContact_aInput = {
+    id?: string
+    userId: string
+    contactBId: string
+    dismissedAt?: Date | string
+  }
+
+  export type MergeDismissalCreateOrConnectWithoutContact_aInput = {
+    where: MergeDismissalWhereUniqueInput
+    create: XOR<MergeDismissalCreateWithoutContact_aInput, MergeDismissalUncheckedCreateWithoutContact_aInput>
+  }
+
+  export type MergeDismissalCreateManyContact_aInputEnvelope = {
+    data: MergeDismissalCreateManyContact_aInput | MergeDismissalCreateManyContact_aInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type MergeDismissalCreateWithoutContact_bInput = {
+    id?: string
+    dismissedAt?: Date | string
+    user: UserCreateNestedOneWithoutDismissalsInput
+    contact_a: ContactCreateNestedOneWithoutDismissalsAsAInput
+  }
+
+  export type MergeDismissalUncheckedCreateWithoutContact_bInput = {
+    id?: string
+    userId: string
+    contactAId: string
+    dismissedAt?: Date | string
+  }
+
+  export type MergeDismissalCreateOrConnectWithoutContact_bInput = {
+    where: MergeDismissalWhereUniqueInput
+    create: XOR<MergeDismissalCreateWithoutContact_bInput, MergeDismissalUncheckedCreateWithoutContact_bInput>
+  }
+
+  export type MergeDismissalCreateManyContact_bInputEnvelope = {
+    data: MergeDismissalCreateManyContact_bInput | MergeDismissalCreateManyContact_bInput[]
     skipDuplicates?: boolean
   }
 
@@ -82261,6 +84009,8 @@ export namespace Prisma {
     importJob?: ImportJobCreateNestedOneWithoutContactsInput
     leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
@@ -82324,6 +84074,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalUncheckedCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalUncheckedCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
@@ -82388,6 +84140,8 @@ export namespace Prisma {
     importJob?: ImportJobCreateNestedOneWithoutContactsInput
     leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
@@ -82450,6 +84204,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalUncheckedCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalUncheckedCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
@@ -82550,6 +84306,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -82614,6 +84371,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -82735,6 +84493,38 @@ export namespace Prisma {
   export type MergeSuggestionUpdateManyWithWhereWithoutRightContactInput = {
     where: MergeSuggestionScalarWhereInput
     data: XOR<MergeSuggestionUpdateManyMutationInput, MergeSuggestionUncheckedUpdateManyWithoutRightContactInput>
+  }
+
+  export type MergeDismissalUpsertWithWhereUniqueWithoutContact_aInput = {
+    where: MergeDismissalWhereUniqueInput
+    update: XOR<MergeDismissalUpdateWithoutContact_aInput, MergeDismissalUncheckedUpdateWithoutContact_aInput>
+    create: XOR<MergeDismissalCreateWithoutContact_aInput, MergeDismissalUncheckedCreateWithoutContact_aInput>
+  }
+
+  export type MergeDismissalUpdateWithWhereUniqueWithoutContact_aInput = {
+    where: MergeDismissalWhereUniqueInput
+    data: XOR<MergeDismissalUpdateWithoutContact_aInput, MergeDismissalUncheckedUpdateWithoutContact_aInput>
+  }
+
+  export type MergeDismissalUpdateManyWithWhereWithoutContact_aInput = {
+    where: MergeDismissalScalarWhereInput
+    data: XOR<MergeDismissalUpdateManyMutationInput, MergeDismissalUncheckedUpdateManyWithoutContact_aInput>
+  }
+
+  export type MergeDismissalUpsertWithWhereUniqueWithoutContact_bInput = {
+    where: MergeDismissalWhereUniqueInput
+    update: XOR<MergeDismissalUpdateWithoutContact_bInput, MergeDismissalUncheckedUpdateWithoutContact_bInput>
+    create: XOR<MergeDismissalCreateWithoutContact_bInput, MergeDismissalUncheckedCreateWithoutContact_bInput>
+  }
+
+  export type MergeDismissalUpdateWithWhereUniqueWithoutContact_bInput = {
+    where: MergeDismissalWhereUniqueInput
+    data: XOR<MergeDismissalUpdateWithoutContact_bInput, MergeDismissalUncheckedUpdateWithoutContact_bInput>
+  }
+
+  export type MergeDismissalUpdateManyWithWhereWithoutContact_bInput = {
+    where: MergeDismissalScalarWhereInput
+    data: XOR<MergeDismissalUpdateManyMutationInput, MergeDismissalUncheckedUpdateManyWithoutContact_bInput>
   }
 
   export type SyncContactLinkUpsertWithWhereUniqueWithoutContactInput = {
@@ -82941,6 +84731,8 @@ export namespace Prisma {
     importJob?: ImportJobUpdateOneWithoutContactsNestedInput
     leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
@@ -83004,6 +84796,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUncheckedUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUncheckedUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
@@ -83105,6 +84899,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
@@ -83169,6 +84964,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
@@ -83329,6 +85125,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
@@ -83393,6 +85190,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
@@ -83473,6 +85271,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
@@ -83537,6 +85336,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
@@ -83682,6 +85482,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
@@ -83746,6 +85547,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
@@ -83856,6 +85658,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -83920,6 +85723,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -84004,6 +85808,8 @@ export namespace Prisma {
     user: UserCreateNestedOneWithoutContactsInput
     leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
@@ -84067,6 +85873,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalUncheckedCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalUncheckedCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
@@ -84132,6 +85940,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -84196,6 +86005,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -84276,6 +86086,7 @@ export namespace Prisma {
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -84340,6 +86151,7 @@ export namespace Prisma {
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -84420,6 +86232,7 @@ export namespace Prisma {
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -84484,6 +86297,7 @@ export namespace Prisma {
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -84548,6 +86362,7 @@ export namespace Prisma {
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -84612,6 +86427,7 @@ export namespace Prisma {
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -84696,6 +86512,8 @@ export namespace Prisma {
     user: UserCreateNestedOneWithoutContactsInput
     importJob?: ImportJobCreateNestedOneWithoutContactsInput
     rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
@@ -84759,6 +86577,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalUncheckedCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalUncheckedCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
@@ -84823,6 +86643,8 @@ export namespace Prisma {
     user: UserCreateNestedOneWithoutContactsInput
     importJob?: ImportJobCreateNestedOneWithoutContactsInput
     leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
+    dismissalsAsA?: MergeDismissalCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
@@ -84886,6 +86708,8 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
+    dismissalsAsA?: MergeDismissalUncheckedCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalUncheckedCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
@@ -84984,6 +86808,7 @@ export namespace Prisma {
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -85048,6 +86873,7 @@ export namespace Prisma {
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -85138,6 +86964,8 @@ export namespace Prisma {
     user?: UserUpdateOneRequiredWithoutContactsNestedInput
     importJob?: ImportJobUpdateOneWithoutContactsNestedInput
     rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
@@ -85201,6 +87029,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUncheckedUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUncheckedUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
@@ -85271,6 +87101,8 @@ export namespace Prisma {
     user?: UserUpdateOneRequiredWithoutContactsNestedInput
     importJob?: ImportJobUpdateOneWithoutContactsNestedInput
     leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
+    dismissalsAsA?: MergeDismissalUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
@@ -85334,6 +87166,8 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
+    dismissalsAsA?: MergeDismissalUncheckedUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUncheckedUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
@@ -85437,6 +87271,7 @@ export namespace Prisma {
     importJobs?: ImportJobCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -85501,6 +87336,7 @@ export namespace Prisma {
     importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -85630,6 +87466,7 @@ export namespace Prisma {
     importJobs?: ImportJobUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -85694,6 +87531,7 @@ export namespace Prisma {
     importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -85722,6 +87560,818 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserCreateWithoutDismissalsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordCreateNestedManyWithoutUserInput
+    contacts?: ContactCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenCreateNestedManyWithoutUserInput
+    sessions?: UserSessionCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventCreateNestedManyWithoutAdminInput
+    notifications?: NotificationCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenCreateNestedManyWithoutUserInput
+    labels?: LabelCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutDismissalsInput = {
+    id?: string
+    name?: string | null
+    email: string
+    password: string
+    lifecycleState?: $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: boolean
+    sessionVersion?: number
+    avatarUrl?: string | null
+    emailVerified?: Date | string | null
+    emailPendingChange?: string | null
+    emailPendingChangeRequestedAt?: Date | string | null
+    emailStatus?: $Enums.EmailStatus
+    totpEnabled?: boolean
+    totpSecret?: string | null
+    totpVerifiedAt?: Date | string | null
+    scheduledDeleteAt?: Date | string | null
+    role?: $Enums.UserRole
+    planOverrideReason?: string | null
+    planOverriddenAt?: Date | string | null
+    reminderLeadDays?: number
+    calToken?: string | null
+    username?: string | null
+    usernameClaimedAt?: Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: number
+    addToKontaxClicks?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    appPasswords?: AppPasswordUncheckedCreateNestedManyWithoutUserInput
+    contacts?: ContactUncheckedCreateNestedManyWithoutUserInput
+    importJobs?: ImportJobUncheckedCreateNestedManyWithoutUserInput
+    exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
+    mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
+    mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
+    ownedGroups?: GroupUncheckedCreateNestedManyWithoutOwnerInput
+    groupMemberships?: GroupMemberUncheckedCreateNestedManyWithoutUserInput
+    contactSharesOwned?: ContactShareUncheckedCreateNestedManyWithoutOwnerInput
+    contactSharesReceived?: ContactShareUncheckedCreateNestedManyWithoutRecipientUserInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedCreateNestedManyWithoutUserInput
+    passwordResetTokens?: PasswordResetTokenUncheckedCreateNestedManyWithoutUserInput
+    sessions?: UserSessionUncheckedCreateNestedManyWithoutUserInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedCreateNestedManyWithoutUserInput
+    addressBooks?: AddressBookUncheckedCreateNestedManyWithoutUserInput
+    savedFilters?: SavedFilterUncheckedCreateNestedManyWithoutUserInput
+    adminAuditEvents?: AdminAuditEventUncheckedCreateNestedManyWithoutAdminInput
+    notifications?: NotificationUncheckedCreateNestedManyWithoutUserInput
+    securityAlerts?: SecurityAlertUncheckedCreateNestedManyWithoutUserInput
+    notificationSettings?: NotificationSettingsUncheckedCreateNestedOneWithoutUserInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutUserInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedCreateNestedManyWithoutUserInput
+    importMappingPresets?: ImportMappingPresetUncheckedCreateNestedManyWithoutUserInput
+    exportPresets?: ExportPresetUncheckedCreateNestedManyWithoutUserInput
+    dataExportJobs?: DataExportJobUncheckedCreateNestedManyWithoutUserInput
+    apiTokens?: ApiTokenUncheckedCreateNestedManyWithoutUserInput
+    labels?: LabelUncheckedCreateNestedManyWithoutUserInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedCreateNestedManyWithoutUserInput
+    onboardingState?: UserOnboardingStateUncheckedCreateNestedOneWithoutUserInput
+    cardViewLog?: PublicCardViewUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutDismissalsInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutDismissalsInput, UserUncheckedCreateWithoutDismissalsInput>
+  }
+
+  export type ContactCreateWithoutDismissalsAsAInput = {
+    id?: string
+    reminderLeadDaysOverride?: number | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
+    nickname?: string | null
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    phoneticCompany?: string | null
+    jobTitle?: string | null
+    department?: string | null
+    website?: string | null
+    birthday?: string | null
+    address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    isEmergency?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutContactsInput
+    importJob?: ImportJobCreateNestedOneWithoutContactsInput
+    leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    dismissalsAsB?: MergeDismissalCreateNestedManyWithoutContact_bInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
+    mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
+    mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+    book?: AddressBookCreateNestedOneWithoutContactsInput
+  }
+
+  export type ContactUncheckedCreateWithoutDismissalsAsAInput = {
+    id?: string
+    userId: string
+    importJobId?: string | null
+    reminderLeadDaysOverride?: number | null
+    mergedIntoContactId?: string | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
+    nickname?: string | null
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    phoneticCompany?: string | null
+    jobTitle?: string | null
+    department?: string | null
+    website?: string | null
+    birthday?: string | null
+    address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    isEmergency?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
+    archivedAt?: Date | string | null
+    bookId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    dismissalsAsB?: MergeDismissalUncheckedCreateNestedManyWithoutContact_bInput
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
+    mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactCreateOrConnectWithoutDismissalsAsAInput = {
+    where: ContactWhereUniqueInput
+    create: XOR<ContactCreateWithoutDismissalsAsAInput, ContactUncheckedCreateWithoutDismissalsAsAInput>
+  }
+
+  export type ContactCreateWithoutDismissalsAsBInput = {
+    id?: string
+    reminderLeadDaysOverride?: number | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
+    nickname?: string | null
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    phoneticCompany?: string | null
+    jobTitle?: string | null
+    department?: string | null
+    website?: string | null
+    birthday?: string | null
+    address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    isEmergency?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
+    archivedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutContactsInput
+    importJob?: ImportJobCreateNestedOneWithoutContactsInput
+    leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalCreateNestedManyWithoutContact_aInput
+    syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateCreateNestedManyWithoutContactInput
+    mergedIntoContact?: ContactCreateNestedOneWithoutMergedChildrenInput
+    mergedChildren?: ContactCreateNestedManyWithoutMergedIntoContactInput
+    book?: AddressBookCreateNestedOneWithoutContactsInput
+  }
+
+  export type ContactUncheckedCreateWithoutDismissalsAsBInput = {
+    id?: string
+    userId: string
+    importJobId?: string | null
+    reminderLeadDaysOverride?: number | null
+    mergedIntoContactId?: string | null
+    syncUid?: string
+    syncVersion?: number
+    syncTombstoneAt?: Date | string | null
+    fullName: string
+    firstName?: string | null
+    middleName?: string | null
+    lastName?: string | null
+    phoneticFirstName?: string | null
+    phoneticLastName?: string | null
+    namePrefix?: string | null
+    nameSuffix?: string | null
+    nickname?: string | null
+    email?: string | null
+    phone?: string | null
+    company?: string | null
+    phoneticCompany?: string | null
+    jobTitle?: string | null
+    department?: string | null
+    website?: string | null
+    birthday?: string | null
+    address?: string | null
+    avatarUrl?: string | null
+    isFavorite?: boolean
+    isEmergency?: boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: string | null
+    sourceType?: $Enums.SourceType
+    sourceDetail?: string | null
+    lastMutatedBy?: $Enums.SourceType
+    lastMutatedByDetail?: string | null
+    archivedAt?: Date | string | null
+    bookId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalUncheckedCreateNestedManyWithoutContact_aInput
+    syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
+    syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
+    activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
+    sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
+    sharesAsRecipientCopy?: ContactShareUncheckedCreateNestedManyWithoutRecipientContactInput
+    groupContacts?: GroupContactUncheckedCreateNestedManyWithoutContactInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedCreateNestedManyWithoutContactInput
+    mergedChildren?: ContactUncheckedCreateNestedManyWithoutMergedIntoContactInput
+  }
+
+  export type ContactCreateOrConnectWithoutDismissalsAsBInput = {
+    where: ContactWhereUniqueInput
+    create: XOR<ContactCreateWithoutDismissalsAsBInput, ContactUncheckedCreateWithoutDismissalsAsBInput>
+  }
+
+  export type UserUpsertWithoutDismissalsInput = {
+    update: XOR<UserUpdateWithoutDismissalsInput, UserUncheckedUpdateWithoutDismissalsInput>
+    create: XOR<UserCreateWithoutDismissalsInput, UserUncheckedCreateWithoutDismissalsInput>
+    where?: UserWhereInput
+  }
+
+  export type UserUpdateToOneWithWhereWithoutDismissalsInput = {
+    where?: UserWhereInput
+    data: XOR<UserUpdateWithoutDismissalsInput, UserUncheckedUpdateWithoutDismissalsInput>
+  }
+
+  export type UserUpdateWithoutDismissalsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUpdateManyWithoutUserNestedInput
+    contacts?: ContactUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUpdateManyWithoutUserNestedInput
+    labels?: LabelUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutDismissalsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: StringFieldUpdateOperationsInput | string
+    password?: StringFieldUpdateOperationsInput | string
+    lifecycleState?: EnumAccountLifecycleStateFieldUpdateOperationsInput | $Enums.AccountLifecycleState
+    autoFillPhoneticNames?: BoolFieldUpdateOperationsInput | boolean
+    sessionVersion?: IntFieldUpdateOperationsInput | number
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    emailVerified?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailPendingChange?: NullableStringFieldUpdateOperationsInput | string | null
+    emailPendingChangeRequestedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    emailStatus?: EnumEmailStatusFieldUpdateOperationsInput | $Enums.EmailStatus
+    totpEnabled?: BoolFieldUpdateOperationsInput | boolean
+    totpSecret?: NullableStringFieldUpdateOperationsInput | string | null
+    totpVerifiedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    scheduledDeleteAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
+    planOverrideReason?: NullableStringFieldUpdateOperationsInput | string | null
+    planOverriddenAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    reminderLeadDays?: IntFieldUpdateOperationsInput | number
+    calToken?: NullableStringFieldUpdateOperationsInput | string | null
+    username?: NullableStringFieldUpdateOperationsInput | string | null
+    usernameClaimedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    publicCardFields?: NullableJsonNullValueInput | InputJsonValue
+    publicCardViews?: IntFieldUpdateOperationsInput | number
+    addToKontaxClicks?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    appPasswords?: AppPasswordUncheckedUpdateManyWithoutUserNestedInput
+    contacts?: ContactUncheckedUpdateManyWithoutUserNestedInput
+    importJobs?: ImportJobUncheckedUpdateManyWithoutUserNestedInput
+    exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
+    mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
+    mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
+    ownedGroups?: GroupUncheckedUpdateManyWithoutOwnerNestedInput
+    groupMemberships?: GroupMemberUncheckedUpdateManyWithoutUserNestedInput
+    contactSharesOwned?: ContactShareUncheckedUpdateManyWithoutOwnerNestedInput
+    contactSharesReceived?: ContactShareUncheckedUpdateManyWithoutRecipientUserNestedInput
+    emailVerificationTokens?: EmailVerificationTokenUncheckedUpdateManyWithoutUserNestedInput
+    passwordResetTokens?: PasswordResetTokenUncheckedUpdateManyWithoutUserNestedInput
+    sessions?: UserSessionUncheckedUpdateManyWithoutUserNestedInput
+    totpRecoveryCodes?: TotpRecoveryCodeUncheckedUpdateManyWithoutUserNestedInput
+    addressBooks?: AddressBookUncheckedUpdateManyWithoutUserNestedInput
+    savedFilters?: SavedFilterUncheckedUpdateManyWithoutUserNestedInput
+    adminAuditEvents?: AdminAuditEventUncheckedUpdateManyWithoutAdminNestedInput
+    notifications?: NotificationUncheckedUpdateManyWithoutUserNestedInput
+    securityAlerts?: SecurityAlertUncheckedUpdateManyWithoutUserNestedInput
+    notificationSettings?: NotificationSettingsUncheckedUpdateOneWithoutUserNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutUserNestedInput
+    importMappingSuggestionFeedbacks?: ImportMappingSuggestionFeedbackUncheckedUpdateManyWithoutUserNestedInput
+    importMappingPresets?: ImportMappingPresetUncheckedUpdateManyWithoutUserNestedInput
+    exportPresets?: ExportPresetUncheckedUpdateManyWithoutUserNestedInput
+    dataExportJobs?: DataExportJobUncheckedUpdateManyWithoutUserNestedInput
+    apiTokens?: ApiTokenUncheckedUpdateManyWithoutUserNestedInput
+    labels?: LabelUncheckedUpdateManyWithoutUserNestedInput
+    failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
+    onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
+    cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type ContactUpsertWithoutDismissalsAsAInput = {
+    update: XOR<ContactUpdateWithoutDismissalsAsAInput, ContactUncheckedUpdateWithoutDismissalsAsAInput>
+    create: XOR<ContactCreateWithoutDismissalsAsAInput, ContactUncheckedCreateWithoutDismissalsAsAInput>
+    where?: ContactWhereInput
+  }
+
+  export type ContactUpdateToOneWithWhereWithoutDismissalsAsAInput = {
+    where?: ContactWhereInput
+    data: XOR<ContactUpdateWithoutDismissalsAsAInput, ContactUncheckedUpdateWithoutDismissalsAsAInput>
+  }
+
+  export type ContactUpdateWithoutDismissalsAsAInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
+    nickname?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    birthday?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutContactsNestedInput
+    importJob?: ImportJobUpdateOneWithoutContactsNestedInput
+    leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    dismissalsAsB?: MergeDismissalUpdateManyWithoutContact_bNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
+    mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
+    mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+    book?: AddressBookUpdateOneWithoutContactsNestedInput
+  }
+
+  export type ContactUncheckedUpdateWithoutDismissalsAsAInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
+    mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
+    nickname?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    birthday?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    dismissalsAsB?: MergeDismissalUncheckedUpdateManyWithoutContact_bNestedInput
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
+    mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
+  }
+
+  export type ContactUpsertWithoutDismissalsAsBInput = {
+    update: XOR<ContactUpdateWithoutDismissalsAsBInput, ContactUncheckedUpdateWithoutDismissalsAsBInput>
+    create: XOR<ContactCreateWithoutDismissalsAsBInput, ContactUncheckedCreateWithoutDismissalsAsBInput>
+    where?: ContactWhereInput
+  }
+
+  export type ContactUpdateToOneWithWhereWithoutDismissalsAsBInput = {
+    where?: ContactWhereInput
+    data: XOR<ContactUpdateWithoutDismissalsAsBInput, ContactUncheckedUpdateWithoutDismissalsAsBInput>
+  }
+
+  export type ContactUpdateWithoutDismissalsAsBInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
+    nickname?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    birthday?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutContactsNestedInput
+    importJob?: ImportJobUpdateOneWithoutContactsNestedInput
+    leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUpdateManyWithoutContact_aNestedInput
+    syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUpdateManyWithoutContactNestedInput
+    mergedIntoContact?: ContactUpdateOneWithoutMergedChildrenNestedInput
+    mergedChildren?: ContactUpdateManyWithoutMergedIntoContactNestedInput
+    book?: AddressBookUpdateOneWithoutContactsNestedInput
+  }
+
+  export type ContactUncheckedUpdateWithoutDismissalsAsBInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    importJobId?: NullableStringFieldUpdateOperationsInput | string | null
+    reminderLeadDaysOverride?: NullableIntFieldUpdateOperationsInput | number | null
+    mergedIntoContactId?: NullableStringFieldUpdateOperationsInput | string | null
+    syncUid?: StringFieldUpdateOperationsInput | string
+    syncVersion?: IntFieldUpdateOperationsInput | number
+    syncTombstoneAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fullName?: StringFieldUpdateOperationsInput | string
+    firstName?: NullableStringFieldUpdateOperationsInput | string | null
+    middleName?: NullableStringFieldUpdateOperationsInput | string | null
+    lastName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticFirstName?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticLastName?: NullableStringFieldUpdateOperationsInput | string | null
+    namePrefix?: NullableStringFieldUpdateOperationsInput | string | null
+    nameSuffix?: NullableStringFieldUpdateOperationsInput | string | null
+    nickname?: NullableStringFieldUpdateOperationsInput | string | null
+    email?: NullableStringFieldUpdateOperationsInput | string | null
+    phone?: NullableStringFieldUpdateOperationsInput | string | null
+    company?: NullableStringFieldUpdateOperationsInput | string | null
+    phoneticCompany?: NullableStringFieldUpdateOperationsInput | string | null
+    jobTitle?: NullableStringFieldUpdateOperationsInput | string | null
+    department?: NullableStringFieldUpdateOperationsInput | string | null
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    birthday?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: NullableStringFieldUpdateOperationsInput | string | null
+    avatarUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    isFavorite?: BoolFieldUpdateOperationsInput | boolean
+    isEmergency?: BoolFieldUpdateOperationsInput | boolean
+    labels?: NullableJsonNullValueInput | InputJsonValue
+    websiteEntries?: NullableJsonNullValueInput | InputJsonValue
+    emailAddresses?: NullableJsonNullValueInput | InputJsonValue
+    phoneNumbers?: NullableJsonNullValueInput | InputJsonValue
+    postalAddresses?: NullableJsonNullValueInput | InputJsonValue
+    emailEntries?: NullableJsonNullValueInput | InputJsonValue
+    phoneEntries?: NullableJsonNullValueInput | InputJsonValue
+    addressEntries?: NullableJsonNullValueInput | InputJsonValue
+    significantDates?: NullableJsonNullValueInput | InputJsonValue
+    relatedPeople?: NullableJsonNullValueInput | InputJsonValue
+    customFields?: NullableJsonNullValueInput | InputJsonValue
+    notes?: NullableStringFieldUpdateOperationsInput | string | null
+    sourceType?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    sourceDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    lastMutatedBy?: EnumSourceTypeFieldUpdateOperationsInput | $Enums.SourceType
+    lastMutatedByDetail?: NullableStringFieldUpdateOperationsInput | string | null
+    archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    bookId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
+    rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUncheckedUpdateManyWithoutContact_aNestedInput
+    syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
+    syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
+    activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
+    sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
+    sharesAsRecipientCopy?: ContactShareUncheckedUpdateManyWithoutRecipientContactNestedInput
+    groupContacts?: GroupContactUncheckedUpdateManyWithoutContactNestedInput
+    birthdayReminderStates?: BirthdayReminderStateUncheckedUpdateManyWithoutContactNestedInput
+    mergedChildren?: ContactUncheckedUpdateManyWithoutMergedIntoContactNestedInput
   }
 
   export type UserCreateWithoutSyncAccountsInput = {
@@ -85759,6 +88409,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
     activityEvents?: ActivityEventCreateNestedManyWithoutUserInput
@@ -85823,6 +88474,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutUserInput
@@ -86111,6 +88763,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutUserNestedInput
@@ -86175,6 +88828,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutUserNestedInput
@@ -86630,6 +89284,8 @@ export namespace Prisma {
     importJob?: ImportJobCreateNestedOneWithoutContactsInput
     leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalCreateNestedManyWithoutContact_bInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
@@ -86693,6 +89349,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalUncheckedCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalUncheckedCreateNestedManyWithoutContact_bInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
@@ -86905,6 +89563,8 @@ export namespace Prisma {
     importJob?: ImportJobUpdateOneWithoutContactsNestedInput
     leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUpdateManyWithoutContact_bNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
@@ -86968,6 +89628,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUncheckedUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUncheckedUpdateManyWithoutContact_bNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
@@ -87317,6 +89979,8 @@ export namespace Prisma {
     importJob?: ImportJobCreateNestedOneWithoutContactsInput
     leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
@@ -87380,6 +90044,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalUncheckedCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalUncheckedCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
@@ -87608,6 +90274,8 @@ export namespace Prisma {
     importJob?: ImportJobUpdateOneWithoutContactsNestedInput
     leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
@@ -87671,6 +90339,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUncheckedUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUncheckedUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
@@ -87748,6 +90418,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -87812,6 +90483,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -87892,6 +90564,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -87956,6 +90629,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -88020,6 +90694,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -88084,6 +90759,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -88164,6 +90840,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -88228,6 +90905,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -88292,6 +90970,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -88356,6 +91035,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -88436,6 +91116,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -88500,6 +91181,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -88564,6 +91246,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -88628,6 +91311,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -88708,6 +91392,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -88772,6 +91457,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -88836,6 +91522,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -88900,6 +91587,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -88984,6 +91672,8 @@ export namespace Prisma {
     importJob?: ImportJobCreateNestedOneWithoutContactsInput
     leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareCreateNestedManyWithoutContactInput
@@ -89047,6 +91737,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalUncheckedCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalUncheckedCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
     sharesFromContact?: ContactShareUncheckedCreateNestedManyWithoutContactInput
@@ -89107,6 +91799,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -89171,6 +91864,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -89261,6 +91955,8 @@ export namespace Prisma {
     importJob?: ImportJobUpdateOneWithoutContactsNestedInput
     leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUpdateManyWithoutContactNestedInput
@@ -89324,6 +92020,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUncheckedUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUncheckedUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
     sharesFromContact?: ContactShareUncheckedUpdateManyWithoutContactNestedInput
@@ -89368,6 +92066,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -89432,6 +92131,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -89512,6 +92212,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -89576,6 +92277,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -89640,6 +92342,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -89704,6 +92407,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -89963,6 +92667,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -90027,6 +92732,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -90282,6 +92988,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -90346,6 +93053,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -90467,6 +93175,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -90531,6 +93240,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -90755,6 +93465,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -90819,6 +93530,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -90903,6 +93615,8 @@ export namespace Prisma {
     importJob?: ImportJobCreateNestedOneWithoutContactsInput
     leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
@@ -90965,6 +93679,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalUncheckedCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalUncheckedCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
@@ -91031,6 +93747,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -91095,6 +93812,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -91175,6 +93893,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -91239,6 +93958,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -91319,6 +94039,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -91383,6 +94104,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -91447,6 +94169,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -91511,6 +94234,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -91591,6 +94315,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -91655,6 +94380,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -92069,6 +94795,8 @@ export namespace Prisma {
     importJob?: ImportJobCreateNestedOneWithoutContactsInput
     leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
@@ -92132,6 +94860,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalUncheckedCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalUncheckedCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
@@ -92244,6 +94974,8 @@ export namespace Prisma {
     importJob?: ImportJobUpdateOneWithoutContactsNestedInput
     leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
@@ -92307,6 +95039,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUncheckedUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUncheckedUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
@@ -92351,6 +95085,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -92415,6 +95150,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -92499,6 +95235,8 @@ export namespace Prisma {
     importJob?: ImportJobCreateNestedOneWithoutContactsInput
     leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
@@ -92562,6 +95300,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalUncheckedCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalUncheckedCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
@@ -92611,6 +95351,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -92675,6 +95416,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -92759,6 +95501,8 @@ export namespace Prisma {
     importJob?: ImportJobCreateNestedOneWithoutContactsInput
     leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
@@ -92822,6 +95566,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalUncheckedCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalUncheckedCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
@@ -92882,6 +95628,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -92946,6 +95693,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -93036,6 +95784,8 @@ export namespace Prisma {
     importJob?: ImportJobUpdateOneWithoutContactsNestedInput
     leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
@@ -93099,6 +95849,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUncheckedUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUncheckedUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
@@ -93154,6 +95906,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -93218,6 +95971,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -93308,6 +96062,8 @@ export namespace Prisma {
     importJob?: ImportJobUpdateOneWithoutContactsNestedInput
     leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
@@ -93371,6 +96127,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUncheckedUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUncheckedUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
@@ -93415,6 +96173,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -93479,6 +96238,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -93588,6 +96348,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -93652,6 +96413,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -93751,6 +96513,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -93815,6 +96578,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -93931,6 +96695,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -93995,6 +96760,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -94075,6 +96841,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -94139,6 +96906,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -94219,6 +96987,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -94283,6 +97052,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -94347,6 +97117,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -94411,6 +97182,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -94491,6 +97263,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -94555,6 +97328,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -94619,6 +97393,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -94683,6 +97458,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -94767,6 +97543,8 @@ export namespace Prisma {
     importJob?: ImportJobCreateNestedOneWithoutContactsInput
     leftMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventCreateNestedManyWithoutContactInput
@@ -94830,6 +97608,8 @@ export namespace Prisma {
     updatedAt?: Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutLeftContactInput
     rightMergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutRightContactInput
+    dismissalsAsA?: MergeDismissalUncheckedCreateNestedManyWithoutContact_aInput
+    dismissalsAsB?: MergeDismissalUncheckedCreateNestedManyWithoutContact_bInput
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutContactInput
     syncConflicts?: SyncConflictUncheckedCreateNestedManyWithoutContactInput
     activityEvents?: ActivityEventUncheckedCreateNestedManyWithoutContactInput
@@ -94890,6 +97670,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -94954,6 +97735,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -95044,6 +97826,8 @@ export namespace Prisma {
     importJob?: ImportJobUpdateOneWithoutContactsNestedInput
     leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
@@ -95107,6 +97891,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUncheckedUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUncheckedUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
@@ -95151,6 +97937,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -95215,6 +98002,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -95295,6 +98083,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -95359,6 +98148,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -95423,6 +98213,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -95487,6 +98278,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -95567,6 +98359,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -95631,6 +98424,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -95695,6 +98489,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -95759,6 +98554,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -95839,6 +98635,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -95903,6 +98700,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -95967,6 +98765,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -96031,6 +98830,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -96111,6 +98911,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -96175,6 +98976,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -96239,6 +99041,7 @@ export namespace Prisma {
     exportJobs?: ExportJobCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionCreateNestedManyWithoutUserInput
@@ -96303,6 +99106,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedCreateNestedManyWithoutUserInput
     mergeSuggestions?: MergeSuggestionUncheckedCreateNestedManyWithoutUserInput
     mergeDecisions?: MergeDecisionUncheckedCreateNestedManyWithoutUserInput
+    dismissals?: MergeDismissalUncheckedCreateNestedManyWithoutUserInput
     syncAccounts?: SyncAccountUncheckedCreateNestedManyWithoutUserInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutUserInput
     subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutUserInput
@@ -96383,6 +99187,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutUserNestedInput
@@ -96447,6 +99252,7 @@ export namespace Prisma {
     exportJobs?: ExportJobUncheckedUpdateManyWithoutUserNestedInput
     mergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutUserNestedInput
     mergeDecisions?: MergeDecisionUncheckedUpdateManyWithoutUserNestedInput
+    dismissals?: MergeDismissalUncheckedUpdateManyWithoutUserNestedInput
     syncAccounts?: SyncAccountUncheckedUpdateManyWithoutUserNestedInput
     subscriptionCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutUserNestedInput
     subscriptions?: SubscriptionUncheckedUpdateManyWithoutUserNestedInput
@@ -96606,6 +99412,13 @@ export namespace Prisma {
     reversalSource?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+  }
+
+  export type MergeDismissalCreateManyUserInput = {
+    id?: string
+    contactAId: string
+    contactBId: string
+    dismissedAt?: Date | string
   }
 
   export type SyncAccountCreateManyUserInput = {
@@ -97011,6 +99824,8 @@ export namespace Prisma {
     importJob?: ImportJobUpdateOneWithoutContactsNestedInput
     leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
@@ -97074,6 +99889,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUncheckedUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUncheckedUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
@@ -97350,6 +100167,27 @@ export namespace Prisma {
     reversalSource?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergeDismissalUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dismissedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    contact_a?: ContactUpdateOneRequiredWithoutDismissalsAsANestedInput
+    contact_b?: ContactUpdateOneRequiredWithoutDismissalsAsBNestedInput
+  }
+
+  export type MergeDismissalUncheckedUpdateWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contactAId?: StringFieldUpdateOperationsInput | string
+    contactBId?: StringFieldUpdateOperationsInput | string
+    dismissedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergeDismissalUncheckedUpdateManyWithoutUserInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    contactAId?: StringFieldUpdateOperationsInput | string
+    contactBId?: StringFieldUpdateOperationsInput | string
+    dismissedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SyncAccountUpdateWithoutUserInput = {
@@ -98464,6 +101302,20 @@ export namespace Prisma {
     updatedAt?: Date | string
   }
 
+  export type MergeDismissalCreateManyContact_aInput = {
+    id?: string
+    userId: string
+    contactBId: string
+    dismissedAt?: Date | string
+  }
+
+  export type MergeDismissalCreateManyContact_bInput = {
+    id?: string
+    userId: string
+    contactAId: string
+    dismissedAt?: Date | string
+  }
+
   export type SyncContactLinkCreateManyContactInput = {
     id?: string
     syncAccountId: string
@@ -98728,6 +101580,48 @@ export namespace Prisma {
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergeDismissalUpdateWithoutContact_aInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dismissedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutDismissalsNestedInput
+    contact_b?: ContactUpdateOneRequiredWithoutDismissalsAsBNestedInput
+  }
+
+  export type MergeDismissalUncheckedUpdateWithoutContact_aInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    contactBId?: StringFieldUpdateOperationsInput | string
+    dismissedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergeDismissalUncheckedUpdateManyWithoutContact_aInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    contactBId?: StringFieldUpdateOperationsInput | string
+    dismissedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergeDismissalUpdateWithoutContact_bInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    dismissedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutDismissalsNestedInput
+    contact_a?: ContactUpdateOneRequiredWithoutDismissalsAsANestedInput
+  }
+
+  export type MergeDismissalUncheckedUpdateWithoutContact_bInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    contactAId?: StringFieldUpdateOperationsInput | string
+    dismissedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type MergeDismissalUncheckedUpdateManyWithoutContact_bInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    contactAId?: StringFieldUpdateOperationsInput | string
+    dismissedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SyncContactLinkUpdateWithoutContactInput = {
@@ -99091,6 +101985,8 @@ export namespace Prisma {
     importJob?: ImportJobUpdateOneWithoutContactsNestedInput
     leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
@@ -99153,6 +102049,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUncheckedUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUncheckedUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
@@ -99506,6 +102404,8 @@ export namespace Prisma {
     user?: UserUpdateOneRequiredWithoutContactsNestedInput
     leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
@@ -99569,6 +102469,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUncheckedUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUncheckedUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput
@@ -100341,6 +103243,8 @@ export namespace Prisma {
     importJob?: ImportJobUpdateOneWithoutContactsNestedInput
     leftMergeSuggestions?: MergeSuggestionUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUpdateManyWithoutContactNestedInput
@@ -100403,6 +103307,8 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     leftMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutLeftContactNestedInput
     rightMergeSuggestions?: MergeSuggestionUncheckedUpdateManyWithoutRightContactNestedInput
+    dismissalsAsA?: MergeDismissalUncheckedUpdateManyWithoutContact_aNestedInput
+    dismissalsAsB?: MergeDismissalUncheckedUpdateManyWithoutContact_bNestedInput
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutContactNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutContactNestedInput
     activityEvents?: ActivityEventUncheckedUpdateManyWithoutContactNestedInput

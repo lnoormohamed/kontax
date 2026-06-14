@@ -16,6 +16,7 @@ import { ContactSharing } from "~/app/_components/contact-sharing";
 import { CopyMonoRow } from "~/app/_components/copy-field";
 import { LastUpdatedBy } from "~/app/_components/last-updated-by";
 import { MoreMenu } from "~/app/_components/more-menu";
+import { MergeWithButton } from "~/app/_components/merge-picker-button";
 import { LabelChip } from "~/app/_components/label-chip";
 import { RecentlyViewedTracker } from "~/app/_components/search-results";
 import { SourceBadge } from "~/app/_components/source-badge";
@@ -131,14 +132,16 @@ const getSyncBadge = (link: {
   return { label: "Syncing", className: "bg-[#f2f4f0] text-[#5c655e]" };
 };
 
-const getInitials = (value: string) =>
-  value
-    .split(" ")
-    .map((part) => part.trim()[0])
+const getInitials = (primary: string | null | undefined, fallback?: string | null) => {
+  const src = primary?.trim() ?? fallback?.trim() ?? "";
+  return src
+    .split(/\s+/)
+    .map((part) => part[0] ?? "")
     .filter(Boolean)
     .slice(0, 2)
     .join("")
     .toUpperCase();
+};
 
 // 8-pair name-hash tints matching the locked design kit (same set as contacts list rows).
 const AVATAR_TINTS: [string, string][] = [
@@ -151,9 +154,10 @@ const AVATAR_TINTS: [string, string][] = [
   ["#efe9df", "#85703f"],
   ["#e3eef0", "#3f7d7a"],
 ];
-const tintForName = (value: string): [string, string] => {
+const tintForName = (primary: string | null | undefined, fallback?: string | null): [string, string] => {
+  const src = primary?.trim() ?? fallback?.trim() ?? "?";
   let hash = 0;
-  for (let i = 0; i < value.length; i++) hash = ((hash * 31 + value.charCodeAt(i)) >>> 0);
+  for (let i = 0; i < src.length; i++) hash = ((hash * 31 + src.charCodeAt(i)) >>> 0);
   return AVATAR_TINTS[hash % AVATAR_TINTS.length]!;
 };
 
@@ -442,7 +446,22 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
           ],
         },
         orderBy: { createdAt: "asc" },
-        select: { id: true, name: true, type: true, _count: { select: { members: true } } },
+        select: {
+          id: true,
+          name: true,
+          type: true,
+          _count: { select: { members: { where: { inviteStatus: "ACCEPTED" } } } },
+          members: {
+            where: { inviteStatus: "ACCEPTED" },
+            orderBy: { joinedAt: "asc" },
+            select: {
+              id: true,
+              role: true,
+              canEdit: true,
+              user: { select: { name: true, email: true } },
+            },
+          },
+        },
       })
     : Promise.resolve([]));
 
@@ -545,7 +564,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
       .filter((e) => e.label.length > 0 || e.value.length > 0),
   };
 
-  const [avatarBg, avatarFg] = tintForName(contact.fullName);
+  const [avatarBg, avatarFg] = tintForName(contact.fullName, contact.company);
 
   return (
     <AppShell
@@ -571,7 +590,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
           detailTab={detailTab}
           editInitial={sheetInitial}
           email={contact.email}
-          initials={getInitials(contact.fullName)}
+          initials={getInitials(contact.fullName, contact.company)}
           isArchived={Boolean(contact.archivedAt)}
           isEditable={canEditContact}
           isFavorite={contact.isFavorite}
@@ -626,6 +645,13 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                   name: b.name,
                   type: b.type,
                   memberCount: b._count.members,
+                  members: b.members
+                    .filter((m) => m.user !== null)
+                    .map((m) => ({
+                      id: m.id,
+                      name: m.user!.name?.trim() ?? m.user!.email,
+                      role: m.role === "OWNER" ? ("OWNER" as const) : m.canEdit ? ("CAN_EDIT" as const) : ("CAN_VIEW" as const),
+                    })),
                 }))}
                 contactId={contact.id}
                 contactName={contact.fullName}
@@ -698,6 +724,21 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               </button>
             </form>
             <MoreMenu>
+              {!isLiveReceived ? (
+                <MergeWithButton
+                  contact={{
+                    id: contact.id,
+                    fullName: contact.fullName,
+                    email: contact.email,
+                    phone: contact.phone,
+                    company: contact.company,
+                    jobTitle: contact.jobTitle ?? null,
+                    notes: contact.notes ?? null,
+                    address: contact.address ?? null,
+                    birthday: contact.birthday ?? null,
+                  }}
+                />
+              ) : null}
               {canAddToFamily ? (
                 <form action={addContactToFamilyBook}>
                   <input name="contactId" type="hidden" value={contact.id} />
@@ -734,19 +775,22 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
       {/* Page body — min-h-screen gives white background on short pages */}
       <div className="min-h-screen bg-white text-[#1d2823]">
         <div className="flex bg-white">
-          {/* left rail (sticky) */}
+          {/* left rail — sticky sidebar, desktop only */}
           <aside
             className="hidden w-[320px] shrink-0 self-start bg-white p-6 lg:block"
             style={{ position: "sticky", top: 56 }}
           >
             {(() => {
-              const [avatarBg, avatarFg] = tintForName(contact.fullName);
+              const [avatarBg, avatarFg] = tintForName(contact.fullName, contact.company);
+              const avatarInitials = getInitials(contact.fullName, contact.company);
               return (
                 <div
                   className="relative inline-flex h-[88px] w-[88px] items-center justify-center rounded-full text-3xl font-bold"
                   style={{ background: avatarBg, color: avatarFg }}
                 >
-                  {getInitials(contact.fullName)}
+                  {avatarInitials ? avatarInitials : (
+                    <WorkspaceIcon name="person" size={36} strokeWidth={1.6} className="text-[#aeb4ac]" />
+                  )}
                   {contact.isFavorite ? (
                     <span className="absolute -bottom-0.5 -right-0.5 grid h-7 w-7 place-items-center rounded-full bg-white text-[#e0a31c] shadow">
                       <WorkspaceIcon fill="#e0a31c" name="star" size={14} />
@@ -1047,6 +1091,13 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               name: b.name,
               type: b.type,
               memberCount: b._count.members,
+              members: b.members
+                .filter((m) => m.user !== null)
+                .map((m) => ({
+                  id: m.id,
+                  name: m.user!.name?.trim() ?? m.user!.email,
+                  role: m.role === "OWNER" ? ("OWNER" as const) : m.canEdit ? ("CAN_EDIT" as const) : ("CAN_VIEW" as const),
+                })),
             }))}
             contactId={contact.id}
             contactName={contact.fullName}
@@ -1078,6 +1129,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               downloadCount: l.downloadCount,
               expiresAt: l.expiresAt ? l.expiresAt.toISOString() : null,
             }))}
+            mobile
           />
         ) : null}
 

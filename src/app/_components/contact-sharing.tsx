@@ -30,11 +30,18 @@ export type VcardLinkItem = {
   expiresAt: string | null;
 };
 
+export type SharedBookMember = {
+  id: string;
+  name: string;
+  role: "OWNER" | "CAN_EDIT" | "CAN_VIEW";
+};
+
 export type SharedBook = {
   id: string;
   name: string;
   type: "FAMILY" | "TEAM";
   memberCount: number;
+  members: SharedBookMember[];
 };
 
 type Props = {
@@ -50,6 +57,7 @@ type Props = {
   staticShares: ShareItem[];
   liveShares: ShareItem[];
   books: SharedBook[];
+  mobile?: boolean;
 };
 
 const formatDate = (iso: string) =>
@@ -59,9 +67,9 @@ const formatDate = (iso: string) =>
 
 // ── Primitives ────────────────────────────────────────────────────────────────
 
-function GroupLabel({ children, note }: { children: React.ReactNode; note?: string }) {
+function GroupLabel({ children, note, id }: { children: React.ReactNode; note?: string; id?: string }) {
   return (
-    <div className="flex items-baseline gap-2 px-3 pb-1 pt-4">
+    <div className="flex items-baseline gap-2 px-3 pb-1 pt-4" id={id}>
       <p className="text-[10.5px] font-bold uppercase tracking-[0.1em] text-[#8b938c]">
         {children}
       </p>
@@ -192,32 +200,152 @@ function LinkRow({
   );
 }
 
-// Shared book row (Phase 13 — Add button disabled).
-function BookRow({ book }: { book: SharedBook }) {
-  const isFamily = book.type === "FAMILY";
+// ── SharedBookCard (P34A-DB01) ────────────────────────────────────────────────
+
+const AVATAR_TINTS = [
+  { bg: "#d6e7dc", color: "#17352e" },
+  { bg: "#d6dffb", color: "#2036a4" },
+  { bg: "#fbe9d6", color: "#8c5010" },
+  { bg: "#f0d6fb", color: "#6b1a9c" },
+  { bg: "#f0f0d6", color: "#6b6b10" },
+];
+
+function hashName(s: string): number {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) {
+    h = (h << 5) - h + s.charCodeAt(i);
+    h |= 0;
+  }
+  return Math.abs(h);
+}
+
+function memberMonogram(name: string): string {
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) return (parts[0]![0]! + parts[parts.length - 1]![0]!).toUpperCase();
+  return name.trim().slice(0, 2).toUpperCase();
+}
+
+function MemberAvatar({ name }: { name: string }) {
+  const t = AVATAR_TINTS[hashName(name) % AVATAR_TINTS.length]!;
   return (
-    <div className="flex items-center gap-3 rounded-[12px] px-3 py-2.5">
-      <IconTile icon={isFamily ? "users" : "team"} />
-      <span className="min-w-0 flex-1">
-        <span className="flex items-center gap-2">
-          <span className="truncate text-sm font-semibold text-[#1d2823]">{book.name}</span>
-          <span className="shrink-0 rounded-[5px] bg-[#f2f4f0] px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-[0.06em] text-[#5c655e]">
-            {book.type}
-          </span>
-        </span>
-        <span className="mt-px block text-xs text-[#8b938c]">
-          {book.memberCount} {book.memberCount === 1 ? "member" : "members"} ·{" "}
-          {isFamily ? "anyone in the family can view & edit" : "members get edit or view access"}
-        </span>
+    <span
+      className="grid size-9 shrink-0 place-items-center rounded-full text-[12px] font-bold"
+      style={{ background: t.bg, color: t.color, letterSpacing: "-0.01em" }}
+    >
+      {memberMonogram(name)}
+    </span>
+  );
+}
+
+const ROLE_BADGE_STYLES = {
+  OWNER:    { bg: "#17352e", label: "Owner" },
+  CAN_EDIT: { bg: "#4158f4", label: "Can edit" },
+  CAN_VIEW: { bg: "#5c655e", label: "Can view" },
+} as const;
+
+function RoleBadge({ role }: { role: SharedBookMember["role"] }) {
+  const s = ROLE_BADGE_STYLES[role];
+  return (
+    <span
+      className="inline-flex h-[22px] shrink-0 items-center rounded-[6px] px-2 text-[11.5px] font-bold text-white whitespace-nowrap"
+      style={{ background: s.bg }}
+    >
+      {s.label}
+    </span>
+  );
+}
+
+function MemberRow({ member, rowHeight }: { member: SharedBookMember; rowHeight: number }) {
+  return (
+    <li className="flex items-center gap-3 px-4" style={{ minHeight: rowHeight }}>
+      <MemberAvatar name={member.name} />
+      <span className="flex-1 truncate text-[13.5px] font-semibold text-[#1d2823]">
+        {member.name}
       </span>
-      <button
-        className="shrink-0 cursor-not-allowed rounded-[8px] border border-[#d8ddd6] bg-white px-3 py-1.5 text-[13px] font-semibold text-[#aeb4ac]"
-        disabled
-        title="Adding contacts to a book arrives with Family & Team (Phase 13)"
-        type="button"
-      >
-        Add
-      </button>
+      <RoleBadge role={member.role} />
+    </li>
+  );
+}
+
+function OverflowRow({ count, rowHeight }: { count: number; rowHeight: number }) {
+  return (
+    <li className="flex items-center gap-3 px-4" style={{ minHeight: rowHeight }}>
+      <span className="grid size-9 shrink-0 place-items-center rounded-full bg-[#f2f4f0] text-[12px] font-bold text-[#5c655e]">
+        +{count}
+      </span>
+      <span className="text-[12px] text-[#5c655e]">And {count} more members</span>
+    </li>
+  );
+}
+
+function SharedBookCard({ book, mobile = false }: { book: SharedBook; mobile?: boolean }) {
+  const isFamily = book.type === "FAMILY";
+  const typeLabel = isFamily ? "Family" : "Team";
+  const callout = isFamily
+    ? "Anyone in this family book can see and edit this contact."
+    : "Members with edit access can update this contact.";
+
+  const rowHeight = mobile ? 44 : 48;
+  const calloutSize = mobile ? "text-[13px]" : "text-[12px]";
+
+  const visible = book.members.length >= 7 ? book.members.slice(0, 5) : book.members;
+  const overflow = book.members.length >= 7 ? book.members.length - 5 : 0;
+
+  return (
+    <section className="overflow-hidden rounded-[14px] border border-[#d8ddd6] bg-white">
+      <div className="flex items-center gap-3 px-4 pb-3 pt-4">
+        <IconTile icon={isFamily ? "users" : "team"} />
+        <div className="min-w-0">
+          <h4 className="truncate text-[14px] font-semibold leading-snug text-[#1d2823]">
+            {book.name}
+          </h4>
+          <p className="mt-0.5 text-[12px] leading-snug text-[#8b938c]">
+            {typeLabel} · {book.memberCount} {book.memberCount === 1 ? "member" : "members"}
+          </p>
+        </div>
+      </div>
+      <p className={`px-4 pb-3 ${calloutSize} leading-[1.45] text-[#8b938c]`}>{callout}</p>
+      <div className="mx-4 h-px bg-[#edf0ea]" />
+      <ul className="m-0 list-none py-1 pb-2">
+        {visible.map((m) => <MemberRow key={m.id} member={m} rowHeight={rowHeight} />)}
+        {overflow > 0 ? <OverflowRow count={overflow} rowHeight={rowHeight} /> : null}
+      </ul>
+    </section>
+  );
+}
+
+// ── P34A-03: Empty state when nothing is shared yet ───────────────────────────
+function EmptySharingState({ contactId, hasBooks }: { contactId: string; hasBooks: boolean }) {
+  return (
+    <div className="flex flex-col items-center gap-3 px-6 py-8 text-center">
+      <span className="grid size-[52px] place-items-center rounded-full bg-[#f2f4f0] text-[#aeb4ac]">
+        <WorkspaceIcon name="users" size={26} strokeWidth={1.5} />
+      </span>
+      <div>
+        <p className="text-[15px] font-semibold text-[#1d2823]">This contact isn&apos;t shared yet</p>
+        <p className="mt-1 text-[13px] text-[#8b938c]">
+          Share with a family member or generate a share link
+        </p>
+      </div>
+      <div className="mt-1 flex flex-wrap justify-center gap-2">
+        <form action={createVcardShareLink}>
+          <input name="contactId" type="hidden" value={contactId} />
+          <button
+            className="rounded-[9px] border border-[#d8ddd6] bg-white px-4 py-2 text-[13.5px] font-semibold text-[#1d2823] transition hover:bg-[#f6f7f4]"
+            type="submit"
+          >
+            Share link
+          </button>
+        </form>
+        {hasBooks ? (
+          <a
+            className="rounded-[9px] border border-[#d8ddd6] bg-white px-4 py-2 text-[13.5px] font-semibold text-[#1d2823] transition hover:bg-[#f6f7f4]"
+            href="#contact-sharing-books"
+          >
+            Add to shared book
+          </a>
+        ) : null}
+      </div>
     </div>
   );
 }
@@ -403,10 +531,16 @@ export function ContactSharing({
   staticShares,
   liveShares,
   books,
+  mobile = false,
 }: Props) {
   const hasStatic = staticShares.some((s) => s.status === "ACTIVE");
   const hasLive = liveShares.some((s) => s.status === "ACTIVE");
   const [qrOpen, setQrOpen] = useState(false);
+  const isCompletelyUnshared =
+    vcardLinks.length === 0 &&
+    !staticShares.some((s) => s.status === "ACTIVE") &&
+    !liveShares.some((s) => s.status === "ACTIVE") &&
+    books.length === 0;
 
   return (
     <section className="rounded-[14px] border border-[#d8ddd6] bg-white" id="contact-sharing">
@@ -414,6 +548,10 @@ export function ContactSharing({
         Share this contact
       </h3>
       <div className="mt-3 h-px bg-[#e9ece7]" />
+
+      {isCompletelyUnshared ? (
+        <EmptySharingState contactId={contactId} hasBooks={books.length > 0} />
+      ) : null}
 
       <div className="px-2 py-2">
 
@@ -539,10 +677,12 @@ export function ContactSharing({
           </ActionRow>
         ) : null}
 
-        {/* ── Add to a shared book (Phase 13) ── */}
-        <GroupLabel>Add to a shared book</GroupLabel>
+        {/* ── Shared books ── */}
+        <GroupLabel id="contact-sharing-books">Shared books</GroupLabel>
         {books.length > 0 ? (
-          books.map((book) => <BookRow book={book} key={book.id} />)
+          <div className="grid gap-2 px-2 pb-1">
+            {books.map((book) => <SharedBookCard book={book} key={book.id} mobile={mobile} />)}
+          </div>
         ) : (
           <div className="mx-3 my-1 rounded-[12px] border border-dashed border-[#d8ddd6] px-4 py-4 text-center">
             <p className="text-[13.5px] font-semibold text-[#1d2823]">No shared books yet</p>

@@ -1,14 +1,22 @@
 "use client";
 
 import { useState } from "react";
+import { dismissMergeSuggestion } from "~/app/actions/merge";
 
-type MergeSuggestionDismissButtonProps = {
+type Props = {
   suggestionId: string;
+  contactAId: string;
+  contactBId: string;
+  /** When true the parent handles animated removal; button just calls the action. */
+  onDismissed?: () => void;
 };
 
 export function MergeSuggestionDismissButton({
   suggestionId,
-}: MergeSuggestionDismissButtonProps) {
+  contactAId,
+  contactBId,
+  onDismissed,
+}: Props) {
   const [isDismissing, setIsDismissing] = useState(false);
   const [error, setError] = useState("");
 
@@ -16,23 +24,23 @@ export function MergeSuggestionDismissButton({
     setIsDismissing(true);
     setError("");
 
-    const response = await fetch("/api/merge-suggestions/dismiss", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ suggestionId }),
-    });
-
-    const data = (await response.json().catch(() => null)) as { message?: string } | null;
-
-    if (!response.ok) {
-      setError(data?.message ?? "Dismiss failed.");
+    try {
+      await Promise.all([
+        fetch("/api/merge-suggestions/dismiss", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ suggestionId }),
+        }).then((r) => {
+          if (!r.ok) throw new Error("Dismiss failed.");
+        }),
+        dismissMergeSuggestion(contactAId, contactBId),
+      ]);
+      onDismissed?.();
+      if (!onDismissed) window.location.reload();
+    } catch {
+      setError("Couldn't dismiss — try again");
       setIsDismissing(false);
-      return;
     }
-
-    window.location.reload();
   };
 
   return (

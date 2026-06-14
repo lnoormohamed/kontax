@@ -17,6 +17,7 @@ import { LabelChip, LabelDot } from "~/app/_components/label-chip";
 import { SwipeableRow } from "~/app/_components/contact-list/swipeable-row";
 import { KeyboardShortcutsOverlay } from "~/app/contacts/_components/keyboard-shortcuts-overlay";
 import { fromJson, toQueryString } from "~/lib/contact-filter-state";
+import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 
 type WorkspaceContact = {
   id: string;
@@ -69,22 +70,25 @@ const AVATAR_TINTS: Array<[string, string]> = [
   ["#e3eef0", "#3f7d7a"],
 ];
 
-const tintForName = (value: string): [string, string] => {
+const tintForName = (primary: string | null | undefined, fallback?: string | null): [string, string] => {
+  const src = (primary?.trim() ?? fallback?.trim()) ?? "?";
   let hash = 0;
-  for (let index = 0; index < value.length; index += 1) {
-    hash = (hash * 31 + value.charCodeAt(index)) >>> 0;
+  for (let index = 0; index < src.length; index += 1) {
+    hash = (hash * 31 + src.charCodeAt(index)) >>> 0;
   }
   return AVATAR_TINTS[hash % AVATAR_TINTS.length]!;
 };
 
-const getInitials = (value: string) =>
-  value
+const getInitials = (primary: string | null | undefined, fallback?: string | null) => {
+  const src = (primary?.trim() ?? fallback?.trim()) ?? "";
+  return src
     .split(/\s+/)
-    .map((part) => part.trim()[0])
+    .map((part) => part[0] ?? "")
     .filter(Boolean)
     .slice(0, 2)
     .join("")
     .toUpperCase();
+};
 
 const getDisplayName = (contact: WorkspaceContact) => {
   const fullName = contact.fullName?.trim() ?? "";
@@ -163,14 +167,27 @@ const Highlight = memo(function Highlight({ text, query }: { text: string; query
   );
 });
 
-const Avatar = memo(function Avatar({ name, size }: { name: string; size: number }) {
-  const [bg, fg] = tintForName(name);
+const Avatar = memo(function Avatar({
+  fullName,
+  company,
+  size,
+}: {
+  fullName: string | null | undefined;
+  company?: string | null;
+  size: number;
+}) {
+  const [bg] = tintForName(fullName, company);
+  const initials = getInitials(fullName, company);
   return (
     <span
       className="flex shrink-0 items-center justify-center rounded-full font-semibold"
-      style={{ width: size, height: size, background: bg, color: fg, fontSize: size * 0.36 }}
+      style={{ width: size, height: size, background: bg, fontSize: size * 0.36 }}
     >
-      {getInitials(name)}
+      {initials ? (
+        <span style={{ color: tintForName(fullName, company)[1] }}>{initials}</span>
+      ) : (
+        <WorkspaceIcon name="person" size={Math.round(size * 0.4)} strokeWidth={1.6} className="text-[#aeb4ac]" />
+      )}
     </span>
   );
 });
@@ -418,7 +435,7 @@ const ContactRow = memo(function ContactRow({
   const avatarSlot = (
     <span className="relative inline-grid place-items-center" style={{ width: 40, height: 40 }}>
       <span className={selected ? "opacity-0" : "opacity-100 group-hover:opacity-0"}>
-        <Avatar name={displayName} size={avatarSize} />
+        <Avatar fullName={contact.fullName} company={contact.company} size={avatarSize} />
       </span>
       <button
         aria-label={selected ? "Deselect contact" : "Select contact"}

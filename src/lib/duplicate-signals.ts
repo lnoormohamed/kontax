@@ -1,6 +1,25 @@
 // Pure helpers for duplicate-detection signals (P10-08).
 // Kept dependency-free and side-effect-free so they're easy to unit test.
 
+/**
+ * Wagner-Fischer Levenshtein distance, capped at maxDist to short-circuit
+ * early for large strings that obviously exceed the threshold.
+ */
+export function levenshtein(a: string, b: string, maxDist = 3): number {
+  if (Math.abs(a.length - b.length) > maxDist) return maxDist + 1;
+  const dp = Array.from({ length: a.length + 1 }, (_, i) => i);
+  for (let j = 1; j <= b.length; j++) {
+    let prev = dp[0]!;
+    dp[0] = j;
+    for (let i = 1; i <= a.length; i++) {
+      const temp = dp[i]!;
+      dp[i] = a[i - 1] === b[j - 1] ? prev : 1 + Math.min(prev, dp[i]!, dp[i - 1]!);
+      prev = temp;
+    }
+  }
+  return dp[a.length]!;
+}
+
 const normalizeValue = (value: string | null | undefined) => value?.trim().toLowerCase() ?? "";
 
 export const normalizeName = (value: string | null | undefined) =>

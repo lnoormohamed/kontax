@@ -373,8 +373,8 @@ export default async function SyncPage({ searchParams }: PageProps) {
 
       {/* ── three-rail body ── */}
       <div className="flex min-h-0 flex-1">
-        {/* Rail 1: Settings sidebar — hidden on mobile */}
-        <div className="hidden md:flex">
+        {/* Rail 1: Settings sidebar — hidden on mobile and tablet */}
+        <div className="hidden lg:flex">
           <SettingsSidebar
             account={{ name: userLabel, email: session.user.email ?? "", plan: planSummary.planLabel }}
             shared={shared}
@@ -396,7 +396,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
 
         {/* Rails 2+3: account list + detail (client-managed). Desktop always
             shows it; mobile only when a connection is selected or adding. */}
-        <div className={`min-w-0 flex-1 ${mobileClientActive ? "flex" : "hidden md:flex"}`}>
+        <div className={`min-w-0 flex-1 ${mobileClientActive ? "flex flex-col lg:flex-row" : "hidden md:flex md:flex-col lg:flex-row"}`}>
           {/* Key on the deep-link target so a mobile nav (summary → connection →
               back → Add) remounts the client with fresh view state. Next's client
               Router Cache doesn't key /sync by searchParams, so without this the

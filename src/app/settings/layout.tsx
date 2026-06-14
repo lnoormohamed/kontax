@@ -6,6 +6,7 @@ import { BottomNav } from "~/app/_components/bottom-nav";
 import { NotificationBellSlot } from "~/app/_components/notification-bell-slot";
 import { SearchInput } from "~/app/_components/search-input";
 import { MobileSettingsHeader } from "~/app/settings/_components/mobile-settings-header";
+import { TabletSettingsHeader } from "~/app/settings/_components/tablet-settings-header";
 import { SettingsSidebar } from "~/app/_components/settings-sidebar";
 import { UserMenu } from "~/app/_components/user-menu";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
@@ -89,8 +90,8 @@ export default async function SettingsLayout({ children }: { children: React.Rea
       <MobileSettingsHeader bell={<NotificationBellSlot userId={userId} />} />
 
       <div className="flex min-h-0 flex-1">
-        {/* Sidebar: hidden on mobile, visible on desktop */}
-        <div className="hidden md:flex">
+        {/* Sidebar: hidden on mobile and tablet, visible at lg+ */}
+        <div className="hidden lg:flex">
           <SettingsSidebar
             account={{ name: userLabel, email: session.user.email ?? "", plan: planSummary.planLabel }}
             shared={shared}
@@ -98,6 +99,7 @@ export default async function SettingsLayout({ children }: { children: React.Rea
         </div>
         <div className="flex min-w-0 flex-1 flex-col overflow-y-auto bg-[#f6f7f4]">
           <div className="mx-auto w-full max-w-[1060px] px-4 pt-4 pb-[calc(56px+env(safe-area-inset-bottom))] md:px-6 md:py-7 md:pb-7 lg:px-9 lg:py-8">
+            <TabletSettingsHeader />
             {children}
           </div>
         </div>

@@ -384,7 +384,9 @@ export function MobileContactDetail({
               letterSpacing: "-0.01em",
             }}
           >
-            {initials}
+            {initials ? initials : (
+              <WorkspaceIcon name="person" size={32} strokeWidth={1.6} className="text-[#aeb4ac]" />
+            )}
           </div>
           <h1
             style={{

@@ -10,6 +10,16 @@ const withBundleAnalyzer = bundleAnalyzer({
 });
 
 /** @type {import("next").NextConfig} */
-const config = {};
+const config = {
+  async redirects() {
+    return [
+      {
+        source: "/settings/profile",
+        destination: "/settings/account",
+        permanent: true,
+      },
+    ];
+  },
+};
 
 export default withBundleAnalyzer(config);

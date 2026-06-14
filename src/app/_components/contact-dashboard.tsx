@@ -7,7 +7,7 @@ import { LabelFilterBar, MobileLabelFilterBar } from "~/app/_components/label-fi
 import { LabelsSidebar, type SidebarLabel } from "~/app/_components/labels-sidebar";
 import { BulkMergeButton, UndoMergeButton } from "~/app/_components/merge-actions";
 import { MobileActivityFeed } from "~/app/_components/mobile-activity-feed";
-import { MergeSuggestionDismissButton } from "~/app/_components/merge-suggestion-dismiss-button";
+import { MergeSuggestionList } from "~/app/_components/merge-suggestion-card";
 import { MergeSuggestionRefreshButton } from "~/app/_components/merge-suggestion-refresh-button";
 import { OnboardingChecklist } from "~/app/_components/onboarding-checklist";
 import { SmartListsBooks, type PersonalBook, type SmartList } from "~/app/_components/smart-lists-books";
@@ -551,56 +551,12 @@ export function ContactDashboard({
 
           {currentTab === "duplicates" ? (
             <div className="grid gap-6">
-              {mergeSuggestions.length === 0 ? (
-              <div className="m-4 rounded-[1.6rem] border border-dashed border-[#d8ddd6] bg-white px-6 py-12 text-center text-sm text-slate-500">
-                No duplicates to review. Kontax scans as you add and import contacts — you&apos;re all clear.
-              </div>
-            ) : (
-              <div className="grid gap-3 p-4">
-                {mergeSuggestionsRefreshed ? (
-                  <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[#1f7a67]">Suggestions refreshed</p>
-                ) : null}
-                {mergeSuggestions.map((suggestion) => (
-                  <article
-                    className="flex flex-col gap-4 rounded-[1.2rem] border border-[#d8ddd6] bg-white p-4 lg:flex-row lg:items-center lg:justify-between"
-                    key={suggestion.id}
-                  >
-                    <div className="min-w-0">
-                      <div className="flex flex-wrap items-center gap-3">
-                        <p className="text-[15px] font-semibold text-slate-900">
-                          {suggestion.leftContact.fullName} ↔ {suggestion.rightContact.fullName}
-                        </p>
-                        <span
-                          className={`rounded-full px-2.5 py-0.5 text-[10.5px] font-bold uppercase tracking-[0.04em] ${
-                            suggestion.confidence === "high"
-                              ? "bg-[#f3e1da] text-[#b5472f]"
-                              : suggestion.confidence === "medium"
-                                ? "bg-[#f6edd9] text-[#bf8526]"
-                                : "bg-[#f2f4f0] text-[#8b938c]"
-                          }`}
-                        >
-                          {suggestion.confidence} confidence
-                        </span>
-                      </div>
-                      <div className="mt-1.5 grid gap-1 text-[12.5px] text-[#5c655e]">
-                        {suggestion.reasons.map((reason) => (
-                          <p key={reason}>{reason}</p>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                      <Link
-                        className="rounded-lg border border-[#d8ddd6] bg-white px-3.5 py-2 text-[13px] font-semibold text-[#1d2823] transition hover:bg-slate-50"
-                        href={`/merge-suggestions/${suggestion.id}`}
-                      >
-                        Review
-                      </Link>
-                      <MergeSuggestionDismissButton suggestionId={suggestion.id} />
-                    </div>
-                  </article>
-                ))}
-              </div>
-            )}
+              {mergeSuggestionsRefreshed ? (
+                <p className="px-4 pt-4 text-xs font-semibold uppercase tracking-[0.18em] text-[#1f7a67]">
+                  Suggestions refreshed
+                </p>
+              ) : null}
+              <MergeSuggestionList suggestions={mergeSuggestions} />
 
               {recentMerges.length > 0 ? (
                 <div className="p-4 pt-0">

@@ -131,7 +131,7 @@ export function MobileSettingsNav({
   const { text: groupDetailText, color: groupDetailColor } = groupEntryDetail(groupEntry);
 
   return (
-    <div className="md:hidden" style={{ paddingBottom: 8 }}>
+    <div className="lg:hidden" style={{ paddingBottom: 8 }}>
       {/* Account card */}
       <GroupCard>
         <div style={{ display: "flex", alignItems: "center", gap: 13, padding: "14px 16px" }}>
@@ -178,7 +178,7 @@ export function MobileSettingsNav({
       </GroupCard>
 
       <GroupCard>
-        <NavRow icon="person" label="Profile" href="/settings/profile" />
+        <NavRow icon="person" label="Account" href="/settings/account" />
         <NavRow icon="qr" label="Public card" href="/settings/profile/card" />
         <NavRow icon="bell" label="Notifications" href="/settings/notifications" />
         <NavRow icon="phone" label="Devices & app passwords" href="/settings/devices" />
