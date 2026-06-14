@@ -50,7 +50,7 @@ index, and the `docs/README.md` concept index (started). Define naming and
 cross-linking conventions.
 
 ### P32-03 — External user help backfill
-Status: Not Started · Priority: P0 · Depends: P32-01
+Status: Done · Priority: P0 · Depends: P32-01
 
 Write Help articles for shipped user-facing features missing them — contacts
 CRUD, books/lists/labels, import/export, merge/duplicates, sync/CardDAV,
