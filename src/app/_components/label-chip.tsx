@@ -27,11 +27,6 @@ export function paletteSwatch(col: string): LabelPaletteSwatch {
   return BY_COL.get(col) ?? { id: "custom", col, soft: "#eef0ec", text: "#5c655e" };
 }
 
-/** Rotate through the palette to assign a color to the nth new label. */
-export function paletteColorAt(index: number): string {
-  return LABEL_PALETTE[index % LABEL_PALETTE.length]!.col;
-}
-
 // ── LabelDot ─────────────────────────────────────────────────────────────────
 
 interface LabelDotProps {

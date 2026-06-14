@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 
-import { LABEL_PALETTE, paletteColorAt } from "~/app/_components/label-chip";
+import { LABEL_PALETTE } from "~/app/_components/label-chip";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 
@@ -30,6 +30,13 @@ const cleanName = (name: string) => {
   return t;
 };
 
+/** Pick a palette color not yet in use; once all 8 are taken, pick random from the full palette. */
+function pickLabelColor(used: Set<string>): string {
+  const pool = LABEL_PALETTE.filter((p) => !used.has(p.col));
+  const src = pool.length > 0 ? pool : LABEL_PALETTE;
+  return src[Math.floor(Math.random() * src.length)]!.col;
+}
+
 const validColor = (col: string) => {
   if (!LABEL_PALETTE.some((p) => p.col === col)) throw new Error("Invalid label color.");
   return col;
@@ -46,7 +53,7 @@ export async function ensureLabelRegistry(): Promise<void> {
 
   const existing = await db.label.findMany({
     where: { userId },
-    select: { name: true },
+    select: { name: true, color: true },
   });
   const registeredNames = new Set(existing.map((l) => l.name.toLowerCase()));
 
@@ -73,16 +80,15 @@ export async function ensureLabelRegistry(): Promise<void> {
     _max: { position: true },
   });
   let pos = (maxPos._max.position ?? -1) + 1;
-  let colorIndex = existing.length;
+  const usedColors = new Set(existing.map((l) => l.color));
 
   const toCreate = [...seen.entries()]
     .filter(([key]) => !registeredNames.has(key))
-    .map(([, name]) => ({
-      userId,
-      name,
-      color: paletteColorAt(colorIndex++),
-      position: pos++,
-    }));
+    .map(([, name]) => {
+      const color = pickLabelColor(usedColors);
+      usedColors.add(color);
+      return { userId, name, color, position: pos++ };
+    });
 
   if (toCreate.length > 0) {
     await db.label.createMany({ data: toCreate, skipDuplicates: true });
@@ -143,17 +149,17 @@ export async function createLabel(input: { name: string }): Promise<{ id: string
   });
   if (existing) return existing;
 
-  const maxPos = await db.label.aggregate({
-    where: { userId },
-    _max: { position: true },
-  });
-  const colorIndex = await db.label.count({ where: { userId } });
+  const [maxPos, existingColors] = await Promise.all([
+    db.label.aggregate({ where: { userId }, _max: { position: true } }),
+    db.label.findMany({ where: { userId }, select: { color: true } }),
+  ]);
+  const usedColors = new Set(existingColors.map((l) => l.color));
 
   const created = await db.label.create({
     data: {
       userId,
       name,
-      color: paletteColorAt(colorIndex),
+      color: pickLabelColor(usedColors),
       position: (maxPos._max.position ?? -1) + 1,
     },
     select: { id: true },
