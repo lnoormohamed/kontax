@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 
 import { createManualMergeSuggestion } from "~/app/actions/merge";
@@ -335,11 +336,20 @@ function MergePickerOverlay({
 export function MergeWithButton({ contact }: { contact: ContactSnap }) {
   const [open, setOpen] = useState(false);
 
+  // Close the overlay and any parent dropdown menu (MoreMenu listens to document mousedown)
+  const handleClose = () => {
+    setOpen(false);
+    document.dispatchEvent(new MouseEvent("mousedown", { bubbles: false }));
+  };
+
   return (
     <>
       <button
         className="flex w-full items-center gap-2 rounded-[0.7rem] px-3 py-2 text-left text-sm font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
-        onClick={() => setOpen(true)}
+        onClick={(e) => {
+          e.stopPropagation(); // prevent MoreMenu's onClick from closing the menu before state updates
+          setOpen(true);
+        }}
         type="button"
       >
         <svg width={15} height={15} viewBox="0 0 24 24" fill="none" stroke="#5c655e" strokeWidth={1.7} strokeLinecap="round" strokeLinejoin="round">
@@ -350,8 +360,9 @@ export function MergeWithButton({ contact }: { contact: ContactSnap }) {
         </svg>
         Merge with another contact
       </button>
-      {open && (
-        <MergePickerOverlay currentContact={contact} onClose={() => setOpen(false)} />
+      {open && createPortal(
+        <MergePickerOverlay currentContact={contact} onClose={handleClose} />,
+        document.body
       )}
     </>
   );
