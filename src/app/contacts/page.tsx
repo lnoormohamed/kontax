@@ -18,6 +18,7 @@ import { getOpenMergeSuggestionsForUser, getRecentMergesForUser } from "~/server
 import { getUserFamilyMembership } from "~/server/family-access";
 import { getAccessibleTeamBooks } from "~/server/team-access";
 import { getOnboardingChecklist } from "~/server/onboarding";
+import { isFullTextEligible, searchContactIds } from "~/server/contact-search";
 import { db } from "~/server/db";
 
 type ContactsPageProps = {
@@ -221,6 +222,16 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
   const mergeSuggestionsRefreshed = mergeSuggestionsRefreshedValue === "1";
 
   const searchConditions = getSearchConditions(query);
+
+  // P28-07: full-text search over the user's own contacts (notes, JSON contact
+  // methods, custom fields, ranked). Short/symbol-only queries fall back to the
+  // multi-field ILIKE path. Shared/family/team contacts keep ILIKE (they aren't
+  // owned by this user, so they're outside the per-user full-text scan).
+  const ftsRows =
+    query && isFullTextEligible(query) ? await searchContactIds(session.user.id, query) : null;
+  const ftsRankById = ftsRows ? new Map(ftsRows.map((r) => [r.id, r.rank])) : null;
+  const privateSearchConditions = ftsRows ? { id: { in: ftsRows.map((r) => r.id) } } : searchConditions;
+
   const recentCutoff = new Date();
   recentCutoff.setDate(recentCutoff.getDate() - 30);
   const filterConditions =
@@ -374,7 +385,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
               userId: session.user.id,
               archivedAt: null,
               groupContacts: { none: {} },
-              AND: [personalBookWhere, searchConditions, filterConditions],
+              AND: [personalBookWhere, privateSearchConditions, filterConditions],
             },
             orderBy: sortOrder,
             select: contactListSelect,
@@ -399,7 +410,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
             where: {
               userId: session.user.id,
               NOT: { archivedAt: null },
-              ...searchConditions,
+              ...privateSearchConditions,
               ...filterConditions,
             },
             orderBy:
@@ -470,8 +481,15 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
     ...c,
     sharedKind: null as "family" | "team" | null,
   }));
-  const sortedActiveContacts =
-    selectedSort === "name"
+  const sortedActiveContacts = ftsRankById
+    ? // P28-07: full-text results lead with relevance. Private contacts carry a
+      // rank; shared (ILIKE-matched) contacts have none and fall to the bottom.
+      [...activeContacts].sort(
+        (a, b) =>
+          (ftsRankById.get(b.id) ?? -1) - (ftsRankById.get(a.id) ?? -1) ||
+          compareWorkspaceContacts(a, b),
+      )
+    : selectedSort === "name"
       ? [...activeContacts].sort(compareWorkspaceContacts)
       : [...activeContacts].sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
   const sortedArchivedContacts =
