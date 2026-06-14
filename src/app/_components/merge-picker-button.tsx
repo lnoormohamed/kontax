@@ -165,8 +165,8 @@ function MergePickerOverlay({
       try {
         const res = await fetch(`/api/contacts/search?q=${encodeURIComponent(query)}&limit=10`);
         if (res.ok) {
-          const data = (await res.json()) as SearchResult[];
-          setResults(data.filter((r) => r.id !== currentContact.id));
+          const { results } = (await res.json()) as { results: SearchResult[] };
+          setResults(results.filter((r) => r.id !== currentContact.id));
         }
       } finally {
         setLoading(false);
