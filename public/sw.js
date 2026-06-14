@@ -1,7 +1,10 @@
 // @ts-nocheck
-const SHELL_CACHE = "kontax-shell-v5";
-const PAGE_CACHE = "kontax-pages-v5";
-const ASSET_CACHE = "kontax-assets-v5";
+// Bump ALL three version strings together on every deploy that changes chunk hashes.
+// Mismatched versions across shell/page/asset caches can cause "module factory not
+// available" errors if an old HTML shell references new chunk names (or vice-versa).
+const SHELL_CACHE = "kontax-shell-v6";
+const PAGE_CACHE = "kontax-pages-v6";
+const ASSET_CACHE = "kontax-assets-v6";
 const OFFLINE_URL = "/offline.html";
 
 const ALL_CACHES = [SHELL_CACHE, PAGE_CACHE, ASSET_CACHE];
