@@ -42,7 +42,7 @@ Inventory Phases 1–31 against the four surfaces. Produce a matrix (feature/pha
 N-A. This drives the rest of the phase.
 
 ### P32-02 — Information architecture & doc homes
-Status: Not Started · Priority: P0
+Status: Done · Priority: P0
 
 Standardize structure and add index/landing pages for each surface: the in-app
 Help center taxonomy, the `/developers` outline, a `roadmap/runbooks/README.md`

@@ -304,6 +304,10 @@
 .kx .faq__a a.inline:hover { text-decoration: underline; }
 
 /* P26-12 — /help FAQ page */
+/* P32-02 — topic nav pills */
+.kx .help-topic-nav { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+.kx .help-topic-pill { display: inline-block; padding: 5px 13px; border-radius: 999px; border: 1px solid var(--line); background: #fff; font-size: 13px; font-weight: 500; color: var(--ink2); text-decoration: none; transition: background 0.13s ease, border-color 0.13s ease, color 0.13s ease; }
+.kx .help-topic-pill:hover { background: var(--wash); border-color: var(--accent); color: var(--accent); }
 .kx .help-wrap { max-width: 760px; margin: 0 auto; padding: 56px 32px 100px; }
 .kx .help-head { margin-bottom: 28px; }
 .kx .help-h1 { margin: 6px 0 0; font-size: clamp(28px, 4vw, 38px); font-weight: 700; letter-spacing: -0.02em; color: var(--ink); }

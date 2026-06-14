@@ -7,7 +7,9 @@ import { HELP_FAQ } from "~/app/_components/help-faq-data";
 // P26-12 · searchable FAQ for /help (design P26-DB07 §4). Live, case-insensitive
 // filter over question + answer; sections with no matches are hidden; a clear
 // (×) button resets. Each item is a native <details> disclosure. Section ids are
-// the deep-link anchors (#carddav / #import / #security / #sharing / #billing).
+// the deep-link anchors (#carddav / #import / #security / #sharing / #billing etc.)
+//
+// P32-02 · Added section nav (Browse by topic) above search, hidden while searching.
 export function HelpFaq() {
   const [q, setQ] = useState("");
   const query = q.trim().toLowerCase();
@@ -21,6 +23,17 @@ export function HelpFaq() {
 
   return (
     <div>
+      {/* Browse by topic nav — hidden while a search query is active */}
+      {!query && (
+        <nav className="help-topic-nav" aria-label="Browse by topic">
+          {HELP_FAQ.map((sec) => (
+            <a key={sec.id} href={`#${sec.id}`} className="help-topic-pill">
+              {sec.title}
+            </a>
+          ))}
+        </nav>
+      )}
+
       <div className="help-search">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#8b938c" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
           <path d="M11 4a7 7 0 105.3 11.7M20 20l-3.7-3.3" />
@@ -43,7 +56,7 @@ export function HelpFaq() {
 
       {sections.length === 0 ? (
         <div className="help-noresult">
-          <p className="help-noresult__title">No results for “{q}”</p>
+          <p className="help-noresult__title">No results for "{q}"</p>
           <p className="help-noresult__sub">Try a different term, or browse the sections by clearing the search.</p>
         </div>
       ) : (

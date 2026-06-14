@@ -196,6 +196,7 @@ const TOC_ITEMS = [
   { href: "#get-contact", label: "  GET /contacts/:id" },
   { href: "#put-contact", label: "  PUT /contacts/:id" },
   { href: "#delete-contact", label: "  DELETE /contacts/:id" },
+  { href: "#pagination", label: "Pagination" },
   { href: "#errors", label: "Errors" },
   { href: "#fields", label: "Field reference" },
   { href: "#rate-limits", label: "Rate limits" },
@@ -560,6 +561,26 @@ curl -X DELETE -H "Authorization: Bearer ktx_live_..." \\
             </P>
           </section>
 
+          {/* Pagination */}
+          <Section id="pagination" title="Pagination">
+            <P>
+              List responses include a <Code>pagination</Code> envelope. Pass the returned{" "}
+              <Code>cursor</Code> as a query parameter on the next request to fetch the next page.
+            </P>
+            <CodeBlock lang="json">{`{
+  "contacts": [ /* up to limit items */ ],
+  "pagination": {
+    "cursor": "clx7b...",   // pass as ?cursor= on the next request
+    "hasMore": true         // false on the last page
+  }
+}`}</CodeBlock>
+            <P>
+              Cursor-based pagination is stable: inserting or deleting contacts between pages does
+              not cause duplicates or gaps. The default <Code>limit</Code> is 50; the maximum is
+              100.
+            </P>
+          </Section>
+
           {/* Errors */}
           <Section id="errors" title="Errors">
             <P>All error responses use the same JSON shape:</P>
@@ -599,6 +620,9 @@ curl -X DELETE -H "Authorization: Bearer ktx_live_..." \\
                 [<Code key="bd">birthday</Code>, "string | null", "✓", "YYYY-MM-DD or --MM-DD"],
                 [<Code key="em">emails</Code>, "entry[]", "✓", "Array of { value, label, isPrimary }"],
                 [<Code key="ph">phones</Code>, "entry[]", "✓", "Array of { value, label, isPrimary }"],
+                [<Code key="la">labels</Code>, "string[]", "✓", "Array of label names, e.g. [\"VIP\", \"Newsletter\"]"],
+                [<Code key="if">isFavorite</Code>, "boolean", "✓", "True if the contact is starred"],
+                [<Code key="ie">isEmergency</Code>, "boolean", "✓", "True if the contact is marked as an emergency contact"],
                 [<Code key="bi">bookId</Code>, "string | null", "✓", "Address book CUID"],
                 [<Code key="sr">source</Code>, "string", "—", "Origin: MANUAL, API, SYNC_CARDDAV, etc."],
                 [<Code key="ca">createdAt</Code>, "ISO 8601", "—", "UTC timestamp"],
