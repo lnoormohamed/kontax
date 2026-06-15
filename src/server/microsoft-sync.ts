@@ -14,15 +14,17 @@ import {
   type Configuration,
 } from "@azure/msal-node";
 
-import type { ConflictPolicy, Prisma } from "../../generated/prisma";
+import type { ConflictPolicy, Prisma, SyncDirection } from "../../generated/prisma";
 import { env } from "~/env";
 import { db } from "~/server/db";
+import { parseContactStringArray } from "~/server/contact-portability";
 import {
   type GraphContact,
   type GraphContactSource,
   mapGraphContactToKontax,
   mapKontaxContactToGraph,
 } from "~/server/microsoft-sync-mapping";
+import type { ValueEntry } from "~/server/sync-contact-mapping";
 import type { ContactConflictSnapshotInput } from "~/server/sync-conflict-snapshot";
 import {
   addImportBatch,
@@ -32,6 +34,7 @@ import {
   type ImportEngineAccount,
   importRemoteContactBatch,
   isConflictQueueFull,
+  isLocalChanged,
   openMutationConflict,
   recordAutoResolved,
   type RemoteContactItem,
@@ -140,10 +143,19 @@ export type MicrosoftImportAccount = MicrosoftSyncAccount & {
   label: string;
   lastSyncCursor: string | null;
   conflictPolicy: ConflictPolicy;
+  // Drives the push phase: only TWO_WAY / EXPORT_ONLY accounts push local edits.
+  syncDirection: SyncDirection;
 };
 
 // Whole-import result the runner records; queueFull drives the auto-pause.
 export type MicrosoftImportSummary = ImportBatchSummary & { queueFull: boolean };
+
+// Full sync result: inbound import + outbound push tallies, recorded separately.
+export type MicrosoftSyncResult = MicrosoftImportSummary & {
+  pushedCreated: number;
+  pushedUpdated: number;
+  pushedDeleted: number;
+};
 
 // Engine account context for Microsoft (adds source/provider provenance).
 const toEngineAccount = (account: MicrosoftImportAccount): ImportEngineAccount => ({
@@ -349,12 +361,6 @@ export const microsoftIncrementalSync = async (
   return finalizeImportSummary(account, result.summary);
 };
 
-// Runner entrypoint: pick full vs incremental based on stored cursor.
-export const runMicrosoftSync = async (
-  account: MicrosoftImportAccount,
-): Promise<MicrosoftImportSummary> =>
-  account.lastSyncCursor ? microsoftIncrementalSync(account) : microsoftFullImport(account);
-
 // ── Push phase (P27-06) ──────────────────────────────────────────────────────
 // PATCH /me/contacts/{id} with an If-Match etag header. A 412 Precondition
 // Failed means the remote changed since our etag → fetch the latest and resolve
@@ -457,6 +463,267 @@ export const pushMicrosoftContact = async (
 
   await openMutationConflict(engineAccount, { id: link.id }, contact, remoteSnapshot, latestEtag);
   return { ok: false, conflict: true, strategy: "MANUAL" };
+};
+
+// ── Push phase wiring (P34D-03) ───────────────────────────────────────────────
+// Mirrors the Google connector: create/update/delete local changes on Outlook,
+// pushed BEFORE the import (the import re-anchors lastSyncedAt for unchanged
+// contacts, which would otherwise mask local edits). NOTE: this connector cannot
+// be run/verified until Microsoft OAuth is configured (Azure app registration).
+
+const parseValueEntries = (value: unknown): ValueEntry[] =>
+  Array.isArray(value)
+    ? value
+        .filter(
+          (entry): entry is Record<string, unknown> =>
+            typeof entry === "object" &&
+            entry !== null &&
+            typeof (entry as { value?: unknown }).value === "string",
+        )
+        .map((entry) => ({
+          label: typeof entry.label === "string" ? entry.label : "",
+          value: entry.value as string,
+          isPrimary: entry.isPrimary === true,
+        }))
+    : [];
+
+const pushContactSelect = {
+  id: true,
+  syncUid: true,
+  syncVersion: true,
+  updatedAt: true,
+  fullName: true,
+  firstName: true,
+  middleName: true,
+  lastName: true,
+  namePrefix: true,
+  nameSuffix: true,
+  nickname: true,
+  email: true,
+  emailAddresses: true,
+  emailEntries: true,
+  phone: true,
+  phoneNumbers: true,
+  phoneEntries: true,
+  website: true,
+  websiteEntries: true,
+  company: true,
+  department: true,
+  jobTitle: true,
+  birthday: true,
+  address: true,
+  postalAddresses: true,
+  notes: true,
+} satisfies Prisma.ContactSelect;
+
+type PushContactRow = Prisma.ContactGetPayload<{ select: typeof pushContactSelect }>;
+
+const buildMicrosoftPushContact = (c: PushContactRow): MicrosoftPushContact => ({
+  id: c.id,
+  syncUid: c.syncUid,
+  syncVersion: c.syncVersion,
+  fullName: c.fullName,
+  firstName: c.firstName,
+  middleName: c.middleName,
+  lastName: c.lastName,
+  namePrefix: c.namePrefix,
+  nameSuffix: c.nameSuffix,
+  nickname: c.nickname,
+  email: c.email,
+  emailAddresses: parseContactStringArray(c.emailAddresses),
+  emailEntries: parseValueEntries(c.emailEntries),
+  phone: c.phone,
+  phoneNumbers: parseContactStringArray(c.phoneNumbers),
+  phoneEntries: parseValueEntries(c.phoneEntries),
+  websiteEntries: parseValueEntries(c.websiteEntries),
+  company: c.company,
+  department: c.department,
+  jobTitle: c.jobTitle,
+  website: c.website,
+  birthday: c.birthday,
+  address: c.address,
+  postalAddresses: c.postalAddresses,
+  notes: c.notes,
+});
+
+// Create a brand-new Outlook contact, then link it.
+const createMicrosoftContactRemote = async (
+  account: MicrosoftImportAccount,
+  contact: PushContactRow,
+): Promise<boolean> => {
+  const accessToken = await getMicrosoftAccessToken(account);
+  const res = await fetch(`${GRAPH_BASE}/me/contacts`, {
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+    body: JSON.stringify(mapKontaxContactToGraph(buildMicrosoftPushContact(contact))),
+  });
+  if (!res.ok) {
+    throw normaliseMicrosoftError({ statusCode: res.status, message: await res.text().catch(() => "") });
+  }
+  const created = (await res.json()) as { id?: string; "@odata.etag"?: string };
+  if (!created.id) return false;
+  await db.syncContactLink.create({
+    data: {
+      syncAccountId: account.id,
+      contactId: contact.id,
+      remoteHref: created.id,
+      remoteUid: created.id,
+      remoteETag: created["@odata.etag"] ?? null,
+      lastSyncedAt: new Date(),
+    },
+  });
+  return true;
+};
+
+// Delete an Outlook contact removed locally, then tombstone the link. A 404
+// (already gone remotely) is treated as success.
+const deleteMicrosoftContactRemote = async (
+  account: MicrosoftImportAccount,
+  link: { id: string; remoteUid: string },
+): Promise<void> => {
+  const accessToken = await getMicrosoftAccessToken(account);
+  const res = await fetch(`${GRAPH_BASE}/me/contacts/${link.remoteUid}`, {
+    method: "DELETE",
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!res.ok && res.status !== 404) {
+    throw normaliseMicrosoftError({ statusCode: res.status, message: await res.text().catch(() => "") });
+  }
+  const now = new Date();
+  await db.syncContactLink.update({
+    where: { id: link.id },
+    data: { tombstonedAt: now, remoteDeletedAt: now, lastSyncedAt: now },
+  });
+};
+
+export const pushLocalChangesToMicrosoft = async (
+  account: MicrosoftImportAccount,
+): Promise<{ created: number; updated: number; deleted: number; conflicts: number }> => {
+  if (account.syncDirection !== "TWO_WAY" && account.syncDirection !== "EXPORT_ONLY") {
+    return { created: 0, updated: 0, deleted: 0, conflicts: 0 };
+  }
+
+  let created = 0;
+  let updated = 0;
+  let deleted = 0;
+  let conflicts = 0;
+
+  // 1) UPDATES — active, locally-edited contacts already linked. Only genuine
+  //    user edits (lastMutatedBy = MANUAL) to avoid the push/import feedback loop.
+  const activeLinks = await db.syncContactLink.findMany({
+    where: {
+      syncAccountId: account.id,
+      tombstonedAt: null,
+      remoteUid: { not: null },
+      contact: { archivedAt: null, syncTombstoneAt: null, lastMutatedBy: "MANUAL" },
+    },
+    select: {
+      id: true,
+      contactId: true,
+      remoteUid: true,
+      remoteETag: true,
+      lastSyncedAt: true,
+      contact: { select: pushContactSelect },
+    },
+  });
+  for (const link of activeLinks) {
+    if (!link.remoteUid) continue;
+    if (!isLocalChanged(link.lastSyncedAt, link.contact.updatedAt)) continue;
+    const result = await pushMicrosoftContact(
+      account,
+      {
+        id: link.id,
+        contactId: link.contactId,
+        remoteUid: link.remoteUid,
+        remoteETag: link.remoteETag,
+      },
+      buildMicrosoftPushContact(link.contact),
+    );
+    if (result.ok) {
+      updated += 1;
+    } else {
+      conflicts += 1;
+    }
+  }
+
+  // 2) CREATES — user-created local contacts not yet on Outlook.
+  const unlinked = await db.contact.findMany({
+    where: {
+      userId: account.userId,
+      archivedAt: null,
+      syncTombstoneAt: null,
+      lastMutatedBy: "MANUAL",
+      syncLinks: { none: { syncAccountId: account.id } },
+    },
+    select: pushContactSelect,
+  });
+  for (const contact of unlinked) {
+    if (await createMicrosoftContactRemote(account, contact)) {
+      created += 1;
+    }
+  }
+
+  // 3) DELETES — contacts removed locally but still present on Outlook.
+  const removedLinks = await db.syncContactLink.findMany({
+    where: {
+      syncAccountId: account.id,
+      tombstonedAt: null,
+      remoteUid: { not: null },
+      remoteDeletedAt: null,
+      contact: { OR: [{ archivedAt: { not: null } }, { syncTombstoneAt: { not: null } }] },
+    },
+    select: { id: true, remoteUid: true },
+  });
+  for (const link of removedLinks) {
+    if (!link.remoteUid) continue;
+    await deleteMicrosoftContactRemote(account, { id: link.id, remoteUid: link.remoteUid });
+    deleted += 1;
+  }
+
+  return { created, updated, deleted, conflicts };
+};
+
+// Runner entrypoint. Push local changes first, then pull; direction gates each
+// half. Inbound + outbound tallies are reported separately.
+export const runMicrosoftSync = async (
+  account: MicrosoftImportAccount,
+): Promise<MicrosoftSyncResult> => {
+  const outbound =
+    account.syncDirection === "TWO_WAY" || account.syncDirection === "EXPORT_ONLY";
+  const inbound =
+    account.syncDirection === "TWO_WAY" || account.syncDirection === "IMPORT_ONLY";
+
+  const push = outbound
+    ? await pushLocalChangesToMicrosoft(account)
+    : { created: 0, updated: 0, deleted: 0, conflicts: 0 };
+
+  const importSummary: MicrosoftImportSummary = inbound
+    ? account.lastSyncCursor
+      ? await microsoftIncrementalSync(account)
+      : await microsoftFullImport(account)
+    : {
+        created: 0,
+        updated: 0,
+        deleted: 0,
+        conflicts: 0,
+        queueFull: await isConflictQueueFull(account.id),
+      };
+
+  return {
+    created: importSummary.created,
+    updated: importSummary.updated,
+    deleted: importSummary.deleted,
+    conflicts: importSummary.conflicts + push.conflicts,
+    queueFull:
+      push.conflicts > 0 ? await isConflictQueueFull(account.id) : importSummary.queueFull,
+    pushedCreated: push.created,
+    pushedUpdated: push.updated,
+    pushedDeleted: push.deleted,
+  };
 };
 
 // ── connected-account email (used by the callback) ───────────────────────────

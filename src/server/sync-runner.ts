@@ -555,6 +555,7 @@ export const runQueuedSyncJobs = async ({
             credentialReference: job.syncAccount.credentialReference,
             lastSyncCursor: job.syncAccount.lastSyncCursor,
             conflictPolicy: settings.conflictPolicy,
+            syncDirection: job.syncAccount.syncDirection,
           }),
         (error) => (error instanceof MicrosoftSyncError ? error.code : "MICROSOFT_SYNC_FAILED"),
       );
@@ -1192,10 +1193,17 @@ export const runQueuedSyncJobs = async ({
             completedAt: new Date(),
             leaseExpiresAt: null,
             nextRetryAt: null,
+            // Inbound (remote -> Kontax). Remote deletions surface as conflicts
+            // rather than auto-applied deletes, so the inbound delete count is 0.
             createdCount: unmatchedCards.length,
-            updatedCount: matchedEntries.length + remoteApplyCandidates.length + pushedLinks.length,
-            deletedCount: deletedLinkIds.length,
+            updatedCount: matchedEntries.length + remoteApplyCandidates.length,
+            deletedCount: 0,
             conflictCount: conflictEntries.length,
+            // Outbound (Kontax -> remote). CardDAV push is update-only for
+            // existing links (no outbound create of brand-new local contacts yet).
+            pushedCreatedCount: 0,
+            pushedUpdatedCount: pushedLinks.length,
+            pushedDeletedCount: deletedLinkIds.length,
             skippedCount: deferredLocalChangesCount,
             cursorBefore: job.syncAccount.remoteCTag ?? job.cursorBefore ?? job.syncAccount.addressBookUrl,
             cursorAfter: String(remoteEntries.length),
