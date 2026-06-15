@@ -27,7 +27,9 @@ async function fetchStripePrices(): Promise<StripePrices | null> {
     const [proM, proY, famM, famY, teaM, teaY] = results.map((p) =>
       Math.round((p.unit_amount ?? 0) / 100),
     );
+    const currency = results[0]?.currency ?? "usd";
     return {
+      currency,
       pro: { monthly: proM!, annual: proY! },
       family: { monthly: famM!, annual: famY! },
       teams: { monthly: teaM!, annual: teaY! },

@@ -6,10 +6,18 @@ import { useState, useTransition } from "react";
 import { createBillingPortalSession, createCheckoutSession } from "~/app/actions/billing";
 
 export type StripePrices = {
+  currency: string;
   pro: { monthly: number; annual: number };
   family: { monthly: number; annual: number };
   teams: { monthly: number; annual: number };
 };
+
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  usd: "$", gbp: "£", eur: "€", aud: "A$", cad: "C$", chf: "Fr",
+};
+function sym(code: string) {
+  return CURRENCY_SYMBOLS[code.toLowerCase()] ?? code.toUpperCase();
+}
 
 const CHECK = (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -90,6 +98,7 @@ const BASE_PLANS: Omit<Plan, "price">[] = [
 ];
 
 const FALLBACK_PRICES: StripePrices = {
+  currency: "usd",
   pro: { monthly: 5, annual: 4 },
   family: { monthly: 8, annual: 6 },
   teams: { monthly: 12, annual: 10 },
@@ -110,7 +119,9 @@ export function PricingToggle({
   currentPlan?: string | null;
   stripePrices?: StripePrices | null;
 }) {
-  const PLANS = buildPlans(stripePrices ?? null);
+  const prices = stripePrices ?? FALLBACK_PRICES;
+  const PLANS = buildPlans(prices);
+  const currencySymbol = sym(prices.currency);
   const [annual, setAnnual] = useState(false);
   const [teamSeats, setTeamSeats] = useState(3);
   const [loading, setLoading] = useState<string | null>(null);
@@ -202,7 +213,7 @@ export function PricingToggle({
                       <span className="pr-plan__free">Free</span>
                     ) : (
                       <>
-                        <span className="pr-plan__currency">£</span>
+                        <span className="pr-plan__currency">{currencySymbol}</span>
                         <span className="pr-plan__amount">{amount}</span>
                         <span className="pr-plan__per">{isTeams ? "/seat/mo" : "/mo"}</span>
                         {showSave && <span className="pr-plan__save">Save 20%</span>}
@@ -212,8 +223,9 @@ export function PricingToggle({
 
                   <p className="pr-plan__sublabel">{sublabel ?? " "}</p>
 
-                  {/* Seat picker — Teams only, not shown if already on Teams */}
+                  {/* Seat picker + total — Teams only, not shown if already on Teams */}
                   {isTeams && !isCurrent && (
+                    <>
                     <div className="pr-seat-picker">
                       <button
                         aria-label="Remove seat"
@@ -230,6 +242,10 @@ export function PricingToggle({
                         type="button"
                       >+</button>
                     </div>
+                    <p className="pr-seat-total">
+                      {currencySymbol}{((amount ?? 0) * teamSeats).toLocaleString()} / mo total
+                    </p>
+                    </>
                   )}
 
                   {isCurrent ? (

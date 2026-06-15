@@ -231,6 +231,7 @@
 .pr-seat-picker__btn:hover:not(:disabled) { background: var(--mkt-surface); }
 .pr-seat-picker__btn:disabled { opacity: 0.35; cursor: default; }
 .pr-seat-picker__count { font-size: 14px; font-weight: 600; color: var(--mkt-ink); min-width: 64px; text-align: center; }
+.pr-seat-total { margin: 6px 0 0; text-align: center; font-size: 13px; font-weight: 600; color: var(--mkt-green); }
 
 .pr-plan__divider {
   height: 1px;
