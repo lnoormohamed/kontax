@@ -247,7 +247,7 @@ Environment: kontax.vexon.co
 | TC-07 | Add Outlook OAuth | ✅ Pass | Azure unconfigured → redirects to `https://kontax.vexon.co/sync?error=microsoft_unconfigured` (correct). `microsoft_unconfigured` toast shown. Docker hostname bug fixed in `eb3041a`; retested and confirmed post-deploy. |
 | TC-08 | Outlook initial import | ⚠️ Blocked | Azure OAuth app not registered (pre-prod checklist item). |
 | TC-09 | Edit in Kontax → appears in source | ✅ Pass (partial) | Added note "SyncTest2026 — added by P34D-03 smoke test" to Fatima Al-Rashid, triggered Sync now. Sync history shows Google +0 ~1 −0 (1 contact updated on Google). API-level push confirmed. Direct verification in Google Contacts web inconclusive — contact likely in Workspace directory contacts vs personal "My Contacts" (web search returned "No results"). |
-| TC-10 | Edit in source → appears in Kontax | ⚠️ Blocked | Requires user to edit a contact in Google Contacts web and re-sync. Google account was disconnected during TC-11; reconnect needed. |
+| TC-10 | Edit in source → appears in Kontax | ✅ Pass | User edited "Fatima Al-Rashid" → "Fatima-test Al-Rashid" in Google Contacts web (contacts.google.com, li@noormohamed.uk). Google token had expired; re-authorisation required (see bugs table — `google_duplicate` bug found and fixed). After re-auth, Sync now ran: Kontax +1 ~330 −0. "Fatima-test Al-Rashid" confirmed in Kontax contacts search. |
 | TC-11 | Disconnect a sync account | ✅ Pass | Clicked Disconnect → Google Contacts entry removed from sync accounts list. Empty state "Connect your first sync account" shown. Note: disconnect completed without password re-confirmation (see Security findings below). |
 | TC-12 | Contacts remain after disconnect | ✅ Pass | 441 contacts still present in Kontax after disconnect. Contact data not deleted. |
 | TC-13 | Sync icon after disconnect | ✅ Pass | Fatima Al-Rashid SYNC section shows "Not linked to any account yet. Connect a CardDAV account to keep this contact in sync." — Google sync badge cleared. Data (incl. TC-09 note) preserved. |
@@ -265,6 +265,7 @@ Environment: kontax.vexon.co
 | `syncUid @unique` is global — blocks multi-account import | P1 | `syncUid` had a global unique constraint across all users. When a user's iCloud contacts shared vCard UIDs with another user's contacts in the DB, the iCloud initial import failed with `Unique constraint failed on the fields: ('syncUid')`. Also affects any scenario where two users have contacts with the same UID. | Changed to `@@unique([userId, syncUid])` — uniqueness is now scoped per user. Confirmed 0 existing duplicate (userId, syncUid) pairs before migration. Commit `10af85c`. |
 | CONNECTED ACCOUNT shows "—" for Google Workspace accounts | P3 | The `userinfo.email` endpoint does not return `email` for Google Workspace accounts (`li@noormohamed.uk`). Sync works correctly; only the display is affected. | Open — investigate `fetchGoogleProfileEmail` / use People API `people/me` to resolve email for Workspace accounts. |
 | Disconnect has no password re-confirmation guard | P2 | Saving connection settings (direction, frequency) requires Kontax password re-confirmation. Disconnect (a more destructive action — removes the entire connection) does not. Inconsistent security posture. | Open — add `reauthRequired` check to the disconnect server action, same as `updateSyncAccount`. |
+| Google re-auth fails with `google_duplicate` when `remoteAccountId` is null | P1 | Accounts connected before email resolution was stored have `remoteAccountId = null`. The callback's `findFirst` only matched by email — missed null accounts — then tried to `create`, hitting the `@@unique([userId, baseUrl, label])` constraint. Re-auth always failed with `?error=google_duplicate`. | Changed to a single `findFirst` with `OR [email, null, ""]` to match any existing Google account for the user. Commits `4c9da1f`, `f9176fc`. Retested ✅. |
 
 ### Security findings
 
@@ -287,13 +288,12 @@ Environment: kontax.vexon.co
 | TC | Requirement |
 |----|-------------|
 | TC-08 | Azure app registration (pre-prod checklist) |
-| TC-10 | Reconnect Google (li@noormohamed.uk), user edits a contact in Google Contacts web, re-sync |
 
 ### Section sign-off
 
 | Criterion | Status |
 |-----------|--------|
-| All 16 TCs pass | ❌ TC-08/10 blocked; 15/16 pass |
+| All 16 TCs pass | ❌ TC-08 blocked (Azure); 15/16 pass |
 | No 500 errors during sync trigger | ✅ (no 500s observed) |
 | Bugs filed | ✅ 3 bugs documented (1 fixed, 2 open) |
 
