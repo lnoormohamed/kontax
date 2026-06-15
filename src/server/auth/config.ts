@@ -6,7 +6,8 @@ import { z } from "zod";
 
 import { db } from "~/server/db";
 import { detectNewDeviceSignIn, recordFailedLogin } from "~/server/notifications";
-import { getPreferences, type UserPreferences, DEFAULT_PREFERENCES } from "~/lib/preferences";
+import { getPreferences } from "~/server/preferences";
+import { DEFAULT_PREFERENCES, type UserPreferences } from "~/lib/preferences-shared";
 
 /**
  * Module augmentation for `next-auth` types.

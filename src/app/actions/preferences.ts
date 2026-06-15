@@ -1,7 +1,8 @@
 "use server";
 
 import { auth } from "~/server/auth";
-import { updatePreferences, type UserPreferences } from "~/lib/preferences";
+import { updatePreferences } from "~/server/preferences";
+import type { UserPreferences } from "~/lib/preferences-shared";
 
 export async function updatePreferencesAction(
   patch: Partial<UserPreferences>,
