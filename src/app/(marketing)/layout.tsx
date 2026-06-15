@@ -9,7 +9,7 @@ export default function MarketingLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="mkt-wrap">
+    <div className="mkt-wrap" style={{ background: "#fff", color: "#1d2823", colorScheme: "light" }}>
       <MarketingNav />
       <main>{children}</main>
       <MarketingFooter />
