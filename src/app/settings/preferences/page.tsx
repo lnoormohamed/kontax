@@ -1,3 +1,5 @@
+import { SessionProvider } from "next-auth/react";
+
 import { SettingsCard, SettingsPageHead } from "~/app/_components/settings-ui";
 import { redirectToLogin } from "~/server/auth/require-page-auth";
 import { updatePhoneticSettings } from "~/app/actions/settings";
@@ -32,7 +34,8 @@ export default async function SettingsPreferencesPage() {
   const preferences = session.user.preferences ?? DEFAULT_PREFERENCES;
 
   return (
-    <>
+    // DisplayPreferencesSection calls useSession(); needs a provider in the tree.
+    <SessionProvider session={session}>
       <SettingsPageHead
         title="Preferences"
         sub="Personal behavior settings. They only affect your account, without changing the structure of your contacts."
@@ -70,6 +73,6 @@ export default async function SettingsPreferencesPage() {
         </form>
       </SettingsCard>
       <DisplayPreferencesSection initialPreferences={preferences} />
-    </>
+    </SessionProvider>
   );
 }
