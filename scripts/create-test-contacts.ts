@@ -68,6 +68,7 @@ async function main() {
       where: { id: contact.id },
     });
 
+    if (!syncAccount.addressBookUrl) throw new Error("Sync account has no addressBookUrl.");
     const result = await pushCardDavContact({
       addressBookUrl: syncAccount.addressBookUrl,
       credentials: { username: creds.username, password: creds.password },

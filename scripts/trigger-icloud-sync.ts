@@ -42,6 +42,7 @@ async function pushNonAsciiContacts() {
     console.log(`\nPushing: ${link.contact.fullName} → ${link.remoteHref}`);
     console.log(`  remoteUid: ${link.remoteUid}`);
 
+    if (!syncAccount.addressBookUrl) throw new Error("Sync account has no addressBookUrl.");
     try {
       const result = await pushCardDavContact({
         addressBookUrl: syncAccount.addressBookUrl,
