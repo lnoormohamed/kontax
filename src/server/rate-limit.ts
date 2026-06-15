@@ -53,6 +53,9 @@ export const rateLimiters = {
   // P29-08: REST API per-token sliding window (key = token SHA-256 hash)
   apiRead: makeLimiter(1_000, 60 * 60, "rl:api-read:"),
   apiWrite: makeLimiter(200, 60 * 60, "rl:api-write:"),
+
+  // P34C-14: contact form — 3 submissions per IP per hour
+  contactForm: makeLimiter(3, 60 * 60, "rl:contact-form"),
 } as const;
 
 export interface RateLimitResult {

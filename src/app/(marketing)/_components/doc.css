@@ -1,0 +1,111 @@
+/* ════════════════════════════════════════════════════════════════
+   Shared prose document layout (Privacy, Terms, About)
+   Prefix: doc-  (tokens come from .mkt-wrap in marketing.css)
+   ════════════════════════════════════════════════════════════════ */
+
+.doc-wrap {
+  max-width: 768px;
+  margin: 0 auto;
+  padding: 72px 24px 96px;
+}
+
+.doc-wrap--center { text-align: center; }
+
+.doc-title {
+  margin: 0;
+  font-size: 36px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--mkt-green);
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.doc-meta {
+  margin: 10px 0 40px;
+  font-size: 14px;
+  color: var(--mkt-mute);
+}
+
+.doc-body {
+  font-size: 16px;
+  line-height: 1.8;
+  color: var(--mkt-body);
+}
+
+.doc-body h2 {
+  margin: 48px 0 12px;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--mkt-ink);
+  letter-spacing: -0.01em;
+  line-height: 1.25;
+}
+
+.doc-body p {
+  margin: 0 0 16px;
+  text-wrap: pretty;
+}
+
+.doc-body ul,
+.doc-body ol {
+  margin: 0 0 16px;
+  padding-left: 22px;
+}
+
+.doc-body li {
+  margin-bottom: 6px;
+}
+
+.doc-body a {
+  color: var(--mkt-accent);
+  text-decoration: none;
+}
+
+.doc-body a:hover { text-decoration: underline; }
+
+.doc-body strong { font-weight: 600; color: var(--mkt-ink); }
+
+.doc-divider {
+  margin: 40px 0 0;
+  padding-top: 40px;
+  border-top: 1px solid var(--mkt-hairline);
+  font-size: 15px;
+  color: var(--mkt-mute);
+}
+
+.doc-divider a {
+  color: var(--mkt-ink);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.doc-divider a:hover { color: var(--mkt-green); }
+
+.doc-cta {
+  margin-top: 48px;
+}
+
+.doc-cta__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 48px;
+  padding: 0 32px;
+  background: var(--mkt-green);
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.doc-cta__btn:hover { background: var(--mkt-green-deep); }
+
+@media (max-width: 767px) {
+  .doc-wrap { padding: 48px 20px 72px; }
+  .doc-title { font-size: 28px; }
+  .doc-body h2 { font-size: 18px; margin-top: 36px; }
+  .doc-cta__btn { width: 100%; }
+}

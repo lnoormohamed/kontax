@@ -119,7 +119,8 @@ export function PricingToggle() {
           <div className="pr-grid">
             {PLANS.map((plan) => {
               const isFree = plan.price === "free";
-              const amount = isFree ? null : (annual ? plan.price.annual : plan.price.monthly);
+              const priceObj = isFree ? null : (plan.price as { monthly: number; annual: number });
+              const amount = priceObj ? (annual ? priceObj.annual : priceObj.monthly) : null;
               const showSave = !isFree && annual;
               const sublabel = plan.sublabel
                 ? (annual ? plan.sublabel.annual : plan.sublabel.monthly)
