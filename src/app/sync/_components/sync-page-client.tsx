@@ -888,7 +888,7 @@ function DuplicatesBanner({ count }: { count: number }) {
         found from this import.
       </div>
       <a
-        href="/merge/manual"
+        href="/contacts?tab=duplicates"
         style={{ fontSize: 13, fontWeight: 600, color: "#4158f4", marginLeft: "auto", whiteSpace: "nowrap" }}
       >
         Review suggestions →
