@@ -18,6 +18,13 @@ const CURRENCY_SYMBOLS: Record<string, string> = {
 function sym(code: string) {
   return CURRENCY_SYMBOLS[code.toLowerCase()] ?? code.toUpperCase();
 }
+function fmt(n: number): string {
+  return n % 1 === 0 ? String(n) : n.toFixed(2);
+}
+function savingsPct(monthly: number, annual: number): number {
+  if (!monthly) return 0;
+  return Math.round((1 - annual / monthly) * 100);
+}
 
 const CHECK = (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -191,7 +198,8 @@ export function PricingToggle({
               const isCurrent = currentPlan === plan.id.toUpperCase();
               const priceObj = isFree ? null : (plan.price as { monthly: number; annual: number });
               const amount = priceObj ? (annual ? priceObj.annual : priceObj.monthly) : null;
-              const showSave = !isFree && annual;
+              const planSavingsPct = priceObj ? savingsPct(priceObj.monthly, priceObj.annual) : 0;
+              const showSave = !isFree && annual && planSavingsPct > 0;
               const sublabel = plan.sublabel
                 ? (annual ? plan.sublabel.annual : plan.sublabel.monthly)
                 : null;
@@ -214,9 +222,9 @@ export function PricingToggle({
                     ) : (
                       <>
                         <span className="pr-plan__currency">{currencySymbol}</span>
-                        <span className="pr-plan__amount">{amount}</span>
+                        <span className="pr-plan__amount">{fmt(amount!)}</span>
                         <span className="pr-plan__per">{isTeams ? "/seat/mo" : "/mo"}</span>
-                        {showSave && <span className="pr-plan__save">Save 20%</span>}
+                        {showSave && <span className="pr-plan__save">Save {planSavingsPct}%</span>}
                       </>
                     )}
                   </div>
@@ -243,7 +251,7 @@ export function PricingToggle({
                       >+</button>
                     </div>
                     <p className="pr-seat-total">
-                      {currencySymbol}{((amount ?? 0) * teamSeats).toLocaleString()} / mo total
+                      {currencySymbol}{fmt((amount ?? 0) * teamSeats)} / mo total
                     </p>
                     </>
                   )}

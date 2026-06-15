@@ -25,7 +25,7 @@ async function fetchStripePrices(): Promise<StripePrices | null> {
       Object.values(ids).map((id) => stripe.prices.retrieve(id!)),
     );
     const [proM, proY, famM, famY, teaM, teaY] = results.map((p) =>
-      Math.round((p.unit_amount ?? 0) / 100),
+      (p.unit_amount ?? 0) / 100,
     );
     const currency = results[0]?.currency ?? "usd";
     return {
