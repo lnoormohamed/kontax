@@ -224,6 +224,14 @@
   border: 1px solid var(--mkt-card-border);
 }
 .pr-plan__cta--outline:hover { background: var(--mkt-surface); }
+.pr-plan__cta--current { background: var(--mkt-surface); color: #8b938c; cursor: default; border: 1px solid var(--mkt-hairline); }
+
+.pr-seat-picker { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 14px 0 4px; }
+.pr-seat-picker__btn { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--mkt-hairline); background: var(--mkt-bg); font-size: 17px; line-height: 1; color: var(--mkt-ink); transition: background 0.1s; cursor: pointer; }
+.pr-seat-picker__btn:hover:not(:disabled) { background: var(--mkt-surface); }
+.pr-seat-picker__btn:disabled { opacity: 0.35; cursor: default; }
+.pr-seat-picker__count { font-size: 14px; font-weight: 600; color: var(--mkt-ink); min-width: 64px; text-align: center; }
+
 .pr-plan__divider {
   height: 1px;
   background: var(--mkt-hairline);

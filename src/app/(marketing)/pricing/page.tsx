@@ -3,6 +3,8 @@ import type { Metadata } from "next";
 import { JsonLd, breadcrumbSchema } from "~/app/_components/json-ld";
 import { PricingToggle } from "./_pricing-toggle";
 import { FaqList } from "./_faq";
+import { auth } from "~/server/auth";
+import { getUserBillingContext } from "~/server/billing";
 import "./pricing.css";
 
 export const metadata: Metadata = {
@@ -39,7 +41,12 @@ function Cell({ yes, text }: { yes?: boolean; text?: string }) {
   return <span className="pr-cell-no" aria-label="Not included">—</span>;
 }
 
-export default function PricingPage() {
+export default async function PricingPage() {
+  const session = await auth();
+  const currentPlan = session?.user?.id
+    ? await getUserBillingContext(session.user.id).then((b) => b.plan).catch(() => null)
+    : null;
+
   return (
     <>
       <JsonLd
@@ -57,7 +64,7 @@ export default function PricingPage() {
       </section>
 
       {/* ── Billing toggle + Plan cards (client interactive) ── */}
-      <PricingToggle />
+      <PricingToggle currentPlan={currentPlan} />
 
       {/* ── Feature matrix ── */}
       <section className="pr-matrix-sec">

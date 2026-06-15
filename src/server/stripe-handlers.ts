@@ -70,6 +70,9 @@ async function upsertSubscription(
   const status = mapStripeStatus(stripeSubscription.status);
   // current_period_start/end moved to the subscription item in Stripe API v2026+
   const item = stripeSubscription.items.data[0];
+  // For TEAMS per-seat billing, Stripe's quantity is the authoritative seat count.
+  const quantity = item?.quantity ?? 1;
+
   const subscriptionData = {
     plan: planInfo.plan,
     status,
@@ -87,6 +90,7 @@ async function upsertSubscription(
     canceledAt: stripeSubscription.canceled_at
       ? new Date(stripeSubscription.canceled_at * 1000)
       : null,
+    ...(planInfo.plan === "TEAMS" ? { memberSlotsLimit: quantity } : {}),
   };
 
   const existing = await tx.subscription.findFirst({

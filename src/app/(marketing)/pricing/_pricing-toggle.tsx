@@ -1,7 +1,9 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useTransition } from "react";
+
+import { createBillingPortalSession, createCheckoutSession } from "~/app/actions/billing";
 
 const CHECK = (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
@@ -73,20 +75,52 @@ const PLANS: Plan[] = [
     name: "Teams",
     tag: "For organisations",
     price: { monthly: 12, annual: 10 },
-    sublabel: { monthly: "billed monthly · per seat", annual: "billed annually · per seat" },
+    sublabel: { monthly: "per seat · billed monthly", annual: "per seat · billed annually · save 20%" },
     cta: { label: "Choose Teams", href: "/register?plan=teams", variant: "outline" },
     features: [
       { text: <>Everything in <strong>Pro</strong></> },
       { text: "Team shared address book" },
-      { text: <><strong>Unlimited</strong> members</> },
+      { text: <>Minimum <strong>3 seats</strong></> },
       { text: "Roles & permissions" },
       { text: "Audit log" },
     ],
   },
 ];
 
-export function PricingToggle() {
+export function PricingToggle({ currentPlan }: { currentPlan?: string | null }) {
   const [annual, setAnnual] = useState(false);
+  const [teamSeats, setTeamSeats] = useState(3);
+  const [loading, setLoading] = useState<string | null>(null);
+  const [, startTransition] = useTransition();
+  const interval = annual ? "YEARLY" : "MONTHLY";
+
+  const handlePaidCta = (planId: string) => {
+    setLoading(planId);
+    startTransition(async () => {
+      // Existing paid subscriber → portal to change plan.
+      const isPaid = currentPlan && currentPlan !== "FREE";
+      const result = isPaid
+        ? await createBillingPortalSession()
+        : await createCheckoutSession({
+            plan: planId.toUpperCase(),
+            interval,
+            seats: planId === "teams" ? teamSeats : undefined,
+          });
+
+      if ("url" in result) {
+        window.location.href = result.url;
+      } else if (result.error === "UNAUTHORIZED") {
+        // Not logged in — send to register with plan context.
+        window.location.href =
+          planId === "teams"
+            ? `/register?plan=teams&seats=${teamSeats}`
+            : `/register?plan=${planId}`;
+      } else {
+        window.location.href = "/pricing?error=billing";
+      }
+      setLoading(null);
+    });
+  };
 
   return (
     <>
@@ -119,6 +153,8 @@ export function PricingToggle() {
           <div className="pr-grid">
             {PLANS.map((plan) => {
               const isFree = plan.price === "free";
+              const isTeams = plan.id === "teams";
+              const isCurrent = currentPlan === plan.id.toUpperCase();
               const priceObj = isFree ? null : (plan.price as { monthly: number; annual: number });
               const amount = priceObj ? (annual ? priceObj.annual : priceObj.monthly) : null;
               const showSave = !isFree && annual;
@@ -145,7 +181,7 @@ export function PricingToggle() {
                       <>
                         <span className="pr-plan__currency">£</span>
                         <span className="pr-plan__amount">{amount}</span>
-                        <span className="pr-plan__per">/mo</span>
+                        <span className="pr-plan__per">{isTeams ? "/seat/mo" : "/mo"}</span>
                         {showSave && <span className="pr-plan__save">Save 20%</span>}
                       </>
                     )}
@@ -153,12 +189,42 @@ export function PricingToggle() {
 
                   <p className="pr-plan__sublabel">{sublabel ?? " "}</p>
 
-                  <Link
-                    className={`pr-plan__cta pr-plan__cta--${plan.cta.variant}`}
-                    href={plan.cta.href}
-                  >
-                    {plan.cta.label}
-                  </Link>
+                  {/* Seat picker — Teams only, not shown if already on Teams */}
+                  {isTeams && !isCurrent && (
+                    <div className="pr-seat-picker">
+                      <button
+                        aria-label="Remove seat"
+                        className="pr-seat-picker__btn"
+                        disabled={teamSeats <= 3}
+                        onClick={() => setTeamSeats((s) => Math.max(3, s - 1))}
+                        type="button"
+                      >−</button>
+                      <span className="pr-seat-picker__count">{teamSeats} seats</span>
+                      <button
+                        aria-label="Add seat"
+                        className="pr-seat-picker__btn"
+                        onClick={() => setTeamSeats((s) => Math.min(500, s + 1))}
+                        type="button"
+                      >+</button>
+                    </div>
+                  )}
+
+                  {isCurrent ? (
+                    <span className="pr-plan__cta pr-plan__cta--current">Current plan</span>
+                  ) : isFree ? (
+                    <Link className={`pr-plan__cta pr-plan__cta--${plan.cta.variant}`} href={plan.cta.href}>
+                      {plan.cta.label}
+                    </Link>
+                  ) : (
+                    <button
+                      className={`pr-plan__cta pr-plan__cta--${plan.cta.variant} disabled:opacity-60`}
+                      disabled={loading === plan.id}
+                      onClick={() => handlePaidCta(plan.id)}
+                      type="button"
+                    >
+                      {loading === plan.id ? "Loading…" : plan.cta.label}
+                    </button>
+                  )}
 
                   <div className="pr-plan__divider" />
 

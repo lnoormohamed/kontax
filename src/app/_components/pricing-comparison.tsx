@@ -200,6 +200,7 @@ export function PricingComparison({ currentPlan }: { currentPlan?: string | null
   const [, startTransition] = useTransition();
   const [downgradeDetails, setDowngradeDetails] = useState<CancelPlanDetails | null>(null);
   const [downgradeOpen, setDowngradeOpen] = useState(false);
+  const [teamSeats, setTeamSeats] = useState(3);
   const period = annual ? "billed annually" : "billed monthly";
   const seatPeriod = annual ? "per seat, billed annually" : "per seat, billed monthly";
   const interval = annual ? "YEARLY" : "MONTHLY";
@@ -218,7 +219,7 @@ export function PricingComparison({ currentPlan }: { currentPlan?: string | null
   const handleUpgrade = (plan: string) => {
     setLoadingPlan(plan);
     startTransition(async () => {
-      const result = await createCheckoutSession({ plan, interval });
+      const result = await createCheckoutSession({ plan, interval, seats: plan === "TEAMS" ? teamSeats : undefined });
       if ("url" in result) {
         window.location.href = result.url;
       } else if (result.error === "USE_CUSTOMER_PORTAL") {
@@ -357,6 +358,16 @@ export function PricingComparison({ currentPlan }: { currentPlan?: string | null
             {PLAN_ORDER.map((plan) => {
               const p = PLAN_META[plan];
               const price = plan === "FREE" ? "£0" : priceLabel(plan);
+              const ctaEl = plan === "TEAMS" && currentPlan !== "TEAMS" ? (
+                <>
+                  <div className="seat-picker seat-picker--mob">
+                    <button aria-label="Remove seat" className="seat-picker__btn" disabled={teamSeats <= 3} onClick={() => setTeamSeats((s) => Math.max(3, s - 1))} type="button">−</button>
+                    <span className="seat-picker__count">{teamSeats} seats</span>
+                    <button aria-label="Add seat" className="seat-picker__btn" onClick={() => setTeamSeats((s) => Math.min(500, s + 1))} type="button">+</button>
+                  </div>
+                  <PlanCta card={plan} />
+                </>
+              ) : <PlanCta card={plan} />;
               return (
                 <MobilePlanCard
                   key={plan}
@@ -365,7 +376,7 @@ export function PricingComparison({ currentPlan }: { currentPlan?: string | null
                   annual={annual}
                   priceLabel={price}
                   openDefault={!!p.rec}
-                  PlanCtaEl={<PlanCta card={plan} />}
+                  PlanCtaEl={ctaEl}
                 />
               );
             })}
@@ -414,9 +425,27 @@ export function PricingComparison({ currentPlan }: { currentPlan?: string | null
                   <th>
                     <div className="plan-card">
                       <div className="plan-name">Teams</div>
-                      <p className="plan-who">For organisations up to 25</p>
-                      <div className="plan-price">{priceLabel("TEAMS")}<small> / mo</small></div>
+                      <p className="plan-who">For organisations</p>
+                      <div className="plan-price">{priceLabel("TEAMS")}<small> / seat / mo</small></div>
                       <p className="plan-period">{seatPeriod}{annual && savingsBadge("TEAMS") ? <> · <span className="save-inline">{savingsBadge("TEAMS")}</span></> : null}</p>
+                      {currentPlan !== "TEAMS" && (
+                        <div className="seat-picker">
+                          <button
+                            aria-label="Remove seat"
+                            className="seat-picker__btn"
+                            disabled={teamSeats <= 3}
+                            onClick={() => setTeamSeats((s) => Math.max(3, s - 1))}
+                            type="button"
+                          >−</button>
+                          <span className="seat-picker__count">{teamSeats} seats</span>
+                          <button
+                            aria-label="Add seat"
+                            className="seat-picker__btn"
+                            onClick={() => setTeamSeats((s) => Math.min(500, s + 1))}
+                            type="button"
+                          >+</button>
+                        </div>
+                      )}
                       <PlanCta card="TEAMS" />
                     </div>
                   </th>

@@ -9,6 +9,7 @@ import { auth } from "~/server/auth";
 import { getUserBillingContext } from "~/server/billing";
 import { db } from "~/server/db";
 import { appUrl, sendEmail } from "~/server/email";
+import { getStripeClient } from "~/server/stripe";
 import { canEditTeamBook } from "~/server/team-access";
 
 const INVITE_TTL_MS = 48 * 60 * 60 * 1000;
@@ -606,4 +607,67 @@ export const deleteTeam = async (formData: FormData) => {
   revalidatePath("/contacts");
   revalidatePath("/settings");
   redirect("/settings");
+};
+
+// --- Seat management --------------------------------------------------------
+// Owner changes the number of seats on their TEAMS subscription. Stripe is the
+// source of truth; the webhook fires on update and persists the new quantity as
+// memberSlotsLimit. We do a local DB update immediately so the UI reflects the
+// change before the webhook arrives.
+export const updateTeamSeats = async (formData: FormData) => {
+  const userId = await requireUserId();
+  const seats = parseInt(str(formData, "seats"), 10);
+  if (!Number.isInteger(seats) || seats < 3 || seats > 500) {
+    throw new Error("Seat count must be between 3 and 500.");
+  }
+
+  // Verify caller owns a TEAMS subscription.
+  const sub = await db.subscription.findFirst({
+    where: { userId, plan: "TEAMS", status: { in: ["ACTIVE", "TRIALING"] } },
+    select: { id: true, providerSubscriptionId: true, memberSlotsLimit: true },
+  });
+  if (!sub) throw new Error("No active Teams subscription found.");
+
+  // Enforce: can't drop below current accepted member count.
+  const team = await db.group.findFirst({
+    where: { ownerId: userId, type: "TEAM" },
+    select: { id: true, _count: { select: { members: true } } },
+  });
+  if (team) {
+    const acceptedCount = await db.groupMember.count({
+      where: { groupId: team.id, inviteStatus: { in: ["ACCEPTED"] } },
+    });
+    if (seats < acceptedCount) {
+      throw new Error(
+        `You have ${acceptedCount} accepted members. You can't go below that number of seats.`,
+      );
+    }
+  }
+
+  // Update Stripe subscription quantity (prorated by default).
+  let stripe: ReturnType<typeof getStripeClient>;
+  try {
+    stripe = getStripeClient();
+  } catch {
+    throw new Error("Billing is not configured.");
+  }
+
+  const stripeSubscription = await stripe.subscriptions.retrieve(sub.providerSubscriptionId);
+  const itemId = stripeSubscription.items.data[0]?.id;
+  if (!itemId) throw new Error("Could not find subscription item.");
+
+  await stripe.subscriptions.update(sub.providerSubscriptionId, {
+    items: [{ id: itemId, quantity: seats }],
+  });
+
+  // Optimistic local update — webhook will confirm.
+  await db.$transaction(async (tx) => {
+    await tx.subscription.update({ where: { id: sub.id }, data: { memberSlotsLimit: seats } });
+    if (team) {
+      await tx.group.update({ where: { id: team.id }, data: { maxMembers: seats } });
+    }
+  });
+
+  revalidatePath("/settings/teams");
+  revalidatePath("/settings");
 };

@@ -11,11 +11,13 @@ import { getStripePriceId } from "~/server/stripe-prices";
 const CheckoutInputSchema = z.object({
   plan: z.enum(["PRO", "FAMILY", "TEAMS"]),
   interval: z.enum(["MONTHLY", "YEARLY"]),
+  seats: z.number().int().min(3).max(500).optional(),
 });
 
 export async function createCheckoutSession(input: {
   plan: string;
   interval: string;
+  seats?: number;
 }): Promise<{ url: string } | { error: string }> {
   const session = await auth();
   if (!session?.user?.id) return { error: "UNAUTHORIZED" };
@@ -23,7 +25,8 @@ export async function createCheckoutSession(input: {
 
   const parsed = CheckoutInputSchema.safeParse(input);
   if (!parsed.success) return { error: "INVALID_PLAN" };
-  const { plan, interval } = parsed.data;
+  const { plan, interval, seats } = parsed.data;
+  const quantity = plan === "TEAMS" ? Math.max(3, seats ?? 3) : 1;
 
   // If the user already has an active paid subscription, send them to the portal
   const activeSub = await db.subscription.findFirst({
@@ -74,7 +77,7 @@ export async function createCheckoutSession(input: {
     const checkoutSession = await stripe.checkout.sessions.create({
       customer: stripeCustomerId,
       mode: "subscription",
-      line_items: [{ price: priceId, quantity: 1 }],
+      line_items: [{ price: priceId, quantity }],
       success_url: successUrl,
       cancel_url: `${appUrl}/pricing?cancelled=1`,
       subscription_data: {

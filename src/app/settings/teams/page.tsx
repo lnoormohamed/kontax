@@ -19,6 +19,7 @@ import {
   setMemberBookPermission,
   setTeamMemberRole,
   unlinkTeamSyncAccount,
+  updateTeamSeats,
 } from "~/app/actions/teams";
 import { auth } from "~/server/auth";
 import { getUserBillingContext } from "~/server/billing";
@@ -252,6 +253,33 @@ export default async function TeamSettingsPage() {
             </div>
           );
         })()}
+
+        {/* seat management */}
+        <SettingsCard className="flex flex-wrap items-center justify-between gap-4">
+          <div className="min-w-0">
+            <div className="text-[14.5px] font-semibold text-[#1d2823]">Seats</div>
+            <p className="mt-1 max-w-[440px] text-[13.5px] text-[#5c655e]">
+              You have {billing.entitlements.memberSlotsLimit ?? ownedTeam.maxMembers} seats on your plan.
+              Changes are prorated and take effect immediately.
+            </p>
+          </div>
+          <form action={updateTeamSeats} className="flex items-center gap-2">
+            <input
+              className="w-20 rounded-xl border border-[#d8ddd6] bg-white px-3 py-2 text-center text-[14px] outline-none transition focus:border-[#4158f4] focus:shadow-[0_0_0_3px_#edf0fe]"
+              defaultValue={billing.entitlements.memberSlotsLimit ?? ownedTeam.maxMembers}
+              min={Math.max(3, activeCount)}
+              max={500}
+              name="seats"
+              type="number"
+            />
+            <button
+              className="rounded-xl border border-[#d8ddd6] bg-white px-4 py-2 text-[13.5px] font-semibold text-[#1d2823] transition hover:bg-[#f6f7f4]"
+              type="submit"
+            >
+              Update seats
+            </button>
+          </form>
+        </SettingsCard>
 
         {/* team identity */}
         <SettingsCard className="flex flex-wrap items-center gap-4">

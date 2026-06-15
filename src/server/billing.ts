@@ -219,7 +219,7 @@ export const getUserBillingContext = async (userId: string): Promise<BillingCont
         },
         orderBy: [{ currentPeriodEnd: "desc" }, { createdAt: "desc" }],
         take: 1,
-        select: { plan: true },
+        select: { plan: true, memberSlotsLimit: true },
       },
     },
   });
@@ -232,15 +232,18 @@ export const getUserBillingContext = async (userId: string): Promise<BillingCont
   const plan = subscription?.plan ?? "FREE";
 
   // Entitlements are tier-driven: the frozen P11-01 matrix (PLAN_DEFAULTS) is the
-  // single source of truth. The per-subscription entitlement columns added in
-  // P11-02 remain in the schema for future custom/enterprise overrides, but are
-  // intentionally NOT merged here — non-nullable boolean columns default to false
-  // and would otherwise silently strip paid-tier features from existing rows.
+  // single source of truth. Exception: TEAMS memberSlotsLimit is per-seat and
+  // stored on the subscription row from the Stripe quantity; override it here.
+  const entitlements = { ...PLAN_DEFAULTS[plan] };
+  if (plan === "TEAMS" && subscription?.memberSlotsLimit != null) {
+    entitlements.memberSlotsLimit = subscription.memberSlotsLimit;
+  }
+
   return {
     lifecycleState: user.lifecycleState,
     plan,
     planLabel: PLAN_LABELS[plan],
-    entitlements: PLAN_DEFAULTS[plan],
+    entitlements,
   };
 };
 

@@ -411,6 +411,13 @@
 .kx .plan-cta--current { background: #f2f4f0; color: #8b938c; border: 1px solid transparent; cursor: default; }
 .kx .plan-cta-sub { margin: 8px 0 0; font-size: 11px; color: var(--mute); text-align: center; line-height: 1.35; }
 
+.kx .seat-picker { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 12px; }
+.kx .seat-picker__btn { display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--line); background: var(--paper); font-size: 16px; line-height: 1; color: var(--ink); transition: background 0.1s; }
+.kx .seat-picker__btn:hover:not(:disabled) { background: var(--wash); }
+.kx .seat-picker__btn:disabled { opacity: 0.4; cursor: default; }
+.kx .seat-picker__count { font-size: 13.5px; font-weight: 600; color: var(--ink); min-width: 60px; text-align: center; }
+.kx .seat-picker--mob { margin-bottom: 8px; }
+
 .kx .ptable td, .kx .ptable th { text-align: left; }
 .kx .cat-row td { padding: 26px 18px 10px; font-size: 11.5px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: var(--green); border-bottom: 1px solid var(--line2); }
 .kx .ptable tbody tr.feat-row:hover td { background: var(--wash); }
