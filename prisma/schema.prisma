@@ -390,7 +390,7 @@ model Contact {
     mergedIntoContactId String?
     mergedIntoContact Contact? @relation("ContactMergeLineage", fields: [mergedIntoContactId], references: [id], onDelete: SetNull)
     mergedChildren Contact[] @relation("ContactMergeLineage")
-    syncUid     String    @unique @default(cuid())
+    syncUid     String    @default(cuid())
     syncVersion Int       @default(1)
     syncTombstoneAt DateTime?
     fullName    String
@@ -437,12 +437,12 @@ model Contact {
     createdAt   DateTime  @default(now())
     updatedAt   DateTime  @updatedAt
 
+    @@unique([userId, syncUid])
     @@index([userId, archivedAt, fullName])
     @@index([userId, archivedAt, nickname])
     @@index([userId, archivedAt, email])
     @@index([userId, archivedAt, phone])
     @@index([userId, importJobId])
-    @@index([userId, syncUid])
     @@index([userId, mergedIntoContactId])
     @@index([bookId, archivedAt, fullName])
 }
