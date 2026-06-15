@@ -2,6 +2,7 @@
 // Builds the Microsoft OAuth consent URL and redirects the user to it.
 import { NextResponse, type NextRequest } from "next/server";
 
+import { env } from "~/env";
 import { auth } from "~/server/auth";
 import {
   MICROSOFT_SCOPES,
@@ -11,14 +12,16 @@ import {
 } from "~/server/microsoft-sync";
 import { encodeOAuthState } from "~/server/sync-oauth-state";
 
-export async function GET(req: NextRequest) {
+const appUrl = () => env.APP_URL ?? "https://kontax.vexon.co";
+
+export async function GET(_req: NextRequest) {
   const session = await auth();
   if (!session?.user?.id) {
-    return NextResponse.redirect(new URL("/login", req.url));
+    return NextResponse.redirect(new URL("/login", appUrl()));
   }
 
   if (!isMicrosoftSyncConfigured()) {
-    return NextResponse.redirect(new URL("/sync?error=microsoft_unconfigured", req.url));
+    return NextResponse.redirect(new URL("/sync?error=microsoft_unconfigured", appUrl()));
   }
 
   const cca = createMsalClient();
