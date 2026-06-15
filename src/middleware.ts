@@ -34,6 +34,9 @@ const PUBLIC_PREFIXES = [
   "/share/", // vCard share public links (P12-02) — trailing slash so it
   // matches /share/<token> but NOT the authenticated /shares page
   "/pricing", // marketing
+  "/features", // marketing
+  "/security", // marketing
+  "/changelog", // marketing
   "/help", // P26-12: public FAQ / help centre
   "/privacy", // legal
   "/terms", // legal
