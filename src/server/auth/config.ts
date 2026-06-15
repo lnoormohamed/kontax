@@ -138,7 +138,6 @@ export const authConfig = {
   ],
   callbacks: {
     jwt: async ({ token, user, trigger, session }) => {
-      console.error("[auth] jwt", { hasSub: !!token.sub, hasSid: !!token.sid, hasUser: !!user, trigger });
       if (user) {
         // Initial sign-in: create UserSession + load DB fields
         const jti = createId();

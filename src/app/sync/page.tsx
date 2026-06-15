@@ -25,6 +25,7 @@ import {
   type SyncConflictData,
 } from "./_components/sync-page-client";
 import { MobileSyncScreen } from "./_components/mobile-sync-screen";
+import { AuthRecoveryReload } from "./_components/auth-recovery-reload";
 
 // P27-07: friendly messages for OAuth callback `?error=` codes (Google/Microsoft).
 const OAUTH_ERROR_MESSAGES: Record<string, string> = {
@@ -138,11 +139,26 @@ export default async function SyncPage({ searchParams }: PageProps) {
   const session = await auth();
   if (!session?.user?.id) {
     const h = await headers();
+    const cookieHeader = h.get("cookie") ?? "";
+    const hasSessionCookie = cookieHeader.includes("authjs.session-token");
+    const sp = searchParams ? await searchParams : {};
+    const alreadyRetried = sp._authretry === "1";
+
+    // Next.js 15 + Auth.js v5 quirk: when this page is re-rendered as part of a
+    // Server Action's redirect/revalidation (every sync action redirects back to
+    // /sync), auth() can return null even though a valid session cookie is
+    // present — the session simply can't be resolved in that render phase. A
+    // fresh top-level GET renders normally and auth() succeeds. So if we still
+    // have a session cookie, recover with a hard reload instead of bouncing to
+    // /login. The one-shot guard param prevents an infinite reload if the
+    // session genuinely can't be resolved on the fresh request.
+    if (hasSessionCookie && !alreadyRetried) {
+      const acctParam = Array.isArray(sp.account) ? sp.account[0] : sp.account;
+      const base = acctParam ? `/sync?account=${acctParam}&_authretry=1` : "/sync?_authretry=1";
+      return <AuthRecoveryReload to={base} />;
+    }
+
     const next = h.get("x-pathname") ?? "/sync";
-    console.error("[sync-page] auth() returned null -> bouncing to login", {
-      hasCookieHeader: !!h.get("cookie"),
-      cookieHasAuthToken: (h.get("cookie") ?? "").includes("authjs.session-token"),
-    });
     redirect(`/login?next=${encodeURIComponent(next)}`);
   }
   const userId = session.user.id;
