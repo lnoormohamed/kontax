@@ -523,7 +523,15 @@ export const pushLocalChangesToGoogle = async (
       syncAccountId: account.id,
       tombstonedAt: null,
       remoteUid: { not: null },
-      contact: { archivedAt: null, syncTombstoneAt: null },
+      contact: {
+        archivedAt: null,
+        syncTombstoneAt: null,
+        // Only push genuine local user edits. A contact whose last write was a
+        // sync re-import (lastMutatedBy = SYNC_*) must NOT be pushed back, or we
+        // get a feedback loop: push -> Google normalises -> re-import bumps
+        // updatedAt past lastSyncedAt -> looks "dirty" -> push again, forever.
+        lastMutatedBy: "MANUAL",
+      },
     },
     select: {
       id: true,
