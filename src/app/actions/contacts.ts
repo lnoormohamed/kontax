@@ -715,6 +715,45 @@ const INLINE_EDITABLE_FIELDS = new Set<string>([
   "notes",
 ]);
 
+// Editing any of these re-derives the canonical fullName (vCard FN / the required
+// display + sort name) so it never drifts out of sync with the structured name.
+// `company` is included as the fallback display for org / company-only contacts.
+const NAME_DERIVE_FIELDS = new Set<string>([
+  "firstName",
+  "middleName",
+  "lastName",
+  "namePrefix",
+  "nameSuffix",
+  "company",
+]);
+
+// Mirrors the create-contact derivation (fullNameFromParts -> company): join the
+// structured name parts, else fall back to company. Returns "" when nothing is
+// available so callers can preserve the existing required fullName.
+const deriveFullNameFromParts = (parts: {
+  namePrefix?: string | null;
+  firstName?: string | null;
+  middleName?: string | null;
+  lastName?: string | null;
+  nameSuffix?: string | null;
+  company?: string | null;
+}): string => {
+  const structured = [
+    parts.namePrefix,
+    parts.firstName,
+    parts.middleName,
+    parts.lastName,
+    parts.nameSuffix,
+  ]
+    .map((value) => value?.trim())
+    .filter((value): value is string => Boolean(value))
+    .join(" ");
+  if (structured) {
+    return structured;
+  }
+  return parts.company?.trim() ?? "";
+};
+
 export const updateContactField = async (contactId: string, field: string, rawValue: string) => {
   const userId = await getRequiredUserId();
   if (!INLINE_EDITABLE_FIELDS.has(field)) {
@@ -740,14 +779,25 @@ export const updateContactField = async (contactId: string, field: string, rawVa
     if ((before as Record<string, unknown>)[field] === newValue) {
       return;
     }
+    const data: Record<string, unknown> = {
+      [field]: field === "fullName" ? trimmed : newValue,
+      lastMutatedBy: "MANUAL",
+      lastMutatedByDetail: null,
+      syncVersion: { increment: 1 },
+    };
+    // Re-derive the display name when a name part (or company) changes so
+    // fullName never drifts from the structured name. Never blank it: if every
+    // part is cleared, keep the existing required fullName.
+    if (NAME_DERIVE_FIELDS.has(field)) {
+      const merged = { ...(before as Record<string, unknown>), [field]: newValue };
+      const derived = deriveFullNameFromParts(merged);
+      if (derived) {
+        data.fullName = derived;
+      }
+    }
     const after = await tx.contact.update({
       where: { id: contactId },
-      data: {
-        [field]: field === "fullName" ? trimmed : newValue,
-        lastMutatedBy: "MANUAL",
-        lastMutatedByDetail: null,
-        syncVersion: { increment: 1 },
-      },
+      data,
     });
     const diffs = computeContactDiff(before, after);
     if (diffs.length > 0) {

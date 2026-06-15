@@ -48,8 +48,10 @@ type FieldDef = {
 };
 
 
+// "Full name" is intentionally not editable here: it's the canonical display
+// name (vCard FN), derived server-side from the parts below so it can't drift.
+// Edit the structured parts (or Company) and fullName updates automatically.
 const IDENTITY_FIELDS: FieldDef[] = [
-  { key: "fullName", label: "Full name" },
   { key: "firstName", label: "First name" },
   { key: "middleName", label: "Middle name" },
   { key: "lastName", label: "Last name" },
