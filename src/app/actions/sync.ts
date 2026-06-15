@@ -661,7 +661,6 @@ export const createSyncAccount = async (formData: FormData) => {
 export const activateSyncAccount = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const syncAccountId = parseSyncAccountId(formData);
-  const redirectTo = getRedirectTarget(formData) ?? "/sync?activated=1";
 
   await assertCanUseCardDavSync(userId);
 
@@ -678,8 +677,10 @@ export const activateSyncAccount = async (formData: FormData) => {
     },
   });
 
+  // No redirect() — a server-action redirect re-runs middleware via a cookieless
+  // internal sub-request and bounces the user to /login (see queueSyncJob).
+  // Re-render in place; revalidate reflects the new ACTIVE status.
   revalidateSyncViews();
-  redirect(redirectTo);
 };
 
 export const attachSyncCredentials = async (formData: FormData) => {
@@ -843,7 +844,6 @@ export const prepareSyncRelink = async (formData: FormData) => {
 export const pauseSyncAccount = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const syncAccountId = parseSyncAccountId(formData);
-  const redirectTo = getRedirectTarget(formData) ?? "/sync?paused=1";
 
   await db.syncAccount.updateMany({
     where: {
@@ -855,8 +855,10 @@ export const pauseSyncAccount = async (formData: FormData) => {
     },
   });
 
+  // No redirect() — a server-action redirect re-runs middleware via a cookieless
+  // internal sub-request and bounces the user to /login (see queueSyncJob).
+  // Re-render in place; revalidate reflects the new PAUSED status.
   revalidateSyncViews();
-  redirect(redirectTo);
 };
 
 export const revalidateSyncAccount = async (formData: FormData) => {
