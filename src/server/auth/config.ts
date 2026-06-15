@@ -6,6 +6,7 @@ import { z } from "zod";
 
 import { db } from "~/server/db";
 import { detectNewDeviceSignIn, recordFailedLogin } from "~/server/notifications";
+import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
 import { getPreferences } from "~/server/preferences";
 import { DEFAULT_PREFERENCES, type UserPreferences } from "~/lib/preferences-shared";
 
@@ -89,11 +90,24 @@ export const authConfig = {
           ?? null;
         const ua = request?.headers?.get("user-agent") ?? null;
 
+        // P34D-01: brute-force protection — check IP bucket first (cheap, no DB).
+        // Email bucket is checked after the user lookup so unknown emails don't
+        // reveal whether an account exists via timing differences.
+        if (ip) {
+          const ipCheck = await checkRateLimit(rateLimiters.loginByIp, `ip:${ip}`);
+          if (!ipCheck.allowed) return null;
+        }
+
         const user = await db.user.findUnique({
           where: { email: parsedCredentials.data.email },
         });
 
         if (!user) return null;
+
+        // P34D-01: per-account bucket — consume before the password check so
+        // an attacker can't bypass by exploiting bcrypt timing.
+        const emailCheck = await checkRateLimit(rateLimiters.loginByEmail, `email:${user.email}`);
+        if (!emailCheck.allowed) return null;
 
         const passwordMatches = await bcrypt.compare(
           parsedCredentials.data.password,

@@ -56,6 +56,11 @@ export const rateLimiters = {
 
   // P34C-14: contact form — 3 submissions per IP per hour
   contactForm: makeLimiter(3, 60 * 60, "rl:contact-form"),
+
+  // P34D-01: login brute-force — 5 wrong-password attempts per email per 15 minutes
+  loginByEmail: makeLimiter(5, 15 * 60, "rl:login-email"),
+  // P34D-01: login brute-force — 20 attempts per IP per 15 minutes (shared across accounts)
+  loginByIp: makeLimiter(20, 15 * 60, "rl:login-ip"),
 } as const;
 
 export interface RateLimitResult {

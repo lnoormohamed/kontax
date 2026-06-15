@@ -18,9 +18,31 @@ export default async function VerifyEmailPage({
   const result = await verifyEmailToken(token);
 
   if ("success" in result) {
-    // EMAIL_CHANGE activates a new email + invalidates all sessions — send to login
+    // EMAIL_CHANGE: render a page instead of redirecting so the stale session
+    // cookie (still present, edge JWT considers it valid) doesn't trigger a
+    // /contacts → /login?next=/contacts → /contacts redirect loop.
     if (result.type === "EMAIL_CHANGE") {
-      redirect("/login?message=email-changed");
+      return (
+        <div className="flex min-h-screen items-center justify-center bg-[#f6f7f4] px-5 py-10">
+          <div className="w-full max-w-[420px] rounded-2xl border border-[#d8ddd6] bg-white p-8 text-center shadow-sm">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-[#e7efe9]">
+              <svg className="h-6 w-6 text-[#17352e]" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                <path d="M5 13l4 4L19 7" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </div>
+            <h1 className="text-[20px] font-semibold text-[#1d2823]">Email address updated</h1>
+            <p className="mt-2 text-[14px] text-[#5c655e]">
+              Your new email address has been confirmed. Sign in with your new address to continue.
+            </p>
+            <Link
+              className="mt-6 inline-flex h-10 items-center rounded-full bg-[#4158f4] px-5 text-[14px] font-semibold text-white transition hover:bg-[#3248db]"
+              href="/login?message=email-changed"
+            >
+              Sign in →
+            </Link>
+          </div>
+        </div>
+      );
     }
     // Only SIGNUP reaches here
     return (
