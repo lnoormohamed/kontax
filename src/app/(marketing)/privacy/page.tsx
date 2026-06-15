@@ -35,7 +35,7 @@ export default function PrivacyPage() {
   return (
     <div className="doc-wrap">
       <h1 className="doc-title">Privacy Policy</h1>
-      <p className="doc-meta">Last updated: {new Date(LAST_UPDATED).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" })}</p>
+      <p className="doc-meta">Last updated: 14 June 2026</p>
 
       <div className="doc-body">
 

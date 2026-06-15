@@ -183,7 +183,7 @@ export function NotificationBell({ initialItems }: { initialItems: FeedItem[] })
             {n.body}
           </div>
           <div className="mt-1 hidden items-center gap-1.5 text-[11.5px] font-medium text-[#8b938c] max-md:flex">
-            <span>{relativeTime(n.createdAt)}</span>
+            <span suppressHydrationWarning>{relativeTime(n.createdAt)}</span>
             {n.category === "SECURITY" ? (
               <>
                 <span aria-hidden>·</span>
@@ -198,7 +198,7 @@ export function NotificationBell({ initialItems }: { initialItems: FeedItem[] })
           </div>
         </div>
         <div className="flex flex-none flex-col items-end gap-1.5 max-md:hidden">
-          <span className="text-[11px] text-[#8b938c] tabular-nums">
+          <span className="text-[11px] text-[#8b938c] tabular-nums" suppressHydrationWarning>
             {relativeTime(n.createdAt)}
           </span>
           <button
