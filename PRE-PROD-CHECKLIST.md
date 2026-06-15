@@ -30,16 +30,23 @@ the code is shipped and working; these are deployment-environment steps. Clean u
   Skips users with no unread non-security notifications in the window; marks digested
   rows read.
 
-- [ ] **Schedule the sync runner cron.** Every **~15 minutes**:
-  ```
-  POST https://<host>/api/cron/sync
-  Header: x-cron-secret: $CRON_SECRET
-  ```
-  Enqueues a SCHEDULED job for every ACTIVE account that is due per its frequency
-  (default 60 min; "Manual only" accounts are skipped) and drains the job queue —
-  Google/Outlook import + push and CardDAV sync. Without this, sync only runs on a
-  manual "Sync now" and queued jobs never drain. Job claiming is atomic, so a tick
-  overlapping an inline "Sync now" is safe.
+- [ ] **Schedule the sync runner cron + wire plan-based frequency (do just before launch).**
+  The route already exists (`POST /api/cron/sync`, CRON_SECRET-guarded); it enqueues a
+  SCHEDULED job for every ACTIVE account due per its `syncFrequencyMinutes` (default 60;
+  "Manual only" skipped) and drains the queue. Without a scheduler calling it, sync only
+  runs on a manual "Sync now" and queued jobs never drain. Job claiming is atomic, so a
+  tick overlapping an inline run is safe. Launch tasks:
+  - **Scheduler:** add a Coolify Scheduled Task (or a dedicated cron LXC) that POSTs the
+    route. Tick **at least as often as the smallest plan interval** (e.g. every ~2 min if
+    paid tiers are 10 min):
+    ```
+    */2 * * * *  curl -fsS -X POST -H "x-cron-secret: $CRON_SECRET" http://localhost:3000/api/cron/sync
+    ```
+  - **Plan-based frequency:** derive `syncFrequencyMinutes` from the user's plan and cap it
+    server-side so a setting can't beat the plan (free → 60; Pro/Teams/Family → 10 or
+    on-change). "On change" is event-driven (enqueue on contact mutation), not the poll —
+    and is the point at which a Valkey/BullMQ queue + dedicated sync-worker LXC becomes
+    worth it (don't build that until traffic needs it).
 
 ### Notes / context
 - A local dev `CRON_SECRET` was added to the gitignored `.env` for testing — prod needs
