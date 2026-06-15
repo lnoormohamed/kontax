@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
-import { isFullTextEligible, searchContactIds } from "~/server/contact-search";
+import { isFullTextEligible, searchContactIds, searchLabelIlikeIds } from "~/server/contact-search";
 import { getUserFamilyMembership } from "~/server/family-access";
 import { getAccessibleTeamBooks } from "~/server/team-access";
 
@@ -142,7 +142,7 @@ export async function GET(request: Request) {
     ...accessibleTeamBooks.map((b) => b.id),
   ].filter((bookId): bookId is string => Boolean(bookId));
 
-  let contacts: ContactRow[];
+  let contacts: ContactRow[] = [];
 
   if (isFullTextEligible(q)) {
     // Full-text + phone match over both scopes, ranked.
@@ -170,36 +170,61 @@ export async function GET(request: Request) {
     // Preserve relevance order (findMany doesn't guarantee it).
     const byId = new Map(rows.map((r) => [r.id, r]));
     contacts = ids.map((id) => byId.get(id)).filter((r): r is (typeof rows)[number] => Boolean(r));
-  } else {
-    // Short / symbol-only query: multi-field ILIKE fallback.
+  }
+
+  if (contacts.length === 0) {
+    // FTS returned nothing (or query wasn't FTS-eligible): fall back to ILIKE.
+    // This catches cases like "corp.com" where FTS tokenization splits the email
+    // differently than the stored tsvector, and short single-char queries.
     const insensitive = { contains: q, mode: "insensitive" as const };
-    contacts = await db.contact.findMany({
-      where: {
-        archivedAt: null,
-        AND: [
-          {
-            OR: [
-              { userId },
-              ...(accessibleBookIds.length > 0
-                ? [{ groupContacts: { some: { groupAddressBookId: { in: accessibleBookIds } } } }]
-                : []),
-            ],
-          },
-          {
-            OR: [
-              { fullName: insensitive },
-              { company: insensitive },
-              { email: insensitive },
-              { nickname: insensitive },
-              { phone: { contains: q } },
-            ],
-          },
-        ],
-      },
-      select: RESULT_SELECT,
-      orderBy: { fullName: "asc" },
-      take: 25,
-    });
+    const scopeOr = [
+      { userId },
+      ...(accessibleBookIds.length > 0
+        ? [{ groupContacts: { some: { groupAddressBookId: { in: accessibleBookIds } } } }]
+        : []),
+    ];
+    // Also collect contacts matched only by label text.
+    const [ilikeContacts, privLabelIds, sharedLabelIds] = await Promise.all([
+      db.contact.findMany({
+        where: {
+          archivedAt: null,
+          AND: [
+            { OR: scopeOr },
+            {
+              OR: [
+                { fullName: insensitive },
+                { company: insensitive },
+                { email: insensitive },
+                { nickname: insensitive },
+                { phone: { contains: q } },
+              ],
+            },
+          ],
+        },
+        select: RESULT_SELECT,
+        orderBy: { fullName: "asc" },
+        take: 25,
+      }),
+      searchLabelIlikeIds({ userId }, q),
+      accessibleBookIds.length > 0
+        ? searchLabelIlikeIds({ groupBookIds: accessibleBookIds }, q)
+        : Promise.resolve([]),
+    ]);
+    const labelIdRows = [...privLabelIds, ...sharedLabelIds];
+
+    // Merge label-matched ids with ILIKE results, fetching any missing contacts.
+    const ilikeIds = new Set(ilikeContacts.map((c) => c.id));
+    const extraIds = labelIdRows.filter((id) => !ilikeIds.has(id));
+    if (extraIds.length > 0) {
+      const extra = await db.contact.findMany({
+        where: { id: { in: extraIds }, archivedAt: null },
+        select: RESULT_SELECT,
+        orderBy: { fullName: "asc" },
+      });
+      contacts = [...ilikeContacts, ...extra];
+    } else {
+      contacts = ilikeContacts;
+    }
   }
 
   const results: SearchResult[] = contacts.map((c) => {

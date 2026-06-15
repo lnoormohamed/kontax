@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 
 import { useContactEdit } from "~/app/_components/contact-inline-editor";
+import { LabelChip } from "~/app/_components/label-chip";
 import { MobileBottomSheet } from "~/app/_components/mobile-bottom-sheet";
 import { MobileContactSheet, type ContactSheetInitial } from "~/app/_components/mobile-contact-sheet";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
@@ -21,6 +22,8 @@ interface MobileContactDetailProps {
   isFavorite: boolean;
   isArchived: boolean;
   isEditable: boolean;
+  labels: string[];
+  labelColors: Record<string, string>;
   /** Prefill payload for the edit sheet (P24B-DB19). */
   editInitial: ContactSheetInitial;
   detailTab: "details" | "sharing" | "history";
@@ -48,6 +51,8 @@ export function MobileContactDetail({
   isFavorite,
   isArchived,
   isEditable,
+  labels,
+  labelColors,
   editInitial,
   detailTab,
   toggleFavoriteAction,
@@ -402,6 +407,13 @@ export function MobileContactDetail({
           </h1>
           {subtitle && (
             <p style={{ marginTop: 4, fontSize: 14, color: "#5c655e" }}>{subtitle}</p>
+          )}
+          {labels.length > 0 && (
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6, justifyContent: "center", marginTop: 10 }}>
+              {labels.map((name) => (
+                <LabelChip key={name} name={name} col={labelColors[name.toLowerCase()] ?? "#8b938c"} sz="sm" />
+              ))}
+            </div>
           )}
         </div>
 

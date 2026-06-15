@@ -93,7 +93,8 @@ export async function searchContactIds(
           coalesce("emailEntries"::text, '') || ' ' || coalesce("phoneEntries"::text, '') || ' ' ||
           coalesce("addressEntries"::text, '') || ' ' || coalesce("postalAddresses"::text, '') || ' ' ||
           coalesce("emailAddresses"::text, '') || ' ' || coalesce("phoneNumbers"::text, '') || ' ' ||
-          coalesce("customFields"::text, '')
+          coalesce("customFields"::text, '') || ' ' ||
+          coalesce((SELECT string_agg(val, ' ') FROM jsonb_array_elements_text(CASE WHEN jsonb_typeof("labels") = 'array' THEN "labels" ELSE '[]'::jsonb END) AS val), '')
         ), 'C') AS vec,
         -- all phone sources stripped to digits, for substring matching
         regexp_replace(
@@ -117,4 +118,37 @@ export async function searchContactIds(
   `);
 
   return rows.map((r) => ({ id: r.id, rank: Number(r.rank) }));
+}
+
+/**
+ * Returns contact ids whose labels jsonb array contains an element matching
+ * the query case-insensitively. Used as a fallback supplement in the ILIKE
+ * path so label-only searches (e.g. "VIP") still work when the tsvector is
+ * cold (newly added label not yet reflected).
+ */
+export async function searchLabelIlikeIds(
+  scope: SearchScope,
+  q: string,
+): Promise<string[]> {
+  if ("groupBookIds" in scope && scope.groupBookIds.length === 0) return [];
+
+  const scopeWhere =
+    "userId" in scope
+      ? Prisma.sql`"userId" = ${scope.userId}`
+      : Prisma.sql`id IN (SELECT "contactId" FROM "GroupContact" WHERE "groupAddressBookId" IN (${Prisma.join(scope.groupBookIds)}))`;
+
+  const likeParam = `%${q}%`;
+  const rows = await db.$queryRaw<{ id: string }[]>(Prisma.sql`
+    SELECT id FROM "Contact"
+    WHERE "archivedAt" IS NULL
+      AND ${scopeWhere}
+      AND EXISTS (
+        SELECT 1 FROM jsonb_array_elements_text(
+          CASE WHEN jsonb_typeof("labels") = 'array' THEN "labels" ELSE '[]'::jsonb END
+        ) AS lbl
+        WHERE lbl ILIKE ${likeParam}
+      )
+    LIMIT 25
+  `);
+  return rows.map((r) => r.id);
 }

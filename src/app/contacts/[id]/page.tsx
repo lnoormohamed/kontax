@@ -561,6 +561,8 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
           isArchived={Boolean(contact.archivedAt)}
           isEditable={canEditContact}
           isFavorite={contact.isFavorite}
+          labelColors={labelColors}
+          labels={contactLabels}
           phone={contact.phone}
           subtitle={[contact.jobTitle, contact.company].filter(Boolean).join(" · ") || null}
           toggleFavoriteAction={toggleFavoriteContact}
