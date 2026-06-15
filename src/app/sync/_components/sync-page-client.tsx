@@ -632,7 +632,11 @@ function HistoryTable({ jobs, isSyncing }: { jobs: SyncJobRow[]; isSyncing: bool
   const [errId, setErrId] = useState<string | null>(null);
   const dirGlyph = { TWO_WAY: "↕", IMPORT_ONLY: "↓", EXPORT_ONLY: "↑" };
   const dirLabel = { TWO_WAY: "Two-way", IMPORT_ONLY: "Import", EXPORT_ONLY: "Export" };
-  const visible = showAll ? jobs : jobs.slice(0, 5);
+  // Order by the time actually shown (`when` is the completed/started/created
+  // ISO timestamp). The server orders by createdAt, which can differ from
+  // completion order, so re-sort here so the rows read newest-first by date.
+  const ordered = [...jobs].sort((a, b) => b.when.localeCompare(a.when));
+  const visible = showAll ? ordered : ordered.slice(0, 5);
 
   return (
     <section style={{ marginTop: 30 }}>
@@ -670,6 +674,20 @@ function HistoryTable({ jobs, isSyncing }: { jobs: SyncJobRow[]; isSyncing: bool
                 {h}
               </span>
             ))}
+          </div>
+
+          {/* legend for the Changes column notation */}
+          <div
+            style={{
+              fontSize: 11.5,
+              color: T.mute,
+              padding: "6px 0 2px",
+            }}
+          >
+            Changes:{" "}
+            <span style={{ fontFamily: '"Geist Mono", ui-monospace, monospace' }}>+</span> added ·{" "}
+            <span style={{ fontFamily: '"Geist Mono", ui-monospace, monospace' }}>~</span> updated ·{" "}
+            <span style={{ fontFamily: '"Geist Mono", ui-monospace, monospace' }}>−</span> removed
           </div>
 
           {/* in-progress row */}
@@ -715,9 +733,13 @@ function HistoryTable({ jobs, isSyncing }: { jobs: SyncJobRow[]; isSyncing: bool
                   fontSize: 12.5,
                 }}
               >
-                {j.status === "ok"
-                  ? `+${j.added} ~${j.modified} −${j.deleted}`
-                  : "—"}
+                {j.status === "ok" ? (
+                  <span title={`${j.added} added · ${j.modified} updated · ${j.deleted} removed`}>
+                    +{j.added} ~{j.modified} −{j.deleted}
+                  </span>
+                ) : (
+                  "—"
+                )}
               </span>
               <span data-th="Status" style={{ display: "flex", justifyContent: "flex-end" }}>
                 {j.status === "ok" ? (
