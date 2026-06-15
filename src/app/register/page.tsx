@@ -6,7 +6,7 @@ import { auth } from "~/server/auth";
 import { CardRegisterContext } from "./card-register-context";
 
 export const metadata: Metadata = {
-  title: "Get started — Kontax",
+  title: "Get started",
   description: "Create a free Kontax account. No credit card required.",
   alternates: { canonical: "/register" },
 };

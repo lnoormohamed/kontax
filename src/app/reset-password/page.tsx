@@ -1,6 +1,9 @@
+import { type Metadata } from "next";
 import crypto from "crypto";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+
+export const metadata: Metadata = { title: "Reset password" };
 
 import { db } from "~/server/db";
 import { ResetPasswordForm } from "./reset-password-form";

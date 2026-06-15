@@ -1,7 +1,10 @@
+import { type Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
 import { verifyEmailToken } from "~/server/email-verification";
+
+export const metadata: Metadata = { title: "Verify email" };
 
 export default async function VerifyEmailPage({
   searchParams,
