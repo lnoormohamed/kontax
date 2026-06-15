@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
@@ -887,12 +888,12 @@ function DuplicatesBanner({ count }: { count: number }) {
         </strong>{" "}
         found from this import.
       </div>
-      <a
+      <Link
         href="/contacts?tab=duplicates"
         style={{ fontSize: 13, fontWeight: 600, color: "#4158f4", marginLeft: "auto", whiteSpace: "nowrap" }}
       >
         Review suggestions →
-      </a>
+      </Link>
     </div>
   );
 }
