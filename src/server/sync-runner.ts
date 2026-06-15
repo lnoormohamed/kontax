@@ -22,7 +22,11 @@ import { GoogleSyncError, runGoogleSync } from "~/server/google-sync";
 import { MicrosoftSyncError, runMicrosoftSync } from "~/server/microsoft-sync";
 import { buildLocalConflictSnapshot } from "~/server/sync-conflict-snapshot";
 import { runPostImportDeduplication } from "~/server/sync-dedup";
-import { getEffectiveSyncAccountSettings } from "~/server/sync-settings";
+import {
+  DEFAULT_SYNC_FREQUENCY_MINUTES,
+  getEffectiveSyncAccountSettings,
+  isManualSyncFrequency,
+} from "~/server/sync-settings";
 
 const createRetrySchedule = (attemptNumber: number) => {
   const backoffMinutes = [5, 15, 60, 180, 720];
@@ -258,6 +262,68 @@ const runPostImportDedupSafely = async (
   } catch {
     // swallow — dedup is advisory; the import already committed.
   }
+};
+
+// P34D-03: enqueue a SCHEDULED sync for every ACTIVE account that is due per its
+// effective frequency. Skips manual-only accounts and accounts that already have
+// a QUEUED/RUNNING job (so ticks don't pile up). The cron route runs the queue
+// afterwards. Returns counts for observability.
+export const enqueueDueSyncJobs = async (): Promise<{ enqueued: number; skipped: number }> => {
+  const now = Date.now();
+  const accounts = await db.syncAccount.findMany({
+    where: { status: "ACTIVE", credentialRevokedAt: null },
+    select: {
+      id: true,
+      syncDirection: true,
+      lastSyncedAt: true,
+      syncJobs: {
+        where: { status: { in: ["QUEUED", "RUNNING"] } },
+        select: { id: true },
+        take: 1,
+      },
+    },
+  });
+
+  let enqueued = 0;
+  let skipped = 0;
+
+  for (const account of accounts) {
+    // Already has a pending job — don't stack another.
+    if (account.syncJobs.length > 0) {
+      skipped += 1;
+      continue;
+    }
+
+    const settings = await getEffectiveSyncAccountSettings(account.id);
+    if (isManualSyncFrequency(settings.syncFrequencyMinutes)) {
+      skipped += 1;
+      continue;
+    }
+
+    const freqMinutes = settings.syncFrequencyMinutes ?? DEFAULT_SYNC_FREQUENCY_MINUTES;
+    const due =
+      !account.lastSyncedAt || now - account.lastSyncedAt.getTime() >= freqMinutes * 60_000;
+    if (!due) {
+      skipped += 1;
+      continue;
+    }
+
+    await db.syncJob.create({
+      data: {
+        syncAccountId: account.id,
+        status: "QUEUED",
+        trigger: "SCHEDULED",
+        syncDirection: account.syncDirection,
+        attemptCount: 1,
+        maxAttempts: 5,
+        nextRetryAt: new Date(),
+        idempotencyKey: `${account.id}:scheduled:${now}`,
+      },
+    });
+    enqueued += 1;
+  }
+
+  return { enqueued, skipped };
 };
 
 export const runQueuedSyncJobs = async ({

@@ -30,6 +30,17 @@ the code is shipped and working; these are deployment-environment steps. Clean u
   Skips users with no unread non-security notifications in the window; marks digested
   rows read.
 
+- [ ] **Schedule the sync runner cron.** Every **~15 minutes**:
+  ```
+  POST https://<host>/api/cron/sync
+  Header: x-cron-secret: $CRON_SECRET
+  ```
+  Enqueues a SCHEDULED job for every ACTIVE account that is due per its frequency
+  (default 60 min; "Manual only" accounts are skipped) and drains the job queue —
+  Google/Outlook import + push and CardDAV sync. Without this, sync only runs on a
+  manual "Sync now" and queued jobs never drain. Job claiming is atomic, so a tick
+  overlapping an inline "Sync now" is safe.
+
 ### Notes / context
 - A local dev `CRON_SECRET` was added to the gitignored `.env` for testing — prod needs
   its own value.
