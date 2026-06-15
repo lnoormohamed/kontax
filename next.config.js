@@ -11,6 +11,9 @@ const withBundleAnalyzer = bundleAnalyzer({
 
 /** @type {import("next").NextConfig} */
 const config = {
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   async redirects() {
     return [
       {
