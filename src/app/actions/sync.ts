@@ -1075,13 +1075,27 @@ export const queueSyncJob = async (formData: FormData) => {
         idempotencyKey: createIdempotencyKey([account.id, "manual", "queue"]),
       },
     });
+    // Run the queued job inline so "Sync now" actually imports immediately,
+    // rather than leaving the job QUEUED until a background runner picks it up
+    // (there is no scheduled runner yet — see follow-up). Scoped to this account.
+    // Dynamic import keeps the googleapis/MSAL graph server-only (this file is
+    // imported by the client sync page).
+    try {
+      const { runQueuedSyncJobs } = await import("~/server/sync-runner");
+      await runQueuedSyncJobs({ syncAccountId: account.id, limit: 1 });
+    } catch (error) {
+      // The job stays QUEUED/recorded with its error; surface nothing fatal to
+      // the action so the page still re-renders with the latest account state.
+      console.error("[sync] inline run failed", error);
+    }
+
     // NOTE: do NOT redirect() here. A server-action redirect() makes Next.js
     // re-run middleware for the target URL via an internal sub-request that
     // carries NO cookies, so the cookie-presence gate in middleware.ts bounces
     // it to /login — logging the user out on every sync action behind the
     // reverse proxy. Returning lets the form re-render in place using this
     // request's own (authenticated) context. revalidateSyncViews() refreshes
-    // the job list so the queued job appears.
+    // the job list + imported contacts.
     revalidateSyncViews();
     return;
   }

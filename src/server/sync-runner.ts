@@ -260,11 +260,16 @@ const runPostImportDedupSafely = async (
   }
 };
 
-export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) => {
+export const runQueuedSyncJobs = async ({
+  limit = 5,
+  syncAccountId,
+}: { limit?: number; syncAccountId?: string } = {}) => {
   const queuedJobs = await db.syncJob.findMany({
     where: {
       status: "QUEUED",
       OR: [{ nextRetryAt: null }, { nextRetryAt: { lte: new Date() } }],
+      // P34D-03: "Sync now" runs only the triggering account's jobs inline.
+      ...(syncAccountId ? { syncAccountId } : {}),
     },
     orderBy: [{ createdAt: "asc" }],
     take: Math.max(limit, 1),
