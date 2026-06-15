@@ -4,7 +4,7 @@ import { useState, useTransition } from "react";
 import { useSession } from "next-auth/react";
 
 import { updatePreferencesAction } from "~/app/actions/preferences";
-import { DEFAULT_PREFERENCES, type UserPreferences } from "~/lib/preferences";
+import { DEFAULT_PREFERENCES, type UserPreferences } from "~/lib/preferences-shared";
 
 // ── helpers ──────────────────────────────────────────────────────────────────
 
