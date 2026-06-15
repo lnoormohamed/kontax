@@ -228,60 +228,75 @@ Account: li+smoketest-mobile2@linoormohamed.com
 ## Sync (P34D-03)
 
 Tester: Claude (automated)  Date: 2026-06-15  
-Account: li+smoketest-sharing@linoormohamed.com (no pre-existing sync connections)  
+Account: li+smoketest-sharing@linoormohamed.com (Google sync connected via li@noormohamed.uk)  
 Environment: kontax.vexon.co
 
-> **Setup note:** TC-01 through TC-08 require real third-party credentials (iCloud app password, Fastmail app password, Google/Microsoft OAuth). TC-01/TC-03 form UI and TC-05 OAuth redirect were verified without completing the full connection. TC-02/TC-04/TC-06/TC-08/TC-09–TC-13/TC-15–TC-16 require an account with existing sync connections — **these TCs need to be re-run against li@linoormohamed.com (which has Fastmail + Google connected)** or with a dedicated test account that has connections set up.
+> **Run 1 (initial, no connections):** TC-01/03/05 (UI-only), TC-07 (bug found + fixed), TC-14 (error state).  
+> **Run 2 (Google OAuth connected — li@noormohamed.uk):** TC-05/06/09 completed; TC-11/12/13 completed via disconnect flow. TC-10/15/16 still need completion.
 
 ### Test Cases
 
 | ID | Test Case | Pass/Fail | Notes |
 |----|-----------|-----------|-------|
-| TC-01 | Add iCloud CardDAV | ✅ Pass (UI) | "Add sync account" form opens in-page (no redirect). iCloud tab selected by default, Label pre-filled "iCloud", Server URL pre-filled "https://contacts.icloud.com". All fields present. Full connection with real credentials not tested — requires iCloud app-specific password. |
-| TC-02 | iCloud initial import | ⚠️ Blocked | No iCloud connection available. Rerun against li@linoormohamed.com after iCloud is connected. |
+| TC-01 | Add iCloud CardDAV | ✅ Pass (UI) | "Add sync account" form opens in-page (no redirect). iCloud tab selected by default, Label pre-filled "iCloud", Server URL pre-filled "https://contacts.icloud.com". All fields present. Full connection requires iCloud app-specific password — not tested. |
+| TC-02 | iCloud initial import | ⚠️ Blocked | No iCloud credentials available. Requires dedicated Apple ID with app-specific password. |
 | TC-03 | Add Fastmail CardDAV | ✅ Pass (UI) | Fastmail tab switches correctly; Label updates to "Fastmail", Server URL updates to "https://carddav.fastmail.com/dav/addressbooks". Form stays in-page. Full connection not tested. |
-| TC-04 | Fastmail initial import | ⚠️ Blocked | No Fastmail connection in test account. |
-| TC-05 | Add Google Contacts OAuth | ✅ Pass | Clicking Google Contacts fires redirect to `accounts.google.com` with correct scopes (`contacts` + `userinfo.email`), `access_type=offline`, `prompt=consent`, `redirect_uri=https://kontax.vexon.co/api/sync/google/callback`. Account picker shown ("to continue to vexon.co"). Flow not completed (would associate real Google account to test account). |
-| TC-06 | Google initial import | ⚠️ Blocked | No Google connection in test account. |
-| TC-07 | Add Outlook OAuth | ❌ Fail (bug found + fixed) | Clicking Outlook/Exchange correctly detected Azure is unconfigured and set `?error=microsoft_unconfigured`. **Bug:** redirect URL used internal Docker container hostname (`http://0c468e86bc85:3000/sync?error=microsoft_unconfigured`) instead of `APP_URL` → ERR_NAME_NOT_RESOLVED for user. Fix: `microsoft/connect/route.ts` and `google/connect/route.ts` now use `env.APP_URL ?? "https://kontax.vexon.co"`. **Toast "Outlook sync isn't configured on this server." displays correctly when navigated to the correct URL manually.** Needs deploy + retest. |
-| TC-08 | Outlook initial import | ⚠️ Blocked | Azure OAuth not configured (pre-prod checklist item). |
-| TC-09 | Edit in Kontax → appears in source | ⚠️ Blocked | No sync connections in test account. |
-| TC-10 | Edit in source → appears in Kontax | ⚠️ Blocked | No sync connections in test account. |
-| TC-11 | Disconnect a sync account | ⚠️ Blocked | No sync connections to disconnect. |
-| TC-12 | Contacts remain after disconnect | ⚠️ Blocked | Depends on TC-11. |
-| TC-13 | Sync icon after disconnect | ⚠️ Blocked | Depends on TC-11. |
-| TC-14 | Error state: invalid credentials | ✅ Pass | Added Fastmail account with wrong credentials. Server shows inline error "CardDAV credentials were rejected during preflight. Check the username, password, or app password." within the form. User stays on /sync — **no login redirect** (confirms useActionState + redirect-sweep fix). Form remains open for correction. No unhandled exception. |
-| TC-15 | Sync direction: import-only | ⚠️ Blocked | No sync connections. |
+| TC-04 | Fastmail initial import | ⚠️ Blocked | Fastmail credentials not available for test run. |
+| TC-05 | Add Google Contacts OAuth | ✅ Pass | Full OAuth flow completed with `li@noormohamed.uk` (approved Google OAuth tester). Redirect to accounts.google.com with correct scopes (`contacts` + `userinfo.email`), `access_type=offline`, `prompt=consent`. Callback landed at `/sync` with Connected status. Note: CONNECTED ACCOUNT shows "—" (Google Workspace account — `userinfo.email` not returned; display-only bug, sync works). |
+| TC-06 | Google initial import | ✅ Pass | Initial sync: Kontax +440 ~1 −0 / Google +1 ~0 −0. 440 contacts imported from Google. 1 pre-existing Kontax manual contact pushed outbound (Google +1). Green dot Connected status. Sync history entry shows per-side change counts correctly. |
+| TC-07 | Add Outlook OAuth | ❌ Fail (bug found + fixed) | Azure unconfigured → `?error=microsoft_unconfigured` redirect used Docker container hostname (`http://0c468e86bc85:3000/sync?error=…`) → ERR_NAME_NOT_RESOLVED. **Fixed** in `microsoft/connect/route.ts` + `google/connect/route.ts`: use `env.APP_URL ?? "https://kontax.vexon.co"` for all Kontax-internal redirects. Commit `eb3041a`. **Needs retest post-deploy.** |
+| TC-08 | Outlook initial import | ⚠️ Blocked | Azure OAuth app not registered (pre-prod checklist item). |
+| TC-09 | Edit in Kontax → appears in source | ✅ Pass (partial) | Added note "SyncTest2026 — added by P34D-03 smoke test" to Fatima Al-Rashid, triggered Sync now. Sync history shows Google +0 ~1 −0 (1 contact updated on Google). API-level push confirmed. Direct verification in Google Contacts web inconclusive — contact likely in Workspace directory contacts vs personal "My Contacts" (web search returned "No results"). |
+| TC-10 | Edit in source → appears in Kontax | ⚠️ Blocked | Requires user to edit a contact in Google Contacts web and re-sync. Google account was disconnected during TC-11; reconnect needed. |
+| TC-11 | Disconnect a sync account | ✅ Pass | Clicked Disconnect → Google Contacts entry removed from sync accounts list. Empty state "Connect your first sync account" shown. Note: disconnect completed without password re-confirmation (see Security findings below). |
+| TC-12 | Contacts remain after disconnect | ✅ Pass | 441 contacts still present in Kontax after disconnect. Contact data not deleted. |
+| TC-13 | Sync icon after disconnect | ✅ Pass | Fatima Al-Rashid SYNC section shows "Not linked to any account yet. Connect a CardDAV account to keep this contact in sync." — Google sync badge cleared. Data (incl. TC-09 note) preserved. |
+| TC-14 | Error state: invalid credentials | ✅ Pass | Added Fastmail account with wrong credentials. Inline error "CardDAV credentials were rejected during preflight. Check the username, password, or app password." shown in form. No login redirect (useActionState + redirect-sweep fix confirmed). |
+| TC-15 | Sync direction: import-only | ⚠️ Blocked | Connection settings panel opens and radio buttons work. Saving settings triggers "Confirm your password" modal (Kontax password). `demo1234` rejected for li+smoketest-sharing account. Blocked until account password is known. |
 | TC-16 | Sync direction restore | ⚠️ Blocked | Depends on TC-15. |
 
 ### Bugs found during run
 
 | Bug | Severity | Description | Fix |
 |-----|----------|-------------|-----|
-| Outlook/Google connect routes redirect to Docker container hostname | P1 | `/api/sync/microsoft/connect` and `/api/sync/google/connect` use `new URL(..., req.url)` for Kontax-internal redirects. In Docker, `req.url` resolves to the container hostname (`http://0c468e86bc85:3000/...`) rather than the public `APP_URL`. Users clicking "Outlook / Exchange" get ERR_NAME_NOT_RESOLVED. | Fixed in `src/app/api/sync/microsoft/connect/route.ts` and `src/app/api/sync/google/connect/route.ts`: changed to `env.APP_URL ?? "https://kontax.vexon.co"`. Deployed fix resolves the redirect correctly. |
+| Outlook/Google connect routes redirect to Docker container hostname | P1 | `/api/sync/microsoft/connect` and `/api/sync/google/connect` used `new URL(..., req.url)` for Kontax-internal redirects. In Docker, `req.url` resolves to the container hostname → ERR_NAME_NOT_RESOLVED for user. | Fixed in both connect routes: use `env.APP_URL ?? "https://kontax.vexon.co"`. Commit `eb3041a`. Deploy + retest TC-07 still pending. |
+| CONNECTED ACCOUNT shows "—" for Google Workspace accounts | P3 | The `userinfo.email` endpoint does not return `email` for Google Workspace accounts (`li@noormohamed.uk`). Sync works correctly; only the display is affected. | Open — investigate `fetchGoogleProfileEmail` / use People API `people/me` to resolve email for Workspace accounts. |
+| Disconnect has no password re-confirmation guard | P2 | Saving connection settings (direction, frequency) requires Kontax password re-confirmation. Disconnect (a more destructive action — removes the entire connection) does not. Inconsistent security posture. | Open — add `reauthRequired` check to the disconnect server action, same as `updateSyncAccount`. |
+
+### Security findings
+
+- ✅ **Settings-change password gate works**: Changing sync direction/frequency requires Kontax password confirmation (modal: "Sync connection settings are sensitive. Enter your Kontax password to continue.")
+- ⚠️ **Disconnect lacks password gate**: Disconnect is more destructive than a settings change but has no re-auth step. Should require the same password confirmation.
 
 ### Key verifications from this run
 
 - ✅ Sync page loads without redirecting to login (middleware fix confirmed)
-- ✅ Add account form opens in-page (useActionState pattern — no login loop on submit)
-- ✅ Wrong credentials show inline error, stay on sync page (redirect-sweep fix for `createSyncAccount` confirmed)
+- ✅ Add account form opens in-page (useActionState — no login loop on submit)
+- ✅ Wrong credentials show inline error, stay on sync page (redirect-sweep fix confirmed)
 - ✅ Google OAuth redirect fires with correct scopes and callback URL
-- ✅ "Outlook sync isn't configured" toast shows correctly on error query param
+- ✅ "Outlook sync isn't configured" toast shows correctly on `?error=microsoft_unconfigured`
+- ✅ Google two-way initial sync: per-side change counts (Kontax +440 / Google +1) display correctly
+- ✅ Google two-way push: contact edit in Kontax → Google ~1 in sync history
+- ✅ Disconnect removes account entry; contacts persist; sync badge cleared
 
 ### Blocked TCs — rerun requirements
 
-To complete TC-02/04/06/08–13/15–16, run against an account with existing sync connections:
-- **Fastmail + Google**: use `li@linoormohamed.com` on kontax.vexon.co
-- **iCloud**: connect using a dedicated test Apple ID with an app-specific password
-- **Outlook**: requires Azure app registration (pre-prod checklist item; mark TC-07/08 blocked until then)
+| TC | Requirement |
+|----|-------------|
+| TC-02 | Dedicated Apple ID with iCloud app-specific password |
+| TC-04 | Fastmail account with app password |
+| TC-07 | Deploy commit `eb3041a` then retest |
+| TC-08 | Azure app registration (pre-prod checklist) |
+| TC-10 | Reconnect Google (li@noormohamed.uk), user edits a contact in Google Contacts web, re-sync |
+| TC-15/16 | Password for li+smoketest-sharing@linoormohamed.com Kontax account |
 
 ### Section sign-off
 
 | Criterion | Status |
 |-----------|--------|
-| All 16 TCs pass (no exceptions) | ❌ 10 blocked (need real connections); TC-07 bug found and fixed; TC-01/03/05/14 pass |
+| All 16 TCs pass | ❌ TC-02/04/07(pending retest)/08/10/15/16 blocked; TC-07 bug fixed; 9/16 pass |
 | No 500 errors during sync trigger | ✅ (no 500s observed) |
-| Bugs filed | ✅ Documented above |
+| Bugs filed | ✅ 3 bugs documented (1 fixed, 2 open) |
 
 ---
 

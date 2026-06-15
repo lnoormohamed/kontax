@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useRef, useState, useTransition } from "react";
 
 import {
   activateSyncAccount,
@@ -1162,12 +1162,14 @@ function AccountHeader({
   isSyncing,
   redirectTo,
   onEdit,
+  onRequestDisconnect,
 }: {
   account: SyncAccountData;
   vHealth: VisualHealth;
   isSyncing: boolean;
   redirectTo: string;
   onEdit: () => void;
+  onRequestDisconnect: () => void;
 }) {
   const [copiedUrl, setCopiedUrl] = useState(false);
   const isPaused = account.status === "PAUSED";
@@ -1400,23 +1402,9 @@ function AccountHeader({
         )}
 
         {/* disconnect */}
-        <form
-          action={disconnectSyncAccount}
-          onSubmit={(e) => {
-            const msg = isOAuth
-              ? `Disconnect ${account.label}? Contacts synced from ${providerName} will remain in Kontax but will no longer sync automatically. Your ${authParty} authorisation will be revoked.`
-              : `Disconnect ${account.label}? Contacts will remain in Kontax but will no longer sync.`;
-            if (!window.confirm(msg)) {
-              e.preventDefault();
-            }
-          }}
-        >
-          <input type="hidden" name="syncAccountId" value={account.id} />
-          <input type="hidden" name="redirectTo" value="/sync" />
-          <ActionBtn danger type="submit">
-            Disconnect
-          </ActionBtn>
-        </form>
+        <ActionBtn danger onClick={onRequestDisconnect}>
+          Disconnect
+        </ActionBtn>
       </div>
     </div>
   );
@@ -2538,6 +2526,93 @@ function ReauthModal({ onConfirmed, onCancel }: { onConfirmed: () => void; onCan
   );
 }
 
+// ── Disconnect confirmation modal ─────────────────────────────────────────────
+function DisconnectModal({
+  label,
+  isOAuth,
+  authParty,
+  syncAccountId,
+  onCancel,
+  onDone,
+}: {
+  label: string;
+  isOAuth: boolean;
+  authParty: string;
+  syncAccountId: string;
+  onCancel: () => void;
+  onDone: () => void;
+}) {
+  const [isPending, startTransition] = useTransition();
+
+  const handleDisconnect = () => {
+    startTransition(async () => {
+      const fd = new FormData();
+      fd.append("syncAccountId", syncAccountId);
+      fd.append("redirectTo", "/sync");
+      await disconnectSyncAccount(fd);
+      onDone();
+    });
+  };
+
+  const msg = isOAuth
+    ? `Contacts synced from ${authParty} will remain in Kontax but will no longer sync automatically. Your ${authParty} authorisation will be revoked.`
+    : "Contacts will remain in Kontax but will no longer sync automatically.";
+
+  return (
+    <div className="sy-overlay" onClick={isPending ? undefined : onCancel}>
+      <div className="sy-modal" onClick={(e) => e.stopPropagation()}>
+        <h3 style={{ margin: 0, fontSize: 18, fontWeight: 700, color: T.ink }}>
+          Disconnect {label}?
+        </h3>
+        <p style={{ margin: "10px 0 24px", fontSize: 14, lineHeight: 1.55, color: T.ink2 }}>
+          {msg}
+        </p>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "flex-end", gap: 12 }}>
+          <button
+            type="button"
+            onClick={onCancel}
+            disabled={isPending}
+            style={{
+              border: "none",
+              background: "transparent",
+              color: T.ink2,
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: isPending ? "default" : "pointer",
+              padding: "10px 6px",
+            }}
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={handleDisconnect}
+            disabled={isPending}
+            style={{
+              height: 40,
+              padding: "0 20px",
+              borderRadius: 10,
+              border: "none",
+              background: T.red,
+              color: "#fff",
+              fontSize: 14,
+              fontWeight: 600,
+              cursor: isPending ? "default" : "pointer",
+              opacity: isPending ? 0.6 : 1,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            {isPending ? <Spinner size={14} color="#fff" /> : null}
+            {isPending ? "Disconnecting…" : "Disconnect"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // ── P23-02: connection settings drawer (within the detail panel) ──────────────
 function ConnectionSettings({
   account,
@@ -2893,6 +2968,13 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
   const [scrollToSettings, setScrollToSettings] = useState(false);
   // P23-06: a pending save that needs re-auth; holds the retry to run once elevated.
   const [reauthRetry, setReauthRetry] = useState<(() => void) | null>(null);
+  // Disconnect confirmation modal target.
+  const [disconnectTarget, setDisconnectTarget] = useState<{
+    label: string;
+    isOAuth: boolean;
+    authParty: string;
+    syncAccountId: string;
+  } | null>(null);
   const detailRef = useRef<HTMLElement>(null);
   const router = useRouter();
 
@@ -2983,6 +3065,15 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
           isSyncing={syncingId === selectedAccount.id}
           redirectTo={redirectTo}
           onEdit={() => setEditing(true)}
+          onRequestDisconnect={() => {
+            const isOAuth = selectedAccount.provider !== "CARDDAV";
+            setDisconnectTarget({
+              label: selectedAccount.label,
+              isOAuth,
+              authParty: selectedAccount.provider === "GOOGLE" ? "Google" : "Microsoft",
+              syncAccountId: selectedAccount.id,
+            });
+          }}
         />
         <ConnectionSettings
           key={selectedAccount.id}
@@ -3364,6 +3455,18 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
             retry();
           }}
           onCancel={() => setReauthRetry(null)}
+        />
+      )}
+
+      {/* Disconnect confirmation modal */}
+      {disconnectTarget && (
+        <DisconnectModal
+          label={disconnectTarget.label}
+          isOAuth={disconnectTarget.isOAuth}
+          authParty={disconnectTarget.authParty}
+          syncAccountId={disconnectTarget.syncAccountId}
+          onCancel={() => setDisconnectTarget(null)}
+          onDone={() => setDisconnectTarget(null)}
         />
       )}
 
