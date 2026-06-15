@@ -6,6 +6,10 @@ export const metadata: Metadata = {
   title: "Features — Kontax",
   description:
     "From search to sync to sharing — everything Kontax does for your contacts, up close.",
+  openGraph: {
+    images: [{ url: "/api/og?page=features", width: 1200, height: 630, alt: "Kontax — Everything your contacts need" }],
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function FeaturesPage() {

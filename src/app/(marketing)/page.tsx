@@ -13,6 +13,10 @@ import "./homepage.css";
 export const metadata: Metadata = {
   title: { absolute: "Kontax — Your contacts, synced everywhere" },
   alternates: { canonical: "/" },
+  openGraph: {
+    images: [{ url: "/api/og?page=homepage", width: 1200, height: 630, alt: "Kontax — Your contacts, organised, synced, and always with you." }],
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function HomePage() {

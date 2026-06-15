@@ -6,6 +6,10 @@ export const metadata: Metadata = {
   title: "Security — Kontax",
   description:
     "Kontax is built around the principle that your contacts are yours. Here's how we keep them safe.",
+  openGraph: {
+    images: [{ url: "/api/og?page=security", width: 1200, height: 630, alt: "Kontax — Security you can trust" }],
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function SecurityPage() {

@@ -6,6 +6,10 @@ export const metadata: Metadata = {
   title: "Contact — Kontax",
   description: "Get in touch with the Kontax team. We read every message and aim to respond within 1 business day.",
   alternates: { canonical: "/contact" },
+  openGraph: {
+    images: [{ url: "/api/og?page=contact", width: 1200, height: 630, alt: "Kontax — Get in touch" }],
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function ContactPage() {

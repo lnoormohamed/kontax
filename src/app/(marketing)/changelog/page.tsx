@@ -5,6 +5,10 @@ import "./changelog.css";
 export const metadata: Metadata = {
   title: "Changelog — Kontax",
   description: "Every update to Kontax, in order. New features, refinements, and fixes.",
+  openGraph: {
+    images: [{ url: "/api/og?page=changelog", width: 1200, height: 630, alt: "Kontax — What's new" }],
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function ChangelogPage() {

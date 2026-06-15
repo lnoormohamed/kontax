@@ -9,6 +9,10 @@ export const metadata: Metadata = {
   description:
     "Simple, honest pricing. Free forever for personal use — upgrade to Pro, Family, or Teams when you're ready.",
   alternates: { canonical: "/pricing" },
+  openGraph: {
+    images: [{ url: "/api/og?page=pricing", width: 1200, height: 630, alt: "Kontax — Simple, honest pricing" }],
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 const CHECK = (

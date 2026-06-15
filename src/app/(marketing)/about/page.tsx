@@ -7,6 +7,10 @@ export const metadata: Metadata = {
   description:
     "Kontax was built because address books haven't kept up with how we live. Made by Vexon.",
   alternates: { canonical: "/about" },
+  openGraph: {
+    images: [{ url: "/api/og?page=about", width: 1200, height: 630, alt: "About Kontax" }],
+  },
+  twitter: { card: "summary_large_image" },
 };
 
 export default function AboutPage() {
