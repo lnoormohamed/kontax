@@ -5,6 +5,9 @@ import { MarketingFooter } from "./_components/marketing-footer";
 import { MarketingNav } from "./_components/marketing-nav";
 
 export const metadata: Metadata = {
+  // Marketing page titles already include "— Kontax"; suppress the root
+  // layout's "%s · Kontax" template so we don't get double-suffixed titles.
+  title: { template: "%s", default: "Kontax" },
   openGraph: {
     images: [{ url: "/api/og?page=homepage", width: 1200, height: 630, alt: "Kontax" }],
   },
