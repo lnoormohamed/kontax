@@ -746,7 +746,6 @@ export const attachSyncCredentials = async (formData: FormData) => {
 export const revokeSyncCredentials = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const syncAccountId = parseSyncAccountId(formData);
-  const redirectTo = getRedirectTarget(formData) ?? "/sync?credentialsRevoked=1";
 
   await assertCanUseCardDavSync(userId);
 
@@ -772,14 +771,14 @@ export const revokeSyncCredentials = async (formData: FormData) => {
     },
   });
 
+  // No redirect() — a server-action redirect re-runs middleware via a cookieless
+  // internal sub-request and bounces the user to /login (see queueSyncJob).
   revalidateSyncViews();
-  redirect(redirectTo);
 };
 
 export const prepareSyncRelink = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const syncAccountId = parseSyncAccountId(formData);
-  const redirectTo = getRedirectTarget(formData) ?? "/sync?relinkPrepared=1";
 
   await assertCanUseCardDavSync(userId);
 
@@ -837,8 +836,8 @@ export const prepareSyncRelink = async (formData: FormData) => {
     }),
   ]);
 
+  // No redirect() — see queueSyncJob (avoids the cookieless-middleware logout).
   revalidateSyncViews();
-  redirect(redirectTo);
 };
 
 export const pauseSyncAccount = async (formData: FormData) => {
@@ -864,7 +863,6 @@ export const pauseSyncAccount = async (formData: FormData) => {
 export const revalidateSyncAccount = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const syncAccountId = parseSyncAccountId(formData);
-  const redirectTo = getRedirectTarget(formData);
 
   await assertCanUseCardDavSync(userId);
 
@@ -909,12 +907,9 @@ export const revalidateSyncAccount = async (formData: FormData) => {
       errorSummary,
     });
 
+    // No redirect() — see queueSyncJob (avoids the cookieless-middleware logout).
     revalidateSyncViews();
-    redirect(
-      buildRedirectWithParams(redirectTo, {
-        preflightFailed: 1,
-      }),
-    );
+    return;
   }
 
   let decryptedCredentials: ReturnType<typeof decryptSyncCredentialPayload>;
@@ -935,12 +930,9 @@ export const revalidateSyncAccount = async (formData: FormData) => {
       errorSummary,
     });
 
+    // No redirect() — see queueSyncJob (avoids the cookieless-middleware logout).
     revalidateSyncViews();
-    redirect(
-      buildRedirectWithParams(redirectTo, {
-        preflightFailed: 1,
-      }),
-    );
+    return;
   }
 
   try {
@@ -1005,20 +997,12 @@ export const revalidateSyncAccount = async (formData: FormData) => {
       errorSummary,
     });
 
+    // No redirect() — see queueSyncJob (avoids the cookieless-middleware logout).
     revalidateSyncViews();
-    redirect(
-      buildRedirectWithParams(redirectTo, {
-        preflightFailed: 1,
-      }),
-    );
+    return;
   }
 
   revalidateSyncViews();
-  redirect(
-    buildRedirectWithParams(redirectTo, {
-      preflightCompleted: 1,
-    }),
-  );
 };
 
 export const queueSyncJob = async (formData: FormData) => {
@@ -1119,8 +1103,9 @@ export const queueSyncJob = async (formData: FormData) => {
       errorSummary,
     });
 
+    // No redirect() — see the note above (avoids the cookieless-middleware logout).
     revalidateSyncViews();
-    redirect(redirectTo ?? "/sync?preflightFailed=1");
+    return;
   }
 
   let decryptedCredentials:
@@ -1143,8 +1128,9 @@ export const queueSyncJob = async (formData: FormData) => {
       errorSummary,
     });
 
+    // No redirect() — see the note above (avoids the cookieless-middleware logout).
     revalidateSyncViews();
-    redirect(redirectTo ?? "/sync?preflightFailed=1");
+    return;
   }
 
   const needsCredentialValidation =
@@ -1222,11 +1208,11 @@ export const queueSyncJob = async (formData: FormData) => {
       });
 
       revalidateSyncViews();
-      redirect("/sync?preflightFailed=1");
+      return;
     }
 
     revalidateSyncViews();
-    redirect("/sync?preflightCompleted=1");
+    return;
   }
 
   await db.$transaction([
@@ -1255,14 +1241,22 @@ export const queueSyncJob = async (formData: FormData) => {
     },
   });
 
+  // Run the queued job inline so "Sync now" imports/pushes immediately (matches
+  // the Google/Microsoft branch). Dynamic import keeps the heavy runner graph
+  // server-only. No redirect() — see the note above.
+  try {
+    const { runQueuedSyncJobs } = await import("~/server/sync-runner");
+    await runQueuedSyncJobs({ syncAccountId: account.id, limit: 1 });
+  } catch (error) {
+    console.error("[sync] inline CardDAV run failed", error);
+  }
+
   revalidateSyncViews();
-  redirect(redirectTo ?? "/sync?queued=1");
 };
 
 export const retrySyncJob = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const syncJobId = parseSyncJobId(formData);
-  const redirectTo = getRedirectTarget(formData) ?? "/sync?retryQueued=1";
 
   await assertCanUseCardDavSync(userId);
 
@@ -1312,14 +1306,13 @@ export const retrySyncJob = async (formData: FormData) => {
     },
   });
 
+  // No redirect() — see queueSyncJob (avoids the cookieless-middleware logout).
   revalidateSyncViews();
-  redirect(redirectTo);
 };
 
 export const resolveSyncConflict = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const input = parseSyncConflictResolution(formData);
-  const redirectTo = getRedirectTarget(formData) ?? "/sync?conflictResolved=1";
 
   await assertCanUseCardDavSync(userId);
 
@@ -1678,8 +1671,8 @@ export const resolveSyncConflict = async (formData: FormData) => {
     });
   }
 
+  // No redirect() — see queueSyncJob (avoids the cookieless-middleware logout).
   revalidateSyncViews();
-  redirect(redirectTo);
 };
 
 export const disconnectSyncAccount = async (formData: FormData) => {
