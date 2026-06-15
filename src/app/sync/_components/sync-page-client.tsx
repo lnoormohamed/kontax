@@ -1475,6 +1475,7 @@ function FormField({
   label,
   name,
   placeholder,
+  defaultValue,
   required,
   mono,
   hint,
@@ -1482,6 +1483,7 @@ function FormField({
   label: string;
   name: string;
   placeholder?: string;
+  defaultValue?: string;
   required?: boolean;
   mono?: boolean;
   hint?: React.ReactNode;
@@ -1495,6 +1497,7 @@ function FormField({
       <input
         name={name}
         placeholder={placeholder}
+        defaultValue={defaultValue}
         required={required}
         style={{
           width: "100%",
@@ -1548,7 +1551,15 @@ const OAUTH_TILES: Array<{ provider: string; kind: PlatKind; label: string; sub:
 
 function AddAccountForm({ onCancel }: { onCancel: () => void }) {
   const [sel, setSel] = useState<QuickPreset>(QUICK_PRESETS[0]!);
+  const [baseUrl, setBaseUrl] = useState(QUICK_PRESETS[0]!.url);
+  const [labelValue, setLabelValue] = useState(QUICK_PRESETS[0]!.label);
   const [reveal, setReveal] = useState(false);
+
+  const pickPreset = (q: QuickPreset) => {
+    setSel(q);
+    setBaseUrl(q.url);
+    setLabelValue(q.label);
+  };
 
   return (
     <div style={{ animation: "sy-fade .15s ease" }}>
@@ -1613,7 +1624,7 @@ function AddAccountForm({ onCancel }: { onCancel: () => void }) {
             <button
               key={q.kind}
               type="button"
-              onClick={() => setSel(q)}
+              onClick={() => pickPreset(q)}
               style={{
                 width: 80,
                 height: 64,
@@ -1638,19 +1649,45 @@ function AddAccountForm({ onCancel }: { onCancel: () => void }) {
 
       <form action={createSyncAccount}>
         <div style={{ display: "grid", gap: 14, maxWidth: 460 }}>
-          <FormField label="Label" name="label" placeholder={sel.label} required />
-          <FormField
-            label="Server URL"
-            name="baseUrl"
-            placeholder={sel.url || "https://…"}
-            required
-            mono
-            hint={
+          <label style={{ display: "block" }}>
+            <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, fontWeight: 600, color: T.ink2, marginBottom: 6 }}>Label</span>
+            <input
+              name="label"
+              required
+              value={labelValue}
+              onChange={(e) => setLabelValue(e.target.value)}
+              placeholder={sel.label}
+              style={{ width: "100%", height: 44, borderRadius: 12, border: `1px solid ${T.line}`, background: "#fff", padding: "0 14px", fontSize: 14, color: T.ink, outline: "none", fontFamily: "inherit", boxSizing: "border-box" }}
+            />
+          </label>
+          <label style={{ display: "block" }}>
+            <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, fontWeight: 600, color: T.ink2, marginBottom: 6 }}>
+              Server URL
               <HelpTooltip learnHref="/help#carddav" place="bottom">
                 Your CardDAV server URL looks like <b className="text-white">https://contacts.icloud.com/</b>. Find it in your contacts app’s account settings.
               </HelpTooltip>
-            }
-          />
+            </span>
+            <input
+              name="baseUrl"
+              required
+              value={baseUrl}
+              onChange={(e) => setBaseUrl(e.target.value)}
+              placeholder="https://…"
+              style={{
+                width: "100%",
+                height: 44,
+                borderRadius: 12,
+                border: `1px solid ${T.line}`,
+                background: "#fff",
+                padding: "0 14px",
+                fontSize: 14,
+                color: T.ink,
+                outline: "none",
+                fontFamily: "monospace",
+                boxSizing: "border-box",
+              }}
+            />
+          </label>
           <FormField
             label="Username"
             name="username"
