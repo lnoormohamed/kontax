@@ -2,8 +2,8 @@ import { ImageResponse } from "next/og";
 
 export const runtime = "edge";
 
-export const size = { width: 1200, height: 630 };
-export const contentType = "image/png";
+const WIDTH = 1200;
+const HEIGHT = 630;
 
 const OG_PAGES: Record<string, { title: string; description: string }> = {
   homepage: {
@@ -129,7 +129,8 @@ export async function GET(request: Request) {
       </div>
     ),
     {
-      ...size,
+      width: WIDTH,
+      height: HEIGHT,
       headers: {
         "Cache-Control": "public, max-age=86400, stale-while-revalidate=604800",
       },
