@@ -83,24 +83,21 @@ export async function GET(req: NextRequest) {
     ? `Google Contacts (${googleEmail})`
     : "Google Contacts";
 
-  // Reuse an existing connection for the same Google account if present, so a
-  // reconnect refreshes credentials instead of hitting the unique constraint.
-  // First try an exact email match; fall back to a null-remoteAccountId record
-  // for accounts created before email resolution was stored (legacy re-auth).
-  const existingByEmail = googleEmail
-    ? await db.syncAccount.findFirst({
-        where: { userId: state.userId, provider: "GOOGLE", remoteAccountId: googleEmail },
-        select: { id: true, credentialReference: true },
-      })
-    : null;
-  const existing =
-    existingByEmail ??
-    (googleEmail
-      ? await db.syncAccount.findFirst({
-          where: { userId: state.userId, provider: "GOOGLE", remoteAccountId: null },
-          select: { id: true, credentialReference: true },
-        })
-      : null);
+  // Reuse the existing connection for this user if one exists, so a reconnect
+  // refreshes credentials instead of hitting the unique constraint.
+  // Match by email first; fall back to any Google account for this user
+  // (handles accounts created before email resolution was stored).
+  const existing = await db.syncAccount.findFirst({
+    where: {
+      userId: state.userId,
+      provider: "GOOGLE",
+      ...(googleEmail
+        ? { OR: [{ remoteAccountId: googleEmail }, { remoteAccountId: null }, { remoteAccountId: "" }] }
+        : {}),
+    },
+    orderBy: { createdAt: "asc" },
+    select: { id: true, credentialReference: true },
+  });
 
   // Google only returns a refresh token on a fresh consent. Never overwrite a
   // good stored refresh token with undefined on reconnect.
