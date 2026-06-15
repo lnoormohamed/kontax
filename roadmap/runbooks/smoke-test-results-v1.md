@@ -252,8 +252,8 @@ Environment: kontax.vexon.co
 | TC-12 | Contacts remain after disconnect | ✅ Pass | 441 contacts still present in Kontax after disconnect. Contact data not deleted. |
 | TC-13 | Sync icon after disconnect | ✅ Pass | Fatima Al-Rashid SYNC section shows "Not linked to any account yet. Connect a CardDAV account to keep this contact in sync." — Google sync badge cleared. Data (incl. TC-09 note) preserved. |
 | TC-14 | Error state: invalid credentials | ✅ Pass | Added Fastmail account with wrong credentials. Inline error "CardDAV credentials were rejected during preflight. Check the username, password, or app password." shown in form. No login redirect (useActionState + redirect-sweep fix confirmed). |
-| TC-15 | Sync direction: import-only | ⚠️ Blocked | Connection settings panel opens and radio buttons work. Saving settings triggers "Confirm your password" modal (Kontax password). `demo1234` rejected for li+smoketest-sharing account. Blocked until account password is known. |
-| TC-16 | Sync direction restore | ⚠️ Blocked | Depends on TC-15. |
+| TC-15 | Sync direction: import-only | ✅ Pass | Connection settings panel opens, radio buttons work. "Confirm your password" modal appeared on Save. Password accepted → direction saved to Import only. Badge updated to "↓ Import only · Connected". Tested on li@linoormohamed.com iCloud account. |
+| TC-16 | Sync direction restore | ✅ Pass | Direction changed back to Two-way, password confirmed, saved. Badge reverted to "↑↓ Two-way · Connected". Sync history shows 23:13 ↓ Import → 23:14 ↑↓ Two-way. |
 
 ### Bugs found during run
 
@@ -288,13 +288,12 @@ Environment: kontax.vexon.co
 |----|-------------|
 | TC-08 | Azure app registration (pre-prod checklist) |
 | TC-10 | Reconnect Google (li@noormohamed.uk), user edits a contact in Google Contacts web, re-sync |
-| TC-15/16 | Password for li+smoketest-sharing@linoormohamed.com Kontax account |
 
 ### Section sign-off
 
 | Criterion | Status |
 |-----------|--------|
-| All 16 TCs pass | ❌ TC-08/10/15/16 blocked; 13/16 pass (TC-01/02 added this run) |
+| All 16 TCs pass | ❌ TC-08/10 blocked; 15/16 pass |
 | No 500 errors during sync trigger | ✅ (no 500s observed) |
 | Bugs filed | ✅ 3 bugs documented (1 fixed, 2 open) |
 
