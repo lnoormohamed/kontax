@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { JsonLd, organizationSchema } from "~/app/_components/json-ld";
 import "../_components/doc.css";
 
 export const metadata: Metadata = {
@@ -8,14 +9,27 @@ export const metadata: Metadata = {
     "Kontax was built because address books haven't kept up with how we live. Made by Vexon.",
   alternates: { canonical: "/about" },
   openGraph: {
+    title: "About Kontax",
+    description:
+      "Kontax was built because address books haven't kept up with how we live. Made by Vexon.",
+    url: "/about",
+    siteName: "Kontax",
+    type: "website",
     images: [{ url: "/api/og?page=about", width: 1200, height: 630, alt: "About Kontax" }],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: {
+    card: "summary_large_image",
+    title: "About — Kontax",
+    description:
+      "Kontax was built because address books haven't kept up with how we live. Made by Vexon.",
+  },
 };
 
 export default function AboutPage() {
   return (
-    <div className="doc-wrap doc-wrap--center">
+    <>
+      <JsonLd data={organizationSchema()} />
+      <div className="doc-wrap doc-wrap--center">
       <h1 className="doc-title">About Kontax</h1>
 
       <div className="doc-body" style={{ textAlign: "left", marginTop: "32px" }}>
@@ -54,5 +68,6 @@ export default function AboutPage() {
         </Link>
       </div>
     </div>
+    </>
   );
 }

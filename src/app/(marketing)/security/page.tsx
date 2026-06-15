@@ -5,11 +5,23 @@ import "./security.css";
 export const metadata: Metadata = {
   title: "Security — Kontax",
   description:
-    "Kontax is built around the principle that your contacts are yours. Here's how we keep them safe.",
+    "How Kontax protects your data: TLS encryption, bcrypt passwords, 2FA, encrypted sync credentials, and GDPR compliance.",
+  alternates: { canonical: "/security" },
   openGraph: {
+    title: "Security",
+    description:
+      "How Kontax protects your data: TLS encryption, bcrypt passwords, 2FA, encrypted sync credentials, and GDPR compliance.",
+    url: "/security",
+    siteName: "Kontax",
+    type: "website",
     images: [{ url: "/api/og?page=security", width: 1200, height: 630, alt: "Kontax — Security you can trust" }],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: {
+    card: "summary_large_image",
+    title: "Security — Kontax",
+    description:
+      "How Kontax protects your data: TLS encryption, bcrypt passwords, 2FA, encrypted sync credentials, and GDPR compliance.",
+  },
 };
 
 export default function SecurityPage() {

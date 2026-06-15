@@ -9,9 +9,9 @@ import { auth } from "~/server/auth";
 import "~/app/_components/public-site.css";
 
 export const metadata: Metadata = {
-  title: "Kontax API — Developer Documentation",
+  title: "Developer API — Kontax",
   description:
-    "Build with Kontax. Use the REST API to read and write your contacts programmatically.",
+    "The Kontax REST API at api.getkontax.com — CRUD for contacts, labels, and sync. API reference and authentication docs.",
   robots: { index: true, follow: true },
   alternates: { canonical: "/developers" },
 };

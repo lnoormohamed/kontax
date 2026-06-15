@@ -11,9 +11,24 @@ const LAST_UPDATED = "2026-06-14";
 export const metadata: Metadata = {
   title: "Privacy Policy — Kontax",
   description:
-    "How Kontax collects, uses, and protects your data — and your rights under GDPR.",
+    "How Kontax collects, uses, and protects your data, and your rights under GDPR.",
   robots: { index: true, follow: true },
   alternates: { canonical: "/privacy" },
+  openGraph: {
+    title: "Privacy Policy",
+    description:
+      "How Kontax collects, uses, and protects your data, and your rights under GDPR.",
+    url: "/privacy",
+    siteName: "Kontax",
+    type: "website",
+    images: [{ url: "/api/og?page=homepage", width: 1200, height: 630, alt: "Kontax" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Privacy Policy — Kontax",
+    description:
+      "How Kontax collects, uses, and protects your data, and your rights under GDPR.",
+  },
 };
 
 export default function PrivacyPage() {

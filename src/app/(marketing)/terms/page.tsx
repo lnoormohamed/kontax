@@ -16,6 +16,21 @@ export const metadata: Metadata = {
     "The terms governing your use of Kontax — subscriptions, acceptable use, and your rights.",
   robots: { index: true, follow: true },
   alternates: { canonical: "/terms" },
+  openGraph: {
+    title: "Terms of Service",
+    description:
+      "The terms governing your use of Kontax — subscriptions, acceptable use, and your rights.",
+    url: "/terms",
+    siteName: "Kontax",
+    type: "website",
+    images: [{ url: "/api/og?page=homepage", width: 1200, height: 630, alt: "Kontax" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Terms of Service — Kontax",
+    description:
+      "The terms governing your use of Kontax — subscriptions, acceptable use, and your rights.",
+  },
 };
 
 export default function TermsPage() {

@@ -24,17 +24,13 @@ export async function generateMetadata({
     return { title: "Not found — Kontax", robots: { index: false } };
   }
 
-  const subtitle =
-    [card.jobTitle, card.company].filter(Boolean).join(" at ") ||
-    `Contact ${card.displayName} via Kontax.`;
-
   return {
-    title: `${card.displayName} — Kontax`,
-    description: subtitle,
+    title: `${card.displayName}'s contact card — Kontax`,
+    description: `Add ${card.displayName} to your contacts in one tap.`,
     robots: { index: true, follow: true },
     openGraph: {
-      title: card.displayName,
-      description: subtitle,
+      title: `${card.displayName}'s contact card`,
+      description: `Add ${card.displayName} to your contacts in one tap.`,
       url: `${SITE_URL}/u/${card.username}`,
     },
   };

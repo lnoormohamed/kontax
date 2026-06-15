@@ -5,8 +5,8 @@ import { AuthCard } from "~/app/_components/auth-card";
 import { auth } from "~/server/auth";
 
 export const metadata: Metadata = {
-  title: "Log in",
-  description: "Log in to Kontax — your contacts, synced everywhere.",
+  title: "Log in — Kontax",
+  description: "Log in to your Kontax account.",
   alternates: { canonical: "/login" },
 };
 

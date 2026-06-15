@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { JsonLd, breadcrumbSchema } from "~/app/_components/json-ld";
 import { PricingToggle } from "./_pricing-toggle";
 import { FaqList } from "./_faq";
 import "./pricing.css";
@@ -7,12 +8,23 @@ import "./pricing.css";
 export const metadata: Metadata = {
   title: "Pricing — Kontax",
   description:
-    "Simple, honest pricing. Free forever for personal use — upgrade to Pro, Family, or Teams when you're ready.",
+    "Start free with 100 contacts. Upgrade to Pro for unlimited contacts, sync, and the developer API.",
   alternates: { canonical: "/pricing" },
   openGraph: {
+    title: "Pricing",
+    description:
+      "Start free with 100 contacts. Upgrade to Pro for unlimited contacts, sync, and the developer API.",
+    url: "/pricing",
+    siteName: "Kontax",
+    type: "website",
     images: [{ url: "/api/og?page=pricing", width: 1200, height: 630, alt: "Kontax — Simple, honest pricing" }],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: {
+    card: "summary_large_image",
+    title: "Pricing — Kontax",
+    description:
+      "Start free with 100 contacts. Upgrade to Pro for unlimited contacts, sync, and the developer API.",
+  },
 };
 
 const CHECK = (
@@ -30,6 +42,12 @@ function Cell({ yes, text }: { yes?: boolean; text?: string }) {
 export default function PricingPage() {
   return (
     <>
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Pricing", path: "/pricing" },
+        ])}
+      />
       {/* ── Hero ── */}
       <section className="pr-hero">
         <div className="pr-wrap">

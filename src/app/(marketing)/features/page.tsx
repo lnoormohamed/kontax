@@ -1,20 +1,39 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { JsonLd, breadcrumbSchema } from "~/app/_components/json-ld";
 import "./features.css";
 
 export const metadata: Metadata = {
   title: "Features — Kontax",
   description:
-    "From search to sync to sharing — everything Kontax does for your contacts, up close.",
+    "Grouped search, labels, multi-provider sync, family and team shared books, public contact cards, and a developer REST API.",
+  alternates: { canonical: "/features" },
   openGraph: {
+    title: "Features",
+    description:
+      "Grouped search, labels, multi-provider sync, family and team shared books, public contact cards, and a developer REST API.",
+    url: "/features",
+    siteName: "Kontax",
+    type: "website",
     images: [{ url: "/api/og?page=features", width: 1200, height: 630, alt: "Kontax — Everything your contacts need" }],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: {
+    card: "summary_large_image",
+    title: "Features — Kontax",
+    description:
+      "Grouped search, labels, multi-provider sync, family and team shared books, public contact cards, and a developer REST API.",
+  },
 };
 
 export default function FeaturesPage() {
   return (
     <>
+      <JsonLd
+        data={breadcrumbSchema([
+          { name: "Home", path: "/" },
+          { name: "Features", path: "/features" },
+        ])}
+      />
       {/* ── Hero ── */}
       <section className="fp-hero">
         <div className="fp-hero__inner">

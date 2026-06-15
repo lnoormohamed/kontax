@@ -4,12 +4,21 @@ import "./contact.css";
 
 export const metadata: Metadata = {
   title: "Contact — Kontax",
-  description: "Get in touch with the Kontax team. We read every message and aim to respond within 1 business day.",
+  description: "Get in touch with the Kontax team. We aim to respond within 1 business day.",
   alternates: { canonical: "/contact" },
   openGraph: {
+    title: "Contact",
+    description: "Get in touch with the Kontax team. We aim to respond within 1 business day.",
+    url: "/contact",
+    siteName: "Kontax",
+    type: "website",
     images: [{ url: "/api/og?page=contact", width: 1200, height: 630, alt: "Kontax — Get in touch" }],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: {
+    card: "summary_large_image",
+    title: "Contact — Kontax",
+    description: "Get in touch with the Kontax team. We aim to respond within 1 business day.",
+  },
 };
 
 export default function ContactPage() {

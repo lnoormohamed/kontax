@@ -4,11 +4,21 @@ import "./changelog.css";
 
 export const metadata: Metadata = {
   title: "Changelog — Kontax",
-  description: "Every update to Kontax, in order. New features, refinements, and fixes.",
+  description: "Every Kontax update in order — new features, improvements, and fixes.",
+  alternates: { canonical: "/changelog" },
   openGraph: {
+    title: "Changelog",
+    description: "Every Kontax update in order — new features, improvements, and fixes.",
+    url: "/changelog",
+    siteName: "Kontax",
+    type: "website",
     images: [{ url: "/api/og?page=changelog", width: 1200, height: 630, alt: "Kontax — What's new" }],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: {
+    card: "summary_large_image",
+    title: "Changelog — Kontax",
+    description: "Every Kontax update in order — new features, improvements, and fixes.",
+  },
 };
 
 export default function ChangelogPage() {

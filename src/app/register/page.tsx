@@ -6,8 +6,8 @@ import { auth } from "~/server/auth";
 import { CardRegisterContext } from "./card-register-context";
 
 export const metadata: Metadata = {
-  title: "Create your account",
-  description: "Create a free Kontax account — up to 500 contacts, synced across every device over CardDAV.",
+  title: "Get started — Kontax",
+  description: "Create a free Kontax account. No credit card required.",
   alternates: { canonical: "/register" },
 };
 

@@ -9,9 +9,8 @@ import { auth } from "~/server/auth";
 import "~/app/_components/public-site.css";
 
 export const metadata: Metadata = {
-  title: "Help & FAQ",
-  description:
-    "Answers to the questions Kontax users ask most — CardDAV & sync, import & export, account security, sharing, and plans & billing.",
+  title: "Help — Kontax",
+  description: "Guides and documentation for using Kontax.",
   alternates: { canonical: "/help" },
 };
 

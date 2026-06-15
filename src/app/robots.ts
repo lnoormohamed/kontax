@@ -27,6 +27,7 @@ export default function robots(): MetadataRoute.Robots {
         "/reset-password",
         "/account-deleted",
         "/account-pending-deletion",
+        "/books",
       ],
     },
     sitemap: `${SITE_URL}/sitemap.xml`,

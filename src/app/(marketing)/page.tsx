@@ -11,12 +11,25 @@ import {
 import "./homepage.css";
 
 export const metadata: Metadata = {
-  title: { absolute: "Kontax — Your contacts, synced everywhere" },
+  title: { absolute: "Kontax — Your contacts, organised and synced" },
+  description:
+    "Manage your address book across every device. Search, labels, CardDAV sync, Google Contacts, shared books, and a public contact card.",
   alternates: { canonical: "/" },
   openGraph: {
+    title: "Kontax — Your contacts, organised and synced",
+    description:
+      "Manage your address book across every device. Search, labels, CardDAV sync, Google Contacts, shared books, and a public contact card.",
+    url: "/",
+    siteName: "Kontax",
+    type: "website",
     images: [{ url: "/api/og?page=homepage", width: 1200, height: 630, alt: "Kontax — Your contacts, organised, synced, and always with you." }],
   },
-  twitter: { card: "summary_large_image" },
+  twitter: {
+    card: "summary_large_image",
+    title: "Kontax — Your contacts, organised and synced",
+    description:
+      "Manage your address book across every device. Search, labels, CardDAV sync, Google Contacts, shared books, and a public contact card.",
+  },
 };
 
 export default function HomePage() {
