@@ -6,7 +6,7 @@ import { z } from "zod";
 
 import { db } from "~/server/db";
 import { detectNewDeviceSignIn, recordFailedLogin } from "~/server/notifications";
-import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
+import { checkRateLimit, peekRateLimit, rateLimiters } from "~/server/rate-limit";
 import { getPreferences } from "~/server/preferences";
 import { DEFAULT_PREFERENCES, type UserPreferences } from "~/lib/preferences-shared";
 
@@ -90,12 +90,12 @@ export const authConfig = {
           ?? null;
         const ua = request?.headers?.get("user-agent") ?? null;
 
-        // P34D-01: brute-force protection — check IP bucket first (cheap, no DB).
-        // Email bucket is checked after the user lookup so unknown emails don't
-        // reveal whether an account exists via timing differences.
+        // P34D-01: brute-force protection.
+        // Peek (no consume) so successful logins don't drain the bucket.
+        // IP bucket checked first — cheap gate before any DB work.
         if (ip) {
-          const ipCheck = await checkRateLimit(rateLimiters.loginByIp, `ip:${ip}`);
-          if (!ipCheck.allowed) return null;
+          const ipPeek = await peekRateLimit(rateLimiters.loginByIp, `ip:${ip}`);
+          if (!ipPeek.allowed) return null;
         }
 
         const user = await db.user.findUnique({
@@ -104,16 +104,18 @@ export const authConfig = {
 
         if (!user) return null;
 
-        // P34D-01: per-account bucket — consume before the password check so
-        // an attacker can't bypass by exploiting bcrypt timing.
-        const emailCheck = await checkRateLimit(rateLimiters.loginByEmail, `email:${user.email}`);
-        if (!emailCheck.allowed) return null;
+        // Peek the per-account bucket before the bcrypt call.
+        const emailPeek = await peekRateLimit(rateLimiters.loginByEmail, `email:${user.email}`);
+        if (!emailPeek.allowed) return null;
 
         const passwordMatches = await bcrypt.compare(
           parsedCredentials.data.password,
           user.password,
         );
         if (!passwordMatches) {
+          // Consume a point only on failure so successful logins don't lock users out.
+          void checkRateLimit(rateLimiters.loginByEmail, `email:${user.email}`);
+          if (ip) void checkRateLimit(rateLimiters.loginByIp, `ip:${ip}`);
           // P22-04 Rule 3: track repeated failed logins against this account.
           await recordFailedLogin(user.id, ip);
           return null;

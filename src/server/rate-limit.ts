@@ -70,8 +70,8 @@ export interface RateLimitResult {
 }
 
 /**
- * Check a rate limit. Returns allowed=true if the request is within limits.
- * identifier: a unique key, e.g. userId or "ip:1.2.3.4"
+ * Consume one point and return the result. Use for actions that should always
+ * count toward the limit (e.g. failed login attempts).
  */
 export async function checkRateLimit(
   limiter: Limiter,
@@ -91,5 +91,29 @@ export async function checkRateLimit(
       remaining: 0,
       resetAt: new Date(Date.now() + msBeforeNext),
     };
+  }
+}
+
+/**
+ * Check whether a key is currently blocked WITHOUT consuming a point.
+ * Use to gate an action before performing it (e.g. check login rate limit
+ * before the bcrypt comparison, then consume only on failure).
+ */
+export async function peekRateLimit(
+  limiter: Limiter,
+  identifier: string,
+): Promise<RateLimitResult> {
+  try {
+    const res = await limiter.get(identifier);
+    if (!res || res.remainingPoints > 0) {
+      return { allowed: true, remaining: res?.remainingPoints ?? Infinity, resetAt: new Date(0) };
+    }
+    return {
+      allowed: false,
+      remaining: 0,
+      resetAt: new Date(Date.now() + (res.msBeforeNext ?? 0)),
+    };
+  } catch {
+    return { allowed: true, remaining: 0, resetAt: new Date(0) };
   }
 }
