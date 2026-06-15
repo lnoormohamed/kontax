@@ -233,7 +233,12 @@ export default async function SyncPage({ searchParams }: PageProps) {
       added: j.createdCount,
       modified: j.updatedCount,
       deleted: j.deletedCount,
-      status: j.status === "SUCCEEDED" || j.status === "PARTIAL" ? "ok" : "fail",
+      status:
+        j.status === "SUCCEEDED" || j.status === "PARTIAL"
+          ? "ok"
+          : j.status === "QUEUED" || j.status === "RUNNING"
+            ? "pending"
+            : "fail",
       error: j.errorSummary ?? null,
     }));
 
