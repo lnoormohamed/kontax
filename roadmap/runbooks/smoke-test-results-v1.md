@@ -238,8 +238,8 @@ Environment: kontax.vexon.co
 
 | ID | Test Case | Pass/Fail | Notes |
 |----|-----------|-----------|-------|
-| TC-01 | Add iCloud CardDAV | ✅ Pass (UI) | "Add sync account" form opens in-page (no redirect). iCloud tab selected by default, Label pre-filled "iCloud", Server URL pre-filled "https://contacts.icloud.com". All fields present. Full connection requires iCloud app-specific password — not tested. |
-| TC-02 | iCloud initial import | ⚠️ Blocked | No iCloud credentials available. Requires dedicated Apple ID with app-specific password. |
+| TC-01 | Add iCloud CardDAV | ✅ Pass | "Add sync account" form opens in-page (no redirect). iCloud tab selected by default, Label pre-filled "iCloud", Server URL pre-filled "https://contacts.icloud.com". Full connection tested on li@linoormohamed.com with app-specific password. Preflight ✅. |
+| TC-02 | iCloud initial import | ✅ Pass | Initial sync: Kontax +274 ~0 −0 / CardDAV +0 ~0 −0. 274 contacts imported from iCloud. New bug found + fixed during this run — see bugs table (syncUid global unique constraint). |
 | TC-03 | Add Fastmail CardDAV | ✅ Pass | Fastmail tab switches correctly; Label updates to "Fastmail", Server URL updates to "https://carddav.fastmail.com/dav/addressbooks". Full connection tested on li@linoormohamed.com: connected and syncing normally. |
 | TC-04 | Fastmail initial import | ✅ Pass | 292 contacts synced from Fastmail (li@linoormohamed.com). Two bugs surfaced and fixed during this run — see bugs table. |
 | TC-05 | Add Google Contacts OAuth | ✅ Pass | Full OAuth flow completed with `li@noormohamed.uk` (approved Google OAuth tester). Redirect to accounts.google.com with correct scopes (`contacts` + `userinfo.email`), `access_type=offline`, `prompt=consent`. Callback landed at `/sync` with Connected status. Note: CONNECTED ACCOUNT shows "—" (Google Workspace account — `userinfo.email` not returned; display-only bug, sync works). |
@@ -262,6 +262,7 @@ Environment: kontax.vexon.co
 | Outlook/Google connect routes redirect to Docker container hostname | P1 | `/api/sync/microsoft/connect` and `/api/sync/google/connect` used `new URL(..., req.url)` for Kontax-internal redirects. In Docker, `req.url` resolves to the container hostname → ERR_NAME_NOT_RESOLVED for user. | Fixed in both connect routes: use `env.APP_URL ?? "https://kontax.vexon.co"`. Commit `eb3041a`. Retested ✅. |
 | Concurrent jobs for same account violate `syncUid` unique constraint | P1 | "Sync now" inline runner and cron drain both claimed QUEUED jobs for the same account simultaneously. Both tried to create the same contacts → `Unique constraint failed on the fields: ('syncUid')`. | Added sibling-RUNNING guard in `runQueuedSyncJobs`: after claiming a job, if another RUNNING job exists for the same account, revert to QUEUED. Commit `9e6dc11`. |
 | Nameless Fastmail contact aborts entire sync job | P1 | A Fastmail contact with blank FN field caused `buildContactWriteDataFromRemoteSnapshot` to throw, failing the whole job and leaving the account in error state indefinitely. | Skip nameless contacts in `remoteApplyCandidates` loop with a soft error on the SyncContactLink (`REMOTE_CONTACT_NO_NAME`) and advance ETag. Commit `ecd5dc3`. |
+| `syncUid @unique` is global — blocks multi-account import | P1 | `syncUid` had a global unique constraint across all users. When a user's iCloud contacts shared vCard UIDs with another user's contacts in the DB, the iCloud initial import failed with `Unique constraint failed on the fields: ('syncUid')`. Also affects any scenario where two users have contacts with the same UID. | Changed to `@@unique([userId, syncUid])` — uniqueness is now scoped per user. Confirmed 0 existing duplicate (userId, syncUid) pairs before migration. Commit `10af85c`. |
 | CONNECTED ACCOUNT shows "—" for Google Workspace accounts | P3 | The `userinfo.email` endpoint does not return `email` for Google Workspace accounts (`li@noormohamed.uk`). Sync works correctly; only the display is affected. | Open — investigate `fetchGoogleProfileEmail` / use People API `people/me` to resolve email for Workspace accounts. |
 | Disconnect has no password re-confirmation guard | P2 | Saving connection settings (direction, frequency) requires Kontax password re-confirmation. Disconnect (a more destructive action — removes the entire connection) does not. Inconsistent security posture. | Open — add `reauthRequired` check to the disconnect server action, same as `updateSyncAccount`. |
 
@@ -285,7 +286,6 @@ Environment: kontax.vexon.co
 
 | TC | Requirement |
 |----|-------------|
-| TC-02 | Dedicated Apple ID with iCloud app-specific password |
 | TC-08 | Azure app registration (pre-prod checklist) |
 | TC-10 | Reconnect Google (li@noormohamed.uk), user edits a contact in Google Contacts web, re-sync |
 | TC-15/16 | Password for li+smoketest-sharing@linoormohamed.com Kontax account |
@@ -294,7 +294,7 @@ Environment: kontax.vexon.co
 
 | Criterion | Status |
 |-----------|--------|
-| All 16 TCs pass | ❌ TC-02/08/10/15/16 blocked; 11/16 pass (TC-03/04/07 added this run) |
+| All 16 TCs pass | ❌ TC-08/10/15/16 blocked; 13/16 pass (TC-01/02 added this run) |
 | No 500 errors during sync trigger | ✅ (no 500s observed) |
 | Bugs filed | ✅ 3 bugs documented (1 fixed, 2 open) |
 
