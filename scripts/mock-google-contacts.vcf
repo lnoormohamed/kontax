@@ -1,0 +1,224 @@
+BEGIN:VCARD
+VERSION:3.0
+FN:James Whitfield
+N:Whitfield;James;;;
+TEL;TYPE=CELL:+44 7911 234567
+EMAIL;TYPE=WORK:james.whitfield@meridianlaw.co.uk
+ORG:Meridian Law Partners
+TITLE:Senior Associate
+ADR;TYPE=WORK:;;22 Chancery Lane;London;;WC2A 1LR;United Kingdom
+BDAY:1983-04-12
+NOTE:Met at the Cambridge alumni dinner. Specialises in IP litigation.
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Priya Nair
+N:Nair;Priya;;;
+TEL;TYPE=CELL:+44 7700 987654
+TEL;TYPE=HOME:+44 20 7946 0321
+EMAIL;TYPE=PERSONAL:priya.nair@gmail.com
+EMAIL;TYPE=WORK:p.nair@oxfordhealth.nhs.uk
+ORG:Oxford University Hospitals NHS Foundation Trust
+TITLE:Consultant Cardiologist
+BDAY:1979-09-28
+NOTE:Referred by Dr Sharma. Best contact via work email.
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Marco Bianchi
+N:Bianchi;Marco;;;
+TEL;TYPE=CELL:+39 333 456 7890
+EMAIL;TYPE=WORK:m.bianchi@bianchidesign.it
+ORG:Bianchi Design Studio
+TITLE:Creative Director
+ADR;TYPE=WORK:;;Via Montenapoleone 8;Milan;Lombardia;20121;Italy
+URL:https://bianchidesign.it
+NOTE:Potential partner for the rebranding project. Speaks English and French.
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Sofia Andersson
+N:Andersson;Sofia;;;
+TEL;TYPE=CELL:+46 70 123 4567
+EMAIL;TYPE=PERSONAL:sofia.andersson@protonmail.com
+BDAY:1991-02-14
+NOTE:University flatmate. Now in Stockholm working in tech.
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:David Okafor
+N:Okafor;David;;;
+TEL;TYPE=CELL:+234 802 345 6789
+TEL;TYPE=WORK:+234 1 270 0001
+EMAIL;TYPE=WORK:d.okafor@lagosinvest.ng
+ORG:Lagos Investment Holdings
+TITLE:Managing Director
+ADR;TYPE=WORK:;;Plot 1234 Adeola Odeku Street;Lagos;VI;;Nigeria
+NOTE:Key contact for West Africa expansion. Prefers WhatsApp.
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Hannah Müller
+N:Müller;Hannah;;;
+TEL;TYPE=CELL:+49 151 2345 6789
+EMAIL;TYPE=PERSONAL:hannah.mueller@web.de
+EMAIL;TYPE=WORK:h.mueller@bmw-group.com
+ORG:BMW Group
+TITLE:Product Manager
+BDAY:1988-11-03
+ADR;TYPE=HOME:;;Leopoldstraße 45;Munich;Bavaria;80803;Germany
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Chen Wei
+N:Wei;Chen;;;
+TEL;TYPE=CELL:+86 138 0013 8000
+EMAIL;TYPE=WORK:chenwei@bytedanceintl.com
+ORG:ByteDance International
+TITLE:Head of Product — EMEA
+BDAY:1986-07-22
+NOTE:Connect on LinkedIn before calling. Travels to London quarterly.
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Fatima Al-Rashid
+N:Al-Rashid;Fatima;;;
+TEL;TYPE=CELL:+971 50 234 5678
+EMAIL;TYPE=PERSONAL:fatima.alrashid@gmail.com
+EMAIL;TYPE=WORK:f.alrashid@adgm.ae
+ORG:Abu Dhabi Global Market
+TITLE:Senior Legal Counsel
+ADR;TYPE=WORK:;;Al Maryah Island;Abu Dhabi;;;United Arab Emirates
+BDAY:1984-03-15
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Tom Brennan
+N:Brennan;Tom;;;
+TEL;TYPE=CELL:+353 87 234 5678
+EMAIL;TYPE=PERSONAL:tombrennan@icloud.com
+BDAY:1995-06-08
+NOTE:Old school friend. Moved to Dublin after college. Graphic designer.
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Yuki Tanaka
+N:Tanaka;Yuki;;;
+TEL;TYPE=CELL:+81 90 1234 5678
+TEL;TYPE=WORK:+81 3 1234 5678
+EMAIL;TYPE=WORK:y.tanaka@softbank.co.jp
+ORG:SoftBank Corp
+TITLE:Investment Analyst
+ADR;TYPE=WORK:;;1-9-1 Higashi-Shimbashi;Tokyo;Minato-ku;105-7316;Japan
+BDAY:1990-12-01
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Isabel Ferreira
+N:Ferreira;Isabel;;;
+TEL;TYPE=CELL:+55 11 98765 4321
+EMAIL;TYPE=PERSONAL:isabelferreira@outlook.com
+EMAIL;TYPE=WORK:i.ferreira@nubank.com.br
+ORG:Nubank
+TITLE:Engineering Manager
+BDAY:1987-05-19
+NOTE:Met at FinTech Connect. Building mobile payments infra.
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Raj Patel
+N:Patel;Raj;;;
+TEL;TYPE=CELL:+44 7800 123456
+TEL;TYPE=HOME:+44 116 260 9999
+EMAIL;TYPE=PERSONAL:raj.patel@hotmail.com
+ADR;TYPE=HOME:;;14 Granby Street;Leicester;;LE1 6EJ;United Kingdom
+BDAY:1972-08-30
+NOTE:Uncle. Retired. Call on weekends only.
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Kontax Support
+N:Support;Kontax;;;
+ORG:Kontax Ltd
+TEL;TYPE=WORK:+44 20 0000 0000
+EMAIL;TYPE=WORK:support@getkontax.com
+URL:https://getkontax.com
+NOTE:Internal test contact — company-only entry.
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Olga Shevchenko
+N:Shevchenko;Olga;;;
+TEL;TYPE=CELL:+380 67 234 5678
+EMAIL;TYPE=PERSONAL:olga.shevchenko@gmail.com
+BDAY:1993-01-27
+NOTE:Translator — Ukrainian/English/Polish. Freelance.
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Antoine Lefebvre
+N:Lefebvre;Antoine;;;
+TEL;TYPE=CELL:+33 6 12 34 56 78
+TEL;TYPE=WORK:+33 1 40 00 00 00
+EMAIL;TYPE=WORK:a.lefebvre@lvcmh.fr
+ORG:LVMH Moët Hennessy
+TITLE:Director of Digital Strategy
+ADR;TYPE=WORK:;;22 Avenue Montaigne;Paris;;75008;France
+BDAY:1981-10-05
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Amira Hassan
+N:Hassan;Amira;;;
+TEL;TYPE=CELL:+20 100 234 5678
+EMAIL;TYPE=PERSONAL:amirahassan92@gmail.com
+EMAIL;TYPE=WORK:a.hassan@aucegypt.edu
+ORG:American University in Cairo
+TITLE:Assistant Professor of Computer Science
+BDAY:1992-04-04
+NOTE:PhD from UCL. Publishing on federated learning in healthcare.
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Liam O'Sullivan
+N:O'Sullivan;Liam;;;
+TEL;TYPE=CELL:+353 86 345 6789
+EMAIL;TYPE=PERSONAL:liam.osullivan@gmail.com
+BDAY:1989-07-17
+NOTE:Contractor. Full-stack. Available from September.
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Mei-Ling Chou
+N:Chou;Mei-Ling;;;
+TEL;TYPE=CELL:+886 912 345 678
+EMAIL;TYPE=WORK:meiling.chou@tsmc.com
+ORG:TSMC
+TITLE:Process Integration Engineer
+ADR;TYPE=WORK:;;No. 8 Li-Hsin Road 6;Hsinchu Science Park;;30078;Taiwan
+BDAY:1994-02-28
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Carlos Mendoza
+N:Mendoza;Carlos;;;
+TEL;TYPE=CELL:+52 55 1234 5678
+EMAIL;TYPE=WORK:carlos.mendoza@cemex.com
+ORG:CEMEX
+TITLE:Regional VP Sales — North America
+BDAY:1976-12-09
+NOTE:Based in Monterrey. Visits London in Q4. Golf contact.
+END:VCARD
+BEGIN:VCARD
+VERSION:3.0
+FN:Nadia Kowalski
+N:Kowalski;Nadia;;;
+TEL;TYPE=CELL:+48 601 234 567
+EMAIL;TYPE=PERSONAL:nadia.kowalski@wp.pl
+EMAIL;TYPE=WORK:n.kowalski@allegro.eu
+ORG:Allegro Group
+TITLE:Head of UX Research
+BDAY:1990-08-11
+ADR;TYPE=WORK:;;ul. Wierzbięcice 1e;Poznań;;61-569;Poland
+NOTE:Introduced by Marta. Great resource for e-commerce UX data.
+END:VCARD

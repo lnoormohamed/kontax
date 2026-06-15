@@ -212,7 +212,9 @@ const davRequest = async ({
     );
   }
 
-  const xml = await response.text();
+  // Force UTF-8: some servers return text/xml without an explicit charset, which
+  // would otherwise cause response.text() to default to Latin-1 per RFC 2616.
+  const xml = new TextDecoder("utf-8").decode(await response.arrayBuffer());
 
   if (response.status === 401 || response.status === 403) {
     throw new CardDavPreflightError(
@@ -625,14 +627,17 @@ export const pushCardDavContact = async ({
 }): Promise<CardDavPushResult> => {
   const collectionUrl = ensureTrailingSlash(normalizeUrl(addressBookUrl));
   const href = hrefOverride ?? new URL(`${encodeURIComponent(remoteUid)}.vcf`, collectionUrl).toString();
-  // Derive a clean UID for the vCard body: prefer extracting from the authoritative href
-  // so contaminated remoteUid values (e.g. legacy &#13; artifacts) don't corrupt the body.
-  const uidForBody = hrefOverride
-    ? decodeURIComponent(hrefOverride.split("/").pop()!.replace(/\.vcf$/i, ""))
-    : remoteUid;
+  // Always use the canonical remoteUid for the vCard body — this is the UID iCloud
+  // already knows for this contact. Using the href filename instead causes iCloud to
+  // update the contact's UID, which then breaks future REPORT lookups (the new UID won't
+  // match our contactByUid map, triggering spurious bootstrap attempts).
+  const uidForBody = remoteUid;
   const body = buildCardDavContactBody(contact, uidForBody);
 
   let response: Response;
+  // Explicitly convert to UTF-8 Buffer so the underlying HTTP stack cannot
+  // re-interpret the string in any other encoding (e.g. Latin-1 fallback).
+  const bodyBytes = Buffer.from(body, "utf-8");
 
   try {
     response = await fetch(href, {
@@ -643,9 +648,10 @@ export const pushCardDavContact = async ({
           "utf8",
         ).toString("base64")}`,
         "Content-Type": "text/vcard; charset=utf-8",
+        "Content-Length": String(bodyBytes.byteLength),
         "User-Agent": USER_AGENT,
       },
-      body,
+      body: bodyBytes,
       cache: "no-store",
     });
   } catch (error) {

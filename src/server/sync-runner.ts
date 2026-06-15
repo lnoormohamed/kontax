@@ -659,14 +659,26 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
       });
       const contactByUid = new Map(existingContacts.map((contact) => [contact.syncUid, contact]));
       const remoteEntryByUid = new Map(remoteEntries.map((entry) => [entry.uid, entry]));
+      // Also index the remote index by href so we can fall back to href lookup when a
+      // contact's UID changed in iCloud (e.g. after we inadvertently pushed a different
+      // UID in the vCard body). Without this fallback the contact would appear as "deleted"
+      // on the remote side even though it still exists at the same href.
+      const remoteEntryByHref = new Map(remoteEntries.map((entry) => [entry.href, entry]));
       const remoteCardByUid = new Map(remoteCards.map((card) => [card.uid, card]));
       const linkedRemoteUids = new Set(
         existingLinks.map((link) => link.remoteUid ?? link.contact.syncUid),
       );
+      // Guard: also index existing links by href so we can detect the case where iCloud
+      // changed a contact's UID (e.g. after we pushed with a wrong UID in the vCard body).
+      // Without this, those cards would fall into unmatchedCards and trigger a unique
+      // constraint failure when we try to create a second link for the same href.
+      const linkedHrefs = new Set(existingLinks.map((link) => link.remoteHref).filter(Boolean));
       const matchedEntries = remoteEntries.filter(
         (entry) => contactByUid.has(entry.uid) && !linkedRemoteUids.has(entry.uid),
       );
-      const unmatchedCards = remoteCards.filter((card) => !contactByUid.has(card.uid));
+      const unmatchedCards = remoteCards.filter(
+        (card) => !contactByUid.has(card.uid) && !linkedHrefs.has(card.href),
+      );
       const conflictEntries: Array<{
         type: "LOCAL_REMOTE_MUTATION" | "DELETE_CONFLICT";
         linkId: string;
@@ -708,8 +720,15 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
 
       for (const link of existingLinks) {
         const remoteUid = link.remoteUid ?? link.contact.syncUid;
-        const remoteEntry = remoteEntryByUid.get(remoteUid);
-        const remoteCard = remoteCardByUid.get(remoteUid);
+        // Primary lookup: by the UID we have on record.
+        // Fallback: by href — handles the edge case where iCloud updated the contact's UID
+        // (e.g. because a previous sync inadvertently pushed a different UID in the vCard body).
+        // Without this, the contact would appear "deleted" on the remote even though it exists.
+        let remoteEntry = remoteEntryByUid.get(remoteUid);
+        if (!remoteEntry && link.remoteHref) {
+          remoteEntry = remoteEntryByHref.get(link.remoteHref);
+        }
+        const remoteCard = remoteEntry ? remoteCardByUid.get(remoteEntry.uid) : undefined;
         const localChanged =
           link.lastSyncedAt == null || link.contact.updatedAt.getTime() > link.lastSyncedAt.getTime();
         const remoteChanged = remoteEntry != null && remoteEntry.etag !== link.remoteETag;

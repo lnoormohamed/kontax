@@ -1141,7 +1141,7 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
     .map((contact) => {
       const lines = [
         "BEGIN:VCARD",
-        "VERSION:4.0",
+        "VERSION:3.0",
         `FN:${escapeVCard(contact.fullName)}`,
       ];
 

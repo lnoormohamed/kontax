@@ -1075,8 +1075,15 @@ export const queueSyncJob = async (formData: FormData) => {
         idempotencyKey: createIdempotencyKey([account.id, "manual", "queue"]),
       },
     });
+    // NOTE: do NOT redirect() here. A server-action redirect() makes Next.js
+    // re-run middleware for the target URL via an internal sub-request that
+    // carries NO cookies, so the cookie-presence gate in middleware.ts bounces
+    // it to /login — logging the user out on every sync action behind the
+    // reverse proxy. Returning lets the form re-render in place using this
+    // request's own (authenticated) context. revalidateSyncViews() refreshes
+    // the job list so the queued job appears.
     revalidateSyncViews();
-    redirect(redirectTo ?? "/sync?queued=1");
+    return;
   }
 
   await assertCanUseCardDavSync(userId);
@@ -1662,7 +1669,6 @@ export const resolveSyncConflict = async (formData: FormData) => {
 export const disconnectSyncAccount = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const syncAccountId = parseSyncAccountId(formData);
-  const redirectTo = getRedirectTarget(formData) ?? "/sync";
 
   // P27-07: revoke OAuth authorisation before deleting the account (best-effort —
   // a revoke failure must not block disconnect).
@@ -1685,8 +1691,11 @@ export const disconnectSyncAccount = async (formData: FormData) => {
     where: { id: syncAccountId, userId },
   });
 
+  // No redirect() — see queueSyncJob: a server-action redirect re-runs middleware
+  // via a cookieless internal sub-request and bounces the user to /login. The
+  // account is now deleted, so revalidate lets the list re-render in place (the
+  // detail panel falls back to the empty state since the selected account is gone).
   revalidateSyncViews();
-  redirect(redirectTo);
 };
 
 // P23-06: confirm the user's password to gain a 15-minute "sudo" elevation for
