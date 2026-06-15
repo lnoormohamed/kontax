@@ -7,6 +7,7 @@ import { people } from "@googleapis/people";
 
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
+import { env } from "~/env";
 import {
   GOOGLE_CONTACTS_SCOPES,
   createGoogleOAuthClient,
@@ -19,8 +20,8 @@ import {
 
 const GOOGLE_BASE_URL = "https://people.googleapis.com/v1";
 
-const redirectTo = (req: NextRequest, path: string) =>
-  NextResponse.redirect(new URL(path, req.url));
+const redirectTo = (_req: NextRequest, path: string) =>
+  NextResponse.redirect(new URL(path, env.APP_URL ?? "https://kontax.vexon.co"));
 
 export async function GET(req: NextRequest) {
   const params = req.nextUrl.searchParams;

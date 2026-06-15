@@ -5,6 +5,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
+import { env } from "~/env";
 import {
   MICROSOFT_SCOPES,
   createMsalClient,
@@ -16,8 +17,8 @@ import { decodeOAuthState } from "~/server/sync-oauth-state";
 
 const GRAPH_BASE_URL = "https://graph.microsoft.com/v1.0";
 
-const redirectTo = (req: NextRequest, path: string) =>
-  NextResponse.redirect(new URL(path, req.url));
+const redirectTo = (_req: NextRequest, path: string) =>
+  NextResponse.redirect(new URL(path, env.APP_URL ?? "https://kontax.vexon.co"));
 
 export async function GET(req: NextRequest) {
   const params = req.nextUrl.searchParams;
