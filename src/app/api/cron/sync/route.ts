@@ -9,8 +9,8 @@ export const dynamic = "force-dynamic";
  * P34D-03: scheduled sync runner. Enqueues a SCHEDULED job for every ACTIVE
  * account that is due per its frequency, then drains the queue (manual,
  * scheduled, and retry jobs alike). Guarded by CRON_SECRET; schedule it every
- * ~15 minutes (see PRE-PROD-CHECKLIST.md). Job claiming is atomic, so it is safe
- * to overlap with an inline "Sync now".
+ * ~15 minutes (see PRE-PROD-CHECKLIST.md). Job claiming is atomic per-job; the
+ * runner also guards against same-account concurrency (see sync-runner.ts).
  */
 export async function POST(req: NextRequest) {
   const denied = assertCronSecret(req);

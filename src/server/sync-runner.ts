@@ -495,6 +495,29 @@ export const runQueuedSyncJobs = async ({
       continue;
     }
 
+    // Guard against same-account concurrent runs. A "Sync now" inline run may
+    // claim and execute an older QUEUED job for an account while the cron
+    // simultaneously claims a newer QUEUED job for the same account. Both would
+    // read the pre-commit snapshot and try to create the same contacts, hitting
+    // the syncUid unique constraint. If another job for this account is already
+    // RUNNING, revert the claim and leave the job for the next drain pass.
+    const siblingRunning = await db.syncJob.findFirst({
+      where: {
+        syncAccountId: job.syncAccountId,
+        status: "RUNNING",
+        id: { not: job.id },
+      },
+      select: { id: true },
+    });
+    if (siblingRunning) {
+      await db.syncJob.update({
+        where: { id: job.id },
+        data: { status: "QUEUED", startedAt: null, workerId: null, leaseExpiresAt: null },
+      });
+      summary.skipped += 1;
+      continue;
+    }
+
     summary.processed += 1;
 
     if (job.syncAccount.status === "PAUSED") {
