@@ -139,6 +139,10 @@ export default async function SyncPage({ searchParams }: PageProps) {
   if (!session?.user?.id) {
     const h = await headers();
     const next = h.get("x-pathname") ?? "/sync";
+    console.error("[sync-page] auth() returned null -> bouncing to login", {
+      hasCookieHeader: !!h.get("cookie"),
+      cookieHasAuthToken: (h.get("cookie") ?? "").includes("authjs.session-token"),
+    });
     redirect(`/login?next=${encodeURIComponent(next)}`);
   }
   const userId = session.user.id;
