@@ -138,7 +138,6 @@ export const authConfig = {
   ],
   callbacks: {
     jwt: async ({ token, user, trigger, session }) => {
-      console.error("[auth] jwt callback", { hasSub: !!token.sub, hasSid: !!token.sid, hasSv: token.sv !== undefined, hasUser: !!user });
       if (user) {
         // Initial sign-in: create UserSession + load DB fields
         const jti = createId();
@@ -204,16 +203,6 @@ export const authConfig = {
         ]);
 
         if (!dbUser || dbUser.sessionVersion !== token.sv || !userSession || userSession.revokedAt) {
-          console.error("[auth] jwt invalidated", {
-            sub: token.sub,
-            sid: token.sid,
-            sv: token.sv,
-            noDbUser: !dbUser,
-            svMismatch: dbUser ? dbUser.sessionVersion !== token.sv : null,
-            dbSv: dbUser?.sessionVersion,
-            noSession: !userSession,
-            revoked: userSession?.revokedAt ?? null,
-          });
           return {};
         }
 
