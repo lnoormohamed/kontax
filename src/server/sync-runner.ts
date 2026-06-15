@@ -1,9 +1,12 @@
 import type { Prisma } from "../../generated/prisma";
 import {
   CardDavPreflightError,
+  deleteCardDavContact,
   fetchCardDavAddressBookCards,
   fetchCardDavAddressBookIndex,
+  pushCardDavContact,
 } from "~/server/carddav";
+import type { PortableContactInput } from "~/server/contact-portability";
 import { db } from "~/server/db";
 import { emitEvent } from "~/lib/activity";
 import { createNotification } from "~/server/notifications";
@@ -29,6 +32,51 @@ const createRetrySchedule = (attemptNumber: number) => {
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
+
+// Shape of a contact row as selected in existingLinks (fields needed for push).
+type SyncContactRow = {
+  fullName: string;
+  firstName: string | null;
+  middleName: string | null;
+  lastName: string | null;
+  namePrefix: string | null;
+  nameSuffix: string | null;
+  nickname: string | null;
+  email: string | null;
+  emailAddresses: unknown;
+  phone: string | null;
+  phoneNumbers: unknown;
+  company: string | null;
+  jobTitle: string | null;
+  website: string | null;
+  birthday: string | null;
+  address: string | null;
+  postalAddresses: unknown;
+  notes: string | null;
+};
+
+const safeStringArray = (v: unknown): string[] =>
+  Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
+
+const contactToPortable = (c: SyncContactRow): PortableContactInput => ({
+  fullName: c.fullName,
+  firstName: c.firstName,
+  lastName: c.lastName,
+  nickname: c.nickname,
+  email: c.email,
+  emailAddresses: safeStringArray(c.emailAddresses),
+  phone: c.phone,
+  phoneNumbers: safeStringArray(c.phoneNumbers),
+  company: c.company,
+  jobTitle: c.jobTitle,
+  website: c.website,
+  birthday: c.birthday,
+  address: c.address,
+  postalAddresses: Array.isArray(c.postalAddresses)
+    ? (c.postalAddresses as PortableContactInput["postalAddresses"])
+    : null,
+  notes: c.notes,
+});
 
 const buildContactWriteDataFromRemoteSnapshot = (snapshot: unknown) => {
   if (!isRecord(snapshot)) {
@@ -636,6 +684,17 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
         remoteSnapshot: unknown;
       }> = [];
       let deferredLocalChangesCount = 0;
+      const canWrite = job.syncDirection !== "IMPORT_ONLY";
+      const localPushCandidates: Array<{
+        linkId: string;
+        remoteHref: string;
+        remoteUid: string;
+        contact: SyncContactRow;
+      }> = [];
+      const localDeleteCandidates: Array<{
+        linkId: string;
+        remoteHref: string;
+      }> = [];
       // P23-05: audit trail for conflicts auto-resolved by SERVER_WINS / DEVICE_WINS.
       const autoResolvedEntries: Array<{
         linkId: string;
@@ -731,7 +790,20 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
         }
 
         if (localChanged) {
-          deferredLocalChangesCount += 1;
+          if (canWrite && link.remoteHref) {
+            if (link.contact.archivedAt) {
+              localDeleteCandidates.push({ linkId: link.id, remoteHref: link.remoteHref });
+            } else {
+              localPushCandidates.push({
+                linkId: link.id,
+                remoteHref: link.remoteHref,
+                remoteUid: remoteUid ?? link.remoteHref,
+                contact: link.contact,
+              });
+            }
+          } else {
+            deferredLocalChangesCount += 1;
+          }
           continue;
         }
 
@@ -742,6 +814,45 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
             remoteETag: remoteEntry.etag ?? null,
             remoteSnapshot: remoteCard,
           });
+        }
+      }
+
+      // Execute outbound writes to CardDAV (outside the DB transaction — network I/O).
+      const pushedLinks: Array<{ linkId: string; newETag: string | null; newHref: string }> = [];
+      const deletedLinkIds: string[] = [];
+
+      for (const candidate of localPushCandidates) {
+        try {
+          const result = await pushCardDavContact({
+            addressBookUrl: job.syncAccount.addressBookUrl,
+            credentials: {
+              username: decryptedCredentials.username,
+              password: decryptedCredentials.password,
+            },
+            remoteUid: candidate.remoteUid,
+            contact: contactToPortable(candidate.contact),
+            hrefOverride: candidate.remoteHref || undefined,
+          });
+          pushedLinks.push({ linkId: candidate.linkId, newETag: result.etag, newHref: result.href });
+        } catch (err) {
+          console.error(`[sync] CardDAV push failed for link ${candidate.linkId}:`, err);
+          deferredLocalChangesCount += 1;
+        }
+      }
+
+      for (const candidate of localDeleteCandidates) {
+        try {
+          await deleteCardDavContact({
+            href: candidate.remoteHref,
+            credentials: {
+              username: decryptedCredentials.username,
+              password: decryptedCredentials.password,
+            },
+          });
+          deletedLinkIds.push(candidate.linkId);
+        } catch (err) {
+          console.error(`[sync] CardDAV delete failed for link ${candidate.linkId}:`, err);
+          deferredLocalChangesCount += 1;
         }
       }
 
@@ -812,6 +923,7 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
             },
             select: {
               id: true,
+              updatedAt: true,
             },
           });
 
@@ -835,7 +947,9 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
               remoteHref: remoteEntry?.href ?? card.href,
               remoteUid: card.uid,
               remoteETag: remoteEntry?.etag ?? card.etag,
-              lastSyncedAt: now,
+              // Use the contact's actual updatedAt (set by Prisma during create) so that
+              // subsequent syncs don't falsely detect all bootstrapped contacts as localChanged.
+              lastSyncedAt: createdContact.updatedAt,
             },
           });
 
@@ -850,7 +964,7 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
         }
 
         for (const remoteApply of remoteApplyCandidates) {
-          await tx.contact.update({
+          const updatedContact = await tx.contact.update({
             where: {
               id: remoteApply.contactId,
             },
@@ -862,6 +976,7 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
                 increment: 1,
               },
             },
+            select: { id: true, updatedAt: true },
           });
 
           await tx.syncContactLink.update({
@@ -874,7 +989,9 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
               tombstonedAt: null,
               lastErrorCode: null,
               lastErrorMessage: null,
-              lastSyncedAt: now,
+              // Use the contact's actual updatedAt so lastSyncedAt >= updatedAt,
+              // preventing falsely detecting this pull as a local change next sync.
+              lastSyncedAt: updatedContact.updatedAt,
             },
           });
 
@@ -917,6 +1034,28 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
           });
         }
 
+        // Update sync links for contacts successfully pushed to the remote.
+        for (const pushed of pushedLinks) {
+          await tx.syncContactLink.update({
+            where: { id: pushed.linkId },
+            data: {
+              remoteHref: pushed.newHref,
+              remoteETag: pushed.newETag,
+              lastSyncedAt: now,
+              lastErrorCode: null,
+              lastErrorMessage: null,
+            },
+          });
+        }
+
+        // Tombstone sync links for contacts deleted on the remote.
+        for (const linkId of deletedLinkIds) {
+          await tx.syncContactLink.update({
+            where: { id: linkId },
+            data: { tombstonedAt: now, lastSyncedAt: now },
+          });
+        }
+
         // P23-05: persist AUTO_RESOLVED audit rows for policy-resolved conflicts.
         for (const auto of autoResolvedEntries) {
           await tx.syncConflict.create({
@@ -946,6 +1085,7 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
         });
         const queueFull = openConflictCount >= MANUAL_CONFLICT_QUEUE_LIMIT;
 
+        const totalPushed = pushedLinks.length + deletedLinkIds.length;
         await tx.syncJob.update({
           where: { id: job.id },
           data: {
@@ -954,24 +1094,26 @@ export const runQueuedSyncJobs = async ({ limit = 5 }: { limit?: number } = {}) 
             leaseExpiresAt: null,
             nextRetryAt: null,
             createdCount: unmatchedCards.length,
-            updatedCount: matchedEntries.length + remoteApplyCandidates.length,
-            deletedCount: 0,
+            updatedCount: matchedEntries.length + remoteApplyCandidates.length + pushedLinks.length,
+            deletedCount: deletedLinkIds.length,
             conflictCount: conflictEntries.length,
             skippedCount: deferredLocalChangesCount,
             cursorBefore: job.syncAccount.remoteCTag ?? job.cursorBefore ?? job.syncAccount.addressBookUrl,
             cursorAfter: String(remoteEntries.length),
             errorCode: conflictEntries.length > 0 ? "SYNC_CONFLICTS_OPEN" : null,
-            errorSummary:
-              unmatchedCards.length > 0 ||
-              remoteApplyCandidates.length > 0 ||
-              deferredLocalChangesCount > 0 ||
-              conflictEntries.length > 0
-                ? `Bootstrap import synced ${unmatchedCards.length} new remote contacts, refreshed ${
-                    matchedEntries.length + remoteApplyCandidates.length
-                  } linked contacts, deferred ${deferredLocalChangesCount} local-only changes, and opened ${
-                    conflictEntries.length
-                  } sync conflicts. Remote writes remain disabled in this first live sync slice.`
-                : `Bootstrap import indexed ${matchedEntries.length} remote contacts and refreshed local sync links without remote writes.`,
+            errorSummary: (() => {
+              const parts: string[] = [];
+              if (unmatchedCards.length > 0) parts.push(`imported ${unmatchedCards.length} new`);
+              const pulled = matchedEntries.length + remoteApplyCandidates.length;
+              if (pulled > 0) parts.push(`pulled ${pulled} remote update${pulled !== 1 ? "s" : ""}`);
+              if (pushedLinks.length > 0) parts.push(`pushed ${pushedLinks.length} local update${pushedLinks.length !== 1 ? "s" : ""}`);
+              if (deletedLinkIds.length > 0) parts.push(`deleted ${deletedLinkIds.length} remote`);
+              if (deferredLocalChangesCount > 0) parts.push(`deferred ${deferredLocalChangesCount} local change${deferredLocalChangesCount !== 1 ? "s" : ""}`);
+              if (conflictEntries.length > 0) parts.push(`opened ${conflictEntries.length} conflict${conflictEntries.length !== 1 ? "s" : ""}`);
+              return parts.length > 0
+                ? `Synced: ${parts.join(", ")}.`
+                : `Sync complete — no changes.`;
+            })(),
           },
         });
 

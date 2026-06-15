@@ -615,15 +615,22 @@ export const pushCardDavContact = async ({
   credentials,
   remoteUid,
   contact,
+  hrefOverride,
 }: {
   addressBookUrl: string;
   credentials: CardDavCredentials;
   remoteUid: string;
   contact: PortableContactInput;
+  hrefOverride?: string;
 }): Promise<CardDavPushResult> => {
   const collectionUrl = ensureTrailingSlash(normalizeUrl(addressBookUrl));
-  const href = new URL(`${encodeURIComponent(remoteUid)}.vcf`, collectionUrl).toString();
-  const body = buildCardDavContactBody(contact, remoteUid);
+  const href = hrefOverride ?? new URL(`${encodeURIComponent(remoteUid)}.vcf`, collectionUrl).toString();
+  // Derive a clean UID for the vCard body: prefer extracting from the authoritative href
+  // so contaminated remoteUid values (e.g. legacy &#13; artifacts) don't corrupt the body.
+  const uidForBody = hrefOverride
+    ? decodeURIComponent(hrefOverride.split("/").pop()!.replace(/\.vcf$/i, ""))
+    : remoteUid;
+  const body = buildCardDavContactBody(contact, uidForBody);
 
   let response: Response;
 
@@ -668,6 +675,54 @@ export const pushCardDavContact = async ({
     href,
     etag: response.headers.get("etag"),
   };
+};
+
+export const deleteCardDavContact = async ({
+  href,
+  credentials,
+}: {
+  href: string;
+  credentials: CardDavCredentials;
+}): Promise<void> => {
+  let response: Response;
+
+  try {
+    response = await fetch(href, {
+      method: "DELETE",
+      headers: {
+        Authorization: `Basic ${Buffer.from(
+          `${credentials.username}:${credentials.password}`,
+          "utf8",
+        ).toString("base64")}`,
+        "User-Agent": USER_AGENT,
+      },
+      cache: "no-store",
+    });
+  } catch (error) {
+    throw new CardDavPreflightError(
+      "CARDDAV_DELETE_NETWORK_ERROR",
+      error instanceof Error
+        ? `CardDAV delete could not reach the remote server: ${error.message}`
+        : "CardDAV delete could not reach the remote server.",
+    );
+  }
+
+  // 404 means it's already gone — treat as success.
+  if (response.status === 404) return;
+
+  if (response.status === 401 || response.status === 403) {
+    throw new CardDavPreflightError(
+      "CARDDAV_DELETE_AUTH_FAILED",
+      "CardDAV delete credentials were rejected by the remote address book.",
+    );
+  }
+
+  if (!response.ok) {
+    throw new CardDavPreflightError(
+      "CARDDAV_DELETE_HTTP_ERROR",
+      `CardDAV delete failed with HTTP ${response.status}.`,
+    );
+  }
 };
 
 export const discoverCardDavAccount = async ({
