@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 
 import {
   activateSyncAccount,
@@ -1425,14 +1425,26 @@ function AccountHeader({
 // ── Edit credentials form ─────────────────────────────────────────────────────
 function EditCredentialsForm({
   account,
-  redirectTo,
   onCancel,
 }: {
   account: SyncAccountData;
-  redirectTo: string;
   onCancel: () => void;
 }) {
   const [reveal, setReveal] = useState(false);
+  const router = useRouter();
+  const [state, formAction] = useActionState(attachSyncCredentials, {
+    ok: false,
+    error: null,
+  });
+
+  // On success, close the form and refresh in place (a client navigation that
+  // carries cookies — no server redirect, so no reverse-proxy logout).
+  useEffect(() => {
+    if (state.ok) {
+      onCancel();
+      router.refresh();
+    }
+  }, [state.ok, onCancel, router]);
 
   return (
     <div style={{ animation: "sy-fade .15s ease" }}>
@@ -1461,9 +1473,23 @@ function EditCredentialsForm({
         </button>
       </div>
 
-      <form action={attachSyncCredentials}>
+      <form action={formAction}>
         <input type="hidden" name="syncAccountId" value={account.id} />
-        <input type="hidden" name="redirectTo" value={redirectTo} />
+        {state.error && (
+          <div
+            style={{
+              marginBottom: 14,
+              padding: "10px 14px",
+              borderRadius: 10,
+              border: "1px solid #e7b4a6",
+              background: "rgba(181,71,47,0.08)",
+              fontSize: 13,
+              color: "#8a3520",
+            }}
+          >
+            {state.error}
+          </div>
+        )}
         <div style={{ display: "grid", gap: 14, maxWidth: 460 }}>
           <FormField label="Username" name="username" placeholder="you@example.com" />
           <div>
@@ -1618,6 +1644,19 @@ function AddAccountForm({ onCancel }: { onCancel: () => void }) {
   const [baseUrl, setBaseUrl] = useState(QUICK_PRESETS[0]!.url);
   const [labelValue, setLabelValue] = useState(QUICK_PRESETS[0]!.label);
   const [reveal, setReveal] = useState(false);
+  const router = useRouter();
+  const [state, formAction] = useActionState(createSyncAccount, {
+    ok: false,
+    error: null,
+  });
+
+  // On success, navigate to the new connection (a client navigation that carries
+  // cookies — no server redirect, so no reverse-proxy logout).
+  useEffect(() => {
+    if (state.ok && state.accountId) {
+      router.push(`/sync?account=${state.accountId}`);
+    }
+  }, [state.ok, state.accountId, router]);
 
   const pickPreset = (q: QuickPreset) => {
     setSel(q);
@@ -1711,7 +1750,23 @@ function AddAccountForm({ onCancel }: { onCancel: () => void }) {
         })}
       </div>
 
-      <form action={createSyncAccount}>
+      <form action={formAction}>
+        {state.error && (
+          <div
+            style={{
+              marginBottom: 14,
+              maxWidth: 460,
+              padding: "10px 14px",
+              borderRadius: 10,
+              border: "1px solid #e7b4a6",
+              background: "rgba(181,71,47,0.08)",
+              fontSize: 13,
+              color: "#8a3520",
+            }}
+          >
+            {state.error}
+          </div>
+        )}
         <div style={{ display: "grid", gap: 14, maxWidth: 460 }}>
           <label style={{ display: "block" }}>
             <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, fontWeight: 600, color: T.ink2, marginBottom: 6 }}>Label</span>
@@ -2910,7 +2965,6 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
       return (
         <EditCredentialsForm
           account={selectedAccount}
-          redirectTo={redirectTo}
           onCancel={() => setEditing(false)}
         />
       );
