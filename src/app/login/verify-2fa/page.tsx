@@ -84,7 +84,7 @@ export default function VerifyTwoFaPage() {
     startTransition(async () => {
       const result = await submitTotpChallenge(v);
       if ("success" in result) {
-        completeLogin();
+        await completeLogin();
       } else {
         setErr(ERROR_MESSAGES[result.error] ?? "Something went wrong.");
         setCode("");
@@ -100,7 +100,7 @@ export default function VerifyTwoFaPage() {
     startTransition(async () => {
       const result = await redeemTotpRecoveryCode(v);
       if ("success" in result) {
-        completeLogin();
+        await completeLogin();
       } else {
         setErr(ERROR_MESSAGES[result.error] ?? "Something went wrong.");
       }
