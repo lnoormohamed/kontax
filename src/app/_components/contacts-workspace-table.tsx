@@ -955,6 +955,7 @@ export function ContactsWorkspaceTable({
 
   const restoredScrollRef = useRef(false);
   const restoreTimersRef = useRef<Array<ReturnType<typeof setTimeout>>>([]);
+  const cancelRestoreListenersRef = useRef<Array<() => void>>([]);
   useLayoutEffect(() => {
     if (!mounted || restoredScrollRef.current || typeof window === "undefined") return;
 
@@ -1023,8 +1024,28 @@ export function ContactsWorkspaceTable({
           sessionStorage.removeItem(CONTACT_LIST_SCROLL_KEY);
           clearRestoreContactParam();
           restoreTimersRef.current = [];
+          for (const fn of cancelRestoreListenersRef.current) fn();
+          cancelRestoreListenersRef.current = [];
         }, 10500),
       );
+
+      // Cancel remaining restore timers the moment the user manually scrolls.
+      // wheel and touchmove are only fired by real user input — never by a
+      // programmatic scrollTop assignment — so this is a reliable signal.
+      const cancelRestore = () => {
+        for (const timer of restoreTimersRef.current) clearTimeout(timer);
+        restoreTimersRef.current = [];
+        sessionStorage.removeItem(CONTACT_LIST_SCROLL_KEY);
+        clearRestoreContactParam();
+        for (const fn of cancelRestoreListenersRef.current) fn();
+        cancelRestoreListenersRef.current = [];
+      };
+      scrollEl.addEventListener("wheel", cancelRestore, { passive: true, capture: true });
+      scrollEl.addEventListener("touchmove", cancelRestore, { passive: true, capture: true });
+      cancelRestoreListenersRef.current = [
+        () => scrollEl.removeEventListener("wheel", cancelRestore, { capture: true }),
+        () => scrollEl.removeEventListener("touchmove", cancelRestore, { capture: true }),
+      ];
     } catch {
       sessionStorage.removeItem(CONTACT_LIST_SCROLL_KEY);
       clearRestoreContactParam();
@@ -1036,6 +1057,8 @@ export function ContactsWorkspaceTable({
       clearTimeout(timer);
     }
     restoreTimersRef.current = [];
+    for (const fn of cancelRestoreListenersRef.current) fn();
+    cancelRestoreListenersRef.current = [];
   }, []);
 
   if (contacts.length === 0) {
