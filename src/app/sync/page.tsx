@@ -141,6 +141,10 @@ export default async function SyncPage({ searchParams }: PageProps) {
     const h = await headers();
     const cookieHeader = h.get("cookie") ?? "";
     const hasSessionCookie = cookieHeader.includes("authjs.session-token");
+    console.error("[PAGE] sync auth() null", {
+      hasCookieHeader: !!cookieHeader,
+      cookieHasAuthToken: hasSessionCookie,
+    });
     const sp = searchParams ? await searchParams : {};
     const alreadyRetried = sp._authretry === "1";
 

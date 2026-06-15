@@ -83,6 +83,11 @@ export default function middleware(req: NextRequest) {
   //    first gate: if no session cookie exists at all, redirect to login now
   //    rather than let the page waste a round-trip to discover the same thing.
   if (!hasAuthSessionCookie(req)) {
+    console.error("[MW] redirect to login (no session cookie)", {
+      method: req.method,
+      pathname,
+      cookieNames: req.cookies.getAll().map((c) => c.name),
+    });
     const loginUrl = new URL("/login", appOrigin);
     loginUrl.searchParams.set("next", pathname);
     return NextResponse.redirect(loginUrl);
