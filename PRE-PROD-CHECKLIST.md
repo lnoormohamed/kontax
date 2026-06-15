@@ -48,6 +48,29 @@ the code is shipped and working; these are deployment-environment steps. Clean u
     and is the point at which a Valkey/BullMQ queue + dedicated sync-worker LXC becomes
     worth it (don't build that until traffic needs it).
 
+- [ ] **Verify Microsoft/Outlook two-way sync on a throwaway account before enabling it.**
+  The Microsoft connector now has full two-way (create `POST /me/contacts`, update, delete
+  `DELETE /me/contacts/{id}`), but it was **shipped unverified** — it can't be connected
+  until the Azure app registration exists and `MICROSOFT_CLIENT_ID/SECRET/REDIRECT_URI` are
+  set, so the write paths (**especially delete-on-Outlook**) have never executed. Before any
+  real Outlook account uses TWO_WAY, connect a disposable Outlook account and walk the
+  create/update/delete cycle, confirming each lands in Outlook and the SyncJob `pushed*Count`
+  columns are right.
+
+- [ ] **Guard outbound create against a mass-export surprise (Google + Microsoft).**
+  Outbound create pushes *every* user-created (`lastMutatedBy = MANUAL`) contact not yet
+  linked to the account. A user who already has manual contacts and *then* connects
+  Google/Outlook will, on the first TWO_WAY sync, create all of them on the remote. That is
+  correct export behaviour but a big, hard-to-undo action — gate it before real users (e.g.
+  only contacts created after the connection, or an explicit "export existing contacts?"
+  opt-in).
+
+- [ ] **(Optional) Outbound create for CardDAV.** CardDAV currently pushes updates + deletes
+  for existing links only; a brand-new local contact is not created on the CardDAV server
+  (its push loop walks existing links only). Google/Outlook do outbound-create; CardDAV does
+  not. Add it (scan unlinked local contacts → PUT → create link) with live iCloud/Fastmail
+  testing if full parity is wanted.
+
 ### Notes / context
 - A local dev `CRON_SECRET` was added to the gitignored `.env` for testing — prod needs
   its own value.
