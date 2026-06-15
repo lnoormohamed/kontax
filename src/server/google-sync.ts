@@ -7,14 +7,16 @@
 // with policy enforcement + tombstone handling (P27-03).
 import { auth as googleAuth, people, type people_v1 } from "@googleapis/people";
 
-import type { ConflictPolicy, Prisma } from "../../generated/prisma";
+import type { ConflictPolicy, Prisma, SyncDirection } from "../../generated/prisma";
 import { env } from "~/env";
 import { db } from "~/server/db";
+import { parseContactStringArray } from "~/server/contact-portability";
 import {
   type GoogleContactSource,
   mapContactToGooglePerson,
   mapGooglePersonToContact,
 } from "~/server/google-sync-mapping";
+import type { ValueEntry } from "~/server/sync-contact-mapping";
 import type { ContactConflictSnapshotInput } from "~/server/sync-conflict-snapshot";
 import {
   addImportBatch,
@@ -24,6 +26,7 @@ import {
   type ImportEngineAccount,
   importRemoteContactBatch,
   isConflictQueueFull,
+  isLocalChanged,
   openMutationConflict,
   recordAutoResolved,
   type RemoteContactItem,
@@ -98,6 +101,8 @@ export type GoogleImportAccount = GoogleSyncAccount & {
   label: string;
   lastSyncCursor: string | null;
   conflictPolicy: ConflictPolicy;
+  // Drives the push phase: only TWO_WAY / EXPORT_ONLY accounts push local edits.
+  syncDirection: SyncDirection;
 };
 
 // Whole-import result the runner records; queueFull drives the auto-pause.
@@ -316,20 +321,10 @@ export const googleIncrementalSync = async (
   return finalizeImportSummary(account, batch);
 };
 
-// Runner entrypoint: pick full vs incremental based on stored cursor.
-export const runGoogleSync = async (
-  account: GoogleImportAccount,
-): Promise<GoogleImportSummary> =>
-  account.lastSyncCursor ? googleIncrementalSync(account) : googleFullImport(account);
-
 // ── Push phase (P27-03) ──────────────────────────────────────────────────────
 // Pushes a local contact to Google. updatePersonFields excludes read-only
 // fields (metadata/photos). On a 409/412 (remote changed since our etag) the
 // push is treated as a conflict against the freshly-fetched remote version.
-//
-// NOTE: no provider has push scheduling wired into the runner yet (CardDAV is
-// pull-only too). This is the connector capability a future push-scheduling
-// ticket invokes; it is unit-callable but not yet driven by runQueuedSyncJobs.
 export const GOOGLE_UPDATE_PERSON_FIELDS =
   "names,emailAddresses,phoneNumbers,organizations,addresses,birthdays,urls,biographies";
 
@@ -432,6 +427,161 @@ export const pushGoogleContact = async (
   // MANUAL — surface for review; leave both sides as-is.
   await openMutationConflict(engineAccount, { id: link.id }, contact, remoteSnapshot, latestEtag);
   return { ok: false, conflict: true, strategy: "MANUAL" };
+};
+
+// ── Push phase wiring (P34D-03) ───────────────────────────────────────────────
+// Finds contacts edited locally since the last sync and pushes them to Google.
+// IMPORTANT ordering: this runs BEFORE the import. The import re-anchors a link's
+// lastSyncedAt whenever a remote contact is unchanged (etag match), and a full
+// import returns every contact — so importing first would mask pending local
+// edits. Per-contact concurrency (etag) and conflict policy live in
+// pushGoogleContact; here we only select dirty contacts and tally results.
+
+const parseValueEntries = (value: unknown): ValueEntry[] =>
+  Array.isArray(value)
+    ? value
+        .filter(
+          (entry): entry is Record<string, unknown> =>
+            typeof entry === "object" &&
+            entry !== null &&
+            typeof (entry as { value?: unknown }).value === "string",
+        )
+        .map((entry) => ({
+          label: typeof entry.label === "string" ? entry.label : "",
+          value: entry.value as string,
+          isPrimary: entry.isPrimary === true,
+        }))
+    : [];
+
+const pushContactSelect = {
+  id: true,
+  syncUid: true,
+  syncVersion: true,
+  updatedAt: true,
+  fullName: true,
+  firstName: true,
+  middleName: true,
+  lastName: true,
+  namePrefix: true,
+  nameSuffix: true,
+  nickname: true,
+  email: true,
+  emailAddresses: true,
+  emailEntries: true,
+  phone: true,
+  phoneNumbers: true,
+  phoneEntries: true,
+  company: true,
+  department: true,
+  jobTitle: true,
+  website: true,
+  birthday: true,
+  address: true,
+  postalAddresses: true,
+  notes: true,
+} satisfies Prisma.ContactSelect;
+
+type PushContactRow = Prisma.ContactGetPayload<{ select: typeof pushContactSelect }>;
+
+const buildGooglePushContact = (c: PushContactRow): GooglePushContact => ({
+  id: c.id,
+  syncUid: c.syncUid,
+  syncVersion: c.syncVersion,
+  fullName: c.fullName,
+  firstName: c.firstName,
+  middleName: c.middleName,
+  lastName: c.lastName,
+  namePrefix: c.namePrefix,
+  nameSuffix: c.nameSuffix,
+  nickname: c.nickname,
+  email: c.email,
+  emailAddresses: parseContactStringArray(c.emailAddresses),
+  emailEntries: parseValueEntries(c.emailEntries),
+  phone: c.phone,
+  phoneNumbers: parseContactStringArray(c.phoneNumbers),
+  phoneEntries: parseValueEntries(c.phoneEntries),
+  company: c.company,
+  department: c.department,
+  jobTitle: c.jobTitle,
+  website: c.website,
+  birthday: c.birthday,
+  address: c.address,
+  postalAddresses: c.postalAddresses,
+  notes: c.notes,
+});
+
+export const pushLocalChangesToGoogle = async (
+  account: GoogleImportAccount,
+): Promise<{ pushed: number; conflicts: number }> => {
+  // Import-only accounts never push.
+  if (account.syncDirection !== "TWO_WAY" && account.syncDirection !== "EXPORT_ONLY") {
+    return { pushed: 0, conflicts: 0 };
+  }
+
+  const links = await db.syncContactLink.findMany({
+    where: {
+      syncAccountId: account.id,
+      tombstonedAt: null,
+      remoteUid: { not: null },
+      contact: { archivedAt: null, syncTombstoneAt: null },
+    },
+    select: {
+      id: true,
+      contactId: true,
+      remoteUid: true,
+      remoteETag: true,
+      lastSyncedAt: true,
+      contact: { select: pushContactSelect },
+    },
+  });
+
+  let pushed = 0;
+  let conflicts = 0;
+  for (const link of links) {
+    if (!link.remoteUid) continue;
+    // Only push contacts edited locally since the link last synced.
+    if (!isLocalChanged(link.lastSyncedAt, link.contact.updatedAt)) continue;
+
+    const result = await pushGoogleContact(
+      account,
+      {
+        id: link.id,
+        contactId: link.contactId,
+        remoteUid: link.remoteUid,
+        remoteETag: link.remoteETag,
+      },
+      buildGooglePushContact(link.contact),
+    );
+    if (result.ok) {
+      pushed += 1;
+    } else {
+      conflicts += 1;
+    }
+  }
+
+  return { pushed, conflicts };
+};
+
+// Runner entrypoint: push local edits first, then pull (full vs incremental
+// based on the stored cursor). Push tallies fold into the import summary so the
+// job records a single created/updated/deleted/conflicts result.
+export const runGoogleSync = async (
+  account: GoogleImportAccount,
+): Promise<GoogleImportSummary> => {
+  const push = await pushLocalChangesToGoogle(account);
+  const importSummary = account.lastSyncCursor
+    ? await googleIncrementalSync(account)
+    : await googleFullImport(account);
+
+  return {
+    ...importSummary,
+    // Pushed contacts are outbound updates; fold them into the updated tally.
+    updated: importSummary.updated + push.pushed,
+    conflicts: importSummary.conflicts + push.conflicts,
+    // A push that opened a MANUAL conflict may have filled the queue.
+    queueFull:
+      push.conflicts > 0 ? await isConflictQueueFull(account.id) : importSummary.queueFull,
+  };
 };
 
 // ── Disconnect (token revocation) — used by P27-07 ───────────────────────────

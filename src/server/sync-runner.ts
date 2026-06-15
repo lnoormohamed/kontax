@@ -457,6 +457,7 @@ export const runQueuedSyncJobs = async ({
             credentialReference: job.syncAccount.credentialReference,
             lastSyncCursor: job.syncAccount.lastSyncCursor,
             conflictPolicy: settings.conflictPolicy,
+            syncDirection: job.syncAccount.syncDirection,
           }),
         (error) => (error instanceof GoogleSyncError ? error.code : "GOOGLE_SYNC_FAILED"),
       );
