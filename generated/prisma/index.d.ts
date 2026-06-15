@@ -27482,6 +27482,9 @@ export namespace Prisma {
     updatedCount: number | null
     deletedCount: number | null
     conflictCount: number | null
+    pushedCreatedCount: number | null
+    pushedUpdatedCount: number | null
+    pushedDeletedCount: number | null
     duplicatesDetectedCount: number | null
     skippedCount: number | null
   }
@@ -27493,6 +27496,9 @@ export namespace Prisma {
     updatedCount: number | null
     deletedCount: number | null
     conflictCount: number | null
+    pushedCreatedCount: number | null
+    pushedUpdatedCount: number | null
+    pushedDeletedCount: number | null
     duplicatesDetectedCount: number | null
     skippedCount: number | null
   }
@@ -27515,6 +27521,9 @@ export namespace Prisma {
     updatedCount: number | null
     deletedCount: number | null
     conflictCount: number | null
+    pushedCreatedCount: number | null
+    pushedUpdatedCount: number | null
+    pushedDeletedCount: number | null
     duplicatesDetectedCount: number | null
     skippedCount: number | null
     errorCode: string | null
@@ -27543,6 +27552,9 @@ export namespace Prisma {
     updatedCount: number | null
     deletedCount: number | null
     conflictCount: number | null
+    pushedCreatedCount: number | null
+    pushedUpdatedCount: number | null
+    pushedDeletedCount: number | null
     duplicatesDetectedCount: number | null
     skippedCount: number | null
     errorCode: string | null
@@ -27571,6 +27583,9 @@ export namespace Prisma {
     updatedCount: number
     deletedCount: number
     conflictCount: number
+    pushedCreatedCount: number
+    pushedUpdatedCount: number
+    pushedDeletedCount: number
     duplicatesDetectedCount: number
     skippedCount: number
     errorCode: number
@@ -27590,6 +27605,9 @@ export namespace Prisma {
     updatedCount?: true
     deletedCount?: true
     conflictCount?: true
+    pushedCreatedCount?: true
+    pushedUpdatedCount?: true
+    pushedDeletedCount?: true
     duplicatesDetectedCount?: true
     skippedCount?: true
   }
@@ -27601,6 +27619,9 @@ export namespace Prisma {
     updatedCount?: true
     deletedCount?: true
     conflictCount?: true
+    pushedCreatedCount?: true
+    pushedUpdatedCount?: true
+    pushedDeletedCount?: true
     duplicatesDetectedCount?: true
     skippedCount?: true
   }
@@ -27623,6 +27644,9 @@ export namespace Prisma {
     updatedCount?: true
     deletedCount?: true
     conflictCount?: true
+    pushedCreatedCount?: true
+    pushedUpdatedCount?: true
+    pushedDeletedCount?: true
     duplicatesDetectedCount?: true
     skippedCount?: true
     errorCode?: true
@@ -27651,6 +27675,9 @@ export namespace Prisma {
     updatedCount?: true
     deletedCount?: true
     conflictCount?: true
+    pushedCreatedCount?: true
+    pushedUpdatedCount?: true
+    pushedDeletedCount?: true
     duplicatesDetectedCount?: true
     skippedCount?: true
     errorCode?: true
@@ -27679,6 +27706,9 @@ export namespace Prisma {
     updatedCount?: true
     deletedCount?: true
     conflictCount?: true
+    pushedCreatedCount?: true
+    pushedUpdatedCount?: true
+    pushedDeletedCount?: true
     duplicatesDetectedCount?: true
     skippedCount?: true
     errorCode?: true
@@ -27794,6 +27824,9 @@ export namespace Prisma {
     updatedCount: number
     deletedCount: number
     conflictCount: number
+    pushedCreatedCount: number
+    pushedUpdatedCount: number
+    pushedDeletedCount: number
     duplicatesDetectedCount: number
     skippedCount: number
     errorCode: string | null
@@ -27841,6 +27874,9 @@ export namespace Prisma {
     updatedCount?: boolean
     deletedCount?: boolean
     conflictCount?: boolean
+    pushedCreatedCount?: boolean
+    pushedUpdatedCount?: boolean
+    pushedDeletedCount?: boolean
     duplicatesDetectedCount?: boolean
     skippedCount?: boolean
     errorCode?: boolean
@@ -27870,6 +27906,9 @@ export namespace Prisma {
     updatedCount?: boolean
     deletedCount?: boolean
     conflictCount?: boolean
+    pushedCreatedCount?: boolean
+    pushedUpdatedCount?: boolean
+    pushedDeletedCount?: boolean
     duplicatesDetectedCount?: boolean
     skippedCount?: boolean
     errorCode?: boolean
@@ -27899,6 +27938,9 @@ export namespace Prisma {
     updatedCount?: boolean
     deletedCount?: boolean
     conflictCount?: boolean
+    pushedCreatedCount?: boolean
+    pushedUpdatedCount?: boolean
+    pushedDeletedCount?: boolean
     duplicatesDetectedCount?: boolean
     skippedCount?: boolean
     errorCode?: boolean
@@ -27928,6 +27970,9 @@ export namespace Prisma {
     updatedCount?: boolean
     deletedCount?: boolean
     conflictCount?: boolean
+    pushedCreatedCount?: boolean
+    pushedUpdatedCount?: boolean
+    pushedDeletedCount?: boolean
     duplicatesDetectedCount?: boolean
     skippedCount?: boolean
     errorCode?: boolean
@@ -27938,7 +27983,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type SyncJobOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "syncAccountId" | "status" | "trigger" | "syncDirection" | "attemptCount" | "maxAttempts" | "nextRetryAt" | "leaseExpiresAt" | "workerId" | "idempotencyKey" | "cursorBefore" | "cursorAfter" | "createdCount" | "updatedCount" | "deletedCount" | "conflictCount" | "duplicatesDetectedCount" | "skippedCount" | "errorCode" | "errorSummary" | "startedAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["syncJob"]>
+  export type SyncJobOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "syncAccountId" | "status" | "trigger" | "syncDirection" | "attemptCount" | "maxAttempts" | "nextRetryAt" | "leaseExpiresAt" | "workerId" | "idempotencyKey" | "cursorBefore" | "cursorAfter" | "createdCount" | "updatedCount" | "deletedCount" | "conflictCount" | "pushedCreatedCount" | "pushedUpdatedCount" | "pushedDeletedCount" | "duplicatesDetectedCount" | "skippedCount" | "errorCode" | "errorSummary" | "startedAt" | "completedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["syncJob"]>
   export type SyncJobInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
   }
@@ -27972,6 +28017,9 @@ export namespace Prisma {
       updatedCount: number
       deletedCount: number
       conflictCount: number
+      pushedCreatedCount: number
+      pushedUpdatedCount: number
+      pushedDeletedCount: number
       duplicatesDetectedCount: number
       skippedCount: number
       errorCode: string | null
@@ -28421,6 +28469,9 @@ export namespace Prisma {
     readonly updatedCount: FieldRef<"SyncJob", 'Int'>
     readonly deletedCount: FieldRef<"SyncJob", 'Int'>
     readonly conflictCount: FieldRef<"SyncJob", 'Int'>
+    readonly pushedCreatedCount: FieldRef<"SyncJob", 'Int'>
+    readonly pushedUpdatedCount: FieldRef<"SyncJob", 'Int'>
+    readonly pushedDeletedCount: FieldRef<"SyncJob", 'Int'>
     readonly duplicatesDetectedCount: FieldRef<"SyncJob", 'Int'>
     readonly skippedCount: FieldRef<"SyncJob", 'Int'>
     readonly errorCode: FieldRef<"SyncJob", 'String'>
@@ -61064,6 +61115,9 @@ export namespace Prisma {
     updatedCount: 'updatedCount',
     deletedCount: 'deletedCount',
     conflictCount: 'conflictCount',
+    pushedCreatedCount: 'pushedCreatedCount',
+    pushedUpdatedCount: 'pushedUpdatedCount',
+    pushedDeletedCount: 'pushedDeletedCount',
     duplicatesDetectedCount: 'duplicatesDetectedCount',
     skippedCount: 'skippedCount',
     errorCode: 'errorCode',
@@ -64200,6 +64254,9 @@ export namespace Prisma {
     updatedCount?: IntFilter<"SyncJob"> | number
     deletedCount?: IntFilter<"SyncJob"> | number
     conflictCount?: IntFilter<"SyncJob"> | number
+    pushedCreatedCount?: IntFilter<"SyncJob"> | number
+    pushedUpdatedCount?: IntFilter<"SyncJob"> | number
+    pushedDeletedCount?: IntFilter<"SyncJob"> | number
     duplicatesDetectedCount?: IntFilter<"SyncJob"> | number
     skippedCount?: IntFilter<"SyncJob"> | number
     errorCode?: StringNullableFilter<"SyncJob"> | string | null
@@ -64229,6 +64286,9 @@ export namespace Prisma {
     updatedCount?: SortOrder
     deletedCount?: SortOrder
     conflictCount?: SortOrder
+    pushedCreatedCount?: SortOrder
+    pushedUpdatedCount?: SortOrder
+    pushedDeletedCount?: SortOrder
     duplicatesDetectedCount?: SortOrder
     skippedCount?: SortOrder
     errorCode?: SortOrderInput | SortOrder
@@ -64262,6 +64322,9 @@ export namespace Prisma {
     updatedCount?: IntFilter<"SyncJob"> | number
     deletedCount?: IntFilter<"SyncJob"> | number
     conflictCount?: IntFilter<"SyncJob"> | number
+    pushedCreatedCount?: IntFilter<"SyncJob"> | number
+    pushedUpdatedCount?: IntFilter<"SyncJob"> | number
+    pushedDeletedCount?: IntFilter<"SyncJob"> | number
     duplicatesDetectedCount?: IntFilter<"SyncJob"> | number
     skippedCount?: IntFilter<"SyncJob"> | number
     errorCode?: StringNullableFilter<"SyncJob"> | string | null
@@ -64291,6 +64354,9 @@ export namespace Prisma {
     updatedCount?: SortOrder
     deletedCount?: SortOrder
     conflictCount?: SortOrder
+    pushedCreatedCount?: SortOrder
+    pushedUpdatedCount?: SortOrder
+    pushedDeletedCount?: SortOrder
     duplicatesDetectedCount?: SortOrder
     skippedCount?: SortOrder
     errorCode?: SortOrderInput | SortOrder
@@ -64327,6 +64393,9 @@ export namespace Prisma {
     updatedCount?: IntWithAggregatesFilter<"SyncJob"> | number
     deletedCount?: IntWithAggregatesFilter<"SyncJob"> | number
     conflictCount?: IntWithAggregatesFilter<"SyncJob"> | number
+    pushedCreatedCount?: IntWithAggregatesFilter<"SyncJob"> | number
+    pushedUpdatedCount?: IntWithAggregatesFilter<"SyncJob"> | number
+    pushedDeletedCount?: IntWithAggregatesFilter<"SyncJob"> | number
     duplicatesDetectedCount?: IntWithAggregatesFilter<"SyncJob"> | number
     skippedCount?: IntWithAggregatesFilter<"SyncJob"> | number
     errorCode?: StringNullableWithAggregatesFilter<"SyncJob"> | string | null
@@ -68937,6 +69006,9 @@ export namespace Prisma {
     updatedCount?: number
     deletedCount?: number
     conflictCount?: number
+    pushedCreatedCount?: number
+    pushedUpdatedCount?: number
+    pushedDeletedCount?: number
     duplicatesDetectedCount?: number
     skippedCount?: number
     errorCode?: string | null
@@ -68966,6 +69038,9 @@ export namespace Prisma {
     updatedCount?: number
     deletedCount?: number
     conflictCount?: number
+    pushedCreatedCount?: number
+    pushedUpdatedCount?: number
+    pushedDeletedCount?: number
     duplicatesDetectedCount?: number
     skippedCount?: number
     errorCode?: string | null
@@ -68993,6 +69068,9 @@ export namespace Prisma {
     updatedCount?: IntFieldUpdateOperationsInput | number
     deletedCount?: IntFieldUpdateOperationsInput | number
     conflictCount?: IntFieldUpdateOperationsInput | number
+    pushedCreatedCount?: IntFieldUpdateOperationsInput | number
+    pushedUpdatedCount?: IntFieldUpdateOperationsInput | number
+    pushedDeletedCount?: IntFieldUpdateOperationsInput | number
     duplicatesDetectedCount?: IntFieldUpdateOperationsInput | number
     skippedCount?: IntFieldUpdateOperationsInput | number
     errorCode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -69022,6 +69100,9 @@ export namespace Prisma {
     updatedCount?: IntFieldUpdateOperationsInput | number
     deletedCount?: IntFieldUpdateOperationsInput | number
     conflictCount?: IntFieldUpdateOperationsInput | number
+    pushedCreatedCount?: IntFieldUpdateOperationsInput | number
+    pushedUpdatedCount?: IntFieldUpdateOperationsInput | number
+    pushedDeletedCount?: IntFieldUpdateOperationsInput | number
     duplicatesDetectedCount?: IntFieldUpdateOperationsInput | number
     skippedCount?: IntFieldUpdateOperationsInput | number
     errorCode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -69050,6 +69131,9 @@ export namespace Prisma {
     updatedCount?: number
     deletedCount?: number
     conflictCount?: number
+    pushedCreatedCount?: number
+    pushedUpdatedCount?: number
+    pushedDeletedCount?: number
     duplicatesDetectedCount?: number
     skippedCount?: number
     errorCode?: string | null
@@ -69077,6 +69161,9 @@ export namespace Prisma {
     updatedCount?: IntFieldUpdateOperationsInput | number
     deletedCount?: IntFieldUpdateOperationsInput | number
     conflictCount?: IntFieldUpdateOperationsInput | number
+    pushedCreatedCount?: IntFieldUpdateOperationsInput | number
+    pushedUpdatedCount?: IntFieldUpdateOperationsInput | number
+    pushedDeletedCount?: IntFieldUpdateOperationsInput | number
     duplicatesDetectedCount?: IntFieldUpdateOperationsInput | number
     skippedCount?: IntFieldUpdateOperationsInput | number
     errorCode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -69105,6 +69192,9 @@ export namespace Prisma {
     updatedCount?: IntFieldUpdateOperationsInput | number
     deletedCount?: IntFieldUpdateOperationsInput | number
     conflictCount?: IntFieldUpdateOperationsInput | number
+    pushedCreatedCount?: IntFieldUpdateOperationsInput | number
+    pushedUpdatedCount?: IntFieldUpdateOperationsInput | number
+    pushedDeletedCount?: IntFieldUpdateOperationsInput | number
     duplicatesDetectedCount?: IntFieldUpdateOperationsInput | number
     skippedCount?: IntFieldUpdateOperationsInput | number
     errorCode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -73591,6 +73681,9 @@ export namespace Prisma {
     updatedCount?: SortOrder
     deletedCount?: SortOrder
     conflictCount?: SortOrder
+    pushedCreatedCount?: SortOrder
+    pushedUpdatedCount?: SortOrder
+    pushedDeletedCount?: SortOrder
     duplicatesDetectedCount?: SortOrder
     skippedCount?: SortOrder
     errorCode?: SortOrder
@@ -73608,6 +73701,9 @@ export namespace Prisma {
     updatedCount?: SortOrder
     deletedCount?: SortOrder
     conflictCount?: SortOrder
+    pushedCreatedCount?: SortOrder
+    pushedUpdatedCount?: SortOrder
+    pushedDeletedCount?: SortOrder
     duplicatesDetectedCount?: SortOrder
     skippedCount?: SortOrder
   }
@@ -73630,6 +73726,9 @@ export namespace Prisma {
     updatedCount?: SortOrder
     deletedCount?: SortOrder
     conflictCount?: SortOrder
+    pushedCreatedCount?: SortOrder
+    pushedUpdatedCount?: SortOrder
+    pushedDeletedCount?: SortOrder
     duplicatesDetectedCount?: SortOrder
     skippedCount?: SortOrder
     errorCode?: SortOrder
@@ -73658,6 +73757,9 @@ export namespace Prisma {
     updatedCount?: SortOrder
     deletedCount?: SortOrder
     conflictCount?: SortOrder
+    pushedCreatedCount?: SortOrder
+    pushedUpdatedCount?: SortOrder
+    pushedDeletedCount?: SortOrder
     duplicatesDetectedCount?: SortOrder
     skippedCount?: SortOrder
     errorCode?: SortOrder
@@ -73675,6 +73777,9 @@ export namespace Prisma {
     updatedCount?: SortOrder
     deletedCount?: SortOrder
     conflictCount?: SortOrder
+    pushedCreatedCount?: SortOrder
+    pushedUpdatedCount?: SortOrder
+    pushedDeletedCount?: SortOrder
     duplicatesDetectedCount?: SortOrder
     skippedCount?: SortOrder
   }
@@ -88637,6 +88742,9 @@ export namespace Prisma {
     updatedCount?: number
     deletedCount?: number
     conflictCount?: number
+    pushedCreatedCount?: number
+    pushedUpdatedCount?: number
+    pushedDeletedCount?: number
     duplicatesDetectedCount?: number
     skippedCount?: number
     errorCode?: string | null
@@ -88664,6 +88772,9 @@ export namespace Prisma {
     updatedCount?: number
     deletedCount?: number
     conflictCount?: number
+    pushedCreatedCount?: number
+    pushedUpdatedCount?: number
+    pushedDeletedCount?: number
     duplicatesDetectedCount?: number
     skippedCount?: number
     errorCode?: string | null
@@ -88982,6 +89093,9 @@ export namespace Prisma {
     updatedCount?: IntFilter<"SyncJob"> | number
     deletedCount?: IntFilter<"SyncJob"> | number
     conflictCount?: IntFilter<"SyncJob"> | number
+    pushedCreatedCount?: IntFilter<"SyncJob"> | number
+    pushedUpdatedCount?: IntFilter<"SyncJob"> | number
+    pushedDeletedCount?: IntFilter<"SyncJob"> | number
     duplicatesDetectedCount?: IntFilter<"SyncJob"> | number
     skippedCount?: IntFilter<"SyncJob"> | number
     errorCode?: StringNullableFilter<"SyncJob"> | string | null
@@ -102783,6 +102897,9 @@ export namespace Prisma {
     updatedCount?: number
     deletedCount?: number
     conflictCount?: number
+    pushedCreatedCount?: number
+    pushedUpdatedCount?: number
+    pushedDeletedCount?: number
     duplicatesDetectedCount?: number
     skippedCount?: number
     errorCode?: string | null
@@ -102879,6 +102996,9 @@ export namespace Prisma {
     updatedCount?: IntFieldUpdateOperationsInput | number
     deletedCount?: IntFieldUpdateOperationsInput | number
     conflictCount?: IntFieldUpdateOperationsInput | number
+    pushedCreatedCount?: IntFieldUpdateOperationsInput | number
+    pushedUpdatedCount?: IntFieldUpdateOperationsInput | number
+    pushedDeletedCount?: IntFieldUpdateOperationsInput | number
     duplicatesDetectedCount?: IntFieldUpdateOperationsInput | number
     skippedCount?: IntFieldUpdateOperationsInput | number
     errorCode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -102906,6 +103026,9 @@ export namespace Prisma {
     updatedCount?: IntFieldUpdateOperationsInput | number
     deletedCount?: IntFieldUpdateOperationsInput | number
     conflictCount?: IntFieldUpdateOperationsInput | number
+    pushedCreatedCount?: IntFieldUpdateOperationsInput | number
+    pushedUpdatedCount?: IntFieldUpdateOperationsInput | number
+    pushedDeletedCount?: IntFieldUpdateOperationsInput | number
     duplicatesDetectedCount?: IntFieldUpdateOperationsInput | number
     skippedCount?: IntFieldUpdateOperationsInput | number
     errorCode?: NullableStringFieldUpdateOperationsInput | string | null
@@ -102933,6 +103056,9 @@ export namespace Prisma {
     updatedCount?: IntFieldUpdateOperationsInput | number
     deletedCount?: IntFieldUpdateOperationsInput | number
     conflictCount?: IntFieldUpdateOperationsInput | number
+    pushedCreatedCount?: IntFieldUpdateOperationsInput | number
+    pushedUpdatedCount?: IntFieldUpdateOperationsInput | number
+    pushedDeletedCount?: IntFieldUpdateOperationsInput | number
     duplicatesDetectedCount?: IntFieldUpdateOperationsInput | number
     skippedCount?: IntFieldUpdateOperationsInput | number
     errorCode?: NullableStringFieldUpdateOperationsInput | string | null

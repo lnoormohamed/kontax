@@ -52,6 +52,10 @@ export type SyncJobRow = {
   added: number;
   modified: number;
   deleted: number;
+  // Outbound (Kontax -> remote) tallies for the second "Changes" line.
+  pushedAdded: number;
+  pushedModified: number;
+  pushedDeleted: number;
   status: "ok" | "fail" | "pending";
   error: string | null;
 };
@@ -627,7 +631,15 @@ function ConflictRow({
 }
 
 // ── Sync history table ────────────────────────────────────────────────────────
-function HistoryTable({ jobs, isSyncing }: { jobs: SyncJobRow[]; isSyncing: boolean }) {
+function HistoryTable({
+  jobs,
+  isSyncing,
+  remoteLabel,
+}: {
+  jobs: SyncJobRow[];
+  isSyncing: boolean;
+  remoteLabel: string;
+}) {
   const [showAll, setShowAll] = useState(false);
   const [errId, setErrId] = useState<string | null>(null);
   const dirGlyph = { TWO_WAY: "↕", IMPORT_ONLY: "↓", EXPORT_ONLY: "↑" };
@@ -684,10 +696,11 @@ function HistoryTable({ jobs, isSyncing }: { jobs: SyncJobRow[]; isSyncing: bool
               padding: "6px 0 2px",
             }}
           >
-            Changes:{" "}
+            Changes per side —{" "}
             <span style={{ fontFamily: '"Geist Mono", ui-monospace, monospace' }}>+</span> added ·{" "}
             <span style={{ fontFamily: '"Geist Mono", ui-monospace, monospace' }}>~</span> updated ·{" "}
-            <span style={{ fontFamily: '"Geist Mono", ui-monospace, monospace' }}>−</span> removed
+            <span style={{ fontFamily: '"Geist Mono", ui-monospace, monospace' }}>−</span> removed.{" "}
+            <span style={{ color: T.ink2 }}>Kontax</span> = pulled in · {remoteLabel} = pushed out.
           </div>
 
           {/* in-progress row */}
@@ -734,8 +747,19 @@ function HistoryTable({ jobs, isSyncing }: { jobs: SyncJobRow[]; isSyncing: bool
                 }}
               >
                 {j.status === "ok" ? (
-                  <span title={`${j.added} added · ${j.modified} updated · ${j.deleted} removed`}>
-                    +{j.added} ~{j.modified} −{j.deleted}
+                  <span style={{ display: "grid", gap: 2 }}>
+                    <span
+                      title={`Kontax: ${j.added} added · ${j.modified} updated · ${j.deleted} removed`}
+                    >
+                      <span style={{ color: T.mute }}>Kontax</span> +{j.added} ~{j.modified} −
+                      {j.deleted}
+                    </span>
+                    <span
+                      title={`${remoteLabel}: ${j.pushedAdded} added · ${j.pushedModified} updated · ${j.pushedDeleted} removed`}
+                    >
+                      <span style={{ color: T.mute }}>{remoteLabel}</span> +{j.pushedAdded} ~
+                      {j.pushedModified} −{j.pushedDeleted}
+                    </span>
                   </span>
                 ) : (
                   "—"
@@ -2918,6 +2942,13 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
         <HistoryTable
           jobs={selectedAccount.jobs}
           isSyncing={syncingId === selectedAccount.id}
+          remoteLabel={
+            selectedAccount.provider === "GOOGLE"
+              ? "Google"
+              : selectedAccount.provider === "MICROSOFT"
+                ? "Outlook"
+                : "CardDAV"
+          }
         />
         {/* conflicts */}
         {selectedAccount.conflicts.length > 0 && (

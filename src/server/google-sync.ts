@@ -108,6 +108,14 @@ export type GoogleImportAccount = GoogleSyncAccount & {
 // Whole-import result the runner records; queueFull drives the auto-pause.
 export type GoogleImportSummary = ImportBatchSummary & { queueFull: boolean };
 
+// Full sync result: inbound import tallies + outbound push tallies, both
+// recorded on the SyncJob so the UI can show each side separately.
+export type GoogleSyncResult = GoogleImportSummary & {
+  pushedCreated: number;
+  pushedUpdated: number;
+  pushedDeleted: number;
+};
+
 // Engine account context for Google (adds source/provider provenance).
 const toEngineAccount = (account: GoogleImportAccount): ImportEngineAccount => ({
   id: account.id,
@@ -510,28 +518,84 @@ const buildGooglePushContact = (c: PushContactRow): GooglePushContact => ({
   notes: c.notes,
 });
 
+// Create a brand-new Google contact for a local contact that has no link yet,
+// then record the link so subsequent syncs treat it as updates, not creates.
+const createGoogleContactRemote = async (
+  account: GoogleImportAccount,
+  contact: PushContactRow,
+): Promise<boolean> => {
+  const { client } = await getGoogleClientForAccount(account);
+  const peopleApi = people({ version: "v1", auth: client });
+  let created: people_v1.Schema$Person;
+  try {
+    const res = await peopleApi.people.createContact({
+      requestBody: mapContactToGooglePerson(buildGooglePushContact(contact)),
+    });
+    created = res.data;
+  } catch (error) {
+    throw normaliseGoogleError(error);
+  }
+  if (!created.resourceName) return false;
+  await db.syncContactLink.create({
+    data: {
+      syncAccountId: account.id,
+      contactId: contact.id,
+      remoteHref: created.resourceName,
+      remoteUid: created.resourceName,
+      remoteETag: created.etag ?? null,
+      lastSyncedAt: new Date(),
+    },
+  });
+  return true;
+};
+
+// Delete a contact on Google that was removed locally, then tombstone the link.
+// A 404 (already gone remotely) is treated as success.
+const deleteGoogleContactRemote = async (
+  account: GoogleImportAccount,
+  link: { id: string; remoteUid: string },
+): Promise<void> => {
+  const { client } = await getGoogleClientForAccount(account);
+  const peopleApi = people({ version: "v1", auth: client });
+  try {
+    await peopleApi.people.deleteContact({ resourceName: link.remoteUid });
+  } catch (error) {
+    const status =
+      (error as { code?: unknown }).code ??
+      (error as { response?: { status?: unknown } }).response?.status;
+    if (status !== 404) throw normaliseGoogleError(error);
+  }
+  const now = new Date();
+  await db.syncContactLink.update({
+    where: { id: link.id },
+    data: { tombstonedAt: now, remoteDeletedAt: now, lastSyncedAt: now },
+  });
+};
+
 export const pushLocalChangesToGoogle = async (
   account: GoogleImportAccount,
-): Promise<{ pushed: number; conflicts: number }> => {
+): Promise<{ created: number; updated: number; deleted: number; conflicts: number }> => {
   // Import-only accounts never push.
   if (account.syncDirection !== "TWO_WAY" && account.syncDirection !== "EXPORT_ONLY") {
-    return { pushed: 0, conflicts: 0 };
+    return { created: 0, updated: 0, deleted: 0, conflicts: 0 };
   }
 
-  const links = await db.syncContactLink.findMany({
+  let created = 0;
+  let updated = 0;
+  let deleted = 0;
+  let conflicts = 0;
+
+  // 1) UPDATES — active, locally-edited contacts already linked to Google.
+  //    Only genuine user edits (lastMutatedBy = MANUAL): a contact whose last
+  //    write was a sync re-import (SYNC_*) must NOT be pushed back, or we get a
+  //    feedback loop (push -> Google normalises -> re-import bumps updatedAt ->
+  //    looks "dirty" -> push again, forever).
+  const activeLinks = await db.syncContactLink.findMany({
     where: {
       syncAccountId: account.id,
       tombstonedAt: null,
       remoteUid: { not: null },
-      contact: {
-        archivedAt: null,
-        syncTombstoneAt: null,
-        // Only push genuine local user edits. A contact whose last write was a
-        // sync re-import (lastMutatedBy = SYNC_*) must NOT be pushed back, or we
-        // get a feedback loop: push -> Google normalises -> re-import bumps
-        // updatedAt past lastSyncedAt -> looks "dirty" -> push again, forever.
-        lastMutatedBy: "MANUAL",
-      },
+      contact: { archivedAt: null, syncTombstoneAt: null, lastMutatedBy: "MANUAL" },
     },
     select: {
       id: true,
@@ -542,14 +606,9 @@ export const pushLocalChangesToGoogle = async (
       contact: { select: pushContactSelect },
     },
   });
-
-  let pushed = 0;
-  let conflicts = 0;
-  for (const link of links) {
+  for (const link of activeLinks) {
     if (!link.remoteUid) continue;
-    // Only push contacts edited locally since the link last synced.
     if (!isLocalChanged(link.lastSyncedAt, link.contact.updatedAt)) continue;
-
     const result = await pushGoogleContact(
       account,
       {
@@ -561,34 +620,92 @@ export const pushLocalChangesToGoogle = async (
       buildGooglePushContact(link.contact),
     );
     if (result.ok) {
-      pushed += 1;
+      updated += 1;
     } else {
       conflicts += 1;
     }
   }
 
-  return { pushed, conflicts };
+  // 2) CREATES — user-created local contacts not yet on Google. Restricted to
+  //    MANUAL contacts so we don't propagate contacts imported from other
+  //    sources into Google.
+  const unlinked = await db.contact.findMany({
+    where: {
+      userId: account.userId,
+      archivedAt: null,
+      syncTombstoneAt: null,
+      lastMutatedBy: "MANUAL",
+      syncLinks: { none: { syncAccountId: account.id } },
+    },
+    select: pushContactSelect,
+  });
+  for (const contact of unlinked) {
+    if (await createGoogleContactRemote(account, contact)) {
+      created += 1;
+    }
+  }
+
+  // 3) DELETES — contacts removed locally but still present on Google.
+  //    remoteDeletedAt = null excludes contacts that were tombstoned *because*
+  //    Google deleted them (those are already gone remotely).
+  const removedLinks = await db.syncContactLink.findMany({
+    where: {
+      syncAccountId: account.id,
+      tombstonedAt: null,
+      remoteUid: { not: null },
+      remoteDeletedAt: null,
+      contact: { OR: [{ archivedAt: { not: null } }, { syncTombstoneAt: { not: null } }] },
+    },
+    select: { id: true, remoteUid: true },
+  });
+  for (const link of removedLinks) {
+    if (!link.remoteUid) continue;
+    await deleteGoogleContactRemote(account, { id: link.id, remoteUid: link.remoteUid });
+    deleted += 1;
+  }
+
+  return { created, updated, deleted, conflicts };
 };
 
-// Runner entrypoint: push local edits first, then pull (full vs incremental
-// based on the stored cursor). Push tallies fold into the import summary so the
-// job records a single created/updated/deleted/conflicts result.
+// Runner entrypoint. Push local changes FIRST (the import re-anchors
+// lastSyncedAt for unchanged contacts, which would otherwise mask local edits),
+// then pull. Direction gates which half runs. Inbound + outbound tallies are
+// reported separately so the UI can show each side.
 export const runGoogleSync = async (
   account: GoogleImportAccount,
-): Promise<GoogleImportSummary> => {
-  const push = await pushLocalChangesToGoogle(account);
-  const importSummary = account.lastSyncCursor
-    ? await googleIncrementalSync(account)
-    : await googleFullImport(account);
+): Promise<GoogleSyncResult> => {
+  const outbound =
+    account.syncDirection === "TWO_WAY" || account.syncDirection === "EXPORT_ONLY";
+  const inbound =
+    account.syncDirection === "TWO_WAY" || account.syncDirection === "IMPORT_ONLY";
+
+  const push = outbound
+    ? await pushLocalChangesToGoogle(account)
+    : { created: 0, updated: 0, deleted: 0, conflicts: 0 };
+
+  const importSummary: GoogleImportSummary = inbound
+    ? account.lastSyncCursor
+      ? await googleIncrementalSync(account)
+      : await googleFullImport(account)
+    : {
+        created: 0,
+        updated: 0,
+        deleted: 0,
+        conflicts: 0,
+        queueFull: await isConflictQueueFull(account.id),
+      };
 
   return {
-    ...importSummary,
-    // Pushed contacts are outbound updates; fold them into the updated tally.
-    updated: importSummary.updated + push.pushed,
+    created: importSummary.created,
+    updated: importSummary.updated,
+    deleted: importSummary.deleted,
     conflicts: importSummary.conflicts + push.conflicts,
     // A push that opened a MANUAL conflict may have filled the queue.
     queueFull:
       push.conflicts > 0 ? await isConflictQueueFull(account.id) : importSummary.queueFull,
+    pushedCreated: push.created,
+    pushedUpdated: push.updated,
+    pushedDeleted: push.deleted,
   };
 };
 

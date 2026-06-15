@@ -729,10 +729,16 @@ model SyncJob {
     idempotencyKey     String?
     cursorBefore       String?
     cursorAfter        String?
+    // Inbound (remote -> Kontax) tallies.
     createdCount       Int            @default(0)
     updatedCount       Int            @default(0)
     deletedCount       Int            @default(0)
     conflictCount      Int            @default(0)
+    // P34D-03: outbound (Kontax -> remote) tallies, shown as the second line in
+    // the Sync History "Changes" column.
+    pushedCreatedCount Int            @default(0)
+    pushedUpdatedCount Int            @default(0)
+    pushedDeletedCount Int            @default(0)
     // P27-08: merge suggestions detected after an initial OAuth full import.
     duplicatesDetectedCount Int        @default(0)
     skippedCount       Int            @default(0)

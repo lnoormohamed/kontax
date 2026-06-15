@@ -186,6 +186,9 @@ export default async function SyncPage({ searchParams }: PageProps) {
               createdCount: true,
               updatedCount: true,
               deletedCount: true,
+              pushedCreatedCount: true,
+              pushedUpdatedCount: true,
+              pushedDeletedCount: true,
               duplicatesDetectedCount: true,
               createdAt: true,
               completedAt: true,
@@ -233,6 +236,9 @@ export default async function SyncPage({ searchParams }: PageProps) {
       added: j.createdCount,
       modified: j.updatedCount,
       deleted: j.deletedCount,
+      pushedAdded: j.pushedCreatedCount,
+      pushedModified: j.pushedUpdatedCount,
+      pushedDeleted: j.pushedDeletedCount,
       status:
         j.status === "SUCCEEDED" || j.status === "PARTIAL"
           ? "ok"

@@ -388,6 +388,11 @@ export const runQueuedSyncJobs = async ({
     deleted: number;
     conflicts: number;
     queueFull: boolean;
+    // Outbound (Kontax -> remote) tallies. Optional: connectors without a push
+    // phase (Microsoft, for now) omit them and they record as 0.
+    pushedCreated?: number;
+    pushedUpdated?: number;
+    pushedDeleted?: number;
   };
   const runOAuthSyncJob = async (
     job: (typeof queuedJobs)[number],
@@ -429,6 +434,9 @@ export const runQueuedSyncJobs = async ({
             updatedCount: result.updated,
             deletedCount: result.deleted,
             conflictCount: result.conflicts,
+            pushedCreatedCount: result.pushedCreated ?? 0,
+            pushedUpdatedCount: result.pushedUpdated ?? 0,
+            pushedDeletedCount: result.pushedDeleted ?? 0,
           },
         }),
         db.syncAccount.update({
