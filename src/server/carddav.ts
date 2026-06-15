@@ -90,6 +90,8 @@ const USER_AGENT = "Kontax/0.1 CardDAV preflight";
 
 const decodeXmlEntities = (value: string) =>
   value
+    .replace(/&#x([0-9a-f]+);/gi, (_, hex: string) => String.fromCharCode(parseInt(hex, 16)))
+    .replace(/&#([0-9]+);/g, (_, dec: string) => String.fromCharCode(parseInt(dec, 10)))
     .replaceAll("&amp;", "&")
     .replaceAll("&lt;", "<")
     .replaceAll("&gt;", ">")
@@ -291,7 +293,11 @@ const getAddressBookCandidate = (xml: string, contextUrl: string) => {
   return summaries.find((summary) => isAddressBookResource(summary) && summary.resolvedHref);
 };
 
-const unfoldVCard = (value: string) => value.replace(/\r?\n[ \t]/g, "");
+// Normalise to LF-only before unfolding so stray CR characters from CRLF
+// vCard/XML responses never leak into parsed field values.
+const normaliseCrLf = (value: string) => value.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+
+const unfoldVCard = (value: string) => normaliseCrLf(value).replace(/\n[ \t]/g, "");
 
 const unescapeVCardValue = (value: string) =>
   value
