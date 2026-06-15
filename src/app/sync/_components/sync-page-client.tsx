@@ -17,6 +17,7 @@ import {
   updateSyncAccountSettings,
 } from "~/app/actions/sync";
 import { HelpTooltip } from "~/app/_components/help-tooltip";
+import { SyncTimestamp } from "./sync-timestamp";
 
 // P23-06: server sentinel returned by settings actions when a re-auth elevation
 // is required. Mirrored here so the client can detect it and open the modal.
@@ -420,7 +421,7 @@ function ConflictRow({
         <span style={{ flex: 1, minWidth: 0 }}>
           <span style={{ fontSize: 14, fontWeight: 600, color: T.ink }}>{cf.contactName}</span>
           <span style={{ fontSize: 13, color: T.ink2, marginLeft: 8 }}>
-            · {cf.field} · {cf.date}
+            · {cf.field} · <SyncTimestamp iso={cf.date} />
           </span>
         </span>
         <span
@@ -702,7 +703,7 @@ function HistoryTable({ jobs, isSyncing }: { jobs: SyncJobRow[]; isSyncing: bool
               className="sy-trow"
               style={{ borderTop: `1px solid ${T.line2}`, position: "relative" }}
             >
-              <span data-th="Date" style={{ color: T.ink2 }}>{j.when}</span>
+              <span data-th="Date" style={{ color: T.ink2 }}><SyncTimestamp iso={j.when} /></span>
               <span data-th="Direction" style={{ color: T.mute }}>
                 {dirGlyph[j.direction]} {dirLabel[j.direction]}
               </span>

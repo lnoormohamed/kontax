@@ -69,29 +69,6 @@ const formatRelative = (date: Date | null): string | null => {
   }).format(date);
 };
 
-const formatJobTimestamp = (date: Date): string => {
-  const now = new Date();
-  const isToday =
-    date.getFullYear() === now.getFullYear() &&
-    date.getMonth() === now.getMonth() &&
-    date.getDate() === now.getDate();
-  const yesterday = new Date(now);
-  yesterday.setDate(yesterday.getDate() - 1);
-  const isYesterday =
-    date.getFullYear() === yesterday.getFullYear() &&
-    date.getMonth() === yesterday.getMonth() &&
-    date.getDate() === yesterday.getDate();
-
-  const time = new Intl.DateTimeFormat("en-GB", {
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
-
-  if (isToday) return `Today ${time}`;
-  if (isYesterday) return `Yesterday ${time}`;
-  return new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "short" }).format(date);
-};
-
 // Extract a human-readable snapshot summary for conflict comparison rows.
 // The snapshots are stored as JSON blobs in the DB.
 const getSnapshotText = (snapshot: unknown, key: string): string => {
@@ -251,7 +228,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
 
     const jobs: SyncJobRow[] = acct.syncJobs.map((j) => ({
       id: j.id,
-      when: formatJobTimestamp(j.completedAt ?? j.startedAt ?? j.createdAt),
+      when: (j.completedAt ?? j.startedAt ?? j.createdAt).toISOString(),
       direction: j.syncDirection,
       added: j.createdCount,
       modified: j.updatedCount,
@@ -264,7 +241,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
       id: cf.id,
       contactName: cf.contact?.fullName ?? "Unknown contact",
       field: cf.conflictType.toLowerCase().replace(/_/g, " "),
-      date: formatJobTimestamp(cf.detectedAt),
+      date: cf.detectedAt.toISOString(),
       comparisonRows: buildConflictRows(cf.localSnapshot, cf.remoteSnapshot),
     }));
 
