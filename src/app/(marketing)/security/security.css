@@ -1,0 +1,366 @@
+/* ════════════════════════════════════════════════════════════════
+   Security page — page-specific styles
+   Prefix: sp-   (tokens come from .mkt-wrap in marketing.css)
+   ════════════════════════════════════════════════════════════════ */
+
+/* ─── Shared inner wrap ───────────────────────────────────────── */
+.sp-wrap {
+  max-width: 1152px;
+  margin: 0 auto;
+  padding: 0 24px;
+}
+
+/* ─── Hero ────────────────────────────────────────────────────── */
+.sp-hero {
+  position: relative;
+  overflow: hidden;
+  background: var(--mkt-paper);
+  padding: 78px 0 32px;
+  text-align: center;
+}
+.sp-hero::before {
+  content: "";
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: -150px;
+  transform: translateX(-50%);
+  width: 900px;
+  height: 440px;
+  background: radial-gradient(ellipse at center, rgba(23, 53, 46, 0.07), rgba(23, 53, 46, 0) 68%);
+  pointer-events: none;
+}
+.sp-hero__inner {
+  position: relative;
+  z-index: 1;
+  max-width: 680px;
+  margin: 0 auto;
+}
+.sp-hero__eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 28px;
+  padding: 0 14px;
+  margin: 0 0 22px;
+  border-radius: 999px;
+  white-space: nowrap;
+  background: var(--mkt-tile-bg);
+  color: var(--mkt-green);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.sp-hero__title {
+  margin: 0;
+  font-size: 47px;
+  font-weight: 700;
+  line-height: 1.07;
+  letter-spacing: -0.025em;
+  color: var(--mkt-green);
+  text-wrap: balance;
+}
+.sp-hero__sub {
+  margin: 20px auto 0;
+  max-width: 600px;
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--mkt-body);
+  text-wrap: pretty;
+}
+
+/* ─── Trust bar ───────────────────────────────────────────────── */
+.sp-trustbar {
+  background: var(--mkt-paper);
+  padding: 28px 0;
+}
+.sp-trustbar__inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+}
+.sp-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 38px;
+  padding: 0 17px;
+  white-space: nowrap;
+  border-radius: 999px;
+  background: var(--mkt-tile-bg);
+  color: var(--mkt-green);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  border: 1px solid #dcebdd;
+}
+.sp-pill svg { flex: 0 0 auto; }
+
+/* ─── Protection flow ─────────────────────────────────────────── */
+.sp-flow-sec {
+  background: var(--mkt-paper);
+  padding: 56px 0 8px;
+}
+.sp-flow-head {
+  text-align: center;
+  max-width: 640px;
+  margin: 0 auto 32px;
+}
+.sp-flow-head__title {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mkt-mute);
+}
+.sp-flow-head__sub {
+  margin: 10px 0 0;
+  font-size: 21px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--mkt-green);
+  text-wrap: balance;
+}
+.sp-flow {
+  display: flex;
+  align-items: stretch;
+  border: 1px solid var(--mkt-card-border);
+  border-radius: 20px;
+  background: linear-gradient(180deg, var(--mkt-surface), var(--mkt-paper));
+  padding: 28px;
+}
+.sp-flow__node {
+  flex: 1 1 0;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 6px 10px;
+}
+.sp-flow__icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 15px;
+  background: var(--mkt-green);
+  color: #fff;
+  display: grid;
+  place-items: center;
+  box-shadow: 0 8px 22px rgba(23, 53, 46, 0.20);
+}
+.sp-flow__label {
+  margin-top: 15px;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--mkt-ink);
+}
+.sp-flow__sub {
+  margin-top: 5px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--mkt-body);
+}
+.sp-flow__edge {
+  flex: 0 0 130px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  padding-top: 14px;
+}
+.sp-flow__pill {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
+  padding: 0 11px;
+  white-space: nowrap;
+  border-radius: 999px;
+  background: var(--mkt-paper);
+  border: 1px solid var(--mkt-card-border);
+  font-family: var(--mkt-mono);
+  font-size: 11.5px;
+  font-weight: 500;
+  color: var(--mkt-green);
+}
+.sp-flow__arrow {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  color: var(--mkt-card-border);
+}
+.sp-flow__arrow-line {
+  flex: 1;
+  border-top: 2px dashed #cfd6cd;
+}
+.sp-flow__arrow svg {
+  flex: 0 0 auto;
+  color: var(--mkt-green);
+  margin-left: -2px;
+}
+
+/* ─── Security topic clusters ─────────────────────────────────── */
+.sp-cluster { padding: 56px 0; }
+.sp-cluster--alt { background: var(--mkt-surface); }
+.sp-cluster__head {
+  max-width: 720px;
+  margin: 0 0 28px;
+}
+.sp-cluster__kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+  font-family: var(--mkt-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--mkt-green);
+  margin-bottom: 12px;
+}
+.sp-cluster__kicker b { color: var(--mkt-mute); font-weight: 500; }
+.sp-cluster__title {
+  margin: 0;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  color: var(--mkt-green);
+  line-height: 1.12;
+  text-wrap: balance;
+}
+.sp-cluster__lede {
+  margin: 12px 0 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--mkt-body);
+  max-width: 620px;
+}
+
+/* ─── Security card grid ──────────────────────────────────────── */
+.sp-sec-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+.sp-scard {
+  background: var(--mkt-paper);
+  border: 1px solid var(--mkt-card-border);
+  border-radius: 18px;
+  padding: 30px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.03);
+}
+.sp-scard__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 13px;
+  background: var(--mkt-tile-bg);
+  color: var(--mkt-green);
+  display: grid;
+  place-items: center;
+}
+.sp-scard__h {
+  margin: 18px 0 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--mkt-green);
+  line-height: 1.2;
+}
+.sp-scard__p {
+  margin: 12px 0 0;
+  font-size: 15.5px;
+  line-height: 1.7;
+  color: var(--mkt-body);
+  text-wrap: pretty;
+}
+.sp-scard__p code {
+  font-family: var(--mkt-mono);
+  font-size: 0.84em;
+  background: rgba(23, 53, 46, 0.07);
+  padding: 1px 6px;
+  border-radius: 5px;
+  color: var(--mkt-green);
+  font-weight: 500;
+}
+.sp-scard__chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 22px;
+  padding-top: 20px;
+  border-top: 1px solid var(--mkt-hairline);
+}
+.sp-techchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 28px;
+  padding: 0 11px;
+  white-space: nowrap;
+  border-radius: 8px;
+  background: var(--mkt-surface);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--mkt-ink);
+}
+.sp-cluster--alt .sp-techchip {
+  background: var(--mkt-paper);
+  border: 1px solid var(--mkt-hairline);
+}
+.sp-techchip__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--mkt-green);
+  flex: 0 0 auto;
+}
+
+/* ─── Disclosure note ─────────────────────────────────────────── */
+.sp-disclose {
+  background: var(--mkt-paper);
+  padding: 8px 0 64px;
+}
+.sp-disclose__box {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  border: 1px dashed var(--mkt-card-border);
+  border-radius: 14px;
+  padding: 20px 24px;
+  background: var(--mkt-surface);
+}
+.sp-disclose__box svg { flex: 0 0 auto; color: var(--mkt-mute); margin-top: 1px; }
+.sp-disclose__box p {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--mkt-body);
+}
+.sp-disclose__box strong { color: var(--mkt-ink); font-weight: 600; }
+
+/* ─── Responsive ──────────────────────────────────────────────── */
+@media (max-width: 939px) {
+  .sp-sec-grid { grid-template-columns: 1fr; gap: 18px; max-width: 560px; }
+}
+@media (max-width: 767px) {
+  .sp-hero { padding: 52px 0 24px; }
+  .sp-hero__title { font-size: 33px; }
+  .sp-hero__sub { font-size: 16.5px; }
+  .sp-flow { flex-direction: column; padding: 22px; }
+  .sp-flow__node { padding: 16px 0; }
+  .sp-flow__edge {
+    flex-direction: row;
+    flex-basis: auto;
+    width: 100%;
+    padding: 4px 0;
+    gap: 12px;
+  }
+  .sp-flow__arrow { width: 60px; }
+  .sp-flow__arrow svg { transform: rotate(90deg); }
+  .sp-cluster { padding: 44px 0; }
+  .sp-cluster__title { font-size: 25px; }
+}
