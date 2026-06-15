@@ -122,6 +122,8 @@ export const createVcardShareLink = async (formData: FormData) => {
   const expiresAt =
     billing.plan === "FREE" ? new Date(Date.now() + FREE_LINK_TTL_MS) : null;
 
+  const singleUse = str(formData, "singleUse") === "true";
+
   await db.contactShare.create({
     data: {
       ownerUserId: userId,
@@ -130,6 +132,7 @@ export const createVcardShareLink = async (formData: FormData) => {
       token: randomBytes(24).toString("base64url"),
       status: "ACTIVE",
       expiresAt,
+      maxDownloads: singleUse ? 1 : null,
     },
   });
 

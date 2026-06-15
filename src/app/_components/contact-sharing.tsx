@@ -28,6 +28,7 @@ export type VcardLinkItem = {
   token: string | null;
   downloadCount: number;
   expiresAt: string | null;
+  maxDownloads: number | null;
 };
 
 export type SharedBookMember = {
@@ -330,6 +331,7 @@ function EmptySharingState({ contactId, hasBooks }: { contactId: string; hasBook
       <div className="mt-1 flex flex-wrap justify-center gap-2">
         <form action={createVcardShareLink}>
           <input name="contactId" type="hidden" value={contactId} />
+          <input name="singleUse" type="hidden" value="false" />
           <button
             className="rounded-[9px] border border-[#d8ddd6] bg-white px-4 py-2 text-[13.5px] font-semibold text-[#1d2823] transition hover:bg-[#f6f7f4]"
             type="submit"
@@ -577,22 +579,43 @@ export function ContactSharing({
           title="Copy vCard link"
         >
           {vcardLinks.length === 0 ? (
-            <form action={createVcardShareLink}>
-              <input name="contactId" type="hidden" value={contactId} />
-              <button
-                className="rounded-[9px] bg-[#4158f4] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#3248db]"
-                type="submit"
-              >
-                Create share link
-              </button>
-            </form>
+            <div className="grid gap-3">
+              <div className="flex overflow-hidden rounded-[9px] border border-[#d8ddd6]">
+                <form action={createVcardShareLink} className="flex-1">
+                  <input name="contactId" type="hidden" value={contactId} />
+                  <input name="singleUse" type="hidden" value="false" />
+                  <button
+                    className="w-full px-4 py-2 text-[13px] font-semibold text-[#1d2823] transition hover:bg-[#f6f7f4]"
+                    type="submit"
+                  >
+                    Reusable
+                  </button>
+                </form>
+                <div className="w-px bg-[#d8ddd6]" />
+                <form action={createVcardShareLink} className="flex-1">
+                  <input name="contactId" type="hidden" value={contactId} />
+                  <input name="singleUse" type="hidden" value="true" />
+                  <button
+                    className="w-full px-4 py-2 text-[13px] font-semibold text-[#1d2823] transition hover:bg-[#f6f7f4]"
+                    type="submit"
+                  >
+                    One-time use
+                  </button>
+                </form>
+              </div>
+              <p className="text-[12px] text-[#8b938c]">
+                One-time use links expire after a single download.
+              </p>
+            </div>
           ) : (
             <div className="grid gap-3">
               {vcardLinks.map((link) => (
                 <div key={link.id}>
                   <CopyField
                     helper={`${link.downloadCount} download${link.downloadCount === 1 ? "" : "s"}${
-                      link.expiresAt ? ` · expires ${formatDate(link.expiresAt)}` : " · no expiry"
+                      link.maxDownloads != null ? ` · one-time use` : ""
+                    }${
+                      link.expiresAt ? ` · expires ${formatDate(link.expiresAt)}` : link.maxDownloads == null ? " · no expiry" : ""
                     }`}
                     label="Share link"
                     value={`${shareOrigin}/share/${link.token}`}

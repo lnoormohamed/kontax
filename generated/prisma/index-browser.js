@@ -677,6 +677,7 @@ exports.Prisma.ContactShareScalarFieldEnum = {
   lastErrorAt: 'lastErrorAt',
   lastErrorCode: 'lastErrorCode',
   downloadCount: 'downloadCount',
+  maxDownloads: 'maxDownloads',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

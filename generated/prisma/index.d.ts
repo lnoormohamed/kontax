@@ -47208,10 +47208,12 @@ export namespace Prisma {
 
   export type ContactShareAvgAggregateOutputType = {
     downloadCount: number | null
+    maxDownloads: number | null
   }
 
   export type ContactShareSumAggregateOutputType = {
     downloadCount: number | null
+    maxDownloads: number | null
   }
 
   export type ContactShareMinAggregateOutputType = {
@@ -47230,6 +47232,7 @@ export namespace Prisma {
     lastErrorAt: Date | null
     lastErrorCode: string | null
     downloadCount: number | null
+    maxDownloads: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -47250,6 +47253,7 @@ export namespace Prisma {
     lastErrorAt: Date | null
     lastErrorCode: string | null
     downloadCount: number | null
+    maxDownloads: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -47271,6 +47275,7 @@ export namespace Prisma {
     lastErrorAt: number
     lastErrorCode: number
     downloadCount: number
+    maxDownloads: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -47279,10 +47284,12 @@ export namespace Prisma {
 
   export type ContactShareAvgAggregateInputType = {
     downloadCount?: true
+    maxDownloads?: true
   }
 
   export type ContactShareSumAggregateInputType = {
     downloadCount?: true
+    maxDownloads?: true
   }
 
   export type ContactShareMinAggregateInputType = {
@@ -47301,6 +47308,7 @@ export namespace Prisma {
     lastErrorAt?: true
     lastErrorCode?: true
     downloadCount?: true
+    maxDownloads?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -47321,6 +47329,7 @@ export namespace Prisma {
     lastErrorAt?: true
     lastErrorCode?: true
     downloadCount?: true
+    maxDownloads?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -47342,6 +47351,7 @@ export namespace Prisma {
     lastErrorAt?: true
     lastErrorCode?: true
     downloadCount?: true
+    maxDownloads?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -47450,6 +47460,7 @@ export namespace Prisma {
     lastErrorAt: Date | null
     lastErrorCode: string | null
     downloadCount: number
+    maxDownloads: number | null
     createdAt: Date
     updatedAt: Date
     _count: ContactShareCountAggregateOutputType | null
@@ -47490,6 +47501,7 @@ export namespace Prisma {
     lastErrorAt?: boolean
     lastErrorCode?: boolean
     downloadCount?: boolean
+    maxDownloads?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     owner?: boolean | UserDefaultArgs<ExtArgs>
@@ -47515,6 +47527,7 @@ export namespace Prisma {
     lastErrorAt?: boolean
     lastErrorCode?: boolean
     downloadCount?: boolean
+    maxDownloads?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     owner?: boolean | UserDefaultArgs<ExtArgs>
@@ -47540,6 +47553,7 @@ export namespace Prisma {
     lastErrorAt?: boolean
     lastErrorCode?: boolean
     downloadCount?: boolean
+    maxDownloads?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     owner?: boolean | UserDefaultArgs<ExtArgs>
@@ -47565,11 +47579,12 @@ export namespace Prisma {
     lastErrorAt?: boolean
     lastErrorCode?: boolean
     downloadCount?: boolean
+    maxDownloads?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type ContactShareOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerUserId" | "contactId" | "shareType" | "token" | "recipientUserId" | "recipientEmail" | "recipientContactId" | "status" | "snapshot" | "expiresAt" | "revokedAt" | "lastPushedAt" | "lastErrorAt" | "lastErrorCode" | "downloadCount" | "createdAt" | "updatedAt", ExtArgs["result"]["contactShare"]>
+  export type ContactShareOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerUserId" | "contactId" | "shareType" | "token" | "recipientUserId" | "recipientEmail" | "recipientContactId" | "status" | "snapshot" | "expiresAt" | "revokedAt" | "lastPushedAt" | "lastErrorAt" | "lastErrorCode" | "downloadCount" | "maxDownloads" | "createdAt" | "updatedAt", ExtArgs["result"]["contactShare"]>
   export type ContactShareInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     owner?: boolean | UserDefaultArgs<ExtArgs>
     contact?: boolean | ContactShare$contactArgs<ExtArgs>
@@ -47614,6 +47629,7 @@ export namespace Prisma {
       lastErrorAt: Date | null
       lastErrorCode: string | null
       downloadCount: number
+      maxDownloads: number | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["contactShare"]>
@@ -48059,6 +48075,7 @@ export namespace Prisma {
     readonly lastErrorAt: FieldRef<"ContactShare", 'DateTime'>
     readonly lastErrorCode: FieldRef<"ContactShare", 'String'>
     readonly downloadCount: FieldRef<"ContactShare", 'Int'>
+    readonly maxDownloads: FieldRef<"ContactShare", 'Int'>
     readonly createdAt: FieldRef<"ContactShare", 'DateTime'>
     readonly updatedAt: FieldRef<"ContactShare", 'DateTime'>
   }
@@ -61394,6 +61411,7 @@ export namespace Prisma {
     lastErrorAt: 'lastErrorAt',
     lastErrorCode: 'lastErrorCode',
     downloadCount: 'downloadCount',
+    maxDownloads: 'maxDownloads',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -62838,7 +62856,7 @@ export namespace Prisma {
 
   export type ContactWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    syncUid?: string
+    userId_syncUid?: ContactUserIdSyncUidCompoundUniqueInput
     AND?: ContactWhereInput | ContactWhereInput[]
     OR?: ContactWhereInput[]
     NOT?: ContactWhereInput | ContactWhereInput[]
@@ -62846,6 +62864,7 @@ export namespace Prisma {
     importJobId?: StringNullableFilter<"Contact"> | string | null
     reminderLeadDaysOverride?: IntNullableFilter<"Contact"> | number | null
     mergedIntoContactId?: StringNullableFilter<"Contact"> | string | null
+    syncUid?: StringFilter<"Contact"> | string
     syncVersion?: IntFilter<"Contact"> | number
     syncTombstoneAt?: DateTimeNullableFilter<"Contact"> | Date | string | null
     fullName?: StringFilter<"Contact"> | string
@@ -62905,7 +62924,7 @@ export namespace Prisma {
     mergedIntoContact?: XOR<ContactNullableScalarRelationFilter, ContactWhereInput> | null
     mergedChildren?: ContactListRelationFilter
     book?: XOR<AddressBookNullableScalarRelationFilter, AddressBookWhereInput> | null
-  }, "id" | "syncUid">
+  }, "id" | "userId_syncUid">
 
   export type ContactOrderByWithAggregationInput = {
     id?: SortOrder
@@ -65713,6 +65732,7 @@ export namespace Prisma {
     lastErrorAt?: DateTimeNullableFilter<"ContactShare"> | Date | string | null
     lastErrorCode?: StringNullableFilter<"ContactShare"> | string | null
     downloadCount?: IntFilter<"ContactShare"> | number
+    maxDownloads?: IntNullableFilter<"ContactShare"> | number | null
     createdAt?: DateTimeFilter<"ContactShare"> | Date | string
     updatedAt?: DateTimeFilter<"ContactShare"> | Date | string
     owner?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -65738,6 +65758,7 @@ export namespace Prisma {
     lastErrorAt?: SortOrderInput | SortOrder
     lastErrorCode?: SortOrderInput | SortOrder
     downloadCount?: SortOrder
+    maxDownloads?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     owner?: UserOrderByWithRelationInput
@@ -65766,6 +65787,7 @@ export namespace Prisma {
     lastErrorAt?: DateTimeNullableFilter<"ContactShare"> | Date | string | null
     lastErrorCode?: StringNullableFilter<"ContactShare"> | string | null
     downloadCount?: IntFilter<"ContactShare"> | number
+    maxDownloads?: IntNullableFilter<"ContactShare"> | number | null
     createdAt?: DateTimeFilter<"ContactShare"> | Date | string
     updatedAt?: DateTimeFilter<"ContactShare"> | Date | string
     owner?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -65791,6 +65813,7 @@ export namespace Prisma {
     lastErrorAt?: SortOrderInput | SortOrder
     lastErrorCode?: SortOrderInput | SortOrder
     downloadCount?: SortOrder
+    maxDownloads?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ContactShareCountOrderByAggregateInput
@@ -65820,6 +65843,7 @@ export namespace Prisma {
     lastErrorAt?: DateTimeNullableWithAggregatesFilter<"ContactShare"> | Date | string | null
     lastErrorCode?: StringNullableWithAggregatesFilter<"ContactShare"> | string | null
     downloadCount?: IntWithAggregatesFilter<"ContactShare"> | number
+    maxDownloads?: IntNullableWithAggregatesFilter<"ContactShare"> | number | null
     createdAt?: DateTimeWithAggregatesFilter<"ContactShare"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"ContactShare"> | Date | string
   }
@@ -70604,6 +70628,7 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     downloadCount?: number
+    maxDownloads?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutContactSharesOwnedInput
@@ -70629,6 +70654,7 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     downloadCount?: number
+    maxDownloads?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -70646,6 +70672,7 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
+    maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutContactSharesOwnedNestedInput
@@ -70671,6 +70698,7 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
+    maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -70692,6 +70720,7 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     downloadCount?: number
+    maxDownloads?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -70709,6 +70738,7 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
+    maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -70730,6 +70760,7 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
+    maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -72421,6 +72452,11 @@ export namespace Prisma {
 
   export type GroupContactOrderByRelationAggregateInput = {
     _count?: SortOrder
+  }
+
+  export type ContactUserIdSyncUidCompoundUniqueInput = {
+    userId: string
+    syncUid: string
   }
 
   export type ContactCountOrderByAggregateInput = {
@@ -74724,12 +74760,14 @@ export namespace Prisma {
     lastErrorAt?: SortOrder
     lastErrorCode?: SortOrder
     downloadCount?: SortOrder
+    maxDownloads?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type ContactShareAvgOrderByAggregateInput = {
     downloadCount?: SortOrder
+    maxDownloads?: SortOrder
   }
 
   export type ContactShareMaxOrderByAggregateInput = {
@@ -74748,6 +74786,7 @@ export namespace Prisma {
     lastErrorAt?: SortOrder
     lastErrorCode?: SortOrder
     downloadCount?: SortOrder
+    maxDownloads?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -74768,12 +74807,14 @@ export namespace Prisma {
     lastErrorAt?: SortOrder
     lastErrorCode?: SortOrder
     downloadCount?: SortOrder
+    maxDownloads?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
 
   export type ContactShareSumOrderByAggregateInput = {
     downloadCount?: SortOrder
+    maxDownloads?: SortOrder
   }
 
   export type EnumShareTypeWithAggregatesFilter<$PrismaModel = never> = {
@@ -80690,6 +80731,7 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     downloadCount?: number
+    maxDownloads?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     contact?: ContactCreateNestedOneWithoutSharesFromContactInput
@@ -80713,6 +80755,7 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     downloadCount?: number
+    maxDownloads?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -80740,6 +80783,7 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     downloadCount?: number
+    maxDownloads?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutContactSharesOwnedInput
@@ -80763,6 +80807,7 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     downloadCount?: number
+    maxDownloads?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -81924,6 +81969,7 @@ export namespace Prisma {
     lastErrorAt?: DateTimeNullableFilter<"ContactShare"> | Date | string | null
     lastErrorCode?: StringNullableFilter<"ContactShare"> | string | null
     downloadCount?: IntFilter<"ContactShare"> | number
+    maxDownloads?: IntNullableFilter<"ContactShare"> | number | null
     createdAt?: DateTimeFilter<"ContactShare"> | Date | string
     updatedAt?: DateTimeFilter<"ContactShare"> | Date | string
   }
@@ -83962,6 +84008,7 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     downloadCount?: number
+    maxDownloads?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutContactSharesOwnedInput
@@ -83985,6 +84032,7 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     downloadCount?: number
+    maxDownloads?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -84012,6 +84060,7 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     downloadCount?: number
+    maxDownloads?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutContactSharesOwnedInput
@@ -84035,6 +84084,7 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     downloadCount?: number
+    maxDownloads?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -99817,6 +99867,7 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     downloadCount?: number
+    maxDownloads?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -99837,6 +99888,7 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     downloadCount?: number
+    maxDownloads?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -100807,6 +100859,7 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
+    maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     contact?: ContactUpdateOneWithoutSharesFromContactNestedInput
@@ -100830,6 +100883,7 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
+    maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -100850,6 +100904,7 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
+    maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -100867,6 +100922,7 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
+    maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutContactSharesOwnedNestedInput
@@ -100890,6 +100946,7 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
+    maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -100910,6 +100967,7 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
+    maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -101656,6 +101714,7 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     downloadCount?: number
+    maxDownloads?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -101676,6 +101735,7 @@ export namespace Prisma {
     lastErrorAt?: Date | string | null
     lastErrorCode?: string | null
     downloadCount?: number
+    maxDownloads?: number | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -102057,6 +102117,7 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
+    maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutContactSharesOwnedNestedInput
@@ -102080,6 +102141,7 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
+    maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -102100,6 +102162,7 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
+    maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -102117,6 +102180,7 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
+    maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutContactSharesOwnedNestedInput
@@ -102140,6 +102204,7 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
+    maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -102160,6 +102225,7 @@ export namespace Prisma {
     lastErrorAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     lastErrorCode?: NullableStringFieldUpdateOperationsInput | string | null
     downloadCount?: IntFieldUpdateOperationsInput | number
+    maxDownloads?: NullableIntFieldUpdateOperationsInput | number | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

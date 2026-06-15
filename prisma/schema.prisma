@@ -1171,6 +1171,7 @@ model ContactShare {
     lastErrorAt        DateTime?
     lastErrorCode      String?
     downloadCount      Int         @default(0)
+    maxDownloads       Int?        // null = unlimited; 1 = single-use
     createdAt          DateTime    @default(now())
     updatedAt          DateTime    @updatedAt
     owner              User        @relation("ShareOwner", fields: [ownerUserId], references: [id], onDelete: Cascade)

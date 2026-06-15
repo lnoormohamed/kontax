@@ -18,6 +18,8 @@ export async function GET(_request: Request, { params }: { params: Promise<{ tok
       shareType: true,
       status: true,
       expiresAt: true,
+      downloadCount: true,
+      maxDownloads: true,
       contact: {
         select: {
           fullName: true,
@@ -55,16 +57,27 @@ export async function GET(_request: Request, { params }: { params: Promise<{ tok
     if (share.status !== "EXPIRED") {
       await db.contactShare.update({ where: { id: share.id }, data: { status: "EXPIRED" } });
     }
-    return new Response("This share link has expired.", { status: 404 });
+    return new Response("This share link has expired.", { status: 410 });
+  }
+  // Single-use enforcement: if maxDownloads is set and already reached, block.
+  if (share.maxDownloads != null && share.downloadCount >= share.maxDownloads) {
+    return new Response("This share link has already been used.", { status: 410 });
   }
   if (!share.contact) {
     // Source contact was deleted — nothing to serve.
     return new Response("Share link not found.", { status: 404 });
   }
 
+  const newCount = share.downloadCount + 1;
   await db.contactShare.update({
     where: { id: share.id },
-    data: { downloadCount: { increment: 1 } },
+    data: {
+      downloadCount: { increment: 1 },
+      // Expire single-use links immediately after serving.
+      ...(share.maxDownloads != null && newCount >= share.maxDownloads
+        ? { status: "EXPIRED" }
+        : {}),
+    },
   });
 
   const c = share.contact;

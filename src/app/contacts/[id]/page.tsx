@@ -341,6 +341,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
             status: true,
             expiresAt: true,
             downloadCount: true,
+            maxDownloads: true,
             recipientEmail: true,
             recipientContactId: true,
             lastPushedAt: true,
@@ -651,6 +652,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
                   token: l.token,
                   downloadCount: l.downloadCount,
                   expiresAt: l.expiresAt ? l.expiresAt.toISOString() : null,
+                  maxDownloads: l.maxDownloads,
                 }))}
               />
             </div>
@@ -1096,6 +1098,7 @@ export default async function ContactDetailPage({ params, searchParams }: Contac
               id: l.id,
               token: l.token,
               downloadCount: l.downloadCount,
+              maxDownloads: l.maxDownloads,
               expiresAt: l.expiresAt ? l.expiresAt.toISOString() : null,
             }))}
             mobile
