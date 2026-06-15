@@ -5,7 +5,37 @@ import { PricingToggle } from "./_pricing-toggle";
 import { FaqList } from "./_faq";
 import { auth } from "~/server/auth";
 import { getUserBillingContext } from "~/server/billing";
+import { getStripeClient } from "~/server/stripe";
+import type { StripePrices } from "./_pricing-toggle";
 import "./pricing.css";
+
+async function fetchStripePrices(): Promise<StripePrices | null> {
+  const ids = {
+    PRO_MONTHLY: process.env.STRIPE_PRICE_ID_PRO_MONTHLY,
+    PRO_YEARLY: process.env.STRIPE_PRICE_ID_PRO_YEARLY,
+    FAMILY_MONTHLY: process.env.STRIPE_PRICE_ID_FAMILY_MONTHLY,
+    FAMILY_YEARLY: process.env.STRIPE_PRICE_ID_FAMILY_YEARLY,
+    TEAMS_MONTHLY: process.env.STRIPE_PRICE_ID_TEAMS_MONTHLY,
+    TEAMS_YEARLY: process.env.STRIPE_PRICE_ID_TEAMS_YEARLY,
+  };
+  if (Object.values(ids).some((id) => !id)) return null;
+  try {
+    const stripe = getStripeClient();
+    const results = await Promise.all(
+      Object.values(ids).map((id) => stripe.prices.retrieve(id!)),
+    );
+    const [proM, proY, famM, famY, teaM, teaY] = results.map((p) =>
+      Math.round((p.unit_amount ?? 0) / 100),
+    );
+    return {
+      pro: { monthly: proM!, annual: proY! },
+      family: { monthly: famM!, annual: famY! },
+      teams: { monthly: teaM!, annual: teaY! },
+    };
+  } catch {
+    return null;
+  }
+}
 
 export const metadata: Metadata = {
   title: "Pricing — Kontax",
@@ -43,9 +73,12 @@ function Cell({ yes, text }: { yes?: boolean; text?: string }) {
 
 export default async function PricingPage() {
   const session = await auth();
-  const currentPlan = session?.user?.id
-    ? await getUserBillingContext(session.user.id).then((b) => b.plan).catch(() => null)
-    : null;
+  const [currentPlan, stripePrices] = await Promise.all([
+    session?.user?.id
+      ? getUserBillingContext(session.user.id).then((b) => b.plan).catch(() => null)
+      : Promise.resolve(null),
+    fetchStripePrices(),
+  ]);
 
   return (
     <>
@@ -64,7 +97,7 @@ export default async function PricingPage() {
       </section>
 
       {/* ── Billing toggle + Plan cards (client interactive) ── */}
-      <PricingToggle currentPlan={currentPlan} />
+      <PricingToggle currentPlan={currentPlan} stripePrices={stripePrices} />
 
       {/* ── Feature matrix ── */}
       <section className="pr-matrix-sec">

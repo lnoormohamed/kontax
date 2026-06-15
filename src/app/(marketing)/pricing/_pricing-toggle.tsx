@@ -5,6 +5,12 @@ import { useState, useTransition } from "react";
 
 import { createBillingPortalSession, createCheckoutSession } from "~/app/actions/billing";
 
+export type StripePrices = {
+  pro: { monthly: number; annual: number };
+  family: { monthly: number; annual: number };
+  teams: { monthly: number; annual: number };
+};
+
 const CHECK = (
   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
     <path d="M5 12.5l4.2 4.2L19 7" />
@@ -23,12 +29,11 @@ interface Plan {
   features: PlanFeat[];
 }
 
-const PLANS: Plan[] = [
+const BASE_PLANS: Omit<Plan, "price">[] = [
   {
     id: "free",
     name: "Free",
     tag: "For personal use",
-    price: "free",
     sublabel: null,
     cta: { label: "Get started free", href: "/register", variant: "filled" },
     features: [
@@ -43,7 +48,6 @@ const PLANS: Plan[] = [
     id: "pro",
     name: "Pro",
     tag: "For power users",
-    price: { monthly: 5, annual: 4 },
     sublabel: { monthly: "billed monthly", annual: "billed annually · save 20%" },
     cta: { label: "Choose Pro", href: "/register?plan=pro", variant: "outline" },
     features: [
@@ -59,7 +63,6 @@ const PLANS: Plan[] = [
     name: "Family",
     tag: "For households",
     recommended: true,
-    price: { monthly: 8, annual: 6 },
     sublabel: { monthly: "billed monthly", annual: "billed annually · save 20%" },
     cta: { label: "Choose Family", href: "/register?plan=family", variant: "filled" },
     features: [
@@ -74,7 +77,6 @@ const PLANS: Plan[] = [
     id: "teams",
     name: "Teams",
     tag: "For organisations",
-    price: { monthly: 12, annual: 10 },
     sublabel: { monthly: "per seat · billed monthly", annual: "per seat · billed annually · save 20%" },
     cta: { label: "Choose Teams", href: "/register?plan=teams", variant: "outline" },
     features: [
@@ -87,7 +89,28 @@ const PLANS: Plan[] = [
   },
 ];
 
-export function PricingToggle({ currentPlan }: { currentPlan?: string | null }) {
+const FALLBACK_PRICES: StripePrices = {
+  pro: { monthly: 5, annual: 4 },
+  family: { monthly: 8, annual: 6 },
+  teams: { monthly: 12, annual: 10 },
+};
+
+function buildPlans(stripePrices: StripePrices | null): Plan[] {
+  const p = stripePrices ?? FALLBACK_PRICES;
+  return BASE_PLANS.map((base) => ({
+    ...base,
+    price: base.id === "free" ? "free" : (p[base.id as keyof StripePrices] as { monthly: number; annual: number }),
+  }));
+}
+
+export function PricingToggle({
+  currentPlan,
+  stripePrices,
+}: {
+  currentPlan?: string | null;
+  stripePrices?: StripePrices | null;
+}) {
+  const PLANS = buildPlans(stripePrices ?? null);
   const [annual, setAnnual] = useState(false);
   const [teamSeats, setTeamSeats] = useState(3);
   const [loading, setLoading] = useState<string | null>(null);
