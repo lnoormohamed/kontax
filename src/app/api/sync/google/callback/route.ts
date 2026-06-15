@@ -85,14 +85,22 @@ export async function GET(req: NextRequest) {
 
   // Reuse an existing connection for the same Google account if present, so a
   // reconnect refreshes credentials instead of hitting the unique constraint.
-  // Only match when we resolved an email — matching on an undefined remoteAccountId
-  // would let Prisma drop the filter and return an arbitrary Google account.
-  const existing = googleEmail
+  // First try an exact email match; fall back to a null-remoteAccountId record
+  // for accounts created before email resolution was stored (legacy re-auth).
+  const existingByEmail = googleEmail
     ? await db.syncAccount.findFirst({
         where: { userId: state.userId, provider: "GOOGLE", remoteAccountId: googleEmail },
         select: { id: true, credentialReference: true },
       })
     : null;
+  const existing =
+    existingByEmail ??
+    (googleEmail
+      ? await db.syncAccount.findFirst({
+          where: { userId: state.userId, provider: "GOOGLE", remoteAccountId: null },
+          select: { id: true, credentialReference: true },
+        })
+      : null);
 
   // Google only returns a refresh token on a fresh consent. Never overwrite a
   // good stored refresh token with undefined on reconnect.
