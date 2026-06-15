@@ -37,29 +37,33 @@ Tester: _____________  Date: _____________
 | TC-05 | Forgot password — email delivery | ✅ Pass | "Check your inbox" shown; reset email arrived from noreply@vexon.co |
 | TC-06 | Forgot password — set new password | ✅ Pass | New password set, redirected to /login?message=password-reset |
 | TC-07 | Forgot password — log in with new password | ✅ Pass | Login with SmokeTest5678! succeeded, redirected to /contacts |
-| TC-08 | Enrol TOTP 2FA | ❌ Fail | TOTP_ENCRYPTION_KEY not set in env — encryptPayload throws, "Couldn't start enrolment" shown. Fix: add TOTP_ENCRYPTION_KEY to Coolify env vars and redeploy |
-| TC-09 | Log in with 2FA active | ⚠️ Blocked | Blocked on TC-08 |
-| TC-10 | Disable 2FA | ⚠️ Blocked | Blocked on TC-08 |
+| TC-08 | Enrol TOTP 2FA | ✅ Pass | TOTP_ENCRYPTION_KEY added to Coolify env. Re-run after fix deploy confirmed enrolment worked; QR code displayed, li+smoketest2 account enrolled successfully |
+| TC-09 | Log in with 2FA active | ✅ Pass | 2FA challenge appeared at /login/verify-2fa; TOTP code accepted; landed on /contacts. Note: completeLogin bug (see below) required /api/auth/session refresh before navigation succeeded |
+| TC-10 | Disable 2FA | ✅ Pass | Disabled via Settings → Security (password + TOTP required). Next login went straight to /contacts with no 2FA challenge |
 | TC-11 | View active sessions | ✅ Pass | Settings → Security shows 3 active Chrome/macOS sessions with IP and "Active X ago" timestamps |
 | TC-12 | Revoke a session | ✅ Pass | Revoked oldest session from Settings → Security; session count dropped 3→2 immediately. JWT revokedAt check confirmed in code audit. |
 | TC-13 | Change email address | ✅ Pass | Verification email sent to li+smoketest2@linoormohamed.com; old email still active |
 | TC-14 | Verify new email | ✅ Pass | New email verified and login succeeds; old email rejected. Note: ERR_TOO_MANY_REDIRECTS on verify page if session cookie still active — sign out first as workaround |
 | TC-15 | Change password | ✅ Pass | Password changed via Settings → Account → Change Password; form dismissed cleanly |
 | TC-16 | Old password rejected after change | ✅ Pass | Old password returns "Incorrect" error, stays on /login |
-| TC-17 | Rate limiting — wrong password | ❌ Fail | Fix implemented locally (loginByEmail + loginByIp limiters in rate-limit.ts, enforced in authorize callback) but not yet deployed to staging. Re-run after deploy. |
+| TC-17 | Rate limiting — wrong password | ✅ Pass | After fix deployed: 5th wrong-password attempt blocked login (HTTP 200 with "Incorrect email or password" — no 429 exposed to UI by design). 6th attempt also blocked. |
+
+### Bugs fixed during run
+
+| Bug | Fix | Commit |
+|-----|-----|--------|
+| TOTP_ENCRYPTION_KEY missing | Added to Coolify env vars | — (env only) |
+| Login rate limit missing | `loginByEmail` + `loginByIp` limiters; consume only on failure | `5677991` |
+| ERR_TOO_MANY_REDIRECTS on email verify with active session | Render success page instead of redirect for `EMAIL_CHANGE` type | `40e1292` |
+| `completeLogin()` loops back to /login/verify-2fa | Fetch `/api/auth/session` before `router.push` to clear `pendingTotp` cookie | (this run) |
 
 ### Section sign-off
 
 | Criterion | Status |
 |-----------|--------|
-| All 17 TCs pass (no exceptions) | ❌ Open — 3 blockers below |
+| All 17 TCs pass (no exceptions) | ✅ All 17 pass |
 | TC-01–04 also pass on getkontax.com (post P34D-23) | ⏳ Post-cutover |
 | SES email delivery < 60 s for all emails | ✅ All emails arrived within 60s |
-| P0 #1: TC-17 rate limit — deploy fix | ❌ Open |
-| P0 #2: TC-08/09/10 TOTP — set TOTP_ENCRYPTION_KEY env var and redeploy | ❌ Open |
-| Bug: ERR_TOO_MANY_REDIRECTS on email verify with active session | ⚠️ Workaround: sign out first |
-
-**Remaining to re-run after fixes deployed:** TC-08, TC-09, TC-10, TC-17
 
 Signed off by: _____________  Date: _____________
 

@@ -67,9 +67,15 @@ export default function VerifyTwoFaPage() {
     NOT_PENDING_TOTP: "Session error. Please sign in again.",
   };
 
-  // After TOTP verification, the JWT callback clears pendingTotp on the next
-  // request. A hard navigation to /contacts triggers that next request.
-  const completeLogin = () => router.push("/contacts");
+  // Refresh the JWT so the middleware sees pendingTotp cleared before navigating.
+  // The JWT callback clears pendingTotp when it sees totpChallengeVerified in the DB,
+  // but only runs in the full Node.js runtime — the edge middleware can't do this.
+  // Fetching /api/auth/session forces a full JWT callback run and issues a new cookie
+  // without pendingTotp, so router.push("/contacts") then passes through middleware.
+  const completeLogin = async () => {
+    await fetch("/api/auth/session", { credentials: "include" });
+    router.push("/contacts");
+  };
 
   const handleTotpSubmit = (val?: string) => {
     const v = val ?? code;
