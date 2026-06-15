@@ -1087,6 +1087,28 @@ export const runQueuedSyncJobs = async ({
         }
 
         for (const remoteApply of remoteApplyCandidates) {
+          // Guard: if the remote snapshot has no valid name (e.g. a Fastmail
+          // contact whose FN field is blank), skip the update rather than
+          // aborting the entire sync job. Record a soft error on the link so
+          // the next sync retries, and advance the ETag so we don't re-fetch
+          // the same unchanged vCard on every pass.
+          const remoteFullName =
+            isRecord(remoteApply.remoteSnapshot) &&
+            typeof remoteApply.remoteSnapshot.fullName === "string"
+              ? remoteApply.remoteSnapshot.fullName.trim()
+              : "";
+          if (!remoteFullName) {
+            await tx.syncContactLink.update({
+              where: { id: remoteApply.linkId },
+              data: {
+                remoteETag: remoteApply.remoteETag,
+                lastErrorCode: "REMOTE_CONTACT_NO_NAME",
+                lastErrorMessage: "Remote contact has no name — skipped update.",
+              },
+            });
+            continue;
+          }
+
           const updatedContact = await tx.contact.update({
             where: {
               id: remoteApply.contactId,
