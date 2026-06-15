@@ -1024,8 +1024,6 @@ export const queueSyncJob = async (formData: FormData) => {
   const syncAccountId = parseSyncAccountId(formData);
   const redirectTo = getRedirectTarget(formData);
 
-  await assertCanUseCardDavSync(userId);
-
   const account = await db.syncAccount.findFirst({
     where: {
       id: syncAccountId,
@@ -1033,6 +1031,7 @@ export const queueSyncJob = async (formData: FormData) => {
     },
     select: {
       id: true,
+      provider: true,
       status: true,
       syncDirection: true,
       baseUrl: true,
@@ -1051,6 +1050,36 @@ export const queueSyncJob = async (formData: FormData) => {
   if (!account) {
     throw new Error("Sync account not found.");
   }
+
+  // Google and Microsoft accounts use OAuth — skip the CardDAV preflight
+  // (credential format is different; discovery is not applicable).
+  if (account.provider === "GOOGLE" || account.provider === "MICROSOFT") {
+    await db.syncAccount.update({
+      where: { id: account.id },
+      data: {
+        status: account.status === "PAUSED" ? "PAUSED" : "ACTIVE",
+        lastErrorAt: null,
+        lastErrorCode: null,
+        lastErrorMessage: null,
+      },
+    });
+    await db.syncJob.create({
+      data: {
+        syncAccountId: account.id,
+        status: "QUEUED",
+        trigger: "MANUAL",
+        syncDirection: account.syncDirection,
+        attemptCount: 1,
+        maxAttempts: 5,
+        nextRetryAt: new Date(),
+        idempotencyKey: createIdempotencyKey([account.id, "manual", "queue"]),
+      },
+    });
+    revalidateSyncViews();
+    redirect(redirectTo ?? "/sync?queued=1");
+  }
+
+  await assertCanUseCardDavSync(userId);
 
   const now = new Date();
 

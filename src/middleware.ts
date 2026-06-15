@@ -83,16 +83,20 @@ export default auth(
 
     // 2. Restricted authenticated sessions are gated everywhere (checked before
     //    public routes) so they cannot reach app content via "/" or a public page.
+    // Build redirect base from APP_URL so reverse-proxy doesn't leak the
+    // internal container hostname (c6c598692882:3000) into redirect targets.
+    const appOrigin = (process.env.APP_URL ?? "").replace(/\/$/, "") || new URL(req.url).origin;
+
     if (session?.pendingTotp) {
       if (!TOTP_ALLOWED_PATHS.some((p) => pathname.startsWith(p))) {
-        return NextResponse.redirect(new URL("/login/verify-2fa", req.url));
+        return NextResponse.redirect(new URL("/login/verify-2fa", appOrigin));
       }
       return NextResponse.next();
     }
     if (session?.pendingDeletion) {
       if (!PENDING_DELETION_ALLOWED_PATHS.some((p) => pathname.startsWith(p))) {
         return NextResponse.redirect(
-          new URL("/account-pending-deletion", req.url),
+          new URL("/account-pending-deletion", appOrigin),
         );
       }
       return NextResponse.next();
@@ -123,7 +127,7 @@ export default auth(
         return res;
       }
 
-      const loginUrl = new URL("/login", req.url);
+      const loginUrl = new URL("/login", appOrigin);
       loginUrl.searchParams.set("next", pathname);
       return NextResponse.redirect(loginUrl);
     }
