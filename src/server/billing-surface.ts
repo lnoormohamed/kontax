@@ -122,6 +122,7 @@ export const getBillingSurface = async (userId: string): Promise<BillingSurface>
       trialEndsAt: true,
       graceEndsAt: true,
       cancelAtPeriodEnd: true,
+      canceledAt: true,
     },
   });
 
@@ -193,7 +194,15 @@ export const getBillingSurface = async (userId: string): Promise<BillingSurface>
   }
 
   // Cancellation scheduled.
-  if (subscription?.cancelAtPeriodEnd && subscription.currentPeriodEnd) {
+  if (
+    subscription?.currentPeriodEnd &&
+    (
+      subscription.cancelAtPeriodEnd ||
+      (subscription.canceledAt !== null &&
+        subscription.status !== "CANCELED" &&
+        subscription.currentPeriodEnd.getTime() > Date.now())
+    )
+  ) {
     return {
       state: "cancel",
       plan,

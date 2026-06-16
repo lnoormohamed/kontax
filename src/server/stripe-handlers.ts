@@ -74,6 +74,9 @@ async function upsertSubscription(
   if (!planInfo) throw new Error(`Unknown price ID: ${priceId}`);
 
   const status = mapStripeStatus(stripeSubscription.status);
+  const cancelScheduled =
+    stripeSubscription.cancel_at_period_end ||
+    (stripeSubscription.cancel_at !== null && stripeSubscription.status !== "canceled");
   // current_period_start/end moved to the subscription item in Stripe API v2026+
   const item = stripeSubscription.items.data[0];
   // For TEAMS per-seat billing, Stripe's quantity is the authoritative seat count.
@@ -92,7 +95,7 @@ async function upsertSubscription(
     trialEndsAt: stripeSubscription.trial_end
       ? new Date(stripeSubscription.trial_end * 1000)
       : null,
-    cancelAtPeriodEnd: stripeSubscription.cancel_at_period_end,
+    cancelAtPeriodEnd: cancelScheduled,
     canceledAt: stripeSubscription.canceled_at
       ? new Date(stripeSubscription.canceled_at * 1000)
       : null,
