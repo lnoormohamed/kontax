@@ -242,15 +242,23 @@ export function AuthCard({
       // The client signIn (next-auth/react) RETURNS { error } on bad credentials
       // with redirect:false — it does not throw. Check the result; keep the catch
       // as a fallback for unexpected failures.
-      let signInFailed = false;
+      let signInError = "";
+      let signInCode = "";
       try {
         const result = await signIn("credentials", { email, password, redirect: false });
-        if (result?.error) signInFailed = true;
+        if (result?.error) {
+          signInError = result.error;
+          signInCode = result.code ?? "";
+        }
       } catch {
-        signInFailed = true;
+        signInError = "CredentialsSignin";
       }
-      if (signInFailed) {
-        setFormError("Incorrect email or password. Please try again.");
+      if (signInError) {
+        setFormError(
+          signInCode === "account_locked"
+            ? "Your account has been suspended. Contact support."
+            : "Incorrect email or password. Please try again.",
+        );
         setSubmitting(false);
         setTimeout(() => errorBoxRef.current?.focus(), 0);
         return;

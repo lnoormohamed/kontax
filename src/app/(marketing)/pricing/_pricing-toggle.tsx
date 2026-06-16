@@ -145,11 +145,13 @@ export function PricingToggle({
   const [annual, setAnnual] = useState(false);
   const [teamSeats, setTeamSeats] = useState(3);
   const [loading, setLoading] = useState<string | null>(null);
+  const [ctaError, setCtaError] = useState<string | null>(null);
   const [, startTransition] = useTransition();
   const interval = annual ? "YEARLY" : "MONTHLY";
 
   const handlePaidCta = (planId: string) => {
     setLoading(planId);
+    setCtaError(null);
     startTransition(async () => {
       // Existing paid subscriber → portal to change plan.
       const isPaid = currentPlan && currentPlan !== "FREE";
@@ -163,23 +165,28 @@ export function PricingToggle({
 
       if ("url" in result) {
         window.location.href = result.url;
-      } else if (result.error === "UNAUTHORIZED") {
+        return;
+      }
+
+      if (result.error === "UNAUTHORIZED") {
         // Not logged in — send to register with plan context.
         window.location.href =
           planId === "teams"
             ? `/register?plan=teams&seats=${teamSeats}`
             : `/register?plan=${planId}`;
-      } else if (result.error === "USE_CUSTOMER_PORTAL") {
+        return;
+      }
+
+      if (result.error === "USE_CUSTOMER_PORTAL") {
         // Active subscription detected server-side — fall through to portal.
         const portalResult = await createBillingPortalSession();
         if ("url" in portalResult) {
           window.location.href = portalResult.url;
-        } else {
-          window.location.href = "/pricing?error=billing";
+          return;
         }
-      } else {
-        window.location.href = "/pricing?error=billing";
       }
+
+      setCtaError("Something went wrong opening billing. Please try again or contact support.");
       setLoading(null);
     });
   };
@@ -310,6 +317,14 @@ export function PricingToggle({
               );
             })}
           </div>
+          {ctaError ? (
+            <p className="mt-6 flex items-center justify-center gap-2 text-[13.5px] text-[#9a3a23]">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#b5472f" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                <circle cx="12" cy="12" r="9" /><path d="M12 8v5M12 16h.01" />
+              </svg>
+              {ctaError}
+            </p>
+          ) : null}
         </div>
       </section>
     </>
