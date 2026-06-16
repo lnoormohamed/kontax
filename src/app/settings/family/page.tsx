@@ -158,12 +158,12 @@ export default async function FamilySettingsPage() {
             <div className="min-w-0">
               <div className="text-[14.5px] font-semibold text-[#1d2823]">Leave this family</div>
               <p className="mt-1 max-w-[440px] text-[13.5px] text-[#5c655e]">
-                You&apos;ll lose access to the shared family book. The owner can invite you again later.
+                You keep a private copy of the family contacts. The owner can invite you again later.
               </p>
             </div>
             <ConfirmAction
               action={leaveFamilyGroup}
-              body="You'll immediately lose access to the shared family book. The owner can re-invite you."
+              body="A private copy of the family contacts will be saved to your account. Other members keep the shared book."
               confirmLabel="Leave family"
               danger
               fields={{ groupId: memberOf.groupId }}

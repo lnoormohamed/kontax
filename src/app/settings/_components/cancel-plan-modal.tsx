@@ -122,8 +122,8 @@ export function CancelPlanModal({
                     <path d="M5.6 5.6l12.8 12.8" />
                   </svg>
                   <span>
-                    Your family group will end. {details.familyMembers} member
-                    {details.familyMembers === 1 ? "" : "s"} will lose group access and revert to Free.
+                    Your family group will end. Each member (including you) keeps a private copy of the
+                    family contacts; the shared book is dissolved and everyone reverts to Free.
                   </span>
                 </div>
               ) : null}

@@ -147,12 +147,13 @@ export default async function TeamSettingsPage() {
             <div className="min-w-0">
               <div className="text-[14.5px] font-semibold text-[#1d2823]">Leave this team</div>
               <p className="mt-1 max-w-[440px] text-[13.5px] text-[#5c655e]">
-                You&apos;ll lose access to the team&apos;s shared books. An admin can invite you again later.
+                Team contacts belong to {memberOf.group.name} — you lose access and they&apos;re not
+                copied to your account. Your private contacts stay private. An admin can invite you again later.
               </p>
             </div>
             <ConfirmAction
               action={leaveTeam}
-              body="You'll immediately lose access to the team's shared books. An admin can re-invite you."
+              body="You'll lose access to all team books. Team contacts belong to the team and aren't copied to you; your private contacts are untouched."
               confirmLabel="Leave team"
               danger
               fields={{ groupId: memberOf.groupId }}
