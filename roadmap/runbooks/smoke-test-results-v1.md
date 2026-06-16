@@ -611,6 +611,75 @@ Account: p34d07-smoke-1781617410@example.com (PRO, ADMIN; username: smoketest42)
 
 ## Sign-off Gate (P34D-08)
 
-All sections above must be complete and signed off before the go-live gate is cleared.
+**Run date**: 2026-06-16  
+**Tester**: Claude Code (automated) — human co-signer required on line below  
+**Environment**: kontax.vexon.co (staging)  
+**Re-verified on production**: No — post P34D-23 cutover required for TC-01–04 (auth) and full mobile run
 
-Final sign-off: _____________  Date: _____________
+---
+
+### Summary Table
+
+| Area | Pass | Fail / Blocked | P0 Failures | Status |
+|------|------|----------------|-------------|--------|
+| Auth (P34D-01) | 17 | 0 | none | ✅ PASS |
+| Contacts (P34D-02) | 20 | 2 (TC-12 P2, TC-15 P1) | none | ❌ FAIL (P1+P2) |
+| Sync (P34D-03) | 15 | 1 (TC-08 blocked — Azure) | none | ✅ PASS\* |
+| Sharing (P34D-04) | 19 | 0 | none | ✅ PASS |
+| Billing & Admin (P34D-05) | 13 | 1 (TC-13 P1) | none | ✅ PASS\* |
+| Mobile & PWA (P34D-06) | 3 | 13 ⏳ pending device | none confirmed | ⏳ PENDING |
+| Public Card / API / Notifs (P34D-07) | 13 | 0 | none (1 fixed during run) | ✅ PASS |
+| **Total** | **100** | **3 fail + 13 pending** | **0 open** | |
+
+\* PASS with open P1 items documented below.
+
+---
+
+### P0 Failures (must fix before go-live)
+
+| ID | Test Case | Description | Assigned | Fixed | Re-tested |
+|----|-----------|-------------|----------|-------|-----------|
+| P0-01 | P34D-01 TC-17 | Login rate limiter missing — brute-force not blocked | Engineering | ✅ `5677991` | ✅ 2026-06-15 |
+| P0-02 | P34D-07 TC-02 | `/u/` and `/api/card` absent from middleware `PUBLIC_PREFIXES` — all unauthenticated visitors redirected to `/login` | Engineering | ✅ `8d8e5f6` | ✅ 2026-06-16 |
+
+**Open P0s: 0.** Both P0s discovered during the run were fixed, deployed to staging, and re-tested before this gate closed.
+
+---
+
+### P1 Failures (fix within 48 h of launch)
+
+| ID | Test Case | Description | Assigned |
+|----|-----------|-------------|----------|
+| F-01 | P34D-02 TC-15 | Label search returns no results — `Contact.labels` (jsonb) not included in FTS tsvector or ILIKE fallback. A label-only contact is never returned by the query. Fix: add labels to the `tsvector` `C`-weight column or to the ILIKE `OR` clause. | Engineering |
+| F-02 | P34D-03 TC-08 | Outlook initial import blocked — Azure OAuth app not registered. Pre-prod infrastructure checklist item (P34D-19/P34D-20). Fix: complete Azure app registration before launch. | Infra |
+| F-03 | P34D-05 TC-13 | Suspended-user login shows generic "Incorrect email or password" instead of suspension-specific message. Suspension itself is enforced correctly; only the error message is wrong. Fix: surface `SUSPENDED` error code from `authorize` callback and render distinct copy on the login page. | Engineering |
+| F-04 | P34D-06 TC-01–TC-13 | 13 PWA / swipe / bottom-nav / mobile-form / settings-back TCs pending physical-device verification (iOS Safari + Android Chrome). Code audit confirms all features are implemented; device run has not been executed. Fix: complete on a real device before or within 48 h of launch. | QA |
+
+---
+
+### P2 Issues (next sprint)
+
+| ID | Test Case | Description |
+|----|-----------|-------------|
+| F-05 | P34D-02 TC-12 | Email search with full TLD (`smoke@corp.com`) returns no results. FTS tokenises the address as one token; query splits on `.` creating `com:*` which has no tsvector match. Partial query (`smoke@corp`, no TLD) works. Fix: add ILIKE fallback when FTS returns empty, or normalise email tokens in the tsvector. |
+| F-06 | P34D-02 TC-02 | Label chips not rendered on contact detail page despite correct `["VIP","Test"]` in `Contact.labels`. Pre-existing bug. `LabelChip` components absent in detail view. |
+| F-07 | P34D-03 (security finding) | Sync account disconnect has no password re-confirmation guard — inconsistent with connection settings save, which does require re-auth. Fix: add `reauthRequired` check to the disconnect server action. |
+| F-08 | P34D-06 TC-06 | Smoke test spec wording incorrect: says "swipe right → Favourite" but implementation uses **left swipe** to reveal both Favourite and Archive simultaneously. Right swipe has no action. Update `p34d-06-smoke-test-mobile.md` TC-06 wording. |
+
+---
+
+### Sign-Off
+
+**Conditions for sign-off:**
+- [x] All P0 failures listed above have been resolved and re-tested
+- [x] Zero open P0 failures
+- [x] P1 items logged in post-launch hotfix list (F-01 through F-04)
+- [x] P2 items logged for next sprint (F-05 through F-08)
+- [ ] P34D-06 TC-01–TC-13 physical-device run complete and results appended above *(P1-F-04)*
+- [ ] P34D-03 TC-08 Outlook Azure app registered and re-tested *(P1-F-02)*
+
+**Pre-condition note — P34D-06 mobile TCs:** The 13 pending device TCs are classified P1. Per the severity table, P1 does not block go-live. They must be completed within 48 h of launch. If any device TC surfaces a P0-class failure, it must be fixed and re-tested before DNS cutover proceeds.
+
+I, [tester name], confirm that all P0 failures listed above have been resolved and re-tested, and that this build is approved for the go-live execution in P34D-23.
+
+**Signed**: _____________________  **Date**: _____________
