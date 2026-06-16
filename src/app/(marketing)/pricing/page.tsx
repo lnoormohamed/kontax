@@ -5,34 +5,20 @@ import { PricingToggle } from "./_pricing-toggle";
 import { FaqList } from "./_faq";
 import { auth } from "~/server/auth";
 import { getUserBillingContext } from "~/server/billing";
-import { getStripeClient } from "~/server/stripe";
+import { getStripeCatalog } from "~/server/stripe-catalog";
 import type { StripePrices } from "./_pricing-toggle";
 import "./pricing.css";
 
 async function fetchStripePrices(): Promise<StripePrices | null> {
-  const ids = {
-    PRO_MONTHLY: process.env.STRIPE_PRICE_ID_PRO_MONTHLY,
-    PRO_YEARLY: process.env.STRIPE_PRICE_ID_PRO_YEARLY,
-    FAMILY_MONTHLY: process.env.STRIPE_PRICE_ID_FAMILY_MONTHLY,
-    FAMILY_YEARLY: process.env.STRIPE_PRICE_ID_FAMILY_YEARLY,
-    TEAMS_MONTHLY: process.env.STRIPE_PRICE_ID_TEAMS_MONTHLY,
-    TEAMS_YEARLY: process.env.STRIPE_PRICE_ID_TEAMS_YEARLY,
-  };
-  if (Object.values(ids).some((id) => !id)) return null;
   try {
-    const stripe = getStripeClient();
-    const results = await Promise.all(
-      Object.values(ids).map((id) => stripe.prices.retrieve(id!)),
-    );
-    const [proM, proY, famM, famY, teaM, teaY] = results.map((p) =>
-      (p.unit_amount ?? 0) / 100,
-    );
-    const currency = results[0]?.currency ?? "usd";
+    const catalog = await getStripeCatalog();
+    if (!catalog) return null;
+    const currency = catalog.pro.monthly.currency;
     return {
       currency,
-      pro: { monthly: proM!, annual: proY! },
-      family: { monthly: famM!, annual: famY! },
-      teams: { monthly: teaM!, annual: teaY! },
+      pro:    { monthly: catalog.pro.monthly.unitAmount / 100,    annual: catalog.pro.annual.unitAmount / 100 },
+      family: { monthly: catalog.family.monthly.unitAmount / 100, annual: catalog.family.annual.unitAmount / 100 },
+      teams:  { monthly: catalog.teams.monthly.unitAmount / 100,  annual: catalog.teams.annual.unitAmount / 100 },
     };
   } catch {
     return null;

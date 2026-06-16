@@ -6,7 +6,7 @@ import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { getStripeClient } from "~/server/stripe";
 import { ensureStripeCustomer } from "~/server/stripe-customers";
-import { getStripePriceId } from "~/server/stripe-prices";
+import { getStripePriceIdAsync } from "~/server/stripe-prices";
 
 const CheckoutInputSchema = z.object({
   plan: z.enum(["PRO", "FAMILY", "TEAMS"]),
@@ -49,7 +49,7 @@ export async function createCheckoutSession(input: {
 
   let priceId: string;
   try {
-    priceId = getStripePriceId(plan, interval);
+    priceId = await getStripePriceIdAsync(plan, interval);
   } catch {
     return { error: "BILLING_NOT_CONFIGURED" };
   }

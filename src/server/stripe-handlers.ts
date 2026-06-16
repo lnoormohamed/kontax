@@ -13,7 +13,7 @@ import {
 } from "~/server/billing-emails";
 import { createNotification } from "~/server/notifications";
 import { getStripeClient } from "~/server/stripe";
-import { getPlanFromPriceId } from "~/server/stripe-prices";
+import { getPlanFromPriceIdAsync } from "~/server/stripe-prices";
 
 type Tx = Prisma.TransactionClient;
 
@@ -64,7 +64,7 @@ async function upsertSubscription(
   const priceId = stripeSubscription.items.data[0]?.price.id;
   if (!priceId) throw new Error("Subscription has no price item");
 
-  const planInfo = getPlanFromPriceId(priceId);
+  const planInfo = await getPlanFromPriceIdAsync(priceId);
   if (!planInfo) throw new Error(`Unknown price ID: ${priceId}`);
 
   const status = mapStripeStatus(stripeSubscription.status);
