@@ -195,7 +195,7 @@ function PublicCard({ card }: { card: PublicCardData }) {
       {/* Attribution */}
       <p style={{ fontSize: 12, color: "#8b938c", textAlign: "center", marginTop: 24 }}>
         Shared via{" "}
-        <a href="https://kontax.app" style={{ color: "#8b938c" }}>Kontax</a>
+        <a href="https://getkontax.com" style={{ color: "#8b938c" }}>Kontax</a>
       </p>
     </div>
   );

@@ -53,5 +53,5 @@ export default function VerifyEmail({
 
 VerifyEmail.PreviewProps = {
   variant: "signup",
-  verifyUrl: "https://kontax.app/verify-email?token=preview",
+  verifyUrl: "https://getkontax.com/verify-email?token=preview",
 } satisfies VerifyEmailProps;

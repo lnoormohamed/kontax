@@ -110,7 +110,7 @@ export default async function CardSettingsPage() {
           <p style={{ fontSize: 14, color: "#5c655e" }}>
             Your card is live at{" "}
             <a href={`/u/${user.username}`} target="_blank" style={{ color: "#4158f4" }}>
-              kontax.app/u/{user.username}
+              getkontax.com/u/{user.username}
             </a>
           </p>
         </div>

@@ -14,7 +14,7 @@ import * as React from "react";
 
 import { tokens } from "../_tokens";
 
-const appUrl = process.env.APP_URL ?? "https://kontax.app";
+const appUrl = process.env.APP_URL ?? "https://getkontax.com";
 
 interface EmailLayoutProps {
   /** Inbox preview text shown before the email is opened. */
@@ -84,7 +84,7 @@ export function EmailLayout({
           <Section style={footerStyle}>
             <Text style={footerTextStyle}>
               Kontax · You&rsquo;re receiving this because you have an account
-              at kontax.app
+              at getkontax.com
             </Text>
             {unsubscribe && (
               <Text style={footerTextStyle}>

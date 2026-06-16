@@ -127,7 +127,7 @@ function buildVEvents(contacts: ContactWithDates[]): string[] {
       const parsed = parseContactDate(contact.birthday);
       if (parsed) {
         events.push(...buildVEvent({
-          uid: `birthday-${contact.id}@kontax.app`,
+          uid: `birthday-${contact.id}@getkontax.com`,
           summary: `🎂 ${name}'s Birthday`,
           dtstart: formatICalDate(parsed.month, parsed.day, currentYear),
           rrule: "FREQ=YEARLY",
@@ -146,7 +146,7 @@ function buildVEvents(contacts: ContactWithDates[]): string[] {
       if (!parsed) return;
       const labelEmoji = getLabelEmoji(sd.label);
       events.push(...buildVEvent({
-        uid: `significant-${contact.id}-${idx}@kontax.app`,
+        uid: `significant-${contact.id}-${idx}@getkontax.com`,
         summary: `${labelEmoji} ${name}'s ${sd.label ?? "Anniversary"}`,
         dtstart: formatICalDate(parsed.month, parsed.day, currentYear),
         rrule: "FREQ=YEARLY",
@@ -204,7 +204,7 @@ Birthday calendar feed
 Subscribe to your contacts' birthdays in any calendar app.
 
 Calendar URL
-[https://kontax.app/api/calendar/birthdays.ics?calToken=…]   [Copy]
+[https://getkontax.com/api/calendar/birthdays.ics?calToken=…]   [Copy]
 
 [Regenerate URL]   (revokes the current URL immediately)
 
@@ -228,7 +228,7 @@ export async function generateCalTokenForUser(): Promise<string> {
 }
 ```
 
-The URL is displayed as `https://kontax.app/api/calendar/birthdays.ics?calToken={token}`. The "Copy" button uses the clipboard API. "Regenerate URL" calls `generateCalTokenForUser` and overwrites the existing token — the old URL immediately returns 401.
+The URL is displayed as `https://getkontax.com/api/calendar/birthdays.ics?calToken={token}`. The "Copy" button uses the clipboard API. "Regenerate URL" calls `generateCalTokenForUser` and overwrites the existing token — the old URL immediately returns 401.
 
 ### `/help#calendar-feed` FAQ entry
 

@@ -160,5 +160,5 @@ BillingEvent.PreviewProps = {
   planName: "Kontax Pro",
   graceDays: 7,
   graceDate: "Jun 18, 2026",
-  updateUrl: "https://kontax.app/settings/billing",
+  updateUrl: "https://getkontax.com/settings/billing",
 } satisfies BillingEventProps;

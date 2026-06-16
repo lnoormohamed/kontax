@@ -30,7 +30,7 @@ Anyone with the link can download this contact as a .vcf.
 (Free: "Free links expire after 7 days.")
 
   ┌ Share link ─────────────────────────────────────────────┐
-  │ https://kontax.app/share/{token}              [ Copy ]   │
+  │ https://getkontax.com/share/{token}              [ Copy ]   │
   │ 3 downloads · expires 14 Jun 2026   (or "· no expiry")   │
   └─────────────────────────────────────────────────────────┘
   Revoke link

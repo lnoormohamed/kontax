@@ -47,7 +47,7 @@ Replace the local/no-op email transport with Amazon SES so all transactional ema
 | `AWS_ACCESS_KEY_ID` | IAM credentials for SES |
 | `AWS_SECRET_ACCESS_KEY` | IAM credentials for SES |
 | `AWS_SES_REGION` | SES region (e.g. `eu-west-1`) |
-| `EMAIL_FROM` | Verified sending address (e.g. `hello@kontax.app`) |
+| `EMAIL_FROM` | Verified sending address (e.g. `hello@getkontax.com`) |
 | `AWS_SNS_BOUNCE_TOPIC_ARN` | SNS topic for bounces/complaints (P20-10) |
 
 ## Build order

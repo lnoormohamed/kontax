@@ -126,7 +126,7 @@ export async function getOrCreateVCardShareLink(contactId: string): Promise<stri
   const session = await auth();
   if (!session?.user?.id) throw new Error("UNAUTHENTICATED");
 
-  const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://kontax.app";
+  const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://getkontax.com";
 
   // Check for an existing non-expired share link
   const existing = await db.contactShare.findFirst({

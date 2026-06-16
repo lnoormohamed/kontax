@@ -11,7 +11,7 @@ Phase 9 is distinct from the existing sync feature in a critical direction: Kont
 ## Scope
 
 **In scope:**
-- Decision: dedicated subdomain (`dav.kontax.app`) vs path prefix (`/dav/`) on the main Next.js app
+- Decision: dedicated subdomain (`dav.getkontax.com`) vs path prefix (`/dav/`) on the main Next.js app
 - Complete URL hierarchy for all CardDAV server resources
 - HTTP method matrix per endpoint
 - Mapping from URL path parameters to Prisma model fields
@@ -31,7 +31,7 @@ Phase 9 is distinct from the existing sync feature in a critical direction: Kont
 
 ### Deployment Topology: Path Prefix vs Subdomain
 
-#### Option A — Dedicated subdomain: `dav.kontax.app`
+#### Option A — Dedicated subdomain: `dav.getkontax.com`
 - Pros: clean separation from Next.js routing; no risk of middleware or static asset handling intercepting DAV requests; simpler `/.well-known/carddav` redirect because the `/.well-known/` path lives on a different origin; some iOS versions are stricter about redirects landing on HTTPS endpoints — a subdomain makes TLS provisioning cleaner.
 - Cons: requires DNS entry, separate TLS cert (or wildcard), and additional reverse proxy configuration in production; local development requires `dav.localhost` or equivalent host entry.
 

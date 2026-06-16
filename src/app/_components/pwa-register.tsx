@@ -56,7 +56,7 @@ function AppTile() {
       </div>
       <div style={{ textAlign: "center" }}>
         <div style={{ fontSize: 13, fontWeight: 700, color: "#1d2823" }}>Kontax</div>
-        <div style={{ fontSize: 12, color: "#8b938c" }}>kontax.app</div>
+        <div style={{ fontSize: 12, color: "#8b938c" }}>getkontax.com</div>
       </div>
     </div>
   );

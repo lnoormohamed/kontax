@@ -187,7 +187,7 @@ export function MobileSettingsNav({
       </GroupCard>
 
       <div style={{ textAlign: "center", fontSize: 12, color: "#aeb4ac", padding: "4px 0 16px" }}>
-        Kontax · kontax.app
+        Kontax · getkontax.com
       </div>
     </div>
   );

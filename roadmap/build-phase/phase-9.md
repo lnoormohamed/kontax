@@ -12,7 +12,7 @@ Turn Kontax into a CardDAV server so users can add it as a native contacts accou
 ## Exit Criteria
 - The Kontax CardDAV server passes a basic standards-compliance smoke test against an iOS client and DAVx⁵.
 - App password creation, listing, and revocation are available in the UI.
-- The server is behind its own subdomain or path (`dav.kontax.app` or `/dav/`) and does not interfere with the existing web app routing.
+- The server is behind its own subdomain or path (`dav.getkontax.com` or `/dav/`) and does not interfere with the existing web app routing.
 - Existing CardDAV client sync (iCloud, Nextcloud, etc.) continues to work unchanged.
 - Phase 9 note: `P9-01` is now complete as the frozen architecture baseline for all later CardDAV server implementation work.
 
@@ -38,7 +38,7 @@ Turn Kontax into a CardDAV server so users can add it as a native contacts accou
 - Priority: `P0`
 - Dependencies: `P1-01`
 - Implementation Notes:
-  - Decide whether the CardDAV server lives on a dedicated subdomain (`dav.kontax.app`) or under a path prefix (`/dav/`) on the main app.
+  - Decide whether the CardDAV server lives on a dedicated subdomain (`dav.getkontax.com`) or under a path prefix (`/dav/`) on the main app.
   - A dedicated subdomain is cleaner for iOS discovery and avoids Next.js routing conflicts; a path prefix is simpler to deploy on a single host. Document the tradeoff and pick one.
   - Define the full URL hierarchy:
     - `/.well-known/carddav` → redirect to principal URL (required for iOS auto-discovery)

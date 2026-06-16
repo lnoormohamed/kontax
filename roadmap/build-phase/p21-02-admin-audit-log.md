@@ -86,8 +86,8 @@ export const ADMIN_ACTIONS = {
 
 | Time | Admin | Action | Target user | Details |
 |---|---|---|---|---|
-| 2026-06-11 14:32 | admin@kontax.app | USER_PLAN_OVERRIDE | john@example.com | Pro → Family |
-| 2026-06-11 14:28 | admin@kontax.app | USER_VIEWED | jane@example.com | — |
+| 2026-06-11 14:32 | admin@getkontax.com | USER_PLAN_OVERRIDE | john@example.com | Pro → Family |
+| 2026-06-11 14:28 | admin@getkontax.com | USER_VIEWED | jane@example.com | — |
 
 - Filterable by action type (dropdown) and date range
 - Paginated (50 rows per page)

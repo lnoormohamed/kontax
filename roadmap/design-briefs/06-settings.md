@@ -268,7 +268,7 @@ This is a **fully built section** (not a placeholder). It is the primary path fo
 │  Add Kontax to your iPhone, Mac, or Android phone    │
 │  as a contacts account…                              │
 │                                                      │
-│  Server URL  [https://kontax.app]  [Copy]            │
+│  Server URL  [https://getkontax.com]  [Copy]            │
 │  Username    [liaqat@example.com]  [Copy]            │
 │                                                      │
 │  App passwords ─────────────────────────────────── │

@@ -82,7 +82,7 @@ Steps:
 5. Capture contact snapshot for the `contactSnapshot` field. Call the same serialization logic used by the static share (not the full vCard serialization — just the plain object representation). This snapshot is used for delivery continuity if the contact is archived before any Pro+ share is downloaded (unlikely scenario, but consistent with the pattern established in P12-01).
 6. Generate a token with `generateShareToken()`. Attempt to insert the `ContactShare` record. On unique constraint violation, retry token generation up to 3 times.
 7. Emit a `CONTACT_SHARED` ActivityEvent with `actor: SHARE`, `actorDetail: "vcard_link"`, `payload: { shareType: "VCARD_LINK", shareId: newShare.id }`.
-8. Return `{ shareId: newShare.id, url: \`https://kontax.app/share/\${token}\` }`.
+8. Return `{ shareId: newShare.id, url: \`https://getkontax.com/share/\${token}\` }`.
 
 The URL returned is based on the `NEXT_PUBLIC_APP_URL` environment variable, not a hardcoded domain, so this works in staging and development environments.
 
@@ -207,7 +207,7 @@ Pro+ users see "No expiry" by default. Optionally, Pro+ users can set a custom e
 ## Acceptance Criteria
 
 - A Free plan user can generate a vCard share link for any contact they own. The link URL is copied to the clipboard.
-- The generated URL follows the format `https://kontax.app/share/{token}` where `{token}` is 32 URL-safe characters.
+- The generated URL follows the format `https://getkontax.com/share/{token}` where `{token}` is 32 URL-safe characters.
 - Accessing the URL from a browser (no auth cookie) downloads a valid `.vcf` file.
 - The `.vcf` file imports successfully into iOS Contacts, macOS Contacts, and Google Contacts (manual verification required).
 - Free plan links expire after 7 days. Accessing an expired link returns HTTP 404.

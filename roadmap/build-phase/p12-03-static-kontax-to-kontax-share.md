@@ -171,13 +171,13 @@ Two transactional emails are required for this ticket:
 - To: recipient's email
 - Subject: `{senderName} shared a contact with you on Kontax`
 - Body: brief description of the share, the contact's display name, and a CTA button linking to the pending shares view in the Kontax app.
-- The link should be a deep link to the Kontax app's pending shares view: `https://kontax.app/contacts/shares/pending`.
+- The link should be a deep link to the Kontax app's pending shares view: `https://getkontax.com/contacts/shares/pending`.
 
 **Email 2: Invite to non-account recipient**
 - To: `recipientEmail`
 - Subject: `{senderName} wants to share a contact with you`
 - Body: explanation that the sender has a contact to share, that they need a free Kontax account to receive it, and a CTA button: "Create account and receive contact."
-- The CTA link should include a query parameter so the registration page can surface the pending share after signup: `https://kontax.app/register?pendingShare={shareId}`.
+- The CTA link should include a query parameter so the registration page can surface the pending share after signup: `https://getkontax.com/register?pendingShare={shareId}`.
 
 Both emails use the transactional email provider configured in the app. If no provider is configured, log a warning and skip email delivery — do not fail the share creation. The in-app notification path must succeed independently of the email path.
 

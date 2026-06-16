@@ -154,7 +154,7 @@ export function CardShareTools({
   jobTitle?: string | null;
   company?: string | null;
 }) {
-  const cardUrl = `https://kontax.app/u/${username}`;
+  const cardUrl = `https://getkontax.com/u/${username}`;
   const [showQr, setShowQr] = useState(false);
   const [showSig, setShowSig] = useState(false);
 

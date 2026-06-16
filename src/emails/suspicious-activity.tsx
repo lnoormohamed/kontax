@@ -62,5 +62,5 @@ SuspiciousActivity.PreviewProps = {
   device: "Chrome on Windows",
   ipAddress: "203.0.113.42",
   time: "Jun 11, 2026 · 9:14 AM GMT",
-  secureUrl: "https://kontax.app/settings/security",
+  secureUrl: "https://getkontax.com/settings/security",
 } satisfies SuspiciousActivityProps;

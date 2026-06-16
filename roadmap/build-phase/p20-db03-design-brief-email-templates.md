@@ -54,7 +54,7 @@ The web app uses the locked light palette. Email must be a simplified version of
 **Footer:**
 - Padding: 16px 32px 24px
 - 1px hairline rule above
-- Text: "Kontax · You're receiving this because you have an account at kontax.app"
+- Text: "Kontax · You're receiving this because you have an account at getkontax.com"
 - Unsubscribe link (non-security emails only): "Unsubscribe from non-security emails"
 - Font: 12px, `#71717a`
 

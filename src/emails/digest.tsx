@@ -110,5 +110,5 @@ Digest.PreviewProps = {
       summary: "New sign-in from Chrome on macOS — recognised device",
     },
   ],
-  viewUrl: "https://kontax.app",
+  viewUrl: "https://getkontax.com",
 } satisfies DigestProps;

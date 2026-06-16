@@ -131,7 +131,7 @@ export function CardSettingsClient({
             rel="noreferrer"
             style={{ fontSize: 13, color: "#4158f4", fontWeight: 500, textDecoration: "none" }}
           >
-            kontax.app/u/{username} ↗
+            getkontax.com/u/{username} ↗
           </a>
         </div>
       )}

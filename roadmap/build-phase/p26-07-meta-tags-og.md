@@ -42,7 +42,7 @@ This image is static — created once as a PNG asset and committed to `/public`.
 ```typescript
 import type { Metadata } from "next";
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://kontax.app";
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://getkontax.com";
 
 export function generatePageMetadata(page: {
   title: string;
@@ -117,7 +117,7 @@ In `src/app/layout.tsx`, add global meta tags:
 
 ```tsx
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://kontax.app"),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "https://getkontax.com"),
   applicationName: "Kontax",
   keywords: ["contacts", "CardDAV", "address book", "sync", "contact management"],
   authors: [{ name: "Kontax" }],
@@ -134,7 +134,7 @@ export const metadata: Metadata = {
 - The OG image (`/og-default.png`) is a well-designed 1200×630px branded card.
 - Sharing the landing page URL on WhatsApp, Slack, or Twitter shows a branded preview with the OG image.
 - The `generatePageMetadata` helper is used consistently — no per-page manual tag duplication.
-- All OG tags use absolute URLs (`https://kontax.app/og-default.png`), not relative paths.
+- All OG tags use absolute URLs (`https://getkontax.com/og-default.png`), not relative paths.
 
 ---
 

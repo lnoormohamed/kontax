@@ -28,7 +28,7 @@ Next.js App Router provides built-in support for both `sitemap.xml` (via `src/ap
 ```typescript
 import type { MetadataRoute } from "next";
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://kontax.app";
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://getkontax.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
@@ -71,7 +71,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
 ```typescript
 import type { MetadataRoute } from "next";
 
-const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://kontax.app";
+const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://getkontax.com";
 
 export default function robots(): MetadataRoute.Robots {
   return {
@@ -105,7 +105,7 @@ Even though `/share/**` is disallowed in `robots.txt`, share pages should additi
 ### Search Console registration
 
 After P26-08 ships, add to the launch runbook:
-1. Submit `https://kontax.app/sitemap.xml` to Google Search Console.
+1. Submit `https://getkontax.com/sitemap.xml` to Google Search Console.
 2. Verify ownership via the DNS TXT record method.
 3. Confirm robots.txt is parsed correctly via the "robots.txt tester" in Search Console.
 

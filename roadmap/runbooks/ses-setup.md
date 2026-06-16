@@ -13,27 +13,27 @@ real delivery.
 ## 1. Verify the sending domain
 
 1. AWS Console → **SES → Verified identities → Create identity → Domain**.
-2. Enter `kontax.app`. Enable **Easy DKIM** (RSA 2048-bit).
-3. SES generates DNS records. Add them to the `kontax.app` zone:
+2. Enter `getkontax.com`. Enable **Easy DKIM** (RSA 2048-bit).
+3. SES generates DNS records. Add them to the `getkontax.com` zone:
 
 **DKIM — three CNAME records** (tokens from the SES console):
 
 ```
-{token1}._domainkey.kontax.app  CNAME  {token1}.dkim.amazonses.com
-{token2}._domainkey.kontax.app  CNAME  {token2}.dkim.amazonses.com
-{token3}._domainkey.kontax.app  CNAME  {token3}.dkim.amazonses.com
+{token1}._domainkey.getkontax.com  CNAME  {token1}.dkim.amazonses.com
+{token2}._domainkey.getkontax.com  CNAME  {token2}.dkim.amazonses.com
+{token3}._domainkey.getkontax.com  CNAME  {token3}.dkim.amazonses.com
 ```
 
 **SPF** — add to the existing root TXT record, or create one:
 
 ```
-TXT  kontax.app  "v=spf1 include:amazonses.com ~all"
+TXT  getkontax.com  "v=spf1 include:amazonses.com ~all"
 ```
 
 **DMARC** (recommended):
 
 ```
-TXT  _dmarc.kontax.app  "v=DMARC1; p=quarantine; rua=mailto:dmarc@kontax.app"
+TXT  _dmarc.getkontax.com  "v=DMARC1; p=quarantine; rua=mailto:dmarc@getkontax.com"
 ```
 
 > DKIM CNAMEs can take up to **72 hours** to propagate. Start this early — it can
@@ -52,7 +52,7 @@ this inline policy (substitute `{region}` and `{account-id}`):
     {
       "Effect": "Allow",
       "Action": ["ses:SendEmail", "ses:SendRawEmail"],
-      "Resource": "arn:aws:ses:{region}:{account-id}:identity/kontax.app"
+      "Resource": "arn:aws:ses:{region}:{account-id}:identity/getkontax.com"
     },
     {
       "Effect": "Allow",
@@ -68,7 +68,7 @@ Generate an access key pair and store it as the env vars in §4.
 ## 3. SNS topic for bounces & complaints
 
 1. SNS → **Create topic** (Standard) named `kontax-email-events` in the SES region.
-2. SES → Verified identity `kontax.app` → **Notifications** → set **Bounce** and
+2. SES → Verified identity `getkontax.com` → **Notifications** → set **Bounce** and
    **Complaint** feedback to publish to `kontax-email-events`.
 3. Add an HTTPS subscription to the topic pointing at
    `{APP_URL}/api/ses/events` — the endpoint lands in **P20-10**. (Confirm the
@@ -84,7 +84,7 @@ Set these (see [.env.example](../../.env.example)). All four are required for
 AWS_ACCESS_KEY_ID=AKIA…
 AWS_SECRET_ACCESS_KEY=…
 AWS_SES_REGION=us-east-1          # region the identity was verified in
-EMAIL_FROM=no-reply@kontax.app    # must be on the verified domain
+EMAIL_FROM=no-reply@getkontax.com    # must be on the verified domain
 ```
 
 Validation: start the app. With the vars set you should **not** see
@@ -119,7 +119,7 @@ radius is limited to sending mail. Rotate keys ~every 90 days:
 
 ## Acceptance checklist
 
-- [ ] `kontax.app` shows **Verified** in SES; DKIM CNAMEs live in DNS.
+- [ ] `getkontax.com` shows **Verified** in SES; DKIM CNAMEs live in DNS.
 - [ ] SPF and DMARC TXT records present.
 - [ ] IAM user `kontax-ses-sender` exists with the policy above.
 - [ ] `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY` / `AWS_SES_REGION` /

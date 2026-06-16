@@ -169,7 +169,7 @@ Centered or bottom-sheet card: 17/700 title, 14 `ink2` body, action row — dest
 
 ## D5. PWA install prompt
 Bottom sheet: drag handle, centered "Add Kontax to your Home Screen", 64px green app tile + "Kontax /
-kontax.app", one-line value prop. **iOS:** two numbered steps (Share → "Add to Home Screen") + "Got
+getkontax.com", one-line value prop. **iOS:** two numbered steps (Share → "Add to Home Screen") + "Got
 it". **Android:** "Install" (blue) + "Not now". Triggered by the install heuristic; dismissable.
 
 ---
@@ -323,7 +323,7 @@ its variants on whichever of these apply. Don't hard-code one happy path.
 - *Chrome:* Plain "Settings" header + bottom nav.
 - *Layout:* account GroupCard (48px avatar, name 16/700, "email · plan"); grouped NavRows —
   [Sync connections · Family/Team management · Import & export], [Profile · Notifications · Devices ·
-  Security · Plan & billing]; danger group ([Sign out], red) to match the design; "Kontax · kontax.app" footer.
+  Security · Plan & billing]; danger group ([Sign out], red) to match the design; "Kontax · getkontax.com" footer.
 - *Variance:* the **Family/Team management** row shows only when the user is in a group or on the matching
   plan (Free/Pro without a group → no row, or an "Upgrade" upsell row). Account card shows the live plan
   label. Read-only → surface the billing/"Manage plan" entry prominently.

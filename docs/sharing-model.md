@@ -49,7 +49,7 @@ The `snapshot` field is a JSON blob of the contact's portable fields at share ti
 
 1. Owner clicks Share → vCard link on a contact.
 2. Server creates a `ContactShare` row with `shareType=VCARD_LINK` and a random `token`.
-3. The public URL is `https://kontax.app/share/{token}`.
+3. The public URL is `https://getkontax.com/share/{token}`.
 4. Any visitor can download a `.vcf` file. No Kontax account needed.
 5. `downloadCount` increments on each download.
 6. Optionally set `expiresAt` to auto-expire the link.

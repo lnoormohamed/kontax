@@ -58,7 +58,7 @@ function buildVEvents(contacts: ContactWithDates[], year: number): string[] {
       if (parsed) {
         events.push(
           ...buildVEvent({
-            uid: `birthday-${contact.id}@kontax.app`,
+            uid: `birthday-${contact.id}@getkontax.com`,
             summary: `🎂 ${name}'s Birthday`,
             dtstart: formatICalDate(parsed.month, parsed.day, year),
           }),
@@ -73,7 +73,7 @@ function buildVEvents(contacts: ContactWithDates[], year: number): string[] {
       if (!parsed) return;
       events.push(
         ...buildVEvent({
-          uid: `significant-${contact.id}-${idx}@kontax.app`,
+          uid: `significant-${contact.id}-${idx}@getkontax.com`,
           summary: `${labelEmoji(sd.label)} ${name}'s ${labelOr(sd.label, "Anniversary")}`,
           dtstart: formatICalDate(parsed.month, parsed.day, year),
         }),

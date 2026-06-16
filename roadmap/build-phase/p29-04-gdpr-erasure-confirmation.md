@@ -66,8 +66,8 @@ export function AccountDeletionCompleteTemplate({
       <Text style={{ color: tokens.secondary, fontSize: "14px", lineHeight: "22px", margin: "0 0 16px" }}>
         If you didn't request this deletion or believe this is an error, please contact
         Kontax support immediately at{" "}
-        <a href="mailto:support@kontax.app" style={{ color: tokens.blue }}>
-          support@kontax.app
+        <a href="mailto:support@getkontax.com" style={{ color: tokens.blue }}>
+          support@getkontax.com
         </a>.
       </Text>
 

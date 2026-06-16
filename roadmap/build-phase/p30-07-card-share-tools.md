@@ -6,12 +6,12 @@ Give card owners three ways to share their public card URL: a copy-link button, 
 
 ## Background
 
-The public card URL (`kontax.app/u/{username}`) is the shareable artefact. The three tools in this ticket serve different distribution channels: copy-link for direct messaging, QR for in-person exchanges, and email signature for professional correspondence. All are available from `/settings/profile/card`.
+The public card URL (`getkontax.com/u/{username}`) is the shareable artefact. The three tools in this ticket serve different distribution channels: copy-link for direct messaging, QR for in-person exchanges, and email signature for professional correspondence. All are available from `/settings/profile/card`.
 
 ## Scope
 
 **In scope:**
-- **Copy link:** copies `https://kontax.app/u/{username}` to the clipboard with a brief "Copied!" confirmation
+- **Copy link:** copies `https://getkontax.com/u/{username}` to the clipboard with a brief "Copied!" confirmation
 - **QR code:** reuses `QrCodeModal` (P28-06) with the card URL instead of a share-link URL
 - **Email signature snippet:** generates a copy-ready HTML snippet with name, title, and the card URL; copy button + preview
 - All three tools surface in `/settings/profile/card` per the P30-DB11 design spec
@@ -29,7 +29,7 @@ The public card URL (`kontax.app/u/{username}`) is the shareable artefact. The t
 ```tsx
 function CopyCardLinkButton({ username }: { username: string }) {
   const [copied, setCopied] = useState(false);
-  const url = `https://kontax.app/u/${username}`;
+  const url = `https://getkontax.com/u/${username}`;
 
   const handleCopy = async () => {
     await navigator.clipboard.writeText(url);
@@ -48,7 +48,7 @@ function CopyCardLinkButton({ username }: { username: string }) {
 
 Displayed inline alongside the card URL in the settings panel:
 ```
-Your card is live at kontax.app/u/janesmith
+Your card is live at getkontax.com/u/janesmith
 [Copy link]   [View card ↗]
 ```
 
@@ -59,7 +59,7 @@ Reuses `QrCodeModal` from P28-06 with the card URL as the `shareUrl` prop:
 ```tsx
 function CardQrButton({ username }: { username: string }) {
   const [open, setOpen] = useState(false);
-  const cardUrl = `https://kontax.app/u/${username}`;
+  const cardUrl = `https://getkontax.com/u/${username}`;
 
   return (
     <>
@@ -91,7 +91,7 @@ function EmailSignatureSnippet({ user }: {
 }) {
   const [copied, setCopied] = useState(false);
 
-  const cardUrl = `https://kontax.app/u/${user.username}`;
+  const cardUrl = `https://getkontax.com/u/${user.username}`;
   const subtitle = [user.jobTitle, user.company].filter(Boolean).join(" at ");
 
   const htmlSnippet = [
@@ -102,7 +102,7 @@ function EmailSignatureSnippet({ user }: {
     subtitle ? `      <p style="margin: 2px 0 6px; font-size: 12px; color: #5c655e;">${subtitle}</p>` : "",
     `      <p style="margin: 0;">`,
     `        <a href="${cardUrl}" style="font-size: 12px; color: #8b938c; text-decoration: none;">`,
-    `          kontax.app/u/${user.username}`,
+    `          getkontax.com/u/${user.username}`,
     `        </a>`,
     `      </p>`,
     `    </td>`,
@@ -140,7 +140,7 @@ function EmailSignatureSnippet({ user }: {
           </p>
         )}
         <a href={cardUrl} style={{ fontSize: 12, color: "#8b938c", textDecoration: "none" }}>
-          kontax.app/u/{user.username}
+          getkontax.com/u/{user.username}
         </a>
       </div>
 

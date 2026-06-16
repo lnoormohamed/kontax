@@ -30,5 +30,5 @@ export default function PasswordReset({ resetUrl }: PasswordResetProps) {
 }
 
 PasswordReset.PreviewProps = {
-  resetUrl: "https://kontax.app/reset-password?token=preview",
+  resetUrl: "https://getkontax.com/reset-password?token=preview",
 } satisfies PasswordResetProps;

@@ -41,7 +41,7 @@ export default async function CardSettingsPage() {
     <>
       <SettingsPageHead
         title="Public card"
-        sub="Choose which fields are visible when someone views your card at kontax.app/u/…"
+        sub="Choose which fields are visible when someone views your card at getkontax.com/u/…"
       />
 
       {/* Visibility controls */}

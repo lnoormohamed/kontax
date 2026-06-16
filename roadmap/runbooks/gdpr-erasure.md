@@ -71,13 +71,13 @@ For each, it calls `db.user.delete({ where: { id } })`. Prisma cascades the dele
 
 ## Handling an inbound GDPR erasure request
 
-If a user emails privacy@kontax.app requesting erasure:
+If a user emails privacy@getkontax.com requesting erasure:
 
 1. **Verify identity**: confirm the requester owns the account (reply asking them to send from their registered email, or verify via the admin panel).
 2. **Check if already initiated**: in `/admin` → Users, check `lifecycleState` and `scheduledDeleteAt`. If already LOCKED and within the 30-day window, it will complete automatically.
 3. **If not initiated**: direct the user to Settings → Account → Delete account. If they cannot access the UI, an admin can trigger deletion via the admin panel.
 4. **Document the request**: note the date of the request in the user's admin notes field (audit log action `account.delete.schedule` captures the timestamp).
-5. **Confirmation**: once the cron job runs and the account is gone, a confirmation email is sent automatically. For a formal deletion certificate, email privacy@kontax.app with the user ID and deletion timestamp.
+5. **Confirmation**: once the cron job runs and the account is gone, a confirmation email is sent automatically. For a formal deletion certificate, email privacy@getkontax.com with the user ID and deletion timestamp.
 
 ---
 

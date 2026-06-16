@@ -45,7 +45,7 @@ Used in server components (safe — data is not user-controlled).
 
 ```typescript
 // src/app/(public)/page.tsx
-const BASE_URL = "https://kontax.app";
+const BASE_URL = "https://getkontax.com";
 
 const organizationSchema = {
   "@context": "https://schema.org",
@@ -106,8 +106,8 @@ const breadcrumbSchema = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Kontax", item: "https://kontax.app" },
-    { "@type": "ListItem", position: 2, name: "Pricing", item: "https://kontax.app/pricing" },
+    { "@type": "ListItem", position: 1, name: "Kontax", item: "https://getkontax.com" },
+    { "@type": "ListItem", position: 2, name: "Pricing", item: "https://getkontax.com/pricing" },
   ],
 };
 ```
@@ -119,8 +119,8 @@ const breadcrumbSchema = {
   "@context": "https://schema.org",
   "@type": "BreadcrumbList",
   itemListElement: [
-    { "@type": "ListItem", position: 1, name: "Kontax", item: "https://kontax.app" },
-    { "@type": "ListItem", position: 2, name: "Help", item: "https://kontax.app/help" },
+    { "@type": "ListItem", position: 1, name: "Kontax", item: "https://getkontax.com" },
+    { "@type": "ListItem", position: 2, name: "Help", item: "https://getkontax.com/help" },
   ],
 };
 ```
@@ -133,4 +133,4 @@ const breadcrumbSchema = {
 - The `/pricing` and `/help` pages include `BreadcrumbList` JSON-LD.
 - Google's Rich Results Test validates all schemas without errors.
 - The `JsonLd` component does not XSS — data is never derived from user input.
-- Structured data uses absolute URLs throughout (`https://kontax.app/...`).
+- Structured data uses absolute URLs throughout (`https://getkontax.com/...`).

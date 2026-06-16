@@ -37,7 +37,7 @@ Add to `.env.example`:
 ```
 GOOGLE_CLIENT_ID=
 GOOGLE_CLIENT_SECRET=
-GOOGLE_REDIRECT_URI=https://app.kontax.app/api/sync/google/callback
+GOOGLE_REDIRECT_URI=https://app.getkontax.com/api/sync/google/callback
 ```
 
 ### OAuth flow

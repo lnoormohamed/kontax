@@ -36,7 +36,7 @@ Add to `.env.example`:
 MICROSOFT_CLIENT_ID=
 MICROSOFT_CLIENT_SECRET=
 MICROSOFT_TENANT_ID=common
-MICROSOFT_REDIRECT_URI=https://app.kontax.app/api/sync/microsoft/callback
+MICROSOFT_REDIRECT_URI=https://app.getkontax.com/api/sync/microsoft/callback
 ```
 
 `MICROSOFT_TENANT_ID=common` allows personal Microsoft accounts (Outlook.com) and work accounts (Microsoft 365). Use `organizations` to restrict to work accounts only.

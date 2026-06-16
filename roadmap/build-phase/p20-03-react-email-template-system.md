@@ -94,7 +94,7 @@ export function EmailLayout({ preview, children }: EmailLayoutProps) {
           {/* Footer */}
           <Section style={footerStyle}>
             <Text style={footerTextStyle}>
-              Kontax · You're receiving this because you have an account at kontax.app
+              Kontax · You're receiving this because you have an account at getkontax.com
             </Text>
             <Text style={footerTextStyle}>
               <a href="{{{unsubscribeUrl}}}" style={footerLinkStyle}>

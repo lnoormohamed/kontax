@@ -112,7 +112,7 @@ function buildVCardFromPublicCard(card: PublicCardData): string {
     lines.push(`URL:${w.value}`);
   });
 
-  lines.push(`URL:https://kontax.app/u/${card.username}`);
+  lines.push(`URL:https://getkontax.com/u/${card.username}`);
   lines.push("END:VCARD");
 
   return lines.join("\r\n");

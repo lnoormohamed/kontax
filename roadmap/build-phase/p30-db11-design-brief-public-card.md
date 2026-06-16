@@ -58,7 +58,7 @@ The locked design language applies: ink `#1d2823`, secondary `#5c655e`, muted `#
 │                                            │
 │  ─────────────────────────────────────     │
 │                                            │
-│  Shared via Kontax · kontax.app            │  ← footer attribution
+│  Shared via Kontax · getkontax.com            │  ← footer attribution
 └────────────────────────────────────────────┘
 ```
 
@@ -81,7 +81,7 @@ The locked design language applies: ink `#1d2823`, secondary `#5c655e`, muted `#
 - For logged-in Kontax users: same button but "Save to Kontax" label, one-tap save
 - The button is the page's primary conversion mechanism
 
-**Footer attribution:** "Shared via Kontax · [kontax.app](https://kontax.app)" — `font-size: 12px`, `color: #8b938c`, centred, `margin-top: 24px`.
+**Footer attribution:** "Shared via Kontax · [getkontax.com](https://getkontax.com)" — `font-size: 12px`, `color: #8b938c`, centred, `margin-top: 24px`.
 
 ---
 
@@ -90,7 +90,7 @@ The locked design language applies: ink `#1d2823`, secondary `#5c655e`, muted `#
 ```
 Public card
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Your public card is live at kontax.app/u/janesmith
+Your public card is live at getkontax.com/u/janesmith
 [Copy link]  [View card →]
 
 Who can see your card?
@@ -122,11 +122,11 @@ In the profile settings section, a "Public card URL" field:
 
 ```
 Public card URL
-kontax.app/u/ [janesmith              ] [Save]
+getkontax.com/u/ [janesmith              ] [Save]
                ↑ 3–30 chars, letters, numbers, hyphens
 ```
 
-- Available: green check + "kontax.app/u/janesmith is available"
+- Available: green check + "getkontax.com/u/janesmith is available"
 - Taken: red × + "This username is taken. Try janesmith2."
 - Reserved: "This username is reserved."
 - Input: real-time availability check (debounced 400ms)
@@ -169,11 +169,11 @@ Share your card
 
 ```html
 <!-- Kontax contact card -->
-<a href="https://kontax.app/u/janesmith"
+<a href="https://getkontax.com/u/janesmith"
    style="font-family: sans-serif; font-size: 13px; color: #1d2823;">
   Jane Smith · Product Manager
   <br>
-  <span style="font-size: 11px; color: #8b938c;">kontax.app/u/janesmith</span>
+  <span style="font-size: 11px; color: #8b938c;">getkontax.com/u/janesmith</span>
 </a>
 ```
 

@@ -124,7 +124,7 @@ The panel looks like a real screenshot of the Kontax contacts list — the same 
 ```
 ┌──────────────────────────────────────────────────────────┐
 │  BROWSER CHROME                                          │
-│  ● ● ●                     kontax.app  🔒               │
+│  ● ● ●                     getkontax.com  🔒               │
 ├──────────────────────────────────────────────────────────┤
 │  APP HEADER                                              │
 │  [K] Kontax          [+ Create contact]  [🔔]  [L]      │
@@ -146,7 +146,7 @@ The panel looks like a real screenshot of the Kontax contacts list — the same 
 └──────────────────────────────────────────────────────────┘
 ```
 
-- **Browser chrome bar:** `background: #e5e7e0`, height 28px. Traffic-light dots (red/amber/green, 10px each), URL bar showing `kontax.app` with padlock. Matches the browser chrome used elsewhere in the design system.
+- **Browser chrome bar:** `background: #e5e7e0`, height 28px. Traffic-light dots (red/amber/green, 10px each), URL bar showing `getkontax.com` with padlock. Matches the browser chrome used elsewhere in the design system.
 - **App content:** white background `#ffffff`, exactly matching the real app. App header: `background: #fff`, `border-bottom: 1px solid #d8ddd6`. Search bar: white, rounded, `border: 1px solid #d8ddd6`.
 - **Contact rows:** same style as the real contacts list rows. Avatar colours are computed from the name-hash tint system — use the exact values below so the preview matches the live app:
 

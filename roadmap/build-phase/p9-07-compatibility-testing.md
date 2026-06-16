@@ -32,7 +32,7 @@ Kontax already has CardDAV client sync (iCloud, Google, Nextcloud). The learning
 
 Before running any tests:
 
-1. Deploy the Kontax CardDAV server (P9-01 through P9-05) to a staging environment accessible over HTTPS at `https://staging.kontax.app`.
+1. Deploy the Kontax CardDAV server (P9-01 through P9-05) to a staging environment accessible over HTTPS at `https://staging.getkontax.com`.
 2. Create at least two test user accounts with known credentials.
 3. For each test user, create an app password with a descriptive label ("iOS test", "macOS test", "DAVx5 test").
 4. Seed each test account with a known set of contacts (at minimum: 5 contacts with varied field richness — see seed set definition below).
@@ -66,7 +66,7 @@ Define a standard seed set of contacts that all clients must sync correctly. Thi
 
 Steps:
 1. On iPhone: Settings > Contacts > Accounts > Add Account > Other > Add CardDAV Account
-2. Enter: Server `https://staging.kontax.app/dav/`, Username `{testEmail}`, Password `{appPassword}`, Description "Kontax"
+2. Enter: Server `https://staging.getkontax.com/dav/`, Username `{testEmail}`, Password `{appPassword}`, Description "Kontax"
 3. Tap Next
 
 Expected:
@@ -204,7 +204,7 @@ Expected:
 Steps:
 1. System Settings > Internet Accounts > Add Account > Add a CardDAV account
 2. Choose "Advanced" account type
-3. Enter: Username `{testEmail}`, Password `{appPassword}`, Server Address `https://staging.kontax.app/dav/`
+3. Enter: Username `{testEmail}`, Password `{appPassword}`, Server Address `https://staging.getkontax.com/dav/`
 4. Click Sign In
 
 Expected:
@@ -260,7 +260,7 @@ Expected:
 
 Steps:
 1. Open DAVx⁵ > + > Login with URL and user name
-2. Base URL: `https://staging.kontax.app/dav/`
+2. Base URL: `https://staging.getkontax.com/dav/`
 3. Username: `{testEmail}`, Password: `{appPassword}`
 4. Tap Login
 5. On the address books screen, enable "Kontax" (or whatever the address book display name is)
@@ -276,11 +276,11 @@ Verify all seed contacts appear in the Android Contacts app (may require opening
 
 **Test C-03: Auto-Discovery**
 
-DAVx⁵ supports auto-discovery: if the user enters just `https://staging.kontax.app` as the base URL, DAVx⁵ will follow the `/.well-known/carddav` redirect automatically.
+DAVx⁵ supports auto-discovery: if the user enters just `https://staging.getkontax.com` as the base URL, DAVx⁵ will follow the `/.well-known/carddav` redirect automatically.
 
 Steps:
 1. Create a second DAVx⁵ account
-2. Enter base URL `https://staging.kontax.app` (without `/dav/`)
+2. Enter base URL `https://staging.getkontax.com` (without `/dav/`)
 3. Complete setup
 
 Expected:

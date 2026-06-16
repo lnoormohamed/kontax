@@ -46,7 +46,7 @@ function buildVCard(card: PublicCardData): string {
   card.emails.forEach((e) => lines.push(`EMAIL;TYPE=HOME:${e}`));
   card.phones.forEach((p) => lines.push(`TEL;TYPE=CELL:${p}`));
   card.websites.forEach((w) => lines.push(`URL:${w}`));
-  lines.push(`URL:https://kontax.app/u/${card.username}`);
+  lines.push(`URL:https://getkontax.com/u/${card.username}`);
   lines.push("END:VCARD");
 
   return lines.join("\r\n");

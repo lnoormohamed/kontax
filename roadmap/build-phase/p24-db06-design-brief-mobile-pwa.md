@@ -169,7 +169,7 @@ Compact fixed header (appears on scroll):
 │                                              │
 │  [App icon 64px]                             │
 │  Kontax                                      │
-│  kontax.app                                  │
+│  getkontax.com                                  │
 │                                              │
 │  Access your contacts instantly, even        │
 │  without an internet connection.             │

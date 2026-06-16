@@ -104,7 +104,7 @@ function ChangeUrlModal({
             <WarnIcon />
             <p className="text-[12.5px] leading-[1.55] text-amber-800">
               Links and QR codes pointing to{" "}
-              <b className="font-semibold">kontax.app/u/{from}</b> will break immediately — there&apos;s no redirect. Your old handle is held for 30 days before anyone else can claim it.
+              <b className="font-semibold">getkontax.com/u/{from}</b> will break immediately — there&apos;s no redirect. Your old handle is held for 30 days before anyone else can claim it.
             </p>
           </div>
         </div>
@@ -212,7 +212,7 @@ export function UsernameSection({ initialUsername }: { initialUsername: string |
             style={{ minWidth: 240 }}
           >
             <span className="select-none whitespace-nowrap pl-3.5 pr-1 text-[13.5px] text-[#8b938c]">
-              kontax.app/u/
+              getkontax.com/u/
             </span>
             <input
               className="min-w-0 flex-1 border-none bg-transparent py-0 pr-3 text-[14px] font-semibold text-[#1d2823] outline-none"
@@ -258,12 +258,12 @@ export function UsernameSection({ initialUsername }: { initialUsername: string |
               rel="noreferrer"
               className="text-[13px] font-medium text-[#4158f4] hover:underline"
             >
-              kontax.app/u/{savedUsername} ↗
+              getkontax.com/u/{savedUsername} ↗
             </a>
           )}
           {status === "available" && (
             <span className="flex items-center gap-1.5 text-[13px] text-[#1c6b48]">
-              <CheckIcon />kontax.app/u/{value} is available
+              <CheckIcon />getkontax.com/u/{value} is available
             </span>
           )}
           {status === "taken" && (
@@ -288,7 +288,7 @@ export function UsernameSection({ initialUsername }: { initialUsername: string |
           )}
           {justSaved && (
             <span className="flex items-center gap-1.5 text-[13px] font-semibold text-[#17352e]">
-              <CheckIcon />Saved — your card is live at kontax.app/u/{savedUsername}
+              <CheckIcon />Saved — your card is live at getkontax.com/u/{savedUsername}
             </span>
           )}
         </div>

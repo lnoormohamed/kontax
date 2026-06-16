@@ -72,7 +72,7 @@ On mobile: TOC collapses to a "Jump to section" dropdown at the top of the conte
 The Kontax API allows you to read and write your contacts programmatically.
 All requests require a valid API token created in your account settings.
 
-Base URL: https://kontax.app/api/v1
+Base URL: https://getkontax.com/api/v1
 ```
 
 **Authentication:**
@@ -116,7 +116,7 @@ List your contacts. Returns up to 100 contacts per page.
 
 ```bash
 curl -H "Authorization: Bearer ktx_live_..." \
-  "https://kontax.app/api/v1/contacts?q=acme&limit=10"
+  "https://getkontax.com/api/v1/contacts?q=acme&limit=10"
 ```
 
 ### Example response

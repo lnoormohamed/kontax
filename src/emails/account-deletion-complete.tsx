@@ -41,8 +41,8 @@ export default function AccountDeletionComplete({
       <EmailText>
         If you didn&rsquo;t request this deletion or believe this is an error, please
         contact Kontax support immediately at{" "}
-        <Link href="mailto:support@kontax.app" style={{ color: tokens.blue }}>
-          support@kontax.app
+        <Link href="mailto:support@getkontax.com" style={{ color: tokens.blue }}>
+          support@getkontax.com
         </Link>
         .
       </EmailText>

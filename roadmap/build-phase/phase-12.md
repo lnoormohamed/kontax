@@ -76,7 +76,7 @@ Let users share individual contacts with people inside and outside of Kontax, in
   - Verified end-to-end against the DB (vCard generates `BEGIN…END:VCARD`).
 - Implementation Notes:
   - Add a "Share" action to the contact detail page. First option is "Copy share link."
-  - On action: create a `ContactShare` record with `shareType: VCARD_LINK`, generate a secure random token, and return the share URL: `https://kontax.app/share/{token}`.
+  - On action: create a `ContactShare` record with `shareType: VCARD_LINK`, generate a secure random token, and return the share URL: `https://getkontax.com/share/{token}`.
   - The `/share/{token}` route is public (no auth required). It resolves the token, checks the share is `ACTIVE` and not expired, increments `downloadCount`, generates a vCard using the existing `contactsToVCard` function, and responds with `Content-Type: text/vcard; Content-Disposition: attachment; filename="{contactFullName}.vcf"`.
   - Free plan: link expires after 7 days. Pro and above: no expiry by default. User can set a custom expiry or leave open.
   - Revoke: the contact detail "Share" section lists active links with a revoke button. Revoked links return HTTP 410 Gone.

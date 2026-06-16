@@ -66,5 +66,5 @@ ShareInvite.PreviewProps = {
   company: "Northwind Studio",
   shareType: "Live · syncs both ways",
   live: true,
-  actionUrl: "https://kontax.app/shares",
+  actionUrl: "https://getkontax.com/shares",
 } satisfies ShareInviteProps;

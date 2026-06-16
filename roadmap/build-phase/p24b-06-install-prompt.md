@@ -19,7 +19,7 @@ the install nudge.
 ## Design / Implementation Spec
 
 Per spec §D5. Bottom sheet: drag handle, centered "Add Kontax to your Home Screen", 64px green app tile
-+ "Kontax / kontax.app", one-line value prop.
++ "Kontax / getkontax.com", one-line value prop.
 - **iOS:** two numbered steps — (1) Tap the Share icon, (2) "Add to Home Screen" — + "Got it".
 - **Android:** capture `beforeinstallprompt`; show "Install" (blue) + "Not now".
 Trigger: not already installed (`display-mode: standalone` false), not previously dismissed (persist a

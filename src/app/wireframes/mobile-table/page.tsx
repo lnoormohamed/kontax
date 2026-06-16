@@ -23,9 +23,9 @@ const MEMBER_COLS = [
 ];
 
 const MEMBERS = [
-  { name: "Jordan Reeve", email: "jordan@kontax.app", role: "Owner" },
-  { name: "Grace Liu", email: "grace@kontax.app", role: "Admin" },
-  { name: "Sam Okafor", email: "sam@kontax.app", role: "Member" },
+  { name: "Jordan Reeve", email: "jordan@getkontax.com", role: "Owner" },
+  { name: "Grace Liu", email: "grace@getkontax.com", role: "Admin" },
+  { name: "Sam Okafor", email: "sam@getkontax.com", role: "Member" },
 ];
 
 function Label({ children }: { children: React.ReactNode }) {

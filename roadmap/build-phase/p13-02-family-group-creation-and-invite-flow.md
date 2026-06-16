@@ -155,8 +155,8 @@ Do not store the token in the database. The GroupMemberId in the payload is the 
 1. Look up whether a Kontax user with this email already exists: `prisma.user.findUnique({ where: { email } })`
 2. Create GroupMember: `{ groupId, userId: existingUser?.id ?? null, role: 'MEMBER', inviteStatus: 'PENDING', canEdit: true, invitedAt: now(), invitedByUserId: requestingUserId, inviteEmail: email }`
 3. Generate invite token (48hr expiry)
-4. Build accept URL: `https://app.kontax.app/invite/accept?token={token}`
-5. Build decline URL: `https://app.kontax.app/invite/decline?token={token}`
+4. Build accept URL: `https://app.getkontax.com/invite/accept?token={token}`
+5. Build decline URL: `https://app.getkontax.com/invite/decline?token={token}`
 6. Send invite email (see email content spec below)
 
 **Email content:**

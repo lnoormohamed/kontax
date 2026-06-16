@@ -261,7 +261,7 @@ export const HELP_FAQ: HelpFaqSection[] = [
     items: [
       {
         q: "How do I claim a username?",
-        a: "Go to Settings → Profile → Public card. Pick a username between 3 and 30 characters — letters, numbers, hyphens, and underscores. Once claimed, your card is available at kontax.app/@username.",
+        a: "Go to Settings → Profile → Public card. Pick a username between 3 and 30 characters — letters, numbers, hyphens, and underscores. Once claimed, your card is available at getkontax.com/@username.",
       },
       {
         q: "What shows on my public card?",
@@ -273,7 +273,7 @@ export const HELP_FAQ: HelpFaqSection[] = [
       },
       {
         q: "Where do I find my QR code?",
-        a: "Open your public card (click your avatar menu and choose View my card, or visit kontax.app/@username). Click the QR code button in the card actions. You can download it as a PNG to put on a business card, email signature, or printed material.",
+        a: "Open your public card (click your avatar menu and choose View my card, or visit getkontax.com/@username). Click the QR code button in the card actions. You can download it as a PNG to put on a business card, email signature, or printed material.",
       },
       {
         q: "Can I see how many people have viewed my card?",
@@ -397,7 +397,7 @@ export const HELP_FAQ: HelpFaqSection[] = [
       },
       {
         q: "How do I request erasure under GDPR?",
-        a: "Deleting your account (Settings → Account → Delete account) triggers the full erasure workflow. The 30-day grace period starts immediately. If you need written confirmation of compliance, contact us at privacy@kontax.app and we will provide a deletion certificate once the process completes.",
+        a: "Deleting your account (Settings → Account → Delete account) triggers the full erasure workflow. The 30-day grace period starts immediately. If you need written confirmation of compliance, contact us at privacy@getkontax.com and we will provide a deletion certificate once the process completes.",
       },
     ],
   },

@@ -46,9 +46,9 @@ Display the following read-only information at the top of the section:
 
 **Server URL:**
 ```
-https://kontax.app/dav/
+https://getkontax.com/dav/
 ```
-(Or `https://dav.kontax.app/` if the subdomain topology is chosen in P9-01.)
+(Or `https://dav.getkontax.com/` if the subdomain topology is chosen in P9-01.)
 
 This is the URL the user enters into their device's "Server" field during CardDAV account setup.
 
@@ -254,7 +254,7 @@ Do not persist the plaintext token in any browser storage. The token exists in c
 - **Mobile usability of connection guide:** The step-by-step guide references Settings menus that may look slightly different across iOS versions. Screenshots would help but are expensive to maintain. For v1, text-only steps with clear menu path notation (using `>` separator) are acceptable.
 - **Deep link from guide to app password creation:** Consider whether the connection guide step for "Password: your app password" should have a "Create one now" link that jumps to the creation form within the same page. This reduces friction for users who open the guide tab before creating a password.
 - **Token clipboard persistence:** After the user copies the token, it lives in the clipboard indefinitely (until overwritten). There is no way to programmatically clear the clipboard in a cross-browser-compatible way. This is acceptable — document it in the security review.
-- **DAVx⁵ auto-discovery:** DAVx⁵ supports auto-discovery via `/.well-known/carddav`. The Android guide can mention that users who type just the domain (`kontax.app`) may have auto-discovery work automatically, reducing the number of fields they need to enter. Verify this in P9-07 before adding it to the guide.
+- **DAVx⁵ auto-discovery:** DAVx⁵ supports auto-discovery via `/.well-known/carddav`. The Android guide can mention that users who type just the domain (`getkontax.com`) may have auto-discovery work automatically, reducing the number of fields they need to enter. Verify this in P9-07 before adding it to the guide.
 - **Upgrade prompt UX:** The upgrade prompt when the plan limit is reached should be unobtrusive but visible. It must not block the user from seeing their existing app passwords or the connection guide. An inline callout (not a modal) is the right pattern.
 
 ---

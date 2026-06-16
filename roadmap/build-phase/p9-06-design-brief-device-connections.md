@@ -55,7 +55,7 @@ This order follows the user's mental model: "Where do I connect? → What creden
 **Contents:**
 - Heading: "Your connection details"
 - Two rows:
-  - Row 1: Label "Server" / Value `https://kontax.app/dav/` / Copy icon button
+  - Row 1: Label "Server" / Value `https://getkontax.com/dav/` / Copy icon button
   - Row 2: Label "Username" / Value (user's email address, e.g. `alice@example.com`) / Copy icon button
 
 **Visual style:** A lightly bordered card or a grey background block. Values should be in monospace or a slightly distinct typeface (not necessarily full code font, but visually distinct from prose). The copy icon should be a standard clipboard icon; after clicking, the icon briefly changes to a checkmark with the label "Copied" for 2 seconds.

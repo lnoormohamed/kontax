@@ -162,7 +162,7 @@ function UsernameClaimInput() {
   }, [value]);
 
   const statusMessages = {
-    available: { icon: "✓", color: "#2f8f63", text: `kontax.app/u/${value} is available` },
+    available: { icon: "✓", color: "#2f8f63", text: `getkontax.com/u/${value} is available` },
     taken:     { icon: "✗", color: "#b5472f", text: `${value} is already taken. Try ${value}2.` },
     reserved:  { icon: "✗", color: "#b5472f", text: "This username is reserved." },
     invalid:   { icon: "✗", color: "#b5472f", text: "3–30 characters, letters, numbers, hyphens, underscores only." },
@@ -172,7 +172,7 @@ function UsernameClaimInput() {
   return (
     <SettingsRow label="Public card URL">
       <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-        <span style={{ fontSize: 14, color: "#8b938c" }}>kontax.app/u/</span>
+        <span style={{ fontSize: 14, color: "#8b938c" }}>getkontax.com/u/</span>
         <input
           value={value}
           onChange={(e) => setValue(e.target.value.toLowerCase())}
