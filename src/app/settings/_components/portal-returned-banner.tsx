@@ -24,7 +24,7 @@ export function PortalReturnedBanner() {
         <path d="M12 11v5M12 8h.01" />
       </svg>
       <p className="flex-1 text-[13px] text-[#1d2823]">
-        Billing updated. Any plan changes will be reflected here shortly.
+        Billing updated. Your latest Stripe subscription status has been refreshed.
       </p>
       <button
         aria-label="Dismiss"

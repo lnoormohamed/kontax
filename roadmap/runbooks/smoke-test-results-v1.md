@@ -422,6 +422,19 @@ Tester: Codex (live sandbox smoke test)  Date: 2026-06-16
 - Checkout, paid-state reflection, billing portal, downgrade, and failed-payment messaging all worked against the deployed app.
 - Admin verification is pending explicit approval for live test-user admin elevation.
 
+### Rerun addendum — 16 June 2026 (fresh-account live sandbox pass)
+
+- Created three fresh live sandbox users: `p34d05-pro-1781605733405@example.com`, `p34d05-family-1781605733405@example.com`, and `p34d05-teams-1781605733405@example.com`.
+- Stripe sandbox Checkout succeeded for all three using the official test card `4242 4242 4242 4242` with a future expiry and any CVC. Source: [Stripe Testing](https://docs.stripe.com/testing).
+- `Free -> Family` and `Free -> Teams` completed successfully end to end. Family landed on `/welcome/family`, Teams landed on `/welcome/teams`, and both plans rendered the correct USD pricing in Settings afterward.
+- `Manage billing` for the fresh Family account opened the Stripe-hosted Billing Portal after password confirmation and showed the correct subscription, amount (`US$3.99 per month`), and saved test card (`Visa •••• 4242`).
+- Two regressions were found on this rerun before the follow-up fix:
+  - Pro trial accounts returned from Checkout showing `Pro · Trial` with an `Add payment method` CTA even though Checkout had already collected card details.
+  - Family cancellation inside Stripe Billing Portal returned to Kontax with the generic `Billing updated...reflected shortly` banner, but the Settings card did not immediately switch into the local cancelling state.
+- Local follow-up fix prepared after the rerun:
+  - Settings now performs a best-effort Stripe state refresh on `billing=success` and `portal=returned` before rendering the billing card, so portal cancellations and immediate post-checkout changes show up without waiting for webhook timing.
+  - Trial cards now keep the live Stripe price visible and route to `Manage billing`, which is correct whether the user already has a saved payment method or still needs to add one.
+
 ---
 
 ## Mobile (P34D-06)

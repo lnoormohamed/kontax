@@ -16,6 +16,7 @@ import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
 import { getBillingSurface } from "~/server/billing-surface";
 import { getUserFamilyMembership } from "~/server/family-access";
+import { syncStripeBillingState } from "~/server/stripe-handlers";
 import { getUserTeamMembership } from "~/server/team-access";
 import { db } from "~/server/db";
 
@@ -38,6 +39,15 @@ export default async function SettingsPlanPage({
   const sp = searchParams ? await searchParams : undefined;
   const showBillingSuccess = sp?.billing === "success";
   const showPortalReturned = sp?.portal === "returned";
+
+  if (showBillingSuccess || showPortalReturned) {
+    try {
+      await syncStripeBillingState(userId);
+    } catch {
+      // Best-effort refresh only. The page still renders from local state if
+      // Stripe is temporarily unavailable.
+    }
+  }
 
   const planSummary = await getUserPlanSummary(userId);
   const [billingSurface, syncConnections, liveContacts, groupMembership, overrideInfo, familyMembership, teamMembership] = await Promise.all([

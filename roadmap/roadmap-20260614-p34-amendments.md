@@ -318,3 +318,71 @@ curl -I -X OPTIONS \
 | P34D-11 through P34D-17 | 34D | Env vars, OAuth URIs, Stripe webhook, domain, TLS, security headers |
 | P34E-01/02 | 34E | DNS + Coolify domain config |
 | P34E-03 through P34E-06 | 34E | Middleware, CORS, rate limit verify |
+
+---
+
+## Phase 34F — Shared-Book Ownership Semantics (Family vs. Teams)
+
+New phase. Makes the **Family-vs-Teams ownership distinction explicit and complete** in
+both behaviour and UI. The two models intentionally diverge on what happens when a
+member leaves or a plan ends:
+
+- **Family books fan out into personal copies.** A family book is jointly held; when
+  the group dissolves *or* a single member leaves, that member keeps a private
+  `AddressBook` copy. Plumbing already exists: `GroupAddressBook.dissolvedToBookId`,
+  `AddressBook.sourceGroupBookId` (see `roadmap/build-phase/p18-11-personal-address-books.md`).
+- **Team books belong to the team/org.** A team contact is owned (nominally) by the
+  team owner. When a member leaves or the owner downgrades, the member loses access
+  and **no copy is made** — the book stays with the team
+  (see `roadmap/design-briefs/14-teams-plan-surfaces.md`).
+
+### Decisions (2026-06-16)
+
+- **Org-anchored Teams billing (full re-anchor).** Today billing is hard-anchored to
+  a single human: `SubscriptionCustomer.userId @unique` and `Subscription.userId`
+  (`prisma/schema.prisma`). For a Teams plan the Stripe **customer is the Group/org**,
+  not a person, so billing survives members joining and leaving. Personal plans
+  (FREE/PRO/FAMILY) stay user-anchored — only Teams moves to the org. The seam
+  already exists: `Group.subscriptionId` links the team to its subscription.
+- **Billing access is permission-gated, not owner-only.** Add a per-member
+  `canManageBilling` flag on `GroupMember` (independent of the Admin role) so a
+  designated finance/billing manager can open the Stripe portal, change plan/seats,
+  and update the payment method without full admin powers. All members can *view*
+  plan + renewal read-only.
+- **Owner transfer becomes a role change — NOT a Stripe operation.** This SUPERSEDES
+  the earlier "re-assign the Stripe customer" decision. Because the customer is the
+  org, transferring the human "owner" is just `Group.ownerId` + role updates; no
+  Stripe customer/subscription surgery, no billing gap.
+- **Family copy-on-leave = yes.** A member who *leaves* a family group (not just on
+  full dissolution) keeps a personal snapshot copy of the family book. This is new
+  behaviour beyond the Phase 13 dissolution spec — `leaveFamilyGroup`
+  (`src/app/actions/family.ts`) currently only deletes the membership row.
+
+### Tickets
+
+| Ticket | Title | Priority | Depends on |
+|---|---|---|---|
+| P34F-DB01 | **Design brief** — org-billing architecture: schema (org customer + `canManageBilling`), Stripe metadata/webhook routing by `groupId`, migration plan for existing teams | P0 | — |
+| P34F-01 | Schema — org-anchored billing: allow `SubscriptionCustomer`/`Subscription` to belong to a Group (not just a user); add `GroupMember.canManageBilling` | P1 | P34F-DB01 |
+| P34F-02 | Stripe re-route — set customer metadata to `groupId`, route webhooks by group, attribute seat quantity to the org subscription | P1 | P34F-01 |
+| P34F-03 | Migration — backfill existing Teams: move owner's Stripe customer/subscription onto the Group; idempotent, dry-run first | P1 | P34F-01/02 |
+| P34F-04 | Billing access UI — gate the Stripe portal + plan/seat/payment controls on `canManageBilling`; admin matrix gets a "Billing manager" toggle | P1 | P34F-01 |
+| P34F-05 | Owner transfer — "Make owner" on admin rows = `Group.ownerId` + role change only (no Stripe writes) | P1 | P34F-01 |
+| P34F-06 | Member billing visibility — all members see "Run by {owner} · Teams · {n}/25 seats · renews {date}" read-only | P2 | P34F-01 |
+| P34F-07 | Family copy-on-leave — `leaveFamilyGroup` snapshots the family book into a personal `AddressBook` (set `sourceGroupBookId`; slug-collision suffix) before removing membership | P1 | — |
+| P34F-08 | Settings copy — make ownership semantics explicit: Family books "stay with you as a copy", Team books "belong to the team and are removed when you leave" | P2 | — |
+| P34F-09 | Smoke test — transfer ownership + change billing as a non-owner billing manager on staging; verify webhooks, seats, member access | P1 | P34F-01..05 |
+
+### Notes
+
+- **P34F-DB01 lands first.** The re-anchor touches money and webhooks — design the
+  schema, Stripe metadata, and migration before writing code. Coordinate with the
+  deferred Stripe smoke test (`project_stripe-smoke-test-deferred`).
+- **Migration risk (P34F-03):** existing teams have their customer on the owner's
+  user. The backfill must be idempotent and dry-runnable; a half-migrated team
+  must not double-bill or lose webhook routing. Keep the old `userId` link readable
+  during transition rather than dropping it immediately.
+- **P34F-07/08 are independent** of the billing re-anchor and can ship in parallel.
+  P34F-07 must distinguish *leave* (one member → one personal copy) from
+  *dissolution* (whole group → copy for every member, Phase 13); reuse one snapshot
+  helper for both paths.

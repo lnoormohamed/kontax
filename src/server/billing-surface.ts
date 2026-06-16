@@ -179,8 +179,8 @@ export const getBillingSurface = async (userId: string): Promise<BillingSurface>
       planLabel,
       status,
       intervalLabel: "Trial",
-      price: null,
-      per: null,
+      price,
+      per,
       renewalDate: null,
       trial: {
         endsOn: formatDate(subscription.trialEndsAt),

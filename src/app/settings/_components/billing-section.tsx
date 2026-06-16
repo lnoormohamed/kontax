@@ -214,8 +214,8 @@ export function BillingSection({
       ) : null}
       {state === "trial" ? (
         <p className="m-0 text-[14.5px] leading-[1.55] text-[#5c655e]">
-          You&rsquo;re enjoying all {surface.planLabel} features free during your trial. Add a payment
-          method before your trial ends to continue.
+          You&rsquo;re enjoying all {surface.planLabel} features free during your trial. Manage billing
+          before your trial ends if you want to update payment details, switch plans, or cancel.
         </p>
       ) : null}
 
@@ -265,7 +265,7 @@ export function BillingSection({
             </svg>
           </Link>
         ) : state === "trial" ? (
-          <BillingPortalButton hasPassword={hasPassword} icon="card" label="Add payment method" variant="blue" />
+          <BillingPortalButton hasPassword={hasPassword} icon="card" label="Manage billing" variant="blue" />
         ) : state === "grace" ? (
           <BillingPortalButton hasPassword={hasPassword} icon="card" label="Update payment method" variant="red" />
         ) : state === "cancel" ? (
@@ -279,7 +279,7 @@ export function BillingSection({
       </div>
 
       {/* portal note (active / family) */}
-      {state === "active" || state === "familyOwner" ? (
+      {state === "active" || state === "familyOwner" || state === "trial" ? (
         <p className="mt-4 flex items-center gap-[7px] text-[12.5px] leading-[1.4] text-[#8b938c]">
           <svg className="h-[13px] w-[13px] shrink-0" fill="none" stroke="#8b938c" strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.7" viewBox="0 0 24 24">
             <rect height="13" rx="2" width="19.5" x="2.25" y="5.5" />

@@ -11,6 +11,7 @@ import {
   sendPlanChangedEmail,
   sendTrialEndingEmail,
 } from "~/server/billing-emails";
+import { db } from "~/server/db";
 import { createNotification } from "~/server/notifications";
 import { getStripeClient } from "~/server/stripe";
 import { getPlanFromPriceIdAsync } from "~/server/stripe-prices";
@@ -419,4 +420,67 @@ export async function handleTrialWillEnd(
     daysLeft,
     trialEndsAt,
   });
+}
+
+/**
+ * Pull the latest Stripe subscription state for a user into Kontax outside the
+ * webhook path. This is used sparingly on high-signal return points like
+ * Checkout success and Billing Portal return so Settings reflects plan changes
+ * immediately even if the webhook arrives a moment later.
+ */
+export async function syncStripeBillingState(userId: string): Promise<boolean> {
+  const customer = await db.subscriptionCustomer.findUnique({
+    where: { userId },
+    select: { provider: true, providerCustomerId: true },
+  });
+  if (!customer || customer.provider !== "STRIPE") return false;
+  if (isLegacyManualSubscription(customer.providerCustomerId)) return false;
+
+  const stripe = getStripeClient();
+
+  const localSubscription = await db.subscription.findFirst({
+    where: {
+      userId,
+      provider: "STRIPE",
+      providerSubscriptionId: { not: "" },
+    },
+    orderBy: [{ currentPeriodEnd: "desc" }, { createdAt: "desc" }],
+    select: { providerSubscriptionId: true },
+  });
+
+  let stripeSubscription: Stripe.Subscription | null = null;
+
+  if (localSubscription?.providerSubscriptionId) {
+    try {
+      stripeSubscription = await stripe.subscriptions.retrieve(localSubscription.providerSubscriptionId);
+    } catch {
+      stripeSubscription = null;
+    }
+  }
+
+  if (!stripeSubscription) {
+    const subscriptions = await stripe.subscriptions.list({
+      customer: customer.providerCustomerId,
+      status: "all",
+      limit: 10,
+    });
+
+    stripeSubscription =
+      subscriptions.data.find((subscription) => subscription.status !== "incomplete_expired")
+      ?? subscriptions.data[0]
+      ?? null;
+  }
+
+  if (!stripeSubscription) return false;
+
+  await db.$transaction(async (tx) => {
+    if (stripeSubscription!.status === "canceled") {
+      await handleSubscriptionDeleted(stripeSubscription!, tx);
+      return;
+    }
+
+    await handleSubscriptionUpserted(stripeSubscription!, tx);
+  });
+
+  return true;
 }
