@@ -10,7 +10,7 @@ import { getUserBillingContext } from "~/server/billing";
 import { db } from "~/server/db";
 import { appUrl, sendEmail } from "~/server/email";
 import { getStripeClient } from "~/server/stripe";
-import { canEditTeamBook } from "~/server/team-access";
+import { canEditTeamBook, getTeamGraceState } from "~/server/team-access";
 
 const INVITE_TTL_MS = 48 * 60 * 60 * 1000;
 
@@ -52,6 +52,21 @@ const getManageableTeam = async (userId: string) => {
     include: { group: true },
   });
   return member ? { team: member.group, role: member.role } : null;
+};
+
+// Throws if the user's team is locked (grace period expired, plan downgraded).
+const requireTeamNotLocked = async (userId: string) => {
+  const billing = await getUserBillingContext(userId);
+  if (billing.entitlements.teamsEnabled) return; // active Teams plan — nothing to check
+  const team = await db.group.findFirst({
+    where: { ownerId: userId, type: "TEAM" },
+    select: { teamsGraceEndsAt: true },
+  });
+  if (!team) return;
+  const state = getTeamGraceState(team.teamsGraceEndsAt, false);
+  if (state === "locked") {
+    throw new Error("This team is read-only. Upgrade to the Teams plan to make changes.");
+  }
 };
 
 // --- Create -----------------------------------------------------------------
@@ -121,6 +136,7 @@ const sendInviteEmail = async (opts: {
 
 export const inviteTeamMember = async (formData: FormData) => {
   const userId = await requireUserId();
+  await requireTeamNotLocked(userId);
   const email = str(formData, "email").toLowerCase();
   if (!emailPattern.test(email)) {
     throw new Error("Enter a valid email address.");
@@ -235,6 +251,7 @@ const requireManagedMember = async (userId: string, memberId: string) => {
 
 export const setTeamMemberRole = async (formData: FormData) => {
   const userId = await requireUserId();
+  await requireTeamNotLocked(userId);
   const memberId = str(formData, "memberId");
   const role = str(formData, "role"); // "ADMIN" | "MEMBER"
   const { member, actorRole } = await requireManagedMember(userId, memberId);
@@ -253,6 +270,7 @@ export const setTeamMemberRole = async (formData: FormData) => {
 
 export const removeTeamMember = async (formData: FormData) => {
   const userId = await requireUserId();
+  await requireTeamNotLocked(userId);
   const memberId = str(formData, "memberId");
   const { member } = await requireManagedMember(userId, memberId);
   if (member.role === "OWNER") {
@@ -264,6 +282,7 @@ export const removeTeamMember = async (formData: FormData) => {
 
 export const resendTeamInvite = async (formData: FormData) => {
   const userId = await requireUserId();
+  await requireTeamNotLocked(userId);
   const memberId = str(formData, "memberId");
   const { member, team } = await requireManagedMember(userId, memberId);
   if (member.inviteStatus !== "PENDING" || !member.invitedEmail) {
@@ -309,6 +328,7 @@ const requireManagedBook = async (userId: string, bookId: string) => {
 
 export const createTeamBook = async (formData: FormData) => {
   const userId = await requireUserId();
+  await requireTeamNotLocked(userId);
   const name = str(formData, "name");
   const description = str(formData, "description") || null;
   if (!name) {
@@ -326,6 +346,7 @@ export const createTeamBook = async (formData: FormData) => {
 
 export const renameTeamBook = async (formData: FormData) => {
   const userId = await requireUserId();
+  await requireTeamNotLocked(userId);
   const bookId = str(formData, "bookId");
   const name = str(formData, "name");
   const description = str(formData, "description") || null;
@@ -339,6 +360,7 @@ export const renameTeamBook = async (formData: FormData) => {
 
 export const archiveTeamBook = async (formData: FormData) => {
   const userId = await requireUserId();
+  await requireTeamNotLocked(userId);
   const bookId = str(formData, "bookId");
   const { book } = await requireManagedBook(userId, bookId);
   await db.groupAddressBook.update({
@@ -351,6 +373,7 @@ export const archiveTeamBook = async (formData: FormData) => {
 // Delete a book: soft-archive its contacts (audit trail) then drop the book.
 export const deleteTeamBook = async (formData: FormData) => {
   const userId = await requireUserId();
+  await requireTeamNotLocked(userId);
   const bookId = str(formData, "bookId");
   await requireManagedBook(userId, bookId);
   const links = await db.groupContact.findMany({
@@ -373,6 +396,7 @@ export const deleteTeamBook = async (formData: FormData) => {
 // Set a member's permission (EDIT | VIEW | NONE) for one book.
 export const setMemberBookPermission = async (formData: FormData) => {
   const userId = await requireUserId();
+  await requireTeamNotLocked(userId);
   const memberId = str(formData, "memberId");
   const bookId = str(formData, "bookId");
   const permission = str(formData, "permission");
@@ -507,6 +531,7 @@ export const addContactToTeamBook = async (formData: FormData) => {
 // operates on that book's contacts (handled in the sync runner).
 export const linkTeamSyncAccount = async (formData: FormData) => {
   const userId = await requireUserId();
+  await requireTeamNotLocked(userId);
   const syncAccountId = str(formData, "syncAccountId");
   const bookId = str(formData, "bookId");
   const manageable = await getManageableTeam(userId);
@@ -552,6 +577,7 @@ export const linkTeamSyncAccount = async (formData: FormData) => {
 
 export const unlinkTeamSyncAccount = async (formData: FormData) => {
   const userId = await requireUserId();
+  await requireTeamNotLocked(userId);
   const teamSyncAccountId = str(formData, "teamSyncAccountId");
   const manageable = await getManageableTeam(userId);
   if (!manageable) {
@@ -616,6 +642,7 @@ export const deleteTeam = async (formData: FormData) => {
 // change before the webhook arrives.
 export const updateTeamSeats = async (formData: FormData) => {
   const userId = await requireUserId();
+  await requireTeamNotLocked(userId);
   const seats = parseInt(str(formData, "seats"), 10);
   if (!Number.isInteger(seats) || seats < 3 || seats > 500) {
     throw new Error("Seat count must be between 3 and 500.");

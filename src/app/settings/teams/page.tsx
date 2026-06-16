@@ -24,6 +24,7 @@ import {
 import { auth } from "~/server/auth";
 import { getUserBillingContext } from "~/server/billing";
 import { db } from "~/server/db";
+import { getTeamGraceState } from "~/server/team-access";
 
 const fmtDate = (value: Date | null) =>
   value
@@ -188,6 +189,10 @@ export default async function TeamSettingsPage() {
   }
 
   // ── Owner/admin view ──
+  const teamState = getTeamGraceState(ownedTeam.teamsGraceEndsAt, billing.entitlements.teamsEnabled);
+  const isLocked = teamState === "locked";
+  const isGrace = teamState === "grace";
+
   const accepted = ownedTeam.members.filter((m) => m.role === "OWNER" || m.inviteStatus === "ACCEPTED");
   const pending = ownedTeam.members.filter((m) => m.role !== "OWNER" && m.inviteStatus !== "ACCEPTED");
   const activeCount = ownedTeam.members.filter((m) => m.inviteStatus !== "DECLINED").length;
@@ -228,6 +233,46 @@ export default async function TeamSettingsPage() {
       />
 
       <div className="grid gap-[18px]">
+        {/* grace / locked banner */}
+        {isLocked && (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-[#dcae9f] bg-[#fdf4f1] px-5 py-4">
+            <div>
+              <p className="text-[14px] font-semibold text-[#b5472f]">This team is read-only</p>
+              <p className="mt-0.5 text-[13px] text-[#b5472f]">
+                Your Teams plan ended and the grace period has expired. Upgrade to re-enable editing.
+              </p>
+            </div>
+            <Link
+              className="shrink-0 rounded-xl bg-[#4158f4] px-4 py-2.5 text-[13.5px] font-semibold text-white transition hover:bg-[#3248db]"
+              href="/settings/billing"
+            >
+              Upgrade to Teams
+            </Link>
+          </div>
+        )}
+        {isGrace && ownedTeam.teamsGraceEndsAt && (
+          <div className="flex flex-wrap items-center justify-between gap-3 rounded-[14px] border border-[#e6d5a0] bg-[#fffbee] px-5 py-4">
+            <div>
+              <p className="text-[14px] font-semibold text-[#7c5511]">Teams plan ended — grace period active</p>
+              <p className="mt-0.5 text-[13px] text-[#7c5511]">
+                Full access until{" "}
+                <strong>
+                  {new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(
+                    ownedTeam.teamsGraceEndsAt,
+                  )}
+                </strong>
+                . After that this team becomes read-only. Upgrade to keep editing.
+              </p>
+            </div>
+            <Link
+              className="shrink-0 rounded-xl bg-[#4158f4] px-4 py-2.5 text-[13.5px] font-semibold text-white transition hover:bg-[#3248db]"
+              href="/settings/billing"
+            >
+              Upgrade to Teams
+            </Link>
+          </div>
+        )}
+
         {/* seat meter — visible on mobile and desktop */}
         {(() => {
           const pct = Math.min(100, Math.round((activeCount / ownedTeam.maxMembers) * 100));
@@ -254,32 +299,34 @@ export default async function TeamSettingsPage() {
           );
         })()}
 
-        {/* seat management */}
-        <SettingsCard className="flex flex-wrap items-center justify-between gap-4">
-          <div className="min-w-0">
-            <div className="text-[14.5px] font-semibold text-[#1d2823]">Seats</div>
-            <p className="mt-1 max-w-[440px] text-[13.5px] text-[#5c655e]">
-              You have {billing.entitlements.memberSlotsLimit ?? ownedTeam.maxMembers} seats on your plan.
-              Changes are prorated and take effect immediately.
-            </p>
-          </div>
-          <form action={updateTeamSeats} className="flex items-center gap-2">
-            <input
-              className="w-20 rounded-xl border border-[#d8ddd6] bg-white px-3 py-2 text-center text-[14px] outline-none transition focus:border-[#4158f4] focus:shadow-[0_0_0_3px_#edf0fe]"
-              defaultValue={billing.entitlements.memberSlotsLimit ?? ownedTeam.maxMembers}
-              min={Math.max(3, activeCount)}
-              max={500}
-              name="seats"
-              type="number"
-            />
-            <button
-              className="rounded-xl border border-[#d8ddd6] bg-white px-4 py-2 text-[13.5px] font-semibold text-[#1d2823] transition hover:bg-[#f6f7f4]"
-              type="submit"
-            >
-              Update seats
-            </button>
-          </form>
-        </SettingsCard>
+        {/* seat management — hidden when locked (no active Teams plan to adjust) */}
+        {!isLocked && (
+          <SettingsCard className="flex flex-wrap items-center justify-between gap-4">
+            <div className="min-w-0">
+              <div className="text-[14.5px] font-semibold text-[#1d2823]">Seats</div>
+              <p className="mt-1 max-w-[440px] text-[13.5px] text-[#5c655e]">
+                You have {ownedTeam.maxMembers} seats on your plan.
+                Changes are prorated and take effect immediately.
+              </p>
+            </div>
+            <form action={updateTeamSeats} className="flex items-center gap-2">
+              <input
+                className="w-20 rounded-xl border border-[#d8ddd6] bg-white px-3 py-2 text-center text-[14px] outline-none transition focus:border-[#4158f4] focus:shadow-[0_0_0_3px_#edf0fe]"
+                defaultValue={ownedTeam.maxMembers}
+                min={Math.max(3, activeCount)}
+                max={500}
+                name="seats"
+                type="number"
+              />
+              <button
+                className="rounded-xl border border-[#d8ddd6] bg-white px-4 py-2 text-[13.5px] font-semibold text-[#1d2823] transition hover:bg-[#f6f7f4]"
+                type="submit"
+              >
+                Update seats
+              </button>
+            </form>
+          </SettingsCard>
+        )}
 
         {/* team identity */}
         <SettingsCard className="flex flex-wrap items-center gap-4">
@@ -338,7 +385,7 @@ export default async function TeamSettingsPage() {
                     </span>
                     <span className="flex shrink-0 items-center gap-3">
                       <Tag green={isOwner || m.role === "ADMIN"}>{isOwner ? "Owner" : m.role === "ADMIN" ? "Admin" : "Member"}</Tag>
-                      {m.role === "MEMBER" ? (
+                      {!isLocked && m.role === "MEMBER" ? (
                         <form action={setTeamMemberRole}>
                           <input name="memberId" type="hidden" value={m.id} />
                           <input name="role" type="hidden" value="ADMIN" />
@@ -347,7 +394,7 @@ export default async function TeamSettingsPage() {
                           </button>
                         </form>
                       ) : null}
-                      {m.role === "ADMIN" ? (
+                      {!isLocked && m.role === "ADMIN" ? (
                         <form action={setTeamMemberRole}>
                           <input name="memberId" type="hidden" value={m.id} />
                           <input name="role" type="hidden" value="MEMBER" />
@@ -356,7 +403,7 @@ export default async function TeamSettingsPage() {
                           </button>
                         </form>
                       ) : null}
-                      {!isOwner ? (
+                      {!isLocked && !isOwner ? (
                         <ConfirmAction
                           action={removeTeamMember}
                           body={`${label} will lose access to the team's shared books.`}
@@ -393,14 +440,14 @@ export default async function TeamSettingsPage() {
                         </span>
                       </span>
                       <span className="flex shrink-0 items-center gap-3">
-                        {!declined ? (
+                        {!isLocked && !declined ? (
                           <form action={resendTeamInvite}>
                             <input name="memberId" type="hidden" value={m.id} />
                             <button className="text-[13px] font-semibold text-[#4158f4]" type="submit">
                               Resend
                             </button>
                           </form>
-                        ) : (
+                        ) : !isLocked ? (
                           <form action={inviteTeamMember}>
                             <input name="email" type="hidden" value={m.invitedEmail ?? m.user?.email ?? ""} />
                             <input name="role" type="hidden" value={m.role} />
@@ -408,13 +455,15 @@ export default async function TeamSettingsPage() {
                               Invite again
                             </button>
                           </form>
+                        ) : null}
+                        {!isLocked && (
+                          <form action={removeTeamMember}>
+                            <input name="memberId" type="hidden" value={m.id} />
+                            <button className="text-[13px] font-semibold text-[#b5472f]" type="submit">
+                              {declined ? "Dismiss" : "Cancel"}
+                            </button>
+                          </form>
                         )}
-                        <form action={removeTeamMember}>
-                          <input name="memberId" type="hidden" value={m.id} />
-                          <button className="text-[13px] font-semibold text-[#b5472f]" type="submit">
-                            {declined ? "Dismiss" : "Cancel"}
-                          </button>
-                        </form>
                       </span>
                     </div>
                   );
@@ -441,50 +490,54 @@ export default async function TeamSettingsPage() {
                       {b.description ? `${b.description} · ` : ""}{b._count.contacts.toLocaleString()} contacts
                     </span>
                   </span>
-                  <span className="flex shrink-0 items-center gap-3">
-                    <form action={archiveTeamBook}>
-                      <input name="bookId" type="hidden" value={b.id} />
-                      <button className="text-[13px] font-semibold text-[#4158f4]" type="submit">
-                        {b.archivedAt ? "Restore" : "Archive"}
-                      </button>
-                    </form>
-                    <ConfirmAction
-                      action={deleteTeamBook}
-                      body={`"${b.name}" and its contacts are permanently removed for everyone. This can't be undone.`}
-                      confirmLabel="Delete book"
-                      danger
-                      fields={{ bookId: b.id }}
-                      title={`Delete ${b.name}?`}
-                      trigger="Delete"
-                    />
-                  </span>
+                  {!isLocked && (
+                    <span className="flex shrink-0 items-center gap-3">
+                      <form action={archiveTeamBook}>
+                        <input name="bookId" type="hidden" value={b.id} />
+                        <button className="text-[13px] font-semibold text-[#4158f4]" type="submit">
+                          {b.archivedAt ? "Restore" : "Archive"}
+                        </button>
+                      </form>
+                      <ConfirmAction
+                        action={deleteTeamBook}
+                        body={`"${b.name}" and its contacts are permanently removed for everyone. This can't be undone.`}
+                        confirmLabel="Delete book"
+                        danger
+                        fields={{ bookId: b.id }}
+                        title={`Delete ${b.name}?`}
+                        trigger="Delete"
+                      />
+                    </span>
+                  )}
                 </div>
               ))}
             </div>
-            <form action={createTeamBook} className="mt-3 flex flex-wrap items-center gap-2">
-              <input
-                className="min-w-[160px] flex-1 rounded-xl border border-[#d8ddd6] bg-white px-4 py-2.5 text-[14px] outline-none transition focus:border-[#4158f4] focus:shadow-[0_0_0_3px_#edf0fe]"
-                name="name"
-                placeholder="New book name"
-                required
-              />
-              <input
-                className="min-w-[160px] flex-1 rounded-xl border border-[#d8ddd6] bg-white px-4 py-2.5 text-[14px] outline-none transition focus:border-[#4158f4] focus:shadow-[0_0_0_3px_#edf0fe]"
-                name="description"
-                placeholder="Description (optional)"
-              />
-              <button
-                className="rounded-xl bg-[#17352e] px-4 py-2.5 text-[14px] font-semibold text-white transition hover:bg-[#20443b]"
-                type="submit"
-              >
-                Add book
-              </button>
-            </form>
+            {!isLocked && (
+              <form action={createTeamBook} className="mt-3 flex flex-wrap items-center gap-2">
+                <input
+                  className="min-w-[160px] flex-1 rounded-xl border border-[#d8ddd6] bg-white px-4 py-2.5 text-[14px] outline-none transition focus:border-[#4158f4] focus:shadow-[0_0_0_3px_#edf0fe]"
+                  name="name"
+                  placeholder="New book name"
+                  required
+                />
+                <input
+                  className="min-w-[160px] flex-1 rounded-xl border border-[#d8ddd6] bg-white px-4 py-2.5 text-[14px] outline-none transition focus:border-[#4158f4] focus:shadow-[0_0_0_3px_#edf0fe]"
+                  name="description"
+                  placeholder="Description (optional)"
+                />
+                <button
+                  className="rounded-xl bg-[#17352e] px-4 py-2.5 text-[14px] font-semibold text-white transition hover:bg-[#20443b]"
+                  type="submit"
+                >
+                  Add book
+                </button>
+              </form>
+            )}
           </SettingsCard>
         </div>
 
-        {/* per-book permissions */}
-        {regularMembers.length > 0 && activeBooks.length > 0 ? (
+        {/* per-book permissions — hidden when locked */}
+        {!isLocked && regularMembers.length > 0 && activeBooks.length > 0 ? (
           <div>
             <SectionLabel>Book permissions</SectionLabel>
             <SettingsCard>
@@ -533,41 +586,43 @@ export default async function TeamSettingsPage() {
           </div>
         ) : null}
 
-        {/* invite */}
-        <SettingsCard>
-          <p className="text-[14.5px] font-semibold text-[#1d2823]">Invite a team member</p>
-          <p className="mt-1 text-[13.5px] text-[#5c655e]">
-            They get an email with a link to join. New members can edit by default; set view-only per book later.
-          </p>
-          {full ? (
-            <p className="mt-3 rounded-xl bg-[#f6edd9] px-3.5 py-2.5 text-[13.5px] text-[#7c5511]">
-              Your team is full ({ownedTeam.maxMembers} members). Remove someone to invite another.
+        {/* invite — hidden when locked */}
+        {!isLocked && (
+          <SettingsCard>
+            <p className="text-[14.5px] font-semibold text-[#1d2823]">Invite a team member</p>
+            <p className="mt-1 text-[13.5px] text-[#5c655e]">
+              They get an email with a link to join. New members can edit by default; set view-only per book later.
             </p>
-          ) : (
-            <form action={inviteTeamMember} className="mt-3 flex flex-wrap items-center gap-2">
-              <input
-                className="min-w-[200px] flex-1 rounded-xl border border-[#d8ddd6] bg-white px-4 py-2.5 text-[14px] outline-none transition focus:border-[#4158f4] focus:shadow-[0_0_0_3px_#edf0fe]"
-                name="email"
-                placeholder="name@email.com"
-                required
-                type="email"
-              />
-              <select
-                className="rounded-xl border border-[#d8ddd6] bg-white px-3 py-2.5 text-[13px] font-semibold text-[#1d2823] outline-none focus:border-[#4158f4]"
-                name="role"
-              >
-                <option value="MEMBER">Member</option>
-                <option value="ADMIN">Admin</option>
-              </select>
-              <button
-                className="rounded-xl bg-[#17352e] px-4 py-2.5 text-[14px] font-semibold text-white transition hover:bg-[#20443b]"
-                type="submit"
-              >
-                Send invite
-              </button>
-            </form>
-          )}
-        </SettingsCard>
+            {full ? (
+              <p className="mt-3 rounded-xl bg-[#f6edd9] px-3.5 py-2.5 text-[13.5px] text-[#7c5511]">
+                Your team is full ({ownedTeam.maxMembers} members). Remove someone to invite another.
+              </p>
+            ) : (
+              <form action={inviteTeamMember} className="mt-3 flex flex-wrap items-center gap-2">
+                <input
+                  className="min-w-[200px] flex-1 rounded-xl border border-[#d8ddd6] bg-white px-4 py-2.5 text-[14px] outline-none transition focus:border-[#4158f4] focus:shadow-[0_0_0_3px_#edf0fe]"
+                  name="email"
+                  placeholder="name@email.com"
+                  required
+                  type="email"
+                />
+                <select
+                  className="rounded-xl border border-[#d8ddd6] bg-white px-3 py-2.5 text-[13px] font-semibold text-[#1d2823] outline-none focus:border-[#4158f4]"
+                  name="role"
+                >
+                  <option value="MEMBER">Member</option>
+                  <option value="ADMIN">Admin</option>
+                </select>
+                <button
+                  className="rounded-xl bg-[#17352e] px-4 py-2.5 text-[14px] font-semibold text-white transition hover:bg-[#20443b]"
+                  type="submit"
+                >
+                  Send invite
+                </button>
+              </form>
+            )}
+          </SettingsCard>
+        )}
 
         {/* sync accounts */}
         <div>
@@ -590,18 +645,20 @@ export default async function TeamSettingsPage() {
                       <span className="text-[#1d2823]">{l.syncAccount.label}</span>
                       <span className="text-[#8b938c]"> → {l.addressBook.name}</span>
                     </span>
-                    <form action={unlinkTeamSyncAccount}>
-                      <input name="teamSyncAccountId" type="hidden" value={l.id} />
-                      <button className="shrink-0 text-[13px] font-semibold text-[#b5472f]" type="submit">
-                        Unlink
-                      </button>
-                    </form>
+                    {!isLocked && (
+                      <form action={unlinkTeamSyncAccount}>
+                        <input name="teamSyncAccountId" type="hidden" value={l.id} />
+                        <button className="shrink-0 text-[13px] font-semibold text-[#b5472f]" type="submit">
+                          Unlink
+                        </button>
+                      </form>
+                    )}
                   </div>
                 ))}
               </div>
             ) : null}
 
-            {linkableAccounts.length > 0 && activeBooks.length > 0 ? (
+            {!isLocked && linkableAccounts.length > 0 && activeBooks.length > 0 ? (
               <form action={linkTeamSyncAccount} className="mt-3 flex flex-wrap items-center gap-2">
                 <select
                   className="rounded-xl border border-[#d8ddd6] bg-white px-3 py-2.5 text-[13px]"

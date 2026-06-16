@@ -157,7 +157,15 @@ async function upsertSubscription(
   });
 
   if (planRank(planInfo.plan) < planRank(fromPlan)) {
-    await applyDowngrade(userId, fromPlan, planInfo.plan, tx);
+    await applyDowngrade(userId, fromPlan, planInfo.plan, tx, subscriptionData.currentPeriodEnd);
+  }
+
+  // Re-upgrading to TEAMS lifts any active grace lock on the owned team group.
+  if (planInfo.plan === "TEAMS" && fromPlan !== "TEAMS") {
+    await tx.group.updateMany({
+      where: { ownerId: userId, type: "TEAM", teamsGraceEndsAt: { not: null } },
+      data: { teamsGraceEndsAt: null },
+    });
   }
 
   // Notify on any plan change (P20-08). Fire-and-forget so a slow/failed send
@@ -174,6 +182,7 @@ async function applyDowngrade(
   fromPlan: SubscriptionPlan,
   toPlan: SubscriptionPlan,
   tx: Tx,
+  currentPeriodEnd?: Date | null,
 ): Promise<void> {
   // 1. Pause over-limit sync accounts — Free allows 1; keep oldest active, pause rest
   if (toPlan === "FREE") {
@@ -211,14 +220,16 @@ async function applyDowngrade(
     });
   }
 
-  // 4. Group dissolution — Phase 13/14 owns this; log for now
-  if (
-    ["FAMILY", "TEAMS"].includes(fromPlan) &&
-    !["FAMILY", "TEAMS"].includes(toPlan)
-  ) {
-    console.warn(
-      `[billing] TODO(Phase13/14): dissolve group for user ${userId} on downgrade from ${fromPlan} to ${toPlan}`,
-    );
+  // 4. Teams downgrade → start 14-day grace period on the owned team group.
+  // Members keep read access; all writes are blocked after grace expires.
+  // Re-upgrading to TEAMS clears the field (handled in upsertSubscription).
+  if (fromPlan === "TEAMS" && toPlan !== "TEAMS") {
+    const graceBase = currentPeriodEnd ?? new Date();
+    const teamsGraceEndsAt = new Date(graceBase.getTime() + 14 * 24 * 60 * 60 * 1000);
+    await tx.group.updateMany({
+      where: { ownerId: userId, type: "TEAM", teamsGraceEndsAt: null },
+      data: { teamsGraceEndsAt },
+    });
   }
 }
 

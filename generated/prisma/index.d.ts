@@ -37982,6 +37982,7 @@ export namespace Prisma {
     memberSlotsLimit: number | null
     maxMembers: number | null
     defaultAddressBookId: string | null
+    teamsGraceEndsAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -37995,6 +37996,7 @@ export namespace Prisma {
     memberSlotsLimit: number | null
     maxMembers: number | null
     defaultAddressBookId: string | null
+    teamsGraceEndsAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -38008,6 +38010,7 @@ export namespace Prisma {
     memberSlotsLimit: number
     maxMembers: number
     defaultAddressBookId: number
+    teamsGraceEndsAt: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -38033,6 +38036,7 @@ export namespace Prisma {
     memberSlotsLimit?: true
     maxMembers?: true
     defaultAddressBookId?: true
+    teamsGraceEndsAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -38046,6 +38050,7 @@ export namespace Prisma {
     memberSlotsLimit?: true
     maxMembers?: true
     defaultAddressBookId?: true
+    teamsGraceEndsAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -38059,6 +38064,7 @@ export namespace Prisma {
     memberSlotsLimit?: true
     maxMembers?: true
     defaultAddressBookId?: true
+    teamsGraceEndsAt?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -38159,6 +38165,7 @@ export namespace Prisma {
     memberSlotsLimit: number | null
     maxMembers: number
     defaultAddressBookId: string | null
+    teamsGraceEndsAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: GroupCountAggregateOutputType | null
@@ -38191,6 +38198,7 @@ export namespace Prisma {
     memberSlotsLimit?: boolean
     maxMembers?: boolean
     defaultAddressBookId?: boolean
+    teamsGraceEndsAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     owner?: boolean | UserDefaultArgs<ExtArgs>
@@ -38210,6 +38218,7 @@ export namespace Prisma {
     memberSlotsLimit?: boolean
     maxMembers?: boolean
     defaultAddressBookId?: boolean
+    teamsGraceEndsAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     owner?: boolean | UserDefaultArgs<ExtArgs>
@@ -38225,6 +38234,7 @@ export namespace Prisma {
     memberSlotsLimit?: boolean
     maxMembers?: boolean
     defaultAddressBookId?: boolean
+    teamsGraceEndsAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     owner?: boolean | UserDefaultArgs<ExtArgs>
@@ -38240,11 +38250,12 @@ export namespace Prisma {
     memberSlotsLimit?: boolean
     maxMembers?: boolean
     defaultAddressBookId?: boolean
+    teamsGraceEndsAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type GroupOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerId" | "type" | "name" | "subscriptionId" | "memberSlotsLimit" | "maxMembers" | "defaultAddressBookId" | "createdAt" | "updatedAt", ExtArgs["result"]["group"]>
+  export type GroupOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerId" | "type" | "name" | "subscriptionId" | "memberSlotsLimit" | "maxMembers" | "defaultAddressBookId" | "teamsGraceEndsAt" | "createdAt" | "updatedAt", ExtArgs["result"]["group"]>
   export type GroupInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     owner?: boolean | UserDefaultArgs<ExtArgs>
     subscription?: boolean | Group$subscriptionArgs<ExtArgs>
@@ -38280,6 +38291,7 @@ export namespace Prisma {
       memberSlotsLimit: number | null
       maxMembers: number
       defaultAddressBookId: string | null
+      teamsGraceEndsAt: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["group"]>
@@ -38718,6 +38730,7 @@ export namespace Prisma {
     readonly memberSlotsLimit: FieldRef<"Group", 'Int'>
     readonly maxMembers: FieldRef<"Group", 'Int'>
     readonly defaultAddressBookId: FieldRef<"Group", 'String'>
+    readonly teamsGraceEndsAt: FieldRef<"Group", 'DateTime'>
     readonly createdAt: FieldRef<"Group", 'DateTime'>
     readonly updatedAt: FieldRef<"Group", 'DateTime'>
   }
@@ -61282,6 +61295,7 @@ export namespace Prisma {
     memberSlotsLimit: 'memberSlotsLimit',
     maxMembers: 'maxMembers',
     defaultAddressBookId: 'defaultAddressBookId',
+    teamsGraceEndsAt: 'teamsGraceEndsAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -65075,6 +65089,7 @@ export namespace Prisma {
     memberSlotsLimit?: IntNullableFilter<"Group"> | number | null
     maxMembers?: IntFilter<"Group"> | number
     defaultAddressBookId?: StringNullableFilter<"Group"> | string | null
+    teamsGraceEndsAt?: DateTimeNullableFilter<"Group"> | Date | string | null
     createdAt?: DateTimeFilter<"Group"> | Date | string
     updatedAt?: DateTimeFilter<"Group"> | Date | string
     owner?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -65093,6 +65108,7 @@ export namespace Prisma {
     memberSlotsLimit?: SortOrderInput | SortOrder
     maxMembers?: SortOrder
     defaultAddressBookId?: SortOrderInput | SortOrder
+    teamsGraceEndsAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     owner?: UserOrderByWithRelationInput
@@ -65114,6 +65130,7 @@ export namespace Prisma {
     memberSlotsLimit?: IntNullableFilter<"Group"> | number | null
     maxMembers?: IntFilter<"Group"> | number
     defaultAddressBookId?: StringNullableFilter<"Group"> | string | null
+    teamsGraceEndsAt?: DateTimeNullableFilter<"Group"> | Date | string | null
     createdAt?: DateTimeFilter<"Group"> | Date | string
     updatedAt?: DateTimeFilter<"Group"> | Date | string
     owner?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -65132,6 +65149,7 @@ export namespace Prisma {
     memberSlotsLimit?: SortOrderInput | SortOrder
     maxMembers?: SortOrder
     defaultAddressBookId?: SortOrderInput | SortOrder
+    teamsGraceEndsAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: GroupCountOrderByAggregateInput
@@ -65153,6 +65171,7 @@ export namespace Prisma {
     memberSlotsLimit?: IntNullableWithAggregatesFilter<"Group"> | number | null
     maxMembers?: IntWithAggregatesFilter<"Group"> | number
     defaultAddressBookId?: StringNullableWithAggregatesFilter<"Group"> | string | null
+    teamsGraceEndsAt?: DateTimeNullableWithAggregatesFilter<"Group"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"Group"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Group"> | Date | string
   }
@@ -69932,6 +69951,7 @@ export namespace Prisma {
     memberSlotsLimit?: number | null
     maxMembers?: number
     defaultAddressBookId?: string | null
+    teamsGraceEndsAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedGroupsInput
@@ -69950,6 +69970,7 @@ export namespace Prisma {
     memberSlotsLimit?: number | null
     maxMembers?: number
     defaultAddressBookId?: string | null
+    teamsGraceEndsAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
@@ -69964,6 +69985,7 @@ export namespace Prisma {
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedGroupsNestedInput
@@ -69982,6 +70004,7 @@ export namespace Prisma {
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
@@ -69998,6 +70021,7 @@ export namespace Prisma {
     memberSlotsLimit?: number | null
     maxMembers?: number
     defaultAddressBookId?: string | null
+    teamsGraceEndsAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -70009,6 +70033,7 @@ export namespace Prisma {
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -70022,6 +70047,7 @@ export namespace Prisma {
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -74341,6 +74367,7 @@ export namespace Prisma {
     memberSlotsLimit?: SortOrder
     maxMembers?: SortOrder
     defaultAddressBookId?: SortOrder
+    teamsGraceEndsAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -74359,6 +74386,7 @@ export namespace Prisma {
     memberSlotsLimit?: SortOrder
     maxMembers?: SortOrder
     defaultAddressBookId?: SortOrder
+    teamsGraceEndsAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -74372,6 +74400,7 @@ export namespace Prisma {
     memberSlotsLimit?: SortOrder
     maxMembers?: SortOrder
     defaultAddressBookId?: SortOrder
+    teamsGraceEndsAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -80643,6 +80672,7 @@ export namespace Prisma {
     memberSlotsLimit?: number | null
     maxMembers?: number
     defaultAddressBookId?: string | null
+    teamsGraceEndsAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     subscription?: SubscriptionCreateNestedOneWithoutGroupsInput
@@ -80659,6 +80689,7 @@ export namespace Prisma {
     memberSlotsLimit?: number | null
     maxMembers?: number
     defaultAddressBookId?: string | null
+    teamsGraceEndsAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
@@ -81893,6 +81924,7 @@ export namespace Prisma {
     memberSlotsLimit?: IntNullableFilter<"Group"> | number | null
     maxMembers?: IntFilter<"Group"> | number
     defaultAddressBookId?: StringNullableFilter<"Group"> | string | null
+    teamsGraceEndsAt?: DateTimeNullableFilter<"Group"> | Date | string | null
     createdAt?: DateTimeFilter<"Group"> | Date | string
     updatedAt?: DateTimeFilter<"Group"> | Date | string
   }
@@ -85603,6 +85635,7 @@ export namespace Prisma {
     memberSlotsLimit?: number | null
     maxMembers?: number
     defaultAddressBookId?: string | null
+    teamsGraceEndsAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedGroupsInput
@@ -85619,6 +85652,7 @@ export namespace Prisma {
     memberSlotsLimit?: number | null
     maxMembers?: number
     defaultAddressBookId?: string | null
+    teamsGraceEndsAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
@@ -93188,6 +93222,7 @@ export namespace Prisma {
     memberSlotsLimit?: number | null
     maxMembers?: number
     defaultAddressBookId?: string | null
+    teamsGraceEndsAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedGroupsInput
@@ -93205,6 +93240,7 @@ export namespace Prisma {
     memberSlotsLimit?: number | null
     maxMembers?: number
     defaultAddressBookId?: string | null
+    teamsGraceEndsAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     addressBooks?: GroupAddressBookUncheckedCreateNestedManyWithoutGroupInput
@@ -93371,6 +93407,7 @@ export namespace Prisma {
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedGroupsNestedInput
@@ -93388,6 +93425,7 @@ export namespace Prisma {
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     addressBooks?: GroupAddressBookUncheckedUpdateManyWithoutGroupNestedInput
@@ -93544,6 +93582,7 @@ export namespace Prisma {
     memberSlotsLimit?: number | null
     maxMembers?: number
     defaultAddressBookId?: string | null
+    teamsGraceEndsAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedGroupsInput
@@ -93561,6 +93600,7 @@ export namespace Prisma {
     memberSlotsLimit?: number | null
     maxMembers?: number
     defaultAddressBookId?: string | null
+    teamsGraceEndsAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
@@ -93642,6 +93682,7 @@ export namespace Prisma {
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedGroupsNestedInput
@@ -93659,6 +93700,7 @@ export namespace Prisma {
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
@@ -94696,6 +94738,7 @@ export namespace Prisma {
     memberSlotsLimit?: number | null
     maxMembers?: number
     defaultAddressBookId?: string | null
+    teamsGraceEndsAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedGroupsInput
@@ -94713,6 +94756,7 @@ export namespace Prisma {
     memberSlotsLimit?: number | null
     maxMembers?: number
     defaultAddressBookId?: string | null
+    teamsGraceEndsAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
@@ -94850,6 +94894,7 @@ export namespace Prisma {
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedGroupsNestedInput
@@ -94867,6 +94912,7 @@ export namespace Prisma {
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
@@ -99831,6 +99877,7 @@ export namespace Prisma {
     memberSlotsLimit?: number | null
     maxMembers?: number
     defaultAddressBookId?: string | null
+    teamsGraceEndsAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -100763,6 +100810,7 @@ export namespace Prisma {
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     subscription?: SubscriptionUpdateOneWithoutGroupsNestedInput
@@ -100779,6 +100827,7 @@ export namespace Prisma {
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
@@ -100794,6 +100843,7 @@ export namespace Prisma {
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -102601,6 +102651,7 @@ export namespace Prisma {
     memberSlotsLimit?: number | null
     maxMembers?: number
     defaultAddressBookId?: string | null
+    teamsGraceEndsAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -102612,6 +102663,7 @@ export namespace Prisma {
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedGroupsNestedInput
@@ -102628,6 +102680,7 @@ export namespace Prisma {
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
@@ -102643,6 +102696,7 @@ export namespace Prisma {
     memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

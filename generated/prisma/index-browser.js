@@ -572,6 +572,7 @@ exports.Prisma.GroupScalarFieldEnum = {
   memberSlotsLimit: 'memberSlotsLimit',
   maxMembers: 'maxMembers',
   defaultAddressBookId: 'defaultAddressBookId',
+  teamsGraceEndsAt: 'teamsGraceEndsAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };

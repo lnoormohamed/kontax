@@ -1,5 +1,18 @@
 import { db } from "~/server/db";
 
+export type TeamGraceState = "active" | "grace" | "locked";
+
+// Derive whether a team is active, in grace, or locked based solely on the
+// group row and the owner's current billing. teamsEnabled=true always means
+// active (re-upgrade clears teamsGraceEndsAt, but this guards the edge case).
+export const getTeamGraceState = (
+  teamsGraceEndsAt: Date | null,
+  teamsEnabled: boolean,
+): TeamGraceState => {
+  if (teamsEnabled || teamsGraceEndsAt === null) return "active";
+  return teamsGraceEndsAt > new Date() ? "grace" : "locked";
+};
+
 // Authorization helpers for Teams (Phase 14) shared address books.
 // A team has multiple GroupAddressBooks. Each MEMBER has a per-book permission
 // (EDIT | VIEW | NONE) stored in GroupMember.addressBookPermissions JSON;

@@ -964,6 +964,9 @@ model Group {
   // P13-01: operational fields. Family v1 caps at 6 members (owner + 5).
   maxMembers           Int                @default(6)
   defaultAddressBookId String?
+  // Set when owner downgrades from TEAMS; grace expires 14 days after billing period end.
+  // null = active (or re-upgraded). Non-null + future = grace. Non-null + past = locked.
+  teamsGraceEndsAt     DateTime?
   createdAt            DateTime           @default(now())
   updatedAt            DateTime           @updatedAt
   owner                User               @relation("GroupOwner", fields: [ownerId], references: [id], onDelete: Cascade)
