@@ -23,7 +23,7 @@ function fmt(n: number): string {
 }
 function savingsPct(monthly: number, annual: number): number {
   if (!monthly) return 0;
-  return Math.round((1 - annual / monthly) * 100);
+  return Math.round((1 - annual / (monthly * 12)) * 100);
 }
 
 const CHECK = (
@@ -105,11 +105,23 @@ const BASE_PLANS: Omit<Plan, "price">[] = [
 ];
 
 const FALLBACK_PRICES: StripePrices = {
-  currency: "usd",
-  pro: { monthly: 5, annual: 4 },
-  family: { monthly: 8, annual: 6 },
-  teams: { monthly: 12, annual: 10 },
+  currency: "gbp",
+  pro: { monthly: 5, annual: 48 },
+  family: { monthly: 8, annual: 72 },
+  teams: { monthly: 12, annual: 120 },
 };
+
+function getToggleSavingsLabel(prices: StripePrices): string | null {
+  const savings = [prices.pro, prices.family, prices.teams]
+    .map((plan) => savingsPct(plan.monthly, plan.annual))
+    .filter((value) => value > 0);
+
+  if (!savings.length) return null;
+
+  const min = Math.min(...savings);
+  const max = Math.max(...savings);
+  return min === max ? `Save ${max}%` : `Save up to ${max}%`;
+}
 
 function buildPlans(stripePrices: StripePrices | null): Plan[] {
   const p = stripePrices ?? FALLBACK_PRICES;
@@ -129,6 +141,7 @@ export function PricingToggle({
   const prices = stripePrices ?? FALLBACK_PRICES;
   const PLANS = buildPlans(prices);
   const currencySymbol = sym(prices.currency);
+  const toggleSavingsLabel = getToggleSavingsLabel(prices);
   const [annual, setAnnual] = useState(false);
   const [teamSeats, setTeamSeats] = useState(3);
   const [loading, setLoading] = useState<string | null>(null);
@@ -191,7 +204,9 @@ export function PricingToggle({
             onClick={() => setAnnual(true)}
           >
             Annually
-            <span className="pr-toggle__badge">Save 20%</span>
+            {toggleSavingsLabel ? (
+              <span className="pr-toggle__badge">{toggleSavingsLabel}</span>
+            ) : null}
           </button>
         </div>
       </section>

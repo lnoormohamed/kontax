@@ -9,6 +9,13 @@ import { getStripeCatalog } from "~/server/stripe-catalog";
 import type { StripePrices } from "./_pricing-toggle";
 import "./pricing.css";
 
+const DEFAULT_STRIPE_PRICES: StripePrices = {
+  currency: "gbp",
+  pro: { monthly: 5, annual: 48 },
+  family: { monthly: 8, annual: 72 },
+  teams: { monthly: 12, annual: 120 },
+};
+
 async function fetchStripePrices(): Promise<StripePrices | null> {
   try {
     const catalog = await getStripeCatalog();
@@ -23,6 +30,26 @@ async function fetchStripePrices(): Promise<StripePrices | null> {
   } catch {
     return null;
   }
+}
+
+function formatCurrencyAmount(currency: string, amount: number): string {
+  const normalizedCurrency = currency.toUpperCase();
+  const hasFraction = amount % 1 !== 0;
+  return new Intl.NumberFormat("en-GB", {
+    style: "currency",
+    currency: normalizedCurrency,
+    minimumFractionDigits: hasFraction ? 2 : 0,
+    maximumFractionDigits: 2,
+  }).format(amount);
+}
+
+function getMatrixPriceLabel(
+  plan: "free" | "pro" | "family" | "teams",
+  stripePrices: StripePrices | null,
+): string {
+  const prices = stripePrices ?? DEFAULT_STRIPE_PRICES;
+  if (plan === "free") return formatCurrencyAmount(prices.currency, 0);
+  return `${formatCurrencyAmount(prices.currency, prices[plan].monthly)}/mo`;
 }
 
 export const metadata: Metadata = {
@@ -99,19 +126,19 @@ export default async function PricingPage() {
                   <th scope="col"></th>
                   <th scope="col">
                     <span className="pr-mh-name">Free</span>
-                    <span className="pr-mh-price">£0</span>
+                    <span className="pr-mh-price">{getMatrixPriceLabel("free", stripePrices)}</span>
                   </th>
                   <th scope="col">
                     <span className="pr-mh-name">Pro</span>
-                    <span className="pr-mh-price">£5/mo</span>
+                    <span className="pr-mh-price">{getMatrixPriceLabel("pro", stripePrices)}</span>
                   </th>
                   <th scope="col">
                     <span className="pr-mh-name">Family</span>
-                    <span className="pr-mh-price">£8/mo</span>
+                    <span className="pr-mh-price">{getMatrixPriceLabel("family", stripePrices)}</span>
                   </th>
                   <th scope="col">
                     <span className="pr-mh-name">Teams</span>
-                    <span className="pr-mh-price">£12/mo</span>
+                    <span className="pr-mh-price">{getMatrixPriceLabel("teams", stripePrices)}</span>
                   </th>
                 </tr>
               </thead>
