@@ -87,21 +87,29 @@ function GroupCard({ children }: { children: React.ReactNode }) {
 }
 
 // ── group entry detail ────────────────────────────────────────────────────────
-// The "Family & teams" row is always shown (per P24B-DB15 §00). The trailing
-// detail and colour reflect the user's current state so the entry carries the
-// variance without needing a sub-screen.
-type GroupEntryState =
+export type FamilyEntryState =
   | { kind: "nogroup" }
   | { kind: "needsAttention" }
-  | { kind: "family"; memberCount: number; limit: number }
+  | { kind: "family"; memberCount: number; limit: number };
+
+export type TeamEntryState =
+  | { kind: "nogroup" }
+  | { kind: "needsAttention" }
   | { kind: "teams"; teamName: string; memberCount: number };
 
-function groupEntryDetail(g: GroupEntryState): { text: string; color: string } {
+function familyEntryDetail(g: FamilyEntryState): { text: string; color: string } {
   switch (g.kind) {
-    case "nogroup":       return { text: "Set up",          color: "#17352e" };
-    case "needsAttention":return { text: "Needs attention", color: "#bf8526" };
-    case "family":        return { text: `${g.memberCount} member${g.memberCount === 1 ? "" : "s"}`, color: "#8b938c" };
-    case "teams":         return { text: `${g.teamName} · ${g.memberCount}`,                         color: "#8b938c" };
+    case "nogroup":        return { text: "Set up",          color: "#17352e" };
+    case "needsAttention": return { text: "Needs attention", color: "#bf8526" };
+    case "family":         return { text: `${g.memberCount} member${g.memberCount === 1 ? "" : "s"}`, color: "#8b938c" };
+  }
+}
+
+function teamEntryDetail(g: TeamEntryState): { text: string; color: string } {
+  switch (g.kind) {
+    case "nogroup":        return { text: "Set up",          color: "#17352e" };
+    case "needsAttention": return { text: "Needs attention", color: "#bf8526" };
+    case "teams":          return { text: `${g.teamName} · ${g.memberCount}`, color: "#8b938c" };
   }
 }
 
@@ -110,25 +118,18 @@ export function MobileSettingsNav({
   email,
   plan,
   syncActive,
-  groupEntry,
+  familyEntry,
+  teamEntry,
 }: {
   name: string;
   email: string;
   plan: string;
   syncActive: number;
-  groupEntry: GroupEntryState;
+  familyEntry: FamilyEntryState | null;
+  teamEntry: TeamEntryState | null;
 }) {
   const getInitials = (s: string) =>
     s.split(/\s+/).map((p) => p[0]).filter(Boolean).slice(0, 2).join("").toUpperCase();
-
-  const groupHref =
-    groupEntry.kind === "nogroup"
-      ? "/settings#plan-billing"
-      : groupEntry.kind === "teams"
-      ? "/settings/teams"
-      : "/settings/family";
-
-  const { text: groupDetailText, color: groupDetailColor } = groupEntryDetail(groupEntry);
 
   return (
     <div className="lg:hidden" style={{ paddingBottom: 8 }}>
@@ -165,13 +166,16 @@ export function MobileSettingsNav({
       {/* Navigation sections */}
       <GroupCard>
         <NavRow icon="sync" label="Sync connections" detail={syncActive > 0 ? `${syncActive} active` : undefined} href="/sync" />
-        <NavRow
-          icon="users"
-          label="Family & teams"
-          detail={groupDetailText}
-          href={groupHref}
-          detailColor={groupDetailColor}
-        />
+        {familyEntry && (() => {
+          const { text, color } = familyEntryDetail(familyEntry);
+          const href = familyEntry.kind === "nogroup" ? "/settings#plan-billing" : "/settings/family";
+          return <NavRow icon="users" label="Family" detail={text} href={href} detailColor={color} />;
+        })()}
+        {teamEntry && (() => {
+          const { text, color } = teamEntryDetail(teamEntry);
+          const href = teamEntry.kind === "nogroup" ? "/settings#plan-billing" : "/settings/teams";
+          return <NavRow icon="team" label="Team management" detail={text} href={href} detailColor={color} />;
+        })()}
         <NavRow icon="upload" label="Import & export" href="/import-export" />
         <NavRow icon="upload" label="Import presets" href="/settings/import-presets" />
         <NavRow icon="download" label="Export presets" href="/settings/export-presets" last />
