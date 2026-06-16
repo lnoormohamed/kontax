@@ -1,4 +1,4 @@
-import { type DefaultSession, type NextAuthConfig } from "next-auth";
+import { CredentialsSignin, type DefaultSession, type NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import { createId } from "@paralleldrive/cuid2";
@@ -52,6 +52,10 @@ function parseDeviceHint(ua: string | null | undefined): string | null {
     : ua.includes("Linux") ? "Linux"
     : "Device";
   return `${browser} on ${os}`;
+}
+
+class AccountLockedSigninError extends CredentialsSignin {
+  code = "account_locked";
 }
 
 export const authConfig = {
@@ -121,6 +125,10 @@ export const authConfig = {
           return null;
         }
 
+        if (user.lifecycleState === "LOCKED") {
+          throw new AccountLockedSigninError();
+        }
+
         return {
           id: user.id,
           email: user.email,
@@ -154,7 +162,7 @@ export const authConfig = {
         const [dbUser, preferences] = await Promise.all([
           db.user.findUnique({
             where: { id: user.id },
-            select: { sessionVersion: true, emailVerified: true, name: true, avatarUrl: true, role: true },
+            select: { sessionVersion: true, emailVerified: true, name: true, avatarUrl: true, role: true, lifecycleState: true },
           }),
           getPreferences(user.id!),
           // Create UserSession row (P18-06)
@@ -194,7 +202,7 @@ export const authConfig = {
         const [dbUser, userSession] = await Promise.all([
           db.user.findUnique({
             where: { id: token.sub },
-            select: { sessionVersion: true, emailVerified: true, role: true },
+            select: { sessionVersion: true, emailVerified: true, role: true, lifecycleState: true },
           }),
           db.userSession.findUnique({
             where: { jti: token.sid as string },
@@ -202,7 +210,7 @@ export const authConfig = {
           }),
         ]);
 
-        if (!dbUser || dbUser.sessionVersion !== token.sv || !userSession || userSession.revokedAt) {
+        if (!dbUser || dbUser.lifecycleState === "LOCKED" || dbUser.sessionVersion !== token.sv || !userSession || userSession.revokedAt) {
           return {};
         }
 
@@ -228,9 +236,9 @@ export const authConfig = {
         // Sessions created before P18-06 — validate sessionVersion only
         const dbUser = await db.user.findUnique({
           where: { id: token.sub },
-          select: { sessionVersion: true, emailVerified: true, role: true },
+          select: { sessionVersion: true, emailVerified: true, role: true, lifecycleState: true },
         });
-        if (!dbUser || dbUser.sessionVersion !== token.sv) return {};
+        if (!dbUser || dbUser.lifecycleState === "LOCKED" || dbUser.sessionVersion !== token.sv) return {};
         token.emailVerified = dbUser.emailVerified?.toISOString() ?? null;
         token.role = dbUser.role;
       }
@@ -239,10 +247,13 @@ export const authConfig = {
         const [fresh, preferences] = await Promise.all([
           db.user.findUnique({
             where: { id: token.sub ?? "" },
-            select: { sessionVersion: true, emailVerified: true, name: true, avatarUrl: true },
+            select: { sessionVersion: true, emailVerified: true, name: true, avatarUrl: true, lifecycleState: true },
           }),
           getPreferences(token.sub ?? ""),
         ]);
+        if (fresh?.lifecycleState === "LOCKED") {
+          return {};
+        }
         token.sv = fresh?.sessionVersion ?? token.sv;
         token.emailVerified = fresh?.emailVerified?.toISOString() ?? null;
         token.name = fresh?.name ?? token.name;

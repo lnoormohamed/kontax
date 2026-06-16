@@ -12,6 +12,7 @@ import {
   overridePlan,
   startImpersonation,
   suspendAccount,
+  unsuspendAccount,
 } from "~/app/actions/admin";
 
 // ─── Collapsible (Recent activity / Active sessions) ──────────────────────────
@@ -44,7 +45,7 @@ export function Collapsible({
 
 // ─── Action panel + confirmation dialogs ──────────────────────────────────────
 
-type DialogKind = "override" | "suspend" | "delete" | "impersonate";
+type DialogKind = "override" | "suspend" | "unsuspend" | "delete" | "impersonate";
 
 const DIALOGS: Record<
   DialogKind,
@@ -66,6 +67,14 @@ const DIALOGS: Record<
     busy: "Suspending…",
     ok: "Suspended",
     tone: "danger",
+  },
+  unsuspend: {
+    title: "Unlock account?",
+    body: "This restores access immediately and allows the user to sign in again.",
+    confirm: "Unlock account",
+    busy: "Unlocking…",
+    ok: "Unlocked",
+    tone: "primary",
   },
   delete: {
     title: "Schedule account deletion?",
@@ -154,10 +163,9 @@ export function UserActions({
         <div className="ad-action-block">
           <button
             className="ad-btn ad-btn--danger-outline ad-btn--full"
-            onClick={() => setDialog("suspend")}
-            disabled={suspended}
+            onClick={() => setDialog(suspended ? "unsuspend" : "suspend")}
           >
-            {suspended ? "Account suspended" : "Suspend account"}
+            {suspended ? "Unlock account" : "Suspend account"}
           </button>
         </div>
 
@@ -229,7 +237,7 @@ function ConfirmDialog({
     return () => document.removeEventListener("keydown", onKey);
   }, [onClose, phase]);
 
-  const needsReason = !reason.trim();
+  const needsReason = kind !== "unsuspend" && !reason.trim();
 
   const submit = async () => {
     if (needsReason || phase === "loading") return;
@@ -239,6 +247,7 @@ function ConfirmDialog({
     let res: { success: true } | { error: string };
     if (kind === "override") res = await overridePlan({ userId, plan, reason });
     else if (kind === "suspend") res = await suspendAccount({ userId, reason });
+    else if (kind === "unsuspend") res = await unsuspendAccount({ userId, reason: reason.trim() || undefined });
     else if (kind === "delete") res = await adminDeleteAccount({ userId, reason });
     else res = await startImpersonation({ userId, reason });
 
@@ -252,6 +261,7 @@ function ConfirmDialog({
     const messages: Record<DialogKind, string> = {
       override: `Plan overridden to ${plan}`,
       suspend: `Suspended ${user.email}`,
+      unsuspend: `Unlocked ${user.email}`,
       delete: `Deletion scheduled for ${user.email}`,
       impersonate: `Impersonating ${user.email}`,
     };
@@ -318,7 +328,7 @@ function ConfirmDialog({
 
         <div className="ad-modal-field">
           <label className="ad-field-label">
-            Reason <span className="ad-req">*</span>
+            Reason {kind === "unsuspend" ? null : <span className="ad-req">*</span>}
           </label>
           <input
             className="ad-text-input"

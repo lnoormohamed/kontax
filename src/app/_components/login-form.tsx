@@ -23,13 +23,23 @@ export function LoginForm({ next }: { next?: string }) {
     setIsPending(true);
 
     try {
-      await signIn("credentials", {
+      const result = await signIn("credentials", {
         email,
         password,
         redirect: false,
       });
 
-      router.push(next ?? "/contacts");
+      if (!result || !result.ok) {
+        setError(
+          result?.code === "account_locked"
+            ? "Your account has been suspended. Contact support."
+            : "We couldn't sign you in with those details.",
+        );
+        setIsPending(false);
+        return;
+      }
+
+      router.push(result.url ?? next ?? "/contacts");
       router.refresh();
     } catch {
       // NextAuth v5 throws on failed credentials (CredentialsSignin)
