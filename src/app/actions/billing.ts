@@ -14,6 +14,9 @@ const CheckoutInputSchema = z.object({
   seats: z.number().int().min(3).max(500).optional(),
 });
 
+const isLegacyManualSubscription = (subscriptionId: string | null | undefined) =>
+  !!subscriptionId && subscriptionId.startsWith("manual_");
+
 export async function createCheckoutSession(input: {
   plan: string;
   interval: string;
@@ -35,9 +38,11 @@ export async function createCheckoutSession(input: {
       status: { in: ["ACTIVE", "TRIALING"] },
       plan: { not: "FREE" },
     },
-    select: { id: true },
+    select: { id: true, providerSubscriptionId: true },
   });
-  if (activeSub) return { error: "USE_CUSTOMER_PORTAL" };
+  if (activeSub && !isLegacyManualSubscription(activeSub.providerSubscriptionId)) {
+    return { error: "USE_CUSTOMER_PORTAL" };
+  }
 
   // 14-day trial for first-time Pro subscribers (no previous non-incomplete Pro sub).
   const isFirstTimePro =

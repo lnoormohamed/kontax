@@ -54,6 +54,11 @@ function planRank(plan: SubscriptionPlan): number {
   return PLAN_RANK[plan] ?? 0;
 }
 
+const ACTIVE_BILLING_STATUSES: SubscriptionStatus[] = ["ACTIVE", "TRIALING", "PAST_DUE"];
+
+const isLegacyManualSubscription = (subscriptionId: string | null | undefined) =>
+  !!subscriptionId && subscriptionId.startsWith("manual_");
+
 // ─── Core upsert ─────────────────────────────────────────────────────────────
 
 async function upsertSubscription(
@@ -97,7 +102,20 @@ async function upsertSubscription(
     where: { userId, providerSubscriptionId: stripeSubscription.id },
   });
 
-  const fromPlan: SubscriptionPlan = existing?.plan ?? "FREE";
+  const legacyManualSubscription = existing
+    ? null
+    : await tx.subscription.findFirst({
+        where: {
+          userId,
+          providerSubscriptionId: { startsWith: "manual_" },
+          status: { in: ACTIVE_BILLING_STATUSES },
+        },
+        orderBy: [{ currentPeriodEnd: "desc" }, { createdAt: "desc" }],
+        select: { plan: true },
+      });
+
+  const fromPlan: SubscriptionPlan =
+    existing?.plan ?? legacyManualSubscription?.plan ?? "FREE";
 
   if (existing) {
     await tx.subscription.update({
@@ -118,6 +136,20 @@ async function upsertSubscription(
       },
     });
   }
+
+  await tx.subscription.updateMany({
+    where: {
+      userId,
+      providerSubscriptionId: { startsWith: "manual_" },
+      status: { in: ACTIVE_BILLING_STATUSES },
+    },
+    data: {
+      status: "CANCELED",
+      cancelAtPeriodEnd: false,
+      canceledAt: new Date(),
+      endedAt: new Date(),
+    },
+  });
 
   await tx.user.update({
     where: { id: userId },

@@ -153,15 +153,14 @@ export function PricingToggle({
     setLoading(planId);
     setCtaError(null);
     startTransition(async () => {
-      // Existing paid subscriber → portal to change plan.
-      const isPaid = currentPlan && currentPlan !== "FREE";
-      const result = isPaid
-        ? await createBillingPortalSession()
-        : await createCheckoutSession({
-            plan: planId.toUpperCase(),
-            interval,
-            seats: planId === "teams" ? teamSeats : undefined,
-          });
+      // Always ask the server what the right billing surface is.
+      // Real Stripe subscribers are routed to the customer portal there;
+      // legacy manual subscribers can be migrated through a fresh checkout.
+      const result = await createCheckoutSession({
+        plan: planId.toUpperCase(),
+        interval,
+        seats: planId === "teams" ? teamSeats : undefined,
+      });
 
       if ("url" in result) {
         window.location.href = result.url;
