@@ -63,7 +63,7 @@ const BASE_PLANS: Omit<Plan, "price">[] = [
     id: "pro",
     name: "Pro",
     tag: "For power users",
-    sublabel: { monthly: "billed monthly", annual: "billed annually · save 20%" },
+    sublabel: { monthly: "billed monthly", annual: "billed annually" },
     cta: { label: "Choose Pro", href: "/register?plan=pro", variant: "outline" },
     features: [
       { text: <><strong>Unlimited</strong> contacts</> },
@@ -78,7 +78,7 @@ const BASE_PLANS: Omit<Plan, "price">[] = [
     name: "Family",
     tag: "For households",
     recommended: true,
-    sublabel: { monthly: "billed monthly", annual: "billed annually · save 20%" },
+    sublabel: { monthly: "billed monthly", annual: "billed annually" },
     cta: { label: "Choose Family", href: "/register?plan=family", variant: "filled" },
     features: [
       { text: <><strong>Unlimited</strong> contacts &amp; sync</> },
@@ -92,7 +92,7 @@ const BASE_PLANS: Omit<Plan, "price">[] = [
     id: "teams",
     name: "Teams",
     tag: "For organisations",
-    sublabel: { monthly: "per seat · billed monthly", annual: "per seat · billed annually · save 20%" },
+    sublabel: { monthly: "per seat · billed monthly", annual: "per seat · billed annually" },
     cta: { label: "Choose Teams", href: "/register?plan=teams", variant: "outline" },
     features: [
       { text: <>Everything in <strong>Pro</strong></> },
@@ -156,6 +156,14 @@ export function PricingToggle({
           planId === "teams"
             ? `/register?plan=teams&seats=${teamSeats}`
             : `/register?plan=${planId}`;
+      } else if (result.error === "USE_CUSTOMER_PORTAL") {
+        // Active subscription detected server-side — fall through to portal.
+        const portalResult = await createBillingPortalSession();
+        if ("url" in portalResult) {
+          window.location.href = portalResult.url;
+        } else {
+          window.location.href = "/pricing?error=billing";
+        }
       } else {
         window.location.href = "/pricing?error=billing";
       }
@@ -223,7 +231,7 @@ export function PricingToggle({
                       <>
                         <span className="pr-plan__currency">{currencySymbol}</span>
                         <span className="pr-plan__amount">{fmt(amount!)}</span>
-                        <span className="pr-plan__per">{isTeams ? "/seat/mo" : "/mo"}</span>
+                        <span className="pr-plan__per">{isTeams ? (annual ? "/seat/yr" : "/seat/mo") : (annual ? "/yr" : "/mo")}</span>
                         {showSave && <span className="pr-plan__save">Save {planSavingsPct}%</span>}
                       </>
                     )}
@@ -251,7 +259,7 @@ export function PricingToggle({
                       >+</button>
                     </div>
                     <p className="pr-seat-total">
-                      {currencySymbol}{fmt((amount ?? 0) * teamSeats)} / mo total
+                      {currencySymbol}{fmt((amount ?? 0) * teamSeats)} / {annual ? "yr" : "mo"} total
                     </p>
                     </>
                   )}
