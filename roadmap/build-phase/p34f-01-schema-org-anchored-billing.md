@@ -2,16 +2,18 @@
 
 ## Purpose
 
-Implement the schema changes agreed in P34F-DB01: allow `SubscriptionCustomer` and
+Implement the schema agreed in P34F-DB01: allow `SubscriptionCustomer` and
 `Subscription` to belong to a `Group` (not only a `User`), and add a per-member
-`canManageBilling` flag. This is the data-layer foundation for all other P34F billing
-tickets. No webhook or UI behaviour changes here — those are P34F-02 and P34F-04.
+`canManageBilling` flag. This is the data-layer foundation for every other P34F
+billing ticket. No webhook or UI behaviour changes here — those are P34F-02 / P34F-04.
 
 ## Background
 
-See P34F-DB01 for the full rationale. Today billing is hard-anchored to `userId`
-(`SubscriptionCustomer.userId @unique`, `Subscription.userId`). Teams need the Stripe
-customer to represent the org so billing survives members joining and leaving.
+See P34F-DB01 for the full audit. Today billing is hard-anchored to `userId`
+(`SubscriptionCustomer.userId @unique` at `prisma/schema.prisma:452`,
+`Subscription.userId` at `:466`). Teams need the Stripe customer to represent the org
+so billing survives members joining and leaving. The forward link
+`Group.subscriptionId` (`:962`) already exists; this ticket adds the reverse anchors.
 
 ## Scope
 
@@ -20,8 +22,9 @@ customer to represent the org so billing survives members joining and leaving.
 - `Subscription.userId` → nullable; add `groupId String?` + relation + index.
 - `GroupMember.canManageBilling Boolean @default(false)`.
 - `Group` reverse relations to `SubscriptionCustomer` / `Subscription`.
-- Application-layer invariant helper: exactly one of `userId` / `groupId` is set.
-- `getGroupBillingCustomer(groupId)` / `getUserBillingCustomer(userId)` accessors.
+- Dual-ownership invariant (CHECK constraint or app guard per DB01 Q1).
+- New module `src/server/billing-owner.ts`: `assertSingleBillingOwner`,
+  `getGroupBillingCustomer`, `getUserBillingCustomer`, `canManageGroupBilling`.
 
 **Out of scope:**
 - Stripe metadata + webhook routing (P34F-02).
@@ -31,56 +34,100 @@ customer to represent the org so billing survives members joining and leaving.
 
 ## Design / Implementation Spec
 
-### Schema changes
+### Schema changes (`prisma/schema.prisma`)
 
+**Before** (`SubscriptionCustomer`, `:450`):
 ```prisma
 model SubscriptionCustomer {
-    id                 String          @id @default(cuid())
-    userId             String?         @unique
-    groupId            String?         @unique
-    provider           BillingProvider @default(STRIPE)
+    id                 String            @id @default(cuid())
+    userId             String            @unique
+    provider           BillingProvider   @default(STRIPE)
     providerCustomerId String
     billingEmail       String?
-    createdAt          DateTime        @default(now())
-    updatedAt          DateTime        @updatedAt
+    createdAt          DateTime          @default(now())
+    updatedAt          DateTime          @updatedAt
+    user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+    subscriptions      Subscription[]
+
+    @@unique([provider, providerCustomerId])
+}
+```
+
+**After:**
+```prisma
+model SubscriptionCustomer {
+    id                 String            @id @default(cuid())
+    userId             String?           @unique
+    groupId            String?           @unique
+    provider           BillingProvider   @default(STRIPE)
+    providerCustomerId String
+    billingEmail       String?
+    createdAt          DateTime          @default(now())
+    updatedAt          DateTime          @updatedAt
     user               User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
     group              Group? @relation(fields: [groupId], references: [id], onDelete: Cascade)
     subscriptions      Subscription[]
 
     @@unique([provider, providerCustomerId])
 }
-
-model Subscription {
-    // ...existing fields...
-    userId                 String?
-    groupId                String?
-    // ...
-    user  User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
-    group Group? @relation(fields: [groupId], references: [id], onDelete: Cascade)
-
-    @@index([groupId, status])
-}
-
-model GroupMember {
-    // ...existing fields...
-    canManageBilling Boolean @default(false)
-}
-
-model Group {
-    // ...existing fields...
-    billingCustomer SubscriptionCustomer?
-    subscriptions   Subscription[]
-}
 ```
 
-Note `Subscription.userId` and `Subscription.groupId` are both nullable now; the
-existing `@@index([userId, status])` stays. The `User` side of both relations becomes
-optional (Prisma will require the back-relation fields to allow null).
+**Before** (`Subscription`, `:464`): `userId String` + `user User @relation(...)`,
+with `@@index([userId, status])`.
 
-### Dual-ownership invariant
+**After:** add alongside the existing fields:
+```prisma
+    userId  String?
+    groupId String?
+    user    User?  @relation(fields: [userId], references: [id], onDelete: Cascade)
+    group   Group? @relation(fields: [groupId], references: [id], onDelete: Cascade)
 
-Postgres/Prisma won't natively enforce "exactly one of userId/groupId." Per the
-DB01 decision, enforce at the application layer with a guard used by every write path:
+    @@index([userId, status])     // keep
+    @@index([groupId, status])    // add
+```
+(`subscriptionCustomerId` and its relation are unchanged.)
+
+**`GroupMember`** (`:982`) — add:
+```prisma
+    canManageBilling Boolean @default(false)
+```
+
+**`Group`** (`:957`) — add reverse relations:
+```prisma
+    billingCustomer SubscriptionCustomer?
+    subscriptions   Subscription[]
+```
+(There is already `subscription Subscription? @relation(fields: [subscriptionId]...)`
+at `:973`. Naming: keep the existing `subscription` forward relation; add a distinct
+`subscriptions` back-relation for `Subscription.group`. Prisma requires named
+relations when two relations connect the same pair of models — annotate both, e.g.
+`@relation("GroupCurrentSubscription")` on the existing FK and
+`@relation("GroupSubscriptions")` on the new back-relation. Resolve the exact names at
+implementation; the constraint is that both compile.)
+
+**`User`** (`:~246`) — the existing `subscriptions Subscription[]` and
+`subscriptionCustomer SubscriptionCustomer?` back-relations stay; Prisma will accept
+them now that the FK sides are optional.
+
+### Dual-ownership invariant (DB01 Q1)
+
+Per DB01 recommendation, add a CHECK constraint. Since the repo uses `prisma db push`
+(no migration files — see `project_db-and-verification-workflow`), apply the CHECK via
+a one-time SQL script run after the push:
+
+```sql
+-- scripts/sql/p34f-billing-owner-checks.sql
+ALTER TABLE "SubscriptionCustomer"
+  ADD CONSTRAINT subscription_customer_one_owner
+  CHECK ((("userId" IS NOT NULL)::int + ("groupId" IS NOT NULL)::int) = 1);
+
+ALTER TABLE "Subscription"
+  ADD CONSTRAINT subscription_one_owner
+  CHECK ((("userId" IS NOT NULL)::int + ("groupId" IS NOT NULL)::int) = 1);
+```
+
+Always pair it with the application guard (cheaper error messages, runs before the DB
+round-trip):
 
 ```typescript
 // src/server/billing-owner.ts
@@ -95,59 +142,84 @@ export function assertSingleBillingOwner(
 }
 ```
 
-If DB01 chose a raw-SQL CHECK constraint instead, add it in the migration:
-`ALTER TABLE "SubscriptionCustomer" ADD CONSTRAINT one_owner CHECK ((("userId" IS NOT NULL)::int + ("groupId" IS NOT NULL)::int) = 1);`
-(and the same for `Subscription`). Document which approach was taken.
+If DB01 chose app-layer-only (Q1 option b), skip the SQL file and rely on the guard
+in every write path. Document the chosen approach at the top of `billing-owner.ts`.
 
-### Accessors
+### Accessors + permission helper
 
 ```typescript
 // src/server/billing-owner.ts
+import { db } from "~/server/db";
+import type { GroupRole } from "../../generated/prisma";
+
 export const getGroupBillingCustomer = (groupId: string) =>
-  db.subscriptionCustomer.findUnique({ where: { groupId }, include: { subscriptions: true } });
+  db.subscriptionCustomer.findUnique({
+    where: { groupId },
+    include: { subscriptions: true },
+  });
 
 export const getUserBillingCustomer = (userId: string) =>
-  db.subscriptionCustomer.findUnique({ where: { userId }, include: { subscriptions: true } });
+  db.subscriptionCustomer.findUnique({
+    where: { userId },
+    include: { subscriptions: true },
+  });
+
+// Owner is always a billing manager (DB01 Q2 backstop); others need the flag.
+export const canManageGroupBilling = (
+  member: { role: GroupRole; canManageBilling: boolean },
+): boolean => member.role === "OWNER" || member.canManageBilling;
 ```
 
-### Owner = implicit billing manager
+### Apply the schema
 
-Add a helper used by P34F-04/05/06 (defined here so the rule lives in one place):
+`prisma db push` (no migration files, per repo convention). Widening `userId` to
+nullable and adding nullable columns is **non-destructive** — do not pass
+`--accept-data-loss`. Inspect the generated SQL/plan first; if `db push` reports any
+drop, stop and investigate (existing personal rows must be preserved exactly).
 
-```typescript
-// canManageGroupBilling — true if member is the owner OR has the flag.
-export const canManageGroupBilling = (member: { role: GroupRole; canManageBilling: boolean }) =>
-  member.role === "OWNER" || member.canManageBilling;
+Then run `node` against `scripts/sql/p34f-billing-owner-checks.sql` (via `psql` or a
+small runner) if the CHECK approach was chosen. The CHECK must be added **after** any
+data is consistent — existing rows all have `userId` set and `groupId` null, so the
+`=1` constraint holds for them immediately.
+
+### Regenerate the client
+
+`prisma generate` (the repo vendors the client under `generated/prisma`). Grep for
+code that assumes a non-null `.user` on subscription/customer objects and null-guard
+those reads:
+
+```bash
+grep -rnE "subscriptionCustomer\.[a-z]+\.user|subscription\.user\b" src/
 ```
-
-### Migration
-
-`prisma db push` per repo convention (no migration files; see project memory
-`project_db-and-verification-workflow`). Do **not** pass `--accept-data-loss` —
-making `userId` nullable and adding nullable columns is non-destructive. Verify the
-generated SQL drops no data before applying.
 
 ## Acceptance Criteria
 
-- `SubscriptionCustomer` and `Subscription` each accept a `groupId` owner; `userId`
-  is nullable on both.
+- `SubscriptionCustomer` and `Subscription` each accept a `groupId` owner; `userId` is
+  nullable on both; both have a `group` relation.
 - `GroupMember.canManageBilling` exists, defaults `false`.
-- `assertSingleBillingOwner` (or the CHECK constraint) rejects rows with zero or two
-  owners.
-- `getGroupBillingCustomer` / `getUserBillingCustomer` / `canManageGroupBilling`
-  exist and are unit-tested.
-- `prisma db push` applies with no data loss; existing personal billing rows are
-  untouched (still `userId`-anchored).
-- No behaviour change for existing users — entitlements still resolve as before.
+- The dual-ownership invariant rejects rows with zero or two owners (CHECK and/or
+  `assertSingleBillingOwner`), and the chosen approach is documented.
+- `getGroupBillingCustomer`, `getUserBillingCustomer`, `canManageGroupBilling` exist
+  and are unit-tested (owner→true, flagged member→true, plain member→false).
+- `prisma db push` applies with no data loss; `prisma generate` succeeds.
+- Existing personal billing rows are untouched (still `userId`-anchored, `groupId`
+  null) and entitlements resolve exactly as before.
+- No team is migrated by this ticket (that's P34F-03); the schema simply *allows*
+  group ownership.
 
 ## Risks and Open Questions
 
-- **Existing rows.** This ticket only widens the schema; existing Teams subscriptions
-  remain on `userId` until P34F-03 migrates them. The app must keep resolving
-  `userId`-anchored Teams billing correctly in the interim (P34F-02 handles the
-  branch).
-- **Prisma optional relations.** Making both relation sides optional can surprise
-  includes that assumed a non-null `user`. Grep for `.user` access on subscription/
-  customer objects and null-guard.
-- **Unique on nullable `groupId`.** Postgres treats multiple NULLs as distinct, so
-  `@unique` on a nullable column is fine (many personal rows have `groupId = null`).
+- **Existing rows in the interim.** This ticket only widens the schema; existing Teams
+  subscriptions stay on `userId` until P34F-03. The app must keep resolving
+  `userId`-anchored Teams billing correctly meanwhile — P34F-02's `resolveBillingOwner`
+  handles both, but verify nothing in this ticket assumes a `groupId` exists yet.
+- **Prisma dual-relation naming.** `Group` now relates to `Subscription` twice (current
+  subscription FK + back-relation). Prisma requires named relations; pick names that
+  compile and read clearly. This is the most likely source of a `prisma generate`
+  error — resolve it here, not downstream.
+- **Optional relations surprise includes.** Making both relation sides optional can
+  break code that did `customer.user.email`. The grep above must come back clean (all
+  null-guarded) before merge.
+- **CHECK timing.** Add the CHECK only after confirming all existing rows satisfy it
+  (they do: `userId` set, `groupId` null). If a future path inserts a two-owner row,
+  the CHECK fails loudly — intended.
