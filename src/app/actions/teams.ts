@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import { emitEvent } from "~/lib/activity";
 import { auth } from "~/server/auth";
 import { getUserBillingContext } from "~/server/billing";
+import { canManageGroupBilling, getGroupBillingCustomer } from "~/server/billing-owner";
 import { db } from "~/server/db";
 import { appUrl, sendEmail } from "~/server/email";
 import { getStripeClient } from "~/server/stripe";
@@ -56,13 +57,16 @@ const getManageableTeam = async (userId: string) => {
 
 // Throws if the user's team is locked (grace period expired, plan downgraded).
 const requireTeamNotLocked = async (userId: string) => {
-  const billing = await getUserBillingContext(userId);
-  if (billing.entitlements.teamsEnabled) return; // active Teams plan — nothing to check
   const team = await db.group.findFirst({
     where: { ownerId: userId, type: "TEAM" },
-    select: { teamsGraceEndsAt: true },
+    select: { teamsEnabled: true, teamsGraceEndsAt: true },
   });
   if (!team) return;
+  // P34F-02 §08: read the org's own entitlement first. Fall back to the owner's
+  // personal plan for teams not yet migrated to org billing (P34F-03).
+  if (team.teamsEnabled) return; // active org Teams plan — nothing to check
+  const billing = await getUserBillingContext(userId);
+  if (billing.entitlements.teamsEnabled) return; // legacy user-anchored Teams
   const state = getTeamGraceState(team.teamsGraceEndsAt, false);
   if (state === "locked") {
     throw new Error("This team is read-only. Upgrade to the Teams plan to make changes.");
@@ -277,6 +281,111 @@ export const removeTeamMember = async (formData: FormData) => {
     throw new Error("The owner can't be removed. Transfer ownership or delete the team.");
   }
   await db.groupMember.delete({ where: { id: member.id } });
+  revalidatePath("/settings/teams");
+};
+
+// --- Billing access (P34F-04) -----------------------------------------------
+// Billing is org-anchored (P34F-02). Access is gated by canManageGroupBilling
+// (owner is always an implicit manager; others need the canManageBilling flag).
+const requireBillingManager = async (groupId: string, userId: string) => {
+  const member = await db.groupMember.findFirst({
+    where: { groupId, userId, inviteStatus: "ACCEPTED" },
+    select: { role: true, canManageBilling: true },
+  });
+  if (!member || !canManageGroupBilling(member)) {
+    throw new Error("You don't have billing access for this team.");
+  }
+  return member;
+};
+
+// Open the Stripe customer portal for the TEAM's customer (not the user's).
+export const openTeamBillingPortal = async (formData: FormData) => {
+  const userId = await requireUserId();
+  const groupId = str(formData, "groupId");
+  await requireBillingManager(groupId, userId);
+
+  const customer = await getGroupBillingCustomer(groupId);
+  if (!customer) {
+    throw new Error("This team has no billing account yet.");
+  }
+
+  const stripe = getStripeClient();
+  const portal = await stripe.billingPortal.sessions.create({
+    customer: customer.providerCustomerId,
+    return_url: `${appUrl()}/settings/teams?portal=returned`,
+  });
+  if (!portal.url) {
+    throw new Error("Could not open the billing portal.");
+  }
+  redirect(portal.url);
+};
+
+// Grant / revoke a member's billing-manager flag. Owner + admins can toggle
+// (DB01 §09 Q3); the owner's own access is always-on and cannot be removed.
+export const setBillingManager = async (formData: FormData) => {
+  const userId = await requireUserId();
+  const memberId = str(formData, "memberId");
+  const enabled = str(formData, "enabled") === "true";
+  const { member } = await requireManagedMember(userId, memberId);
+  if (member.role === "OWNER") {
+    throw new Error("The owner always has billing access.");
+  }
+  await db.groupMember.update({
+    where: { id: member.id },
+    data: { canManageBilling: enabled },
+  });
+  revalidatePath("/settings/teams");
+};
+
+// --- Owner transfer (P34F-05) -----------------------------------------------
+// Because billing is org-anchored, transferring ownership is a pure role change
+// — no Stripe operation. Fails closed if the team's billing isn't org-anchored
+// yet (would otherwise orphan billing on the old owner; see P34F-03).
+export const transferTeamOwnership = async (formData: FormData) => {
+  const userId = await requireUserId();
+  const groupId = str(formData, "groupId");
+  const newOwnerMemberId = str(formData, "memberId");
+
+  await db.$transaction(async (tx) => {
+    const group = await tx.group.findUnique({
+      where: { id: groupId },
+      select: { id: true, ownerId: true, type: true },
+    });
+    if (!group || group.type !== "TEAM") throw new Error("Team not found.");
+    if (group.ownerId !== userId) {
+      throw new Error("Only the owner can transfer ownership.");
+    }
+
+    const billing = await tx.subscriptionCustomer.findUnique({
+      where: { groupId },
+      select: { id: true },
+    });
+    if (!billing) {
+      throw new Error(
+        "This team's billing isn't set up for transfer yet. Contact support.",
+      );
+    }
+
+    const newOwner = await tx.groupMember.findUnique({ where: { id: newOwnerMemberId } });
+    if (!newOwner || newOwner.groupId !== groupId) throw new Error("Member not found.");
+    if (newOwner.inviteStatus !== "ACCEPTED" || !newOwner.userId) {
+      throw new Error("The new owner must be an active team member.");
+    }
+    if (newOwner.userId === userId) throw new Error("You are already the owner.");
+
+    const oldOwnerMember = await tx.groupMember.findFirst({
+      where: { groupId, userId, role: "OWNER" },
+    });
+    if (!oldOwnerMember) throw new Error("Current owner membership not found.");
+
+    await tx.groupMember.update({ where: { id: oldOwnerMember.id }, data: { role: "ADMIN" } });
+    await tx.groupMember.update({
+      where: { id: newOwner.id },
+      data: { role: "OWNER", canManageBilling: true },
+    });
+    await tx.group.update({ where: { id: groupId }, data: { ownerId: newOwner.userId } });
+  });
+
   revalidatePath("/settings/teams");
 };
 

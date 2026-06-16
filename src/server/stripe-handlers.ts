@@ -237,6 +237,93 @@ async function applyDowngrade(
   }
 }
 
+// ─── Org-anchored upsert (P34F-02) ────────────────────────────────────────────
+//
+// The Teams counterpart to upsertSubscription. The subscription row is owned by
+// the Group (groupId set, userId null) and team capability lives on the Group
+// (teamsEnabled / teamsGraceEndsAt / seat count). Per P34F-DB01 §07 this is NOT a
+// copy of upsertSubscription: it deliberately does NOT run applyDowngrade's
+// personal side-effects (sync-account pause, share conversion — meaningless for
+// an org) and does NOT write lifecycleState (an org isn't a user).
+async function upsertGroupSubscription(
+  groupId: string,
+  stripeSubscription: Stripe.Subscription,
+  tx: Tx,
+): Promise<void> {
+  const priceId = stripeSubscription.items.data[0]?.price.id;
+  if (!priceId) throw new Error("Subscription has no price item");
+
+  const planInfo = await getPlanFromPriceIdAsync(priceId);
+  if (!planInfo) throw new Error(`Unknown price ID: ${priceId}`);
+
+  const status = mapStripeStatus(stripeSubscription.status);
+  const cancelScheduled =
+    stripeSubscription.cancel_at_period_end ||
+    (stripeSubscription.cancel_at !== null && stripeSubscription.status !== "canceled");
+  const item = stripeSubscription.items.data[0];
+  // Stripe quantity is the authoritative seat count for Teams.
+  const quantity = item?.quantity ?? 1;
+
+  const subscriptionData = {
+    plan: planInfo.plan,
+    status,
+    interval: planInfo.interval,
+    currentPeriodStart: item?.current_period_start
+      ? new Date(item.current_period_start * 1000)
+      : null,
+    currentPeriodEnd: item?.current_period_end
+      ? new Date(item.current_period_end * 1000)
+      : null,
+    trialEndsAt: stripeSubscription.trial_end
+      ? new Date(stripeSubscription.trial_end * 1000)
+      : null,
+    cancelAtPeriodEnd: cancelScheduled,
+    canceledAt: stripeSubscription.canceled_at
+      ? new Date(stripeSubscription.canceled_at * 1000)
+      : null,
+    ...(planInfo.plan === "TEAMS" ? { memberSlotsLimit: quantity } : {}),
+  };
+
+  const subCustomer = await tx.subscriptionCustomer.findUniqueOrThrow({
+    where: { groupId },
+  });
+
+  const existing = await tx.subscription.findFirst({
+    where: { groupId, providerSubscriptionId: stripeSubscription.id },
+  });
+
+  let subscriptionId: string;
+  if (existing) {
+    await tx.subscription.update({ where: { id: existing.id }, data: subscriptionData });
+    subscriptionId = existing.id;
+  } else {
+    const created = await tx.subscription.create({
+      data: {
+        groupId,
+        subscriptionCustomerId: subCustomer.id,
+        provider: "STRIPE",
+        providerSubscriptionId: stripeSubscription.id,
+        ...subscriptionData,
+      },
+    });
+    subscriptionId = created.id;
+  }
+
+  // Org entitlement (P34F §08): the team's "is Teams active" is read off the
+  // Group, not the owner. An active Teams sub enables the team and clears any
+  // grace (covers re-upgrade); seat count flows to the group's capacity.
+  const teamsActive =
+    planInfo.plan === "TEAMS" && ACTIVE_BILLING_STATUSES.includes(status);
+  await tx.group.update({
+    where: { id: groupId },
+    data: {
+      subscriptionId,
+      teamsEnabled: teamsActive,
+      ...(teamsActive ? { teamsGraceEndsAt: null, maxMembers: quantity, memberSlotsLimit: quantity } : {}),
+    },
+  });
+}
+
 // ─── Public handlers (called by webhook router) ───────────────────────────────
 
 export async function handleCheckoutSessionCompleted(
@@ -250,7 +337,7 @@ export async function handleCheckoutSessionCompleted(
 
   const customer = await tx.subscriptionCustomer.findFirst({
     where: { provider: "STRIPE", providerCustomerId: stripeCustomerId },
-    select: { userId: true },
+    select: { userId: true, groupId: true },
   });
   if (!customer) {
     throw new Error(
@@ -262,7 +349,12 @@ export async function handleCheckoutSessionCompleted(
   const stripeSubscription =
     await stripe.subscriptions.retrieve(stripeSubscriptionId);
 
-  await upsertSubscription(customer.userId, stripeSubscription, tx);
+  // P34F-02: branch on the billing anchor — Teams customers route to the Group.
+  if (customer.groupId) {
+    await upsertGroupSubscription(customer.groupId, stripeSubscription, tx);
+  } else if (customer.userId) {
+    await upsertSubscription(customer.userId, stripeSubscription, tx);
+  }
 }
 
 export async function handleSubscriptionUpserted(
@@ -274,11 +366,16 @@ export async function handleSubscriptionUpserted(
       provider: "STRIPE",
       providerCustomerId: stripeSubscription.customer as string,
     },
-    select: { userId: true },
+    select: { userId: true, groupId: true },
   });
   if (!customer) return;
 
-  await upsertSubscription(customer.userId, stripeSubscription, tx);
+  // P34F-02: Teams customers route to the Group; personal to the User.
+  if (customer.groupId) {
+    await upsertGroupSubscription(customer.groupId, stripeSubscription, tx);
+  } else if (customer.userId) {
+    await upsertSubscription(customer.userId, stripeSubscription, tx);
+  }
 }
 
 export async function handleSubscriptionDeleted(
@@ -290,9 +387,38 @@ export async function handleSubscriptionDeleted(
       provider: "STRIPE",
       providerCustomerId: stripeSubscription.customer as string,
     },
-    select: { userId: true },
+    select: { userId: true, groupId: true },
   });
   if (!customer) return;
+
+  // P34F-02: org-anchored cancellation → disable the team and open the 14-day
+  // grace window on the Group (read-only until expiry, then locked). No user
+  // lifecycle to touch — the org isn't a user.
+  if (customer.groupId) {
+    const groupSub = await tx.subscription.findFirst({
+      where: {
+        groupId: customer.groupId,
+        providerSubscriptionId: stripeSubscription.id,
+      },
+      select: { id: true, currentPeriodEnd: true },
+    });
+    if (groupSub) {
+      await tx.subscription.update({
+        where: { id: groupSub.id },
+        data: { status: "CANCELED", canceledAt: new Date(), endedAt: new Date() },
+      });
+    }
+    const graceBase = groupSub?.currentPeriodEnd ?? new Date();
+    await tx.group.update({
+      where: { id: customer.groupId },
+      data: {
+        teamsEnabled: false,
+        teamsGraceEndsAt: new Date(graceBase.getTime() + 14 * 24 * 60 * 60 * 1000),
+      },
+    });
+    return;
+  }
+  if (!customer.userId) return;
 
   const existing = await tx.subscription.findFirst({
     where: {
@@ -330,9 +456,24 @@ export async function handleInvoicePaymentFailed(
       provider: "STRIPE",
       providerCustomerId: invoice.customer as string,
     },
-    select: { userId: true },
+    select: { userId: true, groupId: true },
   });
   if (!customer) return;
+
+  // P34F-02: org-anchored payment failure → mark the team's subscription
+  // PAST_DUE. No user lifecycle or personal notification (the org isn't a user);
+  // billing-manager dunning is a later ticket.
+  if (customer.groupId) {
+    await tx.subscription.updateMany({
+      where: { groupId: customer.groupId, status: { in: ["ACTIVE", "TRIALING"] } },
+      data: {
+        status: "PAST_DUE",
+        graceEndsAt: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000),
+      },
+    });
+    return;
+  }
+  if (!customer.userId) return;
 
   const graceEndsAt = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
 
@@ -377,9 +518,19 @@ export async function handleInvoicePaymentSucceeded(
       provider: "STRIPE",
       providerCustomerId: invoice.customer as string,
     },
-    select: { userId: true },
+    select: { userId: true, groupId: true },
   });
   if (!customer) return;
+
+  // P34F-02: org-anchored recovery → clear PAST_DUE on the team's subscription.
+  if (customer.groupId) {
+    await tx.subscription.updateMany({
+      where: { groupId: customer.groupId, status: "PAST_DUE" },
+      data: { status: "ACTIVE", graceEndsAt: null },
+    });
+    return;
+  }
+  if (!customer.userId) return;
 
   await tx.user.update({
     where: { id: customer.userId },
@@ -406,6 +557,9 @@ export async function handleTrialWillEnd(
     select: { user: { select: { id: true } } },
   });
   if (!customer) return;
+  // P34F-02: a group (Teams) customer has no single user to email a trial
+  // reminder to; billing-manager notifications are a later ticket. Skip.
+  if (!customer.user) return;
 
   const trialEndsAt = subscription.trial_end
     ? new Date(subscription.trial_end * 1000)

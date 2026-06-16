@@ -109,6 +109,44 @@ export const getContactTeamContext = async (contactId: string) => {
   };
 };
 
+// P34F-06: read-only billing summary for any member. Never returns Stripe IDs.
+export const getTeamBillingSummary = async (groupId: string) => {
+  const group = await db.group.findUnique({
+    where: { id: groupId },
+    select: {
+      teamsEnabled: true,
+      teamsGraceEndsAt: true,
+      owner: { select: { name: true, email: true } },
+      subscriptions: {
+        where: { status: { in: ["ACTIVE", "TRIALING", "PAST_DUE"] } },
+        orderBy: { createdAt: "desc" },
+        take: 1,
+        select: {
+          plan: true,
+          status: true,
+          memberSlotsLimit: true,
+          currentPeriodEnd: true,
+          cancelAtPeriodEnd: true,
+        },
+      },
+      _count: { select: { members: { where: { inviteStatus: "ACCEPTED" } } } },
+    },
+  });
+  if (!group) return null;
+  const sub = group.subscriptions[0] ?? null;
+  return {
+    ownerName: group.owner.name ?? group.owner.email,
+    plan: sub?.plan ?? "TEAMS",
+    status: sub?.status ?? null,
+    seatsUsed: group._count.members,
+    seatsLimit: sub?.memberSlotsLimit ?? null,
+    renewsAt: sub?.currentPeriodEnd ?? null,
+    cancelAtPeriodEnd: sub?.cancelAtPeriodEnd ?? false,
+    graceState: getTeamGraceState(group.teamsGraceEndsAt, group.teamsEnabled),
+    graceEndsAt: group.teamsGraceEndsAt,
+  };
+};
+
 // The manageable team (owner/admin) for management actions.
 export const getManageableTeam = async (userId: string) => {
   const member = await db.groupMember.findFirst({

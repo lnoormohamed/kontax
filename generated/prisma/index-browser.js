@@ -238,6 +238,7 @@ exports.Prisma.ContactScalarFieldEnum = {
 exports.Prisma.SubscriptionCustomerScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
+  groupId: 'groupId',
   provider: 'provider',
   providerCustomerId: 'providerCustomerId',
   billingEmail: 'billingEmail',
@@ -248,6 +249,7 @@ exports.Prisma.SubscriptionCustomerScalarFieldEnum = {
 exports.Prisma.SubscriptionScalarFieldEnum = {
   id: 'id',
   userId: 'userId',
+  groupId: 'groupId',
   subscriptionCustomerId: 'subscriptionCustomerId',
   provider: 'provider',
   providerSubscriptionId: 'providerSubscriptionId',
@@ -573,6 +575,7 @@ exports.Prisma.GroupScalarFieldEnum = {
   maxMembers: 'maxMembers',
   defaultAddressBookId: 'defaultAddressBookId',
   teamsGraceEndsAt: 'teamsGraceEndsAt',
+  teamsEnabled: 'teamsEnabled',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -585,6 +588,7 @@ exports.Prisma.GroupMemberScalarFieldEnum = {
   role: 'role',
   inviteStatus: 'inviteStatus',
   canEdit: 'canEdit',
+  canManageBilling: 'canManageBilling',
   addressBookPermissions: 'addressBookPermissions',
   inviteToken: 'inviteToken',
   inviteExpiresAt: 'inviteExpiresAt',

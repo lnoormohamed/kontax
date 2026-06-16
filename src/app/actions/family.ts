@@ -10,6 +10,7 @@ import { getUserBillingContext } from "~/server/billing";
 import { db } from "~/server/db";
 import { appUrl, sendEmail } from "~/server/email";
 import { getUserFamilyMembership } from "~/server/family-access";
+import { snapshotFamilyBookForUser } from "~/server/family-snapshot";
 
 const INVITE_TTL_MS = 48 * 60 * 60 * 1000; // 48h signed-token expiry
 
@@ -462,7 +463,30 @@ export const leaveFamilyGroup = async (formData: FormData) => {
   if (member.role === "OWNER") {
     throw new Error("The owner can't leave. Transfer ownership or delete the group.");
   }
-  await db.groupMember.delete({ where: { id: member.id } });
+
+  // P34F-07: family books are jointly held — a member who leaves keeps a private
+  // copy of the shared book (unlike Teams, where books belong to the org). Snapshot
+  // before removing membership; the whole thing is transactional so the member is
+  // only removed once their copy is safely written.
+  const group = await db.group.findUnique({
+    where: { id: groupId },
+    select: { name: true, type: true, defaultAddressBookId: true },
+  });
+  if (group?.type !== "FAMILY") {
+    throw new Error("Not a family group."); // Teams leave goes through leaveTeam.
+  }
+
+  await db.$transaction(async (tx) => {
+    if (group.defaultAddressBookId) {
+      await snapshotFamilyBookForUser(tx, {
+        bookId: group.defaultAddressBookId,
+        targetUserId: userId,
+        groupName: group.name,
+      });
+    }
+    await tx.groupMember.delete({ where: { id: member.id } });
+  });
+
   revalidatePath("/contacts");
   revalidatePath("/settings/family");
 };

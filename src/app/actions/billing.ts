@@ -5,8 +5,9 @@ import { z } from "zod";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { getStripeClient } from "~/server/stripe";
-import { ensureStripeCustomer } from "~/server/stripe-customers";
+import { ensureStripeCustomer, ensureTeamStripeCustomer } from "~/server/stripe-customers";
 import { getStripePriceIdAsync } from "~/server/stripe-prices";
+import { ensurePendingTeamGroup } from "~/server/team-provisioning";
 
 const CheckoutInputSchema = z.object({
   plan: z.enum(["PRO", "FAMILY", "TEAMS"]),
@@ -31,17 +32,39 @@ export async function createCheckoutSession(input: {
   const { plan, interval, seats } = parsed.data;
   const quantity = plan === "TEAMS" ? Math.max(3, seats ?? 3) : 1;
 
-  // If the user already has an active paid subscription, send them to the portal
-  const activeSub = await db.subscription.findFirst({
-    where: {
-      userId,
-      status: { in: ["ACTIVE", "TRIALING"] },
-      plan: { not: "FREE" },
-    },
-    select: { id: true, providerSubscriptionId: true },
-  });
-  if (activeSub && !isLegacyManualSubscription(activeSub.providerSubscriptionId)) {
-    return { error: "USE_CUSTOMER_PORTAL" };
+  // If the user already has an active paid subscription, send them to the portal.
+  // P34F-02: a Teams subscription is org-anchored — check the user's owned team
+  // group's subscription, not the user's personal one.
+  if (plan === "TEAMS") {
+    const teamGroup = await db.group.findFirst({
+      where: { ownerId: userId, type: "TEAM" },
+      select: { id: true },
+    });
+    if (teamGroup) {
+      const groupSub = await db.subscription.findFirst({
+        where: {
+          groupId: teamGroup.id,
+          status: { in: ["ACTIVE", "TRIALING"] },
+          plan: { not: "FREE" },
+        },
+        select: { id: true, providerSubscriptionId: true },
+      });
+      if (groupSub && !isLegacyManualSubscription(groupSub.providerSubscriptionId)) {
+        return { error: "USE_CUSTOMER_PORTAL" };
+      }
+    }
+  } else {
+    const activeSub = await db.subscription.findFirst({
+      where: {
+        userId,
+        status: { in: ["ACTIVE", "TRIALING"] },
+        plan: { not: "FREE" },
+      },
+      select: { id: true, providerSubscriptionId: true },
+    });
+    if (activeSub && !isLegacyManualSubscription(activeSub.providerSubscriptionId)) {
+      return { error: "USE_CUSTOMER_PORTAL" };
+    }
   }
 
   // 14-day trial for first-time Pro subscribers (no previous non-incomplete Pro sub).
@@ -59,9 +82,17 @@ export async function createCheckoutSession(input: {
     return { error: "BILLING_NOT_CONFIGURED" };
   }
 
+  // P34F-02 (Option A): for Teams, provision the org's group + Stripe customer
+  // BEFORE checkout so billing anchors to the group, not the person.
   let stripeCustomerId: string;
+  let teamGroupId: string | null = null;
   try {
-    stripeCustomerId = await ensureStripeCustomer(userId);
+    if (plan === "TEAMS") {
+      teamGroupId = await ensurePendingTeamGroup(userId);
+      stripeCustomerId = await ensureTeamStripeCustomer(teamGroupId);
+    } else {
+      stripeCustomerId = await ensureStripeCustomer(userId);
+    }
   } catch {
     return { error: "BILLING_NOT_CONFIGURED" };
   }
@@ -87,7 +118,12 @@ export async function createCheckoutSession(input: {
       cancel_url: `${appUrl}/pricing?cancelled=1`,
       subscription_data: {
         trial_period_days: isFirstTimePro ? 14 : undefined,
-        metadata: { kontaxUserId: userId, plan },
+        // P34F-02: Teams subscriptions are resolved back to the org via
+        // kontaxGroupId (no kontaxUserId); personal plans keep kontaxUserId.
+        metadata:
+          plan === "TEAMS"
+            ? { kontaxGroupId: teamGroupId!, plan }
+            : { kontaxUserId: userId, plan },
       },
       allow_promotion_codes: true,
       billing_address_collection: "auto",

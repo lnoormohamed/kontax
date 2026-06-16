@@ -21,8 +21,18 @@ export default async function WelcomePage({
   const userId = session.user.id;
 
   const billing = await getUserBillingContext(userId);
-  const entitled =
-    plan === "FAMILY" ? billing.entitlements.familyGroupEnabled : billing.entitlements.teamsEnabled;
+  let entitled: boolean;
+  if (plan === "FAMILY") {
+    entitled = billing.entitlements.familyGroupEnabled;
+  } else {
+    // P34F-02 §08: Teams is org-anchored — gate on the owned team group's
+    // entitlement (fallback to the owner's personal plan for un-migrated teams).
+    const team = await db.group.findFirst({
+      where: { ownerId: userId, type: "TEAM" },
+      select: { teamsEnabled: true },
+    });
+    entitled = (team?.teamsEnabled ?? false) || billing.entitlements.teamsEnabled;
+  }
   // Webhook race: if the subscription hasn't activated yet, fall back to settings
   // (the success banner shows there); the user can re-enter setup from there.
   if (!entitled) redirect("/settings?billing=success");

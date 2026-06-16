@@ -6078,12 +6078,14 @@ export namespace Prisma {
    */
 
   export type GroupCountOutputType = {
+    subscriptions: number
     members: number
     addressBooks: number
     teamSyncAccounts: number
   }
 
   export type GroupCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    subscriptions?: boolean | GroupCountOutputTypeCountSubscriptionsArgs
     members?: boolean | GroupCountOutputTypeCountMembersArgs
     addressBooks?: boolean | GroupCountOutputTypeCountAddressBooksArgs
     teamSyncAccounts?: boolean | GroupCountOutputTypeCountTeamSyncAccountsArgs
@@ -6098,6 +6100,13 @@ export namespace Prisma {
      * Select specific fields to fetch from the GroupCountOutputType
      */
     select?: GroupCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * GroupCountOutputType without action
+   */
+  export type GroupCountOutputTypeCountSubscriptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SubscriptionWhereInput
   }
 
   /**
@@ -13923,6 +13932,7 @@ export namespace Prisma {
   export type SubscriptionCustomerMinAggregateOutputType = {
     id: string | null
     userId: string | null
+    groupId: string | null
     provider: $Enums.BillingProvider | null
     providerCustomerId: string | null
     billingEmail: string | null
@@ -13933,6 +13943,7 @@ export namespace Prisma {
   export type SubscriptionCustomerMaxAggregateOutputType = {
     id: string | null
     userId: string | null
+    groupId: string | null
     provider: $Enums.BillingProvider | null
     providerCustomerId: string | null
     billingEmail: string | null
@@ -13943,6 +13954,7 @@ export namespace Prisma {
   export type SubscriptionCustomerCountAggregateOutputType = {
     id: number
     userId: number
+    groupId: number
     provider: number
     providerCustomerId: number
     billingEmail: number
@@ -13955,6 +13967,7 @@ export namespace Prisma {
   export type SubscriptionCustomerMinAggregateInputType = {
     id?: true
     userId?: true
+    groupId?: true
     provider?: true
     providerCustomerId?: true
     billingEmail?: true
@@ -13965,6 +13978,7 @@ export namespace Prisma {
   export type SubscriptionCustomerMaxAggregateInputType = {
     id?: true
     userId?: true
+    groupId?: true
     provider?: true
     providerCustomerId?: true
     billingEmail?: true
@@ -13975,6 +13989,7 @@ export namespace Prisma {
   export type SubscriptionCustomerCountAggregateInputType = {
     id?: true
     userId?: true
+    groupId?: true
     provider?: true
     providerCustomerId?: true
     billingEmail?: true
@@ -14057,7 +14072,8 @@ export namespace Prisma {
 
   export type SubscriptionCustomerGroupByOutputType = {
     id: string
-    userId: string
+    userId: string | null
+    groupId: string | null
     provider: $Enums.BillingProvider
     providerCustomerId: string
     billingEmail: string | null
@@ -14085,12 +14101,14 @@ export namespace Prisma {
   export type SubscriptionCustomerSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
+    groupId?: boolean
     provider?: boolean
     providerCustomerId?: boolean
     billingEmail?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | SubscriptionCustomer$userArgs<ExtArgs>
+    group?: boolean | SubscriptionCustomer$groupArgs<ExtArgs>
     subscriptions?: boolean | SubscriptionCustomer$subscriptionsArgs<ExtArgs>
     _count?: boolean | SubscriptionCustomerCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["subscriptionCustomer"]>
@@ -14098,28 +14116,33 @@ export namespace Prisma {
   export type SubscriptionCustomerSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
+    groupId?: boolean
     provider?: boolean
     providerCustomerId?: boolean
     billingEmail?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | SubscriptionCustomer$userArgs<ExtArgs>
+    group?: boolean | SubscriptionCustomer$groupArgs<ExtArgs>
   }, ExtArgs["result"]["subscriptionCustomer"]>
 
   export type SubscriptionCustomerSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
+    groupId?: boolean
     provider?: boolean
     providerCustomerId?: boolean
     billingEmail?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | SubscriptionCustomer$userArgs<ExtArgs>
+    group?: boolean | SubscriptionCustomer$groupArgs<ExtArgs>
   }, ExtArgs["result"]["subscriptionCustomer"]>
 
   export type SubscriptionCustomerSelectScalar = {
     id?: boolean
     userId?: boolean
+    groupId?: boolean
     provider?: boolean
     providerCustomerId?: boolean
     billingEmail?: boolean
@@ -14127,28 +14150,33 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type SubscriptionCustomerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "provider" | "providerCustomerId" | "billingEmail" | "createdAt" | "updatedAt", ExtArgs["result"]["subscriptionCustomer"]>
+  export type SubscriptionCustomerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "groupId" | "provider" | "providerCustomerId" | "billingEmail" | "createdAt" | "updatedAt", ExtArgs["result"]["subscriptionCustomer"]>
   export type SubscriptionCustomerInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | SubscriptionCustomer$userArgs<ExtArgs>
+    group?: boolean | SubscriptionCustomer$groupArgs<ExtArgs>
     subscriptions?: boolean | SubscriptionCustomer$subscriptionsArgs<ExtArgs>
     _count?: boolean | SubscriptionCustomerCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type SubscriptionCustomerIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | SubscriptionCustomer$userArgs<ExtArgs>
+    group?: boolean | SubscriptionCustomer$groupArgs<ExtArgs>
   }
   export type SubscriptionCustomerIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | SubscriptionCustomer$userArgs<ExtArgs>
+    group?: boolean | SubscriptionCustomer$groupArgs<ExtArgs>
   }
 
   export type $SubscriptionCustomerPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "SubscriptionCustomer"
     objects: {
-      user: Prisma.$UserPayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs> | null
+      group: Prisma.$GroupPayload<ExtArgs> | null
       subscriptions: Prisma.$SubscriptionPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      userId: string
+      userId: string | null
+      groupId: string | null
       provider: $Enums.BillingProvider
       providerCustomerId: string
       billingEmail: string | null
@@ -14548,7 +14576,8 @@ export namespace Prisma {
    */
   export interface Prisma__SubscriptionCustomerClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends SubscriptionCustomer$userArgs<ExtArgs> = {}>(args?: Subset<T, SubscriptionCustomer$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    group<T extends SubscriptionCustomer$groupArgs<ExtArgs> = {}>(args?: Subset<T, SubscriptionCustomer$groupArgs<ExtArgs>>): Prisma__GroupClient<$Result.GetResult<Prisma.$GroupPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     subscriptions<T extends SubscriptionCustomer$subscriptionsArgs<ExtArgs> = {}>(args?: Subset<T, SubscriptionCustomer$subscriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
@@ -14581,6 +14610,7 @@ export namespace Prisma {
   interface SubscriptionCustomerFieldRefs {
     readonly id: FieldRef<"SubscriptionCustomer", 'String'>
     readonly userId: FieldRef<"SubscriptionCustomer", 'String'>
+    readonly groupId: FieldRef<"SubscriptionCustomer", 'String'>
     readonly provider: FieldRef<"SubscriptionCustomer", 'BillingProvider'>
     readonly providerCustomerId: FieldRef<"SubscriptionCustomer", 'String'>
     readonly billingEmail: FieldRef<"SubscriptionCustomer", 'String'>
@@ -14982,6 +15012,44 @@ export namespace Prisma {
   }
 
   /**
+   * SubscriptionCustomer.user
+   */
+  export type SubscriptionCustomer$userArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
+   * SubscriptionCustomer.group
+   */
+  export type SubscriptionCustomer$groupArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Group
+     */
+    select?: GroupSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Group
+     */
+    omit?: GroupOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GroupInclude<ExtArgs> | null
+    where?: GroupWhereInput
+  }
+
+  /**
    * SubscriptionCustomer.subscriptions
    */
   export type SubscriptionCustomer$subscriptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -15059,6 +15127,7 @@ export namespace Prisma {
   export type SubscriptionMinAggregateOutputType = {
     id: string | null
     userId: string | null
+    groupId: string | null
     subscriptionCustomerId: string | null
     provider: $Enums.BillingProvider | null
     providerSubscriptionId: string | null
@@ -15094,6 +15163,7 @@ export namespace Prisma {
   export type SubscriptionMaxAggregateOutputType = {
     id: string | null
     userId: string | null
+    groupId: string | null
     subscriptionCustomerId: string | null
     provider: $Enums.BillingProvider | null
     providerSubscriptionId: string | null
@@ -15129,6 +15199,7 @@ export namespace Prisma {
   export type SubscriptionCountAggregateOutputType = {
     id: number
     userId: number
+    groupId: number
     subscriptionCustomerId: number
     provider: number
     providerSubscriptionId: number
@@ -15186,6 +15257,7 @@ export namespace Prisma {
   export type SubscriptionMinAggregateInputType = {
     id?: true
     userId?: true
+    groupId?: true
     subscriptionCustomerId?: true
     provider?: true
     providerSubscriptionId?: true
@@ -15221,6 +15293,7 @@ export namespace Prisma {
   export type SubscriptionMaxAggregateInputType = {
     id?: true
     userId?: true
+    groupId?: true
     subscriptionCustomerId?: true
     provider?: true
     providerSubscriptionId?: true
@@ -15256,6 +15329,7 @@ export namespace Prisma {
   export type SubscriptionCountAggregateInputType = {
     id?: true
     userId?: true
+    groupId?: true
     subscriptionCustomerId?: true
     provider?: true
     providerSubscriptionId?: true
@@ -15377,7 +15451,8 @@ export namespace Prisma {
 
   export type SubscriptionGroupByOutputType = {
     id: string
-    userId: string
+    userId: string | null
+    groupId: string | null
     subscriptionCustomerId: string
     provider: $Enums.BillingProvider
     providerSubscriptionId: string
@@ -15432,6 +15507,7 @@ export namespace Prisma {
   export type SubscriptionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
+    groupId?: boolean
     subscriptionCustomerId?: boolean
     provider?: boolean
     providerSubscriptionId?: boolean
@@ -15462,15 +15538,17 @@ export namespace Prisma {
     endedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | Subscription$userArgs<ExtArgs>
     subscriptionCustomer?: boolean | SubscriptionCustomerDefaultArgs<ExtArgs>
     groups?: boolean | Subscription$groupsArgs<ExtArgs>
+    group?: boolean | Subscription$groupArgs<ExtArgs>
     _count?: boolean | SubscriptionCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["subscription"]>
 
   export type SubscriptionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
+    groupId?: boolean
     subscriptionCustomerId?: boolean
     provider?: boolean
     providerSubscriptionId?: boolean
@@ -15501,13 +15579,15 @@ export namespace Prisma {
     endedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | Subscription$userArgs<ExtArgs>
     subscriptionCustomer?: boolean | SubscriptionCustomerDefaultArgs<ExtArgs>
+    group?: boolean | Subscription$groupArgs<ExtArgs>
   }, ExtArgs["result"]["subscription"]>
 
   export type SubscriptionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
     userId?: boolean
+    groupId?: boolean
     subscriptionCustomerId?: boolean
     provider?: boolean
     providerSubscriptionId?: boolean
@@ -15538,13 +15618,15 @@ export namespace Prisma {
     endedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | Subscription$userArgs<ExtArgs>
     subscriptionCustomer?: boolean | SubscriptionCustomerDefaultArgs<ExtArgs>
+    group?: boolean | Subscription$groupArgs<ExtArgs>
   }, ExtArgs["result"]["subscription"]>
 
   export type SubscriptionSelectScalar = {
     id?: boolean
     userId?: boolean
+    groupId?: boolean
     subscriptionCustomerId?: boolean
     provider?: boolean
     providerSubscriptionId?: boolean
@@ -15577,32 +15659,37 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type SubscriptionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "subscriptionCustomerId" | "provider" | "providerSubscriptionId" | "plan" | "status" | "interval" | "contactsLimit" | "monthlyImportLimit" | "syncAccountsLimit" | "appPasswordsLimit" | "advancedMergeEnabled" | "premiumExportEnabled" | "cardDavSyncEnabled" | "familyGroupEnabled" | "teamsEnabled" | "sharedAddressBooksLimit" | "memberSlotsLimit" | "activityLogRetentionDays" | "liveShareEnabled" | "staticShareEnabled" | "startedAt" | "currentPeriodStart" | "currentPeriodEnd" | "trialEndsAt" | "graceEndsAt" | "cancelAtPeriodEnd" | "canceledAt" | "endedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["subscription"]>
+  export type SubscriptionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "groupId" | "subscriptionCustomerId" | "provider" | "providerSubscriptionId" | "plan" | "status" | "interval" | "contactsLimit" | "monthlyImportLimit" | "syncAccountsLimit" | "appPasswordsLimit" | "advancedMergeEnabled" | "premiumExportEnabled" | "cardDavSyncEnabled" | "familyGroupEnabled" | "teamsEnabled" | "sharedAddressBooksLimit" | "memberSlotsLimit" | "activityLogRetentionDays" | "liveShareEnabled" | "staticShareEnabled" | "startedAt" | "currentPeriodStart" | "currentPeriodEnd" | "trialEndsAt" | "graceEndsAt" | "cancelAtPeriodEnd" | "canceledAt" | "endedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["subscription"]>
   export type SubscriptionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | Subscription$userArgs<ExtArgs>
     subscriptionCustomer?: boolean | SubscriptionCustomerDefaultArgs<ExtArgs>
     groups?: boolean | Subscription$groupsArgs<ExtArgs>
+    group?: boolean | Subscription$groupArgs<ExtArgs>
     _count?: boolean | SubscriptionCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type SubscriptionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | Subscription$userArgs<ExtArgs>
     subscriptionCustomer?: boolean | SubscriptionCustomerDefaultArgs<ExtArgs>
+    group?: boolean | Subscription$groupArgs<ExtArgs>
   }
   export type SubscriptionIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
-    user?: boolean | UserDefaultArgs<ExtArgs>
+    user?: boolean | Subscription$userArgs<ExtArgs>
     subscriptionCustomer?: boolean | SubscriptionCustomerDefaultArgs<ExtArgs>
+    group?: boolean | Subscription$groupArgs<ExtArgs>
   }
 
   export type $SubscriptionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "Subscription"
     objects: {
-      user: Prisma.$UserPayload<ExtArgs>
+      user: Prisma.$UserPayload<ExtArgs> | null
       subscriptionCustomer: Prisma.$SubscriptionCustomerPayload<ExtArgs>
       groups: Prisma.$GroupPayload<ExtArgs>[]
+      group: Prisma.$GroupPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      userId: string
+      userId: string | null
+      groupId: string | null
       subscriptionCustomerId: string
       provider: $Enums.BillingProvider
       providerSubscriptionId: string
@@ -16027,9 +16114,10 @@ export namespace Prisma {
    */
   export interface Prisma__SubscriptionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
-    user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    user<T extends Subscription$userArgs<ExtArgs> = {}>(args?: Subset<T, Subscription$userArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     subscriptionCustomer<T extends SubscriptionCustomerDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SubscriptionCustomerDefaultArgs<ExtArgs>>): Prisma__SubscriptionCustomerClient<$Result.GetResult<Prisma.$SubscriptionCustomerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     groups<T extends Subscription$groupsArgs<ExtArgs> = {}>(args?: Subset<T, Subscription$groupsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GroupPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    group<T extends Subscription$groupArgs<ExtArgs> = {}>(args?: Subset<T, Subscription$groupArgs<ExtArgs>>): Prisma__GroupClient<$Result.GetResult<Prisma.$GroupPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -16061,6 +16149,7 @@ export namespace Prisma {
   interface SubscriptionFieldRefs {
     readonly id: FieldRef<"Subscription", 'String'>
     readonly userId: FieldRef<"Subscription", 'String'>
+    readonly groupId: FieldRef<"Subscription", 'String'>
     readonly subscriptionCustomerId: FieldRef<"Subscription", 'String'>
     readonly provider: FieldRef<"Subscription", 'BillingProvider'>
     readonly providerSubscriptionId: FieldRef<"Subscription", 'String'>
@@ -16487,6 +16576,25 @@ export namespace Prisma {
   }
 
   /**
+   * Subscription.user
+   */
+  export type Subscription$userArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+  }
+
+  /**
    * Subscription.groups
    */
   export type Subscription$groupsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -16508,6 +16616,25 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: GroupScalarFieldEnum | GroupScalarFieldEnum[]
+  }
+
+  /**
+   * Subscription.group
+   */
+  export type Subscription$groupArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Group
+     */
+    select?: GroupSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Group
+     */
+    omit?: GroupOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: GroupInclude<ExtArgs> | null
+    where?: GroupWhereInput
   }
 
   /**
@@ -37983,6 +38110,7 @@ export namespace Prisma {
     maxMembers: number | null
     defaultAddressBookId: string | null
     teamsGraceEndsAt: Date | null
+    teamsEnabled: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -37997,6 +38125,7 @@ export namespace Prisma {
     maxMembers: number | null
     defaultAddressBookId: string | null
     teamsGraceEndsAt: Date | null
+    teamsEnabled: boolean | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -38011,6 +38140,7 @@ export namespace Prisma {
     maxMembers: number
     defaultAddressBookId: number
     teamsGraceEndsAt: number
+    teamsEnabled: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -38037,6 +38167,7 @@ export namespace Prisma {
     maxMembers?: true
     defaultAddressBookId?: true
     teamsGraceEndsAt?: true
+    teamsEnabled?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -38051,6 +38182,7 @@ export namespace Prisma {
     maxMembers?: true
     defaultAddressBookId?: true
     teamsGraceEndsAt?: true
+    teamsEnabled?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -38065,6 +38197,7 @@ export namespace Prisma {
     maxMembers?: true
     defaultAddressBookId?: true
     teamsGraceEndsAt?: true
+    teamsEnabled?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -38166,6 +38299,7 @@ export namespace Prisma {
     maxMembers: number
     defaultAddressBookId: string | null
     teamsGraceEndsAt: Date | null
+    teamsEnabled: boolean
     createdAt: Date
     updatedAt: Date
     _count: GroupCountAggregateOutputType | null
@@ -38199,10 +38333,13 @@ export namespace Prisma {
     maxMembers?: boolean
     defaultAddressBookId?: boolean
     teamsGraceEndsAt?: boolean
+    teamsEnabled?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     owner?: boolean | UserDefaultArgs<ExtArgs>
     subscription?: boolean | Group$subscriptionArgs<ExtArgs>
+    subscriptions?: boolean | Group$subscriptionsArgs<ExtArgs>
+    billingCustomer?: boolean | Group$billingCustomerArgs<ExtArgs>
     members?: boolean | Group$membersArgs<ExtArgs>
     addressBooks?: boolean | Group$addressBooksArgs<ExtArgs>
     teamSyncAccounts?: boolean | Group$teamSyncAccountsArgs<ExtArgs>
@@ -38219,6 +38356,7 @@ export namespace Prisma {
     maxMembers?: boolean
     defaultAddressBookId?: boolean
     teamsGraceEndsAt?: boolean
+    teamsEnabled?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     owner?: boolean | UserDefaultArgs<ExtArgs>
@@ -38235,6 +38373,7 @@ export namespace Prisma {
     maxMembers?: boolean
     defaultAddressBookId?: boolean
     teamsGraceEndsAt?: boolean
+    teamsEnabled?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     owner?: boolean | UserDefaultArgs<ExtArgs>
@@ -38251,14 +38390,17 @@ export namespace Prisma {
     maxMembers?: boolean
     defaultAddressBookId?: boolean
     teamsGraceEndsAt?: boolean
+    teamsEnabled?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type GroupOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerId" | "type" | "name" | "subscriptionId" | "memberSlotsLimit" | "maxMembers" | "defaultAddressBookId" | "teamsGraceEndsAt" | "createdAt" | "updatedAt", ExtArgs["result"]["group"]>
+  export type GroupOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "ownerId" | "type" | "name" | "subscriptionId" | "memberSlotsLimit" | "maxMembers" | "defaultAddressBookId" | "teamsGraceEndsAt" | "teamsEnabled" | "createdAt" | "updatedAt", ExtArgs["result"]["group"]>
   export type GroupInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     owner?: boolean | UserDefaultArgs<ExtArgs>
     subscription?: boolean | Group$subscriptionArgs<ExtArgs>
+    subscriptions?: boolean | Group$subscriptionsArgs<ExtArgs>
+    billingCustomer?: boolean | Group$billingCustomerArgs<ExtArgs>
     members?: boolean | Group$membersArgs<ExtArgs>
     addressBooks?: boolean | Group$addressBooksArgs<ExtArgs>
     teamSyncAccounts?: boolean | Group$teamSyncAccountsArgs<ExtArgs>
@@ -38278,6 +38420,8 @@ export namespace Prisma {
     objects: {
       owner: Prisma.$UserPayload<ExtArgs>
       subscription: Prisma.$SubscriptionPayload<ExtArgs> | null
+      subscriptions: Prisma.$SubscriptionPayload<ExtArgs>[]
+      billingCustomer: Prisma.$SubscriptionCustomerPayload<ExtArgs> | null
       members: Prisma.$GroupMemberPayload<ExtArgs>[]
       addressBooks: Prisma.$GroupAddressBookPayload<ExtArgs>[]
       teamSyncAccounts: Prisma.$TeamSyncAccountPayload<ExtArgs>[]
@@ -38292,6 +38436,7 @@ export namespace Prisma {
       maxMembers: number
       defaultAddressBookId: string | null
       teamsGraceEndsAt: Date | null
+      teamsEnabled: boolean
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["group"]>
@@ -38690,6 +38835,8 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     owner<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
     subscription<T extends Group$subscriptionArgs<ExtArgs> = {}>(args?: Subset<T, Group$subscriptionArgs<ExtArgs>>): Prisma__SubscriptionClient<$Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    subscriptions<T extends Group$subscriptionsArgs<ExtArgs> = {}>(args?: Subset<T, Group$subscriptionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SubscriptionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    billingCustomer<T extends Group$billingCustomerArgs<ExtArgs> = {}>(args?: Subset<T, Group$billingCustomerArgs<ExtArgs>>): Prisma__SubscriptionCustomerClient<$Result.GetResult<Prisma.$SubscriptionCustomerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     members<T extends Group$membersArgs<ExtArgs> = {}>(args?: Subset<T, Group$membersArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GroupMemberPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     addressBooks<T extends Group$addressBooksArgs<ExtArgs> = {}>(args?: Subset<T, Group$addressBooksArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$GroupAddressBookPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     teamSyncAccounts<T extends Group$teamSyncAccountsArgs<ExtArgs> = {}>(args?: Subset<T, Group$teamSyncAccountsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TeamSyncAccountPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
@@ -38731,6 +38878,7 @@ export namespace Prisma {
     readonly maxMembers: FieldRef<"Group", 'Int'>
     readonly defaultAddressBookId: FieldRef<"Group", 'String'>
     readonly teamsGraceEndsAt: FieldRef<"Group", 'DateTime'>
+    readonly teamsEnabled: FieldRef<"Group", 'Boolean'>
     readonly createdAt: FieldRef<"Group", 'DateTime'>
     readonly updatedAt: FieldRef<"Group", 'DateTime'>
   }
@@ -39148,6 +39296,49 @@ export namespace Prisma {
   }
 
   /**
+   * Group.subscriptions
+   */
+  export type Group$subscriptionsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Subscription
+     */
+    select?: SubscriptionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Subscription
+     */
+    omit?: SubscriptionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SubscriptionInclude<ExtArgs> | null
+    where?: SubscriptionWhereInput
+    orderBy?: SubscriptionOrderByWithRelationInput | SubscriptionOrderByWithRelationInput[]
+    cursor?: SubscriptionWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SubscriptionScalarFieldEnum | SubscriptionScalarFieldEnum[]
+  }
+
+  /**
+   * Group.billingCustomer
+   */
+  export type Group$billingCustomerArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SubscriptionCustomer
+     */
+    select?: SubscriptionCustomerSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SubscriptionCustomer
+     */
+    omit?: SubscriptionCustomerOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SubscriptionCustomerInclude<ExtArgs> | null
+    where?: SubscriptionCustomerWhereInput
+  }
+
+  /**
    * Group.members
    */
   export type Group$membersArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -39256,6 +39447,7 @@ export namespace Prisma {
     role: $Enums.GroupRole | null
     inviteStatus: $Enums.GroupInviteStatus | null
     canEdit: boolean | null
+    canManageBilling: boolean | null
     inviteToken: string | null
     inviteExpiresAt: Date | null
     invitedAt: Date | null
@@ -39272,6 +39464,7 @@ export namespace Prisma {
     role: $Enums.GroupRole | null
     inviteStatus: $Enums.GroupInviteStatus | null
     canEdit: boolean | null
+    canManageBilling: boolean | null
     inviteToken: string | null
     inviteExpiresAt: Date | null
     invitedAt: Date | null
@@ -39288,6 +39481,7 @@ export namespace Prisma {
     role: number
     inviteStatus: number
     canEdit: number
+    canManageBilling: number
     addressBookPermissions: number
     inviteToken: number
     inviteExpiresAt: number
@@ -39307,6 +39501,7 @@ export namespace Prisma {
     role?: true
     inviteStatus?: true
     canEdit?: true
+    canManageBilling?: true
     inviteToken?: true
     inviteExpiresAt?: true
     invitedAt?: true
@@ -39323,6 +39518,7 @@ export namespace Prisma {
     role?: true
     inviteStatus?: true
     canEdit?: true
+    canManageBilling?: true
     inviteToken?: true
     inviteExpiresAt?: true
     invitedAt?: true
@@ -39339,6 +39535,7 @@ export namespace Prisma {
     role?: true
     inviteStatus?: true
     canEdit?: true
+    canManageBilling?: true
     addressBookPermissions?: true
     inviteToken?: true
     inviteExpiresAt?: true
@@ -39429,6 +39626,7 @@ export namespace Prisma {
     role: $Enums.GroupRole
     inviteStatus: $Enums.GroupInviteStatus
     canEdit: boolean
+    canManageBilling: boolean
     addressBookPermissions: JsonValue | null
     inviteToken: string | null
     inviteExpiresAt: Date | null
@@ -39463,6 +39661,7 @@ export namespace Prisma {
     role?: boolean
     inviteStatus?: boolean
     canEdit?: boolean
+    canManageBilling?: boolean
     addressBookPermissions?: boolean
     inviteToken?: boolean
     inviteExpiresAt?: boolean
@@ -39482,6 +39681,7 @@ export namespace Prisma {
     role?: boolean
     inviteStatus?: boolean
     canEdit?: boolean
+    canManageBilling?: boolean
     addressBookPermissions?: boolean
     inviteToken?: boolean
     inviteExpiresAt?: boolean
@@ -39501,6 +39701,7 @@ export namespace Prisma {
     role?: boolean
     inviteStatus?: boolean
     canEdit?: boolean
+    canManageBilling?: boolean
     addressBookPermissions?: boolean
     inviteToken?: boolean
     inviteExpiresAt?: boolean
@@ -39520,6 +39721,7 @@ export namespace Prisma {
     role?: boolean
     inviteStatus?: boolean
     canEdit?: boolean
+    canManageBilling?: boolean
     addressBookPermissions?: boolean
     inviteToken?: boolean
     inviteExpiresAt?: boolean
@@ -39529,7 +39731,7 @@ export namespace Prisma {
     createdAt?: boolean
   }
 
-  export type GroupMemberOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "groupId" | "userId" | "invitedEmail" | "role" | "inviteStatus" | "canEdit" | "addressBookPermissions" | "inviteToken" | "inviteExpiresAt" | "invitedAt" | "invitedByUserId" | "joinedAt" | "createdAt", ExtArgs["result"]["groupMember"]>
+  export type GroupMemberOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "groupId" | "userId" | "invitedEmail" | "role" | "inviteStatus" | "canEdit" | "canManageBilling" | "addressBookPermissions" | "inviteToken" | "inviteExpiresAt" | "invitedAt" | "invitedByUserId" | "joinedAt" | "createdAt", ExtArgs["result"]["groupMember"]>
   export type GroupMemberInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     group?: boolean | GroupDefaultArgs<ExtArgs>
     user?: boolean | GroupMember$userArgs<ExtArgs>
@@ -39557,6 +39759,7 @@ export namespace Prisma {
       role: $Enums.GroupRole
       inviteStatus: $Enums.GroupInviteStatus
       canEdit: boolean
+      canManageBilling: boolean
       addressBookPermissions: Prisma.JsonValue | null
       inviteToken: string | null
       inviteExpiresAt: Date | null
@@ -39996,6 +40199,7 @@ export namespace Prisma {
     readonly role: FieldRef<"GroupMember", 'GroupRole'>
     readonly inviteStatus: FieldRef<"GroupMember", 'GroupInviteStatus'>
     readonly canEdit: FieldRef<"GroupMember", 'Boolean'>
+    readonly canManageBilling: FieldRef<"GroupMember", 'Boolean'>
     readonly addressBookPermissions: FieldRef<"GroupMember", 'Json'>
     readonly inviteToken: FieldRef<"GroupMember", 'String'>
     readonly inviteExpiresAt: FieldRef<"GroupMember", 'DateTime'>
@@ -60901,6 +61105,7 @@ export namespace Prisma {
   export const SubscriptionCustomerScalarFieldEnum: {
     id: 'id',
     userId: 'userId',
+    groupId: 'groupId',
     provider: 'provider',
     providerCustomerId: 'providerCustomerId',
     billingEmail: 'billingEmail',
@@ -60914,6 +61119,7 @@ export namespace Prisma {
   export const SubscriptionScalarFieldEnum: {
     id: 'id',
     userId: 'userId',
+    groupId: 'groupId',
     subscriptionCustomerId: 'subscriptionCustomerId',
     provider: 'provider',
     providerSubscriptionId: 'providerSubscriptionId',
@@ -61296,6 +61502,7 @@ export namespace Prisma {
     maxMembers: 'maxMembers',
     defaultAddressBookId: 'defaultAddressBookId',
     teamsGraceEndsAt: 'teamsGraceEndsAt',
+    teamsEnabled: 'teamsEnabled',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -61311,6 +61518,7 @@ export namespace Prisma {
     role: 'role',
     inviteStatus: 'inviteStatus',
     canEdit: 'canEdit',
+    canManageBilling: 'canManageBilling',
     addressBookPermissions: 'addressBookPermissions',
     inviteToken: 'inviteToken',
     inviteExpiresAt: 'inviteExpiresAt',
@@ -63057,31 +63265,36 @@ export namespace Prisma {
     OR?: SubscriptionCustomerWhereInput[]
     NOT?: SubscriptionCustomerWhereInput | SubscriptionCustomerWhereInput[]
     id?: StringFilter<"SubscriptionCustomer"> | string
-    userId?: StringFilter<"SubscriptionCustomer"> | string
+    userId?: StringNullableFilter<"SubscriptionCustomer"> | string | null
+    groupId?: StringNullableFilter<"SubscriptionCustomer"> | string | null
     provider?: EnumBillingProviderFilter<"SubscriptionCustomer"> | $Enums.BillingProvider
     providerCustomerId?: StringFilter<"SubscriptionCustomer"> | string
     billingEmail?: StringNullableFilter<"SubscriptionCustomer"> | string | null
     createdAt?: DateTimeFilter<"SubscriptionCustomer"> | Date | string
     updatedAt?: DateTimeFilter<"SubscriptionCustomer"> | Date | string
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    group?: XOR<GroupNullableScalarRelationFilter, GroupWhereInput> | null
     subscriptions?: SubscriptionListRelationFilter
   }
 
   export type SubscriptionCustomerOrderByWithRelationInput = {
     id?: SortOrder
-    userId?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    groupId?: SortOrderInput | SortOrder
     provider?: SortOrder
     providerCustomerId?: SortOrder
     billingEmail?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
+    group?: GroupOrderByWithRelationInput
     subscriptions?: SubscriptionOrderByRelationAggregateInput
   }
 
   export type SubscriptionCustomerWhereUniqueInput = Prisma.AtLeast<{
     id?: string
     userId?: string
+    groupId?: string
     provider_providerCustomerId?: SubscriptionCustomerProviderProviderCustomerIdCompoundUniqueInput
     AND?: SubscriptionCustomerWhereInput | SubscriptionCustomerWhereInput[]
     OR?: SubscriptionCustomerWhereInput[]
@@ -63091,13 +63304,15 @@ export namespace Prisma {
     billingEmail?: StringNullableFilter<"SubscriptionCustomer"> | string | null
     createdAt?: DateTimeFilter<"SubscriptionCustomer"> | Date | string
     updatedAt?: DateTimeFilter<"SubscriptionCustomer"> | Date | string
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
+    group?: XOR<GroupNullableScalarRelationFilter, GroupWhereInput> | null
     subscriptions?: SubscriptionListRelationFilter
-  }, "id" | "userId" | "provider_providerCustomerId">
+  }, "id" | "userId" | "groupId" | "provider_providerCustomerId">
 
   export type SubscriptionCustomerOrderByWithAggregationInput = {
     id?: SortOrder
-    userId?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    groupId?: SortOrderInput | SortOrder
     provider?: SortOrder
     providerCustomerId?: SortOrder
     billingEmail?: SortOrderInput | SortOrder
@@ -63113,7 +63328,8 @@ export namespace Prisma {
     OR?: SubscriptionCustomerScalarWhereWithAggregatesInput[]
     NOT?: SubscriptionCustomerScalarWhereWithAggregatesInput | SubscriptionCustomerScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"SubscriptionCustomer"> | string
-    userId?: StringWithAggregatesFilter<"SubscriptionCustomer"> | string
+    userId?: StringNullableWithAggregatesFilter<"SubscriptionCustomer"> | string | null
+    groupId?: StringNullableWithAggregatesFilter<"SubscriptionCustomer"> | string | null
     provider?: EnumBillingProviderWithAggregatesFilter<"SubscriptionCustomer"> | $Enums.BillingProvider
     providerCustomerId?: StringWithAggregatesFilter<"SubscriptionCustomer"> | string
     billingEmail?: StringNullableWithAggregatesFilter<"SubscriptionCustomer"> | string | null
@@ -63126,7 +63342,8 @@ export namespace Prisma {
     OR?: SubscriptionWhereInput[]
     NOT?: SubscriptionWhereInput | SubscriptionWhereInput[]
     id?: StringFilter<"Subscription"> | string
-    userId?: StringFilter<"Subscription"> | string
+    userId?: StringNullableFilter<"Subscription"> | string | null
+    groupId?: StringNullableFilter<"Subscription"> | string | null
     subscriptionCustomerId?: StringFilter<"Subscription"> | string
     provider?: EnumBillingProviderFilter<"Subscription"> | $Enums.BillingProvider
     providerSubscriptionId?: StringFilter<"Subscription"> | string
@@ -63157,14 +63374,16 @@ export namespace Prisma {
     endedAt?: DateTimeNullableFilter<"Subscription"> | Date | string | null
     createdAt?: DateTimeFilter<"Subscription"> | Date | string
     updatedAt?: DateTimeFilter<"Subscription"> | Date | string
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     subscriptionCustomer?: XOR<SubscriptionCustomerScalarRelationFilter, SubscriptionCustomerWhereInput>
     groups?: GroupListRelationFilter
+    group?: XOR<GroupNullableScalarRelationFilter, GroupWhereInput> | null
   }
 
   export type SubscriptionOrderByWithRelationInput = {
     id?: SortOrder
-    userId?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    groupId?: SortOrderInput | SortOrder
     subscriptionCustomerId?: SortOrder
     provider?: SortOrder
     providerSubscriptionId?: SortOrder
@@ -63198,6 +63417,7 @@ export namespace Prisma {
     user?: UserOrderByWithRelationInput
     subscriptionCustomer?: SubscriptionCustomerOrderByWithRelationInput
     groups?: GroupOrderByRelationAggregateInput
+    group?: GroupOrderByWithRelationInput
   }
 
   export type SubscriptionWhereUniqueInput = Prisma.AtLeast<{
@@ -63206,7 +63426,8 @@ export namespace Prisma {
     AND?: SubscriptionWhereInput | SubscriptionWhereInput[]
     OR?: SubscriptionWhereInput[]
     NOT?: SubscriptionWhereInput | SubscriptionWhereInput[]
-    userId?: StringFilter<"Subscription"> | string
+    userId?: StringNullableFilter<"Subscription"> | string | null
+    groupId?: StringNullableFilter<"Subscription"> | string | null
     subscriptionCustomerId?: StringFilter<"Subscription"> | string
     provider?: EnumBillingProviderFilter<"Subscription"> | $Enums.BillingProvider
     providerSubscriptionId?: StringFilter<"Subscription"> | string
@@ -63237,14 +63458,16 @@ export namespace Prisma {
     endedAt?: DateTimeNullableFilter<"Subscription"> | Date | string | null
     createdAt?: DateTimeFilter<"Subscription"> | Date | string
     updatedAt?: DateTimeFilter<"Subscription"> | Date | string
-    user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    user?: XOR<UserNullableScalarRelationFilter, UserWhereInput> | null
     subscriptionCustomer?: XOR<SubscriptionCustomerScalarRelationFilter, SubscriptionCustomerWhereInput>
     groups?: GroupListRelationFilter
+    group?: XOR<GroupNullableScalarRelationFilter, GroupWhereInput> | null
   }, "id" | "provider_providerSubscriptionId">
 
   export type SubscriptionOrderByWithAggregationInput = {
     id?: SortOrder
-    userId?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    groupId?: SortOrderInput | SortOrder
     subscriptionCustomerId?: SortOrder
     provider?: SortOrder
     providerSubscriptionId?: SortOrder
@@ -63287,7 +63510,8 @@ export namespace Prisma {
     OR?: SubscriptionScalarWhereWithAggregatesInput[]
     NOT?: SubscriptionScalarWhereWithAggregatesInput | SubscriptionScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Subscription"> | string
-    userId?: StringWithAggregatesFilter<"Subscription"> | string
+    userId?: StringNullableWithAggregatesFilter<"Subscription"> | string | null
+    groupId?: StringNullableWithAggregatesFilter<"Subscription"> | string | null
     subscriptionCustomerId?: StringWithAggregatesFilter<"Subscription"> | string
     provider?: EnumBillingProviderWithAggregatesFilter<"Subscription"> | $Enums.BillingProvider
     providerSubscriptionId?: StringWithAggregatesFilter<"Subscription"> | string
@@ -65090,10 +65314,13 @@ export namespace Prisma {
     maxMembers?: IntFilter<"Group"> | number
     defaultAddressBookId?: StringNullableFilter<"Group"> | string | null
     teamsGraceEndsAt?: DateTimeNullableFilter<"Group"> | Date | string | null
+    teamsEnabled?: BoolFilter<"Group"> | boolean
     createdAt?: DateTimeFilter<"Group"> | Date | string
     updatedAt?: DateTimeFilter<"Group"> | Date | string
     owner?: XOR<UserScalarRelationFilter, UserWhereInput>
     subscription?: XOR<SubscriptionNullableScalarRelationFilter, SubscriptionWhereInput> | null
+    subscriptions?: SubscriptionListRelationFilter
+    billingCustomer?: XOR<SubscriptionCustomerNullableScalarRelationFilter, SubscriptionCustomerWhereInput> | null
     members?: GroupMemberListRelationFilter
     addressBooks?: GroupAddressBookListRelationFilter
     teamSyncAccounts?: TeamSyncAccountListRelationFilter
@@ -65109,10 +65336,13 @@ export namespace Prisma {
     maxMembers?: SortOrder
     defaultAddressBookId?: SortOrderInput | SortOrder
     teamsGraceEndsAt?: SortOrderInput | SortOrder
+    teamsEnabled?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     owner?: UserOrderByWithRelationInput
     subscription?: SubscriptionOrderByWithRelationInput
+    subscriptions?: SubscriptionOrderByRelationAggregateInput
+    billingCustomer?: SubscriptionCustomerOrderByWithRelationInput
     members?: GroupMemberOrderByRelationAggregateInput
     addressBooks?: GroupAddressBookOrderByRelationAggregateInput
     teamSyncAccounts?: TeamSyncAccountOrderByRelationAggregateInput
@@ -65131,10 +65361,13 @@ export namespace Prisma {
     maxMembers?: IntFilter<"Group"> | number
     defaultAddressBookId?: StringNullableFilter<"Group"> | string | null
     teamsGraceEndsAt?: DateTimeNullableFilter<"Group"> | Date | string | null
+    teamsEnabled?: BoolFilter<"Group"> | boolean
     createdAt?: DateTimeFilter<"Group"> | Date | string
     updatedAt?: DateTimeFilter<"Group"> | Date | string
     owner?: XOR<UserScalarRelationFilter, UserWhereInput>
     subscription?: XOR<SubscriptionNullableScalarRelationFilter, SubscriptionWhereInput> | null
+    subscriptions?: SubscriptionListRelationFilter
+    billingCustomer?: XOR<SubscriptionCustomerNullableScalarRelationFilter, SubscriptionCustomerWhereInput> | null
     members?: GroupMemberListRelationFilter
     addressBooks?: GroupAddressBookListRelationFilter
     teamSyncAccounts?: TeamSyncAccountListRelationFilter
@@ -65150,6 +65383,7 @@ export namespace Prisma {
     maxMembers?: SortOrder
     defaultAddressBookId?: SortOrderInput | SortOrder
     teamsGraceEndsAt?: SortOrderInput | SortOrder
+    teamsEnabled?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: GroupCountOrderByAggregateInput
@@ -65172,6 +65406,7 @@ export namespace Prisma {
     maxMembers?: IntWithAggregatesFilter<"Group"> | number
     defaultAddressBookId?: StringNullableWithAggregatesFilter<"Group"> | string | null
     teamsGraceEndsAt?: DateTimeNullableWithAggregatesFilter<"Group"> | Date | string | null
+    teamsEnabled?: BoolWithAggregatesFilter<"Group"> | boolean
     createdAt?: DateTimeWithAggregatesFilter<"Group"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Group"> | Date | string
   }
@@ -65187,6 +65422,7 @@ export namespace Prisma {
     role?: EnumGroupRoleFilter<"GroupMember"> | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFilter<"GroupMember"> | $Enums.GroupInviteStatus
     canEdit?: BoolFilter<"GroupMember"> | boolean
+    canManageBilling?: BoolFilter<"GroupMember"> | boolean
     addressBookPermissions?: JsonNullableFilter<"GroupMember">
     inviteToken?: StringNullableFilter<"GroupMember"> | string | null
     inviteExpiresAt?: DateTimeNullableFilter<"GroupMember"> | Date | string | null
@@ -65206,6 +65442,7 @@ export namespace Prisma {
     role?: SortOrder
     inviteStatus?: SortOrder
     canEdit?: SortOrder
+    canManageBilling?: SortOrder
     addressBookPermissions?: SortOrderInput | SortOrder
     inviteToken?: SortOrderInput | SortOrder
     inviteExpiresAt?: SortOrderInput | SortOrder
@@ -65231,6 +65468,7 @@ export namespace Prisma {
     role?: EnumGroupRoleFilter<"GroupMember"> | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFilter<"GroupMember"> | $Enums.GroupInviteStatus
     canEdit?: BoolFilter<"GroupMember"> | boolean
+    canManageBilling?: BoolFilter<"GroupMember"> | boolean
     addressBookPermissions?: JsonNullableFilter<"GroupMember">
     inviteExpiresAt?: DateTimeNullableFilter<"GroupMember"> | Date | string | null
     invitedAt?: DateTimeFilter<"GroupMember"> | Date | string
@@ -65249,6 +65487,7 @@ export namespace Prisma {
     role?: SortOrder
     inviteStatus?: SortOrder
     canEdit?: SortOrder
+    canManageBilling?: SortOrder
     addressBookPermissions?: SortOrderInput | SortOrder
     inviteToken?: SortOrderInput | SortOrder
     inviteExpiresAt?: SortOrderInput | SortOrder
@@ -65272,6 +65511,7 @@ export namespace Prisma {
     role?: EnumGroupRoleWithAggregatesFilter<"GroupMember"> | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusWithAggregatesFilter<"GroupMember"> | $Enums.GroupInviteStatus
     canEdit?: BoolWithAggregatesFilter<"GroupMember"> | boolean
+    canManageBilling?: BoolWithAggregatesFilter<"GroupMember"> | boolean
     addressBookPermissions?: JsonNullableWithAggregatesFilter<"GroupMember">
     inviteToken?: StringNullableWithAggregatesFilter<"GroupMember"> | string | null
     inviteExpiresAt?: DateTimeNullableWithAggregatesFilter<"GroupMember"> | Date | string | null
@@ -67644,13 +67884,15 @@ export namespace Prisma {
     billingEmail?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutSubscriptionCustomerInput
+    user?: UserCreateNestedOneWithoutSubscriptionCustomerInput
+    group?: GroupCreateNestedOneWithoutBillingCustomerInput
     subscriptions?: SubscriptionCreateNestedManyWithoutSubscriptionCustomerInput
   }
 
   export type SubscriptionCustomerUncheckedCreateInput = {
     id?: string
-    userId: string
+    userId?: string | null
+    groupId?: string | null
     provider?: $Enums.BillingProvider
     providerCustomerId: string
     billingEmail?: string | null
@@ -67666,13 +67908,15 @@ export namespace Prisma {
     billingEmail?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutSubscriptionCustomerNestedInput
+    user?: UserUpdateOneWithoutSubscriptionCustomerNestedInput
+    group?: GroupUpdateOneWithoutBillingCustomerNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutSubscriptionCustomerNestedInput
   }
 
   export type SubscriptionCustomerUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    groupId?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: EnumBillingProviderFieldUpdateOperationsInput | $Enums.BillingProvider
     providerCustomerId?: StringFieldUpdateOperationsInput | string
     billingEmail?: NullableStringFieldUpdateOperationsInput | string | null
@@ -67683,7 +67927,8 @@ export namespace Prisma {
 
   export type SubscriptionCustomerCreateManyInput = {
     id?: string
-    userId: string
+    userId?: string | null
+    groupId?: string | null
     provider?: $Enums.BillingProvider
     providerCustomerId: string
     billingEmail?: string | null
@@ -67702,7 +67947,8 @@ export namespace Prisma {
 
   export type SubscriptionCustomerUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    groupId?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: EnumBillingProviderFieldUpdateOperationsInput | $Enums.BillingProvider
     providerCustomerId?: StringFieldUpdateOperationsInput | string
     billingEmail?: NullableStringFieldUpdateOperationsInput | string | null
@@ -67741,14 +67987,16 @@ export namespace Prisma {
     endedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutSubscriptionsInput
+    user?: UserCreateNestedOneWithoutSubscriptionsInput
     subscriptionCustomer: SubscriptionCustomerCreateNestedOneWithoutSubscriptionsInput
     groups?: GroupCreateNestedManyWithoutSubscriptionInput
+    group?: GroupCreateNestedOneWithoutSubscriptionsInput
   }
 
   export type SubscriptionUncheckedCreateInput = {
     id?: string
-    userId: string
+    userId?: string | null
+    groupId?: string | null
     subscriptionCustomerId: string
     provider?: $Enums.BillingProvider
     providerSubscriptionId: string
@@ -67813,14 +68061,16 @@ export namespace Prisma {
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutSubscriptionsNestedInput
+    user?: UserUpdateOneWithoutSubscriptionsNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneRequiredWithoutSubscriptionsNestedInput
     groups?: GroupUpdateManyWithoutSubscriptionNestedInput
+    group?: GroupUpdateOneWithoutSubscriptionsNestedInput
   }
 
   export type SubscriptionUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    groupId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionCustomerId?: StringFieldUpdateOperationsInput | string
     provider?: EnumBillingProviderFieldUpdateOperationsInput | $Enums.BillingProvider
     providerSubscriptionId?: StringFieldUpdateOperationsInput | string
@@ -67856,7 +68106,8 @@ export namespace Prisma {
 
   export type SubscriptionCreateManyInput = {
     id?: string
-    userId: string
+    userId?: string | null
+    groupId?: string | null
     subscriptionCustomerId: string
     provider?: $Enums.BillingProvider
     providerSubscriptionId: string
@@ -67924,7 +68175,8 @@ export namespace Prisma {
 
   export type SubscriptionUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    groupId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionCustomerId?: StringFieldUpdateOperationsInput | string
     provider?: EnumBillingProviderFieldUpdateOperationsInput | $Enums.BillingProvider
     providerSubscriptionId?: StringFieldUpdateOperationsInput | string
@@ -69952,10 +70204,13 @@ export namespace Prisma {
     maxMembers?: number
     defaultAddressBookId?: string | null
     teamsGraceEndsAt?: Date | string | null
+    teamsEnabled?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedGroupsInput
     subscription?: SubscriptionCreateNestedOneWithoutGroupsInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutGroupInput
+    billingCustomer?: SubscriptionCustomerCreateNestedOneWithoutGroupInput
     members?: GroupMemberCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookCreateNestedManyWithoutGroupInput
     teamSyncAccounts?: TeamSyncAccountCreateNestedManyWithoutGroupInput
@@ -69971,8 +70226,11 @@ export namespace Prisma {
     maxMembers?: number
     defaultAddressBookId?: string | null
     teamsGraceEndsAt?: Date | string | null
+    teamsEnabled?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutGroupInput
+    billingCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutGroupInput
     members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookUncheckedCreateNestedManyWithoutGroupInput
     teamSyncAccounts?: TeamSyncAccountUncheckedCreateNestedManyWithoutGroupInput
@@ -69986,10 +70244,13 @@ export namespace Prisma {
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedGroupsNestedInput
     subscription?: SubscriptionUpdateOneWithoutGroupsNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutGroupNestedInput
+    billingCustomer?: SubscriptionCustomerUpdateOneWithoutGroupNestedInput
     members?: GroupMemberUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUpdateManyWithoutGroupNestedInput
     teamSyncAccounts?: TeamSyncAccountUpdateManyWithoutGroupNestedInput
@@ -70005,8 +70266,11 @@ export namespace Prisma {
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutGroupNestedInput
+    billingCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutGroupNestedInput
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUncheckedUpdateManyWithoutGroupNestedInput
     teamSyncAccounts?: TeamSyncAccountUncheckedUpdateManyWithoutGroupNestedInput
@@ -70022,6 +70286,7 @@ export namespace Prisma {
     maxMembers?: number
     defaultAddressBookId?: string | null
     teamsGraceEndsAt?: Date | string | null
+    teamsEnabled?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -70034,6 +70299,7 @@ export namespace Prisma {
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -70048,6 +70314,7 @@ export namespace Prisma {
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -70058,6 +70325,7 @@ export namespace Prisma {
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    canManageBilling?: boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
@@ -70077,6 +70345,7 @@ export namespace Prisma {
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    canManageBilling?: boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
@@ -70092,6 +70361,7 @@ export namespace Prisma {
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    canManageBilling?: BoolFieldUpdateOperationsInput | boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -70111,6 +70381,7 @@ export namespace Prisma {
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    canManageBilling?: BoolFieldUpdateOperationsInput | boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -70128,6 +70399,7 @@ export namespace Prisma {
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    canManageBilling?: boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
@@ -70143,6 +70415,7 @@ export namespace Prisma {
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    canManageBilling?: BoolFieldUpdateOperationsInput | boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -70160,6 +70433,7 @@ export namespace Prisma {
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    canManageBilling?: BoolFieldUpdateOperationsInput | boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -72662,6 +72936,16 @@ export namespace Prisma {
     not?: NestedEnumBillingProviderFilter<$PrismaModel> | $Enums.BillingProvider
   }
 
+  export type UserNullableScalarRelationFilter = {
+    is?: UserWhereInput | null
+    isNot?: UserWhereInput | null
+  }
+
+  export type GroupNullableScalarRelationFilter = {
+    is?: GroupWhereInput | null
+    isNot?: GroupWhereInput | null
+  }
+
   export type SubscriptionCustomerProviderProviderCustomerIdCompoundUniqueInput = {
     provider: $Enums.BillingProvider
     providerCustomerId: string
@@ -72670,6 +72954,7 @@ export namespace Prisma {
   export type SubscriptionCustomerCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    groupId?: SortOrder
     provider?: SortOrder
     providerCustomerId?: SortOrder
     billingEmail?: SortOrder
@@ -72680,6 +72965,7 @@ export namespace Prisma {
   export type SubscriptionCustomerMaxOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    groupId?: SortOrder
     provider?: SortOrder
     providerCustomerId?: SortOrder
     billingEmail?: SortOrder
@@ -72690,6 +72976,7 @@ export namespace Prisma {
   export type SubscriptionCustomerMinOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    groupId?: SortOrder
     provider?: SortOrder
     providerCustomerId?: SortOrder
     billingEmail?: SortOrder
@@ -72741,6 +73028,7 @@ export namespace Prisma {
   export type SubscriptionCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    groupId?: SortOrder
     subscriptionCustomerId?: SortOrder
     provider?: SortOrder
     providerSubscriptionId?: SortOrder
@@ -72786,6 +73074,7 @@ export namespace Prisma {
   export type SubscriptionMaxOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    groupId?: SortOrder
     subscriptionCustomerId?: SortOrder
     provider?: SortOrder
     providerSubscriptionId?: SortOrder
@@ -72821,6 +73110,7 @@ export namespace Prisma {
   export type SubscriptionMinOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
+    groupId?: SortOrder
     subscriptionCustomerId?: SortOrder
     provider?: SortOrder
     providerSubscriptionId?: SortOrder
@@ -74368,6 +74658,7 @@ export namespace Prisma {
     maxMembers?: SortOrder
     defaultAddressBookId?: SortOrder
     teamsGraceEndsAt?: SortOrder
+    teamsEnabled?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -74387,6 +74678,7 @@ export namespace Prisma {
     maxMembers?: SortOrder
     defaultAddressBookId?: SortOrder
     teamsGraceEndsAt?: SortOrder
+    teamsEnabled?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -74401,6 +74693,7 @@ export namespace Prisma {
     maxMembers?: SortOrder
     defaultAddressBookId?: SortOrder
     teamsGraceEndsAt?: SortOrder
+    teamsEnabled?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -74439,11 +74732,6 @@ export namespace Prisma {
     isNot?: GroupWhereInput
   }
 
-  export type UserNullableScalarRelationFilter = {
-    is?: UserWhereInput | null
-    isNot?: UserWhereInput | null
-  }
-
   export type GroupMemberGroupIdUserIdCompoundUniqueInput = {
     groupId: string
     userId: string
@@ -74462,6 +74750,7 @@ export namespace Prisma {
     role?: SortOrder
     inviteStatus?: SortOrder
     canEdit?: SortOrder
+    canManageBilling?: SortOrder
     addressBookPermissions?: SortOrder
     inviteToken?: SortOrder
     inviteExpiresAt?: SortOrder
@@ -74479,6 +74768,7 @@ export namespace Prisma {
     role?: SortOrder
     inviteStatus?: SortOrder
     canEdit?: SortOrder
+    canManageBilling?: SortOrder
     inviteToken?: SortOrder
     inviteExpiresAt?: SortOrder
     invitedAt?: SortOrder
@@ -74495,6 +74785,7 @@ export namespace Prisma {
     role?: SortOrder
     inviteStatus?: SortOrder
     canEdit?: SortOrder
+    canManageBilling?: SortOrder
     inviteToken?: SortOrder
     inviteExpiresAt?: SortOrder
     invitedAt?: SortOrder
@@ -77492,6 +77783,12 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type GroupCreateNestedOneWithoutBillingCustomerInput = {
+    create?: XOR<GroupCreateWithoutBillingCustomerInput, GroupUncheckedCreateWithoutBillingCustomerInput>
+    connectOrCreate?: GroupCreateOrConnectWithoutBillingCustomerInput
+    connect?: GroupWhereUniqueInput
+  }
+
   export type SubscriptionCreateNestedManyWithoutSubscriptionCustomerInput = {
     create?: XOR<SubscriptionCreateWithoutSubscriptionCustomerInput, SubscriptionUncheckedCreateWithoutSubscriptionCustomerInput> | SubscriptionCreateWithoutSubscriptionCustomerInput[] | SubscriptionUncheckedCreateWithoutSubscriptionCustomerInput[]
     connectOrCreate?: SubscriptionCreateOrConnectWithoutSubscriptionCustomerInput | SubscriptionCreateOrConnectWithoutSubscriptionCustomerInput[]
@@ -77510,12 +77807,24 @@ export namespace Prisma {
     set?: $Enums.BillingProvider
   }
 
-  export type UserUpdateOneRequiredWithoutSubscriptionCustomerNestedInput = {
+  export type UserUpdateOneWithoutSubscriptionCustomerNestedInput = {
     create?: XOR<UserCreateWithoutSubscriptionCustomerInput, UserUncheckedCreateWithoutSubscriptionCustomerInput>
     connectOrCreate?: UserCreateOrConnectWithoutSubscriptionCustomerInput
     upsert?: UserUpsertWithoutSubscriptionCustomerInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSubscriptionCustomerInput, UserUpdateWithoutSubscriptionCustomerInput>, UserUncheckedUpdateWithoutSubscriptionCustomerInput>
+  }
+
+  export type GroupUpdateOneWithoutBillingCustomerNestedInput = {
+    create?: XOR<GroupCreateWithoutBillingCustomerInput, GroupUncheckedCreateWithoutBillingCustomerInput>
+    connectOrCreate?: GroupCreateOrConnectWithoutBillingCustomerInput
+    upsert?: GroupUpsertWithoutBillingCustomerInput
+    disconnect?: GroupWhereInput | boolean
+    delete?: GroupWhereInput | boolean
+    connect?: GroupWhereUniqueInput
+    update?: XOR<XOR<GroupUpdateToOneWithWhereWithoutBillingCustomerInput, GroupUpdateWithoutBillingCustomerInput>, GroupUncheckedUpdateWithoutBillingCustomerInput>
   }
 
   export type SubscriptionUpdateManyWithoutSubscriptionCustomerNestedInput = {
@@ -77565,6 +77874,12 @@ export namespace Prisma {
     connect?: GroupWhereUniqueInput | GroupWhereUniqueInput[]
   }
 
+  export type GroupCreateNestedOneWithoutSubscriptionsInput = {
+    create?: XOR<GroupCreateWithoutSubscriptionsInput, GroupUncheckedCreateWithoutSubscriptionsInput>
+    connectOrCreate?: GroupCreateOrConnectWithoutSubscriptionsInput
+    connect?: GroupWhereUniqueInput
+  }
+
   export type GroupUncheckedCreateNestedManyWithoutSubscriptionInput = {
     create?: XOR<GroupCreateWithoutSubscriptionInput, GroupUncheckedCreateWithoutSubscriptionInput> | GroupCreateWithoutSubscriptionInput[] | GroupUncheckedCreateWithoutSubscriptionInput[]
     connectOrCreate?: GroupCreateOrConnectWithoutSubscriptionInput | GroupCreateOrConnectWithoutSubscriptionInput[]
@@ -77584,10 +77899,12 @@ export namespace Prisma {
     set?: $Enums.SubscriptionInterval
   }
 
-  export type UserUpdateOneRequiredWithoutSubscriptionsNestedInput = {
+  export type UserUpdateOneWithoutSubscriptionsNestedInput = {
     create?: XOR<UserCreateWithoutSubscriptionsInput, UserUncheckedCreateWithoutSubscriptionsInput>
     connectOrCreate?: UserCreateOrConnectWithoutSubscriptionsInput
     upsert?: UserUpsertWithoutSubscriptionsInput
+    disconnect?: UserWhereInput | boolean
+    delete?: UserWhereInput | boolean
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutSubscriptionsInput, UserUpdateWithoutSubscriptionsInput>, UserUncheckedUpdateWithoutSubscriptionsInput>
   }
@@ -77612,6 +77929,16 @@ export namespace Prisma {
     update?: GroupUpdateWithWhereUniqueWithoutSubscriptionInput | GroupUpdateWithWhereUniqueWithoutSubscriptionInput[]
     updateMany?: GroupUpdateManyWithWhereWithoutSubscriptionInput | GroupUpdateManyWithWhereWithoutSubscriptionInput[]
     deleteMany?: GroupScalarWhereInput | GroupScalarWhereInput[]
+  }
+
+  export type GroupUpdateOneWithoutSubscriptionsNestedInput = {
+    create?: XOR<GroupCreateWithoutSubscriptionsInput, GroupUncheckedCreateWithoutSubscriptionsInput>
+    connectOrCreate?: GroupCreateOrConnectWithoutSubscriptionsInput
+    upsert?: GroupUpsertWithoutSubscriptionsInput
+    disconnect?: GroupWhereInput | boolean
+    delete?: GroupWhereInput | boolean
+    connect?: GroupWhereUniqueInput
+    update?: XOR<XOR<GroupUpdateToOneWithWhereWithoutSubscriptionsInput, GroupUpdateWithoutSubscriptionsInput>, GroupUncheckedUpdateWithoutSubscriptionsInput>
   }
 
   export type GroupUncheckedUpdateManyWithoutSubscriptionNestedInput = {
@@ -78432,6 +78759,19 @@ export namespace Prisma {
     connect?: SubscriptionWhereUniqueInput
   }
 
+  export type SubscriptionCreateNestedManyWithoutGroupInput = {
+    create?: XOR<SubscriptionCreateWithoutGroupInput, SubscriptionUncheckedCreateWithoutGroupInput> | SubscriptionCreateWithoutGroupInput[] | SubscriptionUncheckedCreateWithoutGroupInput[]
+    connectOrCreate?: SubscriptionCreateOrConnectWithoutGroupInput | SubscriptionCreateOrConnectWithoutGroupInput[]
+    createMany?: SubscriptionCreateManyGroupInputEnvelope
+    connect?: SubscriptionWhereUniqueInput | SubscriptionWhereUniqueInput[]
+  }
+
+  export type SubscriptionCustomerCreateNestedOneWithoutGroupInput = {
+    create?: XOR<SubscriptionCustomerCreateWithoutGroupInput, SubscriptionCustomerUncheckedCreateWithoutGroupInput>
+    connectOrCreate?: SubscriptionCustomerCreateOrConnectWithoutGroupInput
+    connect?: SubscriptionCustomerWhereUniqueInput
+  }
+
   export type GroupMemberCreateNestedManyWithoutGroupInput = {
     create?: XOR<GroupMemberCreateWithoutGroupInput, GroupMemberUncheckedCreateWithoutGroupInput> | GroupMemberCreateWithoutGroupInput[] | GroupMemberUncheckedCreateWithoutGroupInput[]
     connectOrCreate?: GroupMemberCreateOrConnectWithoutGroupInput | GroupMemberCreateOrConnectWithoutGroupInput[]
@@ -78451,6 +78791,19 @@ export namespace Prisma {
     connectOrCreate?: TeamSyncAccountCreateOrConnectWithoutGroupInput | TeamSyncAccountCreateOrConnectWithoutGroupInput[]
     createMany?: TeamSyncAccountCreateManyGroupInputEnvelope
     connect?: TeamSyncAccountWhereUniqueInput | TeamSyncAccountWhereUniqueInput[]
+  }
+
+  export type SubscriptionUncheckedCreateNestedManyWithoutGroupInput = {
+    create?: XOR<SubscriptionCreateWithoutGroupInput, SubscriptionUncheckedCreateWithoutGroupInput> | SubscriptionCreateWithoutGroupInput[] | SubscriptionUncheckedCreateWithoutGroupInput[]
+    connectOrCreate?: SubscriptionCreateOrConnectWithoutGroupInput | SubscriptionCreateOrConnectWithoutGroupInput[]
+    createMany?: SubscriptionCreateManyGroupInputEnvelope
+    connect?: SubscriptionWhereUniqueInput | SubscriptionWhereUniqueInput[]
+  }
+
+  export type SubscriptionCustomerUncheckedCreateNestedOneWithoutGroupInput = {
+    create?: XOR<SubscriptionCustomerCreateWithoutGroupInput, SubscriptionCustomerUncheckedCreateWithoutGroupInput>
+    connectOrCreate?: SubscriptionCustomerCreateOrConnectWithoutGroupInput
+    connect?: SubscriptionCustomerWhereUniqueInput
   }
 
   export type GroupMemberUncheckedCreateNestedManyWithoutGroupInput = {
@@ -78496,6 +78849,30 @@ export namespace Prisma {
     update?: XOR<XOR<SubscriptionUpdateToOneWithWhereWithoutGroupsInput, SubscriptionUpdateWithoutGroupsInput>, SubscriptionUncheckedUpdateWithoutGroupsInput>
   }
 
+  export type SubscriptionUpdateManyWithoutGroupNestedInput = {
+    create?: XOR<SubscriptionCreateWithoutGroupInput, SubscriptionUncheckedCreateWithoutGroupInput> | SubscriptionCreateWithoutGroupInput[] | SubscriptionUncheckedCreateWithoutGroupInput[]
+    connectOrCreate?: SubscriptionCreateOrConnectWithoutGroupInput | SubscriptionCreateOrConnectWithoutGroupInput[]
+    upsert?: SubscriptionUpsertWithWhereUniqueWithoutGroupInput | SubscriptionUpsertWithWhereUniqueWithoutGroupInput[]
+    createMany?: SubscriptionCreateManyGroupInputEnvelope
+    set?: SubscriptionWhereUniqueInput | SubscriptionWhereUniqueInput[]
+    disconnect?: SubscriptionWhereUniqueInput | SubscriptionWhereUniqueInput[]
+    delete?: SubscriptionWhereUniqueInput | SubscriptionWhereUniqueInput[]
+    connect?: SubscriptionWhereUniqueInput | SubscriptionWhereUniqueInput[]
+    update?: SubscriptionUpdateWithWhereUniqueWithoutGroupInput | SubscriptionUpdateWithWhereUniqueWithoutGroupInput[]
+    updateMany?: SubscriptionUpdateManyWithWhereWithoutGroupInput | SubscriptionUpdateManyWithWhereWithoutGroupInput[]
+    deleteMany?: SubscriptionScalarWhereInput | SubscriptionScalarWhereInput[]
+  }
+
+  export type SubscriptionCustomerUpdateOneWithoutGroupNestedInput = {
+    create?: XOR<SubscriptionCustomerCreateWithoutGroupInput, SubscriptionCustomerUncheckedCreateWithoutGroupInput>
+    connectOrCreate?: SubscriptionCustomerCreateOrConnectWithoutGroupInput
+    upsert?: SubscriptionCustomerUpsertWithoutGroupInput
+    disconnect?: SubscriptionCustomerWhereInput | boolean
+    delete?: SubscriptionCustomerWhereInput | boolean
+    connect?: SubscriptionCustomerWhereUniqueInput
+    update?: XOR<XOR<SubscriptionCustomerUpdateToOneWithWhereWithoutGroupInput, SubscriptionCustomerUpdateWithoutGroupInput>, SubscriptionCustomerUncheckedUpdateWithoutGroupInput>
+  }
+
   export type GroupMemberUpdateManyWithoutGroupNestedInput = {
     create?: XOR<GroupMemberCreateWithoutGroupInput, GroupMemberUncheckedCreateWithoutGroupInput> | GroupMemberCreateWithoutGroupInput[] | GroupMemberUncheckedCreateWithoutGroupInput[]
     connectOrCreate?: GroupMemberCreateOrConnectWithoutGroupInput | GroupMemberCreateOrConnectWithoutGroupInput[]
@@ -78536,6 +78913,30 @@ export namespace Prisma {
     update?: TeamSyncAccountUpdateWithWhereUniqueWithoutGroupInput | TeamSyncAccountUpdateWithWhereUniqueWithoutGroupInput[]
     updateMany?: TeamSyncAccountUpdateManyWithWhereWithoutGroupInput | TeamSyncAccountUpdateManyWithWhereWithoutGroupInput[]
     deleteMany?: TeamSyncAccountScalarWhereInput | TeamSyncAccountScalarWhereInput[]
+  }
+
+  export type SubscriptionUncheckedUpdateManyWithoutGroupNestedInput = {
+    create?: XOR<SubscriptionCreateWithoutGroupInput, SubscriptionUncheckedCreateWithoutGroupInput> | SubscriptionCreateWithoutGroupInput[] | SubscriptionUncheckedCreateWithoutGroupInput[]
+    connectOrCreate?: SubscriptionCreateOrConnectWithoutGroupInput | SubscriptionCreateOrConnectWithoutGroupInput[]
+    upsert?: SubscriptionUpsertWithWhereUniqueWithoutGroupInput | SubscriptionUpsertWithWhereUniqueWithoutGroupInput[]
+    createMany?: SubscriptionCreateManyGroupInputEnvelope
+    set?: SubscriptionWhereUniqueInput | SubscriptionWhereUniqueInput[]
+    disconnect?: SubscriptionWhereUniqueInput | SubscriptionWhereUniqueInput[]
+    delete?: SubscriptionWhereUniqueInput | SubscriptionWhereUniqueInput[]
+    connect?: SubscriptionWhereUniqueInput | SubscriptionWhereUniqueInput[]
+    update?: SubscriptionUpdateWithWhereUniqueWithoutGroupInput | SubscriptionUpdateWithWhereUniqueWithoutGroupInput[]
+    updateMany?: SubscriptionUpdateManyWithWhereWithoutGroupInput | SubscriptionUpdateManyWithWhereWithoutGroupInput[]
+    deleteMany?: SubscriptionScalarWhereInput | SubscriptionScalarWhereInput[]
+  }
+
+  export type SubscriptionCustomerUncheckedUpdateOneWithoutGroupNestedInput = {
+    create?: XOR<SubscriptionCustomerCreateWithoutGroupInput, SubscriptionCustomerUncheckedCreateWithoutGroupInput>
+    connectOrCreate?: SubscriptionCustomerCreateOrConnectWithoutGroupInput
+    upsert?: SubscriptionCustomerUpsertWithoutGroupInput
+    disconnect?: SubscriptionCustomerWhereInput | boolean
+    delete?: SubscriptionCustomerWhereInput | boolean
+    connect?: SubscriptionCustomerWhereUniqueInput
+    update?: XOR<XOR<SubscriptionCustomerUpdateToOneWithWhereWithoutGroupInput, SubscriptionCustomerUpdateWithoutGroupInput>, SubscriptionCustomerUncheckedUpdateWithoutGroupInput>
   }
 
   export type GroupMemberUncheckedUpdateManyWithoutGroupNestedInput = {
@@ -80537,11 +80938,13 @@ export namespace Prisma {
     billingEmail?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
+    group?: GroupCreateNestedOneWithoutBillingCustomerInput
     subscriptions?: SubscriptionCreateNestedManyWithoutSubscriptionCustomerInput
   }
 
   export type SubscriptionCustomerUncheckedCreateWithoutUserInput = {
     id?: string
+    groupId?: string | null
     provider?: $Enums.BillingProvider
     providerCustomerId: string
     billingEmail?: string | null
@@ -80588,10 +80991,12 @@ export namespace Prisma {
     updatedAt?: Date | string
     subscriptionCustomer: SubscriptionCustomerCreateNestedOneWithoutSubscriptionsInput
     groups?: GroupCreateNestedManyWithoutSubscriptionInput
+    group?: GroupCreateNestedOneWithoutSubscriptionsInput
   }
 
   export type SubscriptionUncheckedCreateWithoutUserInput = {
     id?: string
+    groupId?: string | null
     subscriptionCustomerId: string
     provider?: $Enums.BillingProvider
     providerSubscriptionId: string
@@ -80673,9 +81078,12 @@ export namespace Prisma {
     maxMembers?: number
     defaultAddressBookId?: string | null
     teamsGraceEndsAt?: Date | string | null
+    teamsEnabled?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     subscription?: SubscriptionCreateNestedOneWithoutGroupsInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutGroupInput
+    billingCustomer?: SubscriptionCustomerCreateNestedOneWithoutGroupInput
     members?: GroupMemberCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookCreateNestedManyWithoutGroupInput
     teamSyncAccounts?: TeamSyncAccountCreateNestedManyWithoutGroupInput
@@ -80690,8 +81098,11 @@ export namespace Prisma {
     maxMembers?: number
     defaultAddressBookId?: string | null
     teamsGraceEndsAt?: Date | string | null
+    teamsEnabled?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutGroupInput
+    billingCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutGroupInput
     members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookUncheckedCreateNestedManyWithoutGroupInput
     teamSyncAccounts?: TeamSyncAccountUncheckedCreateNestedManyWithoutGroupInput
@@ -80713,6 +81124,7 @@ export namespace Prisma {
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    canManageBilling?: boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
@@ -80730,6 +81142,7 @@ export namespace Prisma {
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    canManageBilling?: boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
@@ -81799,11 +82212,13 @@ export namespace Prisma {
     billingEmail?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    group?: GroupUpdateOneWithoutBillingCustomerNestedInput
     subscriptions?: SubscriptionUpdateManyWithoutSubscriptionCustomerNestedInput
   }
 
   export type SubscriptionCustomerUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
+    groupId?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: EnumBillingProviderFieldUpdateOperationsInput | $Enums.BillingProvider
     providerCustomerId?: StringFieldUpdateOperationsInput | string
     billingEmail?: NullableStringFieldUpdateOperationsInput | string | null
@@ -81833,7 +82248,8 @@ export namespace Prisma {
     OR?: SubscriptionScalarWhereInput[]
     NOT?: SubscriptionScalarWhereInput | SubscriptionScalarWhereInput[]
     id?: StringFilter<"Subscription"> | string
-    userId?: StringFilter<"Subscription"> | string
+    userId?: StringNullableFilter<"Subscription"> | string | null
+    groupId?: StringNullableFilter<"Subscription"> | string | null
     subscriptionCustomerId?: StringFilter<"Subscription"> | string
     provider?: EnumBillingProviderFilter<"Subscription"> | $Enums.BillingProvider
     providerSubscriptionId?: StringFilter<"Subscription"> | string
@@ -81925,6 +82341,7 @@ export namespace Prisma {
     maxMembers?: IntFilter<"Group"> | number
     defaultAddressBookId?: StringNullableFilter<"Group"> | string | null
     teamsGraceEndsAt?: DateTimeNullableFilter<"Group"> | Date | string | null
+    teamsEnabled?: BoolFilter<"Group"> | boolean
     createdAt?: DateTimeFilter<"Group"> | Date | string
     updatedAt?: DateTimeFilter<"Group"> | Date | string
   }
@@ -81956,6 +82373,7 @@ export namespace Prisma {
     role?: EnumGroupRoleFilter<"GroupMember"> | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFilter<"GroupMember"> | $Enums.GroupInviteStatus
     canEdit?: BoolFilter<"GroupMember"> | boolean
+    canManageBilling?: BoolFilter<"GroupMember"> | boolean
     addressBookPermissions?: JsonNullableFilter<"GroupMember">
     inviteToken?: StringNullableFilter<"GroupMember"> | string | null
     inviteExpiresAt?: DateTimeNullableFilter<"GroupMember"> | Date | string | null
@@ -85227,6 +85645,49 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutSubscriptionCustomerInput, UserUncheckedCreateWithoutSubscriptionCustomerInput>
   }
 
+  export type GroupCreateWithoutBillingCustomerInput = {
+    id?: string
+    type: $Enums.GroupType
+    name: string
+    memberSlotsLimit?: number | null
+    maxMembers?: number
+    defaultAddressBookId?: string | null
+    teamsGraceEndsAt?: Date | string | null
+    teamsEnabled?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    owner: UserCreateNestedOneWithoutOwnedGroupsInput
+    subscription?: SubscriptionCreateNestedOneWithoutGroupsInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutGroupInput
+    members?: GroupMemberCreateNestedManyWithoutGroupInput
+    addressBooks?: GroupAddressBookCreateNestedManyWithoutGroupInput
+    teamSyncAccounts?: TeamSyncAccountCreateNestedManyWithoutGroupInput
+  }
+
+  export type GroupUncheckedCreateWithoutBillingCustomerInput = {
+    id?: string
+    ownerId: string
+    type: $Enums.GroupType
+    name: string
+    subscriptionId?: string | null
+    memberSlotsLimit?: number | null
+    maxMembers?: number
+    defaultAddressBookId?: string | null
+    teamsGraceEndsAt?: Date | string | null
+    teamsEnabled?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutGroupInput
+    members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
+    addressBooks?: GroupAddressBookUncheckedCreateNestedManyWithoutGroupInput
+    teamSyncAccounts?: TeamSyncAccountUncheckedCreateNestedManyWithoutGroupInput
+  }
+
+  export type GroupCreateOrConnectWithoutBillingCustomerInput = {
+    where: GroupWhereUniqueInput
+    create: XOR<GroupCreateWithoutBillingCustomerInput, GroupUncheckedCreateWithoutBillingCustomerInput>
+  }
+
   export type SubscriptionCreateWithoutSubscriptionCustomerInput = {
     id?: string
     provider?: $Enums.BillingProvider
@@ -85258,13 +85719,15 @@ export namespace Prisma {
     endedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutSubscriptionsInput
+    user?: UserCreateNestedOneWithoutSubscriptionsInput
     groups?: GroupCreateNestedManyWithoutSubscriptionInput
+    group?: GroupCreateNestedOneWithoutSubscriptionsInput
   }
 
   export type SubscriptionUncheckedCreateWithoutSubscriptionCustomerInput = {
     id?: string
-    userId: string
+    userId?: string | null
+    groupId?: string | null
     provider?: $Enums.BillingProvider
     providerSubscriptionId: string
     plan?: $Enums.SubscriptionPlan
@@ -85450,6 +85913,55 @@ export namespace Prisma {
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
   }
 
+  export type GroupUpsertWithoutBillingCustomerInput = {
+    update: XOR<GroupUpdateWithoutBillingCustomerInput, GroupUncheckedUpdateWithoutBillingCustomerInput>
+    create: XOR<GroupCreateWithoutBillingCustomerInput, GroupUncheckedCreateWithoutBillingCustomerInput>
+    where?: GroupWhereInput
+  }
+
+  export type GroupUpdateToOneWithWhereWithoutBillingCustomerInput = {
+    where?: GroupWhereInput
+    data: XOR<GroupUpdateWithoutBillingCustomerInput, GroupUncheckedUpdateWithoutBillingCustomerInput>
+  }
+
+  export type GroupUpdateWithoutBillingCustomerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumGroupTypeFieldUpdateOperationsInput | $Enums.GroupType
+    name?: StringFieldUpdateOperationsInput | string
+    memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    maxMembers?: IntFieldUpdateOperationsInput | number
+    defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    owner?: UserUpdateOneRequiredWithoutOwnedGroupsNestedInput
+    subscription?: SubscriptionUpdateOneWithoutGroupsNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutGroupNestedInput
+    members?: GroupMemberUpdateManyWithoutGroupNestedInput
+    addressBooks?: GroupAddressBookUpdateManyWithoutGroupNestedInput
+    teamSyncAccounts?: TeamSyncAccountUpdateManyWithoutGroupNestedInput
+  }
+
+  export type GroupUncheckedUpdateWithoutBillingCustomerInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ownerId?: StringFieldUpdateOperationsInput | string
+    type?: EnumGroupTypeFieldUpdateOperationsInput | $Enums.GroupType
+    name?: StringFieldUpdateOperationsInput | string
+    subscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    maxMembers?: IntFieldUpdateOperationsInput | number
+    defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutGroupNestedInput
+    members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
+    addressBooks?: GroupAddressBookUncheckedUpdateManyWithoutGroupNestedInput
+    teamSyncAccounts?: TeamSyncAccountUncheckedUpdateManyWithoutGroupNestedInput
+  }
+
   export type SubscriptionUpsertWithWhereUniqueWithoutSubscriptionCustomerInput = {
     where: SubscriptionWhereUniqueInput
     update: XOR<SubscriptionUpdateWithoutSubscriptionCustomerInput, SubscriptionUncheckedUpdateWithoutSubscriptionCustomerInput>
@@ -85610,12 +86122,14 @@ export namespace Prisma {
     billingEmail?: string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutSubscriptionCustomerInput
+    user?: UserCreateNestedOneWithoutSubscriptionCustomerInput
+    group?: GroupCreateNestedOneWithoutBillingCustomerInput
   }
 
   export type SubscriptionCustomerUncheckedCreateWithoutSubscriptionsInput = {
     id?: string
-    userId: string
+    userId?: string | null
+    groupId?: string | null
     provider?: $Enums.BillingProvider
     providerCustomerId: string
     billingEmail?: string | null
@@ -85636,9 +86150,12 @@ export namespace Prisma {
     maxMembers?: number
     defaultAddressBookId?: string | null
     teamsGraceEndsAt?: Date | string | null
+    teamsEnabled?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedGroupsInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutGroupInput
+    billingCustomer?: SubscriptionCustomerCreateNestedOneWithoutGroupInput
     members?: GroupMemberCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookCreateNestedManyWithoutGroupInput
     teamSyncAccounts?: TeamSyncAccountCreateNestedManyWithoutGroupInput
@@ -85653,8 +86170,11 @@ export namespace Prisma {
     maxMembers?: number
     defaultAddressBookId?: string | null
     teamsGraceEndsAt?: Date | string | null
+    teamsEnabled?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutGroupInput
+    billingCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutGroupInput
     members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookUncheckedCreateNestedManyWithoutGroupInput
     teamSyncAccounts?: TeamSyncAccountUncheckedCreateNestedManyWithoutGroupInput
@@ -85668,6 +86188,49 @@ export namespace Prisma {
   export type GroupCreateManySubscriptionInputEnvelope = {
     data: GroupCreateManySubscriptionInput | GroupCreateManySubscriptionInput[]
     skipDuplicates?: boolean
+  }
+
+  export type GroupCreateWithoutSubscriptionsInput = {
+    id?: string
+    type: $Enums.GroupType
+    name: string
+    memberSlotsLimit?: number | null
+    maxMembers?: number
+    defaultAddressBookId?: string | null
+    teamsGraceEndsAt?: Date | string | null
+    teamsEnabled?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    owner: UserCreateNestedOneWithoutOwnedGroupsInput
+    subscription?: SubscriptionCreateNestedOneWithoutGroupsInput
+    billingCustomer?: SubscriptionCustomerCreateNestedOneWithoutGroupInput
+    members?: GroupMemberCreateNestedManyWithoutGroupInput
+    addressBooks?: GroupAddressBookCreateNestedManyWithoutGroupInput
+    teamSyncAccounts?: TeamSyncAccountCreateNestedManyWithoutGroupInput
+  }
+
+  export type GroupUncheckedCreateWithoutSubscriptionsInput = {
+    id?: string
+    ownerId: string
+    type: $Enums.GroupType
+    name: string
+    subscriptionId?: string | null
+    memberSlotsLimit?: number | null
+    maxMembers?: number
+    defaultAddressBookId?: string | null
+    teamsGraceEndsAt?: Date | string | null
+    teamsEnabled?: boolean
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    billingCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutGroupInput
+    members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
+    addressBooks?: GroupAddressBookUncheckedCreateNestedManyWithoutGroupInput
+    teamSyncAccounts?: TeamSyncAccountUncheckedCreateNestedManyWithoutGroupInput
+  }
+
+  export type GroupCreateOrConnectWithoutSubscriptionsInput = {
+    where: GroupWhereUniqueInput
+    create: XOR<GroupCreateWithoutSubscriptionsInput, GroupUncheckedCreateWithoutSubscriptionsInput>
   }
 
   export type UserUpsertWithoutSubscriptionsInput = {
@@ -85831,12 +86394,14 @@ export namespace Prisma {
     billingEmail?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutSubscriptionCustomerNestedInput
+    user?: UserUpdateOneWithoutSubscriptionCustomerNestedInput
+    group?: GroupUpdateOneWithoutBillingCustomerNestedInput
   }
 
   export type SubscriptionCustomerUncheckedUpdateWithoutSubscriptionsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    groupId?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: EnumBillingProviderFieldUpdateOperationsInput | $Enums.BillingProvider
     providerCustomerId?: StringFieldUpdateOperationsInput | string
     billingEmail?: NullableStringFieldUpdateOperationsInput | string | null
@@ -85858,6 +86423,55 @@ export namespace Prisma {
   export type GroupUpdateManyWithWhereWithoutSubscriptionInput = {
     where: GroupScalarWhereInput
     data: XOR<GroupUpdateManyMutationInput, GroupUncheckedUpdateManyWithoutSubscriptionInput>
+  }
+
+  export type GroupUpsertWithoutSubscriptionsInput = {
+    update: XOR<GroupUpdateWithoutSubscriptionsInput, GroupUncheckedUpdateWithoutSubscriptionsInput>
+    create: XOR<GroupCreateWithoutSubscriptionsInput, GroupUncheckedCreateWithoutSubscriptionsInput>
+    where?: GroupWhereInput
+  }
+
+  export type GroupUpdateToOneWithWhereWithoutSubscriptionsInput = {
+    where?: GroupWhereInput
+    data: XOR<GroupUpdateWithoutSubscriptionsInput, GroupUncheckedUpdateWithoutSubscriptionsInput>
+  }
+
+  export type GroupUpdateWithoutSubscriptionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    type?: EnumGroupTypeFieldUpdateOperationsInput | $Enums.GroupType
+    name?: StringFieldUpdateOperationsInput | string
+    memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    maxMembers?: IntFieldUpdateOperationsInput | number
+    defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    owner?: UserUpdateOneRequiredWithoutOwnedGroupsNestedInput
+    subscription?: SubscriptionUpdateOneWithoutGroupsNestedInput
+    billingCustomer?: SubscriptionCustomerUpdateOneWithoutGroupNestedInput
+    members?: GroupMemberUpdateManyWithoutGroupNestedInput
+    addressBooks?: GroupAddressBookUpdateManyWithoutGroupNestedInput
+    teamSyncAccounts?: TeamSyncAccountUpdateManyWithoutGroupNestedInput
+  }
+
+  export type GroupUncheckedUpdateWithoutSubscriptionsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    ownerId?: StringFieldUpdateOperationsInput | string
+    type?: EnumGroupTypeFieldUpdateOperationsInput | $Enums.GroupType
+    name?: StringFieldUpdateOperationsInput | string
+    subscriptionId?: NullableStringFieldUpdateOperationsInput | string | null
+    memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    maxMembers?: IntFieldUpdateOperationsInput | number
+    defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
+    teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    billingCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutGroupNestedInput
+    members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
+    addressBooks?: GroupAddressBookUncheckedUpdateManyWithoutGroupNestedInput
+    teamSyncAccounts?: TeamSyncAccountUncheckedUpdateManyWithoutGroupNestedInput
   }
 
   export type UserCreateWithoutImportJobsInput = {
@@ -92768,13 +93382,15 @@ export namespace Prisma {
     endedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
-    user: UserCreateNestedOneWithoutSubscriptionsInput
+    user?: UserCreateNestedOneWithoutSubscriptionsInput
     subscriptionCustomer: SubscriptionCustomerCreateNestedOneWithoutSubscriptionsInput
+    group?: GroupCreateNestedOneWithoutSubscriptionsInput
   }
 
   export type SubscriptionUncheckedCreateWithoutGroupsInput = {
     id?: string
-    userId: string
+    userId?: string | null
+    groupId?: string | null
     subscriptionCustomerId: string
     provider?: $Enums.BillingProvider
     providerSubscriptionId: string
@@ -92812,12 +93428,122 @@ export namespace Prisma {
     create: XOR<SubscriptionCreateWithoutGroupsInput, SubscriptionUncheckedCreateWithoutGroupsInput>
   }
 
+  export type SubscriptionCreateWithoutGroupInput = {
+    id?: string
+    provider?: $Enums.BillingProvider
+    providerSubscriptionId: string
+    plan?: $Enums.SubscriptionPlan
+    status?: $Enums.SubscriptionStatus
+    interval?: $Enums.SubscriptionInterval
+    contactsLimit?: number | null
+    monthlyImportLimit?: number | null
+    syncAccountsLimit?: number | null
+    appPasswordsLimit?: number | null
+    advancedMergeEnabled?: boolean
+    premiumExportEnabled?: boolean
+    cardDavSyncEnabled?: boolean
+    familyGroupEnabled?: boolean
+    teamsEnabled?: boolean
+    sharedAddressBooksLimit?: number | null
+    memberSlotsLimit?: number | null
+    activityLogRetentionDays?: number | null
+    liveShareEnabled?: boolean
+    staticShareEnabled?: boolean
+    startedAt?: Date | string
+    currentPeriodStart?: Date | string | null
+    currentPeriodEnd?: Date | string | null
+    trialEndsAt?: Date | string | null
+    graceEndsAt?: Date | string | null
+    cancelAtPeriodEnd?: boolean
+    canceledAt?: Date | string | null
+    endedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user?: UserCreateNestedOneWithoutSubscriptionsInput
+    subscriptionCustomer: SubscriptionCustomerCreateNestedOneWithoutSubscriptionsInput
+    groups?: GroupCreateNestedManyWithoutSubscriptionInput
+  }
+
+  export type SubscriptionUncheckedCreateWithoutGroupInput = {
+    id?: string
+    userId?: string | null
+    subscriptionCustomerId: string
+    provider?: $Enums.BillingProvider
+    providerSubscriptionId: string
+    plan?: $Enums.SubscriptionPlan
+    status?: $Enums.SubscriptionStatus
+    interval?: $Enums.SubscriptionInterval
+    contactsLimit?: number | null
+    monthlyImportLimit?: number | null
+    syncAccountsLimit?: number | null
+    appPasswordsLimit?: number | null
+    advancedMergeEnabled?: boolean
+    premiumExportEnabled?: boolean
+    cardDavSyncEnabled?: boolean
+    familyGroupEnabled?: boolean
+    teamsEnabled?: boolean
+    sharedAddressBooksLimit?: number | null
+    memberSlotsLimit?: number | null
+    activityLogRetentionDays?: number | null
+    liveShareEnabled?: boolean
+    staticShareEnabled?: boolean
+    startedAt?: Date | string
+    currentPeriodStart?: Date | string | null
+    currentPeriodEnd?: Date | string | null
+    trialEndsAt?: Date | string | null
+    graceEndsAt?: Date | string | null
+    cancelAtPeriodEnd?: boolean
+    canceledAt?: Date | string | null
+    endedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    groups?: GroupUncheckedCreateNestedManyWithoutSubscriptionInput
+  }
+
+  export type SubscriptionCreateOrConnectWithoutGroupInput = {
+    where: SubscriptionWhereUniqueInput
+    create: XOR<SubscriptionCreateWithoutGroupInput, SubscriptionUncheckedCreateWithoutGroupInput>
+  }
+
+  export type SubscriptionCreateManyGroupInputEnvelope = {
+    data: SubscriptionCreateManyGroupInput | SubscriptionCreateManyGroupInput[]
+    skipDuplicates?: boolean
+  }
+
+  export type SubscriptionCustomerCreateWithoutGroupInput = {
+    id?: string
+    provider?: $Enums.BillingProvider
+    providerCustomerId: string
+    billingEmail?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user?: UserCreateNestedOneWithoutSubscriptionCustomerInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutSubscriptionCustomerInput
+  }
+
+  export type SubscriptionCustomerUncheckedCreateWithoutGroupInput = {
+    id?: string
+    userId?: string | null
+    provider?: $Enums.BillingProvider
+    providerCustomerId: string
+    billingEmail?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutSubscriptionCustomerInput
+  }
+
+  export type SubscriptionCustomerCreateOrConnectWithoutGroupInput = {
+    where: SubscriptionCustomerWhereUniqueInput
+    create: XOR<SubscriptionCustomerCreateWithoutGroupInput, SubscriptionCustomerUncheckedCreateWithoutGroupInput>
+  }
+
   export type GroupMemberCreateWithoutGroupInput = {
     id?: string
     invitedEmail?: string | null
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    canManageBilling?: boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
@@ -92835,6 +93561,7 @@ export namespace Prisma {
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    canManageBilling?: boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
@@ -93101,13 +93828,15 @@ export namespace Prisma {
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutSubscriptionsNestedInput
+    user?: UserUpdateOneWithoutSubscriptionsNestedInput
     subscriptionCustomer?: SubscriptionCustomerUpdateOneRequiredWithoutSubscriptionsNestedInput
+    group?: GroupUpdateOneWithoutSubscriptionsNestedInput
   }
 
   export type SubscriptionUncheckedUpdateWithoutGroupsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    groupId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionCustomerId?: StringFieldUpdateOperationsInput | string
     provider?: EnumBillingProviderFieldUpdateOperationsInput | $Enums.BillingProvider
     providerSubscriptionId?: StringFieldUpdateOperationsInput | string
@@ -93138,6 +93867,55 @@ export namespace Prisma {
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SubscriptionUpsertWithWhereUniqueWithoutGroupInput = {
+    where: SubscriptionWhereUniqueInput
+    update: XOR<SubscriptionUpdateWithoutGroupInput, SubscriptionUncheckedUpdateWithoutGroupInput>
+    create: XOR<SubscriptionCreateWithoutGroupInput, SubscriptionUncheckedCreateWithoutGroupInput>
+  }
+
+  export type SubscriptionUpdateWithWhereUniqueWithoutGroupInput = {
+    where: SubscriptionWhereUniqueInput
+    data: XOR<SubscriptionUpdateWithoutGroupInput, SubscriptionUncheckedUpdateWithoutGroupInput>
+  }
+
+  export type SubscriptionUpdateManyWithWhereWithoutGroupInput = {
+    where: SubscriptionScalarWhereInput
+    data: XOR<SubscriptionUpdateManyMutationInput, SubscriptionUncheckedUpdateManyWithoutGroupInput>
+  }
+
+  export type SubscriptionCustomerUpsertWithoutGroupInput = {
+    update: XOR<SubscriptionCustomerUpdateWithoutGroupInput, SubscriptionCustomerUncheckedUpdateWithoutGroupInput>
+    create: XOR<SubscriptionCustomerCreateWithoutGroupInput, SubscriptionCustomerUncheckedCreateWithoutGroupInput>
+    where?: SubscriptionCustomerWhereInput
+  }
+
+  export type SubscriptionCustomerUpdateToOneWithWhereWithoutGroupInput = {
+    where?: SubscriptionCustomerWhereInput
+    data: XOR<SubscriptionCustomerUpdateWithoutGroupInput, SubscriptionCustomerUncheckedUpdateWithoutGroupInput>
+  }
+
+  export type SubscriptionCustomerUpdateWithoutGroupInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: EnumBillingProviderFieldUpdateOperationsInput | $Enums.BillingProvider
+    providerCustomerId?: StringFieldUpdateOperationsInput | string
+    billingEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneWithoutSubscriptionCustomerNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutSubscriptionCustomerNestedInput
+  }
+
+  export type SubscriptionCustomerUncheckedUpdateWithoutGroupInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    provider?: EnumBillingProviderFieldUpdateOperationsInput | $Enums.BillingProvider
+    providerCustomerId?: StringFieldUpdateOperationsInput | string
+    billingEmail?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutSubscriptionCustomerNestedInput
   }
 
   export type GroupMemberUpsertWithWhereUniqueWithoutGroupInput = {
@@ -93223,10 +94001,13 @@ export namespace Prisma {
     maxMembers?: number
     defaultAddressBookId?: string | null
     teamsGraceEndsAt?: Date | string | null
+    teamsEnabled?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedGroupsInput
     subscription?: SubscriptionCreateNestedOneWithoutGroupsInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutGroupInput
+    billingCustomer?: SubscriptionCustomerCreateNestedOneWithoutGroupInput
     addressBooks?: GroupAddressBookCreateNestedManyWithoutGroupInput
     teamSyncAccounts?: TeamSyncAccountCreateNestedManyWithoutGroupInput
   }
@@ -93241,8 +94022,11 @@ export namespace Prisma {
     maxMembers?: number
     defaultAddressBookId?: string | null
     teamsGraceEndsAt?: Date | string | null
+    teamsEnabled?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutGroupInput
+    billingCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutGroupInput
     addressBooks?: GroupAddressBookUncheckedCreateNestedManyWithoutGroupInput
     teamSyncAccounts?: TeamSyncAccountUncheckedCreateNestedManyWithoutGroupInput
   }
@@ -93408,10 +94192,13 @@ export namespace Prisma {
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedGroupsNestedInput
     subscription?: SubscriptionUpdateOneWithoutGroupsNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutGroupNestedInput
+    billingCustomer?: SubscriptionCustomerUpdateOneWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUpdateManyWithoutGroupNestedInput
     teamSyncAccounts?: TeamSyncAccountUpdateManyWithoutGroupNestedInput
   }
@@ -93426,8 +94213,11 @@ export namespace Prisma {
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutGroupNestedInput
+    billingCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUncheckedUpdateManyWithoutGroupNestedInput
     teamSyncAccounts?: TeamSyncAccountUncheckedUpdateManyWithoutGroupNestedInput
   }
@@ -93583,10 +94373,13 @@ export namespace Prisma {
     maxMembers?: number
     defaultAddressBookId?: string | null
     teamsGraceEndsAt?: Date | string | null
+    teamsEnabled?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedGroupsInput
     subscription?: SubscriptionCreateNestedOneWithoutGroupsInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutGroupInput
+    billingCustomer?: SubscriptionCustomerCreateNestedOneWithoutGroupInput
     members?: GroupMemberCreateNestedManyWithoutGroupInput
     teamSyncAccounts?: TeamSyncAccountCreateNestedManyWithoutGroupInput
   }
@@ -93601,8 +94394,11 @@ export namespace Prisma {
     maxMembers?: number
     defaultAddressBookId?: string | null
     teamsGraceEndsAt?: Date | string | null
+    teamsEnabled?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutGroupInput
+    billingCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutGroupInput
     members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
     teamSyncAccounts?: TeamSyncAccountUncheckedCreateNestedManyWithoutGroupInput
   }
@@ -93683,10 +94479,13 @@ export namespace Prisma {
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedGroupsNestedInput
     subscription?: SubscriptionUpdateOneWithoutGroupsNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutGroupNestedInput
+    billingCustomer?: SubscriptionCustomerUpdateOneWithoutGroupNestedInput
     members?: GroupMemberUpdateManyWithoutGroupNestedInput
     teamSyncAccounts?: TeamSyncAccountUpdateManyWithoutGroupNestedInput
   }
@@ -93701,8 +94500,11 @@ export namespace Prisma {
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutGroupNestedInput
+    billingCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutGroupNestedInput
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
     teamSyncAccounts?: TeamSyncAccountUncheckedUpdateManyWithoutGroupNestedInput
   }
@@ -94739,10 +95541,13 @@ export namespace Prisma {
     maxMembers?: number
     defaultAddressBookId?: string | null
     teamsGraceEndsAt?: Date | string | null
+    teamsEnabled?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
     owner: UserCreateNestedOneWithoutOwnedGroupsInput
     subscription?: SubscriptionCreateNestedOneWithoutGroupsInput
+    subscriptions?: SubscriptionCreateNestedManyWithoutGroupInput
+    billingCustomer?: SubscriptionCustomerCreateNestedOneWithoutGroupInput
     members?: GroupMemberCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookCreateNestedManyWithoutGroupInput
   }
@@ -94757,8 +95562,11 @@ export namespace Prisma {
     maxMembers?: number
     defaultAddressBookId?: string | null
     teamsGraceEndsAt?: Date | string | null
+    teamsEnabled?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
+    subscriptions?: SubscriptionUncheckedCreateNestedManyWithoutGroupInput
+    billingCustomer?: SubscriptionCustomerUncheckedCreateNestedOneWithoutGroupInput
     members?: GroupMemberUncheckedCreateNestedManyWithoutGroupInput
     addressBooks?: GroupAddressBookUncheckedCreateNestedManyWithoutGroupInput
   }
@@ -94895,10 +95703,13 @@ export namespace Prisma {
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedGroupsNestedInput
     subscription?: SubscriptionUpdateOneWithoutGroupsNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutGroupNestedInput
+    billingCustomer?: SubscriptionCustomerUpdateOneWithoutGroupNestedInput
     members?: GroupMemberUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUpdateManyWithoutGroupNestedInput
   }
@@ -94913,8 +95724,11 @@ export namespace Prisma {
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutGroupNestedInput
+    billingCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutGroupNestedInput
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUncheckedUpdateManyWithoutGroupNestedInput
   }
@@ -99827,6 +100641,7 @@ export namespace Prisma {
 
   export type SubscriptionCreateManyUserInput = {
     id?: string
+    groupId?: string | null
     subscriptionCustomerId: string
     provider?: $Enums.BillingProvider
     providerSubscriptionId: string
@@ -99878,6 +100693,7 @@ export namespace Prisma {
     maxMembers?: number
     defaultAddressBookId?: string | null
     teamsGraceEndsAt?: Date | string | null
+    teamsEnabled?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -99889,6 +100705,7 @@ export namespace Prisma {
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    canManageBilling?: boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
@@ -100702,10 +101519,12 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     subscriptionCustomer?: SubscriptionCustomerUpdateOneRequiredWithoutSubscriptionsNestedInput
     groups?: GroupUpdateManyWithoutSubscriptionNestedInput
+    group?: GroupUpdateOneWithoutSubscriptionsNestedInput
   }
 
   export type SubscriptionUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
+    groupId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionCustomerId?: StringFieldUpdateOperationsInput | string
     provider?: EnumBillingProviderFieldUpdateOperationsInput | $Enums.BillingProvider
     providerSubscriptionId?: StringFieldUpdateOperationsInput | string
@@ -100741,6 +101560,7 @@ export namespace Prisma {
 
   export type SubscriptionUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
+    groupId?: NullableStringFieldUpdateOperationsInput | string | null
     subscriptionCustomerId?: StringFieldUpdateOperationsInput | string
     provider?: EnumBillingProviderFieldUpdateOperationsInput | $Enums.BillingProvider
     providerSubscriptionId?: StringFieldUpdateOperationsInput | string
@@ -100811,9 +101631,12 @@ export namespace Prisma {
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     subscription?: SubscriptionUpdateOneWithoutGroupsNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutGroupNestedInput
+    billingCustomer?: SubscriptionCustomerUpdateOneWithoutGroupNestedInput
     members?: GroupMemberUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUpdateManyWithoutGroupNestedInput
     teamSyncAccounts?: TeamSyncAccountUpdateManyWithoutGroupNestedInput
@@ -100828,8 +101651,11 @@ export namespace Prisma {
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutGroupNestedInput
+    billingCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutGroupNestedInput
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUncheckedUpdateManyWithoutGroupNestedInput
     teamSyncAccounts?: TeamSyncAccountUncheckedUpdateManyWithoutGroupNestedInput
@@ -100844,6 +101670,7 @@ export namespace Prisma {
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -100854,6 +101681,7 @@ export namespace Prisma {
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    canManageBilling?: BoolFieldUpdateOperationsInput | boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -100871,6 +101699,7 @@ export namespace Prisma {
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    canManageBilling?: BoolFieldUpdateOperationsInput | boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -100887,6 +101716,7 @@ export namespace Prisma {
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    canManageBilling?: BoolFieldUpdateOperationsInput | boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -102507,7 +103337,8 @@ export namespace Prisma {
 
   export type SubscriptionCreateManySubscriptionCustomerInput = {
     id?: string
-    userId: string
+    userId?: string | null
+    groupId?: string | null
     provider?: $Enums.BillingProvider
     providerSubscriptionId: string
     plan?: $Enums.SubscriptionPlan
@@ -102570,13 +103401,15 @@ export namespace Prisma {
     endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
-    user?: UserUpdateOneRequiredWithoutSubscriptionsNestedInput
+    user?: UserUpdateOneWithoutSubscriptionsNestedInput
     groups?: GroupUpdateManyWithoutSubscriptionNestedInput
+    group?: GroupUpdateOneWithoutSubscriptionsNestedInput
   }
 
   export type SubscriptionUncheckedUpdateWithoutSubscriptionCustomerInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    groupId?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: EnumBillingProviderFieldUpdateOperationsInput | $Enums.BillingProvider
     providerSubscriptionId?: StringFieldUpdateOperationsInput | string
     plan?: EnumSubscriptionPlanFieldUpdateOperationsInput | $Enums.SubscriptionPlan
@@ -102611,7 +103444,8 @@ export namespace Prisma {
 
   export type SubscriptionUncheckedUpdateManyWithoutSubscriptionCustomerInput = {
     id?: StringFieldUpdateOperationsInput | string
-    userId?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    groupId?: NullableStringFieldUpdateOperationsInput | string | null
     provider?: EnumBillingProviderFieldUpdateOperationsInput | $Enums.BillingProvider
     providerSubscriptionId?: StringFieldUpdateOperationsInput | string
     plan?: EnumSubscriptionPlanFieldUpdateOperationsInput | $Enums.SubscriptionPlan
@@ -102652,6 +103486,7 @@ export namespace Prisma {
     maxMembers?: number
     defaultAddressBookId?: string | null
     teamsGraceEndsAt?: Date | string | null
+    teamsEnabled?: boolean
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -102664,9 +103499,12 @@ export namespace Prisma {
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     owner?: UserUpdateOneRequiredWithoutOwnedGroupsNestedInput
+    subscriptions?: SubscriptionUpdateManyWithoutGroupNestedInput
+    billingCustomer?: SubscriptionCustomerUpdateOneWithoutGroupNestedInput
     members?: GroupMemberUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUpdateManyWithoutGroupNestedInput
     teamSyncAccounts?: TeamSyncAccountUpdateManyWithoutGroupNestedInput
@@ -102681,8 +103519,11 @@ export namespace Prisma {
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    subscriptions?: SubscriptionUncheckedUpdateManyWithoutGroupNestedInput
+    billingCustomer?: SubscriptionCustomerUncheckedUpdateOneWithoutGroupNestedInput
     members?: GroupMemberUncheckedUpdateManyWithoutGroupNestedInput
     addressBooks?: GroupAddressBookUncheckedUpdateManyWithoutGroupNestedInput
     teamSyncAccounts?: TeamSyncAccountUncheckedUpdateManyWithoutGroupNestedInput
@@ -102697,6 +103538,7 @@ export namespace Prisma {
     maxMembers?: IntFieldUpdateOperationsInput | number
     defaultAddressBookId?: NullableStringFieldUpdateOperationsInput | string | null
     teamsGraceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -103343,6 +104185,41 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type SubscriptionCreateManyGroupInput = {
+    id?: string
+    userId?: string | null
+    subscriptionCustomerId: string
+    provider?: $Enums.BillingProvider
+    providerSubscriptionId: string
+    plan?: $Enums.SubscriptionPlan
+    status?: $Enums.SubscriptionStatus
+    interval?: $Enums.SubscriptionInterval
+    contactsLimit?: number | null
+    monthlyImportLimit?: number | null
+    syncAccountsLimit?: number | null
+    appPasswordsLimit?: number | null
+    advancedMergeEnabled?: boolean
+    premiumExportEnabled?: boolean
+    cardDavSyncEnabled?: boolean
+    familyGroupEnabled?: boolean
+    teamsEnabled?: boolean
+    sharedAddressBooksLimit?: number | null
+    memberSlotsLimit?: number | null
+    activityLogRetentionDays?: number | null
+    liveShareEnabled?: boolean
+    staticShareEnabled?: boolean
+    startedAt?: Date | string
+    currentPeriodStart?: Date | string | null
+    currentPeriodEnd?: Date | string | null
+    trialEndsAt?: Date | string | null
+    graceEndsAt?: Date | string | null
+    cancelAtPeriodEnd?: boolean
+    canceledAt?: Date | string | null
+    endedAt?: Date | string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
   export type GroupMemberCreateManyGroupInput = {
     id?: string
     userId?: string | null
@@ -103350,6 +104227,7 @@ export namespace Prisma {
     role?: $Enums.GroupRole
     inviteStatus?: $Enums.GroupInviteStatus
     canEdit?: boolean
+    canManageBilling?: boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: string | null
     inviteExpiresAt?: Date | string | null
@@ -103378,12 +104256,120 @@ export namespace Prisma {
     createdAt?: Date | string
   }
 
+  export type SubscriptionUpdateWithoutGroupInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    provider?: EnumBillingProviderFieldUpdateOperationsInput | $Enums.BillingProvider
+    providerSubscriptionId?: StringFieldUpdateOperationsInput | string
+    plan?: EnumSubscriptionPlanFieldUpdateOperationsInput | $Enums.SubscriptionPlan
+    status?: EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+    interval?: EnumSubscriptionIntervalFieldUpdateOperationsInput | $Enums.SubscriptionInterval
+    contactsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    monthlyImportLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    syncAccountsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    appPasswordsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    advancedMergeEnabled?: BoolFieldUpdateOperationsInput | boolean
+    premiumExportEnabled?: BoolFieldUpdateOperationsInput | boolean
+    cardDavSyncEnabled?: BoolFieldUpdateOperationsInput | boolean
+    familyGroupEnabled?: BoolFieldUpdateOperationsInput | boolean
+    teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
+    sharedAddressBooksLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    activityLogRetentionDays?: NullableIntFieldUpdateOperationsInput | number | null
+    liveShareEnabled?: BoolFieldUpdateOperationsInput | boolean
+    staticShareEnabled?: BoolFieldUpdateOperationsInput | boolean
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    currentPeriodStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    graceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelAtPeriodEnd?: BoolFieldUpdateOperationsInput | boolean
+    canceledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneWithoutSubscriptionsNestedInput
+    subscriptionCustomer?: SubscriptionCustomerUpdateOneRequiredWithoutSubscriptionsNestedInput
+    groups?: GroupUpdateManyWithoutSubscriptionNestedInput
+  }
+
+  export type SubscriptionUncheckedUpdateWithoutGroupInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionCustomerId?: StringFieldUpdateOperationsInput | string
+    provider?: EnumBillingProviderFieldUpdateOperationsInput | $Enums.BillingProvider
+    providerSubscriptionId?: StringFieldUpdateOperationsInput | string
+    plan?: EnumSubscriptionPlanFieldUpdateOperationsInput | $Enums.SubscriptionPlan
+    status?: EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+    interval?: EnumSubscriptionIntervalFieldUpdateOperationsInput | $Enums.SubscriptionInterval
+    contactsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    monthlyImportLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    syncAccountsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    appPasswordsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    advancedMergeEnabled?: BoolFieldUpdateOperationsInput | boolean
+    premiumExportEnabled?: BoolFieldUpdateOperationsInput | boolean
+    cardDavSyncEnabled?: BoolFieldUpdateOperationsInput | boolean
+    familyGroupEnabled?: BoolFieldUpdateOperationsInput | boolean
+    teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
+    sharedAddressBooksLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    activityLogRetentionDays?: NullableIntFieldUpdateOperationsInput | number | null
+    liveShareEnabled?: BoolFieldUpdateOperationsInput | boolean
+    staticShareEnabled?: BoolFieldUpdateOperationsInput | boolean
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    currentPeriodStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    graceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelAtPeriodEnd?: BoolFieldUpdateOperationsInput | boolean
+    canceledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    groups?: GroupUncheckedUpdateManyWithoutSubscriptionNestedInput
+  }
+
+  export type SubscriptionUncheckedUpdateManyWithoutGroupInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    subscriptionCustomerId?: StringFieldUpdateOperationsInput | string
+    provider?: EnumBillingProviderFieldUpdateOperationsInput | $Enums.BillingProvider
+    providerSubscriptionId?: StringFieldUpdateOperationsInput | string
+    plan?: EnumSubscriptionPlanFieldUpdateOperationsInput | $Enums.SubscriptionPlan
+    status?: EnumSubscriptionStatusFieldUpdateOperationsInput | $Enums.SubscriptionStatus
+    interval?: EnumSubscriptionIntervalFieldUpdateOperationsInput | $Enums.SubscriptionInterval
+    contactsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    monthlyImportLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    syncAccountsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    appPasswordsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    advancedMergeEnabled?: BoolFieldUpdateOperationsInput | boolean
+    premiumExportEnabled?: BoolFieldUpdateOperationsInput | boolean
+    cardDavSyncEnabled?: BoolFieldUpdateOperationsInput | boolean
+    familyGroupEnabled?: BoolFieldUpdateOperationsInput | boolean
+    teamsEnabled?: BoolFieldUpdateOperationsInput | boolean
+    sharedAddressBooksLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    memberSlotsLimit?: NullableIntFieldUpdateOperationsInput | number | null
+    activityLogRetentionDays?: NullableIntFieldUpdateOperationsInput | number | null
+    liveShareEnabled?: BoolFieldUpdateOperationsInput | boolean
+    staticShareEnabled?: BoolFieldUpdateOperationsInput | boolean
+    startedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    currentPeriodStart?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    currentPeriodEnd?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    trialEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    graceEndsAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    cancelAtPeriodEnd?: BoolFieldUpdateOperationsInput | boolean
+    canceledAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    endedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type GroupMemberUpdateWithoutGroupInput = {
     id?: StringFieldUpdateOperationsInput | string
     invitedEmail?: NullableStringFieldUpdateOperationsInput | string | null
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    canManageBilling?: BoolFieldUpdateOperationsInput | boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -103401,6 +104387,7 @@ export namespace Prisma {
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    canManageBilling?: BoolFieldUpdateOperationsInput | boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -103417,6 +104404,7 @@ export namespace Prisma {
     role?: EnumGroupRoleFieldUpdateOperationsInput | $Enums.GroupRole
     inviteStatus?: EnumGroupInviteStatusFieldUpdateOperationsInput | $Enums.GroupInviteStatus
     canEdit?: BoolFieldUpdateOperationsInput | boolean
+    canManageBilling?: BoolFieldUpdateOperationsInput | boolean
     addressBookPermissions?: NullableJsonNullValueInput | InputJsonValue
     inviteToken?: NullableStringFieldUpdateOperationsInput | string | null
     inviteExpiresAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null

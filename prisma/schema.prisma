@@ -449,13 +449,19 @@ model Contact {
 
 model SubscriptionCustomer {
     id                 String            @id @default(cuid())
-    userId             String            @unique
+    // P34F-01: exactly one of userId / groupId is non-null. Personal plans set
+    // userId (unchanged); Teams set groupId (org-anchored billing). Invariant
+    // enforced by a CHECK constraint (scripts/sql/p34f-billing-owner-checks.sql)
+    // and assertSingleBillingOwner in src/server/billing-owner.ts.
+    userId             String?           @unique
+    groupId            String?           @unique
     provider           BillingProvider   @default(STRIPE)
     providerCustomerId String
     billingEmail       String?
     createdAt          DateTime          @default(now())
     updatedAt          DateTime          @updatedAt
-    user               User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user               User?             @relation(fields: [userId], references: [id], onDelete: Cascade)
+    group              Group?            @relation(fields: [groupId], references: [id], onDelete: Cascade)
     subscriptions      Subscription[]
 
     @@unique([provider, providerCustomerId])
@@ -463,7 +469,10 @@ model SubscriptionCustomer {
 
 model Subscription {
     id                     String               @id @default(cuid())
-    userId                 String
+    // P34F-01: org-anchored billing. userId is null for Teams (set for personal);
+    // groupId is set for Teams. Exactly one is non-null (see SubscriptionCustomer).
+    userId                 String?
+    groupId                String?
     subscriptionCustomerId String
     provider               BillingProvider      @default(STRIPE)
     providerSubscriptionId String
@@ -494,12 +503,17 @@ model Subscription {
     endedAt                DateTime?
     createdAt              DateTime             @default(now())
     updatedAt              DateTime             @updatedAt
-    user                   User                 @relation(fields: [userId], references: [id], onDelete: Cascade)
+    user                   User?                @relation(fields: [userId], references: [id], onDelete: Cascade)
     subscriptionCustomer   SubscriptionCustomer @relation(fields: [subscriptionCustomerId], references: [id], onDelete: Cascade)
-    groups                 Group[]
+    // Groups that point at this subscription as their *current* subscription
+    // (via Group.subscriptionId). Distinct from `group` below (the org that
+    // *owns* this subscription row when Teams billing is org-anchored).
+    groups                 Group[]              @relation("GroupCurrentSubscription")
+    group                  Group?               @relation("GroupOrgSubscriptions", fields: [groupId], references: [id], onDelete: Cascade)
 
     @@unique([provider, providerSubscriptionId])
     @@index([userId, status])
+    @@index([groupId, status])
     @@index([subscriptionCustomerId, status])
 }
 
@@ -967,10 +981,21 @@ model Group {
     // Set when owner downgrades from TEAMS; grace expires 14 days after billing period end.
     // null = active (or re-upgraded). Non-null + future = grace. Non-null + past = locked.
     teamsGraceEndsAt DateTime?
+    // P34F-01: org-level entitlement. Once Teams billing is org-anchored, the
+    // team's "is Teams active" can no longer be read off the owner's personal
+    // entitlements — it lives here, maintained by upsertGroupSubscription.
+    // Mirrors the existing teamsGraceEndsAt-on-Group pattern. Read by the team
+    // active/grace paths (team-access, teams/page, welcome/[plan]) — see P34F §08.
+    teamsEnabled     Boolean            @default(false)
     createdAt      DateTime           @default(now())
     updatedAt      DateTime           @updatedAt
     owner          User               @relation("GroupOwner", fields: [ownerId], references: [id], onDelete: Cascade)
-    subscription   Subscription?      @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+    // The team's *current* subscription pointer (canonical "active sub").
+    subscription   Subscription?      @relation("GroupCurrentSubscription", fields: [subscriptionId], references: [id], onDelete: SetNull)
+    // P34F-01: subscription rows *owned by* this org (org-anchored Teams billing).
+    subscriptions  Subscription[]     @relation("GroupOrgSubscriptions")
+    // P34F-01: the org's Stripe customer (Teams). Null for non-billing groups.
+    billingCustomer SubscriptionCustomer?
     members        GroupMember[]
     addressBooks   GroupAddressBook[]
     teamSyncAccounts TeamSyncAccount[]
@@ -990,6 +1015,10 @@ model GroupMember {
     inviteStatus GroupInviteStatus @default(PENDING)
     // P13-01/02: edit permission, invite token (48h), and invite/accept tracking.
     canEdit         Boolean        @default(true)
+    // P34F-01: org billing access, independent of the Admin role. The owner is
+    // always an implicit billing manager regardless of this flag (backstop so an
+    // org can't be locked out of its own billing) — see canManageGroupBilling.
+    canManageBilling Boolean       @default(false)
     // P14-01 (Teams): per-book permission map { [addressBookId]: "EDIT"|"VIEW"|"NONE" }.
     // JSON for flexibility; if book-level permission queries get hot, normalise
     // into a GroupMemberAddressBookPermission join table (documented tradeoff).

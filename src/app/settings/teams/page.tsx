@@ -14,17 +14,20 @@ import {
   inviteTeamMember,
   leaveTeam,
   linkTeamSyncAccount,
+  openTeamBillingPortal,
   removeTeamMember,
   resendTeamInvite,
+  setBillingManager,
   setMemberBookPermission,
   setTeamMemberRole,
+  transferTeamOwnership,
   unlinkTeamSyncAccount,
   updateTeamSeats,
 } from "~/app/actions/teams";
 import { auth } from "~/server/auth";
 import { getUserBillingContext } from "~/server/billing";
 import { db } from "~/server/db";
-import { getTeamGraceState } from "~/server/team-access";
+import { getTeamBillingSummary, getTeamGraceState } from "~/server/team-access";
 
 const fmtDate = (value: Date | null) =>
   value
@@ -92,6 +95,9 @@ export default async function TeamSettingsPage() {
     const ownerName = memberOf.group.owner.name?.trim() ?? memberOf.group.owner.email ?? "the owner";
     const roleLabel =
       memberOf.role === "ADMIN" ? "Admin" : memberOf.canEdit ? "Member · can edit" : "Member · view only";
+    // P34F-06: read-only billing summary for every member. P34F-04: a member with
+    // canManageBilling (or an admin who's been granted it) can open the portal.
+    const memberBilling = await getTeamBillingSummary(memberOf.groupId);
     return (
       <>
         <SettingsPageHead title="Team" sub={`You're a member of ${memberOf.group.name}.`} />
@@ -108,6 +114,34 @@ export default async function TeamSettingsPage() {
               </div>
             </div>
           </SettingsCard>
+
+          {memberBilling && (
+            <SettingsCard className="flex flex-wrap items-center justify-between gap-4">
+              <div className="min-w-0">
+                <div className="text-[14.5px] font-semibold text-[#1d2823]">Plan</div>
+                <p className="mt-1 text-[13.5px] text-[#5c655e]">
+                  {memberBilling.plan} · {memberBilling.seatsUsed}
+                  {memberBilling.seatsLimit ? ` of ${memberBilling.seatsLimit}` : ""} seats
+                  {memberBilling.cancelAtPeriodEnd && memberBilling.renewsAt
+                    ? ` · ends ${fmtDate(memberBilling.renewsAt)}`
+                    : memberBilling.renewsAt
+                      ? ` · renews ${fmtDate(memberBilling.renewsAt)}`
+                      : ""}
+                </p>
+              </div>
+              {memberOf.canManageBilling && (
+                <form action={openTeamBillingPortal}>
+                  <input name="groupId" type="hidden" value={memberOf.groupId} />
+                  <button
+                    className="shrink-0 rounded-xl border border-[#d8ddd6] bg-white px-4 py-2.5 text-[13.5px] font-semibold text-[#1d2823] transition hover:bg-[#f6f7f4]"
+                    type="submit"
+                  >
+                    Manage billing
+                  </button>
+                </form>
+              )}
+            </SettingsCard>
+          )}
 
           <SettingsCard className="flex flex-wrap items-center justify-between gap-4">
             <div className="min-w-0">
@@ -189,7 +223,32 @@ export default async function TeamSettingsPage() {
   }
 
   // ── Owner/admin view ──
-  const teamState = getTeamGraceState(ownedTeam.teamsGraceEndsAt, billing.entitlements.teamsEnabled);
+  // P34F-02 §08: team-active is read off the Group's own entitlement. The fallback
+  // to the owner's personal entitlement covers teams not yet migrated to org
+  // billing (P34F-03); remove the fallback once migration completes.
+  const teamsActive = ownedTeam.teamsEnabled || billing.entitlements.teamsEnabled;
+
+  // Option A: a group created at checkout that hasn't been paid yet — it exists,
+  // is not active, and is not in grace. Show a "finishing setup" state rather than
+  // the full management UI (which getTeamGraceState would otherwise read active).
+  if (!teamsActive && ownedTeam.teamsGraceEndsAt === null) {
+    return (
+      <>
+        <SettingsPageHead title="Team management" sub="Finishing your Teams setup." />
+        <SettingsCard className="text-center">
+          <h2 className="mt-2 text-[18px] font-semibold text-[#1d2823]">
+            Completing your Teams subscription…
+          </h2>
+          <p className="mx-auto mt-2 max-w-[440px] text-[14px] leading-6 text-[#5c655e]">
+            We&apos;re waiting for your payment to confirm. This page updates once your
+            team is active — refresh in a moment.
+          </p>
+        </SettingsCard>
+      </>
+    );
+  }
+
+  const teamState = getTeamGraceState(ownedTeam.teamsGraceEndsAt, teamsActive);
   const isLocked = teamState === "locked";
   const isGrace = teamState === "grace";
 
@@ -219,6 +278,9 @@ export default async function TeamSettingsPage() {
   ]);
   const linkedAccountIds = new Set(teamSyncLinks.map((l) => l.syncAccountId));
   const linkableAccounts = mySyncAccounts.filter((a) => !linkedAccountIds.has(a.id));
+
+  // P34F-06: read-only billing summary (owner is always a billing manager).
+  const billingSummary = await getTeamBillingSummary(ownedTeam.id);
 
   return (
     <>
@@ -298,6 +360,34 @@ export default async function TeamSettingsPage() {
             </div>
           );
         })()}
+
+        {/* P34F-04/06: billing — read-only summary + manager-only portal access */}
+        {billingSummary && (
+          <SettingsCard className="flex flex-wrap items-center justify-between gap-4">
+            <div className="min-w-0">
+              <div className="text-[14.5px] font-semibold text-[#1d2823]">Billing</div>
+              <p className="mt-1 text-[13.5px] text-[#5c655e]">
+                Run by {billingSummary.ownerName} · {billingSummary.plan} ·{" "}
+                {billingSummary.seatsUsed}
+                {billingSummary.seatsLimit ? ` of ${billingSummary.seatsLimit}` : ""} seats
+                {billingSummary.cancelAtPeriodEnd && billingSummary.renewsAt
+                  ? ` · ends ${fmtDate(billingSummary.renewsAt)}`
+                  : billingSummary.renewsAt
+                    ? ` · renews ${fmtDate(billingSummary.renewsAt)}`
+                    : ""}
+              </p>
+            </div>
+            <form action={openTeamBillingPortal}>
+              <input name="groupId" type="hidden" value={ownedTeam.id} />
+              <button
+                className="shrink-0 rounded-xl border border-[#d8ddd6] bg-white px-4 py-2.5 text-[13.5px] font-semibold text-[#1d2823] transition hover:bg-[#f6f7f4]"
+                type="submit"
+              >
+                Manage billing
+              </button>
+            </form>
+          </SettingsCard>
+        )}
 
         {/* seat management — hidden when locked (no active Teams plan to adjust) */}
         {!isLocked && (
@@ -402,6 +492,29 @@ export default async function TeamSettingsPage() {
                             Make member
                           </button>
                         </form>
+                      ) : null}
+                      {/* P34F-04: billing-manager access */}
+                      {isOwner ? (
+                        <Tag green>Billing: Always</Tag>
+                      ) : (
+                        <form action={setBillingManager}>
+                          <input name="memberId" type="hidden" value={m.id} />
+                          <input name="enabled" type="hidden" value={m.canManageBilling ? "false" : "true"} />
+                          <button className="text-[13px] font-semibold text-[#4158f4]" type="submit">
+                            {m.canManageBilling ? "Remove billing" : "Make billing manager"}
+                          </button>
+                        </form>
+                      )}
+                      {/* P34F-05: owner transfer (role change, no Stripe op) */}
+                      {!isOwner && m.inviteStatus === "ACCEPTED" && m.userId ? (
+                        <ConfirmAction
+                          action={transferTeamOwnership}
+                          body={`${label} will become the owner and you'll become an Admin. Billing stays with the team — no payment changes.`}
+                          confirmLabel="Make owner"
+                          fields={{ groupId: ownedTeam.id, memberId: m.id }}
+                          title={`Make ${label} the owner?`}
+                          trigger="Make owner"
+                        />
                       ) : null}
                       {!isLocked && !isOwner ? (
                         <ConfirmAction
