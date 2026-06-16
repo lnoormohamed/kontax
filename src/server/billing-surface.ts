@@ -2,13 +2,14 @@ import { type SubscriptionPlan, type SubscriptionStatus } from "../../generated/
 
 import { getUserBillingContext, getUserPlanSummary } from "~/server/billing";
 import { db } from "~/server/db";
+import { getStripeCatalog } from "~/server/stripe-catalog";
 
 /**
  * Presentation-layer billing state for the P19-DB02 surfaces (settings card +
  * in-app banners). This reads the canonical subscription/lifecycle rows the
- * Stripe webhook maintains and derives the exact state the design renders — it
- * never calls Stripe. Prices stay as the repo-wide "£X" placeholder pending the
- * commercial decision (same convention as pricing-comparison.tsx / plan-data.ts).
+ * Stripe webhook maintains and derives the exact state the design renders.
+ * Display prices come from the live Stripe catalog when available, with the
+ * old placeholder strings kept only as a last-resort fallback.
  */
 
 // The settings billing card picks one layout per lifecycle moment.
@@ -54,12 +55,52 @@ export type BillingSurface = {
 };
 
 const PLAN_PRICE: Record<SubscriptionPlan, { price: string | null; per: string | null }> = {
-  // Placeholder amounts per the locked commercial-decision-pending policy.
   FREE: { price: null, per: null },
   PRO: { price: "£X", per: "/month" },
   FAMILY: { price: "£X", per: "/month" },
   TEAMS: { price: "£X", per: "/seat · month" },
 };
+
+const formatCurrencyAmount = (currency: string, amount: number): string => {
+  const normalizedCurrency = currency.toUpperCase();
+  const hasFraction = amount % 1 !== 0;
+  return new Intl.NumberFormat("en-GB", {
+    style: "currency",
+    currency: normalizedCurrency,
+    minimumFractionDigits: hasFraction ? 2 : 0,
+    maximumFractionDigits: 2,
+  }).format(amount);
+};
+
+async function getPlanPrice(
+  plan: SubscriptionPlan,
+  interval: "MONTHLY" | "YEARLY" | null,
+): Promise<{ price: string | null; per: string | null }> {
+  if (plan === "FREE" || !interval) return PLAN_PRICE[plan];
+
+  const catalog = await getStripeCatalog();
+  if (!catalog) return PLAN_PRICE[plan];
+
+  const planKey =
+    plan === "PRO" ? "pro"
+      : plan === "FAMILY" ? "family"
+      : plan === "TEAMS" ? "teams"
+      : null;
+
+  if (!planKey) return PLAN_PRICE[plan];
+
+  const intervalKey = interval === "YEARLY" ? "annual" : "monthly";
+  const entry = catalog[planKey][intervalKey];
+  if (!entry) return PLAN_PRICE[plan];
+
+  return {
+    price: formatCurrencyAmount(entry.currency, entry.unitAmount / 100),
+    per:
+      plan === "TEAMS"
+        ? interval === "YEARLY" ? "/seat · year" : "/seat · month"
+        : interval === "YEARLY" ? "/year" : "/month",
+  };
+}
 
 const formatDate = (date: Date) =>
   date.toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric" });
@@ -89,7 +130,7 @@ export const getBillingSurface = async (userId: string): Promise<BillingSurface>
       ? "Annual"
       : "Monthly"
     : null;
-  const { price, per } = PLAN_PRICE[plan];
+  const { price, per } = await getPlanPrice(plan, subscription?.interval ?? null);
 
   // Free plan: usage grid only, no subscription chrome.
   if (plan === "FREE") {
