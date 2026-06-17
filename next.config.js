@@ -3,11 +3,11 @@
  * for Docker builds.
  */
 import "./src/env.js";
-import bundleAnalyzer from "@next/bundle-analyzer";
 
-const withBundleAnalyzer = bundleAnalyzer({
-  enabled: process.env.ANALYZE === "true",
-});
+const withBundleAnalyzer =
+  process.env.ANALYZE === "true"
+    ? (await import("@next/bundle-analyzer")).default({ enabled: true })
+    : (x) => x;
 
 /** @type {import("next").NextConfig} */
 const config = {
