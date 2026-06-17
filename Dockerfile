@@ -6,7 +6,7 @@ RUN npm install -g npm@11.6.2
 
 COPY package*.json ./
 COPY prisma ./prisma
-RUN npm ci
+RUN NODE_ENV=development npm ci
 
 COPY . .
 
