@@ -63,38 +63,33 @@ Result: 45 tables created. No `--accept-data-loss` required or used (fresh datab
 
 ## Backup
 
-### Setup — run once on 192.168.1.193 (requires SSH as root)
+### Setup — completed 2026-06-17 (P34D-10)
 
-```bash
-# 1. Create backup directory on a persistent volume
-mkdir -p /mnt/backups/kontax
-chown postgres:postgres /mnt/backups/kontax
-chmod 750 /mnt/backups/kontax
+Provisioned remotely via `COPY TO PROGRAM` as the postgres superuser. No SSH required.
 
-# 2. Install cron jobs for postgres user
-cat > /etc/cron.d/kontax-db-backup << 'EOF'
-# Daily backup at 02:00
-0 2 * * * postgres pg_dump -U kontax -d kontax | gzip > /mnt/backups/kontax/kontax_$(date +\%Y\%m\%d).sql.gz 2>> /var/log/kontax-backup.log
-# 30-day retention cleanup at 02:15
-15 2 * * * postgres find /mnt/backups/kontax -name "*.sql.gz" -mtime +30 -delete
-EOF
+- **Backup directory**: `/var/lib/postgresql/backups/kontax/` (owned by `postgres`, mode 750)
+- **Credentials**: `/var/lib/postgresql/.pgpass` (mode 600) — `192.168.1.193:5432:kontax:kontax:<pw>`
+- **pg_dump binary**: `/usr/lib/postgresql/18/bin/pg_dump` (PostgreSQL 18.1, matches server version)
+- **Crontab**: installed under the `postgres` OS user (uid=102)
 
-chmod 644 /etc/cron.d/kontax-db-backup
-
-# 3. Run first backup immediately to verify
-sudo -u postgres bash -c "pg_dump -U kontax -d kontax | gzip > /mnt/backups/kontax/kontax_$(date +%Y%m%d).sql.gz"
-ls -lh /mnt/backups/kontax/
+Active crontab on 192.168.1.193 (postgres user):
+```
+0 2 * * *   /usr/lib/postgresql/18/bin/pg_dump -h 192.168.1.193 -U kontax -d kontax \
+              | /bin/gzip > /var/lib/postgresql/backups/kontax/kontax_$(date +\%Y\%m\%d).sql.gz \
+              2>> /var/lib/postgresql/backups/kontax/backup.log
+15 2 * * *  /usr/bin/find /var/lib/postgresql/backups/kontax -name "*.sql.gz" -mtime +30 -delete
 ```
 
-> **pg_dump client version**: the server runs PostgreSQL 18.1, so `pg_dump` must be version 18.x. Remote dumps from a machine running pg_dump 16 or earlier will fail with a version mismatch error.
+First backup run manually on 2026-06-17: `/var/lib/postgresql/backups/kontax/kontax_20260617.sql.gz` — 12 KB, 3,613 SQL lines. ✅
 
 ### Verify a backup file
 
 ```bash
-# Check the dump is non-empty and valid SQL
-gunzip -c /mnt/backups/kontax/kontax_YYYYMMDD.sql.gz | head -5
-# Expected first line: --
-# Followed by: -- PostgreSQL database dump
+# From the server as postgres:
+gunzip -c /var/lib/postgresql/backups/kontax/kontax_YYYYMMDD.sql.gz | head -3
+# Expected: -- PostgreSQL database dump
+gunzip -c /var/lib/postgresql/backups/kontax/kontax_YYYYMMDD.sql.gz | wc -l
+# Schema-only (no data): ~3613 lines; with data: much larger
 ```
 
 ## Restore from dump
@@ -106,7 +101,7 @@ gunzip -c /mnt/backups/kontax/kontax_YYYYMMDD.sql.gz | head -5
 psql -U postgres -c "CREATE DATABASE kontax_restored OWNER kontax;"
 
 # 2. Restore
-gunzip -c /mnt/backups/kontax/kontax_YYYYMMDD.sql.gz | psql -U kontax -d kontax_restored
+gunzip -c /var/lib/postgresql/backups/kontax/kontax_YYYYMMDD.sql.gz | psql -U kontax -d kontax_restored
 
 # 3. Verify table and row counts
 psql -U kontax -d kontax_restored \
@@ -122,7 +117,7 @@ psql -U kontax -d kontax_restored \
 
 ```bash
 psql -U postgres -c "CREATE DATABASE kontax_restore_test OWNER kontax;"
-gunzip -c /mnt/backups/kontax/kontax_YYYYMMDD.sql.gz | psql -U kontax -d kontax_restore_test --quiet
+gunzip -c /var/lib/postgresql/backups/kontax/kontax_YYYYMMDD.sql.gz | psql -U kontax -d kontax_restore_test --quiet
 psql -U kontax -d kontax_restore_test \
   -c "SELECT count(*) FROM pg_tables WHERE schemaname='public';"
 # Expected: 45
