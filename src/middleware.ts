@@ -62,6 +62,18 @@ const hasAuthSessionCookie = (req: NextRequest) =>
 // page/action is the authoritative check; this middleware is a lightweight
 // first gate based on cookie presence only.
 export default function middleware(req: NextRequest) {
+  const host = req.headers.get("host") ?? "";
+
+  // Rewrite api.getkontax.com/v1/... → /api/v1/... internally.
+  // Route handlers own auth for API requests; middleware auth below is skipped.
+  if (host.startsWith("api.")) {
+    const url = req.nextUrl.clone();
+    if (!url.pathname.startsWith("/api/")) {
+      url.pathname = `/api${url.pathname}`;
+    }
+    return NextResponse.rewrite(url);
+  }
+
   const { pathname } = req.nextUrl;
 
   // 1. Assets + auth API: never gated.
