@@ -676,16 +676,34 @@ function HistoryTable({
           {/* legend for the Changes column notation */}
           <div
             style={{
+              display: "flex",
+              flexWrap: "wrap",
+              gap: "6px 24px",
               fontSize: 11.5,
               color: T.mute,
               padding: "6px 0 2px",
             }}
           >
-            Changes per side —{" "}
-            <span style={{ fontFamily: '"Geist Mono", ui-monospace, monospace' }}>+</span> added ·{" "}
-            <span style={{ fontFamily: '"Geist Mono", ui-monospace, monospace' }}>~</span> updated ·{" "}
-            <span style={{ fontFamily: '"Geist Mono", ui-monospace, monospace' }}>−</span> removed.{" "}
-            <span style={{ color: T.ink2 }}>Kontax</span> = pulled in · {remoteLabel} = pushed out.
+            <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              {(["+ added", "~ updated", "− removed"] as const).map((item) => (
+                <span key={item} style={{ display: "inline-flex", alignItems: "center", gap: 3 }}>
+                  <span style={{ fontFamily: '"Geist Mono", ui-monospace, monospace', color: T.ink2 }}>
+                    {item[0]}
+                  </span>
+                  <span>{item.slice(2)}</span>
+                </span>
+              ))}
+            </span>
+            <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 3 }}>
+                <span style={{ color: T.ink2, fontWeight: 500 }}>Kontax</span>
+                <span>= pulled in</span>
+              </span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 3 }}>
+                <span style={{ color: T.ink2, fontWeight: 500 }}>{remoteLabel}</span>
+                <span>= pushed out</span>
+              </span>
+            </span>
           </div>
 
           {/* in-progress row */}
