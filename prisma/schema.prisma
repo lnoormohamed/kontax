@@ -684,10 +684,29 @@ model SyncAccountSettings {
     syncFrequencyMinutes Int?
     // P23-06: require password re-auth before editing connection settings
     requireReauthToEdit  Boolean        @default(true)
+
+    // P36 — advanced settings
+    // Auto-label: apply this label to every contact imported from this account (null = none)
+    importLabelId        String?
+    // Deletion safety: pause and alert if a single sync job would delete more than this many contacts (null = disabled)
+    maxDeletionsThreshold Int?
+    // Notify user via in-app + email when this account hits an error or auth failure
+    notifyOnFailure      Boolean        @default(true)
+    // Sync window: only run scheduled syncs within this local-hour range (null = no restriction, 0–23)
+    syncWindowStart      Int?
+    syncWindowEnd        Int?
+    // Field exclusions: vCard field names to skip during sync (e.g. "NOTE", "BDAY")
+    excludedFields       String[]
+    // Export label filter: only push contacts with one of these label IDs to remote (empty = push all)
+    exportLabelFilter    String[]
+    // Retry sensitivity: auto-pause after this many consecutive failures (null = platform default of 5)
+    maxAttemptsBeforePause Int?
+
     lastModifiedAt       DateTime       @updatedAt
     createdAt            DateTime       @default(now())
 
     syncAccount SyncAccount @relation(fields: [syncAccountId], references: [id], onDelete: Cascade)
+    importLabel Label?      @relation(fields: [importLabelId], references: [id], onDelete: SetNull)
 }
 
 // P23-06: short-lived (15 min) "sudo mode" elevation, proving the user re-entered
@@ -1123,6 +1142,8 @@ model Label {
     updatedAt DateTime @updatedAt
 
     user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    syncAccountSettings SyncAccountSettings[]
 
     @@unique([userId, name])
     @@index([userId, position])
