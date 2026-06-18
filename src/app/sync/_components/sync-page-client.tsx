@@ -76,6 +76,9 @@ export type SyncAccountData = {
   exportLabelFilter: string[];
   // null = platform default (5); 0 = never auto-pause.
   maxAttemptsBeforePause: number | null;
+  // P36-DB02: true when the connection was just created and the user hasn't
+  // confirmed sync settings yet — the first sync is held and setup is shown.
+  needsSetup: boolean;
   status: "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR";
   health: "healthy" | "watch" | "needs_attention" | "paused_for_safety" | "needs_reauth";
   lastSyncedAtRelative: string | null;
@@ -2281,8 +2284,11 @@ export type SyncPageClientProps = {
 };
 
 export function SyncPageClient({ accounts, labels, initialAccountId, initialAdd = false, flash: initialFlash, syncAccountsLimit, upgradeableAtCap }: SyncPageClientProps) {
+  // P36-DB02: a freshly-connected account awaiting setup wins the initial selection
+  // so its first-run setup panel opens immediately.
+  const pendingSetup = accounts.find((a) => a.needsSetup) ?? null;
   const [selectedId, setSelectedId] = useState<string | null>(
-    initialAccountId ?? accounts[0]?.id ?? null,
+    initialAccountId ?? (initialAdd ? null : pendingSetup?.id) ?? accounts[0]?.id ?? null,
   );
   const [view, setView] = useState<"detail" | "add">(initialAdd ? "add" : "detail");
   const [editing, setEditing] = useState(false);
@@ -2294,7 +2300,10 @@ export function SyncPageClient({ accounts, labels, initialAccountId, initialAdd 
   // P36: the sync settings panel takes over the detail zone (mutually exclusive
   // with the edit-credentials form). Opened from the [Settings] action button or
   // the gear icon on a list row.
-  const [settingsOpen, setSettingsOpen] = useState(false);
+  // Open the panel straight into first-run setup mode when the selected account is
+  // a brand-new connection awaiting setup.
+  const [settingsOpen, setSettingsOpen] = useState(!initialAdd && !!pendingSetup);
+  const [firstRun, setFirstRun] = useState(!initialAdd && !!pendingSetup);
   // P23-06: a pending save that needs re-auth; holds the retry to run once elevated.
   const [reauthRetry, setReauthRetry] = useState<(() => void) | null>(null);
   // Disconnect confirmation modal target.
@@ -2325,18 +2334,23 @@ export function SyncPageClient({ accounts, labels, initialAccountId, initialAdd 
   const selectedAccount = accounts.find((a) => a.id === selectedId) ?? accounts[0] ?? null;
 
   const selectAccount = (id: string) => {
+    const target = accounts.find((a) => a.id === id);
     setSelectedId(id);
     setView("detail");
     setEditing(false);
-    setSettingsOpen(false);
+    // Selecting a still-pending connection re-opens its first-run setup.
+    setFirstRun(!!target?.needsSetup);
+    setSettingsOpen(!!target?.needsSetup);
     if (detailRef.current) detailRef.current.scrollTop = 0;
   };
 
-  // Gear icon / [Settings] button — select the account and open the settings panel.
+  // Gear icon / [Settings] button — select the account and open the settings panel
+  // (normal edit mode, not first-run).
   const openSettings = (id: string) => {
     setSelectedId(id);
     setView("detail");
     setEditing(false);
+    setFirstRun(false);
     setSettingsOpen(true);
     if (detailRef.current) detailRef.current.scrollTop = 0;
   };
@@ -2344,6 +2358,8 @@ export function SyncPageClient({ accounts, labels, initialAccountId, initialAdd 
   const openAdd = () => {
     setView("add");
     setEditing(false);
+    setSettingsOpen(false);
+    setFirstRun(false);
     if (detailRef.current) detailRef.current.scrollTop = 0;
   };
 
@@ -2386,7 +2402,11 @@ export function SyncPageClient({ accounts, labels, initialAccountId, initialAdd 
           account={selectedAccount}
           labels={labels}
           freqProGated={upgradeableAtCap}
-          onClose={() => setSettingsOpen(false)}
+          firstRun={firstRun}
+          onClose={() => {
+            setSettingsOpen(false);
+            setFirstRun(false);
+          }}
           onSaved={() => router.refresh()}
           setToast={setToast}
           onNeedElevation={(retry) => setReauthRetry(() => retry)}

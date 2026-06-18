@@ -271,7 +271,9 @@ const runPostImportDedupSafely = async (
 export const enqueueDueSyncJobs = async (): Promise<{ enqueued: number; skipped: number }> => {
   const now = Date.now();
   const accounts = await db.syncAccount.findMany({
-    where: { status: "ACTIVE", credentialRevokedAt: null },
+    // P36-DB02: skip accounts awaiting initial setup (setupCompletedAt null) — the
+    // first sync is held until the user confirms settings via completeSyncSetup().
+    where: { status: "ACTIVE", credentialRevokedAt: null, setupCompletedAt: { not: null } },
     select: {
       id: true,
       syncDirection: true,

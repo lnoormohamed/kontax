@@ -2,7 +2,7 @@
 
 import { type ReactNode, useEffect, useState } from "react";
 
-import { updateBookAllowlist, updateSyncAccountSettings } from "~/app/actions/sync";
+import { completeSyncSetup, updateBookAllowlist, updateSyncAccountSettings } from "~/app/actions/sync";
 
 import { ELEVATION_REQUIRED, Spinner, T } from "./sync-shared";
 import type { LabelOption, SyncAccountData } from "./sync-page-client";
@@ -559,6 +559,7 @@ export function ConnectionSettings({
   account,
   labels,
   freqProGated = false,
+  firstRun = false,
   onClose,
   onSaved,
   setToast,
@@ -568,6 +569,9 @@ export function ConnectionSettings({
   labels: LabelOption[];
   // FREE plan → sub-30-minute frequencies are gated behind Pro.
   freqProGated?: boolean;
+  // P36-DB02: initial-setup mode for a freshly-connected account — confirms setup
+  // and starts the held first sync instead of a plain settings save.
+  firstRun?: boolean;
   onClose: () => void;
   onSaved: () => void;
   setToast: (msg: string) => void;
@@ -641,7 +645,49 @@ export function ConnectionSettings({
         : [...draft.exportLabelFilter, id],
     });
 
+  const maxDeletionsValue = () => (draft.deletionGuard ? Math.max(1, Math.min(9999, Number(draft.maxDeletions) || 10)) : null);
+
+  // Full settings payload from the current draft — used by first-run setup, which
+  // applies everything the user chose rather than a diff against a baseline.
+  const fullPayload = () => ({
+    syncAccountId: account.id,
+    syncDirection: draft.direction,
+    conflictPolicy: draft.policy,
+    syncFrequencyMinutes: selectToFreq(draft.freq),
+    importLabelId: draft.importLabelId === "" ? null : draft.importLabelId,
+    maxDeletionsThreshold: maxDeletionsValue(),
+    notifyOnFailure: draft.notifyOnFailure,
+    ...(draft.windowEnabled
+      ? { syncWindowStart: Number(draft.windowStart), syncWindowEnd: Number(draft.windowEnd) }
+      : { syncWindowStart: null, syncWindowEnd: null }),
+    excludedFields: draft.excludedFields,
+    exportLabelFilter: draft.exportLabelFilter,
+    maxAttemptsBeforePause: selectToRetry(draft.retry),
+  });
+
+  // First-run: confirm setup with the chosen settings and start the held sync.
+  const finishSetup = async (useDefaults: boolean) => {
+    if (!useDefaults && windowErr) {
+      setWindowErrShown(true);
+      return;
+    }
+    setSaving(true);
+    const result = await completeSyncSetup(useDefaults ? { syncAccountId: account.id } : fullPayload());
+    setSaving(false);
+    if (result.ok) {
+      setToast("Sync started");
+      onSaved();
+      onClose();
+    } else {
+      setToast(result.error ?? "Could not start syncing.");
+    }
+  };
+
   const onSave = async () => {
+    if (firstRun) {
+      void finishSetup(false);
+      return;
+    }
     if (windowErr) {
       setWindowErrShown(true);
       return;
@@ -649,9 +695,6 @@ export function ConnectionSettings({
     setSaving(true);
     // Optimistic: keep the dirty draft on screen; revert on failure. Only send
     // the fields that actually changed so the audit diff stays meaningful.
-    const maxDeletionsThreshold = draft.deletionGuard
-      ? Math.max(1, Math.min(9999, Number(draft.maxDeletions) || 10))
-      : null;
     const result = await updateSyncAccountSettings({
       syncAccountId: account.id,
       ...(draft.direction !== baseline.direction ? { syncDirection: draft.direction } : {}),
@@ -660,7 +703,7 @@ export function ConnectionSettings({
       ...(draft.importLabelId !== baseline.importLabelId
         ? { importLabelId: draft.importLabelId === "" ? null : draft.importLabelId }
         : {}),
-      ...(maxDeletionsThreshold !== account.maxDeletionsThreshold ? { maxDeletionsThreshold } : {}),
+      ...(maxDeletionsValue() !== account.maxDeletionsThreshold ? { maxDeletionsThreshold: maxDeletionsValue() } : {}),
       ...(draft.notifyOnFailure !== baseline.notifyOnFailure
         ? { notifyOnFailure: draft.notifyOnFailure }
         : {}),
@@ -694,7 +737,12 @@ export function ConnectionSettings({
     }
   };
 
+  // Closing first-run still starts the sync with defaults; otherwise just revert.
   const onCancel = () => {
+    if (firstRun) {
+      void finishSetup(true);
+      return;
+    }
     setDraft(baseline);
     onClose();
   };
@@ -711,7 +759,9 @@ export function ConnectionSettings({
       {/* panel header */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 16, marginBottom: 24 }}>
         <div style={{ minWidth: 0 }}>
-          <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, letterSpacing: "-0.01em", color: T.ink }}>Sync settings</h2>
+          <h2 style={{ margin: 0, fontSize: 20, fontWeight: 600, letterSpacing: "-0.01em", color: T.ink }}>
+            {firstRun ? "Set up sync" : "Sync settings"}
+          </h2>
           <div style={{ fontSize: 13, color: T.mute, marginTop: 3, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
             {subtitle}
           </div>
@@ -964,12 +1014,12 @@ export function ConnectionSettings({
           <OptHint>After this many consecutive failures, the account is auto-paused. You’ll need to resume it manually.</OptHint>
         </OptSection>
 
-        {/* pinned save / cancel — Save disabled until dirty */}
+        {/* pinned actions — first-run starts the held sync; edit mode saves a diff */}
         <div style={{ display: "flex", alignItems: "center", gap: 14, borderTop: `1px solid ${T.line2}`, marginTop: 26, paddingTop: 20, flexWrap: "wrap" }}>
           <button
             type="button"
             onClick={onSave}
-            disabled={!dirty || saving}
+            disabled={saving || (!firstRun && !dirty)}
             style={{
               height: 36,
               padding: "0 16px",
@@ -979,15 +1029,15 @@ export function ConnectionSettings({
               color: "#fff",
               fontSize: 14,
               fontWeight: 600,
-              cursor: !dirty || saving ? "default" : "pointer",
+              cursor: saving || (!firstRun && !dirty) ? "default" : "pointer",
               display: "inline-flex",
               alignItems: "center",
               gap: 8,
-              opacity: !dirty || saving ? 0.55 : 1,
+              opacity: saving || (!firstRun && !dirty) ? 0.55 : 1,
             }}
           >
             {saving ? <Spinner size={14} color="#fff" /> : null}
-            {saving ? "Saving…" : "Save settings"}
+            {saving ? (firstRun ? "Starting…" : "Saving…") : firstRun ? "Start syncing" : "Save settings"}
           </button>
           <button
             type="button"
@@ -995,7 +1045,7 @@ export function ConnectionSettings({
             disabled={saving}
             style={{ border: "none", background: "transparent", color: T.ink2, fontSize: 14, fontWeight: 600, cursor: "pointer" }}
           >
-            Cancel
+            {firstRun ? "Use defaults" : "Cancel"}
           </button>
         </div>
       </div>

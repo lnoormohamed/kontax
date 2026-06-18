@@ -188,19 +188,24 @@ export async function GET(req: NextRequest) {
     return redirectTo(req, "/sync?error=google_duplicate");
   }
 
-  // Queue the initial import so the runner imports contacts on its next tick.
-  await db.syncJob.create({
-    data: {
-      syncAccountId: accountId,
-      status: "QUEUED",
-      trigger: "MANUAL",
-      syncDirection: "TWO_WAY",
-      attemptCount: 1,
-      maxAttempts: 5,
-      nextRetryAt: now,
-      idempotencyKey: `${accountId}:google:connect:${Date.now()}`,
-    },
-  });
+  // P36-DB02: a brand-new connection holds its first sync until the user confirms
+  // settings (completeSyncSetup queues it then). Reconnects of an already-set-up
+  // account import immediately as before.
+  if (existing) {
+    await db.syncJob.create({
+      data: {
+        syncAccountId: accountId,
+        status: "QUEUED",
+        trigger: "MANUAL",
+        syncDirection: "TWO_WAY",
+        attemptCount: 1,
+        maxAttempts: 5,
+        nextRetryAt: now,
+        idempotencyKey: `${accountId}:google:connect:${Date.now()}`,
+      },
+    });
+    return redirectTo(req, "/sync?connected=google");
+  }
 
-  return redirectTo(req, "/sync?connected=google");
+  return redirectTo(req, "/sync?connected=google&setup=1");
 }

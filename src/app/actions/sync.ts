@@ -1995,6 +1995,139 @@ export const updateSyncAccountSettings = async (
   return { ok: true };
 };
 
+// P36-DB02: confirm initial setup for a freshly-connected account. Applies the
+// chosen settings (no re-auth gate — the user just connected and authenticated),
+// stamps setupCompletedAt, and queues the held first sync. Only operates while
+// setup is pending (setupCompletedAt null), so it cannot be used to bypass the
+// elevation gate that protects edits on an already-set-up connection.
+export const completeSyncSetup = async (
+  input: UpdateSyncAccountSettingsInput,
+): Promise<{ ok: true } | { ok: false; error: string }> => {
+  let userId: string;
+  try {
+    userId = await getRequiredUserId();
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Not signed in." };
+  }
+
+  const parsed = updateSyncAccountSettingsSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid settings." };
+  }
+  const {
+    syncAccountId,
+    syncDirection,
+    conflictPolicy,
+    syncFrequencyMinutes,
+    importLabelId,
+    maxDeletionsThreshold,
+    notifyOnFailure,
+    syncWindowStart,
+    syncWindowEnd,
+    excludedFields,
+    exportLabelFilter,
+    maxAttemptsBeforePause,
+  } = parsed.data;
+
+  if ((syncWindowStart == null) !== (syncWindowEnd == null)) {
+    return { ok: false, error: "Set both a start and end hour for the sync window, or neither." };
+  }
+  if (syncWindowStart != null && syncWindowStart === syncWindowEnd) {
+    return { ok: false, error: "The sync window start and end hours must be different." };
+  }
+
+  const account = await db.syncAccount.findFirst({
+    where: { id: syncAccountId, userId },
+    select: {
+      id: true,
+      status: true,
+      setupCompletedAt: true,
+      syncDirection: true,
+      addressBookUrl: true,
+      remoteCTag: true,
+      remoteAccountId: true,
+      credentialReference: true,
+      credentialRevokedAt: true,
+    },
+  });
+  if (!account) {
+    return { ok: false, error: "Sync account not found." };
+  }
+  // Idempotent: a double-submit / reload after setup is a no-op.
+  if (account.setupCompletedAt) {
+    revalidateSyncViews();
+    return { ok: true };
+  }
+
+  if (importLabelId) {
+    const label = await db.label.findFirst({ where: { id: importLabelId, userId }, select: { id: true } });
+    if (!label) {
+      return { ok: false, error: "That label could not be found." };
+    }
+  }
+
+  const settingsPatch = {
+    ...(syncDirection ? { syncDirection } : {}),
+    ...(conflictPolicy ? { conflictPolicy } : {}),
+    ...(syncFrequencyMinutes !== undefined ? { syncFrequencyMinutes } : {}),
+    ...(importLabelId !== undefined ? { importLabelId } : {}),
+    ...(maxDeletionsThreshold !== undefined ? { maxDeletionsThreshold } : {}),
+    ...(notifyOnFailure !== undefined ? { notifyOnFailure } : {}),
+    ...(syncWindowStart !== undefined ? { syncWindowStart } : {}),
+    ...(syncWindowEnd !== undefined ? { syncWindowEnd } : {}),
+    ...(excludedFields !== undefined ? { excludedFields } : {}),
+    ...(exportLabelFilter !== undefined ? { exportLabelFilter } : {}),
+    ...(maxAttemptsBeforePause !== undefined ? { maxAttemptsBeforePause } : {}),
+  };
+
+  const now = new Date();
+  const effectiveDir = syncDirection ?? account.syncDirection;
+  const syncable =
+    account.status === "ACTIVE" && !!account.credentialReference && !account.credentialRevokedAt;
+
+  await db.$transaction(async (tx) => {
+    await tx.syncAccountSettings.upsert({
+      where: { syncAccountId },
+      create: { syncAccountId, ...settingsPatch },
+      update: settingsPatch,
+    });
+    await tx.syncAccount.update({
+      where: { id: syncAccountId },
+      data: { setupCompletedAt: now, ...(syncDirection ? { syncDirection } : {}) },
+    });
+    // Queue the held first sync. EXPORT_ONLY has nothing to pull and isn't runnable
+    // in the live slice yet, so skip it (mirrors updateSyncAccountSettings).
+    if (syncable && effectiveDir !== "EXPORT_ONLY") {
+      await tx.syncJob.create({
+        data: {
+          syncAccountId,
+          status: "QUEUED",
+          trigger: "MANUAL",
+          syncDirection: effectiveDir,
+          attemptCount: 1,
+          maxAttempts: 5,
+          nextRetryAt: now,
+          cursorBefore: account.remoteCTag ?? account.remoteAccountId ?? account.addressBookUrl,
+          idempotencyKey: createIdempotencyKey([syncAccountId, "setup", String(now.getTime())]),
+        },
+      });
+    }
+  });
+
+  await emitEvent(db, {
+    userId,
+    eventType: "SYNC_SETTINGS_CHANGED",
+    actor: "USER",
+    payload: {
+      syncAccountId,
+      changes: [{ field: "setupCompletedAt", before: null, after: now.toISOString() }],
+    },
+  });
+
+  revalidateSyncViews();
+  return { ok: true };
+};
+
 // P23-03: persist the remote address-book allowlist for a connection. Empty array
 // = sync all discovered books (default). The sync engine honors the allowlist by
 // skipping this account's book when the list is non-empty and excludes it

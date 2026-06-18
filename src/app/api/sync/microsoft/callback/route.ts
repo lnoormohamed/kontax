@@ -135,18 +135,23 @@ export async function GET(req: NextRequest) {
     return redirectTo(req, "/sync?error=microsoft_duplicate");
   }
 
-  await db.syncJob.create({
-    data: {
-      syncAccountId: accountId,
-      status: "QUEUED",
-      trigger: "MANUAL",
-      syncDirection: "TWO_WAY",
-      attemptCount: 1,
-      maxAttempts: 5,
-      nextRetryAt: now,
-      idempotencyKey: `${accountId}:microsoft:connect:${Date.now()}`,
-    },
-  });
+  // P36-DB02: hold the first sync for a brand-new connection until the user
+  // confirms settings (completeSyncSetup queues it). Reconnects sync immediately.
+  if (existing) {
+    await db.syncJob.create({
+      data: {
+        syncAccountId: accountId,
+        status: "QUEUED",
+        trigger: "MANUAL",
+        syncDirection: "TWO_WAY",
+        attemptCount: 1,
+        maxAttempts: 5,
+        nextRetryAt: now,
+        idempotencyKey: `${accountId}:microsoft:connect:${Date.now()}`,
+      },
+    });
+    return redirectTo(req, "/sync?connected=microsoft");
+  }
 
-  return redirectTo(req, "/sync?connected=microsoft");
+  return redirectTo(req, "/sync?connected=microsoft&setup=1");
 }

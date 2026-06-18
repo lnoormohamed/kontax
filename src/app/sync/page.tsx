@@ -305,6 +305,8 @@ export default async function SyncPage({ searchParams }: PageProps) {
       excludedFields: acct.settings?.excludedFields ?? [],
       exportLabelFilter: acct.settings?.exportLabelFilter ?? [],
       maxAttemptsBeforePause: acct.settings?.maxAttemptsBeforePause ?? null,
+      // P36-DB02: setup is pending until completeSyncSetup stamps setupCompletedAt.
+      needsSetup: acct.setupCompletedAt == null,
       status: acct.status,
       health,
       lastSyncedAtRelative: formatRelative(acct.lastSyncedAt),
