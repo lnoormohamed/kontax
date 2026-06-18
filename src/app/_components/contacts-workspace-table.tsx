@@ -200,7 +200,6 @@ const RowBadges = memo(function RowBadges({ contact, mode }: { contact: Workspac
         inFamilyBook: contact.sharedKind === "family",
         inTeamBook: contact.sharedKind === "team",
       }}
-      redirectTo={mode === "active" ? "/contacts?tab=people" : "/contacts?tab=archived"}
     />
   );
 });

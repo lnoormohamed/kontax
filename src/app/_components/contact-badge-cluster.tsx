@@ -23,8 +23,6 @@ export function ContactBadgeCluster({
 }: {
   contactId: string;
   flags: ContactBadgeFlags;
-  /** @deprecated favorite toggles no longer redirect in the PWA flow */
-  redirectTo?: string;
 }) {
   const [, startTransition] = useTransition();
   const [optimisticFavorite, setOptimisticFavorite] = useState(flags.isFavorite);

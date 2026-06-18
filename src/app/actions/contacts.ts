@@ -1309,9 +1309,8 @@ export const mergeContacts = async (formData: FormData) => {
 
   revalidateContactViews(result.survivingContactId);
 
-  // A native <form action> (merge-preview-form) relies on the redirect. Callers
-  // that invoke this programmatically must omit redirectTo and navigate on the
-  // client instead — a server-action redirect() re-runs middleware cookielessly
+  // Callers that invoke this programmatically must omit redirectTo and navigate
+  // on the client — a server-action redirect() re-runs middleware cookielessly
   // and bounces to /login.
   if (redirectTo) {
     const separator = redirectTo.includes("?") ? "&" : "?";
