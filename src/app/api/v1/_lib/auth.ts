@@ -4,6 +4,7 @@ import { type NextRequest, NextResponse } from "next/server";
 import type { ApiTokenScope } from "~/server/api-tokens";
 import { validateApiToken } from "~/server/api-tokens";
 import { checkApiRateLimit } from "~/server/api-rate-limit";
+import { corsHeaders } from "~/lib/api-cors";
 
 export async function withApiAuth(
   req: NextRequest,
@@ -13,7 +14,7 @@ export async function withApiAuth(
   if (!authHeader?.startsWith("Bearer ")) {
     return NextResponse.json(
       { error: "UNAUTHENTICATED", message: "Missing or invalid Authorization header." },
-      { status: 401 },
+      { status: 401, headers: corsHeaders },
     );
   }
 
@@ -23,7 +24,7 @@ export async function withApiAuth(
   if (!identity) {
     return NextResponse.json(
       { error: "INVALID_TOKEN", message: "The provided API token is invalid or revoked." },
-      { status: 401 },
+      { status: 401, headers: corsHeaders },
     );
   }
 
@@ -44,6 +45,7 @@ export async function withApiAuth(
         status: 429,
         headers: {
           ...rateLimitHeaders,
+          ...corsHeaders,
           "Retry-After": Math.ceil((rateLimit.resetAt.getTime() - Date.now()) / 1000).toString(),
         },
       },
@@ -52,8 +54,11 @@ export async function withApiAuth(
 
   const response = await handler(identity.userId, identity.scope);
 
-  // Append rate limit headers to every successful response
+  // Append rate limit + CORS headers to every response
   for (const [key, value] of Object.entries(rateLimitHeaders)) {
+    response.headers.set(key, value);
+  }
+  for (const [key, value] of Object.entries(corsHeaders)) {
     response.headers.set(key, value);
   }
 
