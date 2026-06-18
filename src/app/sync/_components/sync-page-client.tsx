@@ -2385,6 +2385,7 @@ export function SyncPageClient({ accounts, labels, initialAccountId, initialAdd 
           key={selectedAccount.id}
           account={selectedAccount}
           labels={labels}
+          freqProGated={upgradeableAtCap}
           onClose={() => setSettingsOpen(false)}
           onSaved={() => router.refresh()}
           setToast={setToast}
