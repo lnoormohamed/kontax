@@ -31,21 +31,9 @@ const FREQ_OPTIONS: { value: string; label: string; short: string }[] = [
   { value: "360", label: "Every 6 hours", short: "6 hr" },
   { value: "manual", label: "Manual only", short: "Manual" },
 ];
-const DIRECTION_SHORT: Record<SyncDirection, string> = {
-  TWO_WAY: "Two-way",
-  IMPORT_ONLY: "Import only",
-  EXPORT_ONLY: "Export only",
-};
-const POLICY_SHORT: Record<ConflictPolicy, string> = {
-  SERVER_WINS: "Server wins",
-  DEVICE_WINS: "Kontax wins",
-  MANUAL: "Review manually",
-};
 const freqToSelect = (minutes: number | null): string =>
   minutes === 0 ? "manual" : minutes == null ? "60" : String(minutes);
 const selectToFreq = (value: string): number | null => (value === "manual" ? 0 : Number(value));
-const freqShort = (value: string): string =>
-  FREQ_OPTIONS.find((o) => o.value === value)?.short ?? "60 min";
 
 function Radio({ on }: { on: boolean }) {
   return (
@@ -653,16 +641,14 @@ const seedDraft = (account: SyncAccountData): SettingsDraft => ({
 export function ConnectionSettings({
   account,
   labels,
-  open,
-  onToggle,
+  onClose,
   onSaved,
   setToast,
   onNeedElevation,
 }: {
   account: SyncAccountData;
   labels: LabelOption[];
-  open: boolean;
-  onToggle: () => void;
+  onClose: () => void;
   onSaved: () => void;
   setToast: (msg: string) => void;
   onNeedElevation: (retry: () => void) => void;
@@ -671,13 +657,11 @@ export function ConnectionSettings({
   const [draft, setDraft] = useState<SettingsDraft>(baseline);
   const [booksOpen, setBooksOpen] = useState(false);
   const [saving, setSaving] = useState(false);
-  const [saved, setSaved] = useState(false);
 
   // Re-seed when the selected account changes (or after a refresh re-supplies props).
   useEffect(() => {
     setDraft(seedDraft(account));
     setBooksOpen(false);
-    setSaved(false);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     account.id,
@@ -714,7 +698,6 @@ export function ConnectionSettings({
 
   const patch = (next: Partial<SettingsDraft>) => {
     setDraft((d) => ({ ...d, ...next }));
-    setSaved(false);
   };
 
   const toggleExcluded = (token: string) =>
@@ -767,9 +750,10 @@ export function ConnectionSettings({
     });
     setSaving(false);
     if (result.ok) {
-      setSaved(true);
       setToast("Settings saved");
       onSaved();
+      // Per the brief, a successful save collapses the panel back to the detail.
+      onClose();
     } else if (result.error === ELEVATION_REQUIRED) {
       // Keep the pending edits and re-run this save once the user re-authenticates.
       onNeedElevation(() => void onSave());
@@ -782,85 +766,72 @@ export function ConnectionSettings({
   const onCancel = () => {
     setDraft(baseline);
     setBooksOpen(false);
+    onClose();
   };
 
-  const summary = `${DIRECTION_SHORT[draft.direction]} · ${POLICY_SHORT[draft.policy]} · ${freqShort(draft.freq)}`;
   const booksSummary =
     account.bookAllowlist.length === 0
       ? "All books synced"
       : `${account.bookAllowlist.length} book${account.bookAllowlist.length === 1 ? "" : "s"} · custom`;
 
+  const accountTitle =
+    account.provider !== "CARDDAV" && account.connectedEmail ? account.connectedEmail : account.label;
+
   return (
-    <section id="sy-settings-zone" style={{ marginTop: 30, scrollMarginTop: 16 }}>
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-expanded={open}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          width: "100%",
-          padding: "6px 2px",
-          border: "none",
-          background: "transparent",
-          cursor: "pointer",
-          textAlign: "left",
-        }}
-      >
-        <span
-          style={{
-            fontSize: 11,
-            fontWeight: 700,
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-            color: T.mute,
-          }}
-        >
-          Connection settings
-        </span>
-        {!open ? (
-          <span
+    <div
+      id="sy-settings-zone"
+      style={{
+        border: `1px solid ${T.line2}`,
+        borderRadius: 14,
+        padding: "22px 22px 20px",
+        background: "#fff",
+        animation: "sy-fade .18s ease",
+      }}
+    >
+      {/* panel header — title + which account + close */}
+      <div style={{ display: "flex", alignItems: "flex-start", marginBottom: 20 }}>
+        <div style={{ minWidth: 0 }}>
+          <div style={{ fontSize: 17, fontWeight: 700, color: T.ink }}>Sync settings</div>
+          <div
             style={{
-              fontSize: 12.5,
-              color: T.ink2,
-              marginLeft: 12,
+              fontSize: 13,
+              color: T.mute,
+              marginTop: 2,
               overflow: "hidden",
               textOverflow: "ellipsis",
               whiteSpace: "nowrap",
             }}
           >
-            {summary}
-          </span>
-        ) : null}
+            {accountTitle}
+          </div>
+        </div>
         <span style={{ flex: 1 }} />
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke={T.ink2}
-          strokeWidth="1.9"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          style={{ flexShrink: 0, transform: open ? "rotate(180deg)" : "none", transition: "transform .18s ease" }}
-        >
-          <path d="M6 9l6 6 6-6" />
-        </svg>
-      </button>
-
-      {open ? (
-        <div
+        <button
+          type="button"
+          onClick={onCancel}
+          aria-label="Close settings"
           style={{
-            border: `1px solid ${T.line2}`,
-            borderRadius: 14,
-            padding: "22px 22px 20px",
-            marginTop: 10,
-            background: "#fff",
-            animation: "sy-fade .18s ease",
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 30,
+            height: 30,
+            borderRadius: 8,
+            border: "none",
+            background: "transparent",
+            color: T.ink2,
+            cursor: "pointer",
+            flexShrink: 0,
           }}
         >
-          <RadioGroup
-            label="Sync direction"
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+
+      <RadioGroup
+        label="Sync direction"
             value={draft.direction}
             options={DIRECTION_OPTIONS}
             onChange={(v) => patch({ direction: v })}
@@ -1153,67 +1124,47 @@ export function ConnectionSettings({
             After this many consecutive failures the account is auto-paused. You&rsquo;ll need to resume it manually.
           </SettingHint>
 
-          {dirty || saved ? <SettingsDivider /> : null}
-          {dirty ? (
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <button
-                type="button"
-                onClick={onSave}
-                disabled={saving}
-                style={{
-                  height: 36,
-                  padding: "0 16px",
-                  borderRadius: 8,
-                  border: "none",
-                  background: T.blue,
-                  color: "#fff",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  cursor: saving ? "default" : "pointer",
-                  opacity: saving ? 0.7 : 1,
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: 8,
-                }}
-              >
-                {saving ? <Spinner size={14} color="#fff" /> : null}
-                {saving ? "Saving…" : "Save settings"}
-              </button>
-              <button
-                type="button"
-                onClick={onCancel}
-                disabled={saving}
-                style={{
-                  border: "none",
-                  background: "transparent",
-                  color: T.ink2,
-                  fontSize: 13,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
-              >
-                Cancel
-              </button>
-            </div>
-          ) : saved ? (
-            <div
+          <SettingsDivider />
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <button
+              type="button"
+              onClick={onSave}
+              disabled={saving || !dirty}
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 7,
-                color: T.sgreen,
+                height: 36,
+                padding: "0 16px",
+                borderRadius: 8,
+                border: "none",
+                background: T.blue,
+                color: "#fff",
                 fontSize: 13,
                 fontWeight: 600,
+                cursor: saving || !dirty ? "default" : "pointer",
+                opacity: saving || !dirty ? 0.55 : 1,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 8,
               }}
             >
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke={T.sgreen} strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round">
-                <path d="M5 12.5l4 4 10-10" />
-              </svg>
-              Settings saved
-            </div>
-          ) : null}
-        </div>
-      ) : null}
-    </section>
+              {saving ? <Spinner size={14} color="#fff" /> : null}
+              {saving ? "Saving…" : "Save settings"}
+            </button>
+            <button
+              type="button"
+              onClick={onCancel}
+              disabled={saving}
+              style={{
+                border: "none",
+                background: "transparent",
+                color: T.ink2,
+                fontSize: 13,
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              Cancel
+            </button>
+          </div>
+    </div>
   );
 }

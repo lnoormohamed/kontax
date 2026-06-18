@@ -1185,6 +1185,7 @@ function AccountHeader({
   isSyncing,
   redirectTo,
   onEdit,
+  onSettings,
   onRequestDisconnect,
   reauthEmail,
 }: {
@@ -1193,6 +1194,7 @@ function AccountHeader({
   isSyncing: boolean;
   redirectTo: string;
   onEdit: () => void;
+  onSettings: () => void;
   onRequestDisconnect: () => void;
   // P35: disambiguate re-auth button when 2+ accounts of same provider
   reauthEmail?: string | null;
@@ -1415,6 +1417,9 @@ function AccountHeader({
           <input type="hidden" name="redirectTo" value={redirectTo} />
           <ActionBtn type="submit">{isPaused ? "Resume" : "Pause"}</ActionBtn>
         </form>
+
+        {/* settings — opens the sync settings panel in the detail zone */}
+        <ActionBtn onClick={onSettings}>Settings</ActionBtn>
 
         {/* edit credentials (CardDAV) / re-authorise (OAuth, only when needed) */}
         {isOAuth ? (
@@ -2286,10 +2291,10 @@ export function SyncPageClient({ accounts, labels, initialAccountId, initialAdd 
   // syncingId reserved for future optimistic in-progress indicator
   const syncingId: string | null = null;
   const [toast, setToast] = useState<string | null>(initialFlash);
-  // P23-02: connection settings drawer open/closed + a pending "scroll to it" flag
-  // set when the user opens it via the gear icon on a list row.
+  // P36: the sync settings panel takes over the detail zone (mutually exclusive
+  // with the edit-credentials form). Opened from the [Settings] action button or
+  // the gear icon on a list row.
   const [settingsOpen, setSettingsOpen] = useState(false);
-  const [scrollToSettings, setScrollToSettings] = useState(false);
   // P23-06: a pending save that needs re-auth; holds the retry to run once elevated.
   const [reauthRetry, setReauthRetry] = useState<(() => void) | null>(null);
   // Disconnect confirmation modal target.
@@ -2310,16 +2315,6 @@ export function SyncPageClient({ accounts, labels, initialAccountId, initialAdd 
   // The remount lets the useState initializers above resolve the view from the
   // fresh props, so no prop-sync effect is needed here.
 
-  // After a gear click selects + expands settings, scroll the zone into view.
-  useEffect(() => {
-    if (!scrollToSettings) return;
-    const id = requestAnimationFrame(() => {
-      document.getElementById("sy-settings-zone")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      setScrollToSettings(false);
-    });
-    return () => cancelAnimationFrame(id);
-  }, [scrollToSettings]);
-
   // Auto-dismiss flash toast
   useEffect(() => {
     if (!toast) return;
@@ -2337,13 +2332,13 @@ export function SyncPageClient({ accounts, labels, initialAccountId, initialAdd 
     if (detailRef.current) detailRef.current.scrollTop = 0;
   };
 
-  // P23-02: gear icon — select the account, open its settings drawer, scroll to it.
+  // Gear icon / [Settings] button — select the account and open the settings panel.
   const openSettings = (id: string) => {
     setSelectedId(id);
     setView("detail");
     setEditing(false);
     setSettingsOpen(true);
-    setScrollToSettings(true);
+    if (detailRef.current) detailRef.current.scrollTop = 0;
   };
 
   const openAdd = () => {
@@ -2382,6 +2377,20 @@ export function SyncPageClient({ accounts, labels, initialAccountId, initialAdd 
           onCancel={() => setEditing(false)}
         />
       );
+    // P36: the settings panel takes over the detail zone, mirroring the
+    // edit-credentials pattern and keeping the two mutually exclusive.
+    if (settingsOpen)
+      return (
+        <ConnectionSettings
+          key={selectedAccount.id}
+          account={selectedAccount}
+          labels={labels}
+          onClose={() => setSettingsOpen(false)}
+          onSaved={() => router.refresh()}
+          setToast={setToast}
+          onNeedElevation={(retry) => setReauthRetry(() => retry)}
+        />
+      );
 
     // P35: show connected email in re-auth button/banner only when 2+ accounts
     // of the same provider exist (so the user knows which one needs fixing).
@@ -2404,7 +2413,11 @@ export function SyncPageClient({ accounts, labels, initialAccountId, initialAdd 
           vHealth={vHealth}
           isSyncing={syncingId === selectedAccount.id}
           redirectTo={redirectTo}
-          onEdit={() => setEditing(true)}
+          onEdit={() => {
+            setSettingsOpen(false);
+            setEditing(true);
+          }}
+          onSettings={() => openSettings(selectedAccount.id)}
           reauthEmail={reauthEmail}
           onRequestDisconnect={() => {
             const isOAuth = selectedAccount.provider !== "CARDDAV";
@@ -2415,16 +2428,6 @@ export function SyncPageClient({ accounts, labels, initialAccountId, initialAdd 
               syncAccountId: selectedAccount.id,
             });
           }}
-        />
-        <ConnectionSettings
-          key={selectedAccount.id}
-          account={selectedAccount}
-          labels={labels}
-          open={settingsOpen}
-          onToggle={() => setSettingsOpen((o) => !o)}
-          onSaved={() => router.refresh()}
-          setToast={setToast}
-          onNeedElevation={(retry) => setReauthRetry(() => retry)}
         />
         <HistoryTable
           jobs={selectedAccount.jobs}
