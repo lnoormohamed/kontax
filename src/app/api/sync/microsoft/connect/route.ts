@@ -12,7 +12,7 @@ import {
 } from "~/server/microsoft-sync";
 import { encodeOAuthState } from "~/server/sync-oauth-state";
 
-const appUrl = () => env.APP_URL ?? "https://kontax.vexon.co";
+const appUrl = () => env.APP_URL ?? "https://getkontax.com";
 
 export async function GET(_req: NextRequest) {
   const session = await auth();

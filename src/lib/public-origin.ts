@@ -5,7 +5,7 @@ import { headers } from "next/headers";
  *
  * Resolution order:
  * 1. APP_URL env var — set this in production to avoid relying on reverse-proxy
- *    headers. e.g. APP_URL=https://kontax.vexon.co
+ *    headers. e.g. APP_URL=https://getkontax.com
  * 2. x-forwarded-proto + x-forwarded-host headers forwarded by the proxy.
  * 3. Scheme inferred from hostname: localhost → http, everything else → https.
  *

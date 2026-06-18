@@ -18,7 +18,7 @@ import { decodeOAuthState } from "~/server/sync-oauth-state";
 const GRAPH_BASE_URL = "https://graph.microsoft.com/v1.0";
 
 const redirectTo = (_req: NextRequest, path: string) =>
-  NextResponse.redirect(new URL(path, env.APP_URL ?? "https://kontax.vexon.co"));
+  NextResponse.redirect(new URL(path, env.APP_URL ?? "https://getkontax.com"));
 
 export async function GET(req: NextRequest) {
   const params = req.nextUrl.searchParams;

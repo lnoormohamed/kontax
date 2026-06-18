@@ -11,7 +11,7 @@ import {
   isGoogleSyncConfigured,
 } from "~/server/google-sync";
 
-const appUrl = () => env.APP_URL ?? "https://kontax.vexon.co";
+const appUrl = () => env.APP_URL ?? "https://getkontax.com";
 
 export async function GET(_req: NextRequest) {
   const session = await auth();
