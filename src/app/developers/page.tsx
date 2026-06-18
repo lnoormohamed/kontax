@@ -316,7 +316,7 @@ export default async function DevelopersPage() {
               }}
             >
               <span style={{ color: "#8b938c" }}>Base URL</span>
-              https://getkontax.com/api/v1
+              https://api.getkontax.com/v1
             </div>
           </div>
 
@@ -389,7 +389,7 @@ export default async function DevelopersPage() {
             />
             <H3>Example request</H3>
             <CodeBlock lang="bash">{`curl -H "Authorization: Bearer ktx_live_..." \\
-  "https://getkontax.com/api/v1/contacts?q=acme&limit=10"`}</CodeBlock>
+  "https://api.getkontax.com/v1/contacts?q=acme&limit=10"`}</CodeBlock>
             <H3>Example response</H3>
             <CodeBlock lang="json">{`{
   "contacts": [
@@ -457,7 +457,7 @@ export default async function DevelopersPage() {
               <Code>primary</Code> / <Code>mobile</Code>.
             </P>
             <H3>Example request</H3>
-            <CodeBlock lang="bash">{`curl -X POST "https://getkontax.com/api/v1/contacts" \\
+            <CodeBlock lang="bash">{`curl -X POST "https://api.getkontax.com/v1/contacts" \\
   -H "Authorization: Bearer ktx_live_..." \\
   -H "Content-Type: application/json" \\
   -d '{
@@ -490,7 +490,7 @@ export default async function DevelopersPage() {
             </div>
             <P>Fetch a single contact by ID.</P>
             <CodeBlock lang="bash">{`curl -H "Authorization: Bearer ktx_live_..." \\
-  "https://getkontax.com/api/v1/contacts/clx7a..."`}</CodeBlock>
+  "https://api.getkontax.com/v1/contacts/clx7a..."`}</CodeBlock>
             <P>
               Returns the contact object, or <Code>404 Not Found</Code> if the contact does not
               exist or belongs to a different user.
@@ -522,7 +522,7 @@ export default async function DevelopersPage() {
               entirely when included. To add a phone number without losing existing ones, send the
               complete array.
             </P>
-            <CodeBlock lang="bash">{`curl -X PUT "https://getkontax.com/api/v1/contacts/clx7a..." \\
+            <CodeBlock lang="bash">{`curl -X PUT "https://api.getkontax.com/v1/contacts/clx7a..." \\
   -H "Authorization: Bearer ktx_live_..." \\
   -H "Content-Type: application/json" \\
   -d '{ "jobTitle": "VP of Sales" }'`}</CodeBlock>
@@ -551,11 +551,11 @@ export default async function DevelopersPage() {
             </P>
             <CodeBlock lang="bash">{`# Archive (reversible)
 curl -X DELETE -H "Authorization: Bearer ktx_live_..." \\
-  "https://getkontax.com/api/v1/contacts/clx7a..."
+  "https://api.getkontax.com/v1/contacts/clx7a..."
 
 # Permanent delete
 curl -X DELETE -H "Authorization: Bearer ktx_live_..." \\
-  "https://getkontax.com/api/v1/contacts/clx7a...?permanent=true"`}</CodeBlock>
+  "https://api.getkontax.com/v1/contacts/clx7a...?permanent=true"`}</CodeBlock>
             <P>
               Returns <Code>204 No Content</Code> on success.
             </P>
@@ -655,10 +655,10 @@ X-RateLimit-Reset: 2026-06-11T15:00:00.000Z`}</CodeBlock>
           <Section id="examples" title="Code examples">
             <H3>cURL — list contacts</H3>
             <CodeBlock lang="bash">{`curl -H "Authorization: Bearer ktx_live_your-token" \\
-  "https://getkontax.com/api/v1/contacts?limit=20"`}</CodeBlock>
+  "https://api.getkontax.com/v1/contacts?limit=20"`}</CodeBlock>
 
             <H3>JavaScript (fetch) — create a contact</H3>
-            <CodeBlock lang="javascript">{`const response = await fetch("https://getkontax.com/api/v1/contacts", {
+            <CodeBlock lang="javascript">{`const response = await fetch("https://api.getkontax.com/v1/contacts", {
   method: "POST",
   headers: {
     "Authorization": "Bearer ktx_live_your-token",
@@ -678,7 +678,7 @@ console.log(contact.id);`}</CodeBlock>
             <CodeBlock lang="python">{`import requests
 
 TOKEN = "ktx_live_your-token"
-BASE  = "https://getkontax.com/api/v1"
+BASE  = "https://api.getkontax.com/v1"
 
 def list_all_contacts():
     contacts = []
