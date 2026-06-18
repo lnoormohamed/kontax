@@ -989,7 +989,7 @@ export const buildContactMergeSuggestions = (contacts: MergeCandidateContact[]) 
     }
   }
 
-  return suggestions.sort((left, right) => right.score - left.score).slice(0, 8);
+  return suggestions.sort((left, right) => right.score - left.score).slice(0, 500);
 };
 
 export const buildMergedContactPreview = (
@@ -1658,7 +1658,7 @@ export const getOpenMergeSuggestionsForUser = async (userId: string) => {
       status: "OPEN",
     },
     orderBy: [{ score: "desc" }, { updatedAt: "desc" }],
-    take: 20,
+    take: 500,
     select: {
       id: true,
       status: true,
@@ -1680,7 +1680,6 @@ export const getOpenMergeSuggestionsForUser = async (userId: string) => {
       const [aId, bId] = [s.leftContact.id, s.rightContact.id].sort() as [string, string];
       return !dismissedSet.has(`${aId}:${bId}`);
     })
-    .slice(0, 8)
     .map((suggestion) => {
       const contributions = parseContributions(suggestion.signals);
       return {
