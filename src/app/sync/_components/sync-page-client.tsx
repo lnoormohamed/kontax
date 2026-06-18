@@ -674,37 +674,66 @@ function HistoryTable({
           </div>
 
           {/* legend for the Changes column notation */}
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              gap: "6px 24px",
-              fontSize: 11.5,
-              color: T.mute,
-              padding: "6px 0 2px",
-            }}
-          >
-            <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              {(["+ added", "~ updated", "− removed"] as const).map((item) => (
-                <span key={item} style={{ display: "inline-flex", alignItems: "center", gap: 3 }}>
-                  <span style={{ fontFamily: '"Geist Mono", ui-monospace, monospace', color: T.ink2 }}>
-                    {item[0]}
-                  </span>
-                  <span>{item.slice(2)}</span>
+          {(() => {
+            const SYMBOLS: { sym: string; label: string; fg: string; bg: string }[] = [
+              { sym: "+", label: "added", fg: T.sgreenText, bg: T.sgreenWash },
+              { sym: "~", label: "updated", fg: T.amber, bg: T.amberT },
+              { sym: "−", label: "removed", fg: T.red, bg: T.redWash },
+            ];
+            const Chip = ({ sym, label, fg, bg }: { sym: string; label: string; fg: string; bg: string }) => (
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                <span
+                  style={{
+                    fontFamily: '"Geist Mono", ui-monospace, monospace',
+                    fontSize: 11,
+                    fontWeight: 700,
+                    color: fg,
+                    background: bg,
+                    borderRadius: 5,
+                    padding: "0 5px",
+                    lineHeight: "16px",
+                    minWidth: 18,
+                    textAlign: "center",
+                  }}
+                >
+                  {sym}
                 </span>
-              ))}
-            </span>
-            <span style={{ display: "flex", alignItems: "center", gap: 8 }}>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 3 }}>
-                <span style={{ color: T.ink2, fontWeight: 500 }}>Kontax</span>
-                <span>= pulled in</span>
+                <span>{label}</span>
               </span>
-              <span style={{ display: "inline-flex", alignItems: "center", gap: 3 }}>
-                <span style={{ color: T.ink2, fontWeight: 500 }}>{remoteLabel}</span>
-                <span>= pushed out</span>
+            );
+            const Dir = ({ arrow, party, verb }: { arrow: string; party: string; verb: string }) => (
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}>
+                <span style={{ color: T.ink2, fontWeight: 600 }}>{arrow}</span>
+                <span>
+                  <span style={{ color: T.ink2, fontWeight: 600 }}>{party}</span> {verb}
+                </span>
               </span>
-            </span>
-          </div>
+            );
+            return (
+              <div
+                style={{
+                  display: "flex",
+                  flexWrap: "wrap",
+                  alignItems: "center",
+                  gap: "8px 16px",
+                  fontSize: 11.5,
+                  color: T.mute,
+                  padding: "8px 0 4px",
+                }}
+              >
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 12 }}>
+                  {SYMBOLS.map((s) => (
+                    <Chip key={s.sym} {...s} />
+                  ))}
+                </span>
+                <span style={{ width: 1, height: 13, background: T.line, flexShrink: 0 }} />
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 14 }}>
+                  <Dir arrow="↓" party="Kontax" verb="pulled in" />
+                  <Dir arrow="↑" party={remoteLabel} verb="pushed out" />
+                </span>
+              </div>
+            );
+          })()}
 
           {/* in-progress row */}
           {isSyncing && (
