@@ -185,7 +185,10 @@ const HEALTH_DETAIL: Record<VisualHealth, (a: SyncAccountData) => string> = {
   warning: (a) =>
     `${a.consecutiveFailures} consecutive sync failures. Kontax will keep retrying.`,
   error: (a) => `Last sync failed${a.lastErrorMessage ? ": " + a.lastErrorMessage : "."}`,
-  auth: () => "Re-authentication required — your app password was rejected.",
+  auth: (a) =>
+    a.provider === "CARDDAV"
+      ? "Re-authentication required — your app password was rejected."
+      : `Re-authentication required — your ${a.provider === "GOOGLE" ? "Google" : "Microsoft"} authorisation has expired or been revoked.`,
   paused: () => "Sync is paused. Click Resume to continue syncing.",
   safety: (a) =>
     a.conflictQueueFull
