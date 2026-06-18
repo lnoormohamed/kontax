@@ -1332,9 +1332,14 @@ export const bulkAcceptHighConfidenceContacts = async (formData: FormData) => {
 
   revalidateContactViews();
 
-  const base = redirectTo ?? "/contacts?tab=duplicates";
-  const separator = base.includes("?") ? "&" : "?";
-  redirect(`${base}${separator}bulkMerged=${mergedCount}&bulkFailed=${failedCount}`);
+  // Only a native <form action> should redirect — a programmatic caller omits
+  // redirectTo and refreshes on the client (a server redirect() re-runs
+  // middleware cookielessly and bounces to /login).
+  if (redirectTo) {
+    const separator = redirectTo.includes("?") ? "&" : "?";
+    redirect(`${redirectTo}${separator}bulkMerged=${mergedCount}&bulkFailed=${failedCount}`);
+  }
+  return { mergedCount, failedCount };
 };
 
 export const undoMergeContacts = async (formData: FormData) => {

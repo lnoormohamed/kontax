@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import { bulkAcceptHighConfidenceContacts, undoMergeContacts } from "~/app/actions/contacts";
@@ -26,6 +27,7 @@ function Modal({ children, onClose }: { children: React.ReactNode; onClose: () =
 
 // ── bulk-merge confirmation dialog ────────────────────────────────────────────
 export function BulkMergeButton({ count }: { count: number }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [merging, setMerging] = useState(false);
 
@@ -66,12 +68,14 @@ export function BulkMergeButton({ count }: { count: number }) {
             <form
               action={async (fd) => {
                 setMerging(true);
+                // No redirectTo — refresh on the client so the action's redirect()
+                // can't bounce us to /login via a cookieless middleware re-run.
                 await bulkAcceptHighConfidenceContacts(fd);
                 setOpen(false);
                 setMerging(false);
+                router.refresh();
               }}
             >
-              <input name="redirectTo" type="hidden" value="/contacts?tab=duplicates" />
               <button
                 className="inline-flex h-[42px] items-center gap-2 rounded-[10px] bg-[#17352e] px-[18px] text-[13.5px] font-semibold text-white transition hover:bg-[#20443b] disabled:opacity-80"
                 disabled={merging}

@@ -431,12 +431,17 @@ export function ContactDashboard({
               ) : null}
             </>
           ) : (
-            <div className="flex items-center gap-2">
-              <MergeSuggestionRefreshButton />
-              <BulkMergeButton count={highConfidenceCount} />
-            </div>
+            <>
+              <span className="text-[13.5px] font-semibold text-[#1d2823]">{countLabel}</span>
+              <div className="ml-auto flex items-center gap-2">
+                <MergeSuggestionRefreshButton />
+                <BulkMergeButton count={highConfidenceCount} />
+              </div>
+            </>
           )}
-          <span className="ml-auto text-[12.5px] text-[#8b938c]">{countLabel}</span>
+          {currentTab !== "duplicates" ? (
+            <span className="ml-auto text-[12.5px] text-[#8b938c]">{countLabel}</span>
+          ) : null}
         </div>
         )}
 
