@@ -129,6 +129,7 @@ export async function GET(req: NextRequest) {
           data: {
             label,
             status: "ACTIVE",
+            remoteAccountId: googleEmail || null,
             credentialReference: enc.credentialReference,
             encryptionKeyRef: enc.encryptionKeyRef,
             credentialUpdatedAt: now,
