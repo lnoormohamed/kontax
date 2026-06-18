@@ -74,6 +74,23 @@ export async function quickMergeSuggestion(
 
   if (!suggestion) throw new Error("Suggestion not found.");
 
+  // If either contact was already absorbed by a previous merge in the same
+  // batch, mark this suggestion stale and return — don't error the whole group.
+  const bothActive = await db.contact.count({
+    where: {
+      id: { in: [suggestion.leftContactId, suggestion.rightContactId] },
+      archivedAt: null,
+      mergedIntoContactId: null,
+    },
+  });
+  if (bothActive < 2) {
+    await db.mergeSuggestion.update({
+      where: { id: suggestion.id },
+      data: { status: "STALE", reviewedAt: new Date() },
+    });
+    return { survivingContactId: suggestion.leftContactId, decisionId: undefined };
+  }
+
   // Older contact wins as primary (was added first)
   const primaryIsLeft =
     suggestion.leftContact.createdAt <= suggestion.rightContact.createdAt;
