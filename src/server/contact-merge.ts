@@ -609,17 +609,19 @@ const mergeDates = (
   const seen = new Set<string>();
   const result: Array<{ label: string; date: string; isPrimary: boolean }> = [];
 
-  for (const entry of [...primaryEntries, ...secondaryEntries]) {
-    const key = `${entry.label.trim().toLowerCase()}::${entry.date.trim()}`;
-    if (!entry.label.trim() || !entry.date.trim() || seen.has(key)) {
-      continue;
-    }
-
+  for (const raw of [...primaryEntries, ...secondaryEntries]) {
+    // Legacy imports stored significant dates as {label, value} instead of {label, date}.
+    const entry = raw as unknown as Record<string, unknown>;
+    const label = String(entry.label ?? "").trim();
+    const date = String(entry.date ?? entry.value ?? "").trim();
+    if (!label || !date) continue;
+    const key = `${label.toLowerCase()}::${date}`;
+    if (seen.has(key)) continue;
     seen.add(key);
     result.push({
-      label: entry.label,
-      date: entry.date,
-      isPrimary: result.length === 0 ? entry.label.trim().toLowerCase() === "birthday" : false,
+      label,
+      date,
+      isPrimary: result.length === 0 ? label.toLowerCase() === "birthday" : false,
     });
   }
 
