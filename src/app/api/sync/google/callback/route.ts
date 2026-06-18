@@ -3,8 +3,6 @@
 // email, stores an encrypted SyncAccount, and queues the initial import.
 import { NextResponse, type NextRequest } from "next/server";
 
-import { people } from "@googleapis/people";
-
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { env } from "~/env";
@@ -64,19 +62,21 @@ export async function GET(req: NextRequest) {
     return redirectTo(req, "/sync?error=google_token");
   }
 
-  // Resolve the connected account email for the label and detail panel.
+  // Resolve the connected account email via the userinfo endpoint.
+  // people/me emailAddresses returns contact-profile emails, not the Google
+  // account email. The userinfo endpoint is correct here since we request
+  // the userinfo.email scope.
   let googleEmail = "";
   try {
-    const peopleApi = people({ version: "v1", auth: client });
-    const me = await peopleApi.people.get({
-      resourceName: "people/me",
-      personFields: "emailAddresses",
+    const res = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+      headers: { Authorization: `Bearer ${tokens.access_token}` },
     });
-    const emails = me.data.emailAddresses ?? [];
-    googleEmail =
-      emails.find((e) => e.metadata?.primary)?.value ?? emails[0]?.value ?? "";
+    if (res.ok) {
+      const info = await res.json() as { email?: string };
+      googleEmail = info.email ?? "";
+    }
   } catch {
-    // Non-fatal — fall back to an empty email; the connection still works.
+    // Non-fatal — fall back to empty; the connection still works.
   }
 
   const label = googleEmail
