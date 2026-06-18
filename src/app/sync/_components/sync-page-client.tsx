@@ -3379,9 +3379,10 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
               {g.items.map((a) => {
             const vH = getVisualHealth(a, syncingId);
             const sel = view === "detail" && selectedId === a.id;
-            // P35: show connectedEmail as primary subtitle for OAuth accounts
+            // OAuth accounts always show the connected email so the user can
+            // identify which account is which regardless of health state.
             const subtitle =
-              a.provider !== "CARDDAV" && a.connectedEmail && (vH === "healthy" || vH === "syncing" || vH === "never")
+              a.provider !== "CARDDAV" && a.connectedEmail
                 ? a.connectedEmail
                 : HEALTH_LIST_TEXT[vH](a);
             return (
