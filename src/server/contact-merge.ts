@@ -727,8 +727,8 @@ const getEdgeCaseWarnings = (left: MergeableContact, right: MergeableContact) =>
   const warnings: string[] = [];
   const leftEmail = normalizeValue(left.email);
   const rightEmail = normalizeValue(right.email);
-  const leftPhone = normalizePhone(left.phone);
-  const rightPhone = normalizePhone(right.phone);
+  const leftPhone = normalizePhoneKey(left.phone);
+  const rightPhone = normalizePhoneKey(right.phone);
   const leftFamilyName = getFamilyName(left.fullName);
   const rightFamilyName = getFamilyName(right.fullName);
   const leftGivenName = getGivenName(left.fullName);
