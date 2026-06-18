@@ -2,9 +2,14 @@ import { type NextRequest, NextResponse } from "next/server";
 
 import { db } from "~/server/db";
 import { emitEvent } from "~/lib/activity";
+import { corsHeaders } from "~/lib/api-cors";
 import { API_CONTACT_SELECT, formatContactForApi, mapUpdateInputToDb } from "../../_lib/contact-mapper";
 import { ContactUpdateSchema } from "../../_lib/schemas";
 import { requireWriteScope, withApiAuth } from "../../_lib/auth";
+
+export function OPTIONS(_request: Request) {
+  return new Response(null, { status: 200, headers: corsHeaders });
+}
 
 export const dynamic = "force-dynamic";
 

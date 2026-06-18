@@ -3,9 +3,14 @@ import { type NextRequest, NextResponse } from "next/server";
 import { assertCanCreateContacts } from "~/server/billing";
 import { db } from "~/server/db";
 import { emitEvent } from "~/lib/activity";
+import { corsHeaders } from "~/lib/api-cors";
 import { API_CONTACT_SELECT, formatContactForApi, mapCreateInputToDb } from "../_lib/contact-mapper";
 import { ContactCreateSchema } from "../_lib/schemas";
 import { requireWriteScope, withApiAuth } from "../_lib/auth";
+
+export function OPTIONS(_request: Request) {
+  return new Response(null, { status: 200, headers: corsHeaders });
+}
 
 export const dynamic = "force-dynamic";
 
