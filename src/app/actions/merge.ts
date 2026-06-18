@@ -102,13 +102,21 @@ export async function quickMergeSuggestion(
     ? suggestion.rightContactId
     : suggestion.leftContactId;
 
-  const result = await mergeContactsForUser({
-    userId,
-    primaryContactId,
-    secondaryContactId,
-    suggestionId: suggestion.id,
-    source: "quick-merge",
-  });
+  let result;
+  try {
+    result = await mergeContactsForUser({
+      userId,
+      primaryContactId,
+      secondaryContactId,
+      suggestionId: suggestion.id,
+      source: "quick-merge",
+    });
+  } catch (e) {
+    console.error("[quickMergeSuggestion] mergeContactsForUser threw:", e);
+    throw new Error(
+      `Merge failed: ${e instanceof Error ? e.message : String(e)}`,
+    );
+  }
 
   return { survivingContactId: result.survivingContactId, decisionId: result.decisionId };
 }
