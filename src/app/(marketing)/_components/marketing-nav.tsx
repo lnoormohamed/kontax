@@ -11,7 +11,21 @@ const NAV_LINKS = [
   { label: "Changelog", href: "/changelog" },
 ] as const;
 
-export function MarketingNav() {
+function initials(name: string | null | undefined): string {
+  if (!name) return "";
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]?.toUpperCase() ?? "")
+    .join("");
+}
+
+interface MarketingNavProps {
+  sessionUser?: { name?: string | null } | null;
+}
+
+export function MarketingNav({ sessionUser }: MarketingNavProps) {
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -56,8 +70,24 @@ export function MarketingNav() {
           </nav>
 
           <div className="mkt-nav__actions">
-            <Link className="mkt-nav__login" href="/login">Log in</Link>
-            <Link className="mkt-btn-pill" href="/register">Get started</Link>
+            {sessionUser ? (
+              <>
+                <Link className="mkt-btn-pill mkt-btn-pill--green" href="/contacts">
+                  Go to app
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M5 12h13" /><path d="M13 6l6 6-6 6" />
+                  </svg>
+                </Link>
+                <Link className="mkt-nav__avatar" href="/settings/account" aria-label="Account settings">
+                  {initials(sessionUser.name)}
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link className="mkt-nav__login" href="/login">Log in</Link>
+                <Link className="mkt-btn-pill" href="/register">Get started</Link>
+              </>
+            )}
           </div>
 
           <button
@@ -111,8 +141,28 @@ export function MarketingNav() {
           </nav>
 
           <div className="mkt-mobile-menu__foot">
-            <Link className="mkt-mobile-menu__login" href="/login">Log in</Link>
-            <Link className="mkt-mobile-menu__cta" href="/register">Get started</Link>
+            {sessionUser ? (
+              <>
+                <Link className="mkt-mobile-menu__userbar" href="/settings/account" onClick={() => setMobileOpen(false)}>
+                  <span className="mkt-mobile-menu__userav">{initials(sessionUser.name)}</span>
+                  <span>
+                    <span className="mkt-mobile-menu__username">{sessionUser.name}</span>
+                    <span className="mkt-mobile-menu__usersub">View account</span>
+                  </span>
+                </Link>
+                <Link className="mkt-mobile-menu__cta mkt-mobile-menu__cta--green" href="/contacts" onClick={() => setMobileOpen(false)}>
+                  Go to app
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M5 12h13" /><path d="M13 6l6 6-6 6" />
+                  </svg>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link className="mkt-mobile-menu__login" href="/login">Log in</Link>
+                <Link className="mkt-mobile-menu__cta" href="/register">Get started</Link>
+              </>
+            )}
           </div>
         </div>
       )}

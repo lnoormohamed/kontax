@@ -133,6 +133,70 @@
 }
 .mkt-btn-pill:hover { background: var(--mkt-green-deep); }
 
+/* Logged-in nav: "Go to app" pill (same shape as mkt-btn-pill, inherits green) */
+.mkt-btn-pill--green { gap: 6px; }
+.mkt-btn-pill--green svg { transition: transform 0.15s ease; }
+.mkt-btn-pill--green:hover svg { transform: translateX(2px); }
+
+/* Logged-in nav: user avatar chip */
+.mkt-nav__avatar {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: #dff0e7;
+  color: var(--mkt-green);
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  flex: 0 0 auto;
+  transition: opacity 0.15s ease;
+}
+.mkt-nav__avatar:hover { opacity: 0.8; }
+
+/* Logged-in mobile: user row */
+.mkt-mobile-menu__userbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  text-decoration: none;
+  border-bottom: 1px solid var(--mkt-hairline);
+  margin-bottom: 4px;
+}
+.mkt-mobile-menu__userav {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #dff0e7;
+  color: var(--mkt-green);
+  font-size: 15px;
+  font-weight: 600;
+  flex: 0 0 auto;
+}
+.mkt-mobile-menu__username {
+  display: block;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--mkt-ink);
+}
+.mkt-mobile-menu__usersub {
+  display: block;
+  font-size: 12.5px;
+  color: var(--mkt-body);
+}
+
+/* Logged-in mobile: green "Go to app" CTA */
+.mkt-mobile-menu__cta--green {
+  gap: 8px;
+  background: var(--mkt-green);
+}
+.mkt-mobile-menu__cta--green:hover { background: var(--mkt-green-deep); }
+
 /* Hamburger */
 .mkt-nav__burger {
   display: none;

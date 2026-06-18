@@ -7,6 +7,7 @@ import {
   softwareApplicationSchema,
   websiteSchema,
 } from "~/app/_components/json-ld";
+import { auth } from "~/server/auth";
 
 import "./homepage.css";
 
@@ -32,7 +33,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function HomePage() {
+export default async function HomePage() {
+  const session = await auth();
+  const firstName = session?.user?.name?.split(/\s+/)[0] ?? null;
+
   return (
     <>
       <JsonLd
@@ -43,36 +47,46 @@ export default function HomePage() {
       <section className="hp-hero">
         <div className="hp-wrap hp-hero__inner">
           <div className="hp-hero__copy">
-            <p className="hp-hero__eyebrow">Contact management, done right</p>
-            <h1 className="hp-hero__title">
-              Your contacts. Organised, synced, and always with you.
-            </h1>
-            <p className="hp-hero__sub">
-              One address book that stays current on every device, every app, and every
-              person you share with.
-            </p>
-            <div className="hp-hero__ctas">
-              <Link className="hp-btn--primary" href="/register">
-                Get started free
-              </Link>
-              <a className="hp-btn--secondary" href="#features">
-                See how it works
-                <svg
-                  width="16"
-                  height="16"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M12 5v13" />
-                  <path d="M6 13l6 6 6-6" />
-                </svg>
-              </a>
-            </div>
+            {session ? (
+              <>
+                <p className="hp-hero__eyebrow">Welcome back</p>
+                <h1 className="hp-hero__title">
+                  {firstName ? `Welcome back, ${firstName}.` : "Pick up where you left off."}
+                </h1>
+                <p className="hp-hero__sub">Your contacts are waiting.</p>
+                <div className="hp-hero__ctas">
+                  <Link className="hp-btn--green" href="/contacts">
+                    Open Kontax
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M5 12h13" /><path d="M13 6l6 6-6 6" />
+                    </svg>
+                  </Link>
+                </div>
+              </>
+            ) : (
+              <>
+                <p className="hp-hero__eyebrow">Contact management, done right</p>
+                <h1 className="hp-hero__title">
+                  Your contacts. Organised, synced, and always with you.
+                </h1>
+                <p className="hp-hero__sub">
+                  One address book that stays current on every device, every app, and every
+                  person you share with.
+                </p>
+                <div className="hp-hero__ctas">
+                  <Link className="hp-btn--primary" href="/register">
+                    Get started free
+                  </Link>
+                  <a className="hp-btn--secondary" href="#features">
+                    See how it works
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                      <path d="M12 5v13" />
+                      <path d="M6 13l6 6 6-6" />
+                    </svg>
+                  </a>
+                </div>
+              </>
+            )}
           </div>
 
           {/* Product screenshot mock */}

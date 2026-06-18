@@ -108,6 +108,29 @@
 .hp-btn--secondary svg { transition: transform 0.15s ease; }
 .hp-btn--secondary:hover svg { transform: translateY(2px); }
 
+/* Logged-in hero CTA — green pill with arrow */
+.hp-btn--green {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 48px;
+  padding: 0 32px;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  text-decoration: none;
+  background: var(--mkt-green);
+  color: #fff;
+  border: 1px solid var(--mkt-green);
+  transition: background 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+  cursor: pointer;
+}
+.hp-btn--green:hover { background: var(--mkt-green-deep); border-color: var(--mkt-green-deep); }
+.hp-btn--green svg { transition: transform 0.15s ease; }
+.hp-btn--green:hover svg { transform: translateX(2px); }
+
 /* ─── Hero product mock ───────────────────────────────────────── */
 .hp-hero__media { display: flex; justify-content: center; }
 .hp-shot {
