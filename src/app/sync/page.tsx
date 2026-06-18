@@ -397,6 +397,8 @@ export default async function SyncPage({ searchParams }: PageProps) {
             initialAccountId={initialAccountId}
             initialAdd={addParam}
             flash={flashMsg}
+            syncAccountsLimit={planSummary.entitlements.syncAccountsLimit}
+            upgradeableAtCap={planSummary.plan === "FREE"}
           />
         </div>
       </div>

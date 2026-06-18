@@ -1043,20 +1043,26 @@ function OAuthMetaRow({ label, children }: { label: string; children: React.Reac
 }
 
 // ── P27-07: OAuth-specific error banners (re-auth / quota / scope-reduced) ─────
+// reauthEmail: pass the account's connectedEmail when 2+ accounts of the same
+// provider exist so the button label disambiguates which account needs fixing.
 function OAuthErrorBanner({
   account,
+  reauthEmail,
 }: {
   account: SyncAccountData;
+  reauthEmail?: string | null;
 }) {
   const providerName = account.provider === "GOOGLE" ? "Google" : "Outlook";
+  const authParty = account.provider === "GOOGLE" ? "Google" : "Microsoft";
   const connectPath =
     account.provider === "GOOGLE" ? "/api/sync/google/connect" : "/api/sync/microsoft/connect";
   const code = account.lastErrorCode ?? "";
   const isQuota = code === "GOOGLE_QUOTA_EXCEEDED" || code === "MICROSOFT_QUOTA_EXCEEDED";
+  const isPermissionReduced = code === "GOOGLE_PERMISSION_REDUCED" || code === "MICROSOFT_PERMISSION_REDUCED";
   const isReauth = account.status === "NEEDS_REAUTH";
 
   // Nothing actionable to surface.
-  if (!isReauth && !isQuota) return null;
+  if (!isReauth && !isQuota && !isPermissionReduced) return null;
 
   const amber = { bg: "#f6edd9", border: "#e9c87b", title: "#7a5a1a", body: "#8a6a2a" };
 
@@ -1080,7 +1086,7 @@ function OAuthErrorBanner({
             {providerName} API quota exceeded
           </div>
           <div style={{ fontSize: 13, color: amber.body, marginTop: 3, lineHeight: 1.5 }}>
-            Sync is paused. Kontax will automatically retry later. “Sync now” is disabled during the
+            Sync is paused. Kontax will automatically retry later. "Sync now" is disabled during the
             pause.
           </div>
         </div>
@@ -1088,7 +1094,41 @@ function OAuthErrorBanner({
     );
   }
 
+  if (isPermissionReduced) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          gap: 12,
+          alignItems: "flex-start",
+          background: "#f7e9e4",
+          border: "1px solid #e8c6ba",
+          borderRadius: 10,
+          padding: "14px 16px",
+          marginBottom: 22,
+        }}
+      >
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={T.red} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 1 }}>
+          <path d="M12 4l9 16H3z" /><path d="M12 10v4" /><path d="M12 17h.01" />
+        </svg>
+        <div style={{ minWidth: 0, flex: 1 }}>
+          <div style={{ fontSize: 13.5, fontWeight: 700, color: "#7a2e1a" }}>Permission reduced</div>
+          <div style={{ fontSize: 13, color: "#8f4733", marginTop: 3, lineHeight: 1.5, maxWidth: 480 }}>
+            You removed Contacts access from the Kontax app in your {authParty} account. Re-authorise to restore sync.
+          </div>
+          <a href={connectPath} style={{ textDecoration: "none" }}>
+            <span style={{ display: "inline-block", marginTop: 12, height: 36, padding: "0 15px", lineHeight: "36px", borderRadius: 9, background: T.red, color: "#fff", fontSize: 13.5, fontWeight: 600, cursor: "pointer" }}>
+              Re-authorise →
+            </span>
+          </a>
+        </div>
+      </div>
+    );
+  }
+
   // Re-authorisation required (AUTH_FAILED / NEEDS_REAUTH).
+  // P35: show email in button when reauthEmail is provided (2+ accounts of same provider).
+  const reauthTarget = reauthEmail ?? providerName;
   return (
     <div
       style={{
@@ -1106,8 +1146,8 @@ function OAuthErrorBanner({
             Re-authorisation required
           </div>
           <div style={{ fontSize: 13, color: amber.body, marginTop: 3, lineHeight: 1.5, maxWidth: 480 }}>
-            Your {account.provider === "GOOGLE" ? "Google" : "Microsoft"} authorisation has expired
-            or been revoked. Re-authorise to restore the connection.
+            Your {authParty} authorisation{reauthEmail ? ` for ${reauthEmail}` : ""} has expired or
+            been revoked. Re-authorise to restore the connection.
           </div>
           <a href={connectPath} style={{ textDecoration: "none" }}>
             <span
@@ -1126,7 +1166,8 @@ function OAuthErrorBanner({
                 cursor: "pointer",
               }}
             >
-              Re-authorise {providerName} →
+              <PlatIcon kind={account.provider === "GOOGLE" ? "gcontacts" : "outlook"} size={16} />
+              Re-authorise {reauthTarget} →
             </span>
           </a>
         </div>
@@ -1163,6 +1204,7 @@ function AccountHeader({
   redirectTo,
   onEdit,
   onRequestDisconnect,
+  reauthEmail,
 }: {
   account: SyncAccountData;
   vHealth: VisualHealth;
@@ -1170,6 +1212,8 @@ function AccountHeader({
   redirectTo: string;
   onEdit: () => void;
   onRequestDisconnect: () => void;
+  // P35: disambiguate re-auth button when 2+ accounts of same provider
+  reauthEmail?: string | null;
 }) {
   const [copiedUrl, setCopiedUrl] = useState(false);
   const isPaused = account.status === "PAUSED";
@@ -1394,7 +1438,9 @@ function AccountHeader({
         {isOAuth ? (
           needsReauth && (
             <a href={connectPath} style={{ textDecoration: "none" }}>
-              <ActionBtn>Re-authorise</ActionBtn>
+              <ActionBtn>
+                Re-authorise{reauthEmail ? ` ${reauthEmail}` : ""}
+              </ActionBtn>
             </a>
           )
         ) : (
@@ -1627,7 +1673,17 @@ const OAUTH_TILES: Array<{ provider: string; kind: PlatKind; label: string; sub:
   },
 ];
 
-function AddAccountForm({ onCancel }: { onCancel: () => void }) {
+function AddAccountForm({
+  onCancel,
+  accounts,
+  syncAccountsLimit,
+  upgradeableAtCap,
+}: {
+  onCancel: () => void;
+  accounts: SyncAccountData[];
+  syncAccountsLimit: number;
+  upgradeableAtCap: boolean;
+}) {
   const [sel, setSel] = useState<QuickPreset>(QUICK_PRESETS[0]!);
   const [baseUrl, setBaseUrl] = useState(QUICK_PRESETS[0]!.url);
   const [labelValue, setLabelValue] = useState(QUICK_PRESETS[0]!.label);
@@ -1652,6 +1708,53 @@ function AddAccountForm({ onCancel }: { onCancel: () => void }) {
     setLabelValue(q.label);
   };
 
+  const capReached = accounts.length >= syncAccountsLimit;
+
+  // P35: entitlement cap — show the gate instead of the form
+  if (capReached) {
+    return (
+      <div style={{ animation: "sy-fade .15s ease" }}>
+        <h2 style={{ margin: "0 0 4px", fontSize: 22, fontWeight: 600, letterSpacing: "-0.01em", color: T.ink }}>
+          Add sync account
+        </h2>
+        <p style={{ margin: "0 0 22px", fontSize: 13.5, color: T.ink2, maxWidth: 480 }}>
+          You've reached the sync-account limit for your plan.
+        </p>
+        <div style={{ maxWidth: 520 }}>
+          <div style={{ display: "flex", gap: 12, alignItems: "flex-start", background: "#f6edd9", border: "1px solid #e9c87b", borderRadius: 10, padding: "14px 16px" }}>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9a6a12" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, marginTop: 1 }}>
+              <path d="M12 4l9 16H3z" /><path d="M12 10v4" /><path d="M12 17h.01" />
+            </svg>
+            <div style={{ minWidth: 0, flex: 1 }}>
+              <div style={{ fontSize: 14, fontWeight: 600, color: "#7a5a1a", lineHeight: 1.5 }}>
+                You're using all {accounts.length} of your {syncAccountsLimit} sync accounts.
+              </div>
+              <div style={{ fontSize: 13, color: "#8a6a2a", marginTop: 2, lineHeight: 1.5 }}>
+                {upgradeableAtCap ? (
+                  <>Upgrade to Pro to connect more.{" "}
+                    <Link href="/settings/billing" style={{ color: T.blue, fontWeight: 600, textDecoration: "none" }}>Upgrade →</Link>
+                  </>
+                ) : (
+                  "Contact support to increase your limit."
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+        <div style={{ marginTop: 22 }}>
+          <button
+            type="button"
+            onClick={onCancel}
+            style={{ border: "none", background: "transparent", color: T.ink2, fontSize: 13, fontWeight: 600, cursor: "pointer", padding: 0, display: "inline-flex", alignItems: "center", gap: 6 }}
+          >
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M15 5l-7 7 7 7" /></svg>
+            Back to accounts
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ animation: "sy-fade .15s ease" }}>
       <h2 style={{ margin: "0 0 4px", fontSize: 22, fontWeight: 600, letterSpacing: "-0.01em", color: T.ink }}>
@@ -1661,7 +1764,7 @@ function AddAccountForm({ onCancel }: { onCancel: () => void }) {
         Connect a Google or Microsoft account in one tap, or link any CardDAV service manually.
       </p>
 
-      {/* P27-07: OAuth quick-connect (Google / Outlook) */}
+      {/* P27-07 / P35: OAuth quick-connect — "Connect another…" when ≥1 of same provider */}
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 10 }}>
         <span style={{ fontSize: 12.5, fontWeight: 600, color: T.ink2 }}>Connect with OAuth</span>
       </div>
@@ -1674,34 +1777,48 @@ function AddAccountForm({ onCancel }: { onCancel: () => void }) {
           maxWidth: 460,
         }}
       >
-        {OAUTH_TILES.map((p) => (
-          <a
-            key={p.provider}
-            href={p.href}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: 12,
-              padding: "13px 15px",
-              minHeight: 64,
-              borderRadius: 12,
-              border: `1px solid ${T.line}`,
-              background: "#fff",
-              textDecoration: "none",
-              boxSizing: "border-box",
-            }}
-          >
-            <span style={{ flexShrink: 0, width: 26, display: "grid", placeItems: "center" }}>
-              <PlatIcon kind={p.kind} size={26} />
-            </span>
-            <span style={{ minWidth: 0 }}>
-              <span style={{ display: "block", fontSize: 14, fontWeight: 600, color: T.ink, lineHeight: 1.2 }}>
-                {p.label}
+        {OAUTH_TILES.map((p) => {
+          const existingEmails = accounts
+            .filter((a) => a.provider === p.provider && a.connectedEmail)
+            .map((a) => a.connectedEmail as string);
+          const hasExisting = existingEmails.length > 0;
+          const label = hasExisting
+            ? `Connect another ${p.provider === "GOOGLE" ? "Google" : "Outlook"} account`
+            : p.label;
+          const sub = hasExisting
+            ? existingEmails.length <= 2
+              ? `${existingEmails.join(", ")} already connected`
+              : `${existingEmails.length} accounts connected`
+            : p.sub;
+          return (
+            <a
+              key={p.provider}
+              href={p.href}
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                padding: "13px 15px",
+                minHeight: 64,
+                borderRadius: 12,
+                border: `1px solid ${T.line}`,
+                background: "#fff",
+                textDecoration: "none",
+                boxSizing: "border-box",
+              }}
+            >
+              <span style={{ flexShrink: 0, width: 26, display: "grid", placeItems: "center" }}>
+                <PlatIcon kind={p.kind} size={26} />
               </span>
-              <span style={{ display: "block", fontSize: 11.5, color: T.mute, marginTop: 2 }}>{p.sub}</span>
-            </span>
-          </a>
-        ))}
+              <span style={{ minWidth: 0 }}>
+                <span style={{ display: "block", fontSize: 14, fontWeight: 600, color: T.ink, lineHeight: 1.2 }}>
+                  {label}
+                </span>
+                <span style={{ display: "block", fontSize: hasExisting ? 11 : 11.5, color: T.mute, marginTop: 2, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{sub}</span>
+              </span>
+            </a>
+          );
+        })}
       </div>
 
       {/* quick-connect tiles (CardDAV) */}
@@ -1771,7 +1888,7 @@ function AddAccountForm({ onCancel }: { onCancel: () => void }) {
             <span style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, fontWeight: 600, color: T.ink2, marginBottom: 6 }}>
               Server URL
               <HelpTooltip learnHref="/help#carddav" place="bottom">
-                Your CardDAV server URL looks like <b className="text-white">https://contacts.icloud.com/</b>. Find it in your contacts app’s account settings.
+                Your CardDAV server URL looks like <b className="text-white">https://contacts.icloud.com/</b>. Find it in your contacts app's account settings.
               </HelpTooltip>
             </span>
             <input
@@ -1810,7 +1927,7 @@ function AddAccountForm({ onCancel }: { onCancel: () => void }) {
             <label style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 12.5, fontWeight: 600, color: T.ink2, marginBottom: 6 }}>
               Password
               <HelpTooltip learnHref="/help#carddav" place="bottom">
-                Generate an app-specific password in your account’s security settings — your normal password won’t work for CardDAV.
+                Generate an app-specific password in your account's security settings — your normal password won't work for CardDAV.
               </HelpTooltip>
             </label>
             <div style={{ position: "relative" }}>
@@ -2949,9 +3066,12 @@ export type SyncPageClientProps = {
   initialAdd?: boolean;
   // flash message from URL params
   flash: string | null;
+  // P35: entitlement cap for the add-account form
+  syncAccountsLimit: number;
+  upgradeableAtCap: boolean;
 };
 
-export function SyncPageClient({ accounts, initialAccountId, initialAdd = false, flash: initialFlash }: SyncPageClientProps) {
+export function SyncPageClient({ accounts, initialAccountId, initialAdd = false, flash: initialFlash, syncAccountsLimit, upgradeableAtCap }: SyncPageClientProps) {
   const [selectedId, setSelectedId] = useState<string | null>(
     initialAccountId ?? accounts[0]?.id ?? null,
   );
@@ -3040,7 +3160,15 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
   const renderDetail = () => {
     // The add form must win over the empty state — otherwise a user with zero
     // connections (the most common case for adding!) can never reach it.
-    if (view === "add") return <AddAccountForm onCancel={() => setView("detail")} />;
+    if (view === "add")
+      return (
+        <AddAccountForm
+          onCancel={() => setView("detail")}
+          accounts={accounts}
+          syncAccountsLimit={syncAccountsLimit}
+          upgradeableAtCap={upgradeableAtCap}
+        />
+      );
     if (accounts.length === 0) return <EmptyState onAdd={openAdd} />;
     if (!selectedAccount) return <EmptyState onAdd={openAdd} />;
     if (editing)
@@ -3050,11 +3178,19 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
           onCancel={() => setEditing(false)}
         />
       );
+
+    // P35: show connected email in re-auth button/banner only when 2+ accounts
+    // of the same provider exist (so the user knows which one needs fixing).
+    const sameProviderCount = accounts.filter(
+      (a) => a.provider === selectedAccount.provider,
+    ).length;
+    const reauthEmail = sameProviderCount >= 2 ? selectedAccount.connectedEmail : null;
+
     return (
       <div>
         {selectedAccount.provider === "CARDDAV"
           ? vHealth === "auth" && <ReauthBanner onFix={() => setEditing(true)} />
-          : <OAuthErrorBanner account={selectedAccount} />}
+          : <OAuthErrorBanner account={selectedAccount} reauthEmail={reauthEmail} />}
         {selectedAccount.conflictQueueFull && <AutoPauseBanner />}
         {selectedAccount.duplicatesDetected > 0 && (
           <DuplicatesBanner count={selectedAccount.duplicatesDetected} />
@@ -3065,6 +3201,7 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
           isSyncing={syncingId === selectedAccount.id}
           redirectTo={redirectTo}
           onEdit={() => setEditing(true)}
+          reauthEmail={reauthEmail}
           onRequestDisconnect={() => {
             const isOAuth = selectedAccount.provider !== "CARDDAV";
             setDisconnectTarget({
@@ -3211,11 +3348,39 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
           Sync accounts
         </div>
 
-        {/* account items */}
+        {/* P35: group accounts by provider; show group labels when multiple providers */}
+        {(() => {
+          type Group = { key: string; label: string; items: SyncAccountData[] };
+          const GROUP_ORDER: Record<string, number> = { GOOGLE: 0, MICROSOFT: 1, CARDDAV: 2 };
+          const GROUP_LABEL: Record<string, string> = { GOOGLE: "Google", MICROSOFT: "Microsoft", CARDDAV: "CardDAV" };
+          const grouped: Group[] = [];
+          accounts.forEach((a) => {
+            let g = grouped.find((x) => x.key === a.provider);
+            if (!g) {
+              g = { key: a.provider, label: GROUP_LABEL[a.provider] ?? a.provider, items: [] };
+              grouped.push(g);
+            }
+            g.items.push(a);
+          });
+          grouped.sort((a, b) => (GROUP_ORDER[a.key] ?? 9) - (GROUP_ORDER[b.key] ?? 9));
+          const showGroupLabels = grouped.length > 1;
+          return (
         <div style={{ display: "grid", gap: 2 }}>
-          {accounts.map((a) => {
+          {grouped.map((g) => (
+            <div key={g.key}>
+              {showGroupLabels && (
+                <div style={{ fontSize: 11, fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", color: T.mute, padding: "10px 16px 4px" }}>
+                  {g.label}
+                </div>
+              )}
+              {g.items.map((a) => {
             const vH = getVisualHealth(a, syncingId);
             const sel = view === "detail" && selectedId === a.id;
+            // P35: show connectedEmail as primary subtitle for OAuth accounts
+            const subtitle =
+              a.provider !== "CARDDAV" && a.connectedEmail && (vH === "healthy" || vH === "syncing" || vH === "never")
+                ? a.connectedEmail
+                : HEALTH_LIST_TEXT[vH](a);
             return (
               <div key={a.id} className="sy-row-wrap" data-sel={sel ? "1" : "0"} style={{ position: "relative" }}>
                 <button
@@ -3270,9 +3435,7 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
                         whiteSpace: "nowrap",
                       }}
                     >
-                      {a.provider !== "CARDDAV" && a.connectedEmail && (vH === "healthy" || vH === "syncing")
-                        ? a.connectedEmail
-                        : HEALTH_LIST_TEXT[vH](a)}
+                      {subtitle}
                     </span>
                   </span>
                   <Dot color={HEALTH_DOT[vH]} pulse={vH === "syncing"} />
@@ -3317,7 +3480,11 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
               </div>
             );
           })}
+            </div>
+          ))}
         </div>
+          );
+        })()}
 
         {/* add account */}
         <button
