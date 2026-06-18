@@ -13,7 +13,7 @@ import { checkRateLimit, rateLimiters } from "~/server/rate-limit";
 import { renderEmail } from "~/server/render-email";
 
 export async function signOutAction() {
-  await signOut({ redirectTo: "/login" });
+  await signOut({ redirectTo: "/" });
 }
 
 // ─── Password Reset (P18-05) ──────────────────────────────────────────────────
