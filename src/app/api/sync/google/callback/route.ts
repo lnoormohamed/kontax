@@ -63,9 +63,9 @@ export async function GET(req: NextRequest) {
   }
 
   // Resolve the connected account email via the userinfo endpoint.
-  // people/me emailAddresses returns contact-profile emails, not the Google
-  // account email. The userinfo endpoint is correct here since we request
-  // the userinfo.email scope.
+  // Resolve the connected account email via the userinfo endpoint (requires
+  // the userinfo.email scope we request on connect). Fall back to the People
+  // API emailAddresses field if userinfo fails for any reason.
   let googleEmail = "";
   try {
     const res = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
@@ -74,9 +74,28 @@ export async function GET(req: NextRequest) {
     if (res.ok) {
       const info = await res.json() as { email?: string };
       googleEmail = info.email ?? "";
+    } else {
+      console.error("[google/callback] userinfo HTTP", res.status, await res.text().catch(() => ""));
     }
-  } catch {
-    // Non-fatal — fall back to empty; the connection still works.
+  } catch (err) {
+    console.error("[google/callback] userinfo fetch failed:", err);
+  }
+
+  // Fallback: try the People API if userinfo didn't yield an email.
+  if (!googleEmail) {
+    try {
+      const peopleApi = people({ version: "v1", auth: client });
+      const me = await peopleApi.people.get({
+        resourceName: "people/me",
+        personFields: "emailAddresses",
+      });
+      const emails = me.data.emailAddresses ?? [];
+      googleEmail =
+        emails.find((e) => e.metadata?.primary)?.value ?? emails[0]?.value ?? "";
+      if (googleEmail) console.log("[google/callback] email resolved via People API fallback:", googleEmail);
+    } catch (err) {
+      console.error("[google/callback] People API fallback failed:", err);
+    }
   }
 
   const label = googleEmail
