@@ -18,7 +18,10 @@ export const metadata: Metadata = {
   },
   description: DESCRIPTION,
   applicationName: "Kontax",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
+  icons: [
+    { rel: "icon", url: "/favicon.ico" },
+    { rel: "apple-touch-icon", url: "/apple-touch-icon.png" },
+  ],
   manifest: "/manifest.webmanifest",
   appleWebApp: {
     capable: true,
@@ -32,11 +35,13 @@ export const metadata: Metadata = {
     description: DESCRIPTION,
     url: SITE_URL,
     locale: "en_GB",
+    images: [{ url: "/opengraph-image.png", width: 1200, height: 630, alt: "Kontax" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Kontax — Your contacts, synced everywhere",
     description: DESCRIPTION,
+    images: ["/opengraph-image.png"],
   },
 };
 

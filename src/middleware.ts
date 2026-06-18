@@ -12,7 +12,7 @@ const ALWAYS_ALLOW = [
   "/api/pwa-icon",
   "/robots.txt", // P26-08
   "/sitemap.xml", // P26-08
-  "/opengraph-image", // P26-07 — default OG card (matches the ?hash query too)
+  "/opengraph-image.png", // P26-07 — default OG card (static file in /public)
 ];
 
 // Public content pages — viewable while logged out. The page component itself

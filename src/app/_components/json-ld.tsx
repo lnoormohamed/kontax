@@ -17,7 +17,7 @@ export const organizationSchema = (): Record<string, unknown> => ({
   "@type": "Organization",
   name: "Kontax",
   url: SITE_URL,
-  logo: `${SITE_URL}/opengraph-image`,
+  logo: `${SITE_URL}/opengraph-image.png`,
 });
 
 export const softwareApplicationSchema = (): Record<string, unknown> => ({
