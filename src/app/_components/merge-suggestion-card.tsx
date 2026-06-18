@@ -359,6 +359,141 @@ export function MergeSuggestionCard({
   );
 }
 
+// ── Identity grouping ─────────────────────────────────────────────────────────
+// When multiple pairs share the same contact details on both sides (e.g. 4
+// copies of the same person → 6 pair suggestions), collapse them into one card.
+
+function identityKey(s: PersistedMergeSuggestion): string {
+  const fp = (c: SuggestionContact) =>
+    `${(c.fullName ?? "").toLowerCase().trim()}|${(c.email ?? "").toLowerCase().trim()}|${(c.phone ?? "").toLowerCase().trim()}`;
+  const [a, b] = [fp(s.leftContact), fp(s.rightContact)].sort();
+  return `${a}::${b}`;
+}
+
+// ── Group card (N identical pairs) ───────────────────────────────────────────
+
+function MergeSuggestionGroup({
+  group,
+  onAllDismissed,
+}: {
+  group: PersistedMergeSuggestion[];
+  onAllDismissed: () => void;
+}) {
+  const router = useRouter();
+  const rep = group[0]!;
+  const count = group.length;
+  const [merging, setMerging] = useState(false);
+  const [dismissing, setDismissing] = useState(false);
+  const [done, setDone] = useState(0);
+  const [error, setError] = useState("");
+  const [, startTransition] = useTransition();
+
+  const handleMergeAll = () => {
+    setMerging(true);
+    setDone(0);
+    startTransition(async () => {
+      try {
+        for (const s of group) {
+          await quickMergeSuggestion(s.id);
+          setDone((n) => n + 1);
+        }
+        router.refresh();
+        onAllDismissed();
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Merge failed — try again");
+        setMerging(false);
+      }
+    });
+  };
+
+  const handleDismissAll = async () => {
+    setDismissing(true);
+    try {
+      await Promise.all(
+        group.map((s) =>
+          Promise.all([
+            fetch("/api/merge-suggestions/dismiss", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ suggestionId: s.id }),
+            }),
+            dismissMergeSuggestion(s.leftContact.id, s.rightContact.id),
+          ]),
+        ),
+      );
+      onAllDismissed();
+    } catch {
+      setError("Couldn't dismiss — try again");
+      setDismissing(false);
+    }
+  };
+
+  const busy = merging || dismissing;
+  const contact = rep.leftContact;
+
+  return (
+    <article className="rounded-[14px] border border-[#d8ddd6] bg-white p-4">
+      {/* Header */}
+      <div className="flex items-start justify-between gap-3">
+        <div className="flex items-center gap-2">
+          <ConfidencePill confidence={rep.confidence} />
+          <span className="inline-flex h-[22px] items-center rounded-[6px] bg-[#eef1fd] px-2 text-[11.5px] font-bold text-[#4158f4]">
+            {count} identical pairs
+          </span>
+        </div>
+        <div className="flex items-center gap-1.5 flex-wrap justify-end">
+          <button
+            className="inline-flex items-center gap-1.5 rounded-[9px] bg-[#17352e] px-3 py-1.5 text-[13px] font-semibold text-white transition hover:bg-[#20443b] disabled:opacity-50"
+            disabled={busy}
+            onClick={handleMergeAll}
+            type="button"
+          >
+            {merging ? (
+              <>
+                <span className="h-[12px] w-[12px] animate-spin rounded-full border-[2px] border-white/40 border-t-white" />
+                {done}/{count}…
+              </>
+            ) : (
+              <>
+                <WorkspaceIcon name="merge" size={13} strokeWidth={2} />
+                Merge all {count}
+              </>
+            )}
+          </button>
+          <Link
+            className="inline-flex items-center gap-1 rounded-[9px] border border-[#d8ddd6] bg-white px-3 py-1.5 text-[13px] font-semibold text-[#1d2823] transition hover:bg-[#f6f7f4]"
+            href={`/merge-suggestions/${rep.id}`}
+          >
+            Review →
+          </Link>
+          <button
+            className="rounded-[9px] px-3 py-1.5 text-[13px] font-semibold text-[#b5472f] transition hover:bg-[#fdf3f1] disabled:opacity-50"
+            disabled={busy}
+            onClick={handleDismissAll}
+            type="button"
+          >
+            {dismissing ? "Dismissing…" : "Not duplicates"}
+          </button>
+        </div>
+      </div>
+
+      {/* Identity */}
+      <div className="mt-3">
+        <p className="text-[14px] font-semibold text-[#1d2823]">{contact.fullName ?? "—"}</p>
+        <p className="text-[12px] text-[#8b938c]">{contact.email ?? contact.phone ?? ""}</p>
+        <p className="mt-1 text-[12px] text-[#aeb4ac]">
+          {count + 1} copies detected · merging will collapse them into one contact
+        </p>
+      </div>
+
+      {/* Signal chips from representative pair */}
+      <SignalChips signals={rep.displaySignals} />
+
+      {error ? <p className="mt-2 text-[12px] text-[#b5472f]">{error}</p> : null}
+    </article>
+  );
+}
+
 // ── Wrapper with optimistic list ──────────────────────────────────────────────
 
 export function MergeSuggestionList({
@@ -368,7 +503,8 @@ export function MergeSuggestionList({
 }) {
   const [visible, setVisible] = useState(() => suggestions.map((s) => s.id));
 
-  const dismiss = (id: string) => setVisible((v) => v.filter((x) => x !== id));
+  const dismissIds = (ids: string[]) =>
+    setVisible((v) => v.filter((x) => !ids.includes(x)));
 
   const shown = suggestions.filter((s) => visible.includes(s.id));
 
@@ -381,11 +517,34 @@ export function MergeSuggestionList({
     );
   }
 
+  // Group identical pairs — same contact details on both sides
+  const groupMap = new Map<string, PersistedMergeSuggestion[]>();
+  for (const s of shown) {
+    const key = identityKey(s);
+    const bucket = groupMap.get(key) ?? [];
+    bucket.push(s);
+    groupMap.set(key, bucket);
+  }
+
+  const renderItems = Array.from(groupMap.values());
+
   return (
     <div className="grid gap-3 p-4">
-      {shown.map((s) => (
-        <MergeSuggestionCard key={s.id} suggestion={s} onDismissed={() => dismiss(s.id)} />
-      ))}
+      {renderItems.map((group) =>
+        group.length === 1 ? (
+          <MergeSuggestionCard
+            key={group[0]!.id}
+            suggestion={group[0]!}
+            onDismissed={() => dismissIds([group[0]!.id])}
+          />
+        ) : (
+          <MergeSuggestionGroup
+            key={group.map((s) => s.id).join(",")}
+            group={group}
+            onAllDismissed={() => dismissIds(group.map((s) => s.id))}
+          />
+        ),
+      )}
     </div>
   );
 }
