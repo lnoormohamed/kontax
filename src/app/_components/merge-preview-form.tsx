@@ -58,7 +58,7 @@ export function MergePreviewForm({
         </div>
       ) : null}
 
-      <form action={mergeContacts} className="mt-5 grid gap-4">
+      <form action={async (fd) => { await mergeContacts(fd); }} className="mt-5 grid gap-4">
         <input name="primaryContactId" type="hidden" value={primaryContactId} />
         <input name="secondaryContactId" type="hidden" value={secondaryContactId} />
         <input name="mergeSource" type="hidden" value={mergeSource} />

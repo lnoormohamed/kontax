@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { mergeContacts } from "~/app/actions/contacts";
 import { dismissMergeSuggestion } from "~/app/actions/merge";
@@ -1250,6 +1251,7 @@ export function MergeReview({
   unionsA,
   unionsB,
 }: MergeReviewProps) {
+  const router = useRouter();
   const [survivor, setSurvivor] = useState<"A" | "B">("A");
   const [choices, setChoices] = useState<Record<string, ChoiceValue>>({});
   const [isPending, setIsPending] = useState(false);
@@ -1303,7 +1305,17 @@ export function MergeReview({
 
   const handleSubmit = async (formData: FormData) => {
     setIsPending(true);
-    await mergeContacts(formData);
+    try {
+      // No redirectTo — navigate on the client so the action's redirect() can't
+      // re-run middleware cookielessly and bounce us to /login.
+      const res = await mergeContacts(formData);
+      const id = res?.survivingContactId ?? survivorContact.id;
+      const dec = res?.decisionId;
+      router.push(`/contacts/${id}?saved=1&merged=1${dec ? `&decisionId=${dec}` : ""}`);
+    } catch (err) {
+      setIsPending(false);
+      alert(err instanceof Error ? err.message : "Could not merge the contacts.");
+    }
   };
 
   return (
@@ -1417,11 +1429,6 @@ export function MergeReview({
         <input name="secondaryContactId" type="hidden" value={otherContact.id} />
         {suggestionId && <input name="suggestionId" type="hidden" value={suggestionId} />}
         <input name="mergeSource" type="hidden" value={mergeSource} />
-        <input
-          name="redirectTo"
-          type="hidden"
-          value={`/contacts/${survivorContact.id}?saved=1`}
-        />
         {scalarConflicts.map((row) =>
           choices[row.key] ? (
             <input
