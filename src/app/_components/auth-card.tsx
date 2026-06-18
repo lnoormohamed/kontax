@@ -317,8 +317,8 @@ export function AuthCard({
 
   return (
     <div className="w-full max-w-[440px] rounded-[24px] border border-[#d8ddd6]/70 bg-white px-10 py-10 shadow-[0_18px_50px_rgba(29,40,35,0.12),0_2px_8px_rgba(29,40,35,0.06)]">
-      {/* Brand mark */}
-      <div className="flex items-center justify-center gap-[10px]">
+      {/* Brand mark — links back to the marketing homepage */}
+      <Link className="flex items-center justify-center gap-[10px]" href="/" aria-label="Kontax home">
         <span
           aria-hidden
           className="grid h-[34px] w-[34px] place-items-center rounded-[10px] text-[19px] font-bold leading-none text-[#dff0e7]"
@@ -329,7 +329,7 @@ export function AuthCard({
         <span className="text-[25px] font-semibold tracking-[-0.018em] text-[#17352e]">
           Kontax
         </span>
-      </div>
+      </Link>
 
       {/* Rule */}
       <div className="mx-auto mt-5 mb-[22px] h-px w-14 bg-[#d8ddd6]" />
