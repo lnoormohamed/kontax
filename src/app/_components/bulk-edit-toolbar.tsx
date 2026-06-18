@@ -102,7 +102,6 @@ export function BulkEditToolbar({
   mode,
   books,
   labelSuggestions,
-  redirectTo,
   onClear,
 }: {
   selectedIds: string[];
@@ -110,7 +109,6 @@ export function BulkEditToolbar({
   mode: "active" | "archived";
   books: ToolbarBook[];
   labelSuggestions: string[];
-  redirectTo: string;
   onClear: () => void;
 }) {
   const router = useRouter();
@@ -154,19 +152,25 @@ export function BulkEditToolbar({
     })();
   };
 
+  // No redirectTo: a server-action redirect() re-runs middleware via a cookieless
+  // internal sub-request and bounces to /login. Instead the action revalidates and
+  // we refresh + clear on the client.
   const runForm = (action: (fd: FormData) => Promise<void>) => {
     setBusy(true);
     const fd = new FormData();
     selectedIds.forEach((id) => fd.append("contactIds", id));
-    fd.set("redirectTo", redirectTo);
     startTransition(async () => {
       try {
         await action(fd);
+        setOpen(null);
+        setConfirm(null);
+        setMergeOpen(false);
+        onClear();
+        router.refresh();
       } catch (err) {
-        if (!(err instanceof Error) || !err.message.includes("NEXT_REDIRECT")) {
-          alert(err instanceof Error ? err.message : "Something went wrong.");
-          setBusy(false);
-        }
+        alert(err instanceof Error ? err.message : "Something went wrong.");
+      } finally {
+        setBusy(false);
       }
     });
   };

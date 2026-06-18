@@ -1126,7 +1126,6 @@ export function ContactsWorkspaceTable({
           mode={mode}
           books={books}
           labelSuggestions={labelSuggestions}
-          redirectTo={mode === "active" ? "/contacts?tab=people" : "/contacts?tab=archived"}
           onClear={clearSelection}
         />
       ) : null}
