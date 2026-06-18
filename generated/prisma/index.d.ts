@@ -6203,6 +6203,37 @@ export namespace Prisma {
 
 
   /**
+   * Count Type LabelCountOutputType
+   */
+
+  export type LabelCountOutputType = {
+    syncAccountSettings: number
+  }
+
+  export type LabelCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    syncAccountSettings?: boolean | LabelCountOutputTypeCountSyncAccountSettingsArgs
+  }
+
+  // Custom InputTypes
+  /**
+   * LabelCountOutputType without action
+   */
+  export type LabelCountOutputTypeDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the LabelCountOutputType
+     */
+    select?: LabelCountOutputTypeSelect<ExtArgs> | null
+  }
+
+  /**
+   * LabelCountOutputType without action
+   */
+  export type LabelCountOutputTypeCountSyncAccountSettingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: SyncAccountSettingsWhereInput
+  }
+
+
+  /**
    * Count Type SecurityAlertCountOutputType
    */
 
@@ -24269,10 +24300,18 @@ export namespace Prisma {
 
   export type SyncAccountSettingsAvgAggregateOutputType = {
     syncFrequencyMinutes: number | null
+    maxDeletionsThreshold: number | null
+    syncWindowStart: number | null
+    syncWindowEnd: number | null
+    maxAttemptsBeforePause: number | null
   }
 
   export type SyncAccountSettingsSumAggregateOutputType = {
     syncFrequencyMinutes: number | null
+    maxDeletionsThreshold: number | null
+    syncWindowStart: number | null
+    syncWindowEnd: number | null
+    maxAttemptsBeforePause: number | null
   }
 
   export type SyncAccountSettingsMinAggregateOutputType = {
@@ -24282,6 +24321,12 @@ export namespace Prisma {
     conflictPolicy: $Enums.ConflictPolicy | null
     syncFrequencyMinutes: number | null
     requireReauthToEdit: boolean | null
+    importLabelId: string | null
+    maxDeletionsThreshold: number | null
+    notifyOnFailure: boolean | null
+    syncWindowStart: number | null
+    syncWindowEnd: number | null
+    maxAttemptsBeforePause: number | null
     lastModifiedAt: Date | null
     createdAt: Date | null
   }
@@ -24293,6 +24338,12 @@ export namespace Prisma {
     conflictPolicy: $Enums.ConflictPolicy | null
     syncFrequencyMinutes: number | null
     requireReauthToEdit: boolean | null
+    importLabelId: string | null
+    maxDeletionsThreshold: number | null
+    notifyOnFailure: boolean | null
+    syncWindowStart: number | null
+    syncWindowEnd: number | null
+    maxAttemptsBeforePause: number | null
     lastModifiedAt: Date | null
     createdAt: Date | null
   }
@@ -24305,6 +24356,14 @@ export namespace Prisma {
     bookAllowlist: number
     syncFrequencyMinutes: number
     requireReauthToEdit: number
+    importLabelId: number
+    maxDeletionsThreshold: number
+    notifyOnFailure: number
+    syncWindowStart: number
+    syncWindowEnd: number
+    excludedFields: number
+    exportLabelFilter: number
+    maxAttemptsBeforePause: number
     lastModifiedAt: number
     createdAt: number
     _all: number
@@ -24313,10 +24372,18 @@ export namespace Prisma {
 
   export type SyncAccountSettingsAvgAggregateInputType = {
     syncFrequencyMinutes?: true
+    maxDeletionsThreshold?: true
+    syncWindowStart?: true
+    syncWindowEnd?: true
+    maxAttemptsBeforePause?: true
   }
 
   export type SyncAccountSettingsSumAggregateInputType = {
     syncFrequencyMinutes?: true
+    maxDeletionsThreshold?: true
+    syncWindowStart?: true
+    syncWindowEnd?: true
+    maxAttemptsBeforePause?: true
   }
 
   export type SyncAccountSettingsMinAggregateInputType = {
@@ -24326,6 +24393,12 @@ export namespace Prisma {
     conflictPolicy?: true
     syncFrequencyMinutes?: true
     requireReauthToEdit?: true
+    importLabelId?: true
+    maxDeletionsThreshold?: true
+    notifyOnFailure?: true
+    syncWindowStart?: true
+    syncWindowEnd?: true
+    maxAttemptsBeforePause?: true
     lastModifiedAt?: true
     createdAt?: true
   }
@@ -24337,6 +24410,12 @@ export namespace Prisma {
     conflictPolicy?: true
     syncFrequencyMinutes?: true
     requireReauthToEdit?: true
+    importLabelId?: true
+    maxDeletionsThreshold?: true
+    notifyOnFailure?: true
+    syncWindowStart?: true
+    syncWindowEnd?: true
+    maxAttemptsBeforePause?: true
     lastModifiedAt?: true
     createdAt?: true
   }
@@ -24349,6 +24428,14 @@ export namespace Prisma {
     bookAllowlist?: true
     syncFrequencyMinutes?: true
     requireReauthToEdit?: true
+    importLabelId?: true
+    maxDeletionsThreshold?: true
+    notifyOnFailure?: true
+    syncWindowStart?: true
+    syncWindowEnd?: true
+    excludedFields?: true
+    exportLabelFilter?: true
+    maxAttemptsBeforePause?: true
     lastModifiedAt?: true
     createdAt?: true
     _all?: true
@@ -24448,6 +24535,14 @@ export namespace Prisma {
     bookAllowlist: string[]
     syncFrequencyMinutes: number | null
     requireReauthToEdit: boolean
+    importLabelId: string | null
+    maxDeletionsThreshold: number | null
+    notifyOnFailure: boolean
+    syncWindowStart: number | null
+    syncWindowEnd: number | null
+    excludedFields: string[]
+    exportLabelFilter: string[]
+    maxAttemptsBeforePause: number | null
     lastModifiedAt: Date
     createdAt: Date
     _count: SyncAccountSettingsCountAggregateOutputType | null
@@ -24479,9 +24574,18 @@ export namespace Prisma {
     bookAllowlist?: boolean
     syncFrequencyMinutes?: boolean
     requireReauthToEdit?: boolean
+    importLabelId?: boolean
+    maxDeletionsThreshold?: boolean
+    notifyOnFailure?: boolean
+    syncWindowStart?: boolean
+    syncWindowEnd?: boolean
+    excludedFields?: boolean
+    exportLabelFilter?: boolean
+    maxAttemptsBeforePause?: boolean
     lastModifiedAt?: boolean
     createdAt?: boolean
     syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    importLabel?: boolean | SyncAccountSettings$importLabelArgs<ExtArgs>
   }, ExtArgs["result"]["syncAccountSettings"]>
 
   export type SyncAccountSettingsSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -24492,9 +24596,18 @@ export namespace Prisma {
     bookAllowlist?: boolean
     syncFrequencyMinutes?: boolean
     requireReauthToEdit?: boolean
+    importLabelId?: boolean
+    maxDeletionsThreshold?: boolean
+    notifyOnFailure?: boolean
+    syncWindowStart?: boolean
+    syncWindowEnd?: boolean
+    excludedFields?: boolean
+    exportLabelFilter?: boolean
+    maxAttemptsBeforePause?: boolean
     lastModifiedAt?: boolean
     createdAt?: boolean
     syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    importLabel?: boolean | SyncAccountSettings$importLabelArgs<ExtArgs>
   }, ExtArgs["result"]["syncAccountSettings"]>
 
   export type SyncAccountSettingsSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -24505,9 +24618,18 @@ export namespace Prisma {
     bookAllowlist?: boolean
     syncFrequencyMinutes?: boolean
     requireReauthToEdit?: boolean
+    importLabelId?: boolean
+    maxDeletionsThreshold?: boolean
+    notifyOnFailure?: boolean
+    syncWindowStart?: boolean
+    syncWindowEnd?: boolean
+    excludedFields?: boolean
+    exportLabelFilter?: boolean
+    maxAttemptsBeforePause?: boolean
     lastModifiedAt?: boolean
     createdAt?: boolean
     syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    importLabel?: boolean | SyncAccountSettings$importLabelArgs<ExtArgs>
   }, ExtArgs["result"]["syncAccountSettings"]>
 
   export type SyncAccountSettingsSelectScalar = {
@@ -24518,25 +24640,37 @@ export namespace Prisma {
     bookAllowlist?: boolean
     syncFrequencyMinutes?: boolean
     requireReauthToEdit?: boolean
+    importLabelId?: boolean
+    maxDeletionsThreshold?: boolean
+    notifyOnFailure?: boolean
+    syncWindowStart?: boolean
+    syncWindowEnd?: boolean
+    excludedFields?: boolean
+    exportLabelFilter?: boolean
+    maxAttemptsBeforePause?: boolean
     lastModifiedAt?: boolean
     createdAt?: boolean
   }
 
-  export type SyncAccountSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "syncAccountId" | "syncDirection" | "conflictPolicy" | "bookAllowlist" | "syncFrequencyMinutes" | "requireReauthToEdit" | "lastModifiedAt" | "createdAt", ExtArgs["result"]["syncAccountSettings"]>
+  export type SyncAccountSettingsOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "syncAccountId" | "syncDirection" | "conflictPolicy" | "bookAllowlist" | "syncFrequencyMinutes" | "requireReauthToEdit" | "importLabelId" | "maxDeletionsThreshold" | "notifyOnFailure" | "syncWindowStart" | "syncWindowEnd" | "excludedFields" | "exportLabelFilter" | "maxAttemptsBeforePause" | "lastModifiedAt" | "createdAt", ExtArgs["result"]["syncAccountSettings"]>
   export type SyncAccountSettingsInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    importLabel?: boolean | SyncAccountSettings$importLabelArgs<ExtArgs>
   }
   export type SyncAccountSettingsIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    importLabel?: boolean | SyncAccountSettings$importLabelArgs<ExtArgs>
   }
   export type SyncAccountSettingsIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     syncAccount?: boolean | SyncAccountDefaultArgs<ExtArgs>
+    importLabel?: boolean | SyncAccountSettings$importLabelArgs<ExtArgs>
   }
 
   export type $SyncAccountSettingsPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "SyncAccountSettings"
     objects: {
       syncAccount: Prisma.$SyncAccountPayload<ExtArgs>
+      importLabel: Prisma.$LabelPayload<ExtArgs> | null
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -24546,6 +24680,14 @@ export namespace Prisma {
       bookAllowlist: string[]
       syncFrequencyMinutes: number | null
       requireReauthToEdit: boolean
+      importLabelId: string | null
+      maxDeletionsThreshold: number | null
+      notifyOnFailure: boolean
+      syncWindowStart: number | null
+      syncWindowEnd: number | null
+      excludedFields: string[]
+      exportLabelFilter: string[]
+      maxAttemptsBeforePause: number | null
       lastModifiedAt: Date
       createdAt: Date
     }, ExtArgs["result"]["syncAccountSettings"]>
@@ -24943,6 +25085,7 @@ export namespace Prisma {
   export interface Prisma__SyncAccountSettingsClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     syncAccount<T extends SyncAccountDefaultArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccountDefaultArgs<ExtArgs>>): Prisma__SyncAccountClient<$Result.GetResult<Prisma.$SyncAccountPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    importLabel<T extends SyncAccountSettings$importLabelArgs<ExtArgs> = {}>(args?: Subset<T, SyncAccountSettings$importLabelArgs<ExtArgs>>): Prisma__LabelClient<$Result.GetResult<Prisma.$LabelPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -24979,6 +25122,14 @@ export namespace Prisma {
     readonly bookAllowlist: FieldRef<"SyncAccountSettings", 'String[]'>
     readonly syncFrequencyMinutes: FieldRef<"SyncAccountSettings", 'Int'>
     readonly requireReauthToEdit: FieldRef<"SyncAccountSettings", 'Boolean'>
+    readonly importLabelId: FieldRef<"SyncAccountSettings", 'String'>
+    readonly maxDeletionsThreshold: FieldRef<"SyncAccountSettings", 'Int'>
+    readonly notifyOnFailure: FieldRef<"SyncAccountSettings", 'Boolean'>
+    readonly syncWindowStart: FieldRef<"SyncAccountSettings", 'Int'>
+    readonly syncWindowEnd: FieldRef<"SyncAccountSettings", 'Int'>
+    readonly excludedFields: FieldRef<"SyncAccountSettings", 'String[]'>
+    readonly exportLabelFilter: FieldRef<"SyncAccountSettings", 'String[]'>
+    readonly maxAttemptsBeforePause: FieldRef<"SyncAccountSettings", 'Int'>
     readonly lastModifiedAt: FieldRef<"SyncAccountSettings", 'DateTime'>
     readonly createdAt: FieldRef<"SyncAccountSettings", 'DateTime'>
   }
@@ -25374,6 +25525,25 @@ export namespace Prisma {
      * Limit how many SyncAccountSettings to delete.
      */
     limit?: number
+  }
+
+  /**
+   * SyncAccountSettings.importLabel
+   */
+  export type SyncAccountSettings$importLabelArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Label
+     */
+    select?: LabelSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Label
+     */
+    omit?: LabelOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: LabelInclude<ExtArgs> | null
+    where?: LabelWhereInput
   }
 
   /**
@@ -44342,6 +44512,8 @@ export namespace Prisma {
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
+    syncAccountSettings?: boolean | Label$syncAccountSettingsArgs<ExtArgs>
+    _count?: boolean | LabelCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["label"]>
 
   export type LabelSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
@@ -44379,6 +44551,8 @@ export namespace Prisma {
   export type LabelOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "name" | "color" | "position" | "createdAt" | "updatedAt", ExtArgs["result"]["label"]>
   export type LabelInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
+    syncAccountSettings?: boolean | Label$syncAccountSettingsArgs<ExtArgs>
+    _count?: boolean | LabelCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type LabelIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -44391,6 +44565,7 @@ export namespace Prisma {
     name: "Label"
     objects: {
       user: Prisma.$UserPayload<ExtArgs>
+      syncAccountSettings: Prisma.$SyncAccountSettingsPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -44795,6 +44970,7 @@ export namespace Prisma {
   export interface Prisma__LabelClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     user<T extends UserDefaultArgs<ExtArgs> = {}>(args?: Subset<T, UserDefaultArgs<ExtArgs>>): Prisma__UserClient<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+    syncAccountSettings<T extends Label$syncAccountSettingsArgs<ExtArgs> = {}>(args?: Subset<T, Label$syncAccountSettingsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$SyncAccountSettingsPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -45224,6 +45400,30 @@ export namespace Prisma {
      * Limit how many Labels to delete.
      */
     limit?: number
+  }
+
+  /**
+   * Label.syncAccountSettings
+   */
+  export type Label$syncAccountSettingsArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the SyncAccountSettings
+     */
+    select?: SyncAccountSettingsSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the SyncAccountSettings
+     */
+    omit?: SyncAccountSettingsOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: SyncAccountSettingsInclude<ExtArgs> | null
+    where?: SyncAccountSettingsWhereInput
+    orderBy?: SyncAccountSettingsOrderByWithRelationInput | SyncAccountSettingsOrderByWithRelationInput[]
+    cursor?: SyncAccountSettingsWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: SyncAccountSettingsScalarFieldEnum | SyncAccountSettingsScalarFieldEnum[]
   }
 
   /**
@@ -61296,6 +61496,14 @@ export namespace Prisma {
     bookAllowlist: 'bookAllowlist',
     syncFrequencyMinutes: 'syncFrequencyMinutes',
     requireReauthToEdit: 'requireReauthToEdit',
+    importLabelId: 'importLabelId',
+    maxDeletionsThreshold: 'maxDeletionsThreshold',
+    notifyOnFailure: 'notifyOnFailure',
+    syncWindowStart: 'syncWindowStart',
+    syncWindowEnd: 'syncWindowEnd',
+    excludedFields: 'excludedFields',
+    exportLabelFilter: 'exportLabelFilter',
+    maxAttemptsBeforePause: 'maxAttemptsBeforePause',
     lastModifiedAt: 'lastModifiedAt',
     createdAt: 'createdAt'
   };
@@ -64267,9 +64475,18 @@ export namespace Prisma {
     bookAllowlist?: StringNullableListFilter<"SyncAccountSettings">
     syncFrequencyMinutes?: IntNullableFilter<"SyncAccountSettings"> | number | null
     requireReauthToEdit?: BoolFilter<"SyncAccountSettings"> | boolean
+    importLabelId?: StringNullableFilter<"SyncAccountSettings"> | string | null
+    maxDeletionsThreshold?: IntNullableFilter<"SyncAccountSettings"> | number | null
+    notifyOnFailure?: BoolFilter<"SyncAccountSettings"> | boolean
+    syncWindowStart?: IntNullableFilter<"SyncAccountSettings"> | number | null
+    syncWindowEnd?: IntNullableFilter<"SyncAccountSettings"> | number | null
+    excludedFields?: StringNullableListFilter<"SyncAccountSettings">
+    exportLabelFilter?: StringNullableListFilter<"SyncAccountSettings">
+    maxAttemptsBeforePause?: IntNullableFilter<"SyncAccountSettings"> | number | null
     lastModifiedAt?: DateTimeFilter<"SyncAccountSettings"> | Date | string
     createdAt?: DateTimeFilter<"SyncAccountSettings"> | Date | string
     syncAccount?: XOR<SyncAccountScalarRelationFilter, SyncAccountWhereInput>
+    importLabel?: XOR<LabelNullableScalarRelationFilter, LabelWhereInput> | null
   }
 
   export type SyncAccountSettingsOrderByWithRelationInput = {
@@ -64280,9 +64497,18 @@ export namespace Prisma {
     bookAllowlist?: SortOrder
     syncFrequencyMinutes?: SortOrderInput | SortOrder
     requireReauthToEdit?: SortOrder
+    importLabelId?: SortOrderInput | SortOrder
+    maxDeletionsThreshold?: SortOrderInput | SortOrder
+    notifyOnFailure?: SortOrder
+    syncWindowStart?: SortOrderInput | SortOrder
+    syncWindowEnd?: SortOrderInput | SortOrder
+    excludedFields?: SortOrder
+    exportLabelFilter?: SortOrder
+    maxAttemptsBeforePause?: SortOrderInput | SortOrder
     lastModifiedAt?: SortOrder
     createdAt?: SortOrder
     syncAccount?: SyncAccountOrderByWithRelationInput
+    importLabel?: LabelOrderByWithRelationInput
   }
 
   export type SyncAccountSettingsWhereUniqueInput = Prisma.AtLeast<{
@@ -64296,9 +64522,18 @@ export namespace Prisma {
     bookAllowlist?: StringNullableListFilter<"SyncAccountSettings">
     syncFrequencyMinutes?: IntNullableFilter<"SyncAccountSettings"> | number | null
     requireReauthToEdit?: BoolFilter<"SyncAccountSettings"> | boolean
+    importLabelId?: StringNullableFilter<"SyncAccountSettings"> | string | null
+    maxDeletionsThreshold?: IntNullableFilter<"SyncAccountSettings"> | number | null
+    notifyOnFailure?: BoolFilter<"SyncAccountSettings"> | boolean
+    syncWindowStart?: IntNullableFilter<"SyncAccountSettings"> | number | null
+    syncWindowEnd?: IntNullableFilter<"SyncAccountSettings"> | number | null
+    excludedFields?: StringNullableListFilter<"SyncAccountSettings">
+    exportLabelFilter?: StringNullableListFilter<"SyncAccountSettings">
+    maxAttemptsBeforePause?: IntNullableFilter<"SyncAccountSettings"> | number | null
     lastModifiedAt?: DateTimeFilter<"SyncAccountSettings"> | Date | string
     createdAt?: DateTimeFilter<"SyncAccountSettings"> | Date | string
     syncAccount?: XOR<SyncAccountScalarRelationFilter, SyncAccountWhereInput>
+    importLabel?: XOR<LabelNullableScalarRelationFilter, LabelWhereInput> | null
   }, "id" | "syncAccountId">
 
   export type SyncAccountSettingsOrderByWithAggregationInput = {
@@ -64309,6 +64544,14 @@ export namespace Prisma {
     bookAllowlist?: SortOrder
     syncFrequencyMinutes?: SortOrderInput | SortOrder
     requireReauthToEdit?: SortOrder
+    importLabelId?: SortOrderInput | SortOrder
+    maxDeletionsThreshold?: SortOrderInput | SortOrder
+    notifyOnFailure?: SortOrder
+    syncWindowStart?: SortOrderInput | SortOrder
+    syncWindowEnd?: SortOrderInput | SortOrder
+    excludedFields?: SortOrder
+    exportLabelFilter?: SortOrder
+    maxAttemptsBeforePause?: SortOrderInput | SortOrder
     lastModifiedAt?: SortOrder
     createdAt?: SortOrder
     _count?: SyncAccountSettingsCountOrderByAggregateInput
@@ -64329,6 +64572,14 @@ export namespace Prisma {
     bookAllowlist?: StringNullableListFilter<"SyncAccountSettings">
     syncFrequencyMinutes?: IntNullableWithAggregatesFilter<"SyncAccountSettings"> | number | null
     requireReauthToEdit?: BoolWithAggregatesFilter<"SyncAccountSettings"> | boolean
+    importLabelId?: StringNullableWithAggregatesFilter<"SyncAccountSettings"> | string | null
+    maxDeletionsThreshold?: IntNullableWithAggregatesFilter<"SyncAccountSettings"> | number | null
+    notifyOnFailure?: BoolWithAggregatesFilter<"SyncAccountSettings"> | boolean
+    syncWindowStart?: IntNullableWithAggregatesFilter<"SyncAccountSettings"> | number | null
+    syncWindowEnd?: IntNullableWithAggregatesFilter<"SyncAccountSettings"> | number | null
+    excludedFields?: StringNullableListFilter<"SyncAccountSettings">
+    exportLabelFilter?: StringNullableListFilter<"SyncAccountSettings">
+    maxAttemptsBeforePause?: IntNullableWithAggregatesFilter<"SyncAccountSettings"> | number | null
     lastModifiedAt?: DateTimeWithAggregatesFilter<"SyncAccountSettings"> | Date | string
     createdAt?: DateTimeWithAggregatesFilter<"SyncAccountSettings"> | Date | string
   }
@@ -65785,6 +66036,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Label"> | Date | string
     updatedAt?: DateTimeFilter<"Label"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    syncAccountSettings?: SyncAccountSettingsListRelationFilter
   }
 
   export type LabelOrderByWithRelationInput = {
@@ -65796,6 +66048,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
+    syncAccountSettings?: SyncAccountSettingsOrderByRelationAggregateInput
   }
 
   export type LabelWhereUniqueInput = Prisma.AtLeast<{
@@ -65811,6 +66064,7 @@ export namespace Prisma {
     createdAt?: DateTimeFilter<"Label"> | Date | string
     updatedAt?: DateTimeFilter<"Label"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
+    syncAccountSettings?: SyncAccountSettingsListRelationFilter
   }, "id" | "userId_name">
 
   export type LabelOrderByWithAggregationInput = {
@@ -69038,9 +69292,17 @@ export namespace Prisma {
     bookAllowlist?: SyncAccountSettingsCreatebookAllowlistInput | string[]
     syncFrequencyMinutes?: number | null
     requireReauthToEdit?: boolean
+    maxDeletionsThreshold?: number | null
+    notifyOnFailure?: boolean
+    syncWindowStart?: number | null
+    syncWindowEnd?: number | null
+    excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
+    exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
+    maxAttemptsBeforePause?: number | null
     lastModifiedAt?: Date | string
     createdAt?: Date | string
     syncAccount: SyncAccountCreateNestedOneWithoutSettingsInput
+    importLabel?: LabelCreateNestedOneWithoutSyncAccountSettingsInput
   }
 
   export type SyncAccountSettingsUncheckedCreateInput = {
@@ -69051,6 +69313,14 @@ export namespace Prisma {
     bookAllowlist?: SyncAccountSettingsCreatebookAllowlistInput | string[]
     syncFrequencyMinutes?: number | null
     requireReauthToEdit?: boolean
+    importLabelId?: string | null
+    maxDeletionsThreshold?: number | null
+    notifyOnFailure?: boolean
+    syncWindowStart?: number | null
+    syncWindowEnd?: number | null
+    excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
+    exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
+    maxAttemptsBeforePause?: number | null
     lastModifiedAt?: Date | string
     createdAt?: Date | string
   }
@@ -69062,9 +69332,17 @@ export namespace Prisma {
     bookAllowlist?: SyncAccountSettingsUpdatebookAllowlistInput | string[]
     syncFrequencyMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     requireReauthToEdit?: BoolFieldUpdateOperationsInput | boolean
+    maxDeletionsThreshold?: NullableIntFieldUpdateOperationsInput | number | null
+    notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
+    syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
+    exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
+    maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
     lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     syncAccount?: SyncAccountUpdateOneRequiredWithoutSettingsNestedInput
+    importLabel?: LabelUpdateOneWithoutSyncAccountSettingsNestedInput
   }
 
   export type SyncAccountSettingsUncheckedUpdateInput = {
@@ -69075,6 +69353,14 @@ export namespace Prisma {
     bookAllowlist?: SyncAccountSettingsUpdatebookAllowlistInput | string[]
     syncFrequencyMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     requireReauthToEdit?: BoolFieldUpdateOperationsInput | boolean
+    importLabelId?: NullableStringFieldUpdateOperationsInput | string | null
+    maxDeletionsThreshold?: NullableIntFieldUpdateOperationsInput | number | null
+    notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
+    syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
+    exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
+    maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
     lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -69087,6 +69373,14 @@ export namespace Prisma {
     bookAllowlist?: SyncAccountSettingsCreatebookAllowlistInput | string[]
     syncFrequencyMinutes?: number | null
     requireReauthToEdit?: boolean
+    importLabelId?: string | null
+    maxDeletionsThreshold?: number | null
+    notifyOnFailure?: boolean
+    syncWindowStart?: number | null
+    syncWindowEnd?: number | null
+    excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
+    exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
+    maxAttemptsBeforePause?: number | null
     lastModifiedAt?: Date | string
     createdAt?: Date | string
   }
@@ -69098,6 +69392,13 @@ export namespace Prisma {
     bookAllowlist?: SyncAccountSettingsUpdatebookAllowlistInput | string[]
     syncFrequencyMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     requireReauthToEdit?: BoolFieldUpdateOperationsInput | boolean
+    maxDeletionsThreshold?: NullableIntFieldUpdateOperationsInput | number | null
+    notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
+    syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
+    exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
+    maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
     lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -69110,6 +69411,14 @@ export namespace Prisma {
     bookAllowlist?: SyncAccountSettingsUpdatebookAllowlistInput | string[]
     syncFrequencyMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     requireReauthToEdit?: BoolFieldUpdateOperationsInput | boolean
+    importLabelId?: NullableStringFieldUpdateOperationsInput | string | null
+    maxDeletionsThreshold?: NullableIntFieldUpdateOperationsInput | number | null
+    notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
+    syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
+    exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
+    maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
     lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -70733,6 +71042,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutLabelsInput
+    syncAccountSettings?: SyncAccountSettingsCreateNestedManyWithoutImportLabelInput
   }
 
   export type LabelUncheckedCreateInput = {
@@ -70743,6 +71053,7 @@ export namespace Prisma {
     position?: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    syncAccountSettings?: SyncAccountSettingsUncheckedCreateNestedManyWithoutImportLabelInput
   }
 
   export type LabelUpdateInput = {
@@ -70753,6 +71064,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutLabelsNestedInput
+    syncAccountSettings?: SyncAccountSettingsUpdateManyWithoutImportLabelNestedInput
   }
 
   export type LabelUncheckedUpdateInput = {
@@ -70763,6 +71075,7 @@ export namespace Prisma {
     position?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncAccountSettings?: SyncAccountSettingsUncheckedUpdateManyWithoutImportLabelNestedInput
   }
 
   export type LabelCreateManyInput = {
@@ -73852,6 +74165,11 @@ export namespace Prisma {
     isNot?: SyncAccountWhereInput
   }
 
+  export type LabelNullableScalarRelationFilter = {
+    is?: LabelWhereInput | null
+    isNot?: LabelWhereInput | null
+  }
+
   export type SyncAccountSettingsCountOrderByAggregateInput = {
     id?: SortOrder
     syncAccountId?: SortOrder
@@ -73860,12 +74178,24 @@ export namespace Prisma {
     bookAllowlist?: SortOrder
     syncFrequencyMinutes?: SortOrder
     requireReauthToEdit?: SortOrder
+    importLabelId?: SortOrder
+    maxDeletionsThreshold?: SortOrder
+    notifyOnFailure?: SortOrder
+    syncWindowStart?: SortOrder
+    syncWindowEnd?: SortOrder
+    excludedFields?: SortOrder
+    exportLabelFilter?: SortOrder
+    maxAttemptsBeforePause?: SortOrder
     lastModifiedAt?: SortOrder
     createdAt?: SortOrder
   }
 
   export type SyncAccountSettingsAvgOrderByAggregateInput = {
     syncFrequencyMinutes?: SortOrder
+    maxDeletionsThreshold?: SortOrder
+    syncWindowStart?: SortOrder
+    syncWindowEnd?: SortOrder
+    maxAttemptsBeforePause?: SortOrder
   }
 
   export type SyncAccountSettingsMaxOrderByAggregateInput = {
@@ -73875,6 +74205,12 @@ export namespace Prisma {
     conflictPolicy?: SortOrder
     syncFrequencyMinutes?: SortOrder
     requireReauthToEdit?: SortOrder
+    importLabelId?: SortOrder
+    maxDeletionsThreshold?: SortOrder
+    notifyOnFailure?: SortOrder
+    syncWindowStart?: SortOrder
+    syncWindowEnd?: SortOrder
+    maxAttemptsBeforePause?: SortOrder
     lastModifiedAt?: SortOrder
     createdAt?: SortOrder
   }
@@ -73886,12 +74222,22 @@ export namespace Prisma {
     conflictPolicy?: SortOrder
     syncFrequencyMinutes?: SortOrder
     requireReauthToEdit?: SortOrder
+    importLabelId?: SortOrder
+    maxDeletionsThreshold?: SortOrder
+    notifyOnFailure?: SortOrder
+    syncWindowStart?: SortOrder
+    syncWindowEnd?: SortOrder
+    maxAttemptsBeforePause?: SortOrder
     lastModifiedAt?: SortOrder
     createdAt?: SortOrder
   }
 
   export type SyncAccountSettingsSumOrderByAggregateInput = {
     syncFrequencyMinutes?: SortOrder
+    maxDeletionsThreshold?: SortOrder
+    syncWindowStart?: SortOrder
+    syncWindowEnd?: SortOrder
+    maxAttemptsBeforePause?: SortOrder
   }
 
   export type EnumConflictPolicyWithAggregatesFilter<$PrismaModel = never> = {
@@ -74940,6 +75286,16 @@ export namespace Prisma {
   export type SavedFilterSumOrderByAggregateInput = {
     sortOrder?: SortOrder
     usageCount?: SortOrder
+  }
+
+  export type SyncAccountSettingsListRelationFilter = {
+    every?: SyncAccountSettingsWhereInput
+    some?: SyncAccountSettingsWhereInput
+    none?: SyncAccountSettingsWhereInput
+  }
+
+  export type SyncAccountSettingsOrderByRelationAggregateInput = {
+    _count?: SortOrder
   }
 
   export type LabelUserIdNameCompoundUniqueInput = {
@@ -78427,10 +78783,24 @@ export namespace Prisma {
     set: string[]
   }
 
+  export type SyncAccountSettingsCreateexcludedFieldsInput = {
+    set: string[]
+  }
+
+  export type SyncAccountSettingsCreateexportLabelFilterInput = {
+    set: string[]
+  }
+
   export type SyncAccountCreateNestedOneWithoutSettingsInput = {
     create?: XOR<SyncAccountCreateWithoutSettingsInput, SyncAccountUncheckedCreateWithoutSettingsInput>
     connectOrCreate?: SyncAccountCreateOrConnectWithoutSettingsInput
     connect?: SyncAccountWhereUniqueInput
+  }
+
+  export type LabelCreateNestedOneWithoutSyncAccountSettingsInput = {
+    create?: XOR<LabelCreateWithoutSyncAccountSettingsInput, LabelUncheckedCreateWithoutSyncAccountSettingsInput>
+    connectOrCreate?: LabelCreateOrConnectWithoutSyncAccountSettingsInput
+    connect?: LabelWhereUniqueInput
   }
 
   export type EnumConflictPolicyFieldUpdateOperationsInput = {
@@ -78442,12 +78812,32 @@ export namespace Prisma {
     push?: string | string[]
   }
 
+  export type SyncAccountSettingsUpdateexcludedFieldsInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type SyncAccountSettingsUpdateexportLabelFilterInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
   export type SyncAccountUpdateOneRequiredWithoutSettingsNestedInput = {
     create?: XOR<SyncAccountCreateWithoutSettingsInput, SyncAccountUncheckedCreateWithoutSettingsInput>
     connectOrCreate?: SyncAccountCreateOrConnectWithoutSettingsInput
     upsert?: SyncAccountUpsertWithoutSettingsInput
     connect?: SyncAccountWhereUniqueInput
     update?: XOR<XOR<SyncAccountUpdateToOneWithWhereWithoutSettingsInput, SyncAccountUpdateWithoutSettingsInput>, SyncAccountUncheckedUpdateWithoutSettingsInput>
+  }
+
+  export type LabelUpdateOneWithoutSyncAccountSettingsNestedInput = {
+    create?: XOR<LabelCreateWithoutSyncAccountSettingsInput, LabelUncheckedCreateWithoutSyncAccountSettingsInput>
+    connectOrCreate?: LabelCreateOrConnectWithoutSyncAccountSettingsInput
+    upsert?: LabelUpsertWithoutSyncAccountSettingsInput
+    disconnect?: LabelWhereInput | boolean
+    delete?: LabelWhereInput | boolean
+    connect?: LabelWhereUniqueInput
+    update?: XOR<XOR<LabelUpdateToOneWithWhereWithoutSyncAccountSettingsInput, LabelUpdateWithoutSyncAccountSettingsInput>, LabelUncheckedUpdateWithoutSyncAccountSettingsInput>
   }
 
   export type SyncAccountCreateNestedOneWithoutSyncLinksInput = {
@@ -79202,12 +79592,54 @@ export namespace Prisma {
     connect?: UserWhereUniqueInput
   }
 
+  export type SyncAccountSettingsCreateNestedManyWithoutImportLabelInput = {
+    create?: XOR<SyncAccountSettingsCreateWithoutImportLabelInput, SyncAccountSettingsUncheckedCreateWithoutImportLabelInput> | SyncAccountSettingsCreateWithoutImportLabelInput[] | SyncAccountSettingsUncheckedCreateWithoutImportLabelInput[]
+    connectOrCreate?: SyncAccountSettingsCreateOrConnectWithoutImportLabelInput | SyncAccountSettingsCreateOrConnectWithoutImportLabelInput[]
+    createMany?: SyncAccountSettingsCreateManyImportLabelInputEnvelope
+    connect?: SyncAccountSettingsWhereUniqueInput | SyncAccountSettingsWhereUniqueInput[]
+  }
+
+  export type SyncAccountSettingsUncheckedCreateNestedManyWithoutImportLabelInput = {
+    create?: XOR<SyncAccountSettingsCreateWithoutImportLabelInput, SyncAccountSettingsUncheckedCreateWithoutImportLabelInput> | SyncAccountSettingsCreateWithoutImportLabelInput[] | SyncAccountSettingsUncheckedCreateWithoutImportLabelInput[]
+    connectOrCreate?: SyncAccountSettingsCreateOrConnectWithoutImportLabelInput | SyncAccountSettingsCreateOrConnectWithoutImportLabelInput[]
+    createMany?: SyncAccountSettingsCreateManyImportLabelInputEnvelope
+    connect?: SyncAccountSettingsWhereUniqueInput | SyncAccountSettingsWhereUniqueInput[]
+  }
+
   export type UserUpdateOneRequiredWithoutLabelsNestedInput = {
     create?: XOR<UserCreateWithoutLabelsInput, UserUncheckedCreateWithoutLabelsInput>
     connectOrCreate?: UserCreateOrConnectWithoutLabelsInput
     upsert?: UserUpsertWithoutLabelsInput
     connect?: UserWhereUniqueInput
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutLabelsInput, UserUpdateWithoutLabelsInput>, UserUncheckedUpdateWithoutLabelsInput>
+  }
+
+  export type SyncAccountSettingsUpdateManyWithoutImportLabelNestedInput = {
+    create?: XOR<SyncAccountSettingsCreateWithoutImportLabelInput, SyncAccountSettingsUncheckedCreateWithoutImportLabelInput> | SyncAccountSettingsCreateWithoutImportLabelInput[] | SyncAccountSettingsUncheckedCreateWithoutImportLabelInput[]
+    connectOrCreate?: SyncAccountSettingsCreateOrConnectWithoutImportLabelInput | SyncAccountSettingsCreateOrConnectWithoutImportLabelInput[]
+    upsert?: SyncAccountSettingsUpsertWithWhereUniqueWithoutImportLabelInput | SyncAccountSettingsUpsertWithWhereUniqueWithoutImportLabelInput[]
+    createMany?: SyncAccountSettingsCreateManyImportLabelInputEnvelope
+    set?: SyncAccountSettingsWhereUniqueInput | SyncAccountSettingsWhereUniqueInput[]
+    disconnect?: SyncAccountSettingsWhereUniqueInput | SyncAccountSettingsWhereUniqueInput[]
+    delete?: SyncAccountSettingsWhereUniqueInput | SyncAccountSettingsWhereUniqueInput[]
+    connect?: SyncAccountSettingsWhereUniqueInput | SyncAccountSettingsWhereUniqueInput[]
+    update?: SyncAccountSettingsUpdateWithWhereUniqueWithoutImportLabelInput | SyncAccountSettingsUpdateWithWhereUniqueWithoutImportLabelInput[]
+    updateMany?: SyncAccountSettingsUpdateManyWithWhereWithoutImportLabelInput | SyncAccountSettingsUpdateManyWithWhereWithoutImportLabelInput[]
+    deleteMany?: SyncAccountSettingsScalarWhereInput | SyncAccountSettingsScalarWhereInput[]
+  }
+
+  export type SyncAccountSettingsUncheckedUpdateManyWithoutImportLabelNestedInput = {
+    create?: XOR<SyncAccountSettingsCreateWithoutImportLabelInput, SyncAccountSettingsUncheckedCreateWithoutImportLabelInput> | SyncAccountSettingsCreateWithoutImportLabelInput[] | SyncAccountSettingsUncheckedCreateWithoutImportLabelInput[]
+    connectOrCreate?: SyncAccountSettingsCreateOrConnectWithoutImportLabelInput | SyncAccountSettingsCreateOrConnectWithoutImportLabelInput[]
+    upsert?: SyncAccountSettingsUpsertWithWhereUniqueWithoutImportLabelInput | SyncAccountSettingsUpsertWithWhereUniqueWithoutImportLabelInput[]
+    createMany?: SyncAccountSettingsCreateManyImportLabelInputEnvelope
+    set?: SyncAccountSettingsWhereUniqueInput | SyncAccountSettingsWhereUniqueInput[]
+    disconnect?: SyncAccountSettingsWhereUniqueInput | SyncAccountSettingsWhereUniqueInput[]
+    delete?: SyncAccountSettingsWhereUniqueInput | SyncAccountSettingsWhereUniqueInput[]
+    connect?: SyncAccountSettingsWhereUniqueInput | SyncAccountSettingsWhereUniqueInput[]
+    update?: SyncAccountSettingsUpdateWithWhereUniqueWithoutImportLabelInput | SyncAccountSettingsUpdateWithWhereUniqueWithoutImportLabelInput[]
+    updateMany?: SyncAccountSettingsUpdateManyWithWhereWithoutImportLabelInput | SyncAccountSettingsUpdateManyWithWhereWithoutImportLabelInput[]
+    deleteMany?: SyncAccountSettingsScalarWhereInput | SyncAccountSettingsScalarWhereInput[]
   }
 
   export type GroupCreateNestedOneWithoutTeamSyncAccountsInput = {
@@ -81772,6 +82204,7 @@ export namespace Prisma {
     position?: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    syncAccountSettings?: SyncAccountSettingsCreateNestedManyWithoutImportLabelInput
   }
 
   export type LabelUncheckedCreateWithoutUserInput = {
@@ -81781,6 +82214,7 @@ export namespace Prisma {
     position?: number
     createdAt?: Date | string
     updatedAt?: Date | string
+    syncAccountSettings?: SyncAccountSettingsUncheckedCreateNestedManyWithoutImportLabelInput
   }
 
   export type LabelCreateOrConnectWithoutUserInput = {
@@ -89575,8 +90009,16 @@ export namespace Prisma {
     bookAllowlist?: SyncAccountSettingsCreatebookAllowlistInput | string[]
     syncFrequencyMinutes?: number | null
     requireReauthToEdit?: boolean
+    maxDeletionsThreshold?: number | null
+    notifyOnFailure?: boolean
+    syncWindowStart?: number | null
+    syncWindowEnd?: number | null
+    excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
+    exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
+    maxAttemptsBeforePause?: number | null
     lastModifiedAt?: Date | string
     createdAt?: Date | string
+    importLabel?: LabelCreateNestedOneWithoutSyncAccountSettingsInput
   }
 
   export type SyncAccountSettingsUncheckedCreateWithoutSyncAccountInput = {
@@ -89586,6 +90028,14 @@ export namespace Prisma {
     bookAllowlist?: SyncAccountSettingsCreatebookAllowlistInput | string[]
     syncFrequencyMinutes?: number | null
     requireReauthToEdit?: boolean
+    importLabelId?: string | null
+    maxDeletionsThreshold?: number | null
+    notifyOnFailure?: boolean
+    syncWindowStart?: number | null
+    syncWindowEnd?: number | null
+    excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
+    exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
+    maxAttemptsBeforePause?: number | null
     lastModifiedAt?: Date | string
     createdAt?: Date | string
   }
@@ -89865,8 +90315,16 @@ export namespace Prisma {
     bookAllowlist?: SyncAccountSettingsUpdatebookAllowlistInput | string[]
     syncFrequencyMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     requireReauthToEdit?: BoolFieldUpdateOperationsInput | boolean
+    maxDeletionsThreshold?: NullableIntFieldUpdateOperationsInput | number | null
+    notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
+    syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
+    exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
+    maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
     lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    importLabel?: LabelUpdateOneWithoutSyncAccountSettingsNestedInput
   }
 
   export type SyncAccountSettingsUncheckedUpdateWithoutSyncAccountInput = {
@@ -89876,6 +90334,14 @@ export namespace Prisma {
     bookAllowlist?: SyncAccountSettingsUpdatebookAllowlistInput | string[]
     syncFrequencyMinutes?: NullableIntFieldUpdateOperationsInput | number | null
     requireReauthToEdit?: BoolFieldUpdateOperationsInput | boolean
+    importLabelId?: NullableStringFieldUpdateOperationsInput | string | null
+    maxDeletionsThreshold?: NullableIntFieldUpdateOperationsInput | number | null
+    notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
+    syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
+    exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
+    maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
     lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -89955,6 +90421,31 @@ export namespace Prisma {
   export type SyncAccountCreateOrConnectWithoutSettingsInput = {
     where: SyncAccountWhereUniqueInput
     create: XOR<SyncAccountCreateWithoutSettingsInput, SyncAccountUncheckedCreateWithoutSettingsInput>
+  }
+
+  export type LabelCreateWithoutSyncAccountSettingsInput = {
+    id?: string
+    name: string
+    color: string
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutLabelsInput
+  }
+
+  export type LabelUncheckedCreateWithoutSyncAccountSettingsInput = {
+    id?: string
+    userId: string
+    name: string
+    color: string
+    position?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type LabelCreateOrConnectWithoutSyncAccountSettingsInput = {
+    where: LabelWhereUniqueInput
+    create: XOR<LabelCreateWithoutSyncAccountSettingsInput, LabelUncheckedCreateWithoutSyncAccountSettingsInput>
   }
 
   export type SyncAccountUpsertWithoutSettingsInput = {
@@ -90038,6 +90529,37 @@ export namespace Prisma {
     syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
     syncConflicts?: SyncConflictUncheckedUpdateManyWithoutSyncAccountNestedInput
     teamLink?: TeamSyncAccountUncheckedUpdateOneWithoutSyncAccountNestedInput
+  }
+
+  export type LabelUpsertWithoutSyncAccountSettingsInput = {
+    update: XOR<LabelUpdateWithoutSyncAccountSettingsInput, LabelUncheckedUpdateWithoutSyncAccountSettingsInput>
+    create: XOR<LabelCreateWithoutSyncAccountSettingsInput, LabelUncheckedCreateWithoutSyncAccountSettingsInput>
+    where?: LabelWhereInput
+  }
+
+  export type LabelUpdateToOneWithWhereWithoutSyncAccountSettingsInput = {
+    where?: LabelWhereInput
+    data: XOR<LabelUpdateWithoutSyncAccountSettingsInput, LabelUncheckedUpdateWithoutSyncAccountSettingsInput>
+  }
+
+  export type LabelUpdateWithoutSyncAccountSettingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    color?: StringFieldUpdateOperationsInput | string
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutLabelsNestedInput
+  }
+
+  export type LabelUncheckedUpdateWithoutSyncAccountSettingsInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    color?: StringFieldUpdateOperationsInput | string
+    position?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type SyncAccountCreateWithoutSyncLinksInput = {
@@ -95390,6 +95912,54 @@ export namespace Prisma {
     create: XOR<UserCreateWithoutLabelsInput, UserUncheckedCreateWithoutLabelsInput>
   }
 
+  export type SyncAccountSettingsCreateWithoutImportLabelInput = {
+    id?: string
+    syncDirection?: $Enums.SyncDirection
+    conflictPolicy?: $Enums.ConflictPolicy
+    bookAllowlist?: SyncAccountSettingsCreatebookAllowlistInput | string[]
+    syncFrequencyMinutes?: number | null
+    requireReauthToEdit?: boolean
+    maxDeletionsThreshold?: number | null
+    notifyOnFailure?: boolean
+    syncWindowStart?: number | null
+    syncWindowEnd?: number | null
+    excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
+    exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
+    maxAttemptsBeforePause?: number | null
+    lastModifiedAt?: Date | string
+    createdAt?: Date | string
+    syncAccount: SyncAccountCreateNestedOneWithoutSettingsInput
+  }
+
+  export type SyncAccountSettingsUncheckedCreateWithoutImportLabelInput = {
+    id?: string
+    syncAccountId: string
+    syncDirection?: $Enums.SyncDirection
+    conflictPolicy?: $Enums.ConflictPolicy
+    bookAllowlist?: SyncAccountSettingsCreatebookAllowlistInput | string[]
+    syncFrequencyMinutes?: number | null
+    requireReauthToEdit?: boolean
+    maxDeletionsThreshold?: number | null
+    notifyOnFailure?: boolean
+    syncWindowStart?: number | null
+    syncWindowEnd?: number | null
+    excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
+    exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
+    maxAttemptsBeforePause?: number | null
+    lastModifiedAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type SyncAccountSettingsCreateOrConnectWithoutImportLabelInput = {
+    where: SyncAccountSettingsWhereUniqueInput
+    create: XOR<SyncAccountSettingsCreateWithoutImportLabelInput, SyncAccountSettingsUncheckedCreateWithoutImportLabelInput>
+  }
+
+  export type SyncAccountSettingsCreateManyImportLabelInputEnvelope = {
+    data: SyncAccountSettingsCreateManyImportLabelInput | SyncAccountSettingsCreateManyImportLabelInput[]
+    skipDuplicates?: boolean
+  }
+
   export type UserUpsertWithoutLabelsInput = {
     update: XOR<UserUpdateWithoutLabelsInput, UserUncheckedUpdateWithoutLabelsInput>
     create: XOR<UserCreateWithoutLabelsInput, UserUncheckedCreateWithoutLabelsInput>
@@ -95531,6 +96101,45 @@ export namespace Prisma {
     failedLoginAttempts?: FailedLoginAttemptUncheckedUpdateManyWithoutUserNestedInput
     onboardingState?: UserOnboardingStateUncheckedUpdateOneWithoutUserNestedInput
     cardViewLog?: PublicCardViewUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type SyncAccountSettingsUpsertWithWhereUniqueWithoutImportLabelInput = {
+    where: SyncAccountSettingsWhereUniqueInput
+    update: XOR<SyncAccountSettingsUpdateWithoutImportLabelInput, SyncAccountSettingsUncheckedUpdateWithoutImportLabelInput>
+    create: XOR<SyncAccountSettingsCreateWithoutImportLabelInput, SyncAccountSettingsUncheckedCreateWithoutImportLabelInput>
+  }
+
+  export type SyncAccountSettingsUpdateWithWhereUniqueWithoutImportLabelInput = {
+    where: SyncAccountSettingsWhereUniqueInput
+    data: XOR<SyncAccountSettingsUpdateWithoutImportLabelInput, SyncAccountSettingsUncheckedUpdateWithoutImportLabelInput>
+  }
+
+  export type SyncAccountSettingsUpdateManyWithWhereWithoutImportLabelInput = {
+    where: SyncAccountSettingsScalarWhereInput
+    data: XOR<SyncAccountSettingsUpdateManyMutationInput, SyncAccountSettingsUncheckedUpdateManyWithoutImportLabelInput>
+  }
+
+  export type SyncAccountSettingsScalarWhereInput = {
+    AND?: SyncAccountSettingsScalarWhereInput | SyncAccountSettingsScalarWhereInput[]
+    OR?: SyncAccountSettingsScalarWhereInput[]
+    NOT?: SyncAccountSettingsScalarWhereInput | SyncAccountSettingsScalarWhereInput[]
+    id?: StringFilter<"SyncAccountSettings"> | string
+    syncAccountId?: StringFilter<"SyncAccountSettings"> | string
+    syncDirection?: EnumSyncDirectionFilter<"SyncAccountSettings"> | $Enums.SyncDirection
+    conflictPolicy?: EnumConflictPolicyFilter<"SyncAccountSettings"> | $Enums.ConflictPolicy
+    bookAllowlist?: StringNullableListFilter<"SyncAccountSettings">
+    syncFrequencyMinutes?: IntNullableFilter<"SyncAccountSettings"> | number | null
+    requireReauthToEdit?: BoolFilter<"SyncAccountSettings"> | boolean
+    importLabelId?: StringNullableFilter<"SyncAccountSettings"> | string | null
+    maxDeletionsThreshold?: IntNullableFilter<"SyncAccountSettings"> | number | null
+    notifyOnFailure?: BoolFilter<"SyncAccountSettings"> | boolean
+    syncWindowStart?: IntNullableFilter<"SyncAccountSettings"> | number | null
+    syncWindowEnd?: IntNullableFilter<"SyncAccountSettings"> | number | null
+    excludedFields?: StringNullableListFilter<"SyncAccountSettings">
+    exportLabelFilter?: StringNullableListFilter<"SyncAccountSettings">
+    maxAttemptsBeforePause?: IntNullableFilter<"SyncAccountSettings"> | number | null
+    lastModifiedAt?: DateTimeFilter<"SyncAccountSettings"> | Date | string
+    createdAt?: DateTimeFilter<"SyncAccountSettings"> | Date | string
   }
 
   export type GroupCreateWithoutTeamSyncAccountsInput = {
@@ -102337,6 +102946,7 @@ export namespace Prisma {
     position?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncAccountSettings?: SyncAccountSettingsUpdateManyWithoutImportLabelNestedInput
   }
 
   export type LabelUncheckedUpdateWithoutUserInput = {
@@ -102346,6 +102956,7 @@ export namespace Prisma {
     position?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncAccountSettings?: SyncAccountSettingsUncheckedUpdateManyWithoutImportLabelNestedInput
   }
 
   export type LabelUncheckedUpdateManyWithoutUserInput = {
@@ -104765,6 +105376,82 @@ export namespace Prisma {
     archivedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncAccountSettingsCreateManyImportLabelInput = {
+    id?: string
+    syncAccountId: string
+    syncDirection?: $Enums.SyncDirection
+    conflictPolicy?: $Enums.ConflictPolicy
+    bookAllowlist?: SyncAccountSettingsCreatebookAllowlistInput | string[]
+    syncFrequencyMinutes?: number | null
+    requireReauthToEdit?: boolean
+    maxDeletionsThreshold?: number | null
+    notifyOnFailure?: boolean
+    syncWindowStart?: number | null
+    syncWindowEnd?: number | null
+    excludedFields?: SyncAccountSettingsCreateexcludedFieldsInput | string[]
+    exportLabelFilter?: SyncAccountSettingsCreateexportLabelFilterInput | string[]
+    maxAttemptsBeforePause?: number | null
+    lastModifiedAt?: Date | string
+    createdAt?: Date | string
+  }
+
+  export type SyncAccountSettingsUpdateWithoutImportLabelInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    conflictPolicy?: EnumConflictPolicyFieldUpdateOperationsInput | $Enums.ConflictPolicy
+    bookAllowlist?: SyncAccountSettingsUpdatebookAllowlistInput | string[]
+    syncFrequencyMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    requireReauthToEdit?: BoolFieldUpdateOperationsInput | boolean
+    maxDeletionsThreshold?: NullableIntFieldUpdateOperationsInput | number | null
+    notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
+    syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
+    exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
+    maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
+    lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    syncAccount?: SyncAccountUpdateOneRequiredWithoutSettingsNestedInput
+  }
+
+  export type SyncAccountSettingsUncheckedUpdateWithoutImportLabelInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: StringFieldUpdateOperationsInput | string
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    conflictPolicy?: EnumConflictPolicyFieldUpdateOperationsInput | $Enums.ConflictPolicy
+    bookAllowlist?: SyncAccountSettingsUpdatebookAllowlistInput | string[]
+    syncFrequencyMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    requireReauthToEdit?: BoolFieldUpdateOperationsInput | boolean
+    maxDeletionsThreshold?: NullableIntFieldUpdateOperationsInput | number | null
+    notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
+    syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
+    exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
+    maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
+    lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type SyncAccountSettingsUncheckedUpdateManyWithoutImportLabelInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    syncAccountId?: StringFieldUpdateOperationsInput | string
+    syncDirection?: EnumSyncDirectionFieldUpdateOperationsInput | $Enums.SyncDirection
+    conflictPolicy?: EnumConflictPolicyFieldUpdateOperationsInput | $Enums.ConflictPolicy
+    bookAllowlist?: SyncAccountSettingsUpdatebookAllowlistInput | string[]
+    syncFrequencyMinutes?: NullableIntFieldUpdateOperationsInput | number | null
+    requireReauthToEdit?: BoolFieldUpdateOperationsInput | boolean
+    maxDeletionsThreshold?: NullableIntFieldUpdateOperationsInput | number | null
+    notifyOnFailure?: BoolFieldUpdateOperationsInput | boolean
+    syncWindowStart?: NullableIntFieldUpdateOperationsInput | number | null
+    syncWindowEnd?: NullableIntFieldUpdateOperationsInput | number | null
+    excludedFields?: SyncAccountSettingsUpdateexcludedFieldsInput | string[]
+    exportLabelFilter?: SyncAccountSettingsUpdateexportLabelFilterInput | string[]
+    maxAttemptsBeforePause?: NullableIntFieldUpdateOperationsInput | number | null
+    lastModifiedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
   export type NotificationCreateManySecurityAlertInput = {

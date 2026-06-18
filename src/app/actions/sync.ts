@@ -1718,6 +1718,17 @@ const updateSyncAccountSettingsSchema = z.object({
   syncDirection: syncDirectionSchema.optional(),
   conflictPolicy: conflictPolicySchema.optional(),
   syncFrequencyMinutes: z.number().int().min(0).max(100_000).nullable().optional(),
+  // P36 — advanced settings.
+  importLabelId: z.string().min(1).nullable().optional(),
+  maxDeletionsThreshold: z.number().int().min(1).max(9999).nullable().optional(),
+  notifyOnFailure: z.boolean().optional(),
+  // Sync window: local hour 0–23, or null for no restriction. Both or neither.
+  syncWindowStart: z.number().int().min(0).max(23).nullable().optional(),
+  syncWindowEnd: z.number().int().min(0).max(23).nullable().optional(),
+  excludedFields: z.array(z.string().min(1)).max(32).optional(),
+  exportLabelFilter: z.array(z.string().min(1)).max(64).optional(),
+  // 0 = never auto-pause; null = platform default (5).
+  maxAttemptsBeforePause: z.number().int().min(0).max(100).nullable().optional(),
 });
 
 export type UpdateSyncAccountSettingsInput = z.infer<typeof updateSyncAccountSettingsSchema>;
@@ -1736,7 +1747,28 @@ export const updateSyncAccountSettings = async (
   if (!parsed.success) {
     return { ok: false, error: parsed.error.issues[0]?.message ?? "Invalid settings." };
   }
-  const { syncAccountId, syncDirection, conflictPolicy, syncFrequencyMinutes } = parsed.data;
+  const {
+    syncAccountId,
+    syncDirection,
+    conflictPolicy,
+    syncFrequencyMinutes,
+    importLabelId,
+    maxDeletionsThreshold,
+    notifyOnFailure,
+    syncWindowStart,
+    syncWindowEnd,
+    excludedFields,
+    exportLabelFilter,
+    maxAttemptsBeforePause,
+  } = parsed.data;
+
+  // A sync window needs both bounds or neither — reject a half-open range.
+  if ((syncWindowStart == null) !== (syncWindowEnd == null)) {
+    return { ok: false, error: "Set both a start and end hour for the sync window, or neither." };
+  }
+  if (syncWindowStart != null && syncWindowStart === syncWindowEnd) {
+    return { ok: false, error: "The sync window start and end hours must be different." };
+  }
 
   // P23-06: require a valid re-auth elevation before changing settings.
   const elevation = await requireSyncSettingsElevation();
@@ -1756,11 +1788,35 @@ export const updateSyncAccountSettings = async (
       remoteAccountId: true,
       credentialReference: true,
       credentialRevokedAt: true,
-      settings: { select: { conflictPolicy: true, syncFrequencyMinutes: true } },
+      settings: {
+        select: {
+          conflictPolicy: true,
+          syncFrequencyMinutes: true,
+          importLabelId: true,
+          maxDeletionsThreshold: true,
+          notifyOnFailure: true,
+          syncWindowStart: true,
+          syncWindowEnd: true,
+          excludedFields: true,
+          exportLabelFilter: true,
+          maxAttemptsBeforePause: true,
+        },
+      },
     },
   });
   if (!account) {
     return { ok: false, error: "Sync account not found." };
+  }
+
+  // P36: a non-null import label must belong to the same user.
+  if (importLabelId) {
+    const label = await db.label.findFirst({
+      where: { id: importLabelId, userId },
+      select: { id: true },
+    });
+    if (!label) {
+      return { ok: false, error: "That label could not be found." };
+    }
   }
 
   // P23-04: a change to a pulling direction (TWO_WAY / IMPORT_ONLY) may need to
@@ -1772,20 +1828,28 @@ export const updateSyncAccountSettings = async (
   const leavingManual =
     conflictPolicy != null && conflictPolicy !== "MANUAL" && prevPolicy === "MANUAL";
 
+  // Only include fields the caller actually sent (all are optional patches). The
+  // same object seeds both the create and update branches of the upsert, so it
+  // holds plain scalars/arrays only (no field-update-operation wrappers).
+  const settingsPatch = {
+    ...(syncDirection ? { syncDirection } : {}),
+    ...(conflictPolicy ? { conflictPolicy } : {}),
+    ...(syncFrequencyMinutes !== undefined ? { syncFrequencyMinutes } : {}),
+    ...(importLabelId !== undefined ? { importLabelId } : {}),
+    ...(maxDeletionsThreshold !== undefined ? { maxDeletionsThreshold } : {}),
+    ...(notifyOnFailure !== undefined ? { notifyOnFailure } : {}),
+    ...(syncWindowStart !== undefined ? { syncWindowStart } : {}),
+    ...(syncWindowEnd !== undefined ? { syncWindowEnd } : {}),
+    ...(excludedFields !== undefined ? { excludedFields } : {}),
+    ...(exportLabelFilter !== undefined ? { exportLabelFilter } : {}),
+    ...(maxAttemptsBeforePause !== undefined ? { maxAttemptsBeforePause } : {}),
+  };
+
   await db.$transaction(async (tx) => {
     await tx.syncAccountSettings.upsert({
       where: { syncAccountId },
-      create: {
-        syncAccountId,
-        ...(syncDirection ? { syncDirection } : {}),
-        ...(conflictPolicy ? { conflictPolicy } : {}),
-        ...(syncFrequencyMinutes !== undefined ? { syncFrequencyMinutes } : {}),
-      },
-      update: {
-        ...(syncDirection ? { syncDirection } : {}),
-        ...(conflictPolicy ? { conflictPolicy } : {}),
-        ...(syncFrequencyMinutes !== undefined ? { syncFrequencyMinutes } : {}),
-      },
+      create: { syncAccountId, ...settingsPatch },
+      update: settingsPatch,
     });
 
     // P23-01 reconcile: direction also lives on SyncAccount (copied onto each
@@ -1897,6 +1961,27 @@ export const updateSyncAccountSettings = async (
   if (syncFrequencyMinutes !== undefined && syncFrequencyMinutes !== prevFreq) {
     changes.push({ field: "syncFrequencyMinutes", before: prevFreq, after: syncFrequencyMinutes });
   }
+  // P36 advanced fields: record a diff for each that actually moved. Arrays are
+  // compared by JSON since order is meaningful and lengths are small.
+  const prev = account.settings;
+  const diffScalar = (field: string, before: unknown, after: unknown) => {
+    if (after !== undefined && after !== (before ?? null)) {
+      changes.push({ field, before: before ?? null, after });
+    }
+  };
+  const diffArray = (field: string, before: string[] | undefined, after: string[] | undefined) => {
+    if (after !== undefined && JSON.stringify(before ?? []) !== JSON.stringify(after)) {
+      changes.push({ field, before: before ?? [], after });
+    }
+  };
+  diffScalar("importLabelId", prev?.importLabelId, importLabelId);
+  diffScalar("maxDeletionsThreshold", prev?.maxDeletionsThreshold, maxDeletionsThreshold);
+  diffScalar("notifyOnFailure", prev?.notifyOnFailure, notifyOnFailure);
+  diffScalar("syncWindowStart", prev?.syncWindowStart, syncWindowStart);
+  diffScalar("syncWindowEnd", prev?.syncWindowEnd, syncWindowEnd);
+  diffScalar("maxAttemptsBeforePause", prev?.maxAttemptsBeforePause, maxAttemptsBeforePause);
+  diffArray("excludedFields", prev?.excludedFields, excludedFields);
+  diffArray("exportLabelFilter", prev?.exportLabelFilter, exportLabelFilter);
   if (changes.length > 0) {
     await emitEvent(db, {
       userId,

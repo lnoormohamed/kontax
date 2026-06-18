@@ -66,6 +66,16 @@ export type SyncAccountData = {
   // P23-01 convention: null = platform default (60 min), 0 = manual only.
   syncFrequencyMinutes: number | null;
   bookAllowlist: string[];
+  // P36 advanced settings.
+  importLabelId: string | null;
+  maxDeletionsThreshold: number | null;
+  notifyOnFailure: boolean;
+  syncWindowStart: number | null;
+  syncWindowEnd: number | null;
+  excludedFields: string[];
+  exportLabelFilter: string[];
+  // null = platform default (5); 0 = never auto-pause.
+  maxAttemptsBeforePause: number | null;
   status: "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR";
   health: "healthy" | "watch" | "needs_attention" | "paused_for_safety" | "needs_reauth";
   lastSyncedAtRelative: string | null;
@@ -77,6 +87,13 @@ export type SyncAccountData = {
   duplicatesDetected: number;
   jobs: SyncJobRow[];
   conflicts: SyncConflictData[];
+};
+
+// P36: a user's label, for the auto-label-on-import and export-filter pickers.
+export type LabelOption = {
+  id: string;
+  name: string;
+  color: string;
 };
 
 // ── Health model (maps DB health → design visual state) ──────────────────────
@@ -2246,6 +2263,8 @@ function DisconnectModal({
 // ── Main client component ─────────────────────────────────────────────────────
 export type SyncPageClientProps = {
   accounts: SyncAccountData[];
+  // P36: the user's labels, for the auto-label and export-filter pickers.
+  labels: LabelOption[];
   initialAccountId: string | null;
   // open the add-account form on mount (mobile deep-link from MobileSyncScreen)
   initialAdd?: boolean;
@@ -2256,7 +2275,7 @@ export type SyncPageClientProps = {
   upgradeableAtCap: boolean;
 };
 
-export function SyncPageClient({ accounts, initialAccountId, initialAdd = false, flash: initialFlash, syncAccountsLimit, upgradeableAtCap }: SyncPageClientProps) {
+export function SyncPageClient({ accounts, labels, initialAccountId, initialAdd = false, flash: initialFlash, syncAccountsLimit, upgradeableAtCap }: SyncPageClientProps) {
   const [selectedId, setSelectedId] = useState<string | null>(
     initialAccountId ?? accounts[0]?.id ?? null,
   );
@@ -2400,6 +2419,7 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
         <ConnectionSettings
           key={selectedAccount.id}
           account={selectedAccount}
+          labels={labels}
           open={settingsOpen}
           onToggle={() => setSettingsOpen((o) => !o)}
           onSaved={() => router.refresh()}

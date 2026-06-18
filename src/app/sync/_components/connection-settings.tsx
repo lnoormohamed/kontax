@@ -5,7 +5,7 @@ import { type ReactNode, useEffect, useState } from "react";
 import { updateBookAllowlist, updateSyncAccountSettings } from "~/app/actions/sync";
 
 import { ELEVATION_REQUIRED, Spinner, T } from "./sync-shared";
-import type { SyncAccountData } from "./sync-page-client";
+import type { LabelOption, SyncAccountData } from "./sync-page-client";
 
 // ── P23-02: connection settings vocabulary ───────────────────────────────────
 type SyncDirection = SyncAccountData["direction"];
@@ -460,9 +460,199 @@ function BookAllowlist({
 }
 
 
-// ── P23-02: connection settings drawer (within the detail panel) ──────────────
+// ── P36: advanced settings vocabulary + small controls ───────────────────────
+const FIELD_EXCLUSIONS: { token: string; label: string }[] = [
+  { token: "NOTE", label: "Notes" },
+  { token: "BDAY", label: "Birthdays" },
+  { token: "ADR", label: "Addresses" },
+  { token: "X-CUSTOM", label: "Custom fields" },
+];
+const RETRY_OPTIONS: { value: string; label: string }[] = [
+  { value: "default", label: "Platform default (5 failures)" },
+  { value: "1", label: "1 failure" },
+  { value: "3", label: "3 failures" },
+  { value: "5", label: "5 failures" },
+  { value: "10", label: "10 failures" },
+  { value: "0", label: "Never auto-pause" },
+];
+const HOUR_OPTIONS: { value: string; label: string }[] = Array.from({ length: 24 }, (_, h) => ({
+  value: String(h),
+  label: `${String(h).padStart(2, "0")}:00`,
+}));
+
+function SettingLabel({ children }: { children: ReactNode }) {
+  return <div style={{ fontSize: 14, fontWeight: 600, color: T.ink, marginBottom: 8 }}>{children}</div>;
+}
+
+function SettingHint({ children }: { children: ReactNode }) {
+  return <div style={{ fontSize: 12, color: T.mute, marginTop: 6, maxWidth: 460 }}>{children}</div>;
+}
+
+function StyledSelect({
+  value,
+  onChange,
+  options,
+  maxWidth = 280,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  options: { value: string; label: string }[];
+  maxWidth?: number;
+}) {
+  return (
+    <div style={{ position: "relative", maxWidth }}>
+      <select
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        style={{
+          width: "100%",
+          height: 36,
+          borderRadius: 8,
+          border: `1px solid ${T.line}`,
+          background: "#fff",
+          padding: "0 38px 0 12px",
+          fontSize: 14,
+          color: T.ink,
+          cursor: "pointer",
+          appearance: "none",
+          WebkitAppearance: "none",
+          outline: "none",
+        }}
+      >
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>
+            {o.label}
+          </option>
+        ))}
+      </select>
+      <svg
+        width="16"
+        height="16"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke={T.ink2}
+        strokeWidth="1.8"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        style={{ position: "absolute", right: 12, top: "50%", transform: "translateY(-50%)", pointerEvents: "none" }}
+      >
+        <path d="M6 9l6 6 6-6" />
+      </svg>
+    </div>
+  );
+}
+
+function CheckboxRow({
+  checked,
+  onToggle,
+  children,
+  swatch,
+}: {
+  checked: boolean;
+  onToggle: () => void;
+  children: ReactNode;
+  swatch?: string;
+}) {
+  return (
+    <button
+      type="button"
+      role="checkbox"
+      aria-checked={checked}
+      onClick={onToggle}
+      style={{
+        display: "flex",
+        alignItems: "center",
+        gap: 10,
+        width: "100%",
+        minHeight: 36,
+        padding: "4px 6px",
+        border: "none",
+        background: "transparent",
+        cursor: "pointer",
+        textAlign: "left",
+        borderRadius: 8,
+      }}
+    >
+      <BookCheckbox checked={checked} />
+      {swatch ? (
+        <span style={{ width: 10, height: 10, borderRadius: 3, background: swatch, flexShrink: 0 }} />
+      ) : null}
+      <span style={{ fontSize: 14, color: T.ink }}>{children}</span>
+    </button>
+  );
+}
+
+function PlainToggle({
+  checked,
+  onToggle,
+  label,
+}: {
+  checked: boolean;
+  onToggle: () => void;
+  label: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      role="checkbox"
+      aria-checked={checked}
+      onClick={onToggle}
+      style={{
+        display: "inline-flex",
+        alignItems: "center",
+        gap: 9,
+        padding: "2px 0",
+        border: "none",
+        background: "transparent",
+        cursor: "pointer",
+      }}
+    >
+      <BookCheckbox checked={checked} />
+      <span style={{ fontSize: 13.5, color: T.ink2 }}>{label}</span>
+    </button>
+  );
+}
+
+// ── P23-02 / P36: connection settings drawer (within the detail panel) ────────
+type SettingsDraft = {
+  direction: SyncDirection;
+  policy: ConflictPolicy;
+  freq: string;
+  // P36 advanced
+  importLabelId: string; // "" = no label
+  deletionGuard: boolean; // whether the deletion threshold is enabled
+  maxDeletions: string; // number as string, only meaningful when deletionGuard
+  notifyOnFailure: boolean;
+  windowEnabled: boolean;
+  windowStart: string; // "0".."23"
+  windowEnd: string;
+  excludedFields: string[]; // vCard field tokens, e.g. "NOTE"
+  exportLabelFilter: string[]; // label ids; [] = push all
+  retry: string; // "default" | "0" | "1" | "3" | "5" | "10"
+};
+
+const retryToSelect = (n: number | null): string => (n == null ? "default" : String(n));
+const selectToRetry = (s: string): number | null => (s === "default" ? null : Number(s));
+
+const seedDraft = (account: SyncAccountData): SettingsDraft => ({
+  direction: account.direction,
+  policy: account.conflictPolicy,
+  freq: freqToSelect(account.syncFrequencyMinutes),
+  importLabelId: account.importLabelId ?? "",
+  deletionGuard: account.maxDeletionsThreshold != null,
+  maxDeletions: account.maxDeletionsThreshold != null ? String(account.maxDeletionsThreshold) : "10",
+  notifyOnFailure: account.notifyOnFailure,
+  windowEnabled: account.syncWindowStart != null && account.syncWindowEnd != null,
+  windowStart: account.syncWindowStart != null ? String(account.syncWindowStart) : "8",
+  windowEnd: account.syncWindowEnd != null ? String(account.syncWindowEnd) : "22",
+  excludedFields: [...account.excludedFields],
+  exportLabelFilter: [...account.exportLabelFilter],
+  retry: retryToSelect(account.maxAttemptsBeforePause),
+});
+
 export function ConnectionSettings({
   account,
+  labels,
   open,
   onToggle,
   onSaved,
@@ -470,52 +660,110 @@ export function ConnectionSettings({
   onNeedElevation,
 }: {
   account: SyncAccountData;
+  labels: LabelOption[];
   open: boolean;
   onToggle: () => void;
   onSaved: () => void;
   setToast: (msg: string) => void;
   onNeedElevation: (retry: () => void) => void;
 }) {
-  type Draft = { direction: SyncDirection; policy: ConflictPolicy; freq: string };
-  const baseline: Draft = {
-    direction: account.direction,
-    policy: account.conflictPolicy,
-    freq: freqToSelect(account.syncFrequencyMinutes),
-  };
-  const [draft, setDraft] = useState<Draft>(baseline);
+  const baseline = seedDraft(account);
+  const [draft, setDraft] = useState<SettingsDraft>(baseline);
   const [booksOpen, setBooksOpen] = useState(false);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
   // Re-seed when the selected account changes (or after a refresh re-supplies props).
   useEffect(() => {
-    setDraft({
-      direction: account.direction,
-      policy: account.conflictPolicy,
-      freq: freqToSelect(account.syncFrequencyMinutes),
-    });
+    setDraft(seedDraft(account));
     setBooksOpen(false);
     setSaved(false);
-  }, [account.id, account.direction, account.conflictPolicy, account.syncFrequencyMinutes]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    account.id,
+    account.direction,
+    account.conflictPolicy,
+    account.syncFrequencyMinutes,
+    account.importLabelId,
+    account.maxDeletionsThreshold,
+    account.notifyOnFailure,
+    account.syncWindowStart,
+    account.syncWindowEnd,
+    account.excludedFields,
+    account.exportLabelFilter,
+    account.maxAttemptsBeforePause,
+  ]);
+
+  // The export filter only applies when Kontax pushes (two-way / export-only).
+  const exportFilterApplies = draft.direction !== "IMPORT_ONLY";
 
   const dirty =
     draft.direction !== baseline.direction ||
     draft.policy !== baseline.policy ||
-    draft.freq !== baseline.freq;
+    draft.freq !== baseline.freq ||
+    draft.importLabelId !== baseline.importLabelId ||
+    draft.deletionGuard !== baseline.deletionGuard ||
+    (draft.deletionGuard && draft.maxDeletions !== baseline.maxDeletions) ||
+    draft.notifyOnFailure !== baseline.notifyOnFailure ||
+    draft.windowEnabled !== baseline.windowEnabled ||
+    (draft.windowEnabled &&
+      (draft.windowStart !== baseline.windowStart || draft.windowEnd !== baseline.windowEnd)) ||
+    JSON.stringify(draft.excludedFields) !== JSON.stringify(baseline.excludedFields) ||
+    JSON.stringify(draft.exportLabelFilter) !== JSON.stringify(baseline.exportLabelFilter) ||
+    draft.retry !== baseline.retry;
 
-  const patch = (next: Partial<Draft>) => {
+  const patch = (next: Partial<SettingsDraft>) => {
     setDraft((d) => ({ ...d, ...next }));
     setSaved(false);
   };
 
+  const toggleExcluded = (token: string) =>
+    patch({
+      excludedFields: draft.excludedFields.includes(token)
+        ? draft.excludedFields.filter((f) => f !== token)
+        : [...draft.excludedFields, token],
+    });
+
+  const toggleExportLabel = (id: string) =>
+    patch({
+      exportLabelFilter: draft.exportLabelFilter.includes(id)
+        ? draft.exportLabelFilter.filter((l) => l !== id)
+        : [...draft.exportLabelFilter, id],
+    });
+
   const onSave = async () => {
     setSaving(true);
-    // Optimistic: keep the dirty draft on screen; revert on failure.
+    // Optimistic: keep the dirty draft on screen; revert on failure. Only send
+    // the fields that actually changed so the audit diff stays meaningful.
+    const maxDeletionsThreshold = draft.deletionGuard
+      ? Math.max(1, Math.min(9999, Number(draft.maxDeletions) || 10))
+      : null;
     const result = await updateSyncAccountSettings({
       syncAccountId: account.id,
       ...(draft.direction !== baseline.direction ? { syncDirection: draft.direction } : {}),
       ...(draft.policy !== baseline.policy ? { conflictPolicy: draft.policy } : {}),
       ...(draft.freq !== baseline.freq ? { syncFrequencyMinutes: selectToFreq(draft.freq) } : {}),
+      ...(draft.importLabelId !== baseline.importLabelId
+        ? { importLabelId: draft.importLabelId === "" ? null : draft.importLabelId }
+        : {}),
+      ...(maxDeletionsThreshold !== account.maxDeletionsThreshold ? { maxDeletionsThreshold } : {}),
+      ...(draft.notifyOnFailure !== baseline.notifyOnFailure
+        ? { notifyOnFailure: draft.notifyOnFailure }
+        : {}),
+      ...(draft.windowEnabled !== baseline.windowEnabled ||
+      (draft.windowEnabled &&
+        (draft.windowStart !== baseline.windowStart || draft.windowEnd !== baseline.windowEnd))
+        ? draft.windowEnabled
+          ? { syncWindowStart: Number(draft.windowStart), syncWindowEnd: Number(draft.windowEnd) }
+          : { syncWindowStart: null, syncWindowEnd: null }
+        : {}),
+      ...(JSON.stringify(draft.excludedFields) !== JSON.stringify(baseline.excludedFields)
+        ? { excludedFields: draft.excludedFields }
+        : {}),
+      ...(JSON.stringify(draft.exportLabelFilter) !== JSON.stringify(baseline.exportLabelFilter)
+        ? { exportLabelFilter: draft.exportLabelFilter }
+        : {}),
+      ...(draft.retry !== baseline.retry ? { maxAttemptsBeforePause: selectToRetry(draft.retry) } : {}),
     });
     setSaving(false);
     if (result.ok) {
@@ -722,6 +970,188 @@ export function ConnectionSettings({
           {booksOpen ? (
             <BookAllowlist account={account} onSaved={onSaved} setToast={setToast} onNeedElevation={onNeedElevation} />
           ) : null}
+
+          {/* ── Advanced ───────────────────────────────────────────────── */}
+          <div
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 10,
+              margin: "22px 0 16px",
+            }}
+          >
+            <span
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                letterSpacing: "0.08em",
+                textTransform: "uppercase",
+                color: T.mute,
+              }}
+            >
+              Advanced
+            </span>
+            <span style={{ height: 1, flex: 1, background: T.line2 }} />
+          </div>
+
+          {/* Auto-label on import — hidden for export-only (no inbound contacts). */}
+          {draft.direction !== "EXPORT_ONLY" ? (
+            <>
+              <SettingLabel>Auto-label on import</SettingLabel>
+              {labels.length > 0 ? (
+                <StyledSelect
+                  value={draft.importLabelId}
+                  onChange={(v) => patch({ importLabelId: v })}
+                  options={[{ value: "", label: "No label" }, ...labels.map((l) => ({ value: l.id, label: l.name }))]}
+                />
+              ) : (
+                <SettingHint>Create a label in Contacts first to tag imported contacts.</SettingHint>
+              )}
+              {draft.importLabelId ? (
+                <SettingHint>Every contact imported from this account is tagged with this label.</SettingHint>
+              ) : null}
+              <SettingsDivider />
+            </>
+          ) : null}
+
+          {/* Deletion safety */}
+          <SettingLabel>Deletion safety</SettingLabel>
+          <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+            <span style={{ fontSize: 13.5, color: T.ink2 }}>Pause if a sync would delete more than</span>
+            <input
+              type="number"
+              min={1}
+              max={9999}
+              value={draft.maxDeletions}
+              disabled={!draft.deletionGuard}
+              onChange={(e) => patch({ maxDeletions: e.target.value })}
+              style={{
+                width: 72,
+                height: 34,
+                borderRadius: 8,
+                border: `1px solid ${T.line}`,
+                background: draft.deletionGuard ? "#fff" : T.wash,
+                padding: "0 8px",
+                fontSize: 14,
+                color: draft.deletionGuard ? T.ink : T.mute,
+                outline: "none",
+              }}
+            />
+            <span style={{ fontSize: 13.5, color: T.ink2 }}>contacts at once</span>
+          </div>
+          <div style={{ marginTop: 8 }}>
+            <PlainToggle
+              checked={!draft.deletionGuard}
+              onToggle={() => patch({ deletionGuard: !draft.deletionGuard })}
+              label="Disabled — never pause for deletions"
+            />
+          </div>
+          <SettingsDivider />
+
+          {/* Sync window — not meaningful for manual-only frequency. */}
+          {draft.freq !== "manual" ? (
+            <>
+              <SettingLabel>Sync window</SettingLabel>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                <span style={{ fontSize: 13.5, color: T.ink2 }}>Only sync between</span>
+                <StyledSelect
+                  value={draft.windowStart}
+                  onChange={(v) => patch({ windowStart: v, windowEnabled: true })}
+                  options={HOUR_OPTIONS}
+                  maxWidth={110}
+                />
+                <span style={{ fontSize: 13.5, color: T.ink2 }}>and</span>
+                <StyledSelect
+                  value={draft.windowEnd}
+                  onChange={(v) => patch({ windowEnd: v, windowEnabled: true })}
+                  options={HOUR_OPTIONS}
+                  maxWidth={110}
+                />
+              </div>
+              <div style={{ marginTop: 8 }}>
+                <PlainToggle
+                  checked={!draft.windowEnabled}
+                  onToggle={() => patch({ windowEnabled: !draft.windowEnabled })}
+                  label="No restriction — sync at any time"
+                />
+              </div>
+              <SettingHint>Hours are in your local time. Scheduled syncs outside the window are skipped.</SettingHint>
+              <SettingsDivider />
+            </>
+          ) : null}
+
+          {/* Field exclusions */}
+          <SettingLabel>Field exclusions</SettingLabel>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "2px 16px", maxWidth: 460 }}>
+            {FIELD_EXCLUSIONS.map((f) => (
+              <CheckboxRow
+                key={f.token}
+                checked={draft.excludedFields.includes(f.token)}
+                onToggle={() => toggleExcluded(f.token)}
+              >
+                {f.label}
+              </CheckboxRow>
+            ))}
+          </div>
+          <SettingHint>
+            Excluded fields are not read from or written to the remote. Existing remote data is left unchanged.
+          </SettingHint>
+          <SettingsDivider />
+
+          {/* Export filter — only when Kontax pushes (two-way / export-only). */}
+          {exportFilterApplies ? (
+            <>
+              <SettingLabel>Export filter</SettingLabel>
+              {labels.length > 0 ? (
+                <>
+                  <div style={{ fontSize: 13.5, color: T.ink2, marginBottom: 6 }}>
+                    {draft.exportLabelFilter.length === 0
+                      ? "Pushing all contacts."
+                      : "Only push contacts with one of these labels:"}
+                  </div>
+                  <div style={{ maxWidth: 460 }}>
+                    {labels.map((l) => (
+                      <CheckboxRow
+                        key={l.id}
+                        checked={draft.exportLabelFilter.includes(l.id)}
+                        onToggle={() => toggleExportLabel(l.id)}
+                        swatch={l.color}
+                      >
+                        {l.name}
+                      </CheckboxRow>
+                    ))}
+                  </div>
+                  <SettingHint>
+                    Contacts already on the remote won&rsquo;t be deleted if they don&rsquo;t match — only new outbound
+                    changes are filtered.
+                  </SettingHint>
+                </>
+              ) : (
+                <SettingHint>Create a label in Contacts first to filter what gets pushed.</SettingHint>
+              )}
+              <SettingsDivider />
+            </>
+          ) : null}
+
+          {/* Notifications */}
+          <SettingLabel>Notifications</SettingLabel>
+          <PlainToggle
+            checked={draft.notifyOnFailure}
+            onToggle={() => patch({ notifyOnFailure: !draft.notifyOnFailure })}
+            label="Alert me when this account fails or needs re-authentication"
+          />
+          <SettingsDivider />
+
+          {/* Retry sensitivity */}
+          <SettingLabel>Retry sensitivity</SettingLabel>
+          <StyledSelect
+            value={draft.retry}
+            onChange={(v) => patch({ retry: v })}
+            options={RETRY_OPTIONS}
+          />
+          <SettingHint>
+            After this many consecutive failures the account is auto-paused. You&rsquo;ll need to resume it manually.
+          </SettingHint>
 
           {dirty || saved ? <SettingsDivider /> : null}
           {dirty ? (

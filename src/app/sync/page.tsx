@@ -156,7 +156,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
     return null;
   })();
 
-  const [planSummary, familyMembership, teamMembership, incomingShares, syncErrorCount, rawAccounts] =
+  const [planSummary, familyMembership, teamMembership, incomingShares, syncErrorCount, labels, rawAccounts] =
     await Promise.all([
       getUserPlanSummary(userId),
       getUserFamilyMembership(userId),
@@ -170,6 +170,12 @@ export default async function SyncPage({ searchParams }: PageProps) {
         },
       }),
       db.syncAccount.count({ where: { userId, status: { in: ["ERROR", "NEEDS_REAUTH"] } } }),
+      // P36: the user's labels power the auto-label-on-import and export-filter pickers.
+      db.label.findMany({
+        where: { userId },
+        orderBy: { position: "asc" },
+        select: { id: true, name: true, color: true },
+      }),
       db.syncAccount.findMany({
         where: { userId },
         orderBy: [{ updatedAt: "desc" }],
@@ -203,13 +209,21 @@ export default async function SyncPage({ searchParams }: PageProps) {
               contact: { select: { id: true, fullName: true } },
             },
           },
-          // P23-02: per-connection advanced settings for the edit drawer.
+          // P23-02 / P36: per-connection advanced settings for the edit drawer.
           settings: {
             select: {
               syncDirection: true,
               conflictPolicy: true,
               syncFrequencyMinutes: true,
               bookAllowlist: true,
+              importLabelId: true,
+              maxDeletionsThreshold: true,
+              notifyOnFailure: true,
+              syncWindowStart: true,
+              syncWindowEnd: true,
+              excludedFields: true,
+              exportLabelFilter: true,
+              maxAttemptsBeforePause: true,
             },
           },
         },
@@ -282,6 +296,15 @@ export default async function SyncPage({ searchParams }: PageProps) {
       conflictPolicy: acct.settings?.conflictPolicy ?? "SERVER_WINS",
       syncFrequencyMinutes: acct.settings?.syncFrequencyMinutes ?? null,
       bookAllowlist: acct.settings?.bookAllowlist ?? [],
+      // P36 advanced settings (fall back to column defaults when no row exists).
+      importLabelId: acct.settings?.importLabelId ?? null,
+      maxDeletionsThreshold: acct.settings?.maxDeletionsThreshold ?? null,
+      notifyOnFailure: acct.settings?.notifyOnFailure ?? true,
+      syncWindowStart: acct.settings?.syncWindowStart ?? null,
+      syncWindowEnd: acct.settings?.syncWindowEnd ?? null,
+      excludedFields: acct.settings?.excludedFields ?? [],
+      exportLabelFilter: acct.settings?.exportLabelFilter ?? [],
+      maxAttemptsBeforePause: acct.settings?.maxAttemptsBeforePause ?? null,
       status: acct.status,
       health,
       lastSyncedAtRelative: formatRelative(acct.lastSyncedAt),
@@ -394,6 +417,7 @@ export default async function SyncPage({ searchParams }: PageProps) {
           <SyncPageClient
             key={addParam ? "add" : initialAccountId ? `account-${initialAccountId}` : "summary"}
             accounts={accounts}
+            labels={labels}
             initialAccountId={initialAccountId}
             initialAdd={addParam}
             flash={flashMsg}

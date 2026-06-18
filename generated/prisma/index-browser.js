@@ -405,6 +405,14 @@ exports.Prisma.SyncAccountSettingsScalarFieldEnum = {
   bookAllowlist: 'bookAllowlist',
   syncFrequencyMinutes: 'syncFrequencyMinutes',
   requireReauthToEdit: 'requireReauthToEdit',
+  importLabelId: 'importLabelId',
+  maxDeletionsThreshold: 'maxDeletionsThreshold',
+  notifyOnFailure: 'notifyOnFailure',
+  syncWindowStart: 'syncWindowStart',
+  syncWindowEnd: 'syncWindowEnd',
+  excludedFields: 'excludedFields',
+  exportLabelFilter: 'exportLabelFilter',
+  maxAttemptsBeforePause: 'maxAttemptsBeforePause',
   lastModifiedAt: 'lastModifiedAt',
   createdAt: 'createdAt'
 };
