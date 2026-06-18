@@ -398,7 +398,7 @@ const ContactRow = memo(function ContactRow({
   focused: boolean;
   labelColors: Record<string, string>;
   nameDisplayOrder?: "first-last" | "last-first";
-  onToggleSelect: (id: string) => void;
+  onToggleSelect: (id: string, shiftKey: boolean) => void;
   onArchived: (contactId: string) => void;
   onOpenContact: (contactId: string) => void;
 }) {
@@ -441,7 +441,7 @@ const ContactRow = memo(function ContactRow({
         }`}
         onClick={(event) => {
           event.stopPropagation();
-          onToggleSelect(contact.id);
+          onToggleSelect(contact.id, event.shiftKey);
         }}
         type="button"
       >
@@ -665,6 +665,8 @@ export function ContactsWorkspaceTable({
 }: ContactsWorkspaceTableProps) {
   const router = useRouter();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  // Anchor for shift-click range selection — the last row toggled without shift.
+  const selectionAnchorRef = useRef<string | null>(null);
   const [focusedId, setFocusedId] = useState<string | null>(null);
   const [shortcutsOpen, setShortcutsOpen] = useState(false);
   const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
@@ -752,14 +754,14 @@ export function ContactsWorkspaceTable({
     [selectedSet, visibleIds],
   );
 
-  const toggleSelect = useCallback((id: string) =>
-    setSelectedIds((current) =>
-      current.includes(id) ? current.filter((value) => value !== id) : [...current, id],
-    ), []);
-  const toggleSelectAll = useCallback(
-    () => setSelectedIds(allSelected ? [] : visibleIds),
-    [allSelected, visibleIds],
-  );
+  const toggleSelectAll = useCallback(() => {
+    setSelectedIds(allSelected ? [] : visibleIds);
+    selectionAnchorRef.current = null;
+  }, [allSelected, visibleIds]);
+  const clearSelection = useCallback(() => {
+    setSelectedIds([]);
+    selectionAnchorRef.current = null;
+  }, []);
 
   const { favorites, rest } = useMemo(() => {
     if (isSearching || mode !== "active") {
@@ -803,6 +805,37 @@ export function ContactsWorkspaceTable({
     }
     return rows;
   }, [favorites, groups, rest]);
+
+  // Contact ids in on-screen order — drives shift-click range selection.
+  const orderedVisibleIds = useMemo(
+    () => flatRows.flatMap((r) => (r.type === "contact" ? [r.contact.id] : [])),
+    [flatRows],
+  );
+
+  // Shift-click selects the contiguous range between the anchor and the clicked
+  // row (in visible order), adding it to the current selection. A plain click
+  // toggles the single row and resets the anchor.
+  const handleToggleSelect = useCallback(
+    (id: string, shiftKey: boolean) => {
+      const anchor = selectionAnchorRef.current;
+      if (shiftKey && anchor && anchor !== id) {
+        const from = orderedVisibleIds.indexOf(anchor);
+        const to = orderedVisibleIds.indexOf(id);
+        if (from !== -1 && to !== -1) {
+          const [lo, hi] = from < to ? [from, to] : [to, from];
+          const range = orderedVisibleIds.slice(lo, hi + 1);
+          setSelectedIds((current) => Array.from(new Set([...current, ...range])));
+          selectionAnchorRef.current = id;
+          return;
+        }
+      }
+      setSelectedIds((current) =>
+        current.includes(id) ? current.filter((value) => value !== id) : [...current, id],
+      );
+      selectionAnchorRef.current = id;
+    },
+    [orderedVisibleIds],
+  );
 
   const rowH = viewMode === "cozy" ? 60 : 52;
 
@@ -1078,7 +1111,7 @@ export function ContactsWorkspaceTable({
           books={books}
           labelSuggestions={labelSuggestions}
           redirectTo={mode === "active" ? "/contacts?tab=people" : "/contacts?tab=archived"}
-          onClear={() => setSelectedIds([])}
+          onClear={clearSelection}
         />
       ) : null}
 
@@ -1131,7 +1164,7 @@ export function ContactsWorkspaceTable({
                   nameDisplayOrder={nameDisplayOrder}
                   onArchived={handleArchived}
                   onOpenContact={saveListScrollPosition}
-                  onToggleSelect={toggleSelect}
+                  onToggleSelect={handleToggleSelect}
                   query={query}
                   selected={selectedSet.has(row.contact.id)}
                   focused={focusedId === row.contact.id}
