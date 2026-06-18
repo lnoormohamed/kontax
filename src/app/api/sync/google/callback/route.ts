@@ -6,6 +6,8 @@ import { NextResponse, type NextRequest } from "next/server";
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
 import { env } from "~/env";
+import { people } from "@googleapis/people";
+
 import {
   GOOGLE_CONTACTS_SCOPES,
   createGoogleOAuthClient,
@@ -91,7 +93,7 @@ export async function GET(req: NextRequest) {
       });
       const emails = me.data.emailAddresses ?? [];
       googleEmail =
-        emails.find((e) => e.metadata?.primary)?.value ?? emails[0]?.value ?? "";
+        emails.find((em) => em.metadata?.primary)?.value ?? emails[0]?.value ?? "";
       if (googleEmail) console.log("[google/callback] email resolved via People API fallback:", googleEmail);
     } catch (err) {
       console.error("[google/callback] People API fallback failed:", err);
