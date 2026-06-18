@@ -62,28 +62,29 @@ export async function quickMergeSuggestion(
   const userId = session.user.id;
 
   const suggestion = await db.mergeSuggestion.findFirst({
-    where: { id: suggestionId, userId, status: "OPEN" },
+    where: { id: suggestionId, userId },
     select: {
       id: true,
+      status: true,
       leftContactId: true,
       rightContactId: true,
-      leftContact: { select: { id: true, createdAt: true } },
-      rightContact: { select: { id: true, createdAt: true } },
+      leftContact: { select: { id: true, createdAt: true, archivedAt: true, mergedIntoContactId: true } },
+      rightContact: { select: { id: true, createdAt: true, archivedAt: true, mergedIntoContactId: true } },
     },
   });
 
   if (!suggestion) throw new Error("Suggestion not found.");
 
-  // If either contact was already absorbed by a previous merge in the same
-  // batch, mark this suggestion stale and return — don't error the whole group.
-  const bothActive = await db.contact.count({
-    where: {
-      id: { in: [suggestion.leftContactId, suggestion.rightContactId] },
-      archivedAt: null,
-      mergedIntoContactId: null,
-    },
-  });
-  if (bothActive < 2) {
+  // Already resolved (e.g. marked STALE by a previous merge in the same batch
+  // because one contact was absorbed) — skip gracefully.
+  if (suggestion.status !== "OPEN") {
+    return { survivingContactId: suggestion.leftContactId, decisionId: undefined };
+  }
+
+  // Either contact absorbed by an earlier pair in the batch — skip.
+  const leftAbsorbed = !!suggestion.leftContact.archivedAt || !!suggestion.leftContact.mergedIntoContactId;
+  const rightAbsorbed = !!suggestion.rightContact.archivedAt || !!suggestion.rightContact.mergedIntoContactId;
+  if (leftAbsorbed || rightAbsorbed) {
     await db.mergeSuggestion.update({
       where: { id: suggestion.id },
       data: { status: "STALE", reviewedAt: new Date() },
