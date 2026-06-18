@@ -626,6 +626,16 @@ const mergeDates = (
   return result;
 };
 
+// Normalise a relatedPeople entry that may have been stored in the legacy
+// {label, value} shape instead of the canonical {relationship, name} shape.
+function normaliseRelatedPerson(
+  raw: Record<string, unknown>,
+): { relationship: string; name: string } {
+  const relationship = String(raw.relationship ?? raw.label ?? "").trim();
+  const name = String(raw.name ?? raw.value ?? "").trim();
+  return { relationship, name };
+}
+
 const mergeRelatedPeople = (
   primaryEntries: Array<{ relationship: string; name: string }>,
   secondaryEntries: Array<{ relationship: string; name: string }>,
@@ -633,12 +643,11 @@ const mergeRelatedPeople = (
   const seen = new Set<string>();
   const result: Array<{ relationship: string; name: string }> = [];
 
-  for (const entry of [...primaryEntries, ...secondaryEntries]) {
-    const key = `${entry.relationship.trim().toLowerCase()}::${entry.name.trim().toLowerCase()}`;
-    if (!entry.relationship.trim() || !entry.name.trim() || seen.has(key)) {
-      continue;
-    }
-
+  for (const raw of [...primaryEntries, ...secondaryEntries]) {
+    const entry = normaliseRelatedPerson(raw as unknown as Record<string, unknown>);
+    if (!entry.relationship || !entry.name) continue;
+    const key = `${entry.relationship.toLowerCase()}::${entry.name.toLowerCase()}`;
+    if (seen.has(key)) continue;
     seen.add(key);
     result.push(entry);
   }
