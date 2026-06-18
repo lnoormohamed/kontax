@@ -1,3 +1,5 @@
+// Future enhancement: generate an OpenAPI spec for this API.
+// Base URL when created: https://api.getkontax.com/v1
 import { type NextRequest, NextResponse } from "next/server";
 
 import { assertCanCreateContacts } from "~/server/billing";
