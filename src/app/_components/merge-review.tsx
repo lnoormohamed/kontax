@@ -1352,9 +1352,8 @@ export function MergeReview({
       // No redirectTo — navigate on the client so the action's redirect() can't
       // re-run middleware cookielessly and bounce us to /login.
       const res = await mergeContacts(formData);
-      const id = res?.survivingContactId ?? survivorContact.id;
       const dec = res?.decisionId;
-      router.push(`/contacts/${id}?saved=1&merged=1${dec ? `&decisionId=${dec}` : ""}`);
+      router.push(`/contacts?tab=duplicates&merged=1${dec ? `&decisionId=${dec}` : ""}`);
     } catch (err) {
       setIsPending(false);
       alert(err instanceof Error ? err.message : "Could not merge the contacts.");

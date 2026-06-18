@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useState, useTransition } from "react";
 
-import { dismissMergeSuggestion } from "~/app/actions/merge";
+import { dismissMergeSuggestion, quickMergeSuggestion } from "~/app/actions/merge";
+import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import type { PersistedMergeSuggestion, SuggestionContact } from "~/server/contact-merge";
 
 // ── Comparison table ─────────────────────────────────────────────────────────
@@ -153,6 +155,44 @@ function SignalChips({ signals }: { signals: string[] }) {
   );
 }
 
+// ── Lite diff row (always visible, only differing fields) ────────────────────
+
+const LITE_FIELDS: { key: keyof SuggestionContact; label: string }[] = [
+  { key: "fullName", label: "Name" },
+  { key: "email", label: "Email" },
+  { key: "phone", label: "Phone" },
+  { key: "company", label: "Company" },
+  { key: "jobTitle", label: "Title" },
+];
+
+function LiteComparison({ a, b }: { a: SuggestionContact; b: SuggestionContact }) {
+  const diffs = LITE_FIELDS.filter(({ key }) => {
+    const av = a[key] as string | null;
+    const bv = b[key] as string | null;
+    return (av || bv) && av !== bv;
+  });
+
+  if (diffs.length === 0) return null;
+
+  return (
+    <div className="mt-3 rounded-[10px] border border-[#edf0ea] bg-[#f9faf8] px-3 py-2.5 grid gap-2">
+      {diffs.map(({ key, label }) => {
+        const av = truncate(a[key] as string | null, 60);
+        const bv = truncate(b[key] as string | null, 60);
+        return (
+          <div key={key} className="grid grid-cols-[52px_1fr_1fr] gap-2 items-baseline">
+            <span className="text-[11px] font-semibold uppercase tracking-[0.04em] text-[#aeb4ac]">
+              {label}
+            </span>
+            <span className="truncate text-[12.5px] text-[#1d2823]">{av ?? <span className="text-[#c2c8bf]">—</span>}</span>
+            <span className="truncate text-[12.5px] text-[#5c655e]">{bv ?? <span className="text-[#c2c8bf]">—</span>}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // ── The card ──────────────────────────────────────────────────────────────────
 
 export function MergeSuggestionCard({
@@ -162,9 +202,12 @@ export function MergeSuggestionCard({
   suggestion: PersistedMergeSuggestion;
   onDismissed: () => void;
 }) {
+  const router = useRouter();
   const [expanded, setExpanded] = useState(false);
   const [dismissing, setDismissing] = useState(false);
+  const [merging, setMerging] = useState(false);
   const [error, setError] = useState("");
+  const [, startTransition] = useTransition();
 
   const handleDismiss = async () => {
     setDismissing(true);
@@ -186,15 +229,49 @@ export function MergeSuggestionCard({
     }
   };
 
+  const handleQuickMerge = () => {
+    setMerging(true);
+    startTransition(async () => {
+      try {
+        await quickMergeSuggestion(suggestion.id);
+        onDismissed();
+        router.refresh();
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Merge failed — try again");
+        setMerging(false);
+      }
+    });
+  };
+
+  const busy = dismissing || merging;
+
   return (
     <article
       className="rounded-[14px] border border-[#d8ddd6] bg-white p-4"
-      style={{ transition: "opacity 200ms, max-height 200ms" }}
+      style={{ transition: "opacity 200ms" }}
     >
-      {/* Header row: confidence + actions */}
-      <div className="flex items-center justify-between gap-3">
+      {/* Header row: confidence pill + action buttons */}
+      <div className="flex items-start justify-between gap-3">
         <ConfidencePill confidence={suggestion.confidence} />
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 flex-wrap justify-end">
+          <button
+            className="inline-flex items-center gap-1.5 rounded-[9px] bg-[#17352e] px-3 py-1.5 text-[13px] font-semibold text-white transition hover:bg-[#20443b] disabled:opacity-50"
+            disabled={busy}
+            onClick={handleQuickMerge}
+            type="button"
+          >
+            {merging ? (
+              <>
+                <span className="h-[12px] w-[12px] animate-spin rounded-full border-[2px] border-white/40 border-t-white" />
+                Merging…
+              </>
+            ) : (
+              <>
+                <WorkspaceIcon name="merge" size={13} strokeWidth={2} />
+                Merge
+              </>
+            )}
+          </button>
           <Link
             className="inline-flex items-center gap-1 rounded-[9px] border border-[#d8ddd6] bg-white px-3 py-1.5 text-[13px] font-semibold text-[#1d2823] transition hover:bg-[#f6f7f4]"
             href={`/merge-suggestions/${suggestion.id}`}
@@ -203,7 +280,7 @@ export function MergeSuggestionCard({
           </Link>
           <button
             className="rounded-[9px] px-3 py-1.5 text-[13px] font-semibold text-[#b5472f] transition hover:bg-[#fdf3f1] disabled:opacity-50"
-            disabled={dismissing}
+            disabled={busy}
             onClick={handleDismiss}
             type="button"
           >
@@ -212,8 +289,8 @@ export function MergeSuggestionCard({
         </div>
       </div>
 
-      {/* Contact pair */}
-      <div className="mt-3 grid grid-cols-[1fr_1px_1fr] items-center gap-4 md:grid-cols-[1fr_1px_1fr]">
+      {/* Contact pair — desktop side-by-side */}
+      <div className="mt-3 hidden grid-cols-[1fr_1px_1fr] items-center gap-4 md:grid">
         <div className="min-w-0">
           <p className="truncate text-[14px] font-semibold text-[#1d2823]">
             {suggestion.leftContact.fullName ?? "—"}
@@ -233,7 +310,7 @@ export function MergeSuggestionCard({
         </div>
       </div>
 
-      {/* Mobile: stacked pair */}
+      {/* Contact pair — mobile stacked */}
       <div className="mt-3 grid gap-3 md:hidden">
         <div className="min-w-0">
           <p className="truncate text-[14px] font-semibold text-[#1d2823]">
@@ -257,14 +334,17 @@ export function MergeSuggestionCard({
       {/* Signal chips */}
       <SignalChips signals={suggestion.displaySignals} />
 
-      {/* Expand toggle + comparison panel */}
+      {/* Lite always-visible diff (only fields that differ) */}
+      <LiteComparison a={suggestion.leftContact} b={suggestion.rightContact} />
+
+      {/* Full comparison expand */}
       <div className="mt-3 border-t border-[#edf0ea] pt-3">
         <button
           className="flex items-center gap-1 text-[12.5px] font-semibold text-[#4158f4] hover:underline"
           onClick={() => setExpanded((e) => !e)}
           type="button"
         >
-          Compare fields {expanded ? "↑" : "↓"}
+          Compare all fields {expanded ? "↑" : "↓"}
         </button>
         <div
           className="overflow-hidden transition-all duration-200"

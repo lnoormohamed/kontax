@@ -2,6 +2,7 @@
 
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
+import { mergeContactsForUser } from "~/server/contact-merge";
 
 export async function dismissMergeSuggestion(
   contactAId: string,
@@ -50,4 +51,46 @@ export async function createManualMergeSuggestion(
   });
 
   return suggestion.id;
+}
+
+export async function quickMergeSuggestion(
+  suggestionId: string,
+): Promise<{ survivingContactId: string; decisionId: string | undefined }> {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("Unauthenticated");
+
+  const userId = session.user.id;
+
+  const suggestion = await db.mergeSuggestion.findFirst({
+    where: { id: suggestionId, userId, status: "OPEN" },
+    select: {
+      id: true,
+      leftContactId: true,
+      rightContactId: true,
+      leftContact: { select: { id: true, createdAt: true } },
+      rightContact: { select: { id: true, createdAt: true } },
+    },
+  });
+
+  if (!suggestion) throw new Error("Suggestion not found.");
+
+  // Older contact wins as primary (was added first)
+  const primaryIsLeft =
+    suggestion.leftContact.createdAt <= suggestion.rightContact.createdAt;
+  const primaryContactId = primaryIsLeft
+    ? suggestion.leftContactId
+    : suggestion.rightContactId;
+  const secondaryContactId = primaryIsLeft
+    ? suggestion.rightContactId
+    : suggestion.leftContactId;
+
+  const result = await mergeContactsForUser({
+    userId,
+    primaryContactId,
+    secondaryContactId,
+    suggestionId: suggestion.id,
+    source: "quick-merge",
+  });
+
+  return { survivingContactId: result.survivingContactId, decisionId: result.decisionId };
 }
