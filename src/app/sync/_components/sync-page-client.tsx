@@ -3427,7 +3427,7 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
                         whiteSpace: "nowrap",
                       }}
                     >
-                      {a.label}
+                      {a.provider !== "CARDDAV" && a.connectedEmail ? a.connectedEmail : a.label}
                     </span>
                     <span
                       style={{
@@ -3439,7 +3439,7 @@ export function SyncPageClient({ accounts, initialAccountId, initialAdd = false,
                         whiteSpace: "nowrap",
                       }}
                     >
-                      {subtitle}
+                      {HEALTH_LIST_TEXT[vH](a)}
                     </span>
                   </span>
                   <Dot color={HEALTH_DOT[vH]} pulse={vH === "syncing"} />
