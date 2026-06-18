@@ -1,15 +1,16 @@
 "use client";
 
-import { useEffect, useRef, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useState, useTransition } from "react";
 import { createPortal } from "react-dom";
 import { useRouter } from "next/navigation";
 
 import { ConfirmDialog } from "~/app/_components/confirm-dialog";
 import { archiveContactsBulk, deleteContactsBulk, favoriteContactsBulk, restoreContactsBulk } from "~/app/actions/contacts";
-import { addLabelBulk, setCompanyBulk } from "~/app/actions/bulk-edit";
+import { addLabelBulk, mergeContactsBulk, removeLabelBulk, setCompanyBulk } from "~/app/actions/bulk-edit";
 import { moveContactsToBook } from "~/app/actions/address-books";
 
 export type ToolbarBook = { id: string; name: string; isDefault: boolean };
+export type ToolbarContact = { id: string; name: string; labels: string[] };
 
 // ── inline glyphs ─────────────────────────────────────────────────────────────
 const S = ({ d, w = 16, sw = 1.8 }: { d: string; w?: number; sw?: number }) => (
@@ -23,6 +24,7 @@ const IconFolder = () => <S d="M3 7.5A1.5 1.5 0 014.5 6H9l2 2.2h8.5A1.5 1.5 0 01
 const IconTag = () => <S d="M3 11l8-8 9 .5.5 9-8 8z|M7.5 7.5h.01" />;
 const IconBuilding = () => <S d="M4 21V5l8-2v18|M12 21V9l6 2v10|M7 8h.01|M7 12h.01|M7 16h.01" />;
 const IconArchive = () => <S d="M3 7h18M5 7l1 13h12l1-13M9 11h6" />;
+const IconMerge = () => <S d="M7 21V9a4 4 0 004 4h6|M17 13l3-3-3-3|M7 3v6" />;
 const IconMore = () => <S d="M5 12h.01|M12 12h.01|M19 12h.01" sw={2.4} />;
 const IconClose = () => <S d="M6 6l12 12M18 6L6 18" sw={2} />;
 const IconRestore = () => <S d="M3 12a9 9 0 109-9 9 9 0 00-6.4 2.6L3 8|M3 4v4h4" />;
@@ -33,16 +35,19 @@ function Act({
   children,
   open,
   onClick,
+  disabled,
 }: {
   children: React.ReactNode;
   open?: boolean;
   onClick?: () => void;
+  disabled?: boolean;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex h-[38px] items-center gap-1.5 whitespace-nowrap rounded-[9px] px-3 text-[13px] font-semibold text-white transition hover:bg-white/10"
+      disabled={disabled}
+      className="inline-flex h-[38px] items-center gap-1.5 whitespace-nowrap rounded-[9px] px-3 text-[13px] font-semibold text-white transition hover:bg-white/10 disabled:opacity-40 disabled:hover:bg-transparent"
       style={{ background: open ? "rgba(255,255,255,0.14)" : undefined }}
     >
       {children}
@@ -74,8 +79,26 @@ function Pop({ children, onClose, width = 210 }: { children: React.ReactNode; on
 const popLabel = "px-2 pb-1.5 pt-1 text-[10.5px] font-bold uppercase tracking-[0.06em] text-[#8b938c]";
 const popItem = "flex h-9 w-full items-center gap-2.5 rounded-[7px] px-2.5 text-left text-[13px] font-medium text-[#1d2823] transition hover:bg-[#f2f4f0]";
 
+// tri-state checkbox glyph for the label manager
+function TriCheck({ state }: { state: "on" | "off" | "mixed" }) {
+  return (
+    <span
+      className={`grid h-[18px] w-[18px] flex-none place-items-center rounded-[5px] border-[1.6px] ${
+        state === "off" ? "border-slate-300 bg-white" : "border-[#4158f4] bg-[#4158f4]"
+      }`}
+    >
+      {state === "on" ? (
+        <svg width="11" height="11" viewBox="0 0 12 12" fill="none" stroke="#fff" strokeWidth="2.3" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 6.2l2.3 2.3L9.5 3.5" /></svg>
+      ) : state === "mixed" ? (
+        <span className="h-[2px] w-[9px] rounded bg-white" />
+      ) : null}
+    </span>
+  );
+}
+
 export function BulkEditToolbar({
   selectedIds,
+  selectedContacts,
   mode,
   books,
   labelSuggestions,
@@ -83,6 +106,7 @@ export function BulkEditToolbar({
   onClear,
 }: {
   selectedIds: string[];
+  selectedContacts: ToolbarContact[];
   mode: "active" | "archived";
   books: ToolbarBook[];
   labelSuggestions: string[];
@@ -91,18 +115,26 @@ export function BulkEditToolbar({
 }) {
   const router = useRouter();
   const [, startTransition] = useTransition();
-  // Portal to body so position:fixed escapes the virtualizer's transformed
-  // ancestor (a fixed descendant of a transformed element is contained by it).
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  const [open, setOpen] = useState<null | "move" | "label" | "company" | "more">(null);
+  const [open, setOpen] = useState<null | "move" | "labels" | "company" | "more">(null);
   const [confirm, setConfirm] = useState<null | "archive" | "delete">(null);
+  const [mergeOpen, setMergeOpen] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [labelText, setLabelText] = useState("");
+  const [labelSearch, setLabelSearch] = useState("");
+  const [labelOverrides, setLabelOverrides] = useState<Record<string, boolean>>({});
   const [companyText, setCompanyText] = useState("");
 
   const count = selectedIds.length;
-  if (count === 0) return null;
+
+  // Per-label membership across the selection → tri-state. Reset overrides when
+  // the selection changes so the manager reflects the new set.
+  const labelCounts = useMemo(() => {
+    const m = new Map<string, number>();
+    for (const c of selectedContacts) for (const l of c.labels) m.set(l, (m.get(l) ?? 0) + 1);
+    return m;
+  }, [selectedContacts]);
+  useEffect(() => setLabelOverrides({}), [selectedContacts]);
 
   const run = (fn: () => Promise<unknown>) => {
     setBusy(true);
@@ -111,6 +143,7 @@ export function BulkEditToolbar({
         await fn();
         setOpen(null);
         setConfirm(null);
+        setMergeOpen(false);
         onClear();
         startTransition(() => router.refresh());
       } catch (err) {
@@ -121,8 +154,6 @@ export function BulkEditToolbar({
     })();
   };
 
-  // archive / delete / restore reuse the FormData server actions (they emit
-  // activity + security signals and redirect, which refreshes the view).
   const runForm = (action: (fd: FormData) => Promise<void>) => {
     setBusy(true);
     const fd = new FormData();
@@ -132,7 +163,6 @@ export function BulkEditToolbar({
       try {
         await action(fd);
       } catch (err) {
-        // NEXT_REDIRECT is expected (the action redirects on success).
         if (!(err instanceof Error) || !err.message.includes("NEXT_REDIRECT")) {
           alert(err instanceof Error ? err.message : "Something went wrong.");
           setBusy(false);
@@ -141,14 +171,43 @@ export function BulkEditToolbar({
     });
   };
 
-  const filteredLabels = labelSuggestions.filter(
-    (l) => labelText.trim() && l.toLowerCase().startsWith(labelText.trim().toLowerCase()),
+  // ── label manager ───────────────────────────────────────────────────────────
+  const labelCatalog = useMemo(() => {
+    const all = new Set<string>(labelSuggestions);
+    for (const l of labelCounts.keys()) all.add(l);
+    return [...all].sort((a, b) => a.localeCompare(b));
+  }, [labelSuggestions, labelCounts]);
+  const filteredLabels = labelCatalog.filter(
+    (l) => !labelSearch.trim() || l.toLowerCase().includes(labelSearch.trim().toLowerCase()),
   );
+  const labelState = (label: string): "on" | "off" | "mixed" => {
+    if (label in labelOverrides) return labelOverrides[label] ? "on" : "off";
+    const n = labelCounts.get(label) ?? 0;
+    if (n === 0) return "off";
+    return n === count ? "on" : "mixed";
+  };
+  const toggleLabel = (label: string) =>
+    setLabelOverrides((o) => ({ ...o, [label]: labelState(label) !== "on" }));
   const showCreateLabel =
-    labelText.trim().length > 0 &&
-    !labelSuggestions.some((l) => l.toLowerCase() === labelText.trim().toLowerCase());
+    labelSearch.trim().length > 0 &&
+    !labelCatalog.some((l) => l.toLowerCase() === labelSearch.trim().toLowerCase());
+  const pendingLabelChanges = Object.keys(labelOverrides).filter((l) => {
+    const n = labelCounts.get(l) ?? 0;
+    const was = n === count && n > 0;
+    return labelOverrides[l] !== was;
+  });
+  const applyLabels = () =>
+    run(async () => {
+      for (const label of pendingLabelChanges) {
+        if (labelOverrides[label]) await addLabelBulk({ contactIds: selectedIds, label });
+        else await removeLabelBulk({ contactIds: selectedIds, label });
+      }
+    });
 
-  const personalBooks = books; // includes Default; moveContactsToBook validates ownership.
+  // ── merge ─────────────────────────────────────────────────────────────────
+  const personalBooks = books;
+
+  if (count === 0) return null;
 
   return (
     <>
@@ -195,37 +254,54 @@ export function BulkEditToolbar({
                 ) : null}
               </div>
 
-              {/* Add label */}
+              {/* Manage labels (tri-state add/remove) */}
               <div className="relative">
-                <Act open={open === "label"} onClick={() => setOpen(open === "label" ? null : "label")}>
+                <Act open={open === "labels"} onClick={() => setOpen(open === "labels" ? null : "labels")}>
                   <IconTag />
-                  <span className="hidden md:inline">Add label</span>
+                  <span className="hidden md:inline">Labels</span>
                   <Chev />
                 </Act>
-                {open === "label" ? (
-                  <Pop onClose={() => setOpen(null)} width={230}>
+                {open === "labels" ? (
+                  <Pop onClose={() => setOpen(null)} width={244}>
                     <div className="p-1">
                       <input
                         autoFocus
-                        value={labelText}
-                        onChange={(e) => setLabelText(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" && labelText.trim()) run(() => addLabelBulk({ contactIds: selectedIds, label: labelText }));
-                        }}
-                        placeholder="Label name…"
-                        className="h-9 w-full rounded-[9px] border-[1.5px] border-[#4158f4] px-2.5 text-[13px] text-[#1d2823] outline-none"
-                        style={{ boxShadow: "0 0 0 3px rgba(65,88,244,0.12)" }}
+                        value={labelSearch}
+                        onChange={(e) => setLabelSearch(e.target.value)}
+                        placeholder="Search or create…"
+                        className="h-9 w-full rounded-[9px] border-[1.5px] border-[#d8ddd6] px-2.5 text-[13px] text-[#1d2823] outline-none focus:border-[#4158f4]"
                       />
                     </div>
-                    {filteredLabels.map((l) => (
-                      <button key={l} type="button" className={popItem} disabled={busy} onClick={() => run(() => addLabelBulk({ contactIds: selectedIds, label: l }))}>
-                        {l}
-                      </button>
-                    ))}
-                    {showCreateLabel ? (
-                      <button type="button" className={`${popItem} text-[#4158f4]`} disabled={busy} onClick={() => run(() => addLabelBulk({ contactIds: selectedIds, label: labelText }))}>
-                        Create “{labelText.trim()}”
-                      </button>
+                    <div className="max-h-[210px] overflow-y-auto">
+                      {filteredLabels.map((l) => {
+                        const st = labelState(l);
+                        return (
+                          <button key={l} type="button" className={popItem} onClick={() => toggleLabel(l)}>
+                            <TriCheck state={st} />
+                            <span className="truncate">{l}</span>
+                          </button>
+                        );
+                      })}
+                      {showCreateLabel ? (
+                        <button
+                          type="button"
+                          className={`${popItem} text-[#4158f4]`}
+                          disabled={busy}
+                          onClick={() => run(() => addLabelBulk({ contactIds: selectedIds, label: labelSearch }))}
+                        >
+                          Create “{labelSearch.trim()}”
+                        </button>
+                      ) : null}
+                      {filteredLabels.length === 0 && !showCreateLabel ? (
+                        <div className="px-2.5 py-2 text-[12.5px] text-[#8b938c]">No labels yet.</div>
+                      ) : null}
+                    </div>
+                    {pendingLabelChanges.length > 0 ? (
+                      <div className="mt-1 flex justify-end border-t border-[#e9ece7] p-1.5">
+                        <button type="button" disabled={busy} className="h-8 rounded-lg bg-[#4158f4] px-3 text-[13px] font-semibold text-white disabled:opacity-50" onClick={applyLabels}>
+                          Apply
+                        </button>
+                      </div>
                     ) : null}
                   </Pop>
                 ) : null}
@@ -265,6 +341,12 @@ export function BulkEditToolbar({
                 ) : null}
               </div>
 
+              {/* Merge */}
+              <Act onClick={() => setMergeOpen(true)} disabled={count < 2}>
+                <IconMerge />
+                <span className="hidden md:inline">Merge</span>
+              </Act>
+
               {/* Archive */}
               <Act onClick={() => setConfirm("archive")}>
                 <IconArchive />
@@ -295,8 +377,18 @@ export function BulkEditToolbar({
                   href={`/api/exports/contacts/csv?ids=${encodeURIComponent(selectedIds.join(","))}`}
                   onClick={() => setOpen(null)}
                 >
-                  Export selection as CSV
+                  Export as CSV
                 </a>
+                <button
+                  type="button"
+                  className={popItem}
+                  onClick={() => {
+                    setOpen(null);
+                    window.open(`/contacts/print?ids=${encodeURIComponent(selectedIds.join(","))}`, "_blank", "noopener");
+                  }}
+                >
+                  Print
+                </button>
                 <div className="my-1 h-px bg-[#e9ece7]" />
                 <button
                   type="button"
@@ -316,6 +408,9 @@ export function BulkEditToolbar({
             document.body,
           )
         : null}
+
+      {/* Merge modal — pick the primary the others fold into */}
+      {mergeOpen ? <MergeModal contacts={selectedContacts} busy={busy} onCancel={() => setMergeOpen(false)} onMerge={(primaryId) => run(() => mergeContactsBulk({ primaryContactId: primaryId, secondaryContactIds: selectedIds.filter((id) => id !== primaryId) }))} /> : null}
 
       <ConfirmDialog
         open={confirm === "archive"}
@@ -338,5 +433,49 @@ export function BulkEditToolbar({
         onConfirm={() => runForm(deleteContactsBulk)}
       />
     </>
+  );
+}
+
+// ── merge modal ────────────────────────────────────────────────────────────────
+function MergeModal({
+  contacts,
+  busy,
+  onCancel,
+  onMerge,
+}: {
+  contacts: ToolbarContact[];
+  busy: boolean;
+  onCancel: () => void;
+  onMerge: (primaryId: string) => void;
+}) {
+  const [primaryId, setPrimaryId] = useState(contacts[0]?.id ?? "");
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  if (!mounted) return null;
+  return createPortal(
+    <div className="fixed inset-0 z-50 grid place-items-center bg-black/30 p-4" onClick={onCancel}>
+      <div className="w-full max-w-[420px] rounded-[16px] bg-white p-5 shadow-[0_24px_60px_rgba(20,30,25,0.25)]" onClick={(e) => e.stopPropagation()}>
+        <h3 className="m-0 text-[17px] font-bold text-[#1d2823]">Merge {contacts.length} contacts</h3>
+        <p className="mb-3 mt-2 text-[13.5px] leading-relaxed text-[#5c655e]">
+          Choose which contact to keep. The others are merged into it — their details fill any gaps, and the duplicates are removed.
+        </p>
+        <div className="max-h-[260px] overflow-y-auto rounded-[10px] border border-[#e9ece7]">
+          {contacts.map((c) => (
+            <label key={c.id} className="flex cursor-pointer items-center gap-3 border-b border-[#f1f3ef] px-3 py-2.5 last:border-b-0 hover:bg-[#f7f8f5]">
+              <input type="radio" name="primary" checked={primaryId === c.id} onChange={() => setPrimaryId(c.id)} className="accent-[#4158f4]" />
+              <span className="truncate text-[14px] font-medium text-[#1d2823]">{c.name}</span>
+              {primaryId === c.id ? <span className="ml-auto rounded-full bg-[#e3efe7] px-2 py-0.5 text-[11px] font-semibold text-[#1c6b48]">Keep</span> : null}
+            </label>
+          ))}
+        </div>
+        <div className="mt-4 flex justify-end gap-2">
+          <button type="button" className="h-9 rounded-[9px] px-3 text-[13.5px] font-semibold text-[#5c655e]" onClick={onCancel}>Cancel</button>
+          <button type="button" disabled={busy || !primaryId} className="h-9 rounded-[9px] bg-[#4158f4] px-4 text-[13.5px] font-semibold text-white disabled:opacity-50" onClick={() => onMerge(primaryId)}>
+            Merge {contacts.length}
+          </button>
+        </div>
+      </div>
+    </div>,
+    document.body,
   );
 }

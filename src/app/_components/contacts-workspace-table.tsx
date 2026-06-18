@@ -753,6 +753,21 @@ export function ContactsWorkspaceTable({
     () => visibleIds.length > 0 && visibleIds.every((id) => selectedSet.has(id)),
     [selectedSet, visibleIds],
   );
+  // Selected contacts' id/name/labels — feeds the bulk toolbar's tri-state label
+  // manager and the merge primary-picker.
+  const selectedContacts = useMemo(
+    () =>
+      contacts
+        .filter((c) => selectedSet.has(c.id))
+        .map((c) => ({
+          id: c.id,
+          name: getDisplayName(c, { nameDisplayOrder }) || "Unnamed contact",
+          labels: Array.isArray(c.labels)
+            ? (c.labels as unknown[]).filter((v): v is string => typeof v === "string")
+            : [],
+        })),
+    [contacts, selectedSet, nameDisplayOrder],
+  );
 
   const toggleSelectAll = useCallback(() => {
     setSelectedIds(allSelected ? [] : visibleIds);
@@ -1107,6 +1122,7 @@ export function ContactsWorkspaceTable({
       {hasSelection ? (
         <BulkEditToolbar
           selectedIds={selectedIds}
+          selectedContacts={selectedContacts}
           mode={mode}
           books={books}
           labelSuggestions={labelSuggestions}
