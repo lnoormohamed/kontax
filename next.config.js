@@ -13,7 +13,7 @@ const securityHeaders = [
   // Prevent MIME-type sniffing
   { key: "X-Content-Type-Options", value: "nosniff" },
   // Prevent clickjacking
-  { key: "X-Frame-Options", value: "SAMEORIGIN" },
+  { key: "X-Frame-Options", value: "DENY" },
   // Force HTTPS for 2 years, include subdomains
   { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains; preload" },
   // Limit referrer info sent cross-origin
