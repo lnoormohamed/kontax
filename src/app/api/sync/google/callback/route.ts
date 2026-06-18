@@ -83,17 +83,17 @@ export async function GET(req: NextRequest) {
     ? `Google Contacts (${googleEmail})`
     : "Google Contacts";
 
-  // Reuse the existing connection for this user if one exists, so a reconnect
-  // refreshes credentials instead of hitting the unique constraint.
-  // Match by email first; fall back to any Google account for this user
-  // (handles accounts created before email resolution was stored).
+  // Reuse an existing connection only when the email matches — so reconnecting
+  // personal@gmail.com refreshes credentials but connecting work@gmail.com
+  // creates a separate account. When email resolution failed (non-fatal), fall
+  // back to any Google account that also has no email stored (legacy rows).
   const existing = await db.syncAccount.findFirst({
     where: {
       userId: state.userId,
       provider: "GOOGLE",
       ...(googleEmail
-        ? { OR: [{ remoteAccountId: googleEmail }, { remoteAccountId: null }, { remoteAccountId: "" }] }
-        : {}),
+        ? { remoteAccountId: googleEmail }
+        : { OR: [{ remoteAccountId: null }, { remoteAccountId: "" }] }),
     },
     orderBy: { createdAt: "asc" },
     select: { id: true, credentialReference: true },
