@@ -22801,6 +22801,7 @@ export namespace Prisma {
     lastErrorCode: string | null
     lastErrorMessage: string | null
     booksDiscoveredAt: Date | null
+    setupCompletedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -22832,6 +22833,7 @@ export namespace Prisma {
     lastErrorCode: string | null
     lastErrorMessage: string | null
     booksDiscoveredAt: Date | null
+    setupCompletedAt: Date | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -22864,6 +22866,7 @@ export namespace Prisma {
     lastErrorMessage: number
     discoveredBooks: number
     booksDiscoveredAt: number
+    setupCompletedAt: number
     createdAt: number
     updatedAt: number
     _all: number
@@ -22905,6 +22908,7 @@ export namespace Prisma {
     lastErrorCode?: true
     lastErrorMessage?: true
     booksDiscoveredAt?: true
+    setupCompletedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -22936,6 +22940,7 @@ export namespace Prisma {
     lastErrorCode?: true
     lastErrorMessage?: true
     booksDiscoveredAt?: true
+    setupCompletedAt?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -22968,6 +22973,7 @@ export namespace Prisma {
     lastErrorMessage?: true
     discoveredBooks?: true
     booksDiscoveredAt?: true
+    setupCompletedAt?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -23087,6 +23093,7 @@ export namespace Prisma {
     lastErrorMessage: string | null
     discoveredBooks: JsonValue | null
     booksDiscoveredAt: Date | null
+    setupCompletedAt: Date | null
     createdAt: Date
     updatedAt: Date
     _count: SyncAccountCountAggregateOutputType | null
@@ -23138,6 +23145,7 @@ export namespace Prisma {
     lastErrorMessage?: boolean
     discoveredBooks?: boolean
     booksDiscoveredAt?: boolean
+    setupCompletedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -23177,6 +23185,7 @@ export namespace Prisma {
     lastErrorMessage?: boolean
     discoveredBooks?: boolean
     booksDiscoveredAt?: boolean
+    setupCompletedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -23210,6 +23219,7 @@ export namespace Prisma {
     lastErrorMessage?: boolean
     discoveredBooks?: boolean
     booksDiscoveredAt?: boolean
+    setupCompletedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     user?: boolean | UserDefaultArgs<ExtArgs>
@@ -23243,11 +23253,12 @@ export namespace Prisma {
     lastErrorMessage?: boolean
     discoveredBooks?: boolean
     booksDiscoveredAt?: boolean
+    setupCompletedAt?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type SyncAccountOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "provider" | "status" | "syncDirection" | "label" | "baseUrl" | "principalUrl" | "addressBookUrl" | "addressBookDisplayName" | "remoteAccountId" | "remoteCTag" | "credentialReference" | "credentialVersion" | "credentialUpdatedAt" | "credentialLastValidatedAt" | "credentialRevokedAt" | "encryptionKeyRef" | "connectionValidatedAt" | "lastSyncCursor" | "lastSyncedAt" | "lastSucceededAt" | "lastErrorAt" | "lastErrorCode" | "lastErrorMessage" | "discoveredBooks" | "booksDiscoveredAt" | "createdAt" | "updatedAt", ExtArgs["result"]["syncAccount"]>
+  export type SyncAccountOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "provider" | "status" | "syncDirection" | "label" | "baseUrl" | "principalUrl" | "addressBookUrl" | "addressBookDisplayName" | "remoteAccountId" | "remoteCTag" | "credentialReference" | "credentialVersion" | "credentialUpdatedAt" | "credentialLastValidatedAt" | "credentialRevokedAt" | "encryptionKeyRef" | "connectionValidatedAt" | "lastSyncCursor" | "lastSyncedAt" | "lastSucceededAt" | "lastErrorAt" | "lastErrorCode" | "lastErrorMessage" | "discoveredBooks" | "booksDiscoveredAt" | "setupCompletedAt" | "createdAt" | "updatedAt", ExtArgs["result"]["syncAccount"]>
   export type SyncAccountInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     syncLinks?: boolean | SyncAccount$syncLinksArgs<ExtArgs>
@@ -23302,6 +23313,7 @@ export namespace Prisma {
       lastErrorMessage: string | null
       discoveredBooks: Prisma.JsonValue | null
       booksDiscoveredAt: Date | null
+      setupCompletedAt: Date | null
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["syncAccount"]>
@@ -23760,6 +23772,7 @@ export namespace Prisma {
     readonly lastErrorMessage: FieldRef<"SyncAccount", 'String'>
     readonly discoveredBooks: FieldRef<"SyncAccount", 'Json'>
     readonly booksDiscoveredAt: FieldRef<"SyncAccount", 'DateTime'>
+    readonly setupCompletedAt: FieldRef<"SyncAccount", 'DateTime'>
     readonly createdAt: FieldRef<"SyncAccount", 'DateTime'>
     readonly updatedAt: FieldRef<"SyncAccount", 'DateTime'>
   }
@@ -61481,6 +61494,7 @@ export namespace Prisma {
     lastErrorMessage: 'lastErrorMessage',
     discoveredBooks: 'discoveredBooks',
     booksDiscoveredAt: 'booksDiscoveredAt',
+    setupCompletedAt: 'setupCompletedAt',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -64302,6 +64316,7 @@ export namespace Prisma {
     lastErrorMessage?: StringNullableFilter<"SyncAccount"> | string | null
     discoveredBooks?: JsonNullableFilter<"SyncAccount">
     booksDiscoveredAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    setupCompletedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     createdAt?: DateTimeFilter<"SyncAccount"> | Date | string
     updatedAt?: DateTimeFilter<"SyncAccount"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -64340,6 +64355,7 @@ export namespace Prisma {
     lastErrorMessage?: SortOrderInput | SortOrder
     discoveredBooks?: SortOrderInput | SortOrder
     booksDiscoveredAt?: SortOrderInput | SortOrder
+    setupCompletedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
@@ -64382,6 +64398,7 @@ export namespace Prisma {
     lastErrorMessage?: StringNullableFilter<"SyncAccount"> | string | null
     discoveredBooks?: JsonNullableFilter<"SyncAccount">
     booksDiscoveredAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    setupCompletedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     createdAt?: DateTimeFilter<"SyncAccount"> | Date | string
     updatedAt?: DateTimeFilter<"SyncAccount"> | Date | string
     user?: XOR<UserScalarRelationFilter, UserWhereInput>
@@ -64420,6 +64437,7 @@ export namespace Prisma {
     lastErrorMessage?: SortOrderInput | SortOrder
     discoveredBooks?: SortOrderInput | SortOrder
     booksDiscoveredAt?: SortOrderInput | SortOrder
+    setupCompletedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: SyncAccountCountOrderByAggregateInput
@@ -64460,6 +64478,7 @@ export namespace Prisma {
     lastErrorMessage?: StringNullableWithAggregatesFilter<"SyncAccount"> | string | null
     discoveredBooks?: JsonNullableWithAggregatesFilter<"SyncAccount">
     booksDiscoveredAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
+    setupCompletedAt?: DateTimeNullableWithAggregatesFilter<"SyncAccount"> | Date | string | null
     createdAt?: DateTimeWithAggregatesFilter<"SyncAccount"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"SyncAccount"> | Date | string
   }
@@ -69069,6 +69088,7 @@ export namespace Prisma {
     lastErrorMessage?: string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
@@ -69107,6 +69127,7 @@ export namespace Prisma {
     lastErrorMessage?: string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
@@ -69143,6 +69164,7 @@ export namespace Prisma {
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
@@ -69181,6 +69203,7 @@ export namespace Prisma {
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
@@ -69218,6 +69241,7 @@ export namespace Prisma {
     lastErrorMessage?: string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -69249,6 +69273,7 @@ export namespace Prisma {
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -69281,6 +69306,7 @@ export namespace Prisma {
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -74041,6 +74067,7 @@ export namespace Prisma {
     lastErrorMessage?: SortOrder
     discoveredBooks?: SortOrder
     booksDiscoveredAt?: SortOrder
+    setupCompletedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -74076,6 +74103,7 @@ export namespace Prisma {
     lastErrorCode?: SortOrder
     lastErrorMessage?: SortOrder
     booksDiscoveredAt?: SortOrder
+    setupCompletedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -74107,6 +74135,7 @@ export namespace Prisma {
     lastErrorCode?: SortOrder
     lastErrorMessage?: SortOrder
     booksDiscoveredAt?: SortOrder
+    setupCompletedAt?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -81308,6 +81337,7 @@ export namespace Prisma {
     lastErrorMessage?: string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     syncLinks?: SyncContactLinkCreateNestedManyWithoutSyncAccountInput
@@ -81344,6 +81374,7 @@ export namespace Prisma {
     lastErrorMessage?: string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
@@ -82624,6 +82655,7 @@ export namespace Prisma {
     lastErrorMessage?: StringNullableFilter<"SyncAccount"> | string | null
     discoveredBooks?: JsonNullableFilter<"SyncAccount">
     booksDiscoveredAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
+    setupCompletedAt?: DateTimeNullableFilter<"SyncAccount"> | Date | string | null
     createdAt?: DateTimeFilter<"SyncAccount"> | Date | string
     updatedAt?: DateTimeFilter<"SyncAccount"> | Date | string
   }
@@ -90373,6 +90405,7 @@ export namespace Prisma {
     lastErrorMessage?: string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
@@ -90410,6 +90443,7 @@ export namespace Prisma {
     lastErrorMessage?: string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
@@ -90486,6 +90520,7 @@ export namespace Prisma {
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
@@ -90523,6 +90558,7 @@ export namespace Prisma {
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
@@ -90589,6 +90625,7 @@ export namespace Prisma {
     lastErrorMessage?: string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
@@ -90626,6 +90663,7 @@ export namespace Prisma {
     lastErrorMessage?: string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     syncJobs?: SyncJobUncheckedCreateNestedManyWithoutSyncAccountInput
@@ -90862,6 +90900,7 @@ export namespace Prisma {
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
@@ -90899,6 +90938,7 @@ export namespace Prisma {
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     syncJobs?: SyncJobUncheckedUpdateManyWithoutSyncAccountNestedInput
@@ -91087,6 +91127,7 @@ export namespace Prisma {
     lastErrorMessage?: string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
@@ -91124,6 +91165,7 @@ export namespace Prisma {
     lastErrorMessage?: string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
@@ -91175,6 +91217,7 @@ export namespace Prisma {
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
@@ -91212,6 +91255,7 @@ export namespace Prisma {
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
@@ -91247,6 +91291,7 @@ export namespace Prisma {
     lastErrorMessage?: string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
@@ -91284,6 +91329,7 @@ export namespace Prisma {
     lastErrorMessage?: string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
@@ -91530,6 +91576,7 @@ export namespace Prisma {
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
@@ -91567,6 +91614,7 @@ export namespace Prisma {
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
@@ -96212,6 +96260,7 @@ export namespace Prisma {
     lastErrorMessage?: string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     user: UserCreateNestedOneWithoutSyncAccountsInput
@@ -96249,6 +96298,7 @@ export namespace Prisma {
     lastErrorMessage?: string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
     syncLinks?: SyncContactLinkUncheckedCreateNestedManyWithoutSyncAccountInput
@@ -96380,6 +96430,7 @@ export namespace Prisma {
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     user?: UserUpdateOneRequiredWithoutSyncAccountsNestedInput
@@ -96417,6 +96468,7 @@ export namespace Prisma {
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
@@ -101244,6 +101296,7 @@ export namespace Prisma {
     lastErrorMessage?: string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: Date | string | null
+    setupCompletedAt?: Date | string | null
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -102019,6 +102072,7 @@ export namespace Prisma {
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     syncLinks?: SyncContactLinkUpdateManyWithoutSyncAccountNestedInput
@@ -102055,6 +102109,7 @@ export namespace Prisma {
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     syncLinks?: SyncContactLinkUncheckedUpdateManyWithoutSyncAccountNestedInput
@@ -102091,6 +102146,7 @@ export namespace Prisma {
     lastErrorMessage?: NullableStringFieldUpdateOperationsInput | string | null
     discoveredBooks?: NullableJsonNullValueInput | InputJsonValue
     booksDiscoveredAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    setupCompletedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

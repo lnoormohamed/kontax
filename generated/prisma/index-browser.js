@@ -393,6 +393,7 @@ exports.Prisma.SyncAccountScalarFieldEnum = {
   lastErrorMessage: 'lastErrorMessage',
   discoveredBooks: 'discoveredBooks',
   booksDiscoveredAt: 'booksDiscoveredAt',
+  setupCompletedAt: 'setupCompletedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
