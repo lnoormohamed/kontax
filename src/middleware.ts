@@ -42,6 +42,7 @@ const PUBLIC_PREFIXES = [
   "/api/calendar", // P22-11: iCal feed authenticated by per-user calToken
   "/api/v1", // P29-06: REST API — authenticated by Bearer token in withApiAuth
   "/api/card", // P30-01: public card click-tracking (unauthenticated)
+  "/api/health", // uptime monitoring — no auth required
   "/developers", // P29-07: public API documentation page
   "/u/", // P30-01: public contact cards — no login required
 ];
