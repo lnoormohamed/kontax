@@ -79,7 +79,7 @@ export type SyncAccountData = {
   // P36-DB02: true when the connection was just created and the user hasn't
   // confirmed sync settings yet — the first sync is held and setup is shown.
   needsSetup: boolean;
-  status: "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR";
+  status: "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR" | "DISCONNECTED";
   health: "healthy" | "watch" | "needs_attention" | "paused_for_safety" | "needs_reauth";
   lastSyncedAtRelative: string | null;
   lastErrorMessage: string | null;

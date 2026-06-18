@@ -459,7 +459,7 @@ const recordFailedPreflight = async ({
 }: {
   accountId: string;
   syncDirection: "TWO_WAY" | "IMPORT_ONLY" | "EXPORT_ONLY";
-  accountStatus: "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR";
+  accountStatus: "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR" | "DISCONNECTED";
   errorCode: string;
   errorSummary: string;
 }) => {
@@ -550,6 +550,39 @@ export const createSyncAccount = async (
     }
 
     const now = new Date();
+    // P36-DB03: re-adding a previously soft-disconnected CardDAV connection
+    // (same userId+baseUrl+label) reactivates that row — restoring its settings,
+    // contact links, and history — instead of hitting the unique constraint.
+    const disconnected = await db.syncAccount.findFirst({
+      where: { userId, baseUrl: input.baseUrl, label: input.label, status: "DISCONNECTED" },
+      select: { id: true },
+    });
+    if (disconnected) {
+      await db.syncAccount.update({
+        where: { id: disconnected.id },
+        data: {
+          status: "ACTIVE",
+          disconnectedAt: null,
+          principalUrl: discovery.principalUrl,
+          addressBookUrl: discovery.addressBookUrl,
+          addressBookDisplayName: discovery.addressBookDisplayName,
+          remoteAccountId: discovery.remoteAccountId,
+          remoteCTag: discovery.remoteCTag,
+          syncDirection: input.syncDirection,
+          credentialReference: encrypted.credentialReference,
+          credentialUpdatedAt: now,
+          credentialLastValidatedAt: now,
+          credentialRevokedAt: null,
+          encryptionKeyRef: encrypted.encryptionKeyRef,
+          connectionValidatedAt: now,
+          lastErrorAt: null,
+          lastErrorCode: null,
+          lastErrorMessage: null,
+        },
+      });
+      revalidateSyncViews();
+      return { ok: true, error: null, accountId: disconnected.id };
+    }
     let accountId: string;
     try {
       accountId = await db.$transaction(async (tx) => {
@@ -1665,14 +1698,33 @@ export const disconnectSyncAccount = async (formData: FormData) => {
     await revokeMicrosoftToken(account);
   }
 
-  await db.syncAccount.deleteMany({
-    where: { id: syncAccountId, userId },
-  });
+  // P36-DB03: soft disconnect — revoke credentials and hide the connection, but
+  // retain its settings, contact links, and history so re-adding the same remote
+  // (matched by email / baseUrl+label) restores it cleanly without duplicating
+  // contacts. Cancel any pending jobs so the runner doesn't pick them up.
+  const now = new Date();
+  await db.$transaction([
+    // Drop not-yet-run jobs so the runner can't pick them up after disconnect.
+    db.syncJob.deleteMany({
+      where: { syncAccountId, status: { in: ["QUEUED", "RUNNING"] } },
+    }),
+    db.syncAccount.updateMany({
+      where: { id: syncAccountId, userId },
+      data: {
+        status: "DISCONNECTED",
+        disconnectedAt: now,
+        credentialRevokedAt: now,
+        lastErrorAt: null,
+        lastErrorCode: null,
+        lastErrorMessage: null,
+      },
+    }),
+  ]);
 
   // No redirect() — see queueSyncJob: a server-action redirect re-runs middleware
   // via a cookieless internal sub-request and bounces the user to /login. The
-  // account is now deleted, so revalidate lets the list re-render in place (the
-  // detail panel falls back to the empty state since the selected account is gone).
+  // account is now hidden from the active rail, so revalidate lets the list
+  // re-render in place (the detail panel falls back to the empty state).
   revalidateSyncViews();
 };
 

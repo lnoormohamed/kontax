@@ -394,6 +394,7 @@ exports.Prisma.SyncAccountScalarFieldEnum = {
   discoveredBooks: 'discoveredBooks',
   booksDiscoveredAt: 'booksDiscoveredAt',
   setupCompletedAt: 'setupCompletedAt',
+  disconnectedAt: 'disconnectedAt',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 };
@@ -955,7 +956,8 @@ exports.SyncAccountStatus = exports.$Enums.SyncAccountStatus = {
   ACTIVE: 'ACTIVE',
   PAUSED: 'PAUSED',
   NEEDS_REAUTH: 'NEEDS_REAUTH',
-  ERROR: 'ERROR'
+  ERROR: 'ERROR',
+  DISCONNECTED: 'DISCONNECTED'
 };
 
 exports.SyncDirection = exports.$Enums.SyncDirection = {

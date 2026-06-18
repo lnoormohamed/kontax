@@ -127,7 +127,7 @@ const buildContactWriteDataFromRemoteSnapshot = (snapshot: unknown) => {
 };
 
 const getFailureStatus = (
-  accountStatus: "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR",
+  accountStatus: "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR" | "DISCONNECTED",
   errorCode: string,
 ) => {
   if (
@@ -158,7 +158,7 @@ const markJobFailed = async ({
   _syncDirection: "TWO_WAY" | "IMPORT_ONLY" | "EXPORT_ONLY";
   attemptCount: number;
   maxAttempts: number;
-  accountStatus: "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR";
+  accountStatus: "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR" | "DISCONNECTED";
   errorCode: string;
   errorSummary: string;
 }) => {

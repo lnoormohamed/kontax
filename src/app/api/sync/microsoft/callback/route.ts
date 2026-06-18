@@ -101,6 +101,8 @@ export async function GET(req: NextRequest) {
           data: {
             label,
             status: "ACTIVE",
+            // P36-DB03: re-adding a soft-disconnected account reactivates it.
+            disconnectedAt: null,
             credentialReference: enc.credentialReference,
             encryptionKeyRef: enc.encryptionKeyRef,
             credentialUpdatedAt: now,

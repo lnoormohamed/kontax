@@ -177,7 +177,8 @@ export default async function SyncPage({ searchParams }: PageProps) {
         select: { id: true, name: true, color: true },
       }),
       db.syncAccount.findMany({
-        where: { userId },
+        // P36-DB03: hide soft-disconnected connections from the active rail.
+        where: { userId, status: { not: "DISCONNECTED" } },
         orderBy: [{ updatedAt: "desc" }],
         include: {
           syncJobs: {

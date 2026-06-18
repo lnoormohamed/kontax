@@ -5,7 +5,7 @@ export const MANUAL_CONFLICT_QUEUE_LIMIT = 50;
 // lastErrorCode set on the account when it auto-pauses for a full conflict queue.
 export const CONFLICT_QUEUE_FULL_CODE = "SYNC_CONFLICT_QUEUE_FULL";
 
-export type SyncAccountStatus = "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR";
+export type SyncAccountStatus = "ACTIVE" | "PAUSED" | "NEEDS_REAUTH" | "ERROR" | "DISCONNECTED";
 export type SyncJobStatus = "QUEUED" | "RUNNING" | "SUCCEEDED" | "PARTIAL" | "FAILED";
 export type SyncSupportBucket =
   | "authentication"
