@@ -112,6 +112,43 @@ export type SuggestionContact = {
   updatedAt: Date;
 };
 
+// P36-DB05: a friendly provenance label + grouping for the merge survivor cards,
+// so near-identical records can be told apart by where they came from.
+const MERGE_SOURCE_LABEL: Record<string, string> = {
+  MANUAL: "Manual",
+  IMPORT_CSV: "CSV import",
+  SYNC_CARDDAV: "CardDAV",
+  SYNC_GOOGLE: "Google",
+  SYNC_MICROSOFT: "Outlook",
+  SHARED_STATIC: "Shared",
+  SHARED_LIVE: "Shared",
+  API: "API",
+  CARD_IMPORT: "Card",
+};
+
+const relativeShort = (d: Date): string => {
+  const diff = Date.now() - d.getTime();
+  const day = 86_400_000;
+  if (diff < day) return "today";
+  if (diff < 2 * day) return "yesterday";
+  if (diff < 7 * day) return `${Math.floor(diff / day)}d ago`;
+  return new Intl.DateTimeFormat("en-GB", { day: "2-digit", month: "short" }).format(d);
+};
+
+export type SurvivorMeta = { source: string; book: string | null; labels: string[]; updated: string };
+
+export const survivorMetaFor = (c: {
+  sourceType: string;
+  labels: unknown;
+  updatedAt: Date;
+  book: { name: string } | null;
+}): SurvivorMeta => ({
+  source: MERGE_SOURCE_LABEL[c.sourceType] ?? "Manual",
+  book: c.book?.name ?? null,
+  labels: Array.isArray(c.labels) ? c.labels.filter((l): l is string => typeof l === "string") : [],
+  updated: relativeShort(c.updatedAt),
+});
+
 const SIGNAL_LABELS: Record<string, string> = {
   "exact-email": "Same email",
   "exact-phone": "Same phone",
@@ -1700,6 +1737,9 @@ const mergeReviewContactSelect = {
   archivedAt: true,
   importJobId: true,
   updatedAt: true,
+  sourceType: true,
+  sourceDetail: true,
+  book: { select: { name: true } },
 } satisfies Prisma.ContactSelect;
 
 export const getMergeSuggestionByIdForUser = async (userId: string, suggestionId: string) => {

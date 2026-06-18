@@ -18,6 +18,11 @@ export type MergeReviewContact = {
   website: string | null;
   birthday: string | null;
   notes: string | null;
+  // P36-DB05: provenance metadata shown on the survivor cards.
+  source?: string | null;
+  book?: string | null;
+  labels?: string[];
+  updated?: string | null;
 };
 
 export type MergeReviewUnions = {
@@ -468,9 +473,47 @@ function SurvivorBtn({
         >
           {sub}
         </span>
+        <SurvivorMetaChips contact={contact} />
       </span>
       <CheckRing on={selected} size={22} />
     </button>
+  );
+}
+
+// Provenance chips that distinguish near-identical records: source, book,
+// labels, and last-updated. Rendered below the email on each survivor card.
+function SurvivorMetaChips({ contact }: { contact: MergeReviewContact }) {
+  const labels = contact.labels ?? [];
+  const chips: { key: string; text: string }[] = [];
+  if (contact.source) chips.push({ key: "src", text: contact.source });
+  if (contact.book) chips.push({ key: "book", text: contact.book });
+  if (labels.length === 1) chips.push({ key: "lbl", text: labels[0]! });
+  else if (labels.length > 1) chips.push({ key: "lbl", text: `${labels.length} labels` });
+  if (contact.updated) chips.push({ key: "upd", text: `updated ${contact.updated}` });
+  if (chips.length === 0) return null;
+  return (
+    <span style={{ display: "flex", flexWrap: "wrap", gap: 4, marginTop: 5 }}>
+      {chips.map((c) => (
+        <span
+          key={c.key}
+          style={{
+            fontSize: 10.5,
+            fontWeight: 500,
+            color: C.ink2,
+            background: C.wash,
+            border: `1px solid ${C.line2}`,
+            borderRadius: 5,
+            padding: "1px 6px",
+            whiteSpace: "nowrap",
+            maxWidth: 130,
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+          }}
+        >
+          {c.text}
+        </span>
+      ))}
+    </span>
   );
 }
 
@@ -1267,8 +1310,8 @@ export function MergeReview({
   const scalarRows = useMemo(
     () =>
       SCALAR_FIELDS.map((f) => {
-        const a = trim(contactA[f.key as keyof MergeReviewContact]);
-        const b = trim(contactB[f.key as keyof MergeReviewContact]);
+        const a = trim(contactA[f.key as keyof MergeReviewContact] as string | null | undefined);
+        const b = trim(contactB[f.key as keyof MergeReviewContact] as string | null | undefined);
         return { ...f, a, b, status: classify(a, b) };
       }),
     [contactA, contactB],

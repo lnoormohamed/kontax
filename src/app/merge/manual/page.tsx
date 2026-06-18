@@ -10,7 +10,7 @@ import {
 import { auth } from "~/server/auth";
 import { getUserPlanSummary } from "~/server/billing";
 import { db } from "~/server/db";
-import { buildMergedContactPreview, type MergePreview } from "~/server/contact-merge";
+import { buildMergedContactPreview, survivorMetaFor, type MergePreview } from "~/server/contact-merge";
 
 type ManualMergePageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
@@ -44,6 +44,10 @@ const toReviewContact = (c: {
   website: string | null;
   birthday: string | null;
   notes: string | null;
+  sourceType: string;
+  labels: unknown;
+  updatedAt: Date;
+  book: { name: string } | null;
 }): MergeReviewContact => ({
   id: c.id,
   fullName: c.fullName,
@@ -55,6 +59,7 @@ const toReviewContact = (c: {
   website: c.website,
   birthday: c.birthday,
   notes: c.notes,
+  ...survivorMetaFor(c),
 });
 
 export default async function ManualMergePage({ searchParams }: ManualMergePageProps) {
@@ -86,6 +91,9 @@ export default async function ManualMergePage({ searchParams }: ManualMergePageP
         notes: true,
         archivedAt: true,
         updatedAt: true,
+        sourceType: true,
+        labels: true,
+        book: { select: { name: true } },
       },
     }),
     getUserPlanSummary(session.user.id),

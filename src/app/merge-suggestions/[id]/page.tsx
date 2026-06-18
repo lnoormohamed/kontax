@@ -15,6 +15,7 @@ import { db } from "~/server/db";
 import {
   buildMergedContactPreview,
   getMergeSuggestionByIdForUser,
+  survivorMetaFor,
   type MergePreview,
 } from "~/server/contact-merge";
 
@@ -47,6 +48,10 @@ const toReviewContact = (c: {
   website: string | null;
   birthday: string | null;
   notes: string | null;
+  sourceType: string;
+  labels: unknown;
+  updatedAt: Date;
+  book: { name: string } | null;
 }): MergeReviewContact => ({
   id: c.id,
   fullName: c.fullName,
@@ -58,6 +63,7 @@ const toReviewContact = (c: {
   website: c.website,
   birthday: c.birthday,
   notes: c.notes,
+  ...survivorMetaFor(c),
 });
 
 export default async function MergeSuggestionReviewPage({ params }: PageProps) {
