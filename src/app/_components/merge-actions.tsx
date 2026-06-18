@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
@@ -114,7 +114,23 @@ export function UndoMergeButton({
   survivorName?: string;
   absorbedName?: string;
 }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
+  const [undoing, setUndoing] = useState(false);
+  const [, startTransition] = useTransition();
+
+  const handleUndo = () => {
+    setUndoing(true);
+    startTransition(async () => {
+      const fd = new FormData();
+      fd.set("decisionId", decisionId);
+      await undoMergeContacts(fd);
+      setOpen(false);
+      setUndoing(false);
+      router.push("/contacts?tab=duplicates&mergeUndone=1");
+    });
+  };
+
   return (
     <>
       <button
@@ -127,7 +143,7 @@ export function UndoMergeButton({
       </button>
 
       {open && (
-        <Modal onClose={() => setOpen(false)}>
+        <Modal onClose={undoing ? () => undefined : () => setOpen(false)}>
           <div className="px-6 py-[22px]">
             <h3 className="text-[17px] font-bold tracking-tight text-[#1d2823]">Undo this merge?</h3>
             <p className="mt-2 mb-[18px] text-[13.5px] leading-[1.55] text-[#5c655e]">
@@ -145,23 +161,31 @@ export function UndoMergeButton({
             </p>
             <div className="flex justify-end gap-2.5">
               <button
-                className="px-2 py-2.5 text-[13.5px] font-semibold text-[#5c655e]"
+                className="px-2 py-2.5 text-[13.5px] font-semibold text-[#5c655e] disabled:opacity-50"
+                disabled={undoing}
                 onClick={() => setOpen(false)}
                 type="button"
               >
                 Cancel
               </button>
-              <form action={undoMergeContacts}>
-                <input name="decisionId" type="hidden" value={decisionId} />
-                <input name="redirectTo" type="hidden" value="/contacts?tab=duplicates" />
-                <button
-                  className="inline-flex h-[42px] items-center gap-1.5 rounded-[10px] bg-[#17352e] px-[18px] text-[13.5px] font-semibold text-white transition hover:bg-[#20443b]"
-                  type="submit"
-                >
-                  <WorkspaceIcon name="restore" size={16} strokeWidth={1.8} />
-                  Undo merge
-                </button>
-              </form>
+              <button
+                className="inline-flex h-[42px] items-center gap-1.5 rounded-[10px] bg-[#17352e] px-[18px] text-[13.5px] font-semibold text-white transition hover:bg-[#20443b] disabled:opacity-80"
+                disabled={undoing}
+                onClick={handleUndo}
+                type="button"
+              >
+                {undoing ? (
+                  <>
+                    <span className="h-[15px] w-[15px] animate-spin rounded-full border-[2.2px] border-white/40 border-t-white" />
+                    Undoing…
+                  </>
+                ) : (
+                  <>
+                    <WorkspaceIcon name="restore" size={16} strokeWidth={1.8} />
+                    Undo merge
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </Modal>

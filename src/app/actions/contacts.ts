@@ -1344,7 +1344,6 @@ export const bulkAcceptHighConfidenceContacts = async (formData: FormData) => {
 export const undoMergeContacts = async (formData: FormData) => {
   const userId = await getRequiredUserId();
   const decisionId = parseMergeDecisionId(formData);
-  const redirectTo = getRedirectTarget(formData);
 
   const survivingContactId = await undoMergedContactsForUser({
     userId,
@@ -1352,9 +1351,4 @@ export const undoMergeContacts = async (formData: FormData) => {
   });
 
   revalidateContactViews(survivingContactId);
-
-  if (redirectTo) {
-    const separator = redirectTo.includes("?") ? "&" : "?";
-    redirect(`${redirectTo}${separator}mergeUndone=1`);
-  }
 };
