@@ -275,13 +275,13 @@ function buildUsage(summary: Awaited<ReturnType<typeof getUserPlanSummary>>): Bi
     },
     {
       label: "Sync accounts",
-      used: Math.min(1, entitlements.syncAccountsLimit),
+      used: summary.syncAccountsUsed,
       limit: entitlements.syncAccountsLimit,
       dots: entitlements.syncAccountsLimit <= 6,
     },
     {
       label: "App passwords",
-      used: Math.min(1, entitlements.appPasswordsLimit),
+      used: summary.appPasswordsUsed,
       limit: entitlements.appPasswordsLimit,
       dots: entitlements.appPasswordsLimit <= 6,
     },

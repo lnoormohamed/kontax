@@ -273,21 +273,20 @@ export const getUserPlanSummary = async (userId: string) => {
   const context = await getUserBillingContext(userId);
   const monthStart = getMonthStart();
 
-  const [contactsUsed, importedThisMonthAggregate] = await Promise.all([
-    db.contact.count({ where: { userId } }),
-    db.importJob.aggregate({
-      where: {
-        userId,
-        status: "COMPLETED",
-        createdAt: {
-          gte: monthStart,
+  const [contactsUsed, importedThisMonthAggregate, syncAccountsUsed, appPasswordsUsed] =
+    await Promise.all([
+      db.contact.count({ where: { userId } }),
+      db.importJob.aggregate({
+        where: {
+          userId,
+          status: "COMPLETED",
+          createdAt: { gte: monthStart },
         },
-      },
-      _sum: {
-        importedCount: true,
-      },
-    }),
-  ]);
+        _sum: { importedCount: true },
+      }),
+      db.syncAccount.count({ where: { userId } }),
+      db.appPassword.count({ where: { userId } }),
+    ]);
 
   return {
     ...context,
@@ -299,6 +298,8 @@ export const getUserPlanSummary = async (userId: string) => {
         ? null
         : Math.max(context.entitlements.contactsLimit - contactsUsed, 0),
     importedThisMonth: importedThisMonthAggregate._sum.importedCount ?? 0,
+    syncAccountsUsed,
+    appPasswordsUsed,
   };
 };
 
