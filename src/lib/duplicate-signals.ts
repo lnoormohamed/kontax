@@ -1,6 +1,8 @@
 // Pure helpers for duplicate-detection signals (P10-08).
 // Kept dependency-free and side-effect-free so they're easy to unit test.
 
+import { normalizePhoneLooseKey } from "./phone-normalization";
+
 /**
  * Wagner-Fischer Levenshtein distance, capped at maxDist to short-circuit
  * early for large strings that obviously exceed the threshold.
@@ -42,13 +44,7 @@ export const getFamilyName = (value: string | null | undefined) => getNameTokens
  * Returns "" for anything too short to be a real phone number.
  */
 export const normalizePhoneKey = (value: string | null | undefined) => {
-  const digits = (value ?? "").replace(/\D/g, "");
-  if (digits.length < 7) {
-    return "";
-  }
-  // National numbers are typically ≤ 10 digits; keep the trailing 10 so an
-  // included country code doesn't prevent a match with the local form.
-  return digits.length > 10 ? digits.slice(-10) : digits;
+  return normalizePhoneLooseKey(value);
 };
 
 /**

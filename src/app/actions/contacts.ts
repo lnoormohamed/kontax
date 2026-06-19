@@ -20,6 +20,7 @@ import { resolveContactEditAccess } from "~/server/shared-access";
 import { canEditTeamBook } from "~/server/team-access";
 import { emitEvent } from "~/lib/activity";
 import { computeContactDiff } from "~/lib/activity/diff";
+import { buildNormalizedPhoneEntries } from "~/lib/phone-normalization";
 import { applyAutoFilledPhoneticFields } from "~/server/phonetics";
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -284,6 +285,14 @@ const parseContactInput = (formData: FormData) => {
     email.toLowerCase(),
   );
   const additionalPhones = getLineSeparatedValues(parsed.data.additionalPhones);
+  const normalizedPhones = buildNormalizedPhoneEntries({
+    primaryValue: parsed.data.phone,
+    primaryLabel: parsed.data.phoneLabel,
+    secondaryValues: dedupeValues([parsed.data.secondaryPhone, ...additionalPhones]),
+    secondaryLabel: parsed.data.secondaryPhoneLabel,
+    defaultLabel: "mobile",
+    source: "user",
+  });
   const additionalWebsites = getLineSeparatedValues(parsed.data.additionalWebsites);
   const additionalAddresses = getLineSeparatedValues(parsed.data.additionalAddresses);
   const labels = dedupeValues(
@@ -404,14 +413,9 @@ const parseContactInput = (formData: FormData) => {
       dedupeValues([parsed.data.secondaryEmail, ...additionalEmails]),
       "primary",
     ),
-    phone: parsed.data.phone,
-    phoneNumbers: dedupeValues([parsed.data.phone, parsed.data.secondaryPhone, ...additionalPhones]),
-    phoneEntries: buildStructuredEntries(
-      parsed.data.phone,
-      parsed.data.phoneLabel,
-      dedupeValues([parsed.data.secondaryPhone, ...additionalPhones]),
-      "mobile",
-    ),
+    phone: normalizedPhones.phone,
+    phoneNumbers: normalizedPhones.phoneNumbers,
+    phoneEntries: normalizedPhones.phoneEntries,
     company: parsed.data.company,
     phoneticCompany: parsed.data.phoneticCompany,
     jobTitle: parsed.data.jobTitle,

@@ -14,6 +14,12 @@ import {
   parseContactStringArray,
 } from "~/server/contact-portability";
 import { db } from "~/server/db";
+import {
+  choosePreferredPhoneChoice,
+  mergePhoneEntries,
+  mergePhoneValues,
+  normalizePhoneExactKey,
+} from "~/lib/phone-normalization";
 
 type MergeCandidateContact = {
   id: string;
@@ -397,8 +403,7 @@ const normalizeName = (value: string) =>
     .trim();
 
 const normalizePhone = (value: string | null | undefined) => {
-  const digits = value?.replace(/\D/g, "") ?? "";
-  return digits.length >= 7 ? digits : "";
+  return normalizePhoneExactKey(value) ?? normalizePhoneKey(value);
 };
 
 const getNameTokens = (value: string) => normalizeName(value).split(" ").filter(Boolean);
@@ -1107,12 +1112,10 @@ export const buildMergedContactPreview = (
       primaryContact: normalizedPrimary,
       secondaryContact: normalizedSecondary,
     }) as "primary" | "secondary",
-    phone: getDefaultFieldChoice({
+    phone: choosePreferredPhoneChoice({
       primaryValue: normalizedPrimary.phone,
       secondaryValue: normalizedSecondary.phone,
-      primaryContact: normalizedPrimary,
-      secondaryContact: normalizedSecondary,
-    }) as "primary" | "secondary",
+    }),
     company: getDefaultFieldChoice({
       primaryValue: normalizedPrimary.company,
       secondaryValue: normalizedSecondary.company,
@@ -1218,13 +1221,13 @@ export const buildMergedContactPreview = (
       secondaryValue: normalizedSecondary.phone,
       choice: resolvedChoices.phone,
     }),
-    phoneNumbers: mergeUniqueStrings(
+    phoneNumbers: mergePhoneValues(
       [normalizedPrimary.phone],
       normalizedPrimary.phoneNumbers,
       [normalizedSecondary.phone],
       normalizedSecondary.phoneNumbers,
     ),
-    phoneEntries: mergeStructuredValueEntries(
+    phoneEntries: mergePhoneEntries(
       normalizedPrimary.phoneEntries,
       normalizedSecondary.phoneEntries,
     ),
