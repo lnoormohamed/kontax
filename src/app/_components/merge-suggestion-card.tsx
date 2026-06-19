@@ -6,7 +6,10 @@ import { useState, useTransition } from "react";
 
 import { dismissMergeSuggestion, quickMergeSuggestion } from "~/app/actions/merge";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
-import type { PersistedMergeSuggestion, SuggestionContact } from "~/server/contact-merge";
+import type {
+  PersistedMergeSuggestion,
+  SuggestionContact,
+} from "~/server/contact-merge";
 
 // ── Comparison table ─────────────────────────────────────────────────────────
 
@@ -165,7 +168,37 @@ const LITE_FIELDS: { key: keyof SuggestionContact; label: string }[] = [
   { key: "jobTitle", label: "Title" },
 ];
 
-function LiteComparison({ a, b }: { a: SuggestionContact; b: SuggestionContact }) {
+const normalizeCompare = (value: string | null | undefined) => value?.trim() ?? "";
+
+function BaseContactPill() {
+  return (
+    <span className="mt-2 inline-flex h-[20px] items-center rounded-[999px] bg-[#eef5ef] px-2 text-[11px] font-semibold text-[#17352e]">
+      Base contact kept
+    </span>
+  );
+}
+
+function KeptPill({ tone }: { tone: "kept" | "same" }) {
+  const style =
+    tone === "kept"
+      ? "bg-[#eef5ef] text-[#17352e]"
+      : "bg-[#f2f4f0] text-[#5c655e]";
+  return (
+    <span className={`inline-flex h-[18px] items-center rounded-[999px] px-1.5 text-[10px] font-semibold ${style}`}>
+      {tone === "kept" ? "Kept" : "Same"}
+    </span>
+  );
+}
+
+function LiteComparison({
+  a,
+  b,
+  suggestion,
+}: {
+  a: SuggestionContact;
+  b: SuggestionContact;
+  suggestion: PersistedMergeSuggestion;
+}) {
   const diffs = LITE_FIELDS.filter(({ key }) => {
     const av = a[key] as string | null;
     const bv = b[key] as string | null;
@@ -177,15 +210,36 @@ function LiteComparison({ a, b }: { a: SuggestionContact; b: SuggestionContact }
   return (
     <div className="mt-3 rounded-[10px] border border-[#edf0ea] bg-[#f9faf8] px-3 py-2.5 grid gap-2">
       {diffs.map(({ key, label }) => {
-        const av = truncate(a[key] as string | null, 60);
-        const bv = truncate(b[key] as string | null, 60);
+        const rawA = a[key] as string | null;
+        const rawB = b[key] as string | null;
+        const av = truncate(rawA, 60);
+        const bv = truncate(rawB, 60);
+        const mergedValue =
+          suggestion.quickMergePreview.mergedContact[key as keyof typeof suggestion.quickMergePreview.mergedContact];
+        const mergedText = typeof mergedValue === "string" ? mergedValue : null;
+        const leftMatches =
+          normalizeCompare(rawA) !== "" && normalizeCompare(rawA) === normalizeCompare(mergedText);
+        const rightMatches =
+          normalizeCompare(rawB) !== "" && normalizeCompare(rawB) === normalizeCompare(mergedText);
+        const leftTone = leftMatches ? (rightMatches ? "same" : "kept") : null;
+        const rightTone = rightMatches ? (leftMatches ? "same" : "kept") : null;
         return (
           <div key={key} className="grid grid-cols-[52px_1fr_1fr] gap-2 items-baseline">
             <span className="text-[11px] font-semibold uppercase tracking-[0.04em] text-[#aeb4ac]">
               {label}
             </span>
-            <span className="truncate text-[12.5px] text-[#1d2823]">{av ?? <span className="text-[#c2c8bf]">—</span>}</span>
-            <span className="truncate text-[12.5px] text-[#5c655e]">{bv ?? <span className="text-[#c2c8bf]">—</span>}</span>
+            <span
+              className={`flex min-w-0 items-center gap-1.5 truncate text-[12.5px] ${leftTone === "kept" ? "text-[#1d2823]" : "text-[#5c655e]"}`}
+            >
+              <span className="truncate">{av ?? <span className="text-[#c2c8bf]">—</span>}</span>
+              {leftTone ? <KeptPill tone={leftTone} /> : null}
+            </span>
+            <span
+              className={`flex min-w-0 items-center gap-1.5 truncate text-[12.5px] ${rightTone === "kept" ? "text-[#1d2823]" : "text-[#5c655e]"}`}
+            >
+              <span className="truncate">{bv ?? <span className="text-[#c2c8bf]">—</span>}</span>
+              {rightTone ? <KeptPill tone={rightTone} /> : null}
+            </span>
           </div>
         );
       })}
@@ -298,6 +352,7 @@ export function MergeSuggestionCard({
           <p className="truncate text-[12px] text-[#8b938c]">
             {suggestion.leftContact.email ?? suggestion.leftContact.phone ?? ""}
           </p>
+          {suggestion.quickMergePreview.survivorSide === "left" ? <BaseContactPill /> : null}
         </div>
         <div className="w-px self-stretch bg-[#edf0ea]" />
         <div className="min-w-0">
@@ -307,6 +362,7 @@ export function MergeSuggestionCard({
           <p className="truncate text-[12px] text-[#8b938c]">
             {suggestion.rightContact.email ?? suggestion.rightContact.phone ?? ""}
           </p>
+          {suggestion.quickMergePreview.survivorSide === "right" ? <BaseContactPill /> : null}
         </div>
       </div>
 
@@ -319,6 +375,7 @@ export function MergeSuggestionCard({
           <p className="truncate text-[12px] text-[#8b938c]">
             {suggestion.leftContact.email ?? suggestion.leftContact.phone ?? ""}
           </p>
+          {suggestion.quickMergePreview.survivorSide === "left" ? <BaseContactPill /> : null}
         </div>
         <div className="h-px bg-[#f2f4f0]" />
         <div className="min-w-0">
@@ -328,14 +385,19 @@ export function MergeSuggestionCard({
           <p className="truncate text-[12px] text-[#8b938c]">
             {suggestion.rightContact.email ?? suggestion.rightContact.phone ?? ""}
           </p>
+          {suggestion.quickMergePreview.survivorSide === "right" ? <BaseContactPill /> : null}
         </div>
       </div>
+
+      <p className="mt-3 text-[12px] text-[#5c655e]">
+        Quick merge keeps the older contact as the base record and applies the default field choices below.
+      </p>
 
       {/* Signal chips */}
       <SignalChips signals={suggestion.displaySignals} />
 
       {/* Lite always-visible diff (only fields that differ) */}
-      <LiteComparison a={suggestion.leftContact} b={suggestion.rightContact} />
+      <LiteComparison a={suggestion.leftContact} b={suggestion.rightContact} suggestion={suggestion} />
 
       {/* Full comparison expand */}
       <div className="mt-3 border-t border-[#edf0ea] pt-3">

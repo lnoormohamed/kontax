@@ -109,6 +109,8 @@ export type SuggestionContact = {
   notes: string | null;
   address: string | null;
   birthday: string | null;
+  createdAt: Date;
+  importJobId: string | null;
   updatedAt: Date;
 };
 
@@ -193,6 +195,14 @@ export type PersistedMergeSuggestion = {
   signals: MergeSuggestionSignal[];
   contributions: SignalContribution[];
   displaySignals: string[];
+  quickMergePreview: {
+    survivorSide: "left" | "right";
+    fieldChoices: Required<MergeFieldChoices>;
+    mergedContact: Pick<
+      MergePreview["mergedContact"],
+      "fullName" | "email" | "phone" | "company" | "jobTitle" | "address" | "birthday" | "notes"
+    >;
+  };
   leftContact: SuggestionContact;
   rightContact: SuggestionContact;
 };
@@ -1668,6 +1678,8 @@ const suggestionContactSelect = {
   notes: true,
   address: true,
   birthday: true,
+  createdAt: true,
+  importJobId: true,
   updatedAt: true,
 } as const;
 
@@ -1715,6 +1727,21 @@ export const getOpenMergeSuggestionsForUser = async (userId: string) => {
       return !dismissedSet.has(`${aId}:${bId}`);
     })
     .map((suggestion) => {
+      const leftIsPrimary = suggestion.leftContact.createdAt <= suggestion.rightContact.createdAt;
+      const primaryContact = leftIsPrimary ? suggestion.leftContact : suggestion.rightContact;
+      const secondaryContact = leftIsPrimary ? suggestion.rightContact : suggestion.leftContact;
+      const quickMergePreview = buildMergedContactPreview(
+        {
+          ...primaryContact,
+          fullName: primaryContact.fullName ?? "",
+          archivedAt: null,
+        },
+        {
+          ...secondaryContact,
+          fullName: secondaryContact.fullName ?? "",
+          archivedAt: null,
+        },
+      );
       const contributions = parseContributions(suggestion.signals);
       return {
         id: suggestion.id,
@@ -1729,6 +1756,20 @@ export const getOpenMergeSuggestionsForUser = async (userId: string) => {
         signals: contributions.map((c) => c.signal),
         contributions,
         displaySignals: deriveDisplaySignals(contributions),
+        quickMergePreview: {
+          survivorSide: leftIsPrimary ? "left" : "right",
+          fieldChoices: quickMergePreview.defaultChoices,
+          mergedContact: {
+            fullName: quickMergePreview.mergedContact.fullName,
+            email: quickMergePreview.mergedContact.email,
+            phone: quickMergePreview.mergedContact.phone,
+            company: quickMergePreview.mergedContact.company,
+            jobTitle: quickMergePreview.mergedContact.jobTitle,
+            address: quickMergePreview.mergedContact.address,
+            birthday: quickMergePreview.mergedContact.birthday,
+            notes: quickMergePreview.mergedContact.notes,
+          },
+        },
         leftContact: suggestion.leftContact,
         rightContact: suggestion.rightContact,
       };
