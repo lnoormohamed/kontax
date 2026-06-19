@@ -6,6 +6,7 @@ import { useState, useTransition } from "react";
 
 import { dismissMergeSuggestion, quickMergeSuggestion } from "~/app/actions/merge";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
+import { normalizePhoneLooseKey } from "~/lib/phone-normalization";
 import type {
   PersistedMergeSuggestion,
   SuggestionContact,
@@ -26,14 +27,22 @@ const COMPARE_FIELDS: Field[] = [
   { key: "notes", label: "Notes" },
 ];
 
+function getContactDisplayName(contact: SuggestionContact, fallback: string) {
+  return (
+    contact.fullName?.trim() ||
+    contact.company?.trim() ||
+    fallback
+  );
+}
+
 function truncate(s: string | null, max: number): string | null {
   if (!s) return null;
   return s.length > max ? s.slice(0, max) + "…" : s;
 }
 
 function ComparisonTable({ a, b }: { a: SuggestionContact; b: SuggestionContact }) {
-  const nameA = a.fullName ?? "Contact A";
-  const nameB = b.fullName ?? "Contact B";
+  const nameA = getContactDisplayName(a, "Contact A");
+  const nameB = getContactDisplayName(b, "Contact B");
   return (
     <>
       {/* Desktop: 3-col table */}
@@ -178,14 +187,16 @@ function BaseContactPill() {
   );
 }
 
-function KeptPill({ tone }: { tone: "kept" | "same" }) {
+function KeptPill({ tone }: { tone: "kept" | "same" | "combined" }) {
   const style =
     tone === "kept"
       ? "bg-[#eef5ef] text-[#17352e]"
+      : tone === "combined"
+        ? "bg-[#edf3ff] text-[#2f4fc7]"
       : "bg-[#f2f4f0] text-[#5c655e]";
   return (
     <span className={`inline-flex h-[18px] items-center rounded-[999px] px-1.5 text-[10px] font-semibold ${style}`}>
-      {tone === "kept" ? "Kept" : "Same"}
+      {tone === "kept" ? "Kept" : tone === "combined" ? "Both kept" : "Same"}
     </span>
   );
 }
@@ -217,12 +228,30 @@ function LiteComparison({
         const mergedValue =
           suggestion.quickMergePreview.mergedContact[key as keyof typeof suggestion.quickMergePreview.mergedContact];
         const mergedText = typeof mergedValue === "string" ? mergedValue : null;
+        const preservesBothValues =
+          key === "email"
+            ? Boolean(
+                normalizeCompare(rawA) &&
+                  normalizeCompare(rawB) &&
+                  normalizeCompare(rawA).toLowerCase() !== normalizeCompare(rawB).toLowerCase(),
+              )
+            : key === "phone"
+              ? Boolean(
+                  normalizeCompare(rawA) &&
+                    normalizeCompare(rawB) &&
+                    normalizePhoneLooseKey(rawA) !== normalizePhoneLooseKey(rawB),
+                )
+              : false;
         const leftMatches =
-          normalizeCompare(rawA) !== "" && normalizeCompare(rawA) === normalizeCompare(mergedText);
+          !preservesBothValues &&
+          normalizeCompare(rawA) !== "" &&
+          normalizeCompare(rawA) === normalizeCompare(mergedText);
         const rightMatches =
-          normalizeCompare(rawB) !== "" && normalizeCompare(rawB) === normalizeCompare(mergedText);
-        const leftTone = leftMatches ? (rightMatches ? "same" : "kept") : null;
-        const rightTone = rightMatches ? (leftMatches ? "same" : "kept") : null;
+          !preservesBothValues &&
+          normalizeCompare(rawB) !== "" &&
+          normalizeCompare(rawB) === normalizeCompare(mergedText);
+        const leftTone = preservesBothValues ? "combined" : leftMatches ? (rightMatches ? "same" : "kept") : null;
+        const rightTone = preservesBothValues ? "combined" : rightMatches ? (leftMatches ? "same" : "kept") : null;
         return (
           <div key={key} className="grid grid-cols-[52px_1fr_1fr] gap-2 items-baseline">
             <span className="text-[11px] font-semibold uppercase tracking-[0.04em] text-[#aeb4ac]">
@@ -298,6 +327,8 @@ export function MergeSuggestionCard({
   };
 
   const busy = dismissing || merging;
+  const leftDisplayName = getContactDisplayName(suggestion.leftContact, "—");
+  const rightDisplayName = getContactDisplayName(suggestion.rightContact, "—");
 
   return (
     <article
@@ -347,7 +378,7 @@ export function MergeSuggestionCard({
       <div className="mt-3 hidden grid-cols-[1fr_1px_1fr] items-center gap-4 md:grid">
         <div className="min-w-0">
           <p className="truncate text-[14px] font-semibold text-[#1d2823]">
-            {suggestion.leftContact.fullName ?? "—"}
+            {leftDisplayName}
           </p>
           <p className="truncate text-[12px] text-[#8b938c]">
             {suggestion.leftContact.email ?? suggestion.leftContact.phone ?? ""}
@@ -357,7 +388,7 @@ export function MergeSuggestionCard({
         <div className="w-px self-stretch bg-[#edf0ea]" />
         <div className="min-w-0">
           <p className="truncate text-[14px] font-semibold text-[#1d2823]">
-            {suggestion.rightContact.fullName ?? "—"}
+            {rightDisplayName}
           </p>
           <p className="truncate text-[12px] text-[#8b938c]">
             {suggestion.rightContact.email ?? suggestion.rightContact.phone ?? ""}
@@ -370,7 +401,7 @@ export function MergeSuggestionCard({
       <div className="mt-3 grid gap-3 md:hidden">
         <div className="min-w-0">
           <p className="truncate text-[14px] font-semibold text-[#1d2823]">
-            {suggestion.leftContact.fullName ?? "—"}
+            {leftDisplayName}
           </p>
           <p className="truncate text-[12px] text-[#8b938c]">
             {suggestion.leftContact.email ?? suggestion.leftContact.phone ?? ""}
@@ -380,7 +411,7 @@ export function MergeSuggestionCard({
         <div className="h-px bg-[#f2f4f0]" />
         <div className="min-w-0">
           <p className="truncate text-[14px] font-semibold text-[#1d2823]">
-            {suggestion.rightContact.fullName ?? "—"}
+            {rightDisplayName}
           </p>
           <p className="truncate text-[12px] text-[#8b938c]">
             {suggestion.rightContact.email ?? suggestion.rightContact.phone ?? ""}
@@ -427,7 +458,7 @@ export function MergeSuggestionCard({
 
 function identityKey(s: PersistedMergeSuggestion): string {
   const fp = (c: SuggestionContact) =>
-    `${(c.fullName ?? "").toLowerCase().trim()}|${(c.email ?? "").toLowerCase().trim()}|${(c.phone ?? "").toLowerCase().trim()}`;
+    `${getContactDisplayName(c, "").toLowerCase().trim()}|${(c.email ?? "").toLowerCase().trim()}|${(c.phone ?? "").toLowerCase().trim()}`;
   const [a, b] = [fp(s.leftContact), fp(s.rightContact)].sort();
   return `${a}::${b}`;
 }
@@ -492,6 +523,7 @@ function MergeSuggestionGroup({
 
   const busy = merging || dismissing;
   const contact = rep.leftContact;
+  const contactDisplayName = getContactDisplayName(contact, "—");
 
   return (
     <article className="rounded-[14px] border border-[#d8ddd6] bg-white p-4">
@@ -541,7 +573,7 @@ function MergeSuggestionGroup({
 
       {/* Identity */}
       <div className="mt-3">
-        <p className="text-[14px] font-semibold text-[#1d2823]">{contact.fullName ?? "—"}</p>
+        <p className="text-[14px] font-semibold text-[#1d2823]">{contactDisplayName}</p>
         <p className="text-[12px] text-[#8b938c]">{contact.email ?? contact.phone ?? ""}</p>
         <p className="mt-1 text-[12px] text-[#aeb4ac]">
           {count + 1} copies detected · merging will collapse them into one contact

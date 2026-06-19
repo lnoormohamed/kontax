@@ -922,15 +922,15 @@ const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateCont
   };
 };
 
-// Confidence tier from the total score. Edge-case warnings cap the result at
-// MEDIUM so review-first pairs never land in the HIGH (bulk-acceptable) bucket,
-// and weak supporting-only signals (phonetic / email-domain) stay LOW (P10-08).
+// Confidence tier from the total score. HIGH is reserved for hard identifier
+// matches only; name/company evidence can still surface a pair for review, but
+// should not be bulk-accepted as a one-click safe merge.
 const deriveConfidence = (
   score: number,
   hardMatch: boolean,
   hasEdgeWarnings: boolean,
 ): MergeSuggestionConfidence => {
-  if (!hasEdgeWarnings && (hardMatch || score >= 80)) {
+  if (!hasEdgeWarnings && hardMatch) {
     return "high";
   }
   if (score >= 50) {
