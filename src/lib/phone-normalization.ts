@@ -6,6 +6,7 @@ import {
   getPhoneCountryRule,
   getPhoneNumberTypeLabel,
   inferPhoneNumberType,
+  resolvePhoneNationalDigitsForRule,
   type PhoneNumberType,
 } from "./phone-country-rules";
 
@@ -208,7 +209,35 @@ const candidatesRepresentSamePhone = (
   right: NormalizedPhoneCandidate,
 ) => {
   if (left.exactKey && right.exactKey) {
-    return left.exactKey === right.exactKey;
+    if (left.exactKey === right.exactKey) {
+      return true;
+    }
+  }
+
+  const anchors = [
+    { anchor: left, other: right },
+    { anchor: right, other: left },
+  ];
+
+  for (const { anchor, other } of anchors) {
+    if (!anchor.exactKey || !anchor.countryCode) {
+      continue;
+    }
+
+    const rule = getPhoneCountryRule(anchor.countryCode);
+    if (!rule) {
+      continue;
+    }
+
+    const otherNationalDigits = resolvePhoneNationalDigitsForRule({
+      digits: other.normalizedDigits,
+      hasPlus: other.rawInput.startsWith("+"),
+      rule,
+    });
+
+    if (otherNationalDigits && `+${rule.callingCode}${otherNationalDigits}` === anchor.exactKey) {
+      return true;
+    }
   }
 
   return left.looseKey !== "" && left.looseKey === right.looseKey;

@@ -439,6 +439,46 @@ export const findPhoneCountryRuleForLocalDigits = (digits: string) => {
   return null;
 };
 
+export const resolvePhoneNationalDigitsForRule = ({
+  digits,
+  hasPlus,
+  rule,
+}: {
+  digits: string;
+  hasPlus: boolean;
+  rule: PhoneCountryRule;
+}) => {
+  if (!digits) {
+    return null;
+  }
+
+  if (hasPlus || digits.startsWith(rule.callingCode)) {
+    const internationalDigits = hasPlus
+      ? digits
+      : digits.startsWith(rule.callingCode)
+        ? digits
+        : "";
+    if (internationalDigits.startsWith(rule.callingCode)) {
+      const nationalDigits = internationalDigits.slice(rule.callingCode.length);
+      if (matchesRuleNationalNumber(rule, nationalDigits)) {
+        return nationalDigits;
+      }
+    }
+  }
+
+  if (!hasPlus && rule.allowLocalNationalInput !== false) {
+    const nationalDigits = stripTrunkPrefix(digits, rule);
+    if (
+      matchesRuleNationalNumber(rule, nationalDigits) &&
+      (!rule.trunkPrefix || digits.startsWith(rule.trunkPrefix))
+    ) {
+      return nationalDigits;
+    }
+  }
+
+  return null;
+};
+
 export const formatPhoneInternational = (
   nationalDigits: string,
   rule: PhoneCountryRule,
