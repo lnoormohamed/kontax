@@ -18,6 +18,7 @@ import {
   choosePreferredPhoneChoice,
   mergePhoneEntries,
   mergePhoneValues,
+  normalizePhoneCandidate,
   normalizePhoneExactKey,
 } from "~/lib/phone-normalization";
 
@@ -819,10 +820,15 @@ const getEdgeCaseWarnings = (left: MergeableContact, right: MergeableContact) =>
 const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateContact) => {
   const leftEmail = normalizeValue(left.email);
   const rightEmail = normalizeValue(right.email);
-  const leftPhoneExact = normalizePhone(left.phone);
-  const rightPhoneExact = normalizePhone(right.phone);
+  const leftPhone = normalizePhoneCandidate(left.phone);
+  const rightPhone = normalizePhoneCandidate(right.phone);
+  const leftPhoneExact = leftPhone.exactKey;
+  const rightPhoneExact = rightPhone.exactKey;
   const leftPhoneKey = normalizePhoneKey(left.phone);
   const rightPhoneKey = normalizePhoneKey(right.phone);
+  const rawPhonesMatch = Boolean(
+    normalizeValue(left.phone) && normalizeValue(left.phone) === normalizeValue(right.phone),
+  );
   const leftName = normalizeName(left.fullName);
   const rightName = normalizeName(right.fullName);
   const leftCompany = normalizeValue(left.company);
@@ -842,7 +848,11 @@ const getSignalDetails = (left: MergeCandidateContact, right: MergeCandidateCont
   }
 
   if (leftPhoneExact && rightPhoneExact && leftPhoneExact === rightPhoneExact) {
-    add("exact-phone", `Same phone: ${left.phone}`, 95);
+    if (rawPhonesMatch) {
+      add("exact-phone", `Same phone: ${left.phone}`, 95);
+    } else {
+      add("normalized-phone", `Same phone in a different format: ${left.phone} ≈ ${right.phone}`, 90);
+    }
     hardMatch = true;
   } else if (leftPhoneKey && rightPhoneKey && leftPhoneKey === rightPhoneKey) {
     add("normalized-phone", `Same phone in a different format: ${left.phone} ≈ ${right.phone}`, 90);
@@ -1220,7 +1230,15 @@ export const buildMergedContactPreview = (
       primaryValue: normalizedPrimary.phone,
       secondaryValue: normalizedSecondary.phone,
       choice: resolvedChoices.phone,
-    }),
+    })
+      ? normalizePhoneCandidate(
+          pickFieldValue({
+            primaryValue: normalizedPrimary.phone,
+            secondaryValue: normalizedSecondary.phone,
+            choice: resolvedChoices.phone,
+          }),
+        ).value || null
+      : null,
     phoneNumbers: mergePhoneValues(
       [normalizedPrimary.phone],
       normalizedPrimary.phoneNumbers,

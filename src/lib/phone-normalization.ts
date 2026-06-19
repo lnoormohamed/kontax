@@ -1,3 +1,14 @@
+import {
+  findPhoneCountryRuleByCallingCode,
+  findPhoneCountryRuleForLocalDigits,
+  formatPhoneInternational,
+  formatPhoneNational,
+  getPhoneCountryRule,
+  getPhoneNumberTypeLabel,
+  inferPhoneNumberType,
+  type PhoneNumberType,
+} from "./phone-country-rules";
+
 export type PhoneValidationStatus = "valid" | "possible" | "invalid";
 export type PhoneEntrySource = "user" | "import" | "sync";
 
@@ -13,11 +24,12 @@ export type StoredPhoneEntry = {
   extension?: string | null;
   displayInternational?: string | null;
   displayNational?: string | null;
+  numberType?: PhoneNumberType;
   validationStatus?: PhoneValidationStatus;
   source?: PhoneEntrySource;
 };
 
-type NormalizedPhoneCandidate = {
+export type NormalizedPhoneCandidate = {
   rawInput: string;
   value: string;
   normalizedDigits: string;
@@ -30,6 +42,7 @@ type NormalizedPhoneCandidate = {
   extension: string | null;
   displayInternational: string | null;
   displayNational: string | null;
+  numberType: PhoneNumberType;
   validationStatus: PhoneValidationStatus;
 };
 
@@ -60,69 +73,17 @@ const normalizeInternationalPrefix = (value: string) => {
     return `+${digits.replace(/^00+/, "")}`;
   }
 
-  if (digits.length === 11 && digits.startsWith("1")) {
-    return `+${digits}`;
-  }
-
   return digits;
 };
 
-const formatNanp = (national: string) =>
-  national.length === 10
-    ? {
-        international: `+1 ${national.slice(0, 3)} ${national.slice(3, 6)} ${national.slice(6)}`,
-        national: `(${national.slice(0, 3)}) ${national.slice(3, 6)} ${national.slice(6)}`,
-      }
-    : {
-        international: `+1 ${national}`,
-        national,
-      };
-
-const formatUk = (national: string) =>
-  national.length === 10
-    ? {
-        international: `+44 ${national.slice(0, 4)} ${national.slice(4)}`,
-        national: `0${national.slice(0, 4)} ${national.slice(4)}`,
-      }
-    : {
-        international: `+44 ${national}`,
-        national: `0${national}`,
-      };
-
-const deriveKnownRegion = (digits: string) => {
-  if (digits.startsWith("1") && digits.length === 11) {
-    return {
-      countryCode: "US",
-      callingCode: "1",
-      national: digits.slice(1),
-      validationStatus: "valid" as const,
-    };
+const inferValidationStatus = (digits: string, e164: string | null) => {
+  if (e164) {
+    return "valid" as const;
   }
-
-  if (digits.startsWith("44") && digits.length >= 12 && digits.length <= 13) {
-    return {
-      countryCode: "GB",
-      callingCode: "44",
-      national: digits.slice(2),
-      validationStatus: "valid" as const,
-    };
-  }
-
   if (digits.length >= 8 && digits.length <= 15) {
-    return {
-      countryCode: null,
-      callingCode: null,
-      national: null,
-      validationStatus: "possible" as const,
-    };
+    return "possible" as const;
   }
-
-  return {
-    countryCode: null,
-    callingCode: null,
-    national: null,
-    validationStatus: "invalid" as const,
-  };
+  return "invalid" as const;
 };
 
 export const normalizePhoneCandidate = (
@@ -143,6 +104,7 @@ export const normalizePhoneCandidate = (
       extension: null,
       displayInternational: null,
       displayNational: null,
+      numberType: "unknown",
       validationStatus: "invalid",
     };
   }
@@ -151,39 +113,49 @@ export const normalizePhoneCandidate = (
   const canonicalSeed = normalizeInternationalPrefix(base);
   const hasPlus = canonicalSeed.startsWith("+");
   const digits = canonicalSeed.replace(/\D/g, "");
-  const known = deriveKnownRegion(digits);
-  const e164 = hasPlus && digits ? `+${digits}` : digits.length === 11 && digits.startsWith("1") ? `+${digits}` : null;
 
-  let displayInternational = e164;
-  let displayNational = known.national;
+  const supportedMatch = hasPlus
+    ? findPhoneCountryRuleByCallingCode(digits)
+    : findPhoneCountryRuleForLocalDigits(digits) ??
+      (digits.length === 11 && digits.startsWith("1")
+        ? findPhoneCountryRuleByCallingCode(digits)
+        : null);
 
-  if (known.countryCode === "US" && known.national) {
-    const formatted = formatNanp(known.national);
-    displayInternational = formatted.international;
-    displayNational = formatted.national;
-  } else if (known.countryCode === "GB" && known.national) {
-    const formatted = formatUk(known.national);
-    displayInternational = formatted.international;
-    displayNational = formatted.national;
-  }
-
-  const fallbackValue = hasPlus ? `+${digits}` : digits || rawInput;
-  const valueForStorage = displayInternational ?? fallbackValue;
+  const rule = supportedMatch?.rule ?? null;
+  const nationalDigits = supportedMatch?.nationalDigits ?? null;
+  const numberType = inferPhoneNumberType(nationalDigits ?? "", rule);
+  const e164 = rule && nationalDigits ? `+${rule.callingCode}${nationalDigits}` : hasPlus && digits ? `+${digits}` : null;
+  const displayInternational = rule && nationalDigits
+    ? formatPhoneInternational(nationalDigits, rule, numberType)
+    : e164;
+  const displayNational = rule && nationalDigits
+    ? formatPhoneNational(nationalDigits, rule, numberType)
+    : null;
+  const validationStatus = inferValidationStatus(digits, e164);
+  const fallbackValue = displayInternational ?? (hasPlus ? `+${digits}` : digits || rawInput);
+  const looseKey = e164
+    ? e164.replace(/^\+/, "")
+    : digits.length >= 7
+      ? digits.length > 10
+        ? digits.slice(-10)
+        : digits
+      : "";
 
   return {
     rawInput,
-    value: valueForStorage,
+    value: fallbackValue,
     normalizedDigits: digits,
     exactKey: e164 ?? "",
-    looseKey: digits.length >= 7 ? digits.slice(-10) : "",
+    looseKey,
     e164,
-    national: known.national,
-    countryCode: known.countryCode,
-    callingCode: known.callingCode,
+    national: nationalDigits,
+    countryCode: rule?.iso2 ?? null,
+    callingCode: rule?.callingCode ?? null,
     extension,
     displayInternational,
     displayNational,
-    validationStatus: known.validationStatus,
+    numberType,
+    validationStatus,
   };
 };
 
@@ -223,7 +195,9 @@ const phoneValueScore = (candidate: NormalizedPhoneCandidate) => {
   else if (candidate.validationStatus === "possible") score += 60;
 
   if (candidate.e164) score += 30;
-  if (candidate.value.startsWith("+")) score += 10;
+  if (candidate.countryCode) score += 15;
+  if (candidate.numberType !== "unknown") score += 5;
+  if (candidate.rawInput.startsWith("+")) score += 8;
   if (candidate.extension) score += 5;
 
   return score;
@@ -235,14 +209,6 @@ const candidatesRepresentSamePhone = (
 ) => {
   if (left.exactKey && right.exactKey) {
     return left.exactKey === right.exactKey;
-  }
-
-  if (left.exactKey && right.looseKey) {
-    return left.looseKey !== "" && left.looseKey === right.looseKey;
-  }
-
-  if (right.exactKey && left.looseKey) {
-    return right.looseKey !== "" && left.looseKey === right.looseKey;
   }
 
   return left.looseKey !== "" && left.looseKey === right.looseKey;
@@ -379,6 +345,7 @@ export const buildNormalizedPhoneEntries = ({
       extension: candidate.extension,
       displayInternational: candidate.displayInternational,
       displayNational: candidate.displayNational,
+      numberType: candidate.numberType,
       validationStatus: candidate.validationStatus,
       source: seed.source,
     };
@@ -440,3 +407,36 @@ export const normalizePhoneExactKey = (value: string | null | undefined) =>
 
 export const normalizePhoneLooseKey = (value: string | null | undefined) =>
   normalizePhoneCandidate(value).looseKey;
+
+export const arePhoneValuesEquivalent = (
+  left: string | null | undefined,
+  right: string | null | undefined,
+) =>
+  candidatesRepresentSamePhone(
+    normalizePhoneCandidate(left),
+    normalizePhoneCandidate(right),
+  );
+
+export const getPhoneValueContext = (value: string | null | undefined) => {
+  const candidate = normalizePhoneCandidate(value);
+  if (!candidate.rawInput) {
+    return null;
+  }
+
+  const rule = candidate.countryCode ? getPhoneCountryRule(candidate.countryCode) : null;
+  const typeLabel = getPhoneNumberTypeLabel(rule, candidate.numberType);
+  const summary = [typeLabel, rule?.displayName].filter(Boolean).join(" · ");
+
+  return {
+    countryCode: candidate.countryCode,
+    countryName: rule?.displayName ?? null,
+    numberType: candidate.numberType,
+    numberTypeLabel: typeLabel,
+    summary: summary || null,
+    preferredDisplay:
+      candidate.displayInternational ??
+      candidate.displayNational ??
+      candidate.value ??
+      candidate.rawInput,
+  };
+};

@@ -6,7 +6,7 @@ import { useState, useTransition } from "react";
 
 import { dismissMergeSuggestion, quickMergeSuggestion } from "~/app/actions/merge";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
-import { normalizePhoneLooseKey } from "~/lib/phone-normalization";
+import { arePhoneValuesEquivalent } from "~/lib/phone-normalization";
 import type {
   PersistedMergeSuggestion,
   SuggestionContact,
@@ -213,7 +213,11 @@ function LiteComparison({
   const diffs = LITE_FIELDS.filter(({ key }) => {
     const av = a[key] as string | null;
     const bv = b[key] as string | null;
-    return (av || bv) && av !== bv;
+    if (!(av || bv)) return false;
+    if (key === "phone") {
+      return !arePhoneValuesEquivalent(av, bv);
+    }
+    return av !== bv;
   });
 
   if (diffs.length === 0) return null;
@@ -239,7 +243,7 @@ function LiteComparison({
               ? Boolean(
                   normalizeCompare(rawA) &&
                     normalizeCompare(rawB) &&
-                    normalizePhoneLooseKey(rawA) !== normalizePhoneLooseKey(rawB),
+                    !arePhoneValuesEquivalent(rawA, rawB),
                 )
               : false;
         const leftMatches =

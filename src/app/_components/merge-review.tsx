@@ -5,6 +5,10 @@ import { useRouter } from "next/navigation";
 
 import { mergeContacts } from "~/app/actions/contacts";
 import { dismissMergeSuggestion } from "~/app/actions/merge";
+import {
+  arePhoneValuesEquivalent,
+  getPhoneValueContext,
+} from "~/lib/phone-normalization";
 
 // ── Public types (consumed by page.tsx) ──────────────────────────────────────
 export type MergeReviewContact = {
@@ -121,6 +125,41 @@ function Avatar({ name, size = 42 }: { name: string; size?: number }) {
   );
 }
 
+function getContactPhoneDisplay(contact: MergeReviewContact) {
+  const phoneContext = getPhoneValueContext(contact.phone);
+  if (!phoneContext) {
+    return null;
+  }
+
+  return {
+    value: phoneContext.preferredDisplay,
+    meta: phoneContext.summary,
+  };
+}
+
+function getContactIdentifier(contact: MergeReviewContact) {
+  const email = trim(contact.email);
+  if (email) {
+    return {
+      primary: email,
+      secondary: getContactPhoneDisplay(contact)?.meta ?? null,
+    };
+  }
+
+  const phoneDisplay = getContactPhoneDisplay(contact);
+  if (phoneDisplay) {
+    return {
+      primary: phoneDisplay.value,
+      secondary: phoneDisplay.meta,
+    };
+  }
+
+  return {
+    primary: "No identifier",
+    secondary: null,
+  };
+}
+
 // ── Field classification helpers ──────────────────────────────────────────────
 type FieldStatus = "conflict" | "auto" | "match" | "empty";
 
@@ -135,25 +174,27 @@ const classify = (a: string, b: string): FieldStatus => {
 
 const SCALAR_FIELDS = [
   { key: "fullName" as const, label: "Full name" },
-  { key: "email" as const, label: "Email" },
-  { key: "phone" as const, label: "Phone" },
+  { key: "email" as const, label: "Primary email" },
+  { key: "phone" as const, label: "Primary phone" },
   { key: "company" as const, label: "Company" },
   { key: "jobTitle" as const, label: "Job title" },
   { key: "nickname" as const, label: "Nickname" },
-  { key: "website" as const, label: "Website" },
+  { key: "website" as const, label: "Primary website" },
   { key: "birthday" as const, label: "Birthday" },
 ];
 
 const UNION_FIELDS: Array<{ key: keyof MergeReviewUnions; label: string }> = [
-  { key: "emails", label: "Email addresses" },
-  { key: "phones", label: "Phone numbers" },
+  { key: "emails", label: "Additional emails kept automatically" },
+  { key: "phones", label: "Additional numbers kept automatically" },
   { key: "addresses", label: "Addresses" },
-  { key: "websites", label: "Websites" },
+  { key: "websites", label: "Additional websites kept automatically" },
   { key: "labels", label: "Labels" },
   { key: "dates", label: "Significant dates" },
   { key: "related", label: "Related people" },
   { key: "custom", label: "Custom fields" },
 ];
+
+const PRIMARY_PRESERVED_FIELDS = new Set(["email", "phone", "website"]);
 
 // ── Confidence pills ──────────────────────────────────────────────────────────
 const CONFIDENCE_PILL: Record<string, { text: string; bg: string; fg: string }> = {
@@ -400,7 +441,7 @@ function SurvivorBtn({
   selected: boolean;
   onClick: () => void;
 }) {
-  const sub = trim(contact.email) || trim(contact.phone) || "No identifier";
+  const identifier = getContactIdentifier(contact);
   return (
     <button
       onClick={onClick}
@@ -471,8 +512,24 @@ function SurvivorBtn({
             textOverflow: "ellipsis",
           }}
         >
-          {sub}
+          {identifier.primary}
         </span>
+        {identifier.secondary ? (
+          <span
+            style={{
+              fontSize: 10.5,
+              fontWeight: 700,
+              letterSpacing: "0.04em",
+              textTransform: "uppercase",
+              color: selected ? C.green : C.mute,
+              whiteSpace: "nowrap",
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+            }}
+          >
+            {identifier.secondary}
+          </span>
+        ) : null}
         <SurvivorMetaChips contact={contact} />
       </span>
       <CheckRing on={selected} size={22} />
@@ -623,6 +680,7 @@ function SegChip({
 function ValueRow({
   badge,
   value,
+  meta,
   selected,
   dimmed,
   isCombine,
@@ -631,6 +689,7 @@ function ValueRow({
 }: {
   badge: "A" | "B" | "";
   value: string;
+  meta?: string | null;
   selected: boolean;
   dimmed: boolean;
   isCombine?: boolean;
@@ -675,8 +734,23 @@ function ValueRow({
           {badge}
         </span>
       )}
-      <span style={{ flex: 1, minWidth: 0, fontSize: 13, lineHeight: 1.45, color: selected ? C.ink : C.ink2 }}>
-        {value || "—"}
+      <span style={{ flex: 1, minWidth: 0, display: "grid", gap: meta ? 2 : 0 }}>
+        {meta ? (
+          <span
+            style={{
+              fontSize: 10.5,
+              fontWeight: 700,
+              letterSpacing: "0.04em",
+              textTransform: "uppercase",
+              color: selected ? C.green : C.mute,
+            }}
+          >
+            {meta}
+          </span>
+        ) : null}
+        <span style={{ fontSize: 13, lineHeight: 1.45, color: selected ? C.ink : C.ink2 }}>
+          {value || "—"}
+        </span>
       </span>
       <CheckRing on={selected} size={18} />
     </button>
@@ -687,17 +761,23 @@ function ConflictCard({
   label,
   valueA,
   valueB,
+  metaA,
+  metaB,
   choice,
   allowCombine,
+  helper,
   onChoose,
 }: {
   label: string;
   valueA: string;
   valueB: string;
+  metaA?: string | null;
+  metaB?: string | null;
   labelA: string;
   labelB: string;
   choice: ChoiceValue | undefined;
   allowCombine?: boolean;
+  helper?: string;
   onChoose: (v: ChoiceValue) => void;
 }) {
   return (
@@ -723,6 +803,18 @@ function ConflictCard({
         <span style={{ fontSize: 13.5, fontWeight: 600, color: C.ink }}>{label}</span>
         <SegChip choice={choice} allowCombine={allowCombine} onChoose={onChoose} />
       </div>
+      {helper ? (
+        <p
+          style={{
+            margin: "0 0 10px",
+            fontSize: 12.5,
+            lineHeight: 1.55,
+            color: C.ink2,
+          }}
+        >
+          {helper}
+        </p>
+      ) : null}
       {/* Slim value rows — stacked on mobile, side-by-side on desktop */}
       <div
         className="mg-two-col"
@@ -730,6 +822,7 @@ function ConflictCard({
       >
         <ValueRow
           badge="A"
+          meta={metaA}
           value={valueA}
           selected={choice === "A"}
           dimmed={!!choice && choice !== "A"}
@@ -737,6 +830,7 @@ function ConflictCard({
         />
         <ValueRow
           badge="B"
+          meta={metaB}
           value={valueB}
           selected={choice === "B"}
           dimmed={!!choice && choice !== "B"}
@@ -773,6 +867,8 @@ function UnionPanel({
   const bEmails = (contactB.email ? [contactB.email] : []);
   const aPhones = (contactA.phone ? [contactA.phone] : []);
   const bPhones = (contactB.phone ? [contactB.phone] : []);
+  const aWebsites = (contactA.website ? [contactA.website] : []);
+  const bWebsites = (contactB.website ? [contactB.website] : []);
 
   const activeFields = UNION_FIELDS.map((f) => ({
     ...f,
@@ -781,6 +877,8 @@ function UnionPanel({
       ? unions.phones.filter((v) => aPhones.includes(v) && bPhones.includes(v))
       : f.key === "emails"
         ? unions.emails.filter((v) => aEmails.includes(v) && bEmails.includes(v))
+        : f.key === "websites"
+          ? unions.websites.filter((v) => aWebsites.includes(v) && bWebsites.includes(v))
         : [],
   })).filter((f) => f.values.length > 1);
 
@@ -840,8 +938,8 @@ function UnionPanel({
       <p
         style={{ margin: "0 0 16px", fontSize: 13, lineHeight: 1.55, color: C.ink2 }}
       >
-        Multi-value fields are combined from both records — nothing is lost. Exact duplicates are
-        removed.
+        Multi-value fields are combined from both records. When one value is marked as primary,
+        the others are still kept on the merged contact.
       </p>
       <div
         className="mg-two-col"
@@ -894,6 +992,11 @@ function UnionPanel({
             <ul style={{ listStyle: "none", margin: 0, padding: 0, display: "grid", gap: 6 }}>
               {f.values.map((v, j) => {
                 const isShared = f.shared.includes(v);
+                const isPrimaryAfterMerge =
+                  (f.key === "phones" || f.key === "emails" || f.key === "websites") && j === 0;
+                const isAlsoKept =
+                  (f.key === "phones" || f.key === "emails" || f.key === "websites") && j > 0;
+                const phoneContext = f.key === "phones" ? getPhoneValueContext(v) : null;
                 return (
                   <li
                     key={j}
@@ -915,17 +1018,76 @@ function UnionPanel({
                     />
                     <span
                       style={{
-                        fontSize: 12.5,
-                        color: C.ink2,
                         minWidth: 0,
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
                         flex: 1,
+                        display: "grid",
+                        gap: phoneContext?.summary ? 2 : 0,
                       }}
                     >
-                      {v}
+                      {phoneContext?.summary ? (
+                        <span
+                          style={{
+                            fontSize: 9.5,
+                            fontWeight: 700,
+                            letterSpacing: "0.04em",
+                            textTransform: "uppercase",
+                            color: C.mute,
+                            minWidth: 0,
+                            overflow: "hidden",
+                            textOverflow: "ellipsis",
+                            whiteSpace: "nowrap",
+                          }}
+                        >
+                          {phoneContext.summary}
+                        </span>
+                      ) : null}
+                      <span
+                        style={{
+                          fontSize: 12.5,
+                          color: C.ink2,
+                          minWidth: 0,
+                          overflow: "hidden",
+                          textOverflow: "ellipsis",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {phoneContext?.preferredDisplay ?? v}
+                      </span>
                     </span>
+                    {isPrimaryAfterMerge && (
+                      <span
+                        style={{
+                          flexShrink: 0,
+                          fontSize: 9.5,
+                          fontWeight: 700,
+                          letterSpacing: "0.04em",
+                          textTransform: "uppercase",
+                          color: C.green,
+                          background: C.greenT,
+                          padding: "1px 6px",
+                          borderRadius: 5,
+                        }}
+                      >
+                        Primary after merge
+                      </span>
+                    )}
+                    {isAlsoKept && (
+                      <span
+                        style={{
+                          flexShrink: 0,
+                          fontSize: 9.5,
+                          fontWeight: 700,
+                          letterSpacing: "0.04em",
+                          textTransform: "uppercase",
+                          color: C.ink2,
+                          background: C.wash,
+                          padding: "1px 6px",
+                          borderRadius: 5,
+                        }}
+                      >
+                        Also kept
+                      </span>
+                    )}
                     {isShared && (
                       <span
                         style={{
@@ -1312,7 +1474,13 @@ export function MergeReview({
       SCALAR_FIELDS.map((f) => {
         const a = trim(contactA[f.key as keyof MergeReviewContact] as string | null | undefined);
         const b = trim(contactB[f.key as keyof MergeReviewContact] as string | null | undefined);
-        return { ...f, a, b, status: classify(a, b) };
+        const status =
+          f.key === "phone" && arePhoneValuesEquivalent(a, b)
+            ? a || b
+              ? "match"
+              : "empty"
+            : classify(a, b);
+        return { ...f, a, b, status };
       }),
     [contactA, contactB],
   );
@@ -1331,7 +1499,13 @@ export function MergeReview({
   }
   const matchingRows = scalarRows
     .filter((r) => r.status === "match")
-    .map((r) => ({ label: r.label, value: r.a }));
+    .map((r) => ({
+      label: r.label,
+      value:
+        r.key === "phone"
+          ? getPhoneValueContext(r.a)?.preferredDisplay ?? r.a
+          : r.a,
+    }));
   if (notesStatus === "match" && notesA) {
     matchingRows.push({ label: "Notes", value: notesA });
   }
@@ -1416,10 +1590,17 @@ export function MergeReview({
           {scalarConflicts.map((row) => (
             <ConflictCard
               choice={choices[row.key]}
+              helper={
+                PRIMARY_PRESERVED_FIELDS.has(row.key)
+                  ? `Both values will be kept if they are different. Choose which one should be the main ${row.label.toLowerCase()} on the merged contact.`
+                  : undefined
+              }
               key={row.key}
               label={row.label}
               labelA={labelA}
               labelB={labelB}
+              metaA={row.key === "phone" ? getPhoneValueContext(row.a)?.summary : undefined}
+              metaB={row.key === "phone" ? getPhoneValueContext(row.b)?.summary : undefined}
               onChoose={(v) => setChoices((prev) => ({ ...prev, [row.key]: v }))}
               valueA={row.a}
               valueB={row.b}

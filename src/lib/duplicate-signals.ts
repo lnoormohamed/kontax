@@ -1,7 +1,7 @@
 // Pure helpers for duplicate-detection signals (P10-08).
 // Kept dependency-free and side-effect-free so they're easy to unit test.
 
-import { normalizePhoneLooseKey } from "./phone-normalization";
+import { normalizePhoneExactKey, normalizePhoneLooseKey } from "./phone-normalization";
 
 /**
  * Wagner-Fischer Levenshtein distance, capped at maxDist to short-circuit
@@ -44,7 +44,8 @@ export const getFamilyName = (value: string | null | undefined) => getNameTokens
  * Returns "" for anything too short to be a real phone number.
  */
 export const normalizePhoneKey = (value: string | null | undefined) => {
-  return normalizePhoneLooseKey(value);
+  const exact = normalizePhoneExactKey(value);
+  return exact ? exact.replace(/^\+/, "") : normalizePhoneLooseKey(value);
 };
 
 /**
