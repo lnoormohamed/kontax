@@ -985,6 +985,9 @@ export const buildContactMergeSuggestions = (contacts: MergeCandidateContact[]) 
       }
 
       const confidence = deriveConfidence(score, hardMatch, edgeCaseWarnings.length > 0);
+      if (confidence === "low") {
+        continue;
+      }
 
       suggestions.push({
         pairKey: buildPairKey(left.id, right.id),
@@ -1621,19 +1624,36 @@ export const regenerateStaleSuggestionsForUser = async (userId: string) => {
       { ...rightContact, notes: null, archivedAt: null },
     );
 
+    const confidence = deriveConfidence(
+      details.score,
+      details.hardMatch,
+      edgeCaseWarnings.length > 0,
+    );
+
     await db.mergeSuggestion.update({
       where: { id: suggestion.id },
-      data: {
-        confidence: toConfidenceEnum(
-          deriveConfidence(details.score, details.hardMatch, edgeCaseWarnings.length > 0),
-        ),
-        score: details.score,
-        hardMatch: details.hardMatch,
-        signals: details.contributions,
-        reasons: [...details.reasons, ...edgeCaseWarnings],
-        source: "stale-regenerated",
-        generatedAt: new Date(),
-      },
+      data:
+        confidence === "low"
+          ? {
+              status: "STALE",
+              reviewedAt: new Date(),
+              confidence: toConfidenceEnum(confidence),
+              score: details.score,
+              hardMatch: details.hardMatch,
+              signals: details.contributions,
+              reasons: [...details.reasons, ...edgeCaseWarnings],
+              source: "stale-regenerated",
+              generatedAt: new Date(),
+            }
+          : {
+              confidence: toConfidenceEnum(confidence),
+              score: details.score,
+              hardMatch: details.hardMatch,
+              signals: details.contributions,
+              reasons: [...details.reasons, ...edgeCaseWarnings],
+              source: "stale-regenerated",
+              generatedAt: new Date(),
+            },
     });
   }
 };
@@ -1667,6 +1687,9 @@ export const getOpenMergeSuggestionsForUser = async (userId: string) => {
     where: {
       userId,
       status: "OPEN",
+      confidence: {
+        in: ["HIGH", "MEDIUM"],
+      },
     },
     orderBy: [{ score: "desc" }, { updatedAt: "desc" }],
     take: 500,
