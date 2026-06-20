@@ -27,6 +27,7 @@
     "seed:phase37:nanp": "node scripts/seed-phase37-nanp.mjs",
     "seed:phase37:nordics-baltics": "node scripts/seed-phase37-nordics-baltics.mjs",
     "seed:phase37:pacific": "node scripts/seed-phase37-au-nz-pacific.mjs",
+    "qa:phase37:phones": "node scripts/phase37-phone-qa-harness.mjs",
     "seed:phase37:sub-saharan-africa": "node scripts/seed-phase37-sub-saharan-africa.mjs",
     "seed:phase37:southern-europe": "node scripts/seed-phase37-southern-europe.mjs",
     "seed:phase37:uk-ie": "node scripts/seed-phase37-uk-ireland.mjs",
