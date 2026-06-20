@@ -33,7 +33,8 @@
     "seed:phase37:western-europe": "node scripts/seed-phase37-western-europe.mjs",
     "seed:demo": "node scripts/seed-demo-showcase.mjs",
     "start": "node server.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "seed:phase37:asia-latam": "node scripts/seed-phase37-asia-latam.mjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.7.2",
