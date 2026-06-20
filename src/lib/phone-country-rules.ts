@@ -1156,7 +1156,7 @@ const PHONE_COUNTRY_RULE_LIST: PhoneCountryRule[] = [
     callingCode: "86",
     trunkPrefix: "0",
     allowLocalNationalInput: true,
-    nationalLengths: [10, 11],
+    nationalLengths: [11],
     mobilePrefixes: ["1"],
     landlinePrefixes: ["10", "2", "3", "4", "5", "6", "7", "8", "9"],
     labels: { mobile: "Mobile", landline: "Landline" },
@@ -1667,6 +1667,14 @@ const getGrouping = (
 const startsWithAny = (value: string, prefixes: string[] | undefined) =>
   Boolean(prefixes?.some((prefix) => value.startsWith(prefix)));
 
+const longestMatchingPrefixLength = (value: string, prefixes: string[] | undefined) =>
+  prefixes?.reduce((best, prefix) => {
+    if (value.startsWith(prefix)) {
+      return Math.max(best, prefix.length);
+    }
+    return best;
+  }, 0) ?? 0;
+
 const matchesRuleNationalNumber = (rule: PhoneCountryRule, nationalDigits: string) => {
   if (!rule.nationalLengths.includes(nationalDigits.length)) {
     return false;
@@ -1757,6 +1765,9 @@ export const findPhoneCountryRuleByCallingCode = (digits: string) => {
 };
 
 export const findPhoneCountryRuleForLocalDigits = (digits: string) => {
+  let bestMatch:
+    | { rule: PhoneCountryRule; nationalDigits: string; score: number }
+    | null = null;
   let fallback: { rule: PhoneCountryRule; nationalDigits: string } | null = null;
 
   for (const rule of PHONE_COUNTRY_RULE_LIST) {
@@ -1768,10 +1779,6 @@ export const findPhoneCountryRuleForLocalDigits = (digits: string) => {
       continue;
     }
 
-    if (rule.trunkPrefix && !digits.startsWith(rule.trunkPrefix)) {
-      continue;
-    }
-
     if (rule.leadingDigits?.length) {
       if (startsWithAny(nationalDigits, rule.leadingDigits)) {
         return { rule, nationalDigits };
@@ -1779,7 +1786,22 @@ export const findPhoneCountryRuleForLocalDigits = (digits: string) => {
       continue;
     }
 
+    const mobileScore = longestMatchingPrefixLength(nationalDigits, rule.mobilePrefixes);
+    const landlineScore = longestMatchingPrefixLength(nationalDigits, rule.landlinePrefixes);
+    const prefixScore = Math.max(mobileScore, landlineScore);
+
+    if (prefixScore > 0) {
+      if (!bestMatch || prefixScore > bestMatch.score) {
+        bestMatch = { rule, nationalDigits, score: prefixScore };
+      }
+      continue;
+    }
+
     fallback ??= { rule, nationalDigits };
+  }
+
+  if (bestMatch) {
+    return { rule: bestMatch.rule, nationalDigits: bestMatch.nationalDigits };
   }
 
   return fallback;
@@ -1814,10 +1836,7 @@ export const resolvePhoneNationalDigitsForRule = ({
 
   if (!hasPlus && rule.allowLocalNationalInput !== false) {
     const nationalDigits = stripTrunkPrefix(digits, rule);
-    if (
-      matchesRuleNationalNumber(rule, nationalDigits) &&
-      (!rule.trunkPrefix || digits.startsWith(rule.trunkPrefix))
-    ) {
+    if (matchesRuleNationalNumber(rule, nationalDigits)) {
       return nationalDigits;
     }
   }
