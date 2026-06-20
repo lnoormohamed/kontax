@@ -54,11 +54,11 @@ function ComparisonTable({ a, b }: { a: SuggestionContact; b: SuggestionContact 
             </th>
             <th className="py-1.5 pr-3 text-left">
               <div className="text-[12px] font-semibold text-[#8b938c] truncate">{nameA}</div>
-              <div className="text-[10px] font-semibold uppercase tracking-[0.04em] text-[#aeb4ac]">Contact A</div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.04em] text-[#aeb4ac]">Base record</div>
             </th>
             <th className="py-1.5 text-left">
               <div className="text-[12px] font-semibold text-[#8b938c] truncate">{nameB}</div>
-              <div className="text-[10px] font-semibold uppercase tracking-[0.04em] text-[#aeb4ac]">Contact B</div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.04em] text-[#aeb4ac]">Merged from</div>
             </th>
           </tr>
         </thead>
@@ -112,11 +112,11 @@ function ComparisonTable({ a, b }: { a: SuggestionContact; b: SuggestionContact 
                 >
                   <span className="text-[13px] text-[#1d2823]">
                     {truncate(aVal, 80) ?? "—"}{" "}
-                    <span className="text-[11.5px] text-[#8b938c]">· {nameA}</span>
+                    <span className="text-[11.5px] text-[#8b938c]">· Base record</span>
                   </span>
                   <span className="text-[13px] text-[#1d2823]">
                     {truncate(bVal, 80) ?? "—"}{" "}
-                    <span className="text-[11.5px] text-[#8b938c]">· {nameB}</span>
+                    <span className="text-[11.5px] text-[#8b938c]">· Merged from</span>
                   </span>
                 </dd>
               ) : (
@@ -182,7 +182,7 @@ const normalizeCompare = (value: string | null | undefined) => value?.trim() ?? 
 function BaseContactPill() {
   return (
     <span className="mt-2 inline-flex h-[20px] items-center rounded-[999px] bg-[#eef5ef] px-2 text-[11px] font-semibold text-[#17352e]">
-      Base contact kept
+      Quick merge keeps this record
     </span>
   );
 }
@@ -196,7 +196,7 @@ function KeptPill({ tone }: { tone: "kept" | "same" | "combined" }) {
       : "bg-[#f2f4f0] text-[#5c655e]";
   return (
     <span className={`inline-flex h-[18px] items-center rounded-[999px] px-1.5 text-[10px] font-semibold ${style}`}>
-      {tone === "kept" ? "Kept" : tone === "combined" ? "Both kept" : "Same"}
+      {tone === "kept" ? "Will keep" : tone === "combined" ? "Keeps both" : "Same value"}
     </span>
   );
 }

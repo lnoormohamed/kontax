@@ -163,8 +163,8 @@ function getContactIdentifier(
   }
 
   return {
-    primary: "No identifier",
-    secondary: null,
+    primary: "No email or phone yet",
+    secondary: "You can add one after the merge",
   };
 }
 
@@ -181,21 +181,21 @@ const classify = (a: string, b: string): FieldStatus => {
 };
 
 const SCALAR_FIELDS = [
-  { key: "fullName" as const, label: "Full name" },
-  { key: "email" as const, label: "Primary email" },
-  { key: "phone" as const, label: "Primary phone" },
+  { key: "fullName" as const, label: "Name" },
+  { key: "email" as const, label: "Email" },
+  { key: "phone" as const, label: "Main phone" },
   { key: "company" as const, label: "Company" },
   { key: "jobTitle" as const, label: "Job title" },
   { key: "nickname" as const, label: "Nickname" },
-  { key: "website" as const, label: "Primary website" },
+  { key: "website" as const, label: "Website" },
   { key: "birthday" as const, label: "Birthday" },
 ];
 
 const UNION_FIELDS: Array<{ key: keyof MergeReviewUnions; label: string }> = [
-  { key: "emails", label: "Additional emails kept automatically" },
-  { key: "phones", label: "Additional numbers kept automatically" },
+  { key: "emails", label: "Extra email addresses kept automatically" },
+  { key: "phones", label: "Extra phone numbers kept automatically" },
   { key: "addresses", label: "Addresses" },
-  { key: "websites", label: "Additional websites kept automatically" },
+  { key: "websites", label: "Extra websites kept automatically" },
   { key: "labels", label: "Labels" },
   { key: "dates", label: "Significant dates" },
   { key: "related", label: "Related people" },
@@ -260,6 +260,18 @@ function PageHeader({
       >
         Review duplicate
       </h1>
+      <p
+        style={{
+          margin: "10px 0 0",
+          maxWidth: 620,
+          color: C.ink2,
+          fontSize: 14,
+          lineHeight: 1.5,
+        }}
+      >
+        Choose the record to keep, review any conflicting fields, and Kontax will
+        combine the rest automatically.
+      </p>
       <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 11, flexWrap: "wrap" }}>
         <span
           style={{
