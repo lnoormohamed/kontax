@@ -1041,7 +1041,27 @@ const PHONE_COUNTRY_RULE_LIST: PhoneCountryRule[] = [
     examples: { mobile: "+254 712 123456", landline: "+254 20 2012345" },
     grouping: { internationalDefault: [3, 3, 3], nationalDefault: [3, 3, 3] },
   },
-  buildIntlOnlyRule({ iso2: "UG", displayName: "Uganda", callingCode: "256", fixedExample: "312345678", mobileExample: "712345678", labels: { mobile: "Mobile", landline: "Landline" }, mobilePrefixes: ["7"], landlinePrefixes: ["3"] }),
+  {
+    iso2: "UG",
+    displayName: "Uganda",
+    callingCode: "256",
+    trunkPrefix: "0",
+    allowLocalNationalInput: true,
+    nationalLengths: [9],
+    mobilePrefixes: ["7"],
+    landlinePrefixes: ["2", "3", "4"],
+    labels: { mobile: "Mobile", landline: "Landline" },
+    examples: {
+      mobile: "+256 712 345678",
+      landline: "+256 312 345678",
+    },
+    grouping: {
+      internationalMobile: [3, 3, 3],
+      internationalLandline: [3, 3, 3],
+      nationalMobile: [3, 3, 3],
+      nationalLandline: [3, 3, 3],
+    },
+  },
   {
     iso2: "TZ",
     displayName: "Tanzania",
