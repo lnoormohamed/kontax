@@ -278,7 +278,8 @@ const parseLabels = (raw: unknown): string[] => {
   return raw.filter((v): v is string => typeof v === "string");
 };
 
-// Desktop: up to 2 chips + +N overflow. Mobile: up to 3 dots + +N count.
+// Compact list labels: dot cluster + optional +N overflow, matching the
+// compact contact-row treatment from the handoff and browser screenshots.
 const RowLabelChips = memo(function RowLabelChips({
   labels,
   labelColors,
@@ -292,29 +293,15 @@ const RowLabelChips = memo(function RowLabelChips({
   if (labels.length === 0) return null;
 
   const col = (name: string) => labelColors[name.toLowerCase()] ?? "#8b938c";
-
-  if (isMobile) {
-    const shown = labels.slice(0, 3);
-    const extra = labels.length - shown.length;
-    return (
-      <span style={{ display: "inline-flex", alignItems: "center", gap: 4, flexShrink: 0 }}>
-        {shown.map((name, i) => (
-          <LabelDot key={i} col={col(name)} size={8} />
-        ))}
-        {extra > 0 && (
-          <span style={{ fontSize: 11, fontWeight: 700, color: "#8b938c", marginLeft: 1 }}>+{extra}</span>
-        )}
-      </span>
-    );
-  }
-
-  const shown = labels.slice(0, 2);
-  const hidden = labels.slice(2);
+  const shown = labels.slice(0, 3);
+  const hidden = labels.slice(3);
+  const dotSize = isMobile ? 8 : 7;
+  const gap = isMobile ? 6 : 7;
 
   return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap: 5, flexShrink: 0 }}>
-      {shown.map((name) => (
-        <LabelChip key={name} name={name} col={col(name)} sz="sm" />
+    <span style={{ display: "inline-flex", alignItems: "center", gap, flexShrink: 0 }}>
+      {shown.map((name, i) => (
+        <LabelDot key={`${name}-${i}`} col={col(name)} size={dotSize} />
       ))}
       {hidden.length > 0 && (
         <span
@@ -326,12 +313,8 @@ const RowLabelChips = memo(function RowLabelChips({
             style={{
               display: "inline-flex",
               alignItems: "center",
-              height: 22,
-              padding: "0 9px",
-              borderRadius: 999,
-              background: "#f2f4f0",
-              color: "#5c655e",
-              fontSize: 12,
+              color: "#8b938c",
+              fontSize: isMobile ? 12 : 11,
               fontWeight: 700,
               lineHeight: 1,
               cursor: "default",
