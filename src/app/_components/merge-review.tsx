@@ -125,8 +125,13 @@ function Avatar({ name, size = 42 }: { name: string; size?: number }) {
   );
 }
 
-function getContactPhoneDisplay(contact: MergeReviewContact) {
-  const phoneContext = getPhoneValueContext(contact.phone);
+function getContactPhoneDisplay(
+  contact: MergeReviewContact,
+  peerPhone?: string | null | undefined,
+) {
+  const phoneContext = getPhoneValueContext(contact.phone, {
+    peerValue: peerPhone,
+  });
   if (!phoneContext) {
     return null;
   }
@@ -137,16 +142,19 @@ function getContactPhoneDisplay(contact: MergeReviewContact) {
   };
 }
 
-function getContactIdentifier(contact: MergeReviewContact) {
+function getContactIdentifier(
+  contact: MergeReviewContact,
+  peerContact?: MergeReviewContact,
+) {
   const email = trim(contact.email);
   if (email) {
     return {
       primary: email,
-      secondary: getContactPhoneDisplay(contact)?.meta ?? null,
+      secondary: getContactPhoneDisplay(contact, peerContact?.phone)?.meta ?? null,
     };
   }
 
-  const phoneDisplay = getContactPhoneDisplay(contact);
+  const phoneDisplay = getContactPhoneDisplay(contact, peerContact?.phone);
   if (phoneDisplay) {
     return {
       primary: phoneDisplay.value,
@@ -434,14 +442,16 @@ function WhyPanel({
 // ── 3. Survivor selector ──────────────────────────────────────────────────────
 function SurvivorBtn({
   contact,
+  peerContact,
   selected,
   onClick,
 }: {
   contact: MergeReviewContact;
+  peerContact: MergeReviewContact;
   selected: boolean;
   onClick: () => void;
 }) {
-  const identifier = getContactIdentifier(contact);
+  const identifier = getContactIdentifier(contact, peerContact);
   return (
     <button
       onClick={onClick}
@@ -612,8 +622,18 @@ function SurvivorSelector({
           marginTop: 16,
         }}
       >
-        <SurvivorBtn contact={contactA} selected={survivor === "A"} onClick={() => onPick("A")} />
-        <SurvivorBtn contact={contactB} selected={survivor === "B"} onClick={() => onPick("B")} />
+        <SurvivorBtn
+          contact={contactA}
+          peerContact={contactB}
+          selected={survivor === "A"}
+          onClick={() => onPick("A")}
+        />
+        <SurvivorBtn
+          contact={contactB}
+          peerContact={contactA}
+          selected={survivor === "B"}
+          onClick={() => onPick("B")}
+        />
       </div>
     </Card>
   );
@@ -1503,7 +1523,7 @@ export function MergeReview({
       label: r.label,
       value:
         r.key === "phone"
-          ? getPhoneValueContext(r.a)?.preferredDisplay ?? r.a
+          ? getPhoneValueContext(r.a, { peerValue: r.b })?.preferredDisplay ?? r.a
           : r.a,
     }));
   if (notesStatus === "match" && notesA) {
@@ -1599,8 +1619,16 @@ export function MergeReview({
               label={row.label}
               labelA={labelA}
               labelB={labelB}
-              metaA={row.key === "phone" ? getPhoneValueContext(row.a)?.summary : undefined}
-              metaB={row.key === "phone" ? getPhoneValueContext(row.b)?.summary : undefined}
+              metaA={
+                row.key === "phone"
+                  ? getPhoneValueContext(row.a, { peerValue: row.b })?.summary
+                  : undefined
+              }
+              metaB={
+                row.key === "phone"
+                  ? getPhoneValueContext(row.b, { peerValue: row.a })?.summary
+                  : undefined
+              }
               onChoose={(v) => setChoices((prev) => ({ ...prev, [row.key]: v }))}
               valueA={row.a}
               valueB={row.b}
