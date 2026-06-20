@@ -446,32 +446,76 @@ export const arePhoneValuesEquivalent = (
     normalizePhoneCandidate(right),
   );
 
-export const getPhoneValueContext = (value: string | null | undefined) => {
+export const getPhoneValueContext = (
+  value: string | null | undefined,
+  options?: {
+    peerValue?: string | null | undefined;
+  },
+) => {
   const candidate = normalizePhoneCandidate(value);
   if (!candidate.rawInput) {
     return null;
   }
 
-  const rule = candidate.countryCode ? getPhoneCountryRule(candidate.countryCode) : null;
-  const typeLabel = getPhoneNumberTypeLabel(rule, candidate.numberType);
   const compactInput = candidate.rawInput.replace(/\s+/g, "");
+  const peerCandidate = normalizePhoneCandidate(options?.peerValue);
+
+  let resolvedCountryCode = candidate.countryCode;
+  let resolvedCallingCode = candidate.callingCode;
+  let resolvedNational = candidate.national;
+
+  if (
+    !compactInput.startsWith("+") &&
+    !compactInput.startsWith("00") &&
+    peerCandidate.exactKey &&
+    peerCandidate.countryCode
+  ) {
+    const peerRule = getPhoneCountryRule(peerCandidate.countryCode);
+    const peerNational = peerRule
+      ? resolvePhoneNationalDigitsForRule({
+          digits: candidate.normalizedDigits,
+          hasPlus: false,
+          rule: peerRule,
+        })
+      : null;
+
+    if (peerRule && peerNational) {
+      resolvedCountryCode = peerRule.iso2;
+      resolvedCallingCode = peerRule.callingCode;
+      resolvedNational = peerNational;
+    }
+  }
+
+  const rule = resolvedCountryCode ? getPhoneCountryRule(resolvedCountryCode) : null;
+  const resolvedNumberType =
+    resolvedNational && rule ? inferPhoneNumberType(resolvedNational, rule) : candidate.numberType;
+  const displayInternational =
+    resolvedNational && rule
+      ? formatPhoneInternational(resolvedNational, rule, resolvedNumberType)
+      : candidate.displayInternational;
+  const displayNational =
+    resolvedNational && rule
+      ? formatPhoneNational(resolvedNational, rule, resolvedNumberType)
+      : candidate.displayNational;
+  const typeLabel = getPhoneNumberTypeLabel(rule, resolvedNumberType);
   const formatLabel = compactInput.startsWith("+") || compactInput.startsWith("00")
     ? "International format"
-    : rule && candidate.displayNational
+    : rule && displayNational
       ? "Local format"
       : "Entered format";
   const summary = [typeLabel, rule?.displayName, formatLabel].filter(Boolean).join(" · ");
 
   return {
-    countryCode: candidate.countryCode,
+    countryCode: resolvedCountryCode,
     countryName: rule?.displayName ?? null,
-    numberType: candidate.numberType,
+    numberType: resolvedNumberType,
     numberTypeLabel: typeLabel,
+    callingCode: resolvedCallingCode,
     formatLabel,
     summary: summary || null,
     preferredDisplay:
-      candidate.displayInternational ??
-      candidate.displayNational ??
+      displayInternational ??
+      displayNational ??
       candidate.value ??
       candidate.rawInput,
   };

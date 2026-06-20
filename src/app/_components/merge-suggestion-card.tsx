@@ -229,8 +229,10 @@ function LiteComparison({
         const rawB = b[key] as string | null;
         const av = truncate(rawA, 60);
         const bv = truncate(rawB, 60);
-        const phoneMetaA = key === "phone" ? getPhoneValueContext(rawA) : null;
-        const phoneMetaB = key === "phone" ? getPhoneValueContext(rawB) : null;
+        const phoneMetaA =
+          key === "phone" ? getPhoneValueContext(rawA, { peerValue: rawB }) : null;
+        const phoneMetaB =
+          key === "phone" ? getPhoneValueContext(rawB, { peerValue: rawA }) : null;
         const mergedValue =
           suggestion.quickMergePreview.mergedContact[key as keyof typeof suggestion.quickMergePreview.mergedContact];
         const mergedText = typeof mergedValue === "string" ? mergedValue : null;
