@@ -1,5 +1,6 @@
 import Link from "next/link";
 
+import { signOutAction } from "~/app/actions/auth";
 import { redirectToLogin } from "~/server/auth/require-page-auth";
 
 import {
@@ -245,6 +246,25 @@ export default async function SettingsPlanPage({
         <p className="px-0.5 text-[12px] text-[#8b938c]">
           Activity log retained for 30 days on Free · 1 year on Pro · 90 days on Family · unlimited on Teams.
         </p>
+
+        <SettingsCard className="flex flex-wrap items-center justify-between gap-4">
+          <div className="min-w-0">
+            <p className="text-[12px] font-semibold uppercase tracking-[0.16em] text-[#8b938c]">
+              Account session
+            </p>
+            <p className="mt-1.5 text-[14px] text-[#3a4540]">
+              Signed in as <span className="font-semibold text-[#1d2823]">{session.user.email ?? userLabel}</span>
+            </p>
+          </div>
+          <form action={signOutAction}>
+            <button
+              className="inline-flex h-10 items-center justify-center rounded-xl border border-[#d8ddd6] px-4 text-[13.5px] font-semibold text-[#1d2823] transition hover:bg-[#f2f4f0]"
+              type="submit"
+            >
+              Sign out
+            </button>
+          </form>
+        </SettingsCard>
       </div>
       </div>{/* end billing wrapper */}
     </>
