@@ -521,7 +521,7 @@ function SurvivorBtn({
                 borderRadius: 5,
               }}
             >
-              Primary
+              Stays active
             </span>
           )}
         </span>
@@ -553,6 +553,17 @@ function SurvivorBtn({
           </span>
         ) : null}
         <SurvivorMetaChips contact={contact} />
+        <span
+          style={{
+            fontSize: 11.5,
+            lineHeight: 1.45,
+            color: selected ? C.green : C.ink2,
+          }}
+        >
+          {selected
+            ? "This record stays active after the merge."
+            : "This record is archived after the merge, and can be restored for 30 days."}
+        </span>
       </span>
       <CheckRing on={selected} size={22} />
     </button>
@@ -618,12 +629,12 @@ function SurvivorSelector({
           color: C.ink,
         }}
       >
-        Which record should survive?
+        Choose the record to keep
       </h2>
       <p
         style={{ margin: "7px 0 0", fontSize: 13, lineHeight: 1.55, color: C.ink2 }}
       >
-        The other contact is archived after the merge — you can undo it for 30 days.
+        The other record is archived after the merge. Nothing is deleted, and you can undo the merge for 30 days.
       </p>
       <div
         className="mg-two-col"
@@ -678,7 +689,7 @@ function SegChip({
         flexShrink: 0,
       }}
       role="group"
-      aria-label="Keep which value"
+      aria-label="Choose which value should be the main value after the merge"
     >
       {opts.map((o) => (
         <button
@@ -700,6 +711,7 @@ function SegChip({
             transition: "background .12s, color .12s, box-shadow .12s",
           }}
           type="button"
+          aria-label={o === "combine" ? "Keep both values" : `Keep value ${o}`}
         >
           {label(o)}
         </button>
@@ -871,7 +883,7 @@ function ConflictCard({
         {allowCombine && (
           <ValueRow
             badge=""
-            value="Keep both — combine"
+            value="Keep both values"
             selected={choice === "combine"}
             dimmed={!!choice && choice !== "combine"}
             isCombine
@@ -1197,7 +1209,7 @@ function SummaryPanel({
             <span
               style={{ display: "block", fontSize: 12.5, lineHeight: 1.5, color: C.ink2 }}
             >
-              Only one contact had a value — kept as-is: {names}.
+              Only one record had a value, so Kontax will carry it over automatically: {names}.
             </span>
           </div>
         </div>
@@ -1243,13 +1255,13 @@ function SummaryPanel({
               <path d="M9 5l7 7-7 7" />
             </svg>
             <span>
-              {open ? "Hide" : "Show"} {matching.length} matching{" "}
+              {open ? "Hide" : "Show"} {matching.length} identical{" "}
               {matching.length === 1 ? "field" : "fields"}
             </span>
             <span
               style={{ fontSize: 12, fontWeight: 400, color: C.mute, marginLeft: "auto" }}
             >
-              identical on both contacts
+              no decision needed
             </span>
           </button>
           {open && (
@@ -1366,7 +1378,7 @@ function MergeBar({
       </button>
       {remaining > 0 && !isPending && (
         <span style={{ fontSize: 12.5, color: C.ink2 }}>
-          Resolve {remaining} more {remaining === 1 ? "field" : "fields"} to continue.
+          Choose {remaining} more {remaining === 1 ? "field" : "fields"} to continue.
         </span>
       )}
     </div>
@@ -1606,9 +1618,8 @@ export function MergeReview({
             }}
           >
             <span>
-              Resolve{" "}
+              Choose the main value for{" "}
               {scalarConflicts.length + (notesStatus === "conflict" ? 1 : 0)}{" "}
-              conflicting{" "}
               {scalarConflicts.length + (notesStatus === "conflict" ? 1 : 0) === 1
                 ? "field"
                 : "fields"}
@@ -1619,12 +1630,22 @@ export function MergeReview({
               {unresolvedCount === 0 ? "All resolved" : `${unresolvedCount} left`}
             </span>
           </h2>
+          <p
+            style={{
+              margin: "-2px 0 2px",
+              fontSize: 12.5,
+              lineHeight: 1.55,
+              color: C.ink2,
+            }}
+          >
+            Pick the value that should show first on the merged contact. When Kontax can safely preserve both values, we’ll say so explicitly.
+          </p>
           {scalarConflicts.map((row) => (
             <ConflictCard
               choice={choices[row.key]}
               helper={
                 PRIMARY_PRESERVED_FIELDS.has(row.key)
-                  ? `Both values will be kept if they are different. Choose which one should be the main ${row.label.toLowerCase()} on the merged contact.`
+                  ? `If these values are different, Kontax will still keep both. Choose which one should be the main ${row.label.toLowerCase()} shown first on the merged contact.`
                   : undefined
               }
               key={row.key}
@@ -1650,6 +1671,7 @@ export function MergeReview({
             <ConflictCard
               allowCombine
               choice={choices.notes}
+              helper="Choose which note should show first, or keep both notes together on the merged contact."
               label="Notes"
               labelA={labelA}
               labelB={labelB}
