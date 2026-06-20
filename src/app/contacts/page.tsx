@@ -33,6 +33,8 @@ type ContactsWorkspaceFilter = "all" | "recent" | "incomplete" | "favorites" | "
 type ContactsWorkspaceSort = "updated" | "name";
 type ContactsWorkspaceView = "compact" | "cozy";
 
+const DUPLICATE_SUGGESTION_BATCH_SIZE = 120;
+
 const getSingleParam = async (
   searchParams: ContactsPageProps["searchParams"],
   key: string,
@@ -228,13 +230,19 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
     : mergeSuggestionsRefreshedParam;
   const mergeSuggestionsRefreshed = mergeSuggestionsRefreshedValue === "1";
 
-  const searchConditions = getSearchConditions(query);
+  const showsPeopleList = selectedTab === "people";
+  const showsArchivedList = selectedTab === "archived";
+  const shouldLoadDuplicateDetails = selectedTab === "duplicates";
+  const supportsContactSearch = showsPeopleList || showsArchivedList;
+  const shouldLoadLabelSuggestions = showsPeopleList || showsArchivedList;
+
+  const searchConditions = supportsContactSearch ? getSearchConditions(query) : {};
 
   // P28-07: full-text search over the user's own contacts (notes, JSON contact
   // methods, custom fields, ranked). Short/symbol-only queries fall back to the
   // multi-field ILIKE path. Shared/family/team contacts keep ILIKE (they aren't
   // owned by this user, so they're outside the per-user full-text scan).
-  const ftsActive = !!(query && isFullTextEligible(query));
+  const ftsActive = !!(supportsContactSearch && query && isFullTextEligible(query));
   const ftsPrivateRows = ftsActive
     ? await searchContactIds({ userId: session.user.id }, query)
     : null;
@@ -311,11 +319,13 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
         _count: { _all: true },
       }),
       // P28-04: existing labels to suggest in the bulk "Add label" popover.
-      db.contact.findMany({
-        where: { userId: session.user.id, archivedAt: null },
-        select: { labels: true },
-        take: 2000,
-      }),
+      shouldLoadLabelSuggestions
+        ? db.contact.findMany({
+            where: { userId: session.user.id, archivedAt: null },
+            select: { labels: true },
+            take: 2000,
+          })
+        : Promise.resolve([]),
       // P31B-04: label registry for the sidebar Labels section.
       getLabels(),
     ]);
@@ -378,14 +388,14 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
   // family/team contacts match the same way private ones do.
   const sharedBookIds = [familyTargetId, ...teamTargetIds].filter((id): id is string => !!id);
   const ftsSharedRows =
-    ftsActive && includeShared && sharedBookIds.length > 0
+    ftsActive && showsPeopleList && includeShared && sharedBookIds.length > 0
       ? await searchContactIds({ groupBookIds: sharedBookIds }, query)
       : null;
   const sharedSearchConditions = ftsSharedRows
     ? { id: { in: ftsSharedRows.map((r) => r.id) } }
     : searchConditions;
   // Relevance ranking spans both scopes (used to order the merged result set).
-  const ftsRankById = ftsActive
+  const ftsRankById = ftsActive && showsPeopleList
     ? new Map([...(ftsPrivateRows ?? []), ...(ftsSharedRows ?? [])].map((r) => [r.id, r.rank]))
     : null;
 
@@ -399,8 +409,6 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
 
   const sortOrder =
     selectedSort === "name" ? { isFavorite: "desc" as const } : { updatedAt: "desc" as const };
-  const shouldLoadArchivedContacts = selectedTab === "archived";
-  const shouldLoadDuplicateDetails = selectedTab === "duplicates";
 
   const [
     privateActive,
@@ -413,7 +421,7 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
     recentMerges,
     planSummary,
   ] = await Promise.all([
-      includePrivate
+      showsPeopleList && includePrivate
         ? db.contact.findMany({
             // AND the fragments rather than spreading: personalBookWhere,
             // searchConditions, and the "incomplete" filter each carry a
@@ -428,21 +436,21 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
             select: contactListSelect,
           })
         : Promise.resolve([]),
-      includeShared && familyTargetId
+      showsPeopleList && includeShared && familyTargetId
         ? db.contact.findMany({
             where: { archivedAt: null, groupContacts: { some: { groupAddressBookId: familyTargetId } }, ...sharedSearchConditions, ...filterConditions, ...labelFilterCondition },
             orderBy: { updatedAt: "desc" as const },
             select: contactListSelect,
           })
         : Promise.resolve([]),
-      includeShared && teamTargetIds.length > 0
+      showsPeopleList && includeShared && teamTargetIds.length > 0
         ? db.contact.findMany({
             where: { archivedAt: null, groupContacts: { some: { groupAddressBookId: { in: teamTargetIds } } }, ...sharedSearchConditions, ...filterConditions, ...labelFilterCondition },
             orderBy: { updatedAt: "desc" as const },
             select: contactListSelect,
           })
         : Promise.resolve([]),
-      shouldLoadArchivedContacts
+      showsArchivedList
         ? db.contact.findMany({
             where: {
               userId: session.user.id,
@@ -457,17 +465,15 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
             select: contactListSelect,
           })
         : Promise.resolve([]),
-      shouldLoadDuplicateDetails ? getOpenMergeSuggestionsForUser(session.user.id) : Promise.resolve([]),
       shouldLoadDuplicateDetails
-        ? Promise.resolve(null)
-        : db.mergeSuggestion.count({
-            where: { userId: session.user.id, status: "OPEN" },
-          }),
-      shouldLoadDuplicateDetails
-        ? Promise.resolve(null)
-        : db.mergeSuggestion.count({
-            where: { userId: session.user.id, status: "OPEN", confidence: "HIGH" },
-          }),
+        ? getOpenMergeSuggestionsForUser(session.user.id, { take: DUPLICATE_SUGGESTION_BATCH_SIZE })
+        : Promise.resolve([]),
+      db.mergeSuggestion.count({
+        where: { userId: session.user.id, status: "OPEN" },
+      }),
+      db.mergeSuggestion.count({
+        where: { userId: session.user.id, status: "OPEN", confidence: "HIGH" },
+      }),
       shouldLoadDuplicateDetails ? getRecentMergesForUser(session.user.id) : Promise.resolve([]),
       getUserPlanSummary(session.user.id),
     ]);
@@ -510,9 +516,8 @@ export default async function ContactsPage({ searchParams }: ContactsPageProps) 
     hasSync: connectedSyncCount > 0,
   });
 
-  const duplicatesCount = mergeSuggestionCount ?? mergeSuggestions.length;
-  const highConfidenceCount =
-    highConfidenceSuggestionCount ?? mergeSuggestions.filter((s) => s.confidence === "high").length;
+  const duplicatesCount = mergeSuggestionCount;
+  const highConfidenceCount = highConfidenceSuggestionCount;
 
   const archivedWithFlag = archivedContacts.map((c) => ({
     ...c,

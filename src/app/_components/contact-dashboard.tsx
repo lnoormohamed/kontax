@@ -567,7 +567,10 @@ export function ContactDashboard({
                   Suggestions refreshed
                 </p>
               ) : null}
-              <MergeSuggestionList suggestions={mergeSuggestions} />
+              <MergeSuggestionList
+                suggestions={mergeSuggestions}
+                totalCount={counts.duplicates}
+              />
 
               {recentMerges.length > 0 ? (
                 <div className="p-4 pt-0">

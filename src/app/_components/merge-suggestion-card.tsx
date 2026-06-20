@@ -608,12 +608,17 @@ function MergeSuggestionGroup({
 
 // ── Wrapper with optimistic list ──────────────────────────────────────────────
 
+const MERGE_SUGGESTION_RENDER_BATCH = 24;
+
 export function MergeSuggestionList({
   suggestions,
+  totalCount,
 }: {
   suggestions: PersistedMergeSuggestion[];
+  totalCount?: number;
 }) {
   const [visible, setVisible] = useState(() => suggestions.map((s) => s.id));
+  const [visibleGroupCount, setVisibleGroupCount] = useState(MERGE_SUGGESTION_RENDER_BATCH);
 
   const dismissIds = (ids: string[]) =>
     setVisible((v) => v.filter((x) => !ids.includes(x)));
@@ -639,10 +644,13 @@ export function MergeSuggestionList({
   }
 
   const renderItems = Array.from(groupMap.values());
+  const visibleItems = renderItems.slice(0, visibleGroupCount);
+  const canLoadMore = visibleGroupCount < renderItems.length;
+  const hasMoreOnServer = (totalCount ?? suggestions.length) > suggestions.length;
 
   return (
     <div className="grid gap-3 p-4">
-      {renderItems.map((group) =>
+      {visibleItems.map((group) =>
         group.length === 1 ? (
           <MergeSuggestionCard
             key={group[0]!.id}
@@ -657,6 +665,24 @@ export function MergeSuggestionList({
           />
         ),
       )}
+      {canLoadMore ? (
+        <div className="flex justify-center pt-1">
+          <button
+            className="inline-flex h-10 items-center rounded-[10px] border border-[#d8ddd6] bg-white px-4 text-[13px] font-semibold text-[#1d2823] transition hover:bg-[#f6f7f4]"
+            onClick={() =>
+              setVisibleGroupCount((count) => count + MERGE_SUGGESTION_RENDER_BATCH)
+            }
+            type="button"
+          >
+            Load more duplicates
+          </button>
+        </div>
+      ) : null}
+      {hasMoreOnServer && !canLoadMore ? (
+        <div className="rounded-[1rem] border border-dashed border-[#d8ddd6] bg-[#f9faf8] px-4 py-3 text-center text-[12.5px] text-[#5c655e]">
+          Showing the first {suggestions.length} highest-priority suggestions. Use Rescan to refresh the queue.
+        </div>
+      ) : null}
     </div>
   );
 }

@@ -1700,14 +1700,16 @@ const suggestionContactSelect = {
   address: true,
   birthday: true,
   createdAt: true,
-  importJobId: true,
-  updatedAt: true,
 } as const;
 
-export const getOpenMergeSuggestionsForUser = async (userId: string) => {
-  // Keep the open queue fresh: any suggestion whose contacts changed since it
-  // was generated is recomputed (or retired) before we read (P10-08).
-  await regenerateStaleSuggestionsForUser(userId);
+export const getOpenMergeSuggestionsForUser = async (
+  userId: string,
+  options?: { take?: number },
+) => {
+  // Keep the read path fast for the duplicates queue. Stale/open suggestions are
+  // refreshed via the explicit refresh endpoint and by background sync flows, so
+  // we avoid blocking every page render on a full regeneration sweep.
+  const take = Math.max(1, Math.min(options?.take ?? 120, 200));
 
   // Load dismissed pairs so we can exclude them after fetch.
   const dismissed = await db.mergeDismissal.findMany({
@@ -1725,7 +1727,7 @@ export const getOpenMergeSuggestionsForUser = async (userId: string) => {
       },
     },
     orderBy: [{ score: "desc" }, { updatedAt: "desc" }],
-    take: 500,
+    take,
     select: {
       id: true,
       status: true,
