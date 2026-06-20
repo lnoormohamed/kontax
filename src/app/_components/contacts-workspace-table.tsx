@@ -299,16 +299,16 @@ const RowLabelChips = memo(function RowLabelChips({
   const gap = isMobile ? 6 : 7;
 
   return (
-    <span style={{ display: "inline-flex", alignItems: "center", gap, flexShrink: 0 }}>
+    <span
+      style={{ position: "relative", display: "inline-flex", alignItems: "center", gap, flexShrink: 0 }}
+      onMouseEnter={() => setOverflowOpen(true)}
+      onMouseLeave={() => setOverflowOpen(false)}
+    >
       {shown.map((name, i) => (
         <LabelDot key={`${name}-${i}`} col={col(name)} size={dotSize} />
       ))}
       {hidden.length > 0 && (
-        <span
-          style={{ position: "relative", display: "inline-flex", flexShrink: 0 }}
-          onMouseEnter={() => setOverflowOpen(true)}
-          onMouseLeave={() => setOverflowOpen(false)}
-        >
+        <span style={{ display: "inline-flex", flexShrink: 0 }}>
           <span
             style={{
               display: "inline-flex",
@@ -322,28 +322,30 @@ const RowLabelChips = memo(function RowLabelChips({
           >
             +{hidden.length}
           </span>
-          {overflowOpen && (
-            <span
-              style={{
-                position: "absolute",
-                top: "calc(100% + 7px)",
-                left: 0,
-                zIndex: 50,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "flex-start",
-                gap: 7,
-                padding: 9,
-                background: "#fff",
-                borderRadius: 11,
-                boxShadow: "0 12px 34px rgba(20,30,25,0.2), 0 0 0 1px rgba(20,30,25,0.06)",
-              }}
-            >
-              {hidden.map((name) => (
-                <LabelChip key={name} name={name} col={col(name)} sz="sm" />
-              ))}
-            </span>
-          )}
+        </span>
+      )}
+      {overflowOpen && (
+        <span
+          style={{
+            position: "absolute",
+            top: "calc(100% + 7px)",
+            left: 0,
+            zIndex: 50,
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "flex-start",
+            gap: 7,
+            minWidth: 160,
+            maxWidth: 260,
+            padding: 9,
+            background: "#fff",
+            borderRadius: 11,
+            boxShadow: "0 12px 34px rgba(20,30,25,0.2), 0 0 0 1px rgba(20,30,25,0.06)",
+          }}
+        >
+          {labels.map((name, i) => (
+            <LabelChip key={`${name}-${i}`} name={name} col={col(name)} sz="sm" />
+          ))}
         </span>
       )}
     </span>
