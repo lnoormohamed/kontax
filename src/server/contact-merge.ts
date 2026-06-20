@@ -1700,6 +1700,8 @@ const suggestionContactSelect = {
   address: true,
   birthday: true,
   createdAt: true,
+  importJobId: true,
+  updatedAt: true,
 } as const;
 
 export const getOpenMergeSuggestionsForUser = async (
