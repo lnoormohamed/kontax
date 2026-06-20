@@ -22,6 +22,7 @@
     "migrate:teams-billing": "node scripts/migrate-teams-billing-to-org.mjs",
     "migrate:teams-billing:apply": "node scripts/migrate-teams-billing-to-org.mjs --apply",
     "prune:activity": "node scripts/prune-activity-retention.mjs",
+    "seed:phase37:pacific": "node scripts/seed-phase37-au-nz-pacific.mjs",
     "seed:demo": "node scripts/seed-demo-showcase.mjs",
     "start": "node server.mjs",
     "typecheck": "tsc --noEmit"

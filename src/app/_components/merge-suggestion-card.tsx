@@ -6,7 +6,7 @@ import { useState, useTransition } from "react";
 
 import { dismissMergeSuggestion, quickMergeSuggestion } from "~/app/actions/merge";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
-import { arePhoneValuesEquivalent } from "~/lib/phone-normalization";
+import { arePhoneValuesEquivalent, getPhoneValueContext } from "~/lib/phone-normalization";
 import type {
   PersistedMergeSuggestion,
   SuggestionContact,
@@ -229,6 +229,8 @@ function LiteComparison({
         const rawB = b[key] as string | null;
         const av = truncate(rawA, 60);
         const bv = truncate(rawB, 60);
+        const phoneMetaA = key === "phone" ? getPhoneValueContext(rawA) : null;
+        const phoneMetaB = key === "phone" ? getPhoneValueContext(rawB) : null;
         const mergedValue =
           suggestion.quickMergePreview.mergedContact[key as keyof typeof suggestion.quickMergePreview.mergedContact];
         const mergedText = typeof mergedValue === "string" ? mergedValue : null;
@@ -262,16 +264,26 @@ function LiteComparison({
               {label}
             </span>
             <span
-              className={`flex min-w-0 items-center gap-1.5 truncate text-[12.5px] ${leftTone === "kept" ? "text-[#1d2823]" : "text-[#5c655e]"}`}
+              className={`flex min-w-0 flex-col gap-0.5 ${leftTone === "kept" ? "text-[#1d2823]" : "text-[#5c655e]"}`}
             >
-              <span className="truncate">{av ?? <span className="text-[#c2c8bf]">—</span>}</span>
-              {leftTone ? <KeptPill tone={leftTone} /> : null}
+              <span className="flex min-w-0 items-center gap-1.5 truncate text-[12.5px]">
+                <span className="truncate">{av ?? <span className="text-[#c2c8bf]">—</span>}</span>
+                {leftTone ? <KeptPill tone={leftTone} /> : null}
+              </span>
+              {phoneMetaA?.summary ? (
+                <span className="truncate text-[11px] text-[#8a9189]">{phoneMetaA.summary}</span>
+              ) : null}
             </span>
             <span
-              className={`flex min-w-0 items-center gap-1.5 truncate text-[12.5px] ${rightTone === "kept" ? "text-[#1d2823]" : "text-[#5c655e]"}`}
+              className={`flex min-w-0 flex-col gap-0.5 ${rightTone === "kept" ? "text-[#1d2823]" : "text-[#5c655e]"}`}
             >
-              <span className="truncate">{bv ?? <span className="text-[#c2c8bf]">—</span>}</span>
-              {rightTone ? <KeptPill tone={rightTone} /> : null}
+              <span className="flex min-w-0 items-center gap-1.5 truncate text-[12.5px]">
+                <span className="truncate">{bv ?? <span className="text-[#c2c8bf]">—</span>}</span>
+                {rightTone ? <KeptPill tone={rightTone} /> : null}
+              </span>
+              {phoneMetaB?.summary ? (
+                <span className="truncate text-[11px] text-[#8a9189]">{phoneMetaB.summary}</span>
+              ) : null}
             </span>
           </div>
         );

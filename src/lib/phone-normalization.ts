@@ -454,13 +454,20 @@ export const getPhoneValueContext = (value: string | null | undefined) => {
 
   const rule = candidate.countryCode ? getPhoneCountryRule(candidate.countryCode) : null;
   const typeLabel = getPhoneNumberTypeLabel(rule, candidate.numberType);
-  const summary = [typeLabel, rule?.displayName].filter(Boolean).join(" · ");
+  const compactInput = candidate.rawInput.replace(/\s+/g, "");
+  const formatLabel = compactInput.startsWith("+") || compactInput.startsWith("00")
+    ? "International format"
+    : rule && candidate.displayNational
+      ? "Local format"
+      : "Entered format";
+  const summary = [typeLabel, rule?.displayName, formatLabel].filter(Boolean).join(" · ");
 
   return {
     countryCode: candidate.countryCode,
     countryName: rule?.displayName ?? null,
     numberType: candidate.numberType,
     numberTypeLabel: typeLabel,
+    formatLabel,
     summary: summary || null,
     preferredDisplay:
       candidate.displayInternational ??
