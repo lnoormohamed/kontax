@@ -6,7 +6,7 @@ import { useState, useTransition } from "react";
 
 import { dismissMergeSuggestion, quickMergeSuggestion } from "~/app/actions/merge";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
-import { arePhoneValuesEquivalent, getPhoneValueContext } from "~/lib/phone-normalization";
+import { arePhoneValuesEquivalent } from "~/lib/phone-normalization";
 import type {
   PersistedMergeSuggestion,
   SuggestionContact,
@@ -187,20 +187,6 @@ function BaseContactPill() {
   );
 }
 
-function KeptPill({ tone }: { tone: "kept" | "same" | "combined" }) {
-  const style =
-    tone === "kept"
-      ? "bg-[#eef5ef] text-[#17352e]"
-      : tone === "combined"
-        ? "bg-[#edf3ff] text-[#2f4fc7]"
-      : "bg-[#f2f4f0] text-[#5c655e]";
-  return (
-    <span className={`inline-flex h-[18px] items-center rounded-[999px] px-1.5 text-[10px] font-semibold ${style}`}>
-      {tone === "kept" ? "Will keep" : tone === "combined" ? "Keeps both" : "Same value"}
-    </span>
-  );
-}
-
 function LiteComparison({
   a,
   b,
@@ -210,86 +196,72 @@ function LiteComparison({
   b: SuggestionContact;
   suggestion: PersistedMergeSuggestion;
 }) {
-  const diffs = LITE_FIELDS.filter(({ key }) => {
-    const av = a[key] as string | null;
-    const bv = b[key] as string | null;
-    if (!(av || bv)) return false;
-    if (key === "phone") {
-      return !arePhoneValuesEquivalent(av, bv);
+  const summaries = LITE_FIELDS.flatMap(({ key, label }) => {
+    const rawA = a[key] as string | null;
+    const rawB = b[key] as string | null;
+    if (!(rawA || rawB)) return [];
+    if (key === "phone" && arePhoneValuesEquivalent(rawA, rawB)) return [];
+    if (key !== "phone" && rawA === rawB) return [];
+
+    const mergedValue =
+      suggestion.quickMergePreview.mergedContact[key as keyof typeof suggestion.quickMergePreview.mergedContact];
+    const mergedText = typeof mergedValue === "string" ? mergedValue : null;
+    const preservesBothValues =
+      key === "email"
+        ? Boolean(
+            normalizeCompare(rawA) &&
+              normalizeCompare(rawB) &&
+              normalizeCompare(rawA).toLowerCase() !== normalizeCompare(rawB).toLowerCase(),
+          )
+        : key === "phone"
+          ? Boolean(
+              normalizeCompare(rawA) &&
+                normalizeCompare(rawB) &&
+                !arePhoneValuesEquivalent(rawA, rawB),
+            )
+          : false;
+
+    if (preservesBothValues) {
+      return [{ key, text: `${label}: keep both values` }];
     }
-    return av !== bv;
+
+    const leftMatches =
+      normalizeCompare(rawA) !== "" &&
+      normalizeCompare(rawA) === normalizeCompare(mergedText);
+    const rightMatches =
+      normalizeCompare(rawB) !== "" &&
+      normalizeCompare(rawB) === normalizeCompare(mergedText);
+
+    if (leftMatches && rightMatches) {
+      return [{ key, text: `${label}: keep shared value` }];
+    }
+
+    const keptValue = leftMatches ? rawA : rightMatches ? rawB : mergedText;
+    return keptValue
+      ? [{ key, text: `${label}: keep ${truncate(keptValue, 36)}` }]
+      : [];
   });
 
-  if (diffs.length === 0) return null;
+  if (summaries.length === 0) return null;
 
   return (
-    <div className="mt-3 rounded-[10px] border border-[#edf0ea] bg-[#f9faf8] px-3 py-2.5 grid gap-2">
-      {diffs.map(({ key, label }) => {
-        const rawA = a[key] as string | null;
-        const rawB = b[key] as string | null;
-        const av = truncate(rawA, 60);
-        const bv = truncate(rawB, 60);
-        const phoneMetaA =
-          key === "phone" ? getPhoneValueContext(rawA, { peerValue: rawB }) : null;
-        const phoneMetaB =
-          key === "phone" ? getPhoneValueContext(rawB, { peerValue: rawA }) : null;
-        const mergedValue =
-          suggestion.quickMergePreview.mergedContact[key as keyof typeof suggestion.quickMergePreview.mergedContact];
-        const mergedText = typeof mergedValue === "string" ? mergedValue : null;
-        const preservesBothValues =
-          key === "email"
-            ? Boolean(
-                normalizeCompare(rawA) &&
-                  normalizeCompare(rawB) &&
-                  normalizeCompare(rawA).toLowerCase() !== normalizeCompare(rawB).toLowerCase(),
-              )
-            : key === "phone"
-              ? Boolean(
-                  normalizeCompare(rawA) &&
-                    normalizeCompare(rawB) &&
-                    !arePhoneValuesEquivalent(rawA, rawB),
-                )
-              : false;
-        const leftMatches =
-          !preservesBothValues &&
-          normalizeCompare(rawA) !== "" &&
-          normalizeCompare(rawA) === normalizeCompare(mergedText);
-        const rightMatches =
-          !preservesBothValues &&
-          normalizeCompare(rawB) !== "" &&
-          normalizeCompare(rawB) === normalizeCompare(mergedText);
-        const leftTone = preservesBothValues ? "combined" : leftMatches ? (rightMatches ? "same" : "kept") : null;
-        const rightTone = preservesBothValues ? "combined" : rightMatches ? (leftMatches ? "same" : "kept") : null;
-        return (
-          <div key={key} className="grid grid-cols-[52px_1fr_1fr] gap-2 items-baseline">
-            <span className="text-[11px] font-semibold uppercase tracking-[0.04em] text-[#aeb4ac]">
-              {label}
-            </span>
-            <span
-              className={`flex min-w-0 flex-col gap-0.5 ${leftTone === "kept" ? "text-[#1d2823]" : "text-[#5c655e]"}`}
-            >
-              <span className="flex min-w-0 items-center gap-1.5 truncate text-[12.5px]">
-                <span className="truncate">{av ?? <span className="text-[#c2c8bf]">—</span>}</span>
-                {leftTone ? <KeptPill tone={leftTone} /> : null}
-              </span>
-              {phoneMetaA?.summary ? (
-                <span className="truncate text-[11px] text-[#8a9189]">{phoneMetaA.summary}</span>
-              ) : null}
-            </span>
-            <span
-              className={`flex min-w-0 flex-col gap-0.5 ${rightTone === "kept" ? "text-[#1d2823]" : "text-[#5c655e]"}`}
-            >
-              <span className="flex min-w-0 items-center gap-1.5 truncate text-[12.5px]">
-                <span className="truncate">{bv ?? <span className="text-[#c2c8bf]">—</span>}</span>
-                {rightTone ? <KeptPill tone={rightTone} /> : null}
-              </span>
-              {phoneMetaB?.summary ? (
-                <span className="truncate text-[11px] text-[#8a9189]">{phoneMetaB.summary}</span>
-              ) : null}
-            </span>
-          </div>
-        );
-      })}
+    <div className="mt-3 rounded-[10px] border border-[#edf0ea] bg-[#f9faf8] px-3 py-2.5">
+      <p className="text-[11px] font-semibold uppercase tracking-[0.04em] text-[#8b938c]">
+        Quick merge will keep
+      </p>
+      <ul className="mt-2 grid gap-1.5 text-[12.5px] text-[#1d2823]">
+        {summaries.slice(0, 3).map((summary) => (
+          <li key={summary.key} className="flex items-start gap-2">
+            <span className="mt-[5px] h-1.5 w-1.5 shrink-0 rounded-full bg-[#17352e]" />
+            <span className="min-w-0 truncate">{summary.text}</span>
+          </li>
+        ))}
+      </ul>
+      {summaries.length > 3 ? (
+        <p className="mt-2 text-[11.5px] text-[#8b938c]">
+          +{summaries.length - 3} more default field choices in full comparison
+        </p>
+      ) : null}
     </div>
   );
 }
@@ -439,7 +411,7 @@ export function MergeSuggestionCard({
       </div>
 
       <p className="mt-3 text-[12px] text-[#5c655e]">
-        Quick merge keeps the older contact as the base record and applies the default field choices below.
+        Quick merge keeps the older contact as the base record.
       </p>
 
       {/* Signal chips */}
