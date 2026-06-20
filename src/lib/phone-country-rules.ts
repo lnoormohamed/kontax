@@ -15,6 +15,7 @@ export type PhoneCountryRule = {
   callingCode: string;
   trunkPrefix?: string;
   allowLocalNationalInput?: boolean;
+  leadingDigits?: string[];
   nationalLengths: number[];
   mobilePrefixes?: string[];
   landlinePrefixes?: string[];
@@ -28,6 +29,39 @@ export type PhoneCountryRule = {
   };
   grouping?: PhoneGrouping;
 };
+
+const formatNanpExample = (digits: string) =>
+  `+1 ${digits.slice(0, 3)} ${digits.slice(3, 6)} ${digits.slice(6)}`.trim();
+
+const buildNanpTerritoryRule = ({
+  iso2,
+  displayName,
+  areaCodes,
+  exampleFixed,
+  exampleMobile,
+}: {
+  iso2: string;
+  displayName: string;
+  areaCodes: string[];
+  exampleFixed: string;
+  exampleMobile?: string;
+}): PhoneCountryRule => ({
+  iso2,
+  displayName,
+  callingCode: "1",
+  allowLocalNationalInput: false,
+  leadingDigits: areaCodes,
+  nationalLengths: [10],
+  labels: { mobile: "Phone", landline: "Phone" },
+  examples: {
+    mobile: formatNanpExample(exampleMobile ?? exampleFixed),
+    landline: formatNanpExample(exampleFixed),
+  },
+  grouping: {
+    internationalDefault: [3, 3, 4],
+    nationalDefault: [3, 3, 4],
+  },
+});
 
 const PHONE_COUNTRY_RULE_LIST: PhoneCountryRule[] = [
   {
@@ -112,6 +146,13 @@ const PHONE_COUNTRY_RULE_LIST: PhoneCountryRule[] = [
     displayName: "Canada",
     callingCode: "1",
     allowLocalNationalInput: true,
+    leadingDigits: [
+      "204", "226", "236", "249", "250", "289", "306", "343", "354", "365", "367", "368",
+      "382", "403", "416", "418", "431", "437", "438", "450", "468", "474", "506", "514",
+      "519", "548", "579", "581", "584", "587", "600", "604", "613", "639", "647", "672",
+      "683", "705", "709", "742", "753", "778", "780", "782", "807", "819", "825", "867",
+      "873", "879", "902", "905", "942",
+    ],
     nationalLengths: [10],
     labels: { mobile: "Phone", landline: "Phone" },
     examples: {
@@ -121,6 +162,350 @@ const PHONE_COUNTRY_RULE_LIST: PhoneCountryRule[] = [
     grouping: {
       internationalDefault: [3, 3, 4],
       nationalDefault: [3, 3, 4],
+    },
+  },
+  buildNanpTerritoryRule({
+    iso2: "AG",
+    displayName: "Antigua and Barbuda",
+    areaCodes: ["268"],
+    exampleFixed: "2684601234",
+    exampleMobile: "2684641234",
+  }),
+  buildNanpTerritoryRule({
+    iso2: "AI",
+    displayName: "Anguilla",
+    areaCodes: ["264"],
+    exampleFixed: "2644612345",
+    exampleMobile: "2642351234",
+  }),
+  buildNanpTerritoryRule({
+    iso2: "AS",
+    displayName: "American Samoa",
+    areaCodes: ["684"],
+    exampleFixed: "6846221234",
+    exampleMobile: "6847331234",
+  }),
+  buildNanpTerritoryRule({
+    iso2: "BB",
+    displayName: "Barbados",
+    areaCodes: ["246"],
+    exampleFixed: "2464123456",
+    exampleMobile: "2462501234",
+  }),
+  buildNanpTerritoryRule({
+    iso2: "BM",
+    displayName: "Bermuda",
+    areaCodes: ["441"],
+    exampleFixed: "4414123456",
+    exampleMobile: "4413701234",
+  }),
+  buildNanpTerritoryRule({
+    iso2: "BS",
+    displayName: "Bahamas",
+    areaCodes: ["242"],
+    exampleFixed: "2423456789",
+    exampleMobile: "2423591234",
+  }),
+  buildNanpTerritoryRule({
+    iso2: "DM",
+    displayName: "Dominica",
+    areaCodes: ["767"],
+    exampleFixed: "7674201234",
+    exampleMobile: "7672251234",
+  }),
+  buildNanpTerritoryRule({
+    iso2: "DO",
+    displayName: "Dominican Republic",
+    areaCodes: ["809", "829", "849"],
+    exampleFixed: "8092345678",
+    exampleMobile: "8092345678",
+  }),
+  buildNanpTerritoryRule({
+    iso2: "GD",
+    displayName: "Grenada",
+    areaCodes: ["473"],
+    exampleFixed: "4732691234",
+    exampleMobile: "4734031234",
+  }),
+  buildNanpTerritoryRule({
+    iso2: "GU",
+    displayName: "Guam",
+    areaCodes: ["671"],
+    exampleFixed: "6713001234",
+    exampleMobile: "6713001234",
+  }),
+  buildNanpTerritoryRule({
+    iso2: "JM",
+    displayName: "Jamaica",
+    areaCodes: ["876", "658"],
+    exampleFixed: "8765230123",
+    exampleMobile: "8762101234",
+  }),
+  buildNanpTerritoryRule({
+    iso2: "KN",
+    displayName: "Saint Kitts and Nevis",
+    areaCodes: ["869"],
+    exampleFixed: "8692361234",
+    exampleMobile: "8697652917",
+  }),
+  buildNanpTerritoryRule({
+    iso2: "KY",
+    displayName: "Cayman Islands",
+    areaCodes: ["345"],
+    exampleFixed: "3452221234",
+    exampleMobile: "3453231234",
+  }),
+  buildNanpTerritoryRule({
+    iso2: "LC",
+    displayName: "Saint Lucia",
+    areaCodes: ["758"],
+    exampleFixed: "7584305678",
+    exampleMobile: "7582845678",
+  }),
+  buildNanpTerritoryRule({
+    iso2: "MP",
+    displayName: "Northern Mariana Islands",
+    areaCodes: ["670"],
+    exampleFixed: "6702345678",
+    exampleMobile: "6702345678",
+  }),
+  buildNanpTerritoryRule({
+    iso2: "MS",
+    displayName: "Montserrat",
+    areaCodes: ["664"],
+    exampleFixed: "6644912345",
+    exampleMobile: "6644923456",
+  }),
+  buildNanpTerritoryRule({
+    iso2: "PR",
+    displayName: "Puerto Rico",
+    areaCodes: ["787", "939"],
+    exampleFixed: "7872345678",
+    exampleMobile: "7872345678",
+  }),
+  buildNanpTerritoryRule({
+    iso2: "SX",
+    displayName: "Sint Maarten",
+    areaCodes: ["721"],
+    exampleFixed: "7215425678",
+    exampleMobile: "7215205678",
+  }),
+  buildNanpTerritoryRule({
+    iso2: "TC",
+    displayName: "Turks and Caicos Islands",
+    areaCodes: ["649"],
+    exampleFixed: "6497121234",
+    exampleMobile: "6492311234",
+  }),
+  buildNanpTerritoryRule({
+    iso2: "TT",
+    displayName: "Trinidad and Tobago",
+    areaCodes: ["868"],
+    exampleFixed: "8682211234",
+    exampleMobile: "8682911234",
+  }),
+  buildNanpTerritoryRule({
+    iso2: "VC",
+    displayName: "Saint Vincent and the Grenadines",
+    areaCodes: ["784"],
+    exampleFixed: "7842661234",
+    exampleMobile: "7844301234",
+  }),
+  buildNanpTerritoryRule({
+    iso2: "VG",
+    displayName: "British Virgin Islands",
+    areaCodes: ["284"],
+    exampleFixed: "2842291234",
+    exampleMobile: "2843001234",
+  }),
+  buildNanpTerritoryRule({
+    iso2: "VI",
+    displayName: "U.S. Virgin Islands",
+    areaCodes: ["340"],
+    exampleFixed: "3406421234",
+    exampleMobile: "3406421234",
+  }),
+  {
+    iso2: "IE",
+    displayName: "Ireland",
+    callingCode: "353",
+    trunkPrefix: "0",
+    allowLocalNationalInput: true,
+    nationalLengths: [7, 8, 9],
+    mobilePrefixes: ["8"],
+    landlinePrefixes: ["1", "2", "4", "5", "6", "7", "9"],
+    labels: { mobile: "Mobile", landline: "Landline" },
+    examples: {
+      mobile: "+353 85 012 3456",
+      landline: "+353 22 12345",
+    },
+    grouping: {
+      internationalMobile: [2, 3, 4],
+      nationalMobile: [2, 3, 4],
+      internationalLandline: [2, 5],
+      nationalLandline: [2, 5],
+    },
+  },
+  {
+    iso2: "FR",
+    displayName: "France",
+    callingCode: "33",
+    trunkPrefix: "0",
+    allowLocalNationalInput: true,
+    nationalLengths: [9],
+    mobilePrefixes: ["6", "7"],
+    landlinePrefixes: ["1", "2", "3", "4", "5"],
+    labels: { mobile: "Mobile", landline: "Landline" },
+    examples: {
+      mobile: "+33 6 12 34 56 78",
+      landline: "+33 1 23 45 67 89",
+    },
+    grouping: {
+      internationalDefault: [1, 2, 2, 2, 2],
+      nationalDefault: [1, 2, 2, 2, 2],
+    },
+  },
+  {
+    iso2: "DE",
+    displayName: "Germany",
+    callingCode: "49",
+    trunkPrefix: "0",
+    allowLocalNationalInput: true,
+    nationalLengths: [8, 9, 10, 11],
+    mobilePrefixes: ["15", "16", "17"],
+    landlinePrefixes: ["2", "3", "4", "5", "6", "7", "8", "9"],
+    labels: { mobile: "Mobile", landline: "Landline" },
+    examples: {
+      mobile: "+49 151 234 56789",
+      landline: "+49 30 123456",
+    },
+    grouping: {
+      internationalMobile: [3, 3, 5],
+      nationalMobile: [3, 3, 5],
+      internationalLandline: [2, 6],
+      nationalLandline: [2, 6],
+    },
+  },
+  {
+    iso2: "NL",
+    displayName: "Netherlands",
+    callingCode: "31",
+    trunkPrefix: "0",
+    allowLocalNationalInput: true,
+    nationalLengths: [9],
+    mobilePrefixes: ["6"],
+    landlinePrefixes: ["1", "2", "3", "4", "5"],
+    labels: { mobile: "Mobile", landline: "Landline" },
+    examples: {
+      mobile: "+31 6 1234 5678",
+      landline: "+31 10 123 4567",
+    },
+    grouping: {
+      internationalMobile: [1, 4, 4],
+      nationalMobile: [1, 4, 4],
+      internationalLandline: [2, 3, 4],
+      nationalLandline: [2, 3, 4],
+    },
+  },
+  {
+    iso2: "BE",
+    displayName: "Belgium",
+    callingCode: "32",
+    trunkPrefix: "0",
+    allowLocalNationalInput: true,
+    nationalLengths: [8, 9],
+    mobilePrefixes: ["4"],
+    landlinePrefixes: ["1", "2", "3", "5", "6", "7", "8", "9"],
+    labels: { mobile: "Mobile", landline: "Landline" },
+    examples: {
+      mobile: "+32 450 00 12 34",
+      landline: "+32 12 34 56 78",
+    },
+    grouping: {
+      internationalMobile: [3, 2, 2, 2],
+      nationalMobile: [3, 2, 2, 2],
+      internationalLandline: [2, 2, 2, 2],
+      nationalLandline: [2, 2, 2, 2],
+    },
+  },
+  {
+    iso2: "CH",
+    displayName: "Switzerland",
+    callingCode: "41",
+    trunkPrefix: "0",
+    allowLocalNationalInput: true,
+    nationalLengths: [9],
+    mobilePrefixes: ["7"],
+    landlinePrefixes: ["2", "3", "4", "5", "6", "8", "9"],
+    labels: { mobile: "Mobile", landline: "Landline" },
+    examples: {
+      mobile: "+41 78 123 45 67",
+      landline: "+41 21 234 56 78",
+    },
+    grouping: {
+      internationalDefault: [2, 3, 2, 2],
+      nationalDefault: [2, 3, 2, 2],
+    },
+  },
+  {
+    iso2: "AT",
+    displayName: "Austria",
+    callingCode: "43",
+    trunkPrefix: "0",
+    allowLocalNationalInput: true,
+    nationalLengths: [9, 10],
+    mobilePrefixes: ["6"],
+    landlinePrefixes: ["1", "2", "3", "4", "5", "7", "8", "9"],
+    labels: { mobile: "Mobile", landline: "Landline" },
+    examples: {
+      mobile: "+43 664 123456",
+      landline: "+43 1 234567890",
+    },
+    grouping: {
+      internationalMobile: [3, 6],
+      nationalMobile: [3, 6],
+      internationalLandline: [1, 9],
+      nationalLandline: [1, 9],
+    },
+  },
+  {
+    iso2: "LU",
+    displayName: "Luxembourg",
+    callingCode: "352",
+    allowLocalNationalInput: true,
+    nationalLengths: [8, 9],
+    mobilePrefixes: ["6"],
+    landlinePrefixes: ["2", "3", "4", "5", "7", "8", "9"],
+    labels: { mobile: "Mobile", landline: "Landline" },
+    examples: {
+      mobile: "+352 628 123 456",
+      landline: "+352 27 12 34 56",
+    },
+    grouping: {
+      internationalMobile: [3, 3, 3],
+      nationalMobile: [3, 3, 3],
+      internationalLandline: [2, 2, 2, 2],
+      nationalLandline: [2, 2, 2, 2],
+    },
+  },
+  {
+    iso2: "LI",
+    displayName: "Liechtenstein",
+    callingCode: "423",
+    allowLocalNationalInput: true,
+    nationalLengths: [7, 9],
+    mobilePrefixes: ["6", "7"],
+    landlinePrefixes: ["2", "3"],
+    labels: { mobile: "Mobile", landline: "Landline" },
+    examples: {
+      mobile: "+423 660 234 567",
+      landline: "+423 234 56 78",
+    },
+    grouping: {
+      internationalMobile: [3, 3, 3],
+      nationalMobile: [3, 3, 3],
+      internationalLandline: [3, 2, 2],
+      nationalLandline: [3, 2, 2],
     },
   },
   {
@@ -556,6 +941,8 @@ export const getPhoneNumberTypeLabel = (
 };
 
 export const findPhoneCountryRuleByCallingCode = (digits: string) => {
+  let fallback: { rule: PhoneCountryRule; nationalDigits: string } | null = null;
+
   for (const rule of CALLING_CODE_RULES) {
     if (!digits.startsWith(rule.callingCode)) {
       continue;
@@ -566,13 +953,22 @@ export const findPhoneCountryRuleByCallingCode = (digits: string) => {
       continue;
     }
 
-    return { rule, nationalDigits };
+    if (rule.leadingDigits?.length) {
+      if (startsWithAny(nationalDigits, rule.leadingDigits)) {
+        return { rule, nationalDigits };
+      }
+      continue;
+    }
+
+    fallback ??= { rule, nationalDigits };
   }
 
-  return null;
+  return fallback;
 };
 
 export const findPhoneCountryRuleForLocalDigits = (digits: string) => {
+  let fallback: { rule: PhoneCountryRule; nationalDigits: string } | null = null;
+
   for (const rule of PHONE_COUNTRY_RULE_LIST) {
     if (rule.allowLocalNationalInput === false) {
       continue;
@@ -586,10 +982,17 @@ export const findPhoneCountryRuleForLocalDigits = (digits: string) => {
       continue;
     }
 
-    return { rule, nationalDigits };
+    if (rule.leadingDigits?.length) {
+      if (startsWithAny(nationalDigits, rule.leadingDigits)) {
+        return { rule, nationalDigits };
+      }
+      continue;
+    }
+
+    fallback ??= { rule, nationalDigits };
   }
 
-  return null;
+  return fallback;
 };
 
 export const resolvePhoneNationalDigitsForRule = ({
