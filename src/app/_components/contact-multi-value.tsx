@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { updateContactEntries } from "~/app/actions/contacts";
+import { PhoneCountryInput } from "~/app/_components/phone-country-input";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 
 // Multi-value contact fields (emails / phones / websites / dates / related) and
@@ -131,6 +132,7 @@ function MultiRow({
   const [editing, setEditing] = useState(item.value.trim().length === 0 && editable);
   const [draft, setDraft] = useState(item.value);
   const [hover, setHover] = useState(false);
+  const isPhoneField = type === "phones";
 
   const has = item.value.trim().length > 0;
   const display = type === "dates" && has ? formatDateDisplay(item.value) : item.value;
@@ -153,16 +155,40 @@ function MultiRow({
           setEditing(true);
         }
       }}
+      onBlur={(event) => {
+        if (!editing || !isPhoneField) return;
+        const nextTarget = event.relatedTarget as Node | null;
+        if (!nextTarget || !event.currentTarget.contains(nextTarget)) {
+          commit();
+        }
+      }}
       onMouseEnter={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
     >
       <LabelPill label={item.label} onPick={onChangeLabel} options={labelOptions} readOnly={!editable} />
       <div className="min-w-0 flex-1">
-        {editing ? (
+        {editing && isPhoneField ? (
+          <PhoneCountryInput
+            autoFocus
+            numberInputClassName="w-full border-none bg-transparent p-0 text-sm leading-[1.45] text-[#1d2823] outline-none"
+            onChange={setDraft}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                e.preventDefault();
+                commit();
+              } else if (e.key === "Escape") {
+                setDraft(item.value);
+                setEditing(false);
+              }
+            }}
+            selectorClassName="flex h-[34px] items-center gap-2 rounded-[0.7rem] border border-[#d8ddd6] bg-white px-2.5 text-sm text-[#1d2823] transition hover:bg-[#f6f7f4]"
+            value={draft}
+            wrapperClassName="flex min-w-0 items-center gap-2"
+          />
+        ) : editing ? (
           <input
             autoFocus
             className="w-full border-none bg-transparent p-0 text-sm leading-[1.45] text-[#1d2823] outline-none"
-            onBlur={commit}
             onChange={(e) => setDraft(e.target.value)}
             onClick={(e) => e.stopPropagation()}
             onKeyDown={(e) => {

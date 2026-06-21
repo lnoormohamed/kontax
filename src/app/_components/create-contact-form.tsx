@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 
 import { createContact } from "~/app/actions/contacts";
+import { PhoneCountryInput } from "~/app/_components/phone-country-input";
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import type { CardPrefillData } from "~/app/u/[username]/add-to-kontax";
 
@@ -71,6 +72,7 @@ function MultiValue({
 }) {
   const update = (i: number, patch: Partial<ValueRow>) =>
     setRows(rows.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
+  const isPhoneField = type === "tel";
   return (
     <div className="grid gap-2">
       {rows.map((row, i) => (
@@ -86,13 +88,23 @@ function MultiValue({
               </option>
             ))}
           </select>
-          <input
-            className={FIELD}
-            onChange={(e) => update(i, { value: e.target.value })}
-            placeholder={placeholder}
-            type={type}
-            value={row.value}
-          />
+          {isPhoneField ? (
+            <PhoneCountryInput
+              numberInputClassName={FIELD}
+              onChange={(value) => update(i, { value })}
+              placeholder={placeholder}
+              value={row.value}
+              wrapperClassName="min-w-0 flex-1"
+            />
+          ) : (
+            <input
+              className={FIELD}
+              onChange={(e) => update(i, { value: e.target.value })}
+              placeholder={placeholder}
+              type={type}
+              value={row.value}
+            />
+          )}
           {rows.length > 1 ? (
             <button
               aria-label="Remove"
