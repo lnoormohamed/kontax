@@ -90,7 +90,6 @@ function MultiValue({
           </select>
           {isPhoneField ? (
             <PhoneCountryInput
-              numberInputClassName={FIELD}
               onChange={(value) => update(i, { value })}
               placeholder={placeholder}
               value={row.value}

@@ -170,7 +170,6 @@ function MultiRow({
         {editing && isPhoneField ? (
           <PhoneCountryInput
             autoFocus
-            numberInputClassName="w-full border-none bg-transparent p-0 text-sm leading-[1.45] text-[#1d2823] outline-none"
             onChange={setDraft}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
@@ -181,7 +180,7 @@ function MultiRow({
                 setEditing(false);
               }
             }}
-            selectorClassName="flex h-[34px] items-center gap-2 rounded-[0.7rem] border border-[#d8ddd6] bg-white px-2.5 text-sm text-[#1d2823] transition hover:bg-[#f6f7f4]"
+            selectorClassName="flex h-[34px] shrink-0 items-center gap-2 border-r border-[#d8ddd6] bg-[#f6f7f4] px-2.5 text-sm text-[#1d2823] transition hover:bg-[#eef2ec]"
             value={draft}
             wrapperClassName="flex min-w-0 items-center gap-2"
           />

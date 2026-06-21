@@ -1,6 +1,14 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState, type KeyboardEventHandler } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+  type KeyboardEventHandler,
+} from "react";
+import { createPortal } from "react-dom";
 
 import { WorkspaceIcon } from "~/app/_components/workspace-icons";
 import {
@@ -17,15 +25,13 @@ type PhoneCountryInputProps = {
   placeholder?: string;
   wrapperClassName?: string;
   selectorClassName?: string;
-  codeInputClassName?: string;
   numberInputClassName?: string;
   onKeyDown?: KeyboardEventHandler<HTMLInputElement>;
 };
 
 type ParsedPhoneState = {
   iso2: string | null;
-  code: string;
-  number: string;
+  value: string;
 };
 
 const COUNTRY_OPTIONS = [...PHONE_COUNTRY_RULES_LIST].sort((left, right) =>
@@ -41,60 +47,51 @@ const flagEmojiForIso2 = (iso2: string | null) => {
     .join("");
 };
 
-const normalizeCodeDraft = (value: string) => {
-  const digits = value.replace(/\D/g, "").slice(0, 4);
-  if (!digits) {
-    return value.trim().startsWith("+") ? "+" : "";
-  }
-  return `+${digits}`;
-};
-
-const composePhoneValue = (code: string, number: string) => {
-  const digits = code.replace(/\D/g, "");
-  const trimmedNumber = number.trim();
-
-  if (digits) {
-    return trimmedNumber ? `+${digits} ${trimmedNumber}` : `+${digits}`;
-  }
-
-  return trimmedNumber;
-};
-
 const parsePhoneValue = (value: string): ParsedPhoneState => {
   const raw = value.trim();
   if (!raw) {
-    return { iso2: null, code: "", number: "" };
+    return { iso2: null, value: "" };
   }
 
   const candidate = normalizePhoneCandidate(raw);
-  const matchedRule = candidate.countryCode ? getPhoneCountryRule(candidate.countryCode) : null;
-
-  if (matchedRule) {
-    return {
-      iso2: matchedRule.iso2,
-      code: `+${matchedRule.callingCode}`,
-      number: candidate.displayNational ?? candidate.national ?? raw,
-    };
-  }
+  const iso2 = candidate.countryCode ?? null;
+  const normalizedValue = candidate.displayInternational ?? candidate.value ?? raw;
 
   if (raw.startsWith("+")) {
-    const match = raw.match(/^\+(\d{0,4})(.*)$/);
-    const codeDigits = match?.[1] ?? "";
-    const number = match?.[2]?.trim() ?? "";
-    const fallbackRule = codeDigits ? findPhoneCountryRuleByCallingCode(codeDigits)?.rule ?? null : null;
-
+    const match = raw.match(/^\+(\d{1,4})/);
+    const rule = match?.[1] ? findPhoneCountryRuleByCallingCode(match[1])?.rule ?? null : null;
     return {
-      iso2: fallbackRule?.iso2 ?? null,
-      code: codeDigits ? `+${codeDigits}` : "+",
-      number,
+      iso2: iso2 ?? rule?.iso2 ?? null,
+      value: normalizedValue,
     };
   }
 
   return {
-    iso2: candidate.countryCode,
-    code: candidate.callingCode ? `+${candidate.callingCode}` : "",
-    number: candidate.displayNational ?? raw,
+    iso2,
+    value: normalizedValue,
   };
+};
+
+const replaceCallingCode = (currentValue: string, nextCallingCode: string) => {
+  const parsedCurrent = parsePhoneValue(currentValue);
+  const normalizedCurrent = normalizePhoneCandidate(parsedCurrent.value);
+  const existingRule = parsedCurrent.iso2 ? getPhoneCountryRule(parsedCurrent.iso2) : null;
+
+  let localNumber = "";
+  if (normalizedCurrent.displayNational) {
+    localNumber = normalizedCurrent.displayNational;
+  } else if (existingRule) {
+    const prefix = `+${existingRule.callingCode}`;
+    localNumber = parsedCurrent.value.startsWith(prefix)
+      ? parsedCurrent.value.slice(prefix.length).trim()
+      : parsedCurrent.value.trim();
+  } else if (parsedCurrent.value.startsWith("+")) {
+    localNumber = parsedCurrent.value.replace(/^\+\d{1,4}\s*/, "").trim();
+  } else {
+    localNumber = parsedCurrent.value.trim();
+  }
+
+  return localNumber ? `+${nextCallingCode} ${localNumber}` : `+${nextCallingCode}`;
 };
 
 export function PhoneCountryInput({
@@ -104,14 +101,21 @@ export function PhoneCountryInput({
   placeholder = "Phone number",
   wrapperClassName,
   selectorClassName,
-  codeInputClassName,
   numberInputClassName,
   onKeyDown,
 }: PhoneCountryInputProps) {
-  const [{ iso2, code, number }, setState] = useState<ParsedPhoneState>(() => parsePhoneValue(value));
+  const [{ iso2, value: draftValue }, setState] = useState<ParsedPhoneState>(() => parsePhoneValue(value));
   const [open, setOpen] = useState(false);
-  const numberInputRef = useRef<HTMLInputElement | null>(null);
+  const [menuStyle, setMenuStyle] = useState<CSSProperties | null>(null);
+  const [mounted, setMounted] = useState(false);
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const triggerRef = useRef<HTMLButtonElement | null>(null);
+  const inputRef = useRef<HTMLInputElement | null>(null);
   const lastEmittedValueRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (value === lastEmittedValueRef.current) {
@@ -120,106 +124,74 @@ export function PhoneCountryInput({
     setState(parsePhoneValue(value));
   }, [value]);
 
-  const selectedRule = useMemo(() => (iso2 ? getPhoneCountryRule(iso2) : null), [iso2]);
-  const numberPlaceholder = useMemo(() => {
-    const example = selectedRule?.examples?.mobile ?? selectedRule?.examples?.landline;
-    if (!example || !selectedRule) {
-      return placeholder;
+  useEffect(() => {
+    if (!open) {
+      return;
     }
-    return example.replace(new RegExp(`^\\+${selectedRule.callingCode}\\s*`), "").trim();
+
+    const updatePosition = () => {
+      const rect = triggerRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      setMenuStyle({
+        position: "fixed",
+        top: rect.bottom + 8,
+        left: rect.left,
+        width: 320,
+        maxWidth: Math.max(260, window.innerWidth - rect.left - 16),
+        zIndex: 2000,
+      });
+    };
+
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+  }, [open]);
+
+  const selectedRule = useMemo(() => (iso2 ? getPhoneCountryRule(iso2) : null), [iso2]);
+  const inputPlaceholder = useMemo(() => {
+    const example = selectedRule?.examples?.mobile ?? selectedRule?.examples?.landline;
+    return example ?? placeholder;
   }, [placeholder, selectedRule]);
 
-  const emit = (next: ParsedPhoneState, normalize = false) => {
-    const raw = composePhoneValue(next.code, next.number);
-    const normalized = normalize ? normalizePhoneCandidate(raw) : null;
-    const finalValue = normalized?.displayInternational ?? normalized?.value ?? raw;
-
-    if (normalize) {
-      setState(parsePhoneValue(finalValue));
-    } else {
-      setState(next);
-    }
-
+  const emit = (nextRawValue: string, normalize = false) => {
+    const normalized = normalize ? normalizePhoneCandidate(nextRawValue) : null;
+    const finalValue = normalized?.displayInternational ?? normalized?.value ?? nextRawValue;
+    const nextState = parsePhoneValue(finalValue);
+    setState(nextState);
     lastEmittedValueRef.current = finalValue;
     onChange(finalValue);
-  };
-
-  const updateCode = (nextCode: string) => {
-    const normalizedCode = normalizeCodeDraft(nextCode);
-    const codeDigits = normalizedCode.replace(/\D/g, "");
-    const rule =
-      codeDigits && selectedRule?.callingCode === codeDigits
-        ? selectedRule
-        : codeDigits
-          ? findPhoneCountryRuleByCallingCode(codeDigits)?.rule ?? null
-          : null;
-
-    emit(
-      {
-        iso2: rule?.iso2 ?? null,
-        code: normalizedCode,
-        number,
-      },
-      false,
-    );
-  };
-
-  const updateNumber = (nextNumber: string) => {
-    emit({ iso2, code, number: nextNumber }, false);
   };
 
   const selectCountry = (nextIso2: string) => {
     const rule = getPhoneCountryRule(nextIso2);
     if (!rule) return;
     setOpen(false);
-    emit({ iso2: rule.iso2, code: `+${rule.callingCode}`, number }, false);
+    emit(replaceCallingCode(draftValue, rule.callingCode), false);
     requestAnimationFrame(() => {
-      numberInputRef.current?.focus();
+      inputRef.current?.focus();
+      inputRef.current?.setSelectionRange(inputRef.current.value.length, inputRef.current.value.length);
     });
   };
 
-  return (
-    <div
-      className={wrapperClassName ?? "flex min-w-0 flex-1 items-center gap-2"}
-      onBlur={(event) => {
-        const nextTarget = event.relatedTarget as Node | null;
-        if (!nextTarget || !event.currentTarget.contains(nextTarget)) {
-          emit({ iso2, code, number }, true);
-          setOpen(false);
-        }
-      }}
-    >
-      <div className="relative shrink-0">
-        <button
-          aria-expanded={open}
-          aria-haspopup="listbox"
-          className={
-            selectorClassName ??
-            "flex h-[42px] items-center gap-2 rounded-[0.7rem] border border-[#d8ddd6] bg-white px-3 text-sm text-[#1d2823] transition hover:bg-[#f6f7f4]"
-          }
-          onClick={(event) => {
-            event.stopPropagation();
-            setOpen((current) => !current);
-          }}
-          type="button"
-        >
-          <span className="text-[18px] leading-none">{flagEmojiForIso2(iso2)}</span>
-          <WorkspaceIcon
-            name={open ? "chevron-up" : "chevron-down"}
-            size={14}
-            strokeWidth={2}
-          />
-        </button>
-        {open ? (
+  const menu =
+    open && mounted && menuStyle
+      ? createPortal(
           <>
             <span
-              className="fixed inset-0 z-30"
+              className="fixed inset-0 z-[1999]"
               onClick={(event) => {
                 event.stopPropagation();
                 setOpen(false);
               }}
             />
-            <div className="absolute left-0 top-[calc(100%+8px)] z-40 max-h-72 w-[320px] overflow-y-auto rounded-[14px] border border-[#d8ddd6] bg-white p-1.5 shadow-[0_16px_36px_rgba(20,30,25,0.16)]">
+            <div
+              className="max-h-72 overflow-y-auto rounded-[14px] border border-[#d8ddd6] bg-white p-1.5 shadow-[0_16px_36px_rgba(20,30,25,0.16)]"
+              style={menuStyle}
+            >
               {COUNTRY_OPTIONS.map((rule) => (
                 <button
                   className={`flex w-full items-center gap-3 rounded-[10px] px-3 py-2.5 text-left text-sm text-[#1d2823] ${
@@ -238,37 +210,64 @@ export function PhoneCountryInput({
                 </button>
               ))}
             </div>
-          </>
-        ) : null}
+          </>,
+          document.body,
+        )
+      : null;
+
+  return (
+    <>
+      <div
+        className={wrapperClassName ?? "flex min-w-0 flex-1 items-center"}
+        onBlur={(event) => {
+          const nextTarget = event.relatedTarget as Node | null;
+          if (!nextTarget || !rootRef.current?.contains(nextTarget)) {
+            emit(draftValue, true);
+            setOpen(false);
+          }
+        }}
+        ref={rootRef}
+      >
+        <div className="flex min-w-0 flex-1 items-center overflow-hidden rounded-[0.7rem] border border-[#d8ddd6] bg-white focus-within:border-[#4158f4]">
+          <button
+            aria-expanded={open}
+            aria-haspopup="listbox"
+            className={
+              selectorClassName ??
+              "flex h-[42px] shrink-0 items-center gap-2 border-r border-[#d8ddd6] bg-[#f6f7f4] px-3 text-sm text-[#1d2823] transition hover:bg-[#eef2ec]"
+            }
+            onClick={(event) => {
+              event.stopPropagation();
+              setOpen((current) => !current);
+            }}
+            ref={triggerRef}
+            type="button"
+          >
+            <span className="text-[18px] leading-none">{flagEmojiForIso2(iso2)}</span>
+            <WorkspaceIcon
+              name={open ? "chevron-up" : "chevron-down"}
+              size={14}
+              strokeWidth={2}
+            />
+          </button>
+          <input
+            autoFocus={autoFocus}
+            className={
+              numberInputClassName ??
+              "h-[42px] min-w-0 flex-1 border-none bg-white px-3 text-sm text-[#1d2823] outline-none placeholder:text-[#aeb4ac]"
+            }
+            inputMode="tel"
+            onChange={(event) => emit(event.target.value, false)}
+            onClick={(event) => event.stopPropagation()}
+            onKeyDown={onKeyDown}
+            placeholder={inputPlaceholder}
+            ref={inputRef}
+            type="text"
+            value={draftValue}
+          />
+        </div>
       </div>
-      <input
-        className={
-          codeInputClassName ??
-          "h-[42px] w-[88px] shrink-0 rounded-[0.7rem] border border-[#d8ddd6] bg-[#f6f7f4] px-3 text-sm font-semibold text-[#1d2823] outline-none transition focus:border-[#4158f4] focus:bg-white"
-        }
-        inputMode="tel"
-        onChange={(event) => updateCode(event.target.value)}
-        onClick={(event) => event.stopPropagation()}
-        onKeyDown={onKeyDown}
-        placeholder="+1"
-        type="text"
-        value={code}
-      />
-      <input
-        autoFocus={autoFocus}
-        className={
-          numberInputClassName ??
-          "h-[42px] min-w-0 flex-1 rounded-[0.7rem] border border-[#d8ddd6] bg-white px-3 text-sm text-[#1d2823] outline-none transition placeholder:text-[#aeb4ac] focus:border-[#4158f4]"
-        }
-        inputMode="tel"
-        onChange={(event) => updateNumber(event.target.value)}
-        onClick={(event) => event.stopPropagation()}
-        onKeyDown={onKeyDown}
-        placeholder={numberPlaceholder}
-        ref={numberInputRef}
-        type="text"
-        value={number}
-      />
-    </div>
+      {menu}
+    </>
   );
 }
