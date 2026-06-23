@@ -1160,7 +1160,12 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
         label: string,
       ): string[] => {
         const normalized = label.trim().toLowerCase();
-        if (!normalized) return [];
+        if (!normalized) {
+          if (kind === "email") return ["INTERNET"];
+          if (kind === "phone") return ["VOICE"];
+          if (kind === "address") return ["HOME"];
+          return [];
+        }
 
         const commonMap: Record<string, string[]> = {
           mobile: ["CELL"],
@@ -1172,9 +1177,13 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
           company: ["WORK"],
           home: ["HOME"],
           personal: ["HOME"],
+          alt: ["HOME"],
+          alternate: ["HOME"],
+          other: ["HOME"],
           main: ["PREF"],
           primary: ["PREF"],
           fax: ["FAX"],
+          portfolio: ["HOME"],
         };
 
         const addressMap: Record<string, string[]> = {
@@ -1183,12 +1192,21 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
           business: ["WORK"],
           home: ["HOME"],
           personal: ["HOME"],
+          primary: ["HOME"],
+          address: ["HOME"],
+          other: ["HOME"],
           postal: ["POSTAL"],
           mailing: ["POSTAL"],
         };
 
         const value = kind === "address" ? addressMap[normalized] : commonMap[normalized];
-        return value ?? ["OTHER"];
+        if (value) {
+          return kind === "email" ? ["INTERNET", ...value] : value;
+        }
+        if (kind === "email") return ["INTERNET"];
+        if (kind === "phone") return ["VOICE"];
+        if (kind === "address") return ["HOME"];
+        return [];
       };
 
       const appendTypedLine = (
