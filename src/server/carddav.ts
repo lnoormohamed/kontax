@@ -51,6 +51,7 @@ export type CardDavContactCard = CardDavAddressBookEntry & {
   phoneNumbers: string[];
   phoneEntries: Array<{ label: string; value: string; isPrimary: boolean }>;
   company: string | null;
+  department: string | null;
   jobTitle: string | null;
   website: string | null;
   websiteEntries: Array<{ label: string; value: string; isPrimary: boolean }>;
@@ -497,6 +498,7 @@ const parseCardDavContactCard = (
     formatted: entry.formatted,
   }));
   const nameParts = nLine ? parseNameParts(nLine.value) : null;
+  const [company, department] = (orgLine?.value.split(";") ?? []).map((part) => part.trim());
   const derivedFullName = [
     nameParts?.namePrefix,
     nameParts?.firstName,
@@ -522,7 +524,8 @@ const parseCardDavContactCard = (
     emailEntries,
     phoneNumbers: phoneEntries.map((item) => item.value),
     phoneEntries,
-    company: orgLine?.value.split(";")[0]?.trim() ?? null,
+    company: company || null,
+    department: department || null,
     jobTitle: titleLine?.value ?? null,
     website: websiteEntries[0]?.value ?? null,
     websiteEntries,

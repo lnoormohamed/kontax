@@ -53,6 +53,7 @@ type SyncContactRow = {
   phoneNumbers: unknown;
   phoneEntries?: unknown;
   company: string | null;
+  department: string | null;
   jobTitle: string | null;
   website: string | null;
   websiteEntries?: unknown;
@@ -126,6 +127,7 @@ const contactToPortable = (c: SyncContactRow): PortableContactInput => ({
   phoneNumbers: safeStringArray(c.phoneNumbers),
   phoneEntries: safeValueEntries(c.phoneEntries),
   company: c.company,
+  department: c.department,
   jobTitle: c.jobTitle,
   website: c.website,
   websiteEntries: safeValueEntries(c.websiteEntries),
@@ -156,6 +158,7 @@ const cardDavPushContactSelect = {
   phoneNumbers: true,
   phoneEntries: true,
   company: true,
+  department: true,
   jobTitle: true,
   website: true,
   websiteEntries: true,
@@ -199,6 +202,7 @@ const buildContactWriteDataFromRemoteSnapshot = (snapshot: unknown) => {
     phoneNumbers: phoneNumbers.length > 0 ? phoneNumbers : undefined,
     phoneEntries: Array.isArray(snapshot.phoneEntries) ? snapshot.phoneEntries : undefined,
     company: typeof snapshot.company === "string" ? snapshot.company : null,
+    department: typeof snapshot.department === "string" ? snapshot.department : null,
     jobTitle: typeof snapshot.jobTitle === "string" ? snapshot.jobTitle : null,
     website: typeof snapshot.website === "string" ? snapshot.website : null,
     websiteEntries: Array.isArray(snapshot.websiteEntries) ? snapshot.websiteEntries : undefined,
@@ -839,6 +843,7 @@ export const runQueuedSyncJobs = async ({
               phoneNumbers: true,
               phoneEntries: true,
               company: true,
+              department: true,
               jobTitle: true,
               website: true,
               websiteEntries: true,
@@ -1193,6 +1198,7 @@ export const runQueuedSyncJobs = async ({
               phoneNumbers: card.phoneNumbers.length > 0 ? card.phoneNumbers : undefined,
               phoneEntries: card.phoneEntries.length > 0 ? card.phoneEntries : undefined,
               company: card.company,
+              department: card.department,
               jobTitle: card.jobTitle,
               website: card.website,
               websiteEntries: card.websiteEntries.length > 0 ? card.websiteEntries : undefined,

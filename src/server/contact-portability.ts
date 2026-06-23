@@ -76,6 +76,7 @@ export type PortableContactInput = {
   phoneNumbers?: string[] | null;
   phoneEntries?: ContactValueEntryInput[] | null;
   company?: string | null;
+  department?: string | null;
   phoneticCompany?: string | null;
   jobTitle?: string | null;
   website?: string | null;
@@ -1302,8 +1303,10 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
         lines.push(`NICKNAME:${escapeVCard(contact.nickname)}`);
       }
 
-      if (contact.company) {
-        lines.push(`ORG:${escapeVCard(contact.company)}`);
+      if (contact.company || contact.department) {
+        lines.push(
+          `ORG:${escapeVCard(contact.company ?? "")};${escapeVCard(contact.department ?? "")}`,
+        );
       }
 
       if (contact.phoneticCompany) {
