@@ -366,6 +366,31 @@ const getPreferredLabel = (params: Record<string, string[]>, fallback: string) =
   return firstUsableType;
 };
 
+const normalizeBirthdayValue = (value: string | null) => {
+  if (!value) {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  const noYearMatch = /^--(\d{2})-?(\d{2})$/.exec(trimmed);
+  if (noYearMatch) {
+    const [, month, day] = noYearMatch;
+    return `--${month}-${day}`;
+  }
+
+  const fullDateMatch = /^(\d{4})-?(\d{2})-?(\d{2})$/.exec(trimmed);
+  if (fullDateMatch) {
+    const [, year, month, day] = fullDateMatch;
+    return `${year}-${month}-${day}`;
+  }
+
+  return trimmed;
+};
+
 const parseVCardLines = (value: string) =>
   unfoldVCard(decodeXmlEntities(value))
     .split(/\r?\n/)
@@ -486,10 +511,10 @@ const parseNameParts = (value: string) => {
 };
 
 const parseAdrValue = (value: string, label: string) => {
-  const [poBox, , streetLine1, cityOrTown, region, postcode, countryOrRegion] = value
+  const [poBox, streetLine2, streetLine1, cityOrTown, region, postcode, countryOrRegion] = value
     .split(";")
     .map((part) => unescapeVCardValue(part));
-  const formatted = [streetLine1, cityOrTown, region, postcode, countryOrRegion]
+  const formatted = [streetLine1, streetLine2, cityOrTown, region, postcode, countryOrRegion]
     .filter(Boolean)
     .join(", ");
 
@@ -501,8 +526,9 @@ const parseAdrValue = (value: string, label: string) => {
     label,
     formatted,
     isPrimary: false,
-    countryOrRegion: countryOrRegion ?? region ?? undefined,
+    countryOrRegion: countryOrRegion ?? undefined,
     streetLine1: streetLine1 ?? undefined,
+    streetLine2: streetLine2 ?? undefined,
     cityOrTown: cityOrTown ?? undefined,
     postcode: postcode ?? undefined,
     poBox: poBox ?? undefined,
@@ -624,7 +650,7 @@ const parseCardDavContactCard = (
     jobTitle: titleLine?.value ?? null,
     website: websiteEntries[0]?.value ?? null,
     websiteEntries,
-    birthday: bdayLine?.value ?? null,
+    birthday: normalizeBirthdayValue(bdayLine?.value ?? null),
     address: addressEntries[0]?.formatted ?? null,
     postalAddresses,
     addressEntries,

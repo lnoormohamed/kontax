@@ -521,6 +521,31 @@ const escapeVCardParamValue = (value: string) => {
 const serializeVCardComponents = (components: Array<string | null | undefined>) =>
   components.map((component) => escapeVCard(component ?? "")).join(";");
 
+const normalizeBirthdayForVCard = (value: string | null | undefined) => {
+  if (!value) {
+    return null;
+  }
+
+  const trimmed = value.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  const noYearMatch = /^--(\d{2})-?(\d{2})$/.exec(trimmed);
+  if (noYearMatch) {
+    const [, month, day] = noYearMatch;
+    return `--${month}-${day}`;
+  }
+
+  const fullDateMatch = /^(\d{4})-?(\d{2})-?(\d{2})$/.exec(trimmed);
+  if (fullDateMatch) {
+    const [, year, month, day] = fullDateMatch;
+    return `${year}-${month}-${day}`;
+  }
+
+  return trimmed;
+};
+
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const getAliasesForField = (
@@ -1183,6 +1208,7 @@ export const contactsToVCard = (
   contacts
     .map((contact) => {
       const flavor = options?.flavor ?? "generic";
+      let customGroupIndex = 1;
       const normalizeTypeValues = (
         kind: "email" | "phone" | "website" | "address",
         label: string,
@@ -1277,17 +1303,17 @@ export const contactsToVCard = (
       ) => {
         const uniqueTypes = [...new Set(types.filter(Boolean))];
         const typeSegment = uniqueTypes.length > 0 ? `;TYPE=${uniqueTypes.join(",")}` : "";
-        const groupPrefix = customLabel ? `item${lines.length + 1}.` : "";
+        const groupPrefix = customLabel ? `item${customGroupIndex++}.` : "";
         if (property === "ADR") {
           lines.push(`${groupPrefix}${property}${typeSegment}:${value}`);
           if (customLabel) {
-            lines.push(`${groupPrefix}X-ABLabel:${escapeVCard(customLabel)}`);
+            lines.push(`${groupPrefix}X-ABLABEL:${escapeVCard(customLabel)}`);
           }
           return;
         }
         lines.push(`${groupPrefix}${property}${typeSegment}:${escapeVCard(value)}`);
         if (customLabel) {
-          lines.push(`${groupPrefix}X-ABLabel:${escapeVCard(customLabel)}`);
+          lines.push(`${groupPrefix}X-ABLABEL:${escapeVCard(customLabel)}`);
         }
       };
 
@@ -1357,6 +1383,9 @@ export const contactsToVCard = (
       if (emailEntries.length > 0) {
         for (const entry of emailEntries) {
           const types = normalizeTypeValues("email", entry.label);
+          if (!types.includes("INTERNET")) {
+            types.unshift("INTERNET");
+          }
           if (entry.isPrimary) types.push("PREF");
           appendTypedLine(
             "EMAIL",
@@ -1435,8 +1464,9 @@ export const contactsToVCard = (
         lines.push(`URL:${escapeVCard(contact.website)}`);
       }
 
-      if (contact.birthday) {
-        lines.push(`BDAY:${escapeVCard(contact.birthday)}`);
+      const birthdayValue = normalizeBirthdayForVCard(contact.birthday);
+      if (birthdayValue) {
+        lines.push(`BDAY:${escapeVCard(birthdayValue)}`);
       }
 
       const addressEntries = (contact.addressEntries ?? []).filter(
