@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useTransition } from "react";
+import { memo, useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useTransition, type CSSProperties } from "react";
+import { createPortal } from "react-dom";
 import { useVirtualizer } from "@tanstack/react-virtual";
 
 import {
@@ -290,7 +291,9 @@ const RowLabelChips = memo(function RowLabelChips({
   isMobile?: boolean;
 }) {
   const [overflowOpen, setOverflowOpen] = useState(false);
-  if (labels.length === 0) return null;
+  const [portalReady, setPortalReady] = useState(false);
+  const [overlayStyle, setOverlayStyle] = useState<CSSProperties | null>(null);
+  const anchorRef = useRef<HTMLSpanElement | null>(null);
 
   const col = (name: string) => labelColors[name.toLowerCase()] ?? "#8b938c";
   const shown = labels.slice(0, 3);
@@ -298,9 +301,66 @@ const RowLabelChips = memo(function RowLabelChips({
   const dotSize = isMobile ? 8 : 7;
   const gap = isMobile ? 6 : 7;
   const overlayOffset = isMobile ? 10 : 12;
+  const overlayMaxWidth = isMobile ? 210 : 240;
+
+  useEffect(() => {
+    setPortalReady(true);
+  }, []);
+
+  useLayoutEffect(() => {
+    if (!overflowOpen || !anchorRef.current) return;
+
+    const estimateHeight = labels.length * 22 + Math.max(0, labels.length - 1) * 7 + 20;
+
+    const updatePosition = () => {
+      const rect = anchorRef.current?.getBoundingClientRect();
+      if (!rect) return;
+
+      let left = rect.right + overlayOffset;
+      if (left + overlayMaxWidth > window.innerWidth - 12) {
+        left = Math.max(12, rect.left - overlayMaxWidth - overlayOffset);
+      }
+
+      const midpoint = rect.top + rect.height / 2;
+      const minMidpoint = estimateHeight / 2 + 12;
+      const maxMidpoint = window.innerHeight - estimateHeight / 2 - 12;
+      const top = Math.min(Math.max(midpoint, minMidpoint), Math.max(minMidpoint, maxMidpoint));
+
+      setOverlayStyle({
+        position: "fixed",
+        top,
+        left,
+        zIndex: 80,
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "flex-start",
+        gap: 7,
+        minWidth: 150,
+        maxWidth: overlayMaxWidth,
+        padding: 10,
+        background: "#fff",
+        border: "1px solid rgba(20,30,25,0.08)",
+        borderRadius: 12,
+        boxShadow: "0 12px 34px rgba(20,30,25,0.16)",
+        pointerEvents: "none",
+        transform: "translateY(-50%)",
+      });
+    };
+
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+  }, [isMobile, labels.length, overflowOpen, overlayMaxWidth, overlayOffset]);
+
+  if (labels.length === 0) return null;
 
   return (
     <span
+      ref={anchorRef}
       style={{ position: "relative", display: "inline-flex", alignItems: "center", gap, flexShrink: 0 }}
       onMouseEnter={() => setOverflowOpen(true)}
       onMouseLeave={() => setOverflowOpen(false)}
@@ -325,33 +385,16 @@ const RowLabelChips = memo(function RowLabelChips({
           </span>
         </span>
       )}
-      {overflowOpen && (
-        <span
-          style={{
-            position: "absolute",
-            top: "50%",
-            left: `calc(100% + ${overlayOffset}px)`,
-            transform: "translateY(-50%)",
-            zIndex: 50,
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "flex-start",
-            gap: 7,
-            minWidth: 150,
-            maxWidth: isMobile ? 210 : 240,
-            padding: 10,
-            background: "#fff",
-            border: "1px solid rgba(20,30,25,0.08)",
-            borderRadius: 12,
-            boxShadow: "0 12px 34px rgba(20,30,25,0.16)",
-            pointerEvents: "none",
-          }}
-        >
-          {labels.map((name, i) => (
-            <LabelChip key={`${name}-${i}`} name={name} col={col(name)} sz="sm" />
-          ))}
-        </span>
-      )}
+      {overflowOpen && portalReady && overlayStyle
+        ? createPortal(
+            <span style={overlayStyle}>
+              {labels.map((name, i) => (
+                <LabelChip key={`${name}-${i}`} name={name} col={col(name)} sz="sm" />
+              ))}
+            </span>,
+            document.body,
+          )
+        : null}
     </span>
   );
 });
