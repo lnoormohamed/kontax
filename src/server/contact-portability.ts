@@ -1178,6 +1178,10 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
           return [];
         }
 
+        if (kind === "website") {
+          return normalized === "primary" || normalized === "main" ? ["PREF"] : [];
+        }
+
         const commonMap: Record<string, string[]> = {
           mobile: ["CELL"],
           cell: ["CELL"],
@@ -1224,6 +1228,10 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
         const normalized = label.trim().toLowerCase();
         if (!normalized) {
           return true;
+        }
+
+        if (kind === "website") {
+          return ["website", "homepage", "home page", "other"].includes(normalized);
         }
 
         const types = normalizeTypeValues(kind, label);

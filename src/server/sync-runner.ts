@@ -110,6 +110,30 @@ const safeAddressEntries = (value: unknown) =>
             label: typeof (entry as { label?: unknown }).label === "string" ? (entry as { label: string }).label : "",
             formatted: (entry as { formatted: string }).formatted,
             isPrimary: (entry as { isPrimary?: unknown }).isPrimary === true,
+            countryOrRegion:
+              typeof (entry as { countryOrRegion?: unknown }).countryOrRegion === "string"
+                ? (entry as { countryOrRegion: string }).countryOrRegion
+                : undefined,
+            streetLine1:
+              typeof (entry as { streetLine1?: unknown }).streetLine1 === "string"
+                ? (entry as { streetLine1: string }).streetLine1
+                : undefined,
+            streetLine2:
+              typeof (entry as { streetLine2?: unknown }).streetLine2 === "string"
+                ? (entry as { streetLine2: string }).streetLine2
+                : undefined,
+            cityOrTown:
+              typeof (entry as { cityOrTown?: unknown }).cityOrTown === "string"
+                ? (entry as { cityOrTown: string }).cityOrTown
+                : undefined,
+            postcode:
+              typeof (entry as { postcode?: unknown }).postcode === "string"
+                ? (entry as { postcode: string }).postcode
+                : undefined,
+            poBox:
+              typeof (entry as { poBox?: unknown }).poBox === "string"
+                ? (entry as { poBox: string }).poBox
+                : undefined,
           },
         ];
       })
