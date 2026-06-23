@@ -509,6 +509,15 @@ const escapeVCard = (value: string) =>
     .replace(/,/g, "\\,")
     .replace(/;/g, "\\;");
 
+const escapeVCardParamValue = (value: string) => {
+  const trimmed = value.trim();
+  if (/^[A-Za-z0-9_-]+$/.test(trimmed)) {
+    return trimmed;
+  }
+
+  return `"${trimmed.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
+};
+
 const serializeVCardComponents = (components: Array<string | null | undefined>) =>
   components.map((component) => escapeVCard(component ?? "")).join(";");
 
@@ -1165,9 +1174,15 @@ export const contactsToCsv = (contacts: PortableContactInput[]) => {
   return [header.join(","), ...rows.map((row) => row.join(","))].join("\n");
 };
 
-export const contactsToVCard = (contacts: PortableContactInput[]) =>
+export const contactsToVCard = (
+  contacts: PortableContactInput[],
+  options?: {
+    flavor?: "generic" | "fastmail";
+  },
+) =>
   contacts
     .map((contact) => {
+      const flavor = options?.flavor ?? "generic";
       const normalizeTypeValues = (
         kind: "email" | "phone" | "website" | "address",
         label: string,
@@ -1286,6 +1301,17 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
         });
       };
 
+      const appendFastmailOnlineServiceLine = (
+        value: string,
+        customLabel: string,
+        isPrimary: boolean,
+      ) => {
+        const prefSegment = isPrimary ? ";PREF=1" : "";
+        lines.push(
+          `X-CYRUS-ONLINESERVICE;X-SERVICE-TYPE=${escapeVCardParamValue(customLabel)}${prefSegment}:${escapeVCard(value)};`,
+        );
+      };
+
       const lines = [
         "BEGIN:VCARD",
         "VERSION:3.0",
@@ -1395,13 +1421,15 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
       if (websiteEntries.length > 0) {
         for (const entry of websiteEntries) {
           const types = normalizeTypeValues("website", entry.label);
+          const customLabel = isStandardLabel("website", entry.label)
+            ? null
+            : entry.label.trim();
+          if (customLabel && flavor === "fastmail") {
+            appendFastmailOnlineServiceLine(entry.value, customLabel, Boolean(entry.isPrimary));
+            continue;
+          }
           if (entry.isPrimary) types.push("PREF");
-          appendTypedLine(
-            "URL",
-            entry.value,
-            types,
-            isStandardLabel("website", entry.label) ? null : entry.label.trim(),
-          );
+          appendTypedLine("URL", entry.value, types, customLabel);
         }
       } else if (contact.website) {
         lines.push(`URL:${escapeVCard(contact.website)}`);

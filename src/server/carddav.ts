@@ -323,7 +323,14 @@ const parseVCardParams = (parts: string[]) =>
     const values =
       rawValue
         ?.split(",")
-        .map((value) => unescapeVCardValue(value))
+        .map((value) => {
+          const trimmed = value.trim();
+          const unquoted =
+            trimmed.startsWith('"') && trimmed.endsWith('"')
+              ? trimmed.slice(1, -1).replace(/\\"/g, '"').replace(/\\\\/g, "\\")
+              : trimmed;
+          return unescapeVCardValue(unquoted);
+        })
         .filter(Boolean) ?? [""];
 
     acc[key] = values;
@@ -374,7 +381,13 @@ const parseVCardLines = (value: string) =>
       const rawValue = line.slice(separatorIndex + 1);
       const [rawNameWithGroup, ...paramParts] = left.split(";");
       const rawNameParts = rawNameWithGroup?.trim().split(".", 2) ?? [];
-      const group = rawNameParts.length === 2 ? rawNameParts[0]?.trim() || null : null;
+      const trimmedGroup = rawNameParts[0]?.trim();
+      const group =
+        rawNameParts.length === 2
+          ? trimmedGroup && trimmedGroup.length > 0
+            ? trimmedGroup
+            : null
+          : null;
       const rawName = rawNameParts.length === 2 ? rawNameParts[1] : rawNameWithGroup;
       const name = rawName?.trim().toUpperCase();
 
@@ -456,6 +469,8 @@ const buildStructuredValues = (
       isPrimary: index === 0,
     }));
 
+const normalizeOnlineServiceValue = (value: string) => value.replace(/;+$/, "").trim();
+
 const parseNameParts = (value: string) => {
   const [lastName, firstName, middleName, namePrefix, nameSuffix] = value
     .split(";")
@@ -530,11 +545,32 @@ const parseCardDavContactCard = (
   );
   const websiteEntries = buildStructuredValues(
     dedupeValues(
-      lines.filter((line) => line.name === "URL").map((line) => line.value),
+      lines
+        .filter((line) => line.name === "URL" || line.name === "X-CYRUS-ONLINESERVICE")
+        .map((line) =>
+          line.name === "X-CYRUS-ONLINESERVICE"
+            ? normalizeOnlineServiceValue(line.value)
+            : line.value,
+        ),
     ).map((value) => {
-      const original = lines.find((line) => line.name === "URL" && line.value === value);
+      const original = lines.find((line) => {
+        if (line.name === "URL") {
+          return line.value === value;
+        }
+        if (line.name === "X-CYRUS-ONLINESERVICE") {
+          return normalizeOnlineServiceValue(line.value) === value;
+        }
+        return false;
+      });
+      const cyrusLabel =
+        original?.name === "X-CYRUS-ONLINESERVICE"
+          ? original.params["X-SERVICE-TYPE"]?.[0] ?? null
+          : null;
       return {
-        label: getLineCustomLabel(lines, original!) ?? getPreferredLabel(original?.params ?? {}, "website"),
+        label:
+          cyrusLabel ??
+          getLineCustomLabel(lines, original!) ??
+          getPreferredLabel(original?.params ?? {}, "website"),
         value,
       };
     }),
@@ -583,8 +619,8 @@ const parseCardDavContactCard = (
     emailEntries,
     phoneNumbers: phoneEntries.map((item) => item.value),
     phoneEntries,
-    company: company || null,
-    department: department || null,
+    company: company?.trim() ? company : null,
+    department: department?.trim() ? department : null,
     jobTitle: titleLine?.value ?? null,
     website: websiteEntries[0]?.value ?? null,
     websiteEntries,
@@ -671,8 +707,21 @@ export const fetchCardDavAddressBookCards = async ({
 
 const ensureTrailingSlash = (value: string) => (value.endsWith("/") ? value : `${value}/`);
 
-const buildCardDavContactBody = (contact: PortableContactInput, uid: string) =>
-  contactsToVCard([contact]).replace(/\r\nEND:VCARD$/, `\r\nUID:${uid}\r\nEND:VCARD`);
+const getCardDavFlavor = (url: string): "generic" | "fastmail" => {
+  try {
+    const hostname = new URL(url).hostname.toLowerCase();
+    return hostname.includes("fastmail.com") ? "fastmail" : "generic";
+  } catch {
+    return "generic";
+  }
+};
+
+const buildCardDavContactBody = (
+  contact: PortableContactInput,
+  uid: string,
+  flavor: "generic" | "fastmail",
+) =>
+  contactsToVCard([contact], { flavor }).replace(/\r\nEND:VCARD$/, `\r\nUID:${uid}\r\nEND:VCARD`);
 
 export const pushCardDavContact = async ({
   addressBookUrl,
@@ -694,7 +743,7 @@ export const pushCardDavContact = async ({
   // update the contact's UID, which then breaks future REPORT lookups (the new UID won't
   // match our contactByUid map, triggering spurious bootstrap attempts).
   const uidForBody = remoteUid;
-  const body = buildCardDavContactBody(contact, uidForBody);
+  const body = buildCardDavContactBody(contact, uidForBody, getCardDavFlavor(href));
 
   let response: Response;
   // Explicitly convert to UTF-8 Buffer so the underlying HTTP stack cannot
