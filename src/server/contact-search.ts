@@ -25,6 +25,20 @@ const sanitizeTerms = (q: string): string[] =>
     .split(/[^\p{L}\p{N}]+/u)
     .filter((t) => t.length > 0);
 
+export const getOrderedNameSearchQueries = (q: string): string[] => {
+  const terms = q
+    .trim()
+    .split(/[^\p{L}\p{N}]+/u)
+    .filter(Boolean);
+  const queries = [terms.join(" ")];
+
+  if (terms.length > 1) {
+    queries.push([...terms].reverse().join(" "));
+  }
+
+  return [...new Set(queries.filter(Boolean))];
+};
+
 /**
  * Build a prefix `tsquery` string ("acme:* & corp:*") from raw user input, or
  * null when there's nothing worth a full-text pass (caller falls back to ILIKE).
@@ -70,6 +84,9 @@ export async function searchContactIds(
 
   const tsq = buildTsQuery(q);
   const digits = phoneDigits(q); // "" unless the query looks like a phone number
+  const [nameQuery, reversedNameQuery = nameQuery] = getOrderedNameSearchQueries(q);
+  const nameLikeParam = `%${nameQuery ?? ""}%`;
+  const reversedNameLikeParam = `%${reversedNameQuery ?? ""}%`;
   // Nothing to search on (too short / symbol-only and not a phone number).
   if (!tsq && digits.length < 3) return [];
   // A phone-only query may not be text-eligible; a tsquery that matches nothing
@@ -100,7 +117,16 @@ export async function searchContactIds(
         regexp_replace(
           coalesce("phone", '') || ' ' || coalesce("phoneNumbers"::text, '') || ' ' || coalesce("phoneEntries"::text, ''),
           '[^0-9]', '', 'g'
-        ) AS phone_digits
+        ) AS phone_digits,
+        -- Name matching is order-aware outside FTS so "first last" and
+        -- "last first" both work, including for CJK names that Postgres'
+        -- english text search does not reliably tokenize.
+        regexp_replace(trim(coalesce("fullName", '')), '[[:space:]]+', ' ', 'g') AS full_name_normalized,
+        regexp_replace(trim(coalesce("nickname", '')), '[[:space:]]+', ' ', 'g') AS nickname_normalized,
+        regexp_replace(trim(concat_ws(' ', "firstName", "lastName")), '[[:space:]]+', ' ', 'g') AS first_last_name,
+        regexp_replace(trim(concat_ws(' ', "lastName", "firstName")), '[[:space:]]+', ' ', 'g') AS last_first_name,
+        regexp_replace(trim(concat_ws(' ', "phoneticFirstName", "phoneticLastName")), '[[:space:]]+', ' ', 'g') AS phonetic_first_last_name,
+        regexp_replace(trim(concat_ws(' ', "phoneticLastName", "phoneticFirstName")), '[[:space:]]+', ' ', 'g') AS phonetic_last_first_name
       FROM "Contact"
       WHERE ${scopeWhere}
     )
@@ -108,11 +134,29 @@ export async function searchContactIds(
       id,
       GREATEST(
         ts_rank(vec, to_tsquery('english', ${tsqParam})),
-        CASE WHEN length(${digits}) >= 3 AND phone_digits LIKE '%' || ${digits} || '%' THEN 1.0 ELSE 0 END
+        CASE WHEN length(${digits}) >= 3 AND phone_digits LIKE '%' || ${digits} || '%' THEN 1.0 ELSE 0 END,
+        CASE WHEN (
+          full_name_normalized ILIKE ${nameLikeParam}
+          OR full_name_normalized ILIKE ${reversedNameLikeParam}
+          OR nickname_normalized ILIKE ${nameLikeParam}
+          OR first_last_name ILIKE ${nameLikeParam}
+          OR last_first_name ILIKE ${nameLikeParam}
+          OR phonetic_first_last_name ILIKE ${nameLikeParam}
+          OR phonetic_last_first_name ILIKE ${nameLikeParam}
+        ) THEN 1.2 ELSE 0 END
       ) AS rank
     FROM scored
     WHERE vec @@ to_tsquery('english', ${tsqParam})
        OR (length(${digits}) >= 3 AND phone_digits LIKE '%' || ${digits} || '%')
+       OR (
+          full_name_normalized ILIKE ${nameLikeParam}
+          OR full_name_normalized ILIKE ${reversedNameLikeParam}
+          OR nickname_normalized ILIKE ${nameLikeParam}
+          OR first_last_name ILIKE ${nameLikeParam}
+          OR last_first_name ILIKE ${nameLikeParam}
+          OR phonetic_first_last_name ILIKE ${nameLikeParam}
+          OR phonetic_last_first_name ILIKE ${nameLikeParam}
+       )
     ORDER BY rank DESC
     LIMIT ${limit}
   `);

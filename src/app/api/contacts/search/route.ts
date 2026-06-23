@@ -2,7 +2,12 @@ import { NextResponse } from "next/server";
 
 import { auth } from "~/server/auth";
 import { db } from "~/server/db";
-import { isFullTextEligible, searchContactIds, searchLabelIlikeIds } from "~/server/contact-search";
+import {
+  getOrderedNameSearchQueries,
+  isFullTextEligible,
+  searchContactIds,
+  searchLabelIlikeIds,
+} from "~/server/contact-search";
 import { getUserFamilyMembership } from "~/server/family-access";
 import { getAccessibleTeamBooks } from "~/server/team-access";
 
@@ -73,14 +78,14 @@ function attributeMatch(
   q: string,
 ): { matchField: MatchField; snippet: string | null; matchAlt: boolean } {
   const ql = q.toLowerCase();
+  const nameQueries = getOrderedNameSearchQueries(q).map((query) => query.toLowerCase());
   const digits = q.replace(/\D/g, "");
   const isPhoneQuery = !/[a-z]/i.test(q) && digits.length >= 2;
+  const nameValueMatches = (value: string | null | undefined) =>
+    nameQueries.some((query) => (value ?? "").toLowerCase().includes(query));
 
   if (!isPhoneQuery) {
-    if (
-      c.fullName.toLowerCase().includes(ql) ||
-      (c.nickname ?? "").toLowerCase().includes(ql)
-    ) {
+    if (nameValueMatches(c.fullName) || nameValueMatches(c.nickname)) {
       return { matchField: "name", snippet: null, matchAlt: false };
     }
     if (c.company?.toLowerCase().includes(ql)) {
