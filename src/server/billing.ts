@@ -355,7 +355,10 @@ export const assertCanUseCardDavSync = async (userId: string) => {
 export const assertCanCreateSyncAccount = async (userId: string) => {
   const summary = await assertCanUseCardDavSync(userId);
   const syncAccountsUsed = await db.syncAccount.count({
-    where: { userId },
+    // P36-DB03: soft-disconnected connections stay in the database so they can
+    // be restored with settings/history intact, but they should not consume one
+    // of the plan's active sync-account slots.
+    where: { userId, status: { not: "DISCONNECTED" } },
   });
 
   if (syncAccountsUsed + 1 > summary.entitlements.syncAccountsLimit) {
