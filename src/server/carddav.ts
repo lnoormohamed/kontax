@@ -331,10 +331,23 @@ const parseVCardParams = (parts: string[]) =>
   }, {});
 
 const getPreferredLabel = (params: Record<string, string[]>, fallback: string) => {
-  const typeValues = params.TYPE ?? [];
-  const firstUsableType = typeValues.find((value) => value.toLowerCase() !== "pref");
+  const bareTypeParams = Object.entries(params)
+    .filter(([key, values]) => key !== "TYPE" && values.length === 1 && values[0] === "")
+    .map(([key]) => key);
+  const typeValues = [...(params.TYPE ?? []), ...bareTypeParams].map((value) => value.toLowerCase());
+  const firstUsableType = typeValues.find(
+    (value) => !["pref", "internet", "voice"].includes(value),
+  );
 
-  return firstUsableType?.toLowerCase() ?? fallback;
+  if (!firstUsableType) {
+    return fallback;
+  }
+
+  if (firstUsableType === "cell") {
+    return "mobile";
+  }
+
+  return firstUsableType;
 };
 
 const parseVCardLines = (value: string) =>

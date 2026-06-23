@@ -36,6 +36,12 @@ export type ContactAddressEntryInput = {
   label: string;
   formatted: string;
   isPrimary?: boolean;
+  countryOrRegion?: string;
+  streetLine1?: string;
+  streetLine2?: string;
+  cityOrTown?: string;
+  postcode?: string;
+  poBox?: string;
 };
 
 const isRecord = (value: unknown): value is Record<string, unknown> =>
@@ -65,9 +71,12 @@ export const parseContactPostalAddresses = (value: unknown): ContactPostalAddres
 export type PortableContactInput = {
   fullName: string;
   firstName?: string | null;
+  middleName?: string | null;
   lastName?: string | null;
   phoneticFirstName?: string | null;
   phoneticLastName?: string | null;
+  namePrefix?: string | null;
+  nameSuffix?: string | null;
   nickname?: string | null;
   email?: string | null;
   emailAddresses?: string[] | null;
@@ -499,6 +508,9 @@ const escapeVCard = (value: string) =>
     .replace(/\n/g, "\\n")
     .replace(/,/g, "\\,")
     .replace(/;/g, "\\;");
+
+const serializeVCardComponents = (components: Array<string | null | undefined>) =>
+  components.map((component) => escapeVCard(component ?? "")).join(";");
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -1162,9 +1174,7 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
       ): string[] => {
         const normalized = label.trim().toLowerCase();
         if (!normalized) {
-          if (kind === "email") return ["INTERNET"];
-          if (kind === "phone") return ["VOICE"];
-          if (kind === "address") return ["HOME"];
+          if (kind === "email" || kind === "phone" || kind === "address") return ["OTHER"];
           return [];
         }
 
@@ -1178,13 +1188,14 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
           company: ["WORK"],
           home: ["HOME"],
           personal: ["HOME"],
-          alt: ["HOME"],
-          alternate: ["HOME"],
-          other: ["HOME"],
+          alt: ["OTHER"],
+          alternate: ["OTHER"],
+          other: ["OTHER"],
           main: ["PREF"],
           primary: ["PREF"],
           fax: ["FAX"],
-          portfolio: ["HOME"],
+          portfolio: ["OTHER"],
+          booking: ["OTHER"],
         };
 
         const addressMap: Record<string, string[]> = {
@@ -1195,18 +1206,14 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
           personal: ["HOME"],
           primary: ["HOME"],
           address: ["HOME"],
-          other: ["HOME"],
+          other: ["OTHER"],
           postal: ["POSTAL"],
           mailing: ["POSTAL"],
         };
 
         const value = kind === "address" ? addressMap[normalized] : commonMap[normalized];
-        if (value) {
-          return kind === "email" ? ["INTERNET", ...value] : value;
-        }
-        if (kind === "email") return ["INTERNET"];
-        if (kind === "phone") return ["VOICE"];
-        if (kind === "address") return ["HOME"];
+        if (value) return value;
+        if (kind === "email" || kind === "phone" || kind === "address") return ["OTHER"];
         return [];
       };
 
@@ -1240,9 +1247,21 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
         `FN:${escapeVCard(contact.fullName)}`,
       ];
 
-      if (contact.lastName || contact.firstName) {
+      if (
+        contact.lastName ||
+        contact.firstName ||
+        contact.middleName ||
+        contact.namePrefix ||
+        contact.nameSuffix
+      ) {
         lines.push(
-          `N:${escapeVCard(contact.lastName ?? "")};${escapeVCard(contact.firstName ?? "")};;;`,
+          `N:${serializeVCardComponents([
+            contact.lastName,
+            contact.firstName,
+            contact.middleName,
+            contact.namePrefix,
+            contact.nameSuffix,
+          ])}`,
         );
       }
 
@@ -1341,17 +1360,31 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
         for (const entry of addressEntries) {
           const types = normalizeTypeValues("address", entry.label);
           if (entry.isPrimary) types.push("PREF");
-          appendTypedLine("ADR", `;;${escapeVCard(entry.formatted)};;;;`, types);
+          appendTypedLine(
+            "ADR",
+            serializeVCardComponents([
+              entry.poBox,
+              entry.streetLine2,
+              entry.streetLine1 ?? entry.formatted,
+              entry.cityOrTown,
+              undefined,
+              entry.postcode,
+              entry.countryOrRegion,
+            ]),
+            types,
+          );
         }
       } else {
         if (contact.address) {
-          lines.push(`ADR:;;${escapeVCard(contact.address)};;;;`);
+          lines.push(`ADR:${serializeVCardComponents(["", "", contact.address, "", "", "", ""])}`);
         }
 
         for (const postalAddress of (contact.postalAddresses ?? []).filter(
           (value) => value.formatted !== contact.address,
         )) {
-          lines.push(`ADR:;;${escapeVCard(postalAddress.formatted)};;;;`);
+          lines.push(
+            `ADR:${serializeVCardComponents(["", "", postalAddress.formatted, "", "", "", ""])}`,
+          );
         }
       }
 

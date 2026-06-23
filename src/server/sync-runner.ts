@@ -118,7 +118,10 @@ const safeAddressEntries = (value: unknown) =>
 const contactToPortable = (c: SyncContactRow): PortableContactInput => ({
   fullName: c.fullName,
   firstName: c.firstName,
+  middleName: c.middleName,
   lastName: c.lastName,
+  namePrefix: c.namePrefix,
+  nameSuffix: c.nameSuffix,
   nickname: c.nickname,
   email: c.email,
   emailAddresses: safeStringArray(c.emailAddresses),
