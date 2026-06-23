@@ -297,6 +297,7 @@ const RowLabelChips = memo(function RowLabelChips({
   const hidden = labels.slice(3);
   const dotSize = isMobile ? 8 : 7;
   const gap = isMobile ? 6 : 7;
+  const overlayOffset = isMobile ? 10 : 12;
 
   return (
     <span
@@ -328,19 +329,22 @@ const RowLabelChips = memo(function RowLabelChips({
         <span
           style={{
             position: "absolute",
-            top: "calc(100% + 7px)",
-            left: 0,
+            top: "50%",
+            left: `calc(100% + ${overlayOffset}px)`,
+            transform: "translateY(-50%)",
             zIndex: 50,
             display: "flex",
-            flexWrap: "wrap",
+            flexDirection: "column",
             alignItems: "flex-start",
             gap: 7,
-            minWidth: 160,
-            maxWidth: 260,
-            padding: 9,
+            minWidth: 150,
+            maxWidth: isMobile ? 210 : 240,
+            padding: 10,
             background: "#fff",
-            borderRadius: 11,
-            boxShadow: "0 12px 34px rgba(20,30,25,0.2), 0 0 0 1px rgba(20,30,25,0.06)",
+            border: "1px solid rgba(20,30,25,0.08)",
+            borderRadius: 12,
+            boxShadow: "0 12px 34px rgba(20,30,25,0.16)",
+            pointerEvents: "none",
           }}
         >
           {labels.map((name, i) => (
