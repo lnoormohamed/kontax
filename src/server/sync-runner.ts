@@ -59,6 +59,12 @@ type SyncContactRow = {
   notes: string | null;
 };
 
+type SyncPushContactRow = SyncContactRow & {
+  id: string;
+  syncUid: string;
+  updatedAt: Date;
+};
+
 const safeStringArray = (v: unknown): string[] =>
   Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
 
@@ -81,6 +87,30 @@ const contactToPortable = (c: SyncContactRow): PortableContactInput => ({
     : null,
   notes: c.notes,
 });
+
+const cardDavPushContactSelect = {
+  id: true,
+  syncUid: true,
+  updatedAt: true,
+  fullName: true,
+  firstName: true,
+  middleName: true,
+  lastName: true,
+  namePrefix: true,
+  nameSuffix: true,
+  nickname: true,
+  email: true,
+  emailAddresses: true,
+  phone: true,
+  phoneNumbers: true,
+  company: true,
+  jobTitle: true,
+  website: true,
+  birthday: true,
+  address: true,
+  postalAddresses: true,
+  notes: true,
+} satisfies Prisma.ContactSelect;
 
 const buildContactWriteDataFromRemoteSnapshot = (snapshot: unknown) => {
   if (!isRecord(snapshot)) {
@@ -823,6 +853,19 @@ export const runQueuedSyncJobs = async ({
         remoteSnapshot: unknown;
         strategy: "KEEP_REMOTE" | "KEEP_LOCAL";
       }> = [];
+      const localCreateCandidates: SyncPushContactRow[] =
+        canWrite
+          ? await db.contact.findMany({
+              where: {
+                ...contactScopeWhere,
+                archivedAt: null,
+                syncTombstoneAt: null,
+                lastMutatedBy: "MANUAL",
+                syncLinks: { none: { syncAccountId: job.syncAccountId } },
+              },
+              select: cardDavPushContactSelect,
+            })
+          : [];
 
       for (const link of existingLinks) {
         const remoteUid = link.remoteUid ?? link.contact.syncUid;
@@ -944,6 +987,13 @@ export const runQueuedSyncJobs = async ({
 
       // Execute outbound writes to CardDAV (outside the DB transaction — network I/O).
       const pushedLinks: Array<{ linkId: string; newETag: string | null; newHref: string }> = [];
+      const createdLinks: Array<{
+        contactId: string;
+        remoteUid: string;
+        remoteHref: string;
+        remoteETag: string | null;
+        lastSyncedAt: Date;
+      }> = [];
       const deletedLinkIds: string[] = [];
 
       for (const candidate of localPushCandidates) {
@@ -961,6 +1011,30 @@ export const runQueuedSyncJobs = async ({
           pushedLinks.push({ linkId: candidate.linkId, newETag: result.etag, newHref: result.href });
         } catch (err) {
           console.error(`[sync] CardDAV push failed for link ${candidate.linkId}:`, err);
+          deferredLocalChangesCount += 1;
+        }
+      }
+
+      for (const contact of localCreateCandidates) {
+        try {
+          const result = await pushCardDavContact({
+            addressBookUrl: job.syncAccount.addressBookUrl,
+            credentials: {
+              username: decryptedCredentials.username,
+              password: decryptedCredentials.password,
+            },
+            remoteUid: contact.syncUid,
+            contact: contactToPortable(contact),
+          });
+          createdLinks.push({
+            contactId: contact.id,
+            remoteUid: contact.syncUid,
+            remoteHref: result.href,
+            remoteETag: result.etag,
+            lastSyncedAt: contact.updatedAt,
+          });
+        } catch (err) {
+          console.error(`[sync] CardDAV create failed for contact ${contact.id}:`, err);
           deferredLocalChangesCount += 1;
         }
       }
@@ -1009,6 +1083,35 @@ export const runQueuedSyncJobs = async ({
               lastErrorCode: null,
               lastErrorMessage: null,
               lastSyncedAt: now,
+            },
+          });
+        }
+
+        for (const created of createdLinks) {
+          await tx.syncContactLink.upsert({
+            where: {
+              syncAccountId_contactId: {
+                syncAccountId: job.syncAccountId,
+                contactId: created.contactId,
+              },
+            },
+            create: {
+              syncAccountId: job.syncAccountId,
+              contactId: created.contactId,
+              remoteHref: created.remoteHref,
+              remoteUid: created.remoteUid,
+              remoteETag: created.remoteETag,
+              lastSyncedAt: created.lastSyncedAt,
+            },
+            update: {
+              remoteHref: created.remoteHref,
+              remoteUid: created.remoteUid,
+              remoteETag: created.remoteETag,
+              remoteDeletedAt: null,
+              tombstonedAt: null,
+              lastErrorCode: null,
+              lastErrorMessage: null,
+              lastSyncedAt: created.lastSyncedAt,
             },
           });
         }
@@ -1246,9 +1349,9 @@ export const runQueuedSyncJobs = async ({
             updatedCount: matchedEntries.length + remoteApplyCandidates.length,
             deletedCount: 0,
             conflictCount: conflictEntries.length,
-            // Outbound (Kontax -> remote). CardDAV push is update-only for
-            // existing links (no outbound create of brand-new local contacts yet).
-            pushedCreatedCount: 0,
+            // Outbound (Kontax -> remote). CardDAV now creates new unlinked
+            // local MANUAL contacts remotely, plus updates/deletes linked ones.
+            pushedCreatedCount: createdLinks.length,
             pushedUpdatedCount: pushedLinks.length,
             pushedDeletedCount: deletedLinkIds.length,
             skippedCount: deferredLocalChangesCount,
@@ -1260,6 +1363,7 @@ export const runQueuedSyncJobs = async ({
               if (unmatchedCards.length > 0) parts.push(`imported ${unmatchedCards.length} new`);
               const pulled = matchedEntries.length + remoteApplyCandidates.length;
               if (pulled > 0) parts.push(`pulled ${pulled} remote update${pulled !== 1 ? "s" : ""}`);
+              if (createdLinks.length > 0) parts.push(`created ${createdLinks.length} remote contact${createdLinks.length !== 1 ? "s" : ""}`);
               if (pushedLinks.length > 0) parts.push(`pushed ${pushedLinks.length} local update${pushedLinks.length !== 1 ? "s" : ""}`);
               if (deletedLinkIds.length > 0) parts.push(`deleted ${deletedLinkIds.length} remote`);
               if (deferredLocalChangesCount > 0) parts.push(`deferred ${deferredLocalChangesCount} local change${deferredLocalChangesCount !== 1 ? "s" : ""}`);
