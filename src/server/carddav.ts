@@ -330,6 +330,15 @@ const parseVCardParams = (parts: string[]) =>
     return acc;
   }, {});
 
+const normalizeAppleLabelValue = (value: string | null) => {
+  if (!value) {
+    return null;
+  }
+
+  const match = /^_\$!<(.*)>!\$_$/.exec(value.trim());
+  return (match?.[1] ?? value).trim() || null;
+};
+
 const getPreferredLabel = (params: Record<string, string[]>, fallback: string) => {
   const bareTypeParams = Object.entries(params)
     .filter(([key, values]) => key !== "TYPE" && values.length === 1 && values[0] === "")
@@ -363,7 +372,10 @@ const parseVCardLines = (value: string) =>
 
       const left = line.slice(0, separatorIndex);
       const rawValue = line.slice(separatorIndex + 1);
-      const [rawName, ...paramParts] = left.split(";");
+      const [rawNameWithGroup, ...paramParts] = left.split(";");
+      const rawNameParts = rawNameWithGroup?.trim().split(".", 2) ?? [];
+      const group = rawNameParts.length === 2 ? rawNameParts[0]?.trim() || null : null;
+      const rawName = rawNameParts.length === 2 ? rawNameParts[1] : rawNameWithGroup;
       const name = rawName?.trim().toUpperCase();
 
       if (!name) {
@@ -371,12 +383,41 @@ const parseVCardLines = (value: string) =>
       }
 
       return {
+        group,
         name,
         params: parseVCardParams(paramParts),
         value: unescapeVCardValue(rawValue),
       };
     })
-    .filter((line): line is { name: string; params: Record<string, string[]>; value: string } => line != null);
+    .filter(
+      (
+        line,
+      ): line is {
+        group: string | null;
+        name: string;
+        params: Record<string, string[]>;
+        value: string;
+      } => line != null,
+    );
+
+const getLineCustomLabel = (
+  lines: Array<{
+    group: string | null;
+    name: string;
+    params: Record<string, string[]>;
+    value: string;
+  }>,
+  line: {
+    group: string | null;
+    name: string;
+    params: Record<string, string[]>;
+    value: string;
+  },
+) =>
+  normalizeAppleLabelValue(
+    lines.find((candidate) => candidate.group === line.group && candidate.name === "X-ABLABEL")
+      ?.value ?? null,
+  );
 
 const getVCardUid = (value: string) => {
   const unfolded = unfoldVCard(decodeXmlEntities(value));
@@ -471,7 +512,7 @@ const parseCardDavContactCard = (
     ).map((value) => {
       const original = lines.find((line) => line.name === "EMAIL" && line.value === value);
       return {
-        label: getPreferredLabel(original?.params ?? {}, "email"),
+        label: getLineCustomLabel(lines, original!) ?? getPreferredLabel(original?.params ?? {}, "email"),
         value,
       };
     }),
@@ -482,7 +523,7 @@ const parseCardDavContactCard = (
     ).map((value) => {
       const original = lines.find((line) => line.name === "TEL" && line.value === value);
       return {
-        label: getPreferredLabel(original?.params ?? {}, "phone"),
+        label: getLineCustomLabel(lines, original!) ?? getPreferredLabel(original?.params ?? {}, "phone"),
         value,
       };
     }),
@@ -493,14 +534,19 @@ const parseCardDavContactCard = (
     ).map((value) => {
       const original = lines.find((line) => line.name === "URL" && line.value === value);
       return {
-        label: getPreferredLabel(original?.params ?? {}, "website"),
+        label: getLineCustomLabel(lines, original!) ?? getPreferredLabel(original?.params ?? {}, "website"),
         value,
       };
     }),
   );
   const addressEntries = lines
     .filter((line) => line.name === "ADR")
-    .map((line) => parseAdrValue(line.value, getPreferredLabel(line.params, "address")))
+    .map((line) =>
+      parseAdrValue(
+        line.value,
+        getLineCustomLabel(lines, line) ?? getPreferredLabel(line.params, "address"),
+      ),
+    )
     .filter((entry): entry is NonNullable<ReturnType<typeof parseAdrValue>> => entry != null)
     .map((entry, index) => ({
       ...entry,

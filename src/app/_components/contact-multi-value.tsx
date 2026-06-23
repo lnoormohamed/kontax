@@ -57,6 +57,25 @@ function LabelPill({
   readOnly: boolean;
 }) {
   const [open, setOpen] = useState(false);
+  const [customOpen, setCustomOpen] = useState(false);
+  const [customDraft, setCustomDraft] = useState("");
+  const hasPresetLabel = options.some((opt) => opt.toLowerCase() === label.trim().toLowerCase());
+
+  const openCustom = () => {
+    setCustomDraft(hasPresetLabel ? "" : label);
+    setCustomOpen(true);
+  };
+
+  const saveCustom = () => {
+    const next = customDraft.trim();
+    if (!next) {
+      return;
+    }
+    onPick(next);
+    setCustomOpen(false);
+    setOpen(false);
+  };
+
   return (
     <span className="relative shrink-0">
       <button
@@ -71,7 +90,14 @@ function LabelPill({
       </button>
       {open ? (
         <>
-          <span className="fixed inset-0 z-30" onClick={(e) => { e.stopPropagation(); setOpen(false); }} />
+          <span
+            className="fixed inset-0 z-30"
+            onClick={(e) => {
+              e.stopPropagation();
+              setCustomOpen(false);
+              setOpen(false);
+            }}
+          />
           <div className="absolute left-0 top-[26px] z-40 w-[130px] rounded-[10px] border border-[#d8ddd6] bg-white p-1 shadow-[0_12px_30px_rgba(20,30,25,0.14)]">
             {options.map((opt) => (
               <button
@@ -89,6 +115,51 @@ function LabelPill({
                 {opt}
               </button>
             ))}
+            <div className="my-1 border-t border-[#eef2ec]" />
+            <button
+              className={`block w-full rounded-[6px] px-2 py-1.5 text-left text-[12.5px] text-[#1d2823] ${
+                customOpen ? "bg-[#f2f4f0]" : "hover:bg-[#f6f7f4]"
+              }`}
+              onClick={(e) => {
+                e.stopPropagation();
+                openCustom();
+              }}
+              type="button"
+            >
+              Custom...
+            </button>
+            {customOpen ? (
+              <div className="px-1 pb-1 pt-1">
+                <input
+                  autoFocus
+                  className="w-full rounded-[6px] border border-[#d8ddd6] bg-white px-2 py-1.5 text-[12.5px] text-[#1d2823] outline-none focus:border-[#4158f4]"
+                  onChange={(e) => setCustomDraft(e.target.value)}
+                  onClick={(e) => e.stopPropagation()}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                      e.preventDefault();
+                      saveCustom();
+                    } else if (e.key === "Escape") {
+                      e.preventDefault();
+                      setCustomOpen(false);
+                    }
+                  }}
+                  placeholder="Custom label"
+                  value={customDraft}
+                />
+                <button
+                  className="mt-1.5 w-full rounded-[6px] bg-[#4158f4] px-2 py-1.5 text-[12px] font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
+                  disabled={!customDraft.trim()}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    saveCustom();
+                  }}
+                  type="button"
+                >
+                  Save label
+                </button>
+              </div>
+            ) : null}
           </div>
         </>
       ) : null}

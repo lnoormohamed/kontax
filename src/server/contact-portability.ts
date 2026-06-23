@@ -1217,18 +1217,47 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
         return [];
       };
 
+      const isStandardLabel = (
+        kind: "email" | "phone" | "website" | "address",
+        label: string,
+      ) => {
+        const normalized = label.trim().toLowerCase();
+        if (!normalized) {
+          return true;
+        }
+
+        const types = normalizeTypeValues(kind, label);
+        const normalizedTypes = [...new Set(types.map((type) => type.toLowerCase()))];
+        const isGenericOther =
+          normalizedTypes.length === 1 && normalizedTypes[0] === "other";
+
+        if (isGenericOther) {
+          return ["other", "alt", "alternate"].includes(normalized);
+        }
+
+        return normalizedTypes.length > 0;
+      };
+
       const appendTypedLine = (
         property: "EMAIL" | "TEL" | "URL" | "ADR",
         value: string,
         types: string[],
+        customLabel?: string | null,
       ) => {
         const uniqueTypes = [...new Set(types.filter(Boolean))];
         const typeSegment = uniqueTypes.length > 0 ? `;TYPE=${uniqueTypes.join(",")}` : "";
+        const groupPrefix = customLabel ? `item${lines.length + 1}.` : "";
         if (property === "ADR") {
-          lines.push(`${property}${typeSegment}:${value}`);
+          lines.push(`${groupPrefix}${property}${typeSegment}:${value}`);
+          if (customLabel) {
+            lines.push(`${groupPrefix}X-ABLabel:${escapeVCard(customLabel)}`);
+          }
           return;
         }
-        lines.push(`${property}${typeSegment}:${escapeVCard(value)}`);
+        lines.push(`${groupPrefix}${property}${typeSegment}:${escapeVCard(value)}`);
+        if (customLabel) {
+          lines.push(`${groupPrefix}X-ABLabel:${escapeVCard(customLabel)}`);
+        }
       };
 
       const dedupeEntryValues = (entries: ContactValueEntryInput[] | null | undefined) => {
@@ -1287,7 +1316,12 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
         for (const entry of emailEntries) {
           const types = normalizeTypeValues("email", entry.label);
           if (entry.isPrimary) types.push("PREF");
-          appendTypedLine("EMAIL", entry.value, types);
+          appendTypedLine(
+            "EMAIL",
+            entry.value,
+            types,
+            isStandardLabel("email", entry.label) ? null : entry.label.trim(),
+          );
         }
       } else {
         if (contact.email) {
@@ -1305,7 +1339,12 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
         for (const entry of phoneEntries) {
           const types = normalizeTypeValues("phone", entry.label);
           if (entry.isPrimary) types.push("PREF");
-          appendTypedLine("TEL", entry.value, types);
+          appendTypedLine(
+            "TEL",
+            entry.value,
+            types,
+            isStandardLabel("phone", entry.label) ? null : entry.label.trim(),
+          );
         }
       } else {
         if (contact.phone) {
@@ -1341,7 +1380,12 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
         for (const entry of websiteEntries) {
           const types = normalizeTypeValues("website", entry.label);
           if (entry.isPrimary) types.push("PREF");
-          appendTypedLine("URL", entry.value, types);
+          appendTypedLine(
+            "URL",
+            entry.value,
+            types,
+            isStandardLabel("website", entry.label) ? null : entry.label.trim(),
+          );
         }
       } else if (contact.website) {
         lines.push(`URL:${escapeVCard(contact.website)}`);
@@ -1372,6 +1416,7 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
               entry.countryOrRegion,
             ]),
             types,
+            isStandardLabel("address", entry.label) ? null : entry.label.trim(),
           );
         }
       } else {
