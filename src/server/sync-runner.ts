@@ -48,14 +48,18 @@ type SyncContactRow = {
   nickname: string | null;
   email: string | null;
   emailAddresses: unknown;
+  emailEntries?: unknown;
   phone: string | null;
   phoneNumbers: unknown;
+  phoneEntries?: unknown;
   company: string | null;
   jobTitle: string | null;
   website: string | null;
+  websiteEntries?: unknown;
   birthday: string | null;
   address: string | null;
   postalAddresses: unknown;
+  addressEntries?: unknown;
   notes: string | null;
 };
 
@@ -68,6 +72,48 @@ type SyncPushContactRow = SyncContactRow & {
 const safeStringArray = (v: unknown): string[] =>
   Array.isArray(v) ? v.filter((x): x is string => typeof x === "string") : [];
 
+const safeValueEntries = (value: unknown) =>
+  Array.isArray(value)
+    ? value.flatMap((entry) => {
+        if (
+          typeof entry !== "object" ||
+          entry === null ||
+          typeof (entry as { value?: unknown }).value !== "string"
+        ) {
+          return [];
+        }
+
+        return [
+          {
+            label: typeof (entry as { label?: unknown }).label === "string" ? (entry as { label: string }).label : "",
+            value: (entry as { value: string }).value,
+            isPrimary: (entry as { isPrimary?: unknown }).isPrimary === true,
+          },
+        ];
+      })
+    : [];
+
+const safeAddressEntries = (value: unknown) =>
+  Array.isArray(value)
+    ? value.flatMap((entry) => {
+        if (
+          typeof entry !== "object" ||
+          entry === null ||
+          typeof (entry as { formatted?: unknown }).formatted !== "string"
+        ) {
+          return [];
+        }
+
+        return [
+          {
+            label: typeof (entry as { label?: unknown }).label === "string" ? (entry as { label: string }).label : "",
+            formatted: (entry as { formatted: string }).formatted,
+            isPrimary: (entry as { isPrimary?: unknown }).isPrimary === true,
+          },
+        ];
+      })
+    : [];
+
 const contactToPortable = (c: SyncContactRow): PortableContactInput => ({
   fullName: c.fullName,
   firstName: c.firstName,
@@ -75,16 +121,20 @@ const contactToPortable = (c: SyncContactRow): PortableContactInput => ({
   nickname: c.nickname,
   email: c.email,
   emailAddresses: safeStringArray(c.emailAddresses),
+  emailEntries: safeValueEntries(c.emailEntries),
   phone: c.phone,
   phoneNumbers: safeStringArray(c.phoneNumbers),
+  phoneEntries: safeValueEntries(c.phoneEntries),
   company: c.company,
   jobTitle: c.jobTitle,
   website: c.website,
+  websiteEntries: safeValueEntries(c.websiteEntries),
   birthday: c.birthday,
   address: c.address,
   postalAddresses: Array.isArray(c.postalAddresses)
     ? (c.postalAddresses as PortableContactInput["postalAddresses"])
     : null,
+  addressEntries: safeAddressEntries(c.addressEntries),
   notes: c.notes,
 });
 
@@ -101,14 +151,18 @@ const cardDavPushContactSelect = {
   nickname: true,
   email: true,
   emailAddresses: true,
+  emailEntries: true,
   phone: true,
   phoneNumbers: true,
+  phoneEntries: true,
   company: true,
   jobTitle: true,
   website: true,
+  websiteEntries: true,
   birthday: true,
   address: true,
   postalAddresses: true,
+  addressEntries: true,
   notes: true,
 } satisfies Prisma.ContactSelect;
 

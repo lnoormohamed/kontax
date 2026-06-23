@@ -26,6 +26,18 @@ export type ContactPostalAddressInput = {
   formatted: string;
 };
 
+export type ContactValueEntryInput = {
+  label: string;
+  value: string;
+  isPrimary?: boolean;
+};
+
+export type ContactAddressEntryInput = {
+  label: string;
+  formatted: string;
+  isPrimary?: boolean;
+};
+
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
 
@@ -59,15 +71,19 @@ export type PortableContactInput = {
   nickname?: string | null;
   email?: string | null;
   emailAddresses?: string[] | null;
+  emailEntries?: ContactValueEntryInput[] | null;
   phone?: string | null;
   phoneNumbers?: string[] | null;
+  phoneEntries?: ContactValueEntryInput[] | null;
   company?: string | null;
   phoneticCompany?: string | null;
   jobTitle?: string | null;
   website?: string | null;
+  websiteEntries?: ContactValueEntryInput[] | null;
   birthday?: string | null;
   address?: string | null;
   postalAddresses?: ContactPostalAddressInput[] | null;
+  addressEntries?: ContactAddressEntryInput[] | null;
   notes?: string | null;
   customFields?: Record<string, string> | null;
 };
@@ -1139,6 +1155,66 @@ export const contactsToCsv = (contacts: PortableContactInput[]) => {
 export const contactsToVCard = (contacts: PortableContactInput[]) =>
   contacts
     .map((contact) => {
+      const normalizeTypeValues = (
+        kind: "email" | "phone" | "website" | "address",
+        label: string,
+      ): string[] => {
+        const normalized = label.trim().toLowerCase();
+        if (!normalized) return [];
+
+        const commonMap: Record<string, string[]> = {
+          mobile: ["CELL"],
+          cell: ["CELL"],
+          iphone: ["CELL"],
+          work: ["WORK"],
+          office: ["WORK"],
+          business: ["WORK"],
+          company: ["WORK"],
+          home: ["HOME"],
+          personal: ["HOME"],
+          main: ["PREF"],
+          primary: ["PREF"],
+          fax: ["FAX"],
+        };
+
+        const addressMap: Record<string, string[]> = {
+          work: ["WORK"],
+          office: ["WORK"],
+          business: ["WORK"],
+          home: ["HOME"],
+          personal: ["HOME"],
+          postal: ["POSTAL"],
+          mailing: ["POSTAL"],
+        };
+
+        const value = kind === "address" ? addressMap[normalized] : commonMap[normalized];
+        return value ?? ["OTHER"];
+      };
+
+      const appendTypedLine = (
+        property: "EMAIL" | "TEL" | "URL" | "ADR",
+        value: string,
+        types: string[],
+      ) => {
+        const uniqueTypes = [...new Set(types.filter(Boolean))];
+        const typeSegment = uniqueTypes.length > 0 ? `;TYPE=${uniqueTypes.join(",")}` : "";
+        if (property === "ADR") {
+          lines.push(`${property}${typeSegment}:${value}`);
+          return;
+        }
+        lines.push(`${property}${typeSegment}:${escapeVCard(value)}`);
+      };
+
+      const dedupeEntryValues = (entries: ContactValueEntryInput[] | null | undefined) => {
+        const seen = new Set<string>();
+        return (entries ?? []).filter((entry) => {
+          const key = entry.value.trim().toLowerCase();
+          if (!key || seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+      };
+
       const lines = [
         "BEGIN:VCARD",
         "VERSION:3.0",
@@ -1168,24 +1244,40 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
         lines.push(`X-KONTAX-PINYIN-LAST-NAME:${escapeVCard(contact.phoneticLastName)}`);
       }
 
-      if (contact.email) {
-        lines.push(`EMAIL:${escapeVCard(contact.email)}`);
+      const emailEntries = dedupeEntryValues(contact.emailEntries);
+      if (emailEntries.length > 0) {
+        for (const entry of emailEntries) {
+          const types = normalizeTypeValues("email", entry.label);
+          if (entry.isPrimary) types.push("PREF");
+          appendTypedLine("EMAIL", entry.value, types);
+        }
+      } else {
+        if (contact.email) {
+          lines.push(`EMAIL:${escapeVCard(contact.email)}`);
+        }
+        for (const emailValue of (contact.emailAddresses ?? []).filter(
+          (value) => value !== contact.email,
+        )) {
+          lines.push(`EMAIL:${escapeVCard(emailValue)}`);
+        }
       }
 
-      for (const emailValue of (contact.emailAddresses ?? []).filter(
-        (value) => value !== contact.email,
-      )) {
-        lines.push(`EMAIL:${escapeVCard(emailValue)}`);
-      }
-
-      if (contact.phone) {
-        lines.push(`TEL:${escapeVCard(contact.phone)}`);
-      }
-
-      for (const phoneValue of (contact.phoneNumbers ?? []).filter(
-        (value) => value !== contact.phone,
-      )) {
-        lines.push(`TEL:${escapeVCard(phoneValue)}`);
+      const phoneEntries = dedupeEntryValues(contact.phoneEntries);
+      if (phoneEntries.length > 0) {
+        for (const entry of phoneEntries) {
+          const types = normalizeTypeValues("phone", entry.label);
+          if (entry.isPrimary) types.push("PREF");
+          appendTypedLine("TEL", entry.value, types);
+        }
+      } else {
+        if (contact.phone) {
+          lines.push(`TEL:${escapeVCard(contact.phone)}`);
+        }
+        for (const phoneValue of (contact.phoneNumbers ?? []).filter(
+          (value) => value !== contact.phone,
+        )) {
+          lines.push(`TEL:${escapeVCard(phoneValue)}`);
+        }
       }
 
       if (contact.nickname) {
@@ -1204,7 +1296,14 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
         lines.push(`TITLE:${escapeVCard(contact.jobTitle)}`);
       }
 
-      if (contact.website) {
+      const websiteEntries = dedupeEntryValues(contact.websiteEntries);
+      if (websiteEntries.length > 0) {
+        for (const entry of websiteEntries) {
+          const types = normalizeTypeValues("website", entry.label);
+          if (entry.isPrimary) types.push("PREF");
+          appendTypedLine("URL", entry.value, types);
+        }
+      } else if (contact.website) {
         lines.push(`URL:${escapeVCard(contact.website)}`);
       }
 
@@ -1212,14 +1311,27 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
         lines.push(`BDAY:${escapeVCard(contact.birthday)}`);
       }
 
-      if (contact.address) {
-        lines.push(`ADR:;;${escapeVCard(contact.address)};;;;`);
-      }
+      const addressEntries = (contact.addressEntries ?? []).filter(
+        (entry, index, entries) =>
+          entry.formatted.trim().length > 0 &&
+          entries.findIndex((other) => other.formatted.trim().toLowerCase() === entry.formatted.trim().toLowerCase()) === index,
+      );
+      if (addressEntries.length > 0) {
+        for (const entry of addressEntries) {
+          const types = normalizeTypeValues("address", entry.label);
+          if (entry.isPrimary) types.push("PREF");
+          appendTypedLine("ADR", `;;${escapeVCard(entry.formatted)};;;;`, types);
+        }
+      } else {
+        if (contact.address) {
+          lines.push(`ADR:;;${escapeVCard(contact.address)};;;;`);
+        }
 
-      for (const postalAddress of (contact.postalAddresses ?? []).filter(
-        (value) => value.formatted !== contact.address,
-      )) {
-        lines.push(`ADR:;;${escapeVCard(postalAddress.formatted)};;;;`);
+        for (const postalAddress of (contact.postalAddresses ?? []).filter(
+          (value) => value.formatted !== contact.address,
+        )) {
+          lines.push(`ADR:;;${escapeVCard(postalAddress.formatted)};;;;`);
+        }
       }
 
       if (contact.notes) {
