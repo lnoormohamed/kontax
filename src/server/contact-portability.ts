@@ -1174,12 +1174,20 @@ export const contactsToVCard = (contacts: PortableContactInput[]) =>
       ): string[] => {
         const normalized = label.trim().toLowerCase();
         if (!normalized) {
-          if (kind === "email" || kind === "phone" || kind === "address") return ["OTHER"];
+          if (kind === "email" || kind === "phone" || kind === "address" || kind === "website") {
+            return ["OTHER"];
+          }
           return [];
         }
 
         if (kind === "website") {
-          return normalized === "primary" || normalized === "main" ? ["PREF"] : [];
+          if (normalized === "primary" || normalized === "main") {
+            return ["PREF"];
+          }
+          if (["website", "homepage", "home page", "other"].includes(normalized)) {
+            return ["OTHER"];
+          }
+          return ["OTHER"];
         }
 
         const commonMap: Record<string, string[]> = {
