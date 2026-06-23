@@ -743,29 +743,32 @@ export const discoverCardDavAccount = async ({
   credentials: CardDavCredentials;
 }): Promise<CardDavDiscoveryResult> => {
   const normalizedBaseUrl = normalizeUrl(baseUrl);
-  const baseXml = await propfind({
-    url: normalizedBaseUrl,
-    credentials,
-    depth: 0,
-    body: BASE_DISCOVERY_BODY,
-  });
-  const baseSummary = getFirstSummary(baseXml, normalizedBaseUrl);
+  let baseSummary: CardDavResponseSummary | null = null;
+  if (!principalUrl && !addressBookUrl) {
+    const baseXml = await propfind({
+      url: normalizedBaseUrl,
+      credentials,
+      depth: 0,
+      body: BASE_DISCOVERY_BODY,
+    });
+    baseSummary = getFirstSummary(baseXml, normalizedBaseUrl);
 
-  if (!baseSummary) {
-    throw new CardDavPreflightError(
-      "CARDDAV_DISCOVERY_EMPTY",
-      "CardDAV preflight received an empty discovery response.",
-    );
+    if (!baseSummary) {
+      throw new CardDavPreflightError(
+        "CARDDAV_DISCOVERY_EMPTY",
+        "CardDAV preflight received an empty discovery response.",
+      );
+    }
   }
 
   let resolvedPrincipalUrl =
-    principalUrl != null ? normalizeUrl(principalUrl) : (baseSummary.currentUserPrincipal ?? null);
+    principalUrl != null ? normalizeUrl(principalUrl) : (baseSummary?.currentUserPrincipal ?? null);
   let resolvedAddressBookUrl =
     addressBookUrl != null ? normalizeUrl(addressBookUrl) : null;
-  let resolvedRemoteCTag = baseSummary.ctag;
-  let resolvedDisplayName = baseSummary.displayName;
+  let resolvedRemoteCTag = baseSummary?.ctag ?? null;
+  let resolvedDisplayName = baseSummary?.displayName ?? null;
 
-  if (!resolvedAddressBookUrl && isAddressBookResource(baseSummary) && baseSummary.resolvedHref) {
+  if (!resolvedAddressBookUrl && baseSummary && isAddressBookResource(baseSummary) && baseSummary.resolvedHref) {
     resolvedAddressBookUrl = baseSummary.resolvedHref;
   }
 
@@ -774,7 +777,7 @@ export const discoverCardDavAccount = async ({
   }
 
   if (!resolvedAddressBookUrl) {
-    let addressBookHomeSetUrl = baseSummary.addressBookHomeSet;
+    let addressBookHomeSetUrl = baseSummary?.addressBookHomeSet ?? null;
 
     if (!addressBookHomeSetUrl && resolvedPrincipalUrl) {
       const principalXml = await propfind({
@@ -860,24 +863,27 @@ export const discoverCardDavAddressBooks = async ({
   credentials: CardDavCredentials;
 }): Promise<CardDavDiscoveredBook[]> => {
   const normalizedBaseUrl = normalizeUrl(baseUrl);
-  const baseXml = await propfind({
-    url: normalizedBaseUrl,
-    credentials,
-    depth: 0,
-    body: BASE_DISCOVERY_BODY,
-  });
-  const baseSummary = getFirstSummary(baseXml, normalizedBaseUrl);
+  let baseSummary: CardDavResponseSummary | null = null;
+  if (!principalUrl) {
+    const baseXml = await propfind({
+      url: normalizedBaseUrl,
+      credentials,
+      depth: 0,
+      body: BASE_DISCOVERY_BODY,
+    });
+    baseSummary = getFirstSummary(baseXml, normalizedBaseUrl);
 
-  if (!baseSummary) {
-    throw new CardDavPreflightError(
-      "CARDDAV_DISCOVERY_EMPTY",
-      "CardDAV discovery received an empty response.",
-    );
+    if (!baseSummary) {
+      throw new CardDavPreflightError(
+        "CARDDAV_DISCOVERY_EMPTY",
+        "CardDAV discovery received an empty response.",
+      );
+    }
   }
 
-  let homeSetUrl = baseSummary.addressBookHomeSet;
+  let homeSetUrl = baseSummary?.addressBookHomeSet ?? null;
   const resolvedPrincipalUrl =
-    principalUrl != null ? normalizeUrl(principalUrl) : (baseSummary.currentUserPrincipal ?? null);
+    principalUrl != null ? normalizeUrl(principalUrl) : (baseSummary?.currentUserPrincipal ?? null);
 
   if (!homeSetUrl && resolvedPrincipalUrl) {
     const principalXml = await propfind({
