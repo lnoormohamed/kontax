@@ -1302,7 +1302,8 @@ export const contactsToVCard = (
         customLabel?: string | null,
       ) => {
         const uniqueTypes = [...new Set(types.filter(Boolean))];
-        const typeSegment = uniqueTypes.length > 0 ? `;TYPE=${uniqueTypes.join(",")}` : "";
+        const typeSegment =
+          uniqueTypes.length > 0 ? uniqueTypes.map((type) => `;TYPE=${type}`).join("") : "";
         const groupPrefix = customLabel ? `item${customGroupIndex++}.` : "";
         if (property === "ADR") {
           lines.push(`${groupPrefix}${property}${typeSegment}:${value}`);

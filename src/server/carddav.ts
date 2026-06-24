@@ -333,7 +333,8 @@ const parseVCardParams = (parts: string[]) =>
         })
         .filter(Boolean) ?? [""];
 
-    acc[key] = values;
+    const existingValues = acc[key] ?? [];
+    acc[key] = [...existingValues, ...values];
     return acc;
   }, {});
 
