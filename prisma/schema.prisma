@@ -643,9 +643,19 @@ model SyncAccount {
     // P34G-01: stable logical connection identity. Nullable for deploy-safe
     // `db push`; all new writes set it immediately and a backfill script fills
     // legacy rows before any code relies on it being present.
-    connectionId        String?           @unique
-    replacesSyncAccountId String?         @unique
-    replacedBySyncAccountId String?       @unique
+    //
+    // IMPORTANT: do not add a DB-level @unique here. The production container
+    // runs `prisma db push` during startup, and Prisma treats new unique
+    // constraints on existing tables as potential data-loss operations. That
+    // would crash-loop the app unless someone manually applies `--accept-data-loss`.
+    // We keep this indexed and enforce the intended one-row-per-logical-connection
+    // behavior in app code / invariants instead.
+    connectionId        String?
+    // Replacement lineage links are also intentionally non-unique at the schema
+    // level for the same deploy-safety reason. They remain indexed for support
+    // queries and validated by lineage invariants.
+    replacesSyncAccountId String?
+    replacedBySyncAccountId String?
     provider            SyncProvider      @default(CARDDAV)
     status              SyncAccountStatus @default(PAUSED)
     syncDirection       SyncDirection     @default(TWO_WAY)
@@ -686,9 +696,9 @@ model SyncAccount {
     updatedAt           DateTime          @updatedAt
     user                User              @relation(fields: [userId], references: [id], onDelete: Cascade)
     replacesSyncAccount SyncAccount?      @relation("SyncAccountReplaces", fields: [replacesSyncAccountId], references: [id], onDelete: SetNull)
-    replacementChild    SyncAccount?      @relation("SyncAccountReplaces")
+    replacementChildren SyncAccount[]     @relation("SyncAccountReplaces")
     replacedBySyncAccount SyncAccount?    @relation("SyncAccountReplacedBy", fields: [replacedBySyncAccountId], references: [id], onDelete: SetNull)
-    replacedAccount     SyncAccount?      @relation("SyncAccountReplacedBy")
+    replacedAccounts    SyncAccount[]     @relation("SyncAccountReplacedBy")
     syncLinks           SyncContactLink[]
     syncJobs            SyncJob[]
     syncConflicts       SyncConflict[]
@@ -696,6 +706,7 @@ model SyncAccount {
     settings            SyncAccountSettings?
 
     @@index([userId, status, updatedAt])
+    @@index([connectionId])
     @@index([replacesSyncAccountId])
     @@index([replacedBySyncAccountId])
     @@unique([userId, baseUrl, label])
